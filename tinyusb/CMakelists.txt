@@ -1,0 +1,30 @@
+set(TUSB_SRCS 
+    tinyusb/
+    tinyusb/src/tusb.c
+	tinyusb/src/common/tusb_fifo.c
+	tinyusb/src/device/usbd.c
+	tinyusb/src/device/usbd_control.c
+	tinyusb/src/class/cdc/cdc_device.c
+	tinyusb/src/class/dfu/dfu_rt_device.c
+	tinyusb/src/class/hid/hid_device.c
+	tinyusb/src/class/midi/midi_device.c
+	tinyusb/src/class/msc/msc_device.c
+	tinyusb/src/class/net/net_device.c
+	tinyusb/src/class/usbtmc/usbtmc_device.c
+	tinyusb/src/class/vendor/vendor_device.c
+	tinyusb/src/portable/nordic/nrf5x/dcd_nrf5x.c
+)
+
+add_library(tusb STATIC ${TUSB_SRCS})
+
+set(NRF5_SDK ../nRF5_SDK_17.0.0_9d13099)
+
+target_include_directories(tusb PUBLIC tinyusb/src ./ 
+    ${NRF5_SDK}/modules/nrfx
+    ${NRF5_SDK}/modules/nrfx/mdk
+    ${NRF5_SDK}/modules/nrfx/hal
+    ${NRF5_SDK}/modules/nrfx/drivers/src
+    ${NRF5_SDK}/integration/nrfx 
+    ${NRF5_SDK}/components/toolchain/cmsis/include
+    ${NRF5_SDK}/components/libraries/util
+    ${NRF5_SDK}/components/softdevice/s140/headers)
