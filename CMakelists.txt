@@ -7,3 +7,7 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
 set(CMAKE_CROSSCOMPILING 1)
 
 set(CMAKE_C_COMPILER arm-none-eabi-gcc CACHE PATH "" FORCE)
+
+add_sub_directory(tinyusb)
+add_sub_directory(tmk)
+add_sub_directory(main)
