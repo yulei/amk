@@ -1,6 +1,3 @@
-[submodule "tinyusb/tinyusb"]
-	path = tinyusb/tinyusb
-	url = https://github.com/hathach/tinyusb.git
 [submodule "tmk/tmk"]
 	path = tmk/tmk
 	url = https://github.com/tmk/tmk_keyboard.git
