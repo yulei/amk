@@ -1,20 +1,22 @@
+
+set(TUSB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/tinyusb/src")
 set(TUSB_SRCS 
-  tinyusb/src/tusb.c
-	tinyusb/src/common/tusb_fifo.c
-	tinyusb/src/device/usbd.c
-	tinyusb/src/device/usbd_control.c
-	tinyusb/src/class/cdc/cdc_device.c
-	tinyusb/src/class/dfu/dfu_rt_device.c
-	tinyusb/src/class/hid/hid_device.c
-	tinyusb/src/class/midi/midi_device.c
-	tinyusb/src/class/msc/msc_device.c
-	tinyusb/src/class/net/net_device.c
-	tinyusb/src/class/usbtmc/usbtmc_device.c
-	tinyusb/src/class/vendor/vendor_device.c
-	tinyusb/src/portable/nordic/nrf5x/dcd_nrf5x.c
+  ${TUSB_PATH}/tusb.c
+	${TUSB_PATH}/common/tusb_fifo.c
+	${TUSB_PATH}/device/usbd.c
+	${TUSB_PATH}/device/usbd_control.c
+	${TUSB_PATH}/class/cdc/cdc_device.c
+	${TUSB_PATH}/class/dfu/dfu_rt_device.c
+	${TUSB_PATH}/class/hid/hid_device.c
+	${TUSB_PATH}/class/midi/midi_device.c
+	${TUSB_PATH}/class/msc/msc_device.c
+	${TUSB_PATH}/class/net/net_device.c
+	${TUSB_PATH}/class/usbtmc/usbtmc_device.c
+	${TUSB_PATH}/class/vendor/vendor_device.c
+	${TUSB_PATH}/portable/nordic/nrf5x/dcd_nrf5x.c
 )
 
 add_library(tusb STATIC ${TUSB_SRCS})
 
-target_include_directories(tusb PUBLIC "./" "./tinyusb/src/" )
+target_include_directories(tusb PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${TUSB_PATH}" )
 target_link_libraries(tusb PUBLIC nrf5_sdk)
