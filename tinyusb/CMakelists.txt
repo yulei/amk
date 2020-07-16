@@ -1,6 +1,5 @@
 set(TUSB_SRCS 
-    tinyusb/
-    tinyusb/src/tusb.c
+  tinyusb/src/tusb.c
 	tinyusb/src/common/tusb_fifo.c
 	tinyusb/src/device/usbd.c
 	tinyusb/src/device/usbd_control.c
@@ -17,14 +16,5 @@ set(TUSB_SRCS
 
 add_library(tusb STATIC ${TUSB_SRCS})
 
-set(NRF5_SDK ../nRF5_SDK_17.0.0_9d13099)
-
-target_include_directories(tusb PUBLIC tinyusb/src ./ 
-    ${NRF5_SDK}/modules/nrfx
-    ${NRF5_SDK}/modules/nrfx/mdk
-    ${NRF5_SDK}/modules/nrfx/hal
-    ${NRF5_SDK}/modules/nrfx/drivers/src
-    ${NRF5_SDK}/integration/nrfx 
-    ${NRF5_SDK}/components/toolchain/cmsis/include
-    ${NRF5_SDK}/components/libraries/util
-    ${NRF5_SDK}/components/softdevice/s140/headers)
+target_include_directories(tusb PUBLIC "./" "./tinyusb/src/" )
+target_link_libraries(tusb PUBLIC nrf5_sdk)

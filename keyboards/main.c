@@ -1,7 +1,7 @@
-#include <stdio.h>
+//#include <stdio.h>
 
-int main(int argc, char argv[])
+int main(int argc, char* argv[])
 {
-    printf("hello astro\n");
+ //   printf("hello astro\n");
     return 0;
 }

@@ -1,15 +1,13 @@
 cmake_minimum_required(VERSION 3.15)
 
+set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 project(astro VERSION 0.0.1
-            DESCRIPTION "Keyboard firmware")
+            DESCRIPTION "Keyboard firmware"
+            LANGUAGES C ASM)
 
-set(CMAKE_SYSTEM_NAME  Generic)
-set(CMAKE_SYSTEM_PROCESSOR ARM)
-set(CMAKE_CROSSCOMPILING 1)
+set(NRF5_SDK_PATH "${PROJECT_SOURCE_DIR}/nrf5_sdk/nRF5_SDK_17.0.0_9d13099")
 
-set(CMAKE_C_COMPILER arm-none-eabi-gcc CACHE PATH "" FORCE)
-set(CMAKE_C_FLAGS  "-std=gnu99 -DNRF52840_XXAA -DCONFIG_GPIO_AS_PINRESET" CACHE INTERNAL "C Compiler options")
-
+add_subdirectory(nrf5_sdk)
 add_subdirectory(tinyusb)
 add_subdirectory(tmk)
 add_subdirectory(main)
