@@ -20,7 +20,7 @@ endif()
 # Perform compiler test with static library
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
-set(OBJECT_GEN_FLAGS "-DNRF52840_XXAA -mthumb -mabi=aapcs -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16")
+set(OBJECT_GEN_FLAGS "-DSTM32F411xE -DUSE_HAL_DRIVER -mthumb -mabi=aapcs -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16")
 # Set compiler linker flags
 set(OBJECT_CXX_GEN_GLAGS "${OBJECT_GEN_FLAGS} -fdata-sections -ffunction-sections -fno-builtin -fno-strict-aliasing -fshort-enums -Wall")
 

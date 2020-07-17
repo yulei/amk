@@ -4,9 +4,9 @@ project(astro VERSION 0.0.1
             DESCRIPTION "Keyboard firmware"
             LANGUAGES C ASM)
 
-set(NRF5_SDK_PATH "${PROJECT_SOURCE_DIR}/nrf5_sdk/nRF5_SDK_17.0.0_9d13099")
 
-add_subdirectory(nrf5_sdk)
+#add_subdirectory(nrf5_sdk)
+add_subdirectory(stm32_sdk)
 add_subdirectory(tinyusb)
 add_subdirectory(tmk)
 add_subdirectory(main)
