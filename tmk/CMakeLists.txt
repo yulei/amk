@@ -2,7 +2,7 @@
 set(TMK_PATH "tmk/tmk_core")
 add_library(tmk STATIC "")
 target_sources(tmk
-      PRIVATE 
+    PRIVATE 
         ${TMK_PATH}/common/host.c
         ${TMK_PATH}/common/keyboard.c
         ${TMK_PATH}/common/matrix.c
@@ -15,19 +15,17 @@ target_sources(tmk
         ${TMK_PATH}/common/debug.c
         ${TMK_PATH}/common/util.c 
         ${TMK_PATH}/common/hook.c
-      PUBLIC
-        ${TMK_PATH}/common/matrix.h
-        ${TMK_PATH}/common/host.h
+        ${TMK_PATH}/common/keymap.c
       ) 
 
 target_include_directories(tmk
-      PUBLIC
+    PUBLIC
         ${TMK_PATH}/common
         ${TMK_PATH}/
         ${CMAKE_CURRENT_LIST_DIR})
 
 target_compile_options(tmk
-      PRIVATE
-      -include config.h
+    PUBLIC   
+        -include config.h
     )
       

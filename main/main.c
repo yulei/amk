@@ -31,22 +31,44 @@
 #include "tusb.h"
 #include "usb_descriptors.h"
 
-void hid_task(void);
+#include "keyboard.h"
+#include "host.h"
+
+static uint8_t keyboard_leds(void);
+static void send_keyboard(report_keyboard_t *report);
+static void send_mouse(report_mouse_t *report);
+static void send_system(uint16_t data);
+static void send_consumer(uint16_t data);
+host_driver_t tusb_driver = {
+    keyboard_leds,
+    send_keyboard,
+    send_mouse,
+    send_system,
+    send_consumer
+};
 
 /*------------- MAIN -------------*/
 int main(void)
 {
-  board_init();
-  tusb_init();
+    board_init();
+    keyboard_setup();
+  
+    tusb_init();
+    keyboard_init();
+    host_set_driver(&tusb_driver);
+    while (1)
+    {
+        tud_task(); // tinyusb device task
+        //if ( tud_suspended()) {
+            // Wake up host if we are in suspend mode
+            // and REMOTE_WAKEUP feature is enabled by host
+            //    tud_remote_wakeup();
+        //} else {
+            keyboard_task(); // tmk task
+        //}
+    }
 
-  while (1)
-  {
-    tud_task(); // tinyusb device task
-
-    hid_task();
-  }
-
-  return 0;
+    return 0;
 }
 
 //--------------------------------------------------------------------+
@@ -76,34 +98,6 @@ void tud_resume_cb(void)
 {
 }
 
-//--------------------------------------------------------------------+
-// USB HID
-//--------------------------------------------------------------------+
-
-void hid_task(void)
-{
-  // Poll every 10ms
-  const uint32_t interval_ms = 10;
-  static uint32_t start_ms = 0;
-
-  if ( board_millis() - start_ms < interval_ms) return; // not enough time
-  start_ms += interval_ms;
-
-  // Remote wakeup
-//  if ( tud_suspended() && btn )
-//  {
-    // Wake up host if we are in suspend mode
-    // and REMOTE_WAKEUP feature is enabled by host
-//    tud_remote_wakeup();
-//  }
-
-  /*------------- Keyboard -------------*/
-  if ( tud_hid_ready() )
-  {
-  }
-}
-
-
 // Invoked when received GET_REPORT control request
 // Application must fill buffer report's content and return its length.
 // Return zero will cause the stack to STALL request
@@ -128,3 +122,16 @@ void tud_hid_set_report_cb(uint8_t report_id, hid_report_type_t report_type, uin
   (void) buffer;
   (void) bufsize;
 }
+
+// tmk callback
+uint8_t keyboard_leds(void)
+{
+    return 0;
+}
+
+void send_keyboard(report_keyboard_t *report)
+{}
+void send_mouse(report_mouse_t *report)
+{}
+void send_system(uint16_t data){}
+void send_consumer(uint16_t data){}
