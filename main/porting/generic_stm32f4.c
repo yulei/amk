@@ -4,7 +4,9 @@
 
 #include "stm32f4xx_hal.h"
 #include "board.h"
+#include "tusb.h"
 
+static void Error_Handler(void);
 //--------------------------------------------------------------------+
 // Forward USB interrupt events to TinyUSB IRQ Handler
 //--------------------------------------------------------------------+
@@ -99,6 +101,7 @@ void board_init(void)
 
   /* Configure USB FS GPIOs */
   /* Configure USB D+ D- Pins */
+  GPIO_InitTypeDef GPIO_InitStruct;
   GPIO_InitStruct.Pin = GPIO_PIN_11 | GPIO_PIN_12;
   GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -129,7 +132,7 @@ uint32_t board_millis(void)
 
 void HardFault_Handler (void)
 {
-  asm("bkpt");
+  //asm("bkpt");
 }
 
 void Error_Handler(void)
@@ -137,7 +140,7 @@ void Error_Handler(void)
 
 // Required by __libc_init_array in startup code if we are compiling using
 // -nostdlib/-nostartfiles.
-void _init(void)
+/*void _init(void)
 {
 
-}
+}*/

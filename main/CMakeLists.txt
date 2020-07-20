@@ -1,11 +1,7 @@
 add_executable(kbd "")
 
 target_link_libraries(kbd PRIVATE tusb)
-target_sources(kbd PRIVATE main.c)
-target_include_directories(kbd 
-      PRIVATE
-      ../tinyusb 
-      ../tinyusb/tinyusb/src) 
+target_sources(kbd PRIVATE main.c usb_descriptors.c)
 
 if (MCU_TYPE STREQUAL "NRF52840")
   set(NRF5_MDK_PATH "${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nRF5_SDK_17.0.0_9d13099/modules/nrfx/mdk")
@@ -17,9 +13,3 @@ elseif(MCU_TYPE STREQUAL "STM32F411")
 else()
   message(ERROR "unknown platform on main application building")
 endif()
-
-message(STATUS "get include directories")
-get_property(dirs TARGET kbd PROPERTY INCLUDE_DIRECTORIES)
-foreach(dir ${dirs})
-  message(STATUS "dir='${dir}'")
-endforeach()

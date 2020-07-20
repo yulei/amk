@@ -35,7 +35,6 @@
 //--------------------------------------------------------------------
 
 // defined by board.mk
-
 #ifndef CFG_TUSB_MCU
   #error CFG_TUSB_MCU must be defined
 #endif
