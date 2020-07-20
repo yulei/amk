@@ -4,9 +4,8 @@ set(TUSB_PATH "tinyusb/src")
 add_library(tusb STATIC "")
 
 target_include_directories(tusb
-      PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR} 
       PUBLIC
+        ${CMAKE_CURRENT_LIST_DIR} 
         ${TUSB_PATH}
       )
 
@@ -33,12 +32,14 @@ if (MCU_TYPE STREQUAL "NRF52840")
         ${TUSB_PATH}/portable/nordic/nrf5x/dcd_nrf5x.c
   )
   target_link_libraries(tusb PUBLIC nrf5_sdk)
+  target_compile_definitions(tusb PUBLIC CFG_TUSB_MCU=OPT_MCU_NRF5X)
 elseif(MCU_TYPE STREQUAL "STM32F411")
   target_sources(tusb
         PRIVATE 
         ${TUSB_PATH}/portable/st/synopsys/dcd_synopsys.c
   )
   target_link_libraries(tusb PUBLIC stm32_sdk)
+  target_compile_definitions(tusb PUBLIC CFG_TUSB_MCU=OPT_MCU_STM32F4)
 else()
   message(ERROR "unknown platform on tinyusb building")
 endif()
