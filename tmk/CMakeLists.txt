@@ -16,7 +16,7 @@ target_sources(tmk
         ${TMK_PATH}/common/util.c 
         ${TMK_PATH}/common/hook.c
         ${TMK_PATH}/common/keymap.c
-      ) 
+    ) 
 
 target_include_directories(tmk
     PUBLIC
@@ -28,4 +28,3 @@ target_compile_options(tmk
     PUBLIC   
         -include config.h
     )
-      

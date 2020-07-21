@@ -16,3 +16,6 @@
 /* key matrix size */
 #define MATRIX_ROWS 6
 #define MATRIX_COLS 16
+
+#define MATRIX_ROW_PINS {{GPIOA, 0}}
+#define MATRIX_COL_PINS {{GPIOB, 0}}

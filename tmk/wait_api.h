@@ -1,4 +1,4 @@
 #pragma once
 
-#define wait_ms(x)
-#define wait_ns(x)
+void wait_ms(int ms);
+void wait_us(int us);

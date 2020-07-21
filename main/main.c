@@ -27,12 +27,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "porting/board.h"
+#include "board.h"
 #include "tusb.h"
 #include "usb_descriptors.h"
 
 #include "keyboard.h"
 #include "host.h"
+#include "suspend.h"
 
 static uint8_t keyboard_leds(void);
 static void send_keyboard(report_keyboard_t *report);
@@ -59,13 +60,15 @@ int main(void)
     while (1)
     {
         tud_task(); // tinyusb device task
-        //if ( tud_suspended()) {
-            // Wake up host if we are in suspend mode
-            // and REMOTE_WAKEUP feature is enabled by host
-            //    tud_remote_wakeup();
-        //} else {
+        if ( tud_suspended() ) {
+            if (suspend_wakeup_condition()) {
+                // Wake up host if we are in suspend mode
+                // and REMOTE_WAKEUP feature is enabled by host
+                    tud_remote_wakeup();
+            }
+        } else {
             keyboard_task(); // tmk task
-        //}
+        }
     }
 
     return 0;
