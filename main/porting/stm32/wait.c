@@ -12,8 +12,6 @@ void wait_ms(int ms)
 
 void wait_us(int us)
 {
-    __IO uint32_t delay = us * 72 / 8;
-    do {
-        __NOP();
-    } while (delay --);
+    __IO int32_t ticks = DWT->CYCCNT + us * (SystemCoreClock/1000000);
+    while (DWT->CYCCNT <= ticks);
 }

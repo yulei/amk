@@ -6,6 +6,7 @@
 #include "board.h"
 #include "tusb.h"
 
+static void DWT_Delay_Init(void);
 static void Error_Handler(void);
 //--------------------------------------------------------------------+
 // Forward USB interrupt events to TinyUSB IRQ Handler
@@ -117,6 +118,7 @@ void board_init(void)
   USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_NOVBUSSENS;
   USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSBSEN;
   USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSASEN;
+  DWT_Delay_Init();
 }
 
 volatile uint32_t system_ticks = 0;
@@ -139,3 +141,12 @@ void Error_Handler(void)
 {
 
 }*/
+
+static void DWT_Delay_Init(void)
+{
+    if (!(CoreDebug->DEMCR & CoreDebug_DEMCR_TRCENA_Msk)) {
+        CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+        DWT->CYCCNT = 0;
+        DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+    }
+}
