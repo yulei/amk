@@ -5,6 +5,8 @@ project(astro
       DESCRIPTION "Keyboard firmware"
       LANGUAGES C ASM)
 
+set(CONFIG_INCLUDE_PATH "${CMAKE_CURRENT_LIST_DIR}/keyboards/m20add")
+
 if(NOT MCU_TYPE)
     set(MCU_TYPE "NRF52840" CACHE STRING "mcu chip type")
 endif()
@@ -21,7 +23,6 @@ else()
   message(ERROR " Unknown mcu chip type: ${MCU_TYPE}")
 endif()
 
-add_subdirectory(tmk)
 add_subdirectory(keyboards)
-
+add_subdirectory(tmk)
 add_subdirectory(main)

@@ -1,6 +1,8 @@
 
 set(TMK_PATH "tmk/tmk_core")
+
 add_library(tmk STATIC "")
+
 target_sources(tmk
     PRIVATE 
         ${TMK_PATH}/common/host.c
@@ -19,10 +21,14 @@ target_sources(tmk
     ) 
 
 target_include_directories(tmk
+    PRIVATE
+        ${CONFIG_INCLUDE_PATH}
     PUBLIC
         ${TMK_PATH}/common
         ${TMK_PATH}/
         ${CMAKE_CURRENT_LIST_DIR})
+
+message(STATUS ${CONFIG_INCLUDE_PATH})
 
 target_compile_options(tmk
     PUBLIC   

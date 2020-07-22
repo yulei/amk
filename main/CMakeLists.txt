@@ -1,6 +1,8 @@
 add_executable(amk "")
 
-target_link_libraries(amk PRIVATE tusb tmk)
+set(CONFIG_INCLUDE_PATH ../keyboards/m20add)
+target_link_libraries(amk PRIVATE tusb tmk m20add)
+
 target_include_directories(amk
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
@@ -13,7 +15,6 @@ target_sources(amk
         usb_descriptors.c
         matrix.c
         suspend.c
-        keymap.c
         xprintf.c)
 
 target_sources(amk
