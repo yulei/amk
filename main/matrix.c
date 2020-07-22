@@ -3,6 +3,7 @@
  *  keyboard matrix scanning implementation
  */
 
+#include <string.h>
 #include "gpio_pin.h"
 #include "matrix.h"
 #include "print.h"
@@ -25,31 +26,19 @@ static uint16_t debouncing_time = 0;
 static void init_pins(void);
 
 
-uint8_t matrix_rows(void)
-{
-    return MATRIX_ROWS;
-}
-
-uint8_t matrix_cols(void)
-{
-    return MATRIX_COLS;
-}
-
 void matrix_init(void)
 {
     // initialize row and col
     init_pins();
 
     // initialize matrix state: all keys off
-    for (uint8_t i=0; i < MATRIX_ROWS; i++) {
-        matrix[i] = 0;
-        matrix_debouncing[i] = 0;
-    }
+    memset(&matrix[0], 0, sizeof(matrix));
+    memset(&matrix_debouncing[0], 0, sizeof(matrix_debouncing));
 }
 
 uint8_t matrix_scan(void)
 {
-    bool matrix_changed = false;
+    bool changed = false;
     for (int col = 0; col < MATRIX_COLS; col++) {
         gpio_write_pin(col_pins[col], 1);
         wait_us(30);
@@ -66,20 +55,20 @@ uint8_t matrix_scan(void)
 
             if (last_row_value != current_row_value) {
                 matrix_debouncing[row] = current_row_value;
-                matrix_changed = true;
+                changed = true;
             }
         }
         gpio_write_pin(col_pins[col], 0);
     }
 
-    if (matrix_changed && !debouncing) {
+    if (changed && !debouncing) {
         debouncing = true;
         debouncing_time = timer_read();
     }
 
     if (debouncing && timer_elapsed(debouncing_time) > DEBOUNCE) {
-        for (int col = 0; col < MATRIX_COLS; col++) {
-            matrix[col] = matrix_debouncing[col];
+        for (int row = 0; row < MATRIX_ROWS; row++) {
+            matrix[row] = matrix_debouncing[row];
         }
         debouncing = false;
     }
@@ -89,7 +78,7 @@ uint8_t matrix_scan(void)
 
 bool matrix_is_on(uint8_t row, uint8_t col)
 {
-    return (matrix[col] & ((matrix_row_t)1<<row));
+    return (matrix[row] & ((matrix_row_t)1<<col));
 }
 
 matrix_row_t matrix_get_row(uint8_t row)

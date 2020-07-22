@@ -19,7 +19,7 @@ else
         tf="./cmake/toolchain_stm32f4.cmake"
         mt="STM32F411"
     else
-        echo "Unknown enviroment, exiting..."
+        echo "Unknown mcu, exiting..."
         exit
     fi
     cmake -S . -B build -DMCU_TYPE=${mt} -DCMAKE_TOOLCHAIN_FILE=${tf} -DTOOLCHAIN_PREFIX=${tp}
