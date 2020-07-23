@@ -23,13 +23,21 @@ target_sources(amk
 
 target_compile_definitions(amk
     PRIVATE
-    SEGGER_RTT_ENABLE
-    CFG_TUSB_MCU=OPT_MCU_STM32F4)
+    SEGGER_RTT_ENABLE)
 
-if (MCU_TYPE STREQUAL "NRF52840")
+if (MCU_TYPE MATCHES "NRF52840")
+    target_sources(amk
+        PRIVATE 
+            porting/nrf52/nrf52840.c
+            porting/nrf52/timer.c
+            porting/nrf52/bootloader.c
+            porting/nrf52/gpio_pin.c
+            porting/nrf52/wait.c)
+
     set(NRF5_MDK_PATH "${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nRF5_SDK_17.0.0_9d13099/modules/nrfx/mdk")
-    target_link_options(amk PRIVATE "-L${NRF5_MDK_PATH}" "-T${NRF5_MDK_PATH}/nrf52840_xxaa.ld")
-elseif(MCU_TYPE STREQUAL "STM32F411")
+    target_link_options(amk PRIVATE "-L${NRF5_MDK_PATH}" "-T${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/app_gcc_nrf52.ld")
+    target_compile_definitions(amk PRIVATE MCU_NRF5X)
+elseif(MCU_TYPE MATCHES "STM32F411")
     target_sources(amk
         PRIVATE 
             porting/stm32/generic_stm32f4.c
@@ -40,6 +48,7 @@ elseif(MCU_TYPE STREQUAL "STM32F411")
 
     set(STM32F4_LINKER_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/../stm32_sdk/stm32f411ceux_flash.ld")
     target_link_options(amk PRIVATE "-T${STM32F4_LINKER_SCRIPT}")
+    target_compile_definitions(amk PRIVATE MCU_STM32F4)
 else()
     message(ERROR "unknown platform on main application building")
 endif()
