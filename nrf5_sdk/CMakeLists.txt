@@ -26,8 +26,8 @@ target_sources(nrf5_sdk
         ${NRF5_SDK_PATH}/components/libraries/util/app_util_platform.c
         ${NRF5_SDK_PATH}/integration/nrfx/legacy/nrf_drv_clock.c
         ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_clock.c
-        ${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT.c
-        ${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT_printf.c
+        #${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT.c
+        #${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT_printf.c
         )
 
 target_include_directories(nrf5_sdk

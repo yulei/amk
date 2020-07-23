@@ -35,7 +35,7 @@ if (MCU_TYPE MATCHES "NRF52840")
             porting/nrf52/wait.c)
 
     set(NRF5_MDK_PATH "${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nRF5_SDK_17.0.0_9d13099/modules/nrfx/mdk")
-    target_link_options(amk PRIVATE "-L${NRF5_MDK_PATH}" "-T${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/app_gcc_nrf52.ld")
+    target_link_options(amk PRIVATE "-L${NRF5_MDK_PATH}" "-T${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nrf52840_flash.ld")
     target_compile_definitions(amk PRIVATE MCU_NRF5X)
 elseif(MCU_TYPE MATCHES "STM32F411")
     target_sources(amk
@@ -46,7 +46,7 @@ elseif(MCU_TYPE MATCHES "STM32F411")
             porting/stm32/gpio_pin.c
             porting/stm32/wait.c)
 
-    set(STM32F4_LINKER_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/../stm32_sdk/stm32f411ceux_flash.ld")
+    set(STM32F4_LINKER_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/../stm32_sdk/stm32f411xe_flash.ld")
     target_link_options(amk PRIVATE "-T${STM32F4_LINKER_SCRIPT}")
     target_compile_definitions(amk PRIVATE MCU_STM32F4)
 else()
