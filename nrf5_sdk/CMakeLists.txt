@@ -69,9 +69,22 @@ target_include_directories(nrf5_sdk
         ${NRF5_SDK_PATH}/components/libraries/ringbuf
         ${NRF5_SDK_PATH}/components/libraries/sortlist
         ${NRF5_SDK_PATH}/components/libraries/scheduler
+        ${NRF5_SDK_PATH}/components/libraries/pwr_mgmt
         ${NRF5_SDK_PATH}/components/libraries/experimental_section_vars
         ${NRF5_SDK_PATH}/components/softdevice/common
         ${NRF5_SDK_PATH}/components/softdevice/mbr/headers
         ${NRF5_SDK_PATH}/components/softdevice/s132/headers
+        ${NRF5_SDK_PATH}/components/ble/ble_advertising
+        ${NRF5_SDK_PATH}/components/ble/common
+        ${NRF5_SDK_PATH}/components/ble/ble_dtm
+        ${NRF5_SDK_PATH}/components/ble/ble_link_ctx_manager
+        ${NRF5_SDK_PATH}/components/ble/ble_racp
+        ${NRF5_SDK_PATH}/components/ble/ble_services/ble_bas
+        ${NRF5_SDK_PATH}/components/ble/ble_services/ble_bas_c
+        ${NRF5_SDK_PATH}/components/ble/ble_services/ble_dis
+        ${NRF5_SDK_PATH}/components/ble/ble_services/ble_hids
+        ${NRF5_SDK_PATH}/components/ble/nrf_ble_gatt
+        ${NRF5_SDK_PATH}/components/ble/nrf_ble_qwr
+        ${NRF5_SDK_PATH}/components/ble/peer_manager 
         ${NRF5_SDK_PATH}/external/segger_rtt
         ${NRF5_SDK_PATH}/external/fprintf)

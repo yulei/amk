@@ -26,7 +26,7 @@ target_sources(tusb
         ${TUSB_PATH}/class/vendor/vendor_device.c
       )
 
-if (MCU_TYPE STREQUAL "NRF52840")
+if (MCU_TYPE MATCHES "NRF52840")
   target_sources(tusb
         PRIVATE
         ${TUSB_PATH}/portable/nordic/nrf5x/dcd_nrf5x.c

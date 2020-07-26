@@ -20,7 +20,7 @@ endif()
 # Perform compiler test with static library
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
-set(NRF_FLAGS "-DNRF52 -D${MCU_CHIP} -DNRF52_PAN_74 -DNRF_SD_BLE_API_VERSION=7 -DS132 -DSOFTDEVICE_PRESENT")
+set(NRF_FLAGS "-DNRF52 -D${MCU_CHIP} -DNRF52_PAN_74 -DNRF_SD_BLE_API_VERSION=7 -DS132 -DSOFTDEVICE_PRESENT -DAPP_TIMER_V2 -DAPP_TIMER_V2_RTC1_ENABLE")
 set(OBJECT_GEN_FLAGS "${NRF_FLAGS} -mthumb -mabi=aapcs -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16")
 # Set compiler linker flags
 set(OBJECT_CXX_GEN_GLAGS "${OBJECT_GEN_FLAGS} -fdata-sections -ffunction-sections -fno-builtin -fno-strict-aliasing -fshort-enums -Wall")

@@ -5,7 +5,10 @@ target_link_libraries(amk PRIVATE tmk kbd)
 target_include_directories(amk
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
+        ${CMAKE_CURRENT_LIST_DIR}/../tinyusb
+        ${CMAKE_CURRENT_LIST_DIR}/../tinyusb/tinyusb/src
         porting
+        porting/nrf52
         rtt)
 
 target_sources(amk
@@ -23,7 +26,8 @@ target_sources(amk
 
 target_compile_definitions(amk
     PRIVATE
-    SEGGER_RTT_ENABLE)
+    SEGGER_RTT_ENABLE
+    CFG_TUSB_MCU=OPT_MCU_NRF5X)
 
 if (MCU_TYPE MATCHES "NRF52840")
     target_sources(amk
@@ -57,6 +61,8 @@ elseif (MCU_TYPE MATCHES "NRF52832")
             porting/nrf52/nrf52832.c
             porting/nrf52/ble_keyboard.c
             )
+
+    target_link_libraries(amk PRIVATE nrf5_sdk)
 
     set(NRF5_MDK_PATH "${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nRF5_SDK_17.0.0_9d13099/modules/nrfx/mdk")
     target_link_options(amk PRIVATE "-L${NRF5_MDK_PATH}" "-T${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nrf52832.ld")
