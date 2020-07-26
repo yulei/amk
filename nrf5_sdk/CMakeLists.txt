@@ -4,8 +4,6 @@ set(NRF5_SDK_PATH "nRF5_SDK_17.0.0_9d13099")
 add_library(nrf5_sdk STATIC "")
 target_sources(nrf5_sdk
     PRIVATE
-        ${NRF5_SDK_PATH}/modules/nrfx/mdk/system_nrf52840.c 
-        ${NRF5_SDK_PATH}/modules/nrfx/mdk/gcc_startup_nrf52840.S
         ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_backend_rtt.c
         ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_backend_serial.c
         ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_backend_uart.c
@@ -30,6 +28,21 @@ target_sources(nrf5_sdk
         #${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT_printf.c
         )
 
+if (MCU_TYPE MATCHES "NRF52840")
+    target_sources(nrf5_sdk
+        PRIVATE
+            ${NRF5_SDK_PATH}/modules/nrfx/mdk/system_nrf52840.c 
+            ${NRF5_SDK_PATH}/modules/nrfx/mdk/gcc_startup_nrf52840.S)
+
+elseif (MCU_TYPE MATCHES "NRF52832")
+    target_sources(nrf5_sdk
+        PRIVATE
+            ${NRF5_SDK_PATH}/modules/nrfx/mdk/system_nrf52.c 
+            ${NRF5_SDK_PATH}/modules/nrfx/mdk/gcc_startup_nrf52.S)
+else()
+message(ERROR "could not find valid nrf chips")
+endif()
+
 target_include_directories(nrf5_sdk
     PUBLIC 
         ${CMAKE_CURRENT_LIST_DIR}
@@ -42,7 +55,6 @@ target_include_directories(nrf5_sdk
         ${NRF5_SDK_PATH}/integration/nrfx/legacy
         ${NRF5_SDK_PATH}/components/toolchain/cmsis/include
         ${NRF5_SDK_PATH}/components/libraries/util
-        ${NRF5_SDK_PATH}/components/softdevice/s140/headers
         ${NRF5_SDK_PATH}/components/libraries/atomic
         ${NRF5_SDK_PATH}/components/libraries/atomic_fifo
         ${NRF5_SDK_PATH}/components/libraries/queue
@@ -58,5 +70,8 @@ target_include_directories(nrf5_sdk
         ${NRF5_SDK_PATH}/components/libraries/sortlist
         ${NRF5_SDK_PATH}/components/libraries/scheduler
         ${NRF5_SDK_PATH}/components/libraries/experimental_section_vars
+        ${NRF5_SDK_PATH}/components/softdevice/common
+        ${NRF5_SDK_PATH}/components/softdevice/mbr/headers
+        ${NRF5_SDK_PATH}/components/softdevice/s132/headers
         ${NRF5_SDK_PATH}/external/segger_rtt
         ${NRF5_SDK_PATH}/external/fprintf)

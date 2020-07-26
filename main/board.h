@@ -6,3 +6,4 @@
 #pragma once
 
 void board_init(void);
+void board_task(void);

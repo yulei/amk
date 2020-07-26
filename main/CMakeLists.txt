@@ -1,6 +1,6 @@
 add_executable(amk "")
 
-target_link_libraries(amk PRIVATE tusb tmk m20add)
+target_link_libraries(amk PRIVATE tmk kbd)
 
 target_include_directories(amk
     PRIVATE
@@ -36,6 +36,30 @@ if (MCU_TYPE MATCHES "NRF52840")
 
     set(NRF5_MDK_PATH "${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nRF5_SDK_17.0.0_9d13099/modules/nrfx/mdk")
     target_link_options(amk PRIVATE "-L${NRF5_MDK_PATH}" "-T${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nrf52840_flash.ld")
+    target_compile_definitions(amk PRIVATE MCU_NRF5X)
+elseif (MCU_TYPE MATCHES "NRF52832")
+    target_sources(amk
+        PRIVATE 
+            porting/nrf52/timer.c
+            porting/nrf52/bootloader.c
+            porting/nrf52/gpio_pin.c
+            porting/nrf52/wait.c)
+
+     target_sources(amk
+        PRIVATE 
+            porting/nrf52/ble/ble_adv_service.c
+            porting/nrf52/ble/ble_bas_service.c
+            porting/nrf52/ble/ble_hids_service.c
+            porting/nrf52/ble/ble_services.c)
+
+    target_sources(amk
+        PRIVATE 
+            porting/nrf52/nrf52832.c
+            porting/nrf52/ble_keyboard.c
+            )
+
+    set(NRF5_MDK_PATH "${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nRF5_SDK_17.0.0_9d13099/modules/nrfx/mdk")
+    target_link_options(amk PRIVATE "-L${NRF5_MDK_PATH}" "-T${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nrf52832.ld")
     target_compile_definitions(amk PRIVATE MCU_NRF5X)
 elseif(MCU_TYPE MATCHES "STM32F411")
     target_sources(amk

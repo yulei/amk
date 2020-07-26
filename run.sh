@@ -14,7 +14,10 @@ else
 
     if [ $2 == "nrf52" ]; then
         tf="./cmake/toolchain_nrf5x.cmake"
-        mt="NRF52840"
+        #mt="NRF52840"
+        #mc="NRF52840_XXAA"
+        mt="NRF52832"
+        mc="NRF52832_XXAA"
     elif [ $2 == "stm32f4" ]; then
         tf="./cmake/toolchain_stm32f4.cmake"
         mt="STM32F411"
@@ -22,5 +25,5 @@ else
         echo "Unknown mcu, exiting..."
         exit
     fi
-    cmake -S . -B build -DMCU_TYPE=${mt} -DCMAKE_TOOLCHAIN_FILE=${tf} -DTOOLCHAIN_PREFIX=${tp}
+    cmake -S . -B build -DMCU_TYPE=${mt} -DMCU_CHIP=${mc} -DCMAKE_TOOLCHAIN_FILE=${tf} -DTOOLCHAIN_PREFIX=${tp}
 fi

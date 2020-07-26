@@ -46,7 +46,20 @@
 #ifdef USE_APP_CONFIG
 #include "app_config.h"
 #endif
-// <h> nRF_BLE 
+// <h> Board Support
+
+//==========================================================
+// <q> BSP_BTN_BLE_ENABLED  - bsp_btn_ble - Button Control for BLE
+
+
+#ifndef BSP_BTN_BLE_ENABLED
+#define BSP_BTN_BLE_ENABLED 0
+#endif
+
+// </h>
+//==========================================================
+
+// <h> nRF_BLE
 
 //==========================================================
 // <q> BLE_ADVERTISING_ENABLED  - ble_advertising - Advertising module
@@ -1400,7 +1413,7 @@
 #endif
 // <o> GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS - Number of lower power input pins 
 #ifndef GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS
-#define GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS 4
+#define GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS 6
 #endif
 
 // <o> GPIOTE_CONFIG_IRQ_PRIORITY  - Interrupt priority
@@ -2693,13 +2706,13 @@
 // <e> NRFX_PWM_ENABLED - nrfx_pwm - PWM peripheral driver
 //==========================================================
 #ifndef NRFX_PWM_ENABLED
-#define NRFX_PWM_ENABLED 0
+#define NRFX_PWM_ENABLED 1
 #endif
 // <q> NRFX_PWM0_ENABLED  - Enable PWM0 instance
  
 
 #ifndef NRFX_PWM0_ENABLED
-#define NRFX_PWM0_ENABLED 0
+#define NRFX_PWM0_ENABLED 1
 #endif
 
 // <q> NRFX_PWM1_ENABLED  - Enable PWM1 instance
@@ -2727,28 +2740,28 @@
 
 
 #ifndef NRFX_PWM_DEFAULT_CONFIG_OUT0_PIN
-#define NRFX_PWM_DEFAULT_CONFIG_OUT0_PIN 31
+#define NRFX_PWM_DEFAULT_CONFIG_OUT0_PIN 20
 #endif
 
-// <o> NRFX_PWM_DEFAULT_CONFIG_OUT1_PIN - Out1 pin  <0-31> 
+// <o> NRFX_PWM_DEFAULT_CONFIG_OUT1_PIN - Out1 pin  <0-31>
 
 
 #ifndef NRFX_PWM_DEFAULT_CONFIG_OUT1_PIN
-#define NRFX_PWM_DEFAULT_CONFIG_OUT1_PIN 31
+#define NRFX_PWM_DEFAULT_CONFIG_OUT1_PIN 20
 #endif
 
 // <o> NRFX_PWM_DEFAULT_CONFIG_OUT2_PIN - Out2 pin  <0-31> 
 
 
 #ifndef NRFX_PWM_DEFAULT_CONFIG_OUT2_PIN
-#define NRFX_PWM_DEFAULT_CONFIG_OUT2_PIN 31
+#define NRFX_PWM_DEFAULT_CONFIG_OUT2_PIN 20
 #endif
 
 // <o> NRFX_PWM_DEFAULT_CONFIG_OUT3_PIN - Out3 pin  <0-31> 
 
 
 #ifndef NRFX_PWM_DEFAULT_CONFIG_OUT3_PIN
-#define NRFX_PWM_DEFAULT_CONFIG_OUT3_PIN 31
+#define NRFX_PWM_DEFAULT_CONFIG_OUT3_PIN 20
 #endif
 
 // <o> NRFX_PWM_DEFAULT_CONFIG_BASE_CLOCK  - Base clock
@@ -2865,6 +2878,32 @@
 #endif
 
 // </e>
+
+// <e> NRFX_PWM_NRF52_ANOMALY_109_WORKAROUND_ENABLED - Enables nRF52 Anomaly 109 workaround for PWM.
+
+// <i> The workaround uses interrupts to wake up the CPU and ensure
+// <i> it is active when PWM is about to start a DMA transfer. For
+// <i> initial transfer, done when a playback is started via PPI,
+// <i> a specific EGU instance is used to generate the interrupt.
+// <i> During the playback, the PWM interrupt triggered on SEQEND
+// <i> event of a preceding sequence is used to protect the transfer
+// <i> done for the next sequence to be played.
+//==========================================================
+#ifndef NRFX_PWM_NRF52_ANOMALY_109_WORKAROUND_ENABLED
+#define NRFX_PWM_NRF52_ANOMALY_109_WORKAROUND_ENABLED 0
+#endif
+// <o> NRFX_PWM_NRF52_ANOMALY_109_EGU_INSTANCE  - EGU instance used by the nRF52 Anomaly 109 workaround for PWM.
+
+// <0=> EGU0
+// <1=> EGU1
+// <2=> EGU2
+// <3=> EGU3
+// <4=> EGU4
+// <5=> EGU5
+
+#ifndef NRFX_PWM_NRF52_ANOMALY_109_EGU_INSTANCE
+#define NRFX_PWM_NRF52_ANOMALY_109_EGU_INSTANCE 5
+#endif
 
 // </e>
 
@@ -3344,7 +3383,7 @@
 // <e> NRFX_SAADC_ENABLED - nrfx_saadc - SAADC peripheral driver
 //==========================================================
 #ifndef NRFX_SAADC_ENABLED
-#define NRFX_SAADC_ENABLED 0
+#define NRFX_SAADC_ENABLED 1
 #endif
 // <o> NRFX_SAADC_CONFIG_RESOLUTION  - Resolution
  
@@ -3377,7 +3416,7 @@
  
 
 #ifndef NRFX_SAADC_CONFIG_LP_MODE
-#define NRFX_SAADC_CONFIG_LP_MODE 0
+#define NRFX_SAADC_CONFIG_LP_MODE 1
 #endif
 
 // <o> NRFX_SAADC_CONFIG_IRQ_PRIORITY  - Interrupt priority
@@ -3564,6 +3603,20 @@
 
 // </e>
 
+// <q> NRFX_SPIM_NRF52_ANOMALY_109_WORKAROUND_ENABLED  - Enables nRF52 anomaly 109 workaround for SPIM.
+
+
+// <i> The workaround uses interrupts to wake up the CPU by catching
+// <i> a start event of zero-length transmission to start the clock. This
+// <i> ensures that the DMA transfer will be executed without issues and
+// <i> that the proper transfer will be started. See more in the Errata
+// <i> document or Anomaly 109 Addendum located at
+// <i> https://infocenter.nordicsemi.com/
+
+#ifndef NRFX_SPIM_NRF52_ANOMALY_109_WORKAROUND_ENABLED
+#define NRFX_SPIM_NRF52_ANOMALY_109_WORKAROUND_ENABLED 0
+#endif
+
 // </e>
 
 // <e> NRFX_SPIS_ENABLED - nrfx_spis - SPIS peripheral driver
@@ -3671,6 +3724,20 @@
 #endif
 
 // </e>
+
+// <q> NRFX_SPIS_NRF52_ANOMALY_109_WORKAROUND_ENABLED  - Enables nRF52 Anomaly 109 workaround for SPIS.
+
+
+// <i> The workaround uses a GPIOTE channel to generate interrupts
+// <i> on falling edges detected on the CSN line. This will make
+// <i> the CPU active for the moment when SPIS starts DMA transfers,
+// <i> and this way the transfers will be protected.
+// <i> This workaround uses GPIOTE driver, so this driver must be
+// <i> enabled as well.
+
+#ifndef NRFX_SPIS_NRF52_ANOMALY_109_WORKAROUND_ENABLED
+#define NRFX_SPIS_NRF52_ANOMALY_109_WORKAROUND_ENABLED 0
+#endif
 
 // </e>
 
@@ -4132,6 +4199,19 @@
 
 // </e>
 
+// <q> NRFX_TWIM_NRF52_ANOMALY_109_WORKAROUND_ENABLED  - Enables nRF52 anomaly 109 workaround for TWIM.
+
+
+// <i> The workaround uses interrupts to wake up the CPU by catching
+// <i> the start event of zero-frequency transmission, clear the
+// <i> peripheral, set desired frequency, start the peripheral, and
+// <i> the proper transmission. See more in the Errata document or
+// <i> Anomaly 109 Addendum located at https://infocenter.nordicsemi.com/
+
+#ifndef NRFX_TWIM_NRF52_ANOMALY_109_WORKAROUND_ENABLED
+#define NRFX_TWIM_NRF52_ANOMALY_109_WORKAROUND_ENABLED 0
+#endif
+
 // </e>
 
 // <e> NRFX_TWIS_ENABLED - nrfx_twis - TWIS peripheral driver
@@ -4272,13 +4352,13 @@
 // <e> NRFX_TWI_ENABLED - nrfx_twi - TWI peripheral driver
 //==========================================================
 #ifndef NRFX_TWI_ENABLED
-#define NRFX_TWI_ENABLED 0
+#define NRFX_TWI_ENABLED 1
 #endif
 // <q> NRFX_TWI0_ENABLED  - Enable TWI0 instance
  
 
 #ifndef NRFX_TWI0_ENABLED
-#define NRFX_TWI0_ENABLED 0
+#define NRFX_TWI0_ENABLED 1
 #endif
 
 // <q> NRFX_TWI1_ENABLED  - Enable TWI1 instance
@@ -4295,7 +4375,7 @@
 // <104857600=> 400k 
 
 #ifndef NRFX_TWI_DEFAULT_CONFIG_FREQUENCY
-#define NRFX_TWI_DEFAULT_CONFIG_FREQUENCY 26738688
+#define NRFX_TWI_DEFAULT_CONFIG_FREQUENCY 104857600
 #endif
 
 // <q> NRFX_TWI_DEFAULT_CONFIG_HOLD_BUS_UNINIT  - Enables bus holding after uninit
@@ -4502,11 +4582,11 @@
 // <e> NRFX_UART_ENABLED - nrfx_uart - UART peripheral driver
 //==========================================================
 #ifndef NRFX_UART_ENABLED
-#define NRFX_UART_ENABLED 0
+#define NRFX_UART_ENABLED 1
 #endif
 // <o> NRFX_UART0_ENABLED - Enable UART0 instance 
 #ifndef NRFX_UART0_ENABLED
-#define NRFX_UART0_ENABLED 0
+#define NRFX_UART0_ENABLED 1
 #endif
 
 // <o> NRFX_UART_DEFAULT_CONFIG_HWFC  - Hardware Flow Control
@@ -4918,37 +4998,95 @@
 #define PPI_ENABLED 0
 #endif
 
+// <e> SAADC_ENABLED - nrf_drv_saadc - SAADC peripheral driver - legacy layer
+//==========================================================
+#ifndef SAADC_ENABLED
+#define SAADC_ENABLED 1
+#endif
+// <o> SAADC_CONFIG_RESOLUTION  - Resolution
+
+// <0=> 8 bit
+// <1=> 10 bit
+// <2=> 12 bit
+// <3=> 14 bit
+
+#ifndef SAADC_CONFIG_RESOLUTION
+#define SAADC_CONFIG_RESOLUTION 1
+#endif
+
+// <o> SAADC_CONFIG_OVERSAMPLE  - Sample period
+
+// <0=> Disabled
+// <1=> 2x
+// <2=> 4x
+// <3=> 8x
+// <4=> 16x
+// <5=> 32x
+// <6=> 64x
+// <7=> 128x
+// <8=> 256x
+
+#ifndef SAADC_CONFIG_OVERSAMPLE
+#define SAADC_CONFIG_OVERSAMPLE 0
+#endif
+
+// <q> SAADC_CONFIG_LP_MODE  - Enabling low power mode
+
+
+#ifndef SAADC_CONFIG_LP_MODE
+#define SAADC_CONFIG_LP_MODE 1
+#endif
+
+// <o> SAADC_CONFIG_IRQ_PRIORITY  - Interrupt priority
+
+
+// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
+// <0=> 0 (highest)
+// <1=> 1
+// <2=> 2
+// <3=> 3
+// <4=> 4
+// <5=> 5
+// <6=> 6
+// <7=> 7
+
+#ifndef SAADC_CONFIG_IRQ_PRIORITY
+#define SAADC_CONFIG_IRQ_PRIORITY 6
+#endif
+
+// </e>
+
 // <e> PWM_ENABLED - nrf_drv_pwm - PWM peripheral driver - legacy layer
 //==========================================================
 #ifndef PWM_ENABLED
-#define PWM_ENABLED 0
+#define PWM_ENABLED 1
 #endif
 // <o> PWM_DEFAULT_CONFIG_OUT0_PIN - Out0 pin  <0-31> 
 
 
 #ifndef PWM_DEFAULT_CONFIG_OUT0_PIN
-#define PWM_DEFAULT_CONFIG_OUT0_PIN 31
+#define PWM_DEFAULT_CONFIG_OUT0_PIN 20
 #endif
 
 // <o> PWM_DEFAULT_CONFIG_OUT1_PIN - Out1 pin  <0-31> 
 
 
 #ifndef PWM_DEFAULT_CONFIG_OUT1_PIN
-#define PWM_DEFAULT_CONFIG_OUT1_PIN 31
+#define PWM_DEFAULT_CONFIG_OUT1_PIN 20
 #endif
 
 // <o> PWM_DEFAULT_CONFIG_OUT2_PIN - Out2 pin  <0-31> 
 
 
 #ifndef PWM_DEFAULT_CONFIG_OUT2_PIN
-#define PWM_DEFAULT_CONFIG_OUT2_PIN 31
+#define PWM_DEFAULT_CONFIG_OUT2_PIN 20
 #endif
 
 // <o> PWM_DEFAULT_CONFIG_OUT3_PIN - Out3 pin  <0-31> 
 
 
 #ifndef PWM_DEFAULT_CONFIG_OUT3_PIN
-#define PWM_DEFAULT_CONFIG_OUT3_PIN 31
+#define PWM_DEFAULT_CONFIG_OUT3_PIN 20
 #endif
 
 // <o> PWM_DEFAULT_CONFIG_BASE_CLOCK  - Base clock
@@ -4963,7 +5101,7 @@
 // <7=> 125 kHz 
 
 #ifndef PWM_DEFAULT_CONFIG_BASE_CLOCK
-#define PWM_DEFAULT_CONFIG_BASE_CLOCK 4
+#define PWM_DEFAULT_CONFIG_BASE_CLOCK 1
 #endif
 
 // <o> PWM_DEFAULT_CONFIG_COUNT_MODE  - Count mode
@@ -5021,7 +5159,7 @@
  
 
 #ifndef PWM0_ENABLED
-#define PWM0_ENABLED 0
+#define PWM0_ENABLED 1
 #endif
 
 // <q> PWM1_ENABLED  - Enable PWM1 instance
@@ -5043,6 +5181,32 @@
 
 #ifndef PWM3_ENABLED
 #define PWM3_ENABLED 0
+#endif
+
+// <e> PWM_NRF52_ANOMALY_109_WORKAROUND_ENABLED - Enables nRF52 Anomaly 109 workaround for PWM.
+
+// <i> The workaround uses interrupts to wake up the CPU and ensure
+// <i> it is active when PWM is about to start a DMA transfer. For
+// <i> initial transfer, done when a playback is started via PPI,
+// <i> a specific EGU instance is used to generate the interrupt.
+// <i> During the playback, the PWM interrupt triggered on SEQEND
+// <i> event of a preceding sequence is used to protect the transfer
+// <i> done for the next sequence to be played.
+//==========================================================
+#ifndef PWM_NRF52_ANOMALY_109_WORKAROUND_ENABLED
+#define PWM_NRF52_ANOMALY_109_WORKAROUND_ENABLED 0
+#endif
+// <o> PWM_NRF52_ANOMALY_109_EGU_INSTANCE  - EGU instance used by the nRF52 Anomaly 109 workaround for PWM.
+
+// <0=> EGU0
+// <1=> EGU1
+// <2=> EGU2
+// <3=> EGU3
+// <4=> EGU4
+// <5=> EGU5
+
+#ifndef PWM_NRF52_ANOMALY_109_EGU_INSTANCE
+#define PWM_NRF52_ANOMALY_109_EGU_INSTANCE 5
 #endif
 
 // </e>
@@ -5380,64 +5544,6 @@
 
 // </e>
 
-// <e> SAADC_ENABLED - nrf_drv_saadc - SAADC peripheral driver - legacy layer
-//==========================================================
-#ifndef SAADC_ENABLED
-#define SAADC_ENABLED 0
-#endif
-// <o> SAADC_CONFIG_RESOLUTION  - Resolution
- 
-// <0=> 8 bit 
-// <1=> 10 bit 
-// <2=> 12 bit 
-// <3=> 14 bit 
-
-#ifndef SAADC_CONFIG_RESOLUTION
-#define SAADC_CONFIG_RESOLUTION 1
-#endif
-
-// <o> SAADC_CONFIG_OVERSAMPLE  - Sample period
- 
-// <0=> Disabled 
-// <1=> 2x 
-// <2=> 4x 
-// <3=> 8x 
-// <4=> 16x 
-// <5=> 32x 
-// <6=> 64x 
-// <7=> 128x 
-// <8=> 256x 
-
-#ifndef SAADC_CONFIG_OVERSAMPLE
-#define SAADC_CONFIG_OVERSAMPLE 0
-#endif
-
-// <q> SAADC_CONFIG_LP_MODE  - Enabling low power mode
- 
-
-#ifndef SAADC_CONFIG_LP_MODE
-#define SAADC_CONFIG_LP_MODE 0
-#endif
-
-// <o> SAADC_CONFIG_IRQ_PRIORITY  - Interrupt priority
- 
-
-// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
-// <0=> 0 (highest) 
-// <1=> 1 
-// <2=> 2 
-// <3=> 3 
-// <4=> 4 
-// <5=> 5 
-// <6=> 6 
-// <7=> 7 
-
-#ifndef SAADC_CONFIG_IRQ_PRIORITY
-#define SAADC_CONFIG_IRQ_PRIORITY 6
-#endif
-
-// </e>
-
 // <e> SPIS_ENABLED - nrf_drv_spis - SPIS peripheral driver - legacy layer
 //==========================================================
 #ifndef SPIS_ENABLED
@@ -5515,6 +5621,20 @@
 #define SPIS2_ENABLED 0
 #endif
 
+// <q> SPIS_NRF52_ANOMALY_109_WORKAROUND_ENABLED  - Enables nRF52 Anomaly 109 workaround for SPIS.
+
+
+// <i> The workaround uses a GPIOTE channel to generate interrupts
+// <i> on falling edges detected on the CSN line. This will make
+// <i> the CPU active for the moment when SPIS starts DMA transfers,
+// <i> and this way the transfers will be protected.
+// <i> This workaround uses GPIOTE driver, so this driver must be
+// <i> enabled as well.
+
+#ifndef SPIS_NRF52_ANOMALY_109_WORKAROUND_ENABLED
+#define SPIS_NRF52_ANOMALY_109_WORKAROUND_ENABLED 0
+#endif
+
 // </e>
 
 // <e> SPI_ENABLED - nrf_drv_spi - SPI/SPIM peripheral driver - legacy layer
@@ -5590,6 +5710,20 @@
 #endif
 
 // </e>
+
+// <q> SPIM_NRF52_ANOMALY_109_WORKAROUND_ENABLED  - Enables nRF52 anomaly 109 workaround for SPIM.
+
+
+// <i> The workaround uses interrupts to wake up the CPU by catching
+// <i> a start event of zero-length transmission to start the clock. This
+// <i> ensures that the DMA transfer will be executed without issues and
+// <i> that the proper transfer will be started. See more in the Errata
+// <i> document or Anomaly 109 Addendum located at
+// <i> https://infocenter.nordicsemi.com/
+
+#ifndef SPIM_NRF52_ANOMALY_109_WORKAROUND_ENABLED
+#define SPIM_NRF52_ANOMALY_109_WORKAROUND_ENABLED 0
+#endif
 
 // </e>
 
@@ -5778,7 +5912,7 @@
 // <e> TWI_ENABLED - nrf_drv_twi - TWI/TWIM peripheral driver - legacy layer
 //==========================================================
 #ifndef TWI_ENABLED
-#define TWI_ENABLED 0
+#define TWI_ENABLED 1
 #endif
 // <o> TWI_DEFAULT_CONFIG_FREQUENCY  - Frequency
  
@@ -5787,7 +5921,7 @@
 // <104857600=> 400k 
 
 #ifndef TWI_DEFAULT_CONFIG_FREQUENCY
-#define TWI_DEFAULT_CONFIG_FREQUENCY 26738688
+#define TWI_DEFAULT_CONFIG_FREQUENCY 104857600
 #endif
 
 // <q> TWI_DEFAULT_CONFIG_CLR_BUS_INIT  - Enables bus clearing procedure during init
@@ -5824,7 +5958,7 @@
 // <e> TWI0_ENABLED - Enable TWI0 instance
 //==========================================================
 #ifndef TWI0_ENABLED
-#define TWI0_ENABLED 0
+#define TWI0_ENABLED 1
 #endif
 // <q> TWI0_USE_EASY_DMA  - Use EasyDMA (if present)
  
@@ -5849,12 +5983,25 @@
 
 // </e>
 
+// <q> TWIM_NRF52_ANOMALY_109_WORKAROUND_ENABLED  - Enables nRF52 anomaly 109 workaround for TWIM.
+
+
+// <i> The workaround uses interrupts to wake up the CPU by catching
+// <i> the start event of zero-frequency transmission, clear the
+// <i> peripheral, set desired frequency, start the peripheral, and
+// <i> the proper transmission. See more in the Errata document or
+// <i> Anomaly 109 Addendum located at https://infocenter.nordicsemi.com/
+
+#ifndef TWIM_NRF52_ANOMALY_109_WORKAROUND_ENABLED
+#define TWIM_NRF52_ANOMALY_109_WORKAROUND_ENABLED 0
+#endif
+
 // </e>
 
 // <e> UART_ENABLED - nrf_drv_uart - UART/UARTE peripheral driver - legacy layer
 //==========================================================
 #ifndef UART_ENABLED
-#define UART_ENABLED 0
+#define UART_ENABLED 1
 #endif
 // <o> UART_DEFAULT_CONFIG_HWFC  - Hardware Flow Control
  
@@ -5931,7 +6078,7 @@
 // <e> UART0_ENABLED - Enable UART0 instance
 //==========================================================
 #ifndef UART0_ENABLED
-#define UART0_ENABLED 0
+#define UART0_ENABLED 1
 #endif
 // <q> UART0_CONFIG_USE_EASY_DMA  - Default setting for using EasyDMA
  
@@ -6069,11 +6216,32 @@
 // <h> nRF_Libraries 
 
 //==========================================================
+// <q> APP_FIFO_ENABLED  - app_fifo - Software FIFO implementation
+#ifndef APP_FIFO_ENABLED
+#define APP_FIFO_ENABLED 1
+#endif
+
+// <e> APP_UART_ENABLED - app_uart - UART driver
+//==========================================================
+#ifndef APP_UART_ENABLED
+#define APP_UART_ENABLED 1
+#endif
+// <o> APP_UART_DRIVER_INSTANCE  - UART instance used
+
+// <0=> 0
+
+#ifndef APP_UART_DRIVER_INSTANCE
+#define APP_UART_DRIVER_INSTANCE 0
+#endif
+
+// </e>
+
+//==========================================================
 // <q> APP_GPIOTE_ENABLED  - app_gpiote - GPIOTE events dispatcher
  
 
 #ifndef APP_GPIOTE_ENABLED
-#define APP_GPIOTE_ENABLED 0
+#define APP_GPIOTE_ENABLED 1
 #endif
 
 // <q> APP_PWM_ENABLED  - app_pwm - PWM functionality
@@ -6208,7 +6376,7 @@
 // <i> This option can be used when app_timer is used for timestamping.
 
 #ifndef APP_TIMER_KEEPS_RTC_ACTIVE
-#define APP_TIMER_KEEPS_RTC_ACTIVE 0
+#define APP_TIMER_KEEPS_RTC_ACTIVE 1
 #endif
 
 // <o> APP_TIMER_SAFE_WINDOW_MS - Maximum possible latency (in milliseconds) of handling app_timer event. 
@@ -6582,7 +6750,7 @@
  
 
 #ifndef CRC16_ENABLED
-#define CRC16_ENABLED 1
+#define CRC16_ENABLED 0
 #endif
 
 // <q> CRC32_ENABLED  - crc32 - CRC32 calculation routines
@@ -6627,7 +6795,7 @@
 // <2048=> 2048 
 
 #ifndef FDS_VIRTUAL_PAGE_SIZE
-#define FDS_VIRTUAL_PAGE_SIZE 1024
+#define FDS_VIRTUAL_PAGE_SIZE 2048
 #endif
 
 // <o> FDS_VIRTUAL_PAGES_RESERVED - The number of virtual flash pages that are used by other modules. 
@@ -6720,7 +6888,7 @@
  
 
 #ifndef HARDFAULT_HANDLER_ENABLED
-#define HARDFAULT_HANDLER_ENABLED 0
+#define HARDFAULT_HANDLER_ENABLED 1
 #endif
 
 // <e> HCI_MEM_POOL_ENABLED - hci_mem_pool - memory pool implementation used by HCI
@@ -6784,22 +6952,22 @@
 
 // <o> HCI_UART_RX_PIN - UART RX pin 
 #ifndef HCI_UART_RX_PIN
-#define HCI_UART_RX_PIN 31
+#define HCI_UART_RX_PIN 8
 #endif
 
 // <o> HCI_UART_TX_PIN - UART TX pin 
 #ifndef HCI_UART_TX_PIN
-#define HCI_UART_TX_PIN 31
+#define HCI_UART_TX_PIN 6
 #endif
 
 // <o> HCI_UART_RTS_PIN - UART RTS pin 
 #ifndef HCI_UART_RTS_PIN
-#define HCI_UART_RTS_PIN 31
+#define HCI_UART_RTS_PIN 5
 #endif
 
 // <o> HCI_UART_CTS_PIN - UART CTS pin 
 #ifndef HCI_UART_CTS_PIN
-#define HCI_UART_CTS_PIN 31
+#define HCI_UART_CTS_PIN 7
 #endif
 
 // </e>
@@ -7282,7 +7450,7 @@
 // <i> Shutdown procedure will begin no earlier than after this number of seconds.
 
 #ifndef NRF_PWR_MGMT_CONFIG_STANDBY_TIMEOUT_S
-#define NRF_PWR_MGMT_CONFIG_STANDBY_TIMEOUT_S 3
+#define NRF_PWR_MGMT_CONFIG_STANDBY_TIMEOUT_S 900
 #endif
 
 // </e>
@@ -7291,21 +7459,21 @@
  
 
 #ifndef NRF_PWR_MGMT_CONFIG_FPU_SUPPORT_ENABLED
-#define NRF_PWR_MGMT_CONFIG_FPU_SUPPORT_ENABLED 1
+#define NRF_PWR_MGMT_CONFIG_FPU_SUPPORT_ENABLED 0
 #endif
 
 // <q> NRF_PWR_MGMT_CONFIG_AUTO_SHUTDOWN_RETRY  - Blocked shutdown procedure will be retried every second.
  
 
 #ifndef NRF_PWR_MGMT_CONFIG_AUTO_SHUTDOWN_RETRY
-#define NRF_PWR_MGMT_CONFIG_AUTO_SHUTDOWN_RETRY 0
+#define NRF_PWR_MGMT_CONFIG_AUTO_SHUTDOWN_RETRY 1
 #endif
 
 // <q> NRF_PWR_MGMT_CONFIG_USE_SCHEDULER  - Module will use @ref app_scheduler.
  
 
 #ifndef NRF_PWR_MGMT_CONFIG_USE_SCHEDULER
-#define NRF_PWR_MGMT_CONFIG_USE_SCHEDULER 0
+#define NRF_PWR_MGMT_CONFIG_USE_SCHEDULER 1
 #endif
 
 // <o> NRF_PWR_MGMT_CONFIG_HANDLER_PRIORITY_COUNT - The number of priorities for module handlers. 
@@ -7575,7 +7743,7 @@
  
 
 #ifndef NRF_FPRINTF_FLAG_AUTOMATIC_CR_ON_LF_ENABLED
-#define NRF_FPRINTF_FLAG_AUTOMATIC_CR_ON_LF_ENABLED 1
+#define NRF_FPRINTF_FLAG_AUTOMATIC_CR_ON_LF_ENABLED 0
 #endif
 
 // <q> NRF_FPRINTF_DOUBLE_ENABLED  - Enable IEEE-754 double precision formatting.
@@ -11736,7 +11904,49 @@
 #define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
 #endif
 
-// <o> NRF_BLE_BMS_BLE_OBSERVER_PRIO  
+// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
+// <i> Priority with which BLE events are dispatched to the NFC pairing library.
+
+#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
+#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
+#endif
+
+// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
+// <i> Priority with which BLE events are dispatched to the NFC pairing library.
+
+#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
+#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
+#endif
+
+// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
+// <i> Priority with which BLE events are dispatched to the NFC pairing library.
+
+#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
+#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
+#endif
+
+// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
+// <i> Priority with which BLE events are dispatched to the NFC pairing library.
+
+#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
+#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
+#endif
+
+// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
+// <i> Priority with which BLE events are dispatched to the NFC pairing library.
+
+#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
+#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
+#endif
+
+// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
+// <i> Priority with which BLE events are dispatched to the NFC pairing library.
+
+#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
+#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
+#endif
+
+// <o> NRF_BLE_BMS_BLE_OBSERVER_PRIO
 // <i> Priority with which BLE events are dispatched to the Bond Management Service.
 
 #ifndef NRF_BLE_BMS_BLE_OBSERVER_PRIO
