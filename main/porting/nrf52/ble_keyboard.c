@@ -102,7 +102,7 @@ void ble_keyboard_init(void)
 
 void ble_keyboard_start(void)
 {
-    matrix_driver.scan_start();
+    matrix_driver_scan_start();
     keyboard_timer_start();
     ble_driver.scan_count = 0;
 }
@@ -115,8 +115,7 @@ void ble_keyboard_prepare_sleep(void)
     // keyboard sleep
     keyboard_prepare_sleep();
     // turn matrix to sense mode
-    matrix_driver.trigger_stop();
-    matrix_driver.prepare_sleep();
+    matrix_driver_prepare_sleep();
     // usb backend to sleep
     nrf_usb_prepare_sleep();
 }
@@ -174,8 +173,8 @@ static void keyboard_timout_handler(void *p_context)
     // scan count overflow, switch to trigger mode
     if (ble_driver.scan_count >= MAX_SCAN_COUNT) {
         keyboard_timer_stop();
-        matrix_driver.scan_stop();
-        matrix_driver.trigger_start(matrix_event_handler);
+        matrix_driver_scan_stop();
+        matrix_driver_trigger_start(matrix_event_handler);
 
         NRF_LOG_INFO("keyboard matrix swtiched to trigger mode");
         ble_driver.scan_count = 0;
@@ -265,8 +264,8 @@ static void matrix_event_handler(bool changed)
     if (!changed) return;
 
     // disable row event
-    matrix_driver.trigger_stop();
-    matrix_driver.scan_start();
+    matrix_driver_trigger_stop();
+    matrix_driver_scan_start();
     keyboard_timer_start();
 
     keyboard_task();

@@ -9,6 +9,13 @@
 #include "wait.h"
 #include "timer.h"
 
+typedef struct {
+    matrix_event_callback   event_callback;
+    bool                    trigger_mode;
+} matrix_driver_t;
+
+matrix_driver_t matrix_driver;
+
 #ifdef MATRIX_USE_TCA6424
 #   ifndef MATRIX_DETECT_PIN
 #       error "the tca6424 interrupt detect pin must be defined first"
@@ -30,7 +37,6 @@ pin_t col_pins[] = MATRIX_COL_PINS;
 static matrix_row_t raw_matrix[MATRIX_ROWS];    //raw values
 static matrix_row_t matrix[MATRIX_ROWS];        //debounced values
 
-matrix_driver_t matrix_driver;
 
 __attribute__((weak))
 void matrix_init_user(void) { }
@@ -60,7 +66,8 @@ static void matrix_pin_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polari
         }
     }
 }
-static void matrix_trigger_start(matrix_event_callback_f me_cb)
+
+static void matrix_trigger_start(void)
 {
     if (matrix_driver.trigger_mode) {
         return;
@@ -80,7 +87,6 @@ static void matrix_trigger_start(matrix_event_callback_f me_cb)
         nrf_drv_gpiote_in_event_enable(row_pins[i], true);
     }
     matrix_driver.trigger_mode = true;
-    matrix_driver.event_callback = me_cb;
     NRF_LOG_INFO("keyboard matrix trigger mode started");
 }
 
@@ -100,7 +106,6 @@ static void matrix_trigger_stop(void)
         nrf_drv_gpiote_in_uninit(row_pins[i]);
     }
     matrix_driver.trigger_mode = false;
-    matrix_driver.event_callback = NULL;
     NRF_LOG_INFO("keyboard matrix trigger mode stopped");
 }
 
@@ -118,6 +123,7 @@ static void  init_pins(void)
 
 static void matrix_prepare_sleep(void)
 {
+    matrix_trigger_stop();
     for (uint32_t i = 0; i < MATRIX_COLS; i++) {
         nrf_gpio_cfg_output(col_pins[i]);
         nrf_gpio_pin_set(col_pins[i]);
@@ -296,28 +302,40 @@ uint8_t matrix_scan(void)
     return 1;
 }
 
-bool matrix_is_on(uint8_t row, uint8_t col)
+void matrix_driver_init(void)
 {
-    return (matrix[row] & ((matrix_row_t)1<<col));
+    matrix_driver.event_callback    = NULL;
+    matrix_driver.trigger_mode      = false;
+    init_pins();
+}
+
+void matrix_driver_trigger_start(matrix_event_callback event_cb)
+{
+    matrix_driver.event_callback    = event_cb;
+    matrix_trigger_start();
+}
+
+void matrix_driver_trigger_stop(void)
+{
+    matrix_trigger_stop();
+}
+
+void matrix_driver_scan_start(void)
+{
+    matrix_scan_start();
+}
+
+void matrix_driver_scan_stop(void)
+{
+    matrix_scan_stop();
+}
+
+void matrix_driver_prepare_sleep(void)
+{
+    matrix_prepare_sleep();
 }
 
 matrix_row_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
-}
-
-void matrix_print(void)
-{
-}
-
-void matrix_driver_init(void)
-{
-    matrix_driver.trigger_start     = matrix_trigger_start;
-    matrix_driver.trigger_stop      = matrix_trigger_stop;
-    matrix_driver.scan_start        = matrix_scan_start;
-    matrix_driver.scan_stop         = matrix_scan_stop;
-    matrix_driver.prepare_sleep     = matrix_prepare_sleep;
-    matrix_driver.event_callback    = NULL;
-    matrix_driver.trigger_mode      = false;
-    init_pins();
 }
