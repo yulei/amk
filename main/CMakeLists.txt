@@ -9,13 +9,14 @@ target_include_directories(amk
         ${CMAKE_CURRENT_LIST_DIR}/../tinyusb/tinyusb/src
         porting
         porting/nrf52
+        porting/nrf52/ble
         rtt)
 
 target_sources(amk
     PRIVATE         
         main.c 
         usb_descriptors.c
-        matrix.c
+        matrix_driver.c
         suspend.c
         xprintf.c)
 
@@ -60,13 +61,13 @@ elseif (MCU_TYPE MATCHES "NRF52832")
         PRIVATE 
             porting/nrf52/nrf52832.c
             porting/nrf52/ble_keyboard.c
-            )
+            porting/nrf52/usb_backend_uart.c)
 
     target_link_libraries(amk PRIVATE nrf5_sdk)
 
     set(NRF5_MDK_PATH "${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nRF5_SDK_17.0.0_9d13099/modules/nrfx/mdk")
     target_link_options(amk PRIVATE "-L${NRF5_MDK_PATH}" "-T${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nrf52832.ld")
-    target_compile_definitions(amk PRIVATE MCU_NRF5X)
+    target_compile_definitions(amk PRIVATE MCU_NRF5X MATRIX_USE_GPIO)
 elseif(MCU_TYPE MATCHES "STM32F411")
     target_sources(amk
         PRIVATE 

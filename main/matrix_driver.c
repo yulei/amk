@@ -3,12 +3,11 @@
  * default matrix implementation
  */
 
-#include "quantum.h"
-#include "debounce.h"
 #include "ble_config.h"
 #include "matrix_driver.h"
-#include "nrf_gpio.h"
-#include "nrf_drv_gpiote.h"
+#include "gpio_pin.h"
+#include "wait.h"
+#include "timer.h"
 
 #ifdef MATRIX_USE_TCA6424
 #   ifndef MATRIX_DETECT_PIN
@@ -18,18 +17,14 @@
 #   include "tca6424.h"
 #endif
 
-#ifndef MATRIX_PIN
-#   define MATRIX_PIN uint32_t
-#endif
-
 #ifndef DEBOUNCE
 #   define DEBOUNCE 5
 #endif
 
 static bool debouncing = false;
 static uint16_t debouncing_time = 0;
-MATRIX_PIN row_pins[] = MATRIX_ROW_PINS;
-MATRIX_PIN col_pins[] = MATRIX_COL_PINS;
+pin_t row_pins[] = MATRIX_ROW_PINS;
+pin_t col_pins[] = MATRIX_COL_PINS;
 
 /* matrix state(1:on, 0:off) */
 static matrix_row_t raw_matrix[MATRIX_ROWS];    //raw values
@@ -37,7 +32,22 @@ static matrix_row_t matrix[MATRIX_ROWS];        //debounced values
 
 matrix_driver_t matrix_driver;
 
+__attribute__((weak))
+void matrix_init_user(void) { }
+
+__attribute__((weak))
+void matrix_init_kb(void) { matrix_init_user(); }
+
+__attribute__((weak))
+void matrix_scan_user(void) {}
+
+__attribute__((weak))
+void matrix_scan_kb(void) { matrix_scan_user(); }
+
 #if defined(MATRIX_USE_GPIO)
+
+#include "nrf_gpio.h"
+#include "nrf_drv_gpiote.h"
 
 static void matrix_pin_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
@@ -242,6 +252,7 @@ void matrix_init(void)
     // initialize matrix state: all keys off
     memset(&matrix[0], 0, sizeof(matrix));
     memset(&raw_matrix[0], 0, sizeof(raw_matrix));
+    matrix_init_kb();
 }
 
 uint8_t matrix_scan(void)
@@ -281,6 +292,7 @@ uint8_t matrix_scan(void)
         debouncing = false;
     }
 
+    matrix_scan_kb();
     return 1;
 }
 
@@ -296,25 +308,7 @@ matrix_row_t matrix_get_row(uint8_t row)
 
 void matrix_print(void)
 {
-    print("\nr/c 0123456789ABCDEF\n");
-    for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-        phex(row); print(": ");
-        pbin_reverse16(matrix_get_row(row));
-        print("\n");
-    }
 }
-
-__attribute__((weak))
-void matrix_init_kb(void) { matrix_init_user(); }
-
-__attribute__((weak))
-void matrix_init_user(void) { }
-
-__attribute__((weak))
-void matrix_scan_kb(void) { matrix_scan_user(); }
-
-__attribute__((weak))
-void matrix_scan_user(void) {}
 
 void matrix_driver_init(void)
 {

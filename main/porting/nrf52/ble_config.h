@@ -184,7 +184,6 @@ typedef struct {
 
     uint8_t         keyboard_led;   /**< keyboard led status */
     uint8_t         vbus_enabled;   /**< vbus status */
-    uint8_t         uart_enabled;   /**< uart status */
     uint8_t         output_target;  /**< target of output */
     uint8_t         matrix_changed; /**< matrix has changed */
     uint8_t         battery_power;  /**< power of the battery */

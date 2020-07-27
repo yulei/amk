@@ -14,16 +14,61 @@ target_sources(nrf5_sdk
         ${NRF5_SDK_PATH}/components/libraries/ringbuf/nrf_ringbuf.c
         ${NRF5_SDK_PATH}/components/libraries/atomic/nrf_atomic.c
         ${NRF5_SDK_PATH}/components/libraries/atomic_fifo/nrf_atfifo.c
+        ${NRF5_SDK_PATH}/components/libraries/atomic_flags/nrf_atflags.c
         ${NRF5_SDK_PATH}/components/libraries/queue/nrf_queue.c
+        ${NRF5_SDK_PATH}/components/libraries/fds/fds.c
+        ${NRF5_SDK_PATH}/components/libraries/fstorage/nrf_fstorage.c
+        ${NRF5_SDK_PATH}/components/libraries/fstorage/nrf_fstorage_sd.c
         ${NRF5_SDK_PATH}/components/libraries/memobj/nrf_memobj.c
+        ${NRF5_SDK_PATH}/components/libraries/fifo/app_fifo.c
+        ${NRF5_SDK_PATH}/components/libraries/uart/app_uart_fifo.c
         ${NRF5_SDK_PATH}/components/libraries/balloc/nrf_balloc.c
         ${NRF5_SDK_PATH}/components/libraries/sortlist/nrf_sortlist.c
         ${NRF5_SDK_PATH}/components/libraries/scheduler/app_scheduler.c
         ${NRF5_SDK_PATH}/components/libraries/util/app_error.c
         ${NRF5_SDK_PATH}/components/libraries/util/app_error_weak.c
         ${NRF5_SDK_PATH}/components/libraries/util/app_util_platform.c
+        ${NRF5_SDK_PATH}/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c
+        ${NRF5_SDK_PATH}/components/libraries/strerror/nrf_strerror.c
+        ${NRF5_SDK_PATH}/components/libraries/experimental_section_vars/nrf_section_iter.c
         ${NRF5_SDK_PATH}/integration/nrfx/legacy/nrf_drv_clock.c
+        ${NRF5_SDK_PATH}/integration/nrfx/legacy/nrf_drv_uart.c
         ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_clock.c
+        ${NRF5_SDK_PATH}/components/ble/ble_link_ctx_manager/ble_link_ctx_manager.c
+        ${NRF5_SDK_PATH}/components/ble/ble_services/ble_bas/ble_bas.c
+        ${NRF5_SDK_PATH}/components/ble/ble_services/ble_dis/ble_dis.c
+        ${NRF5_SDK_PATH}/components/ble/ble_services/ble_hids/ble_hids.c
+        ${NRF5_SDK_PATH}/components/ble/common/ble_advdata.c
+        ${NRF5_SDK_PATH}/components/ble/common/ble_conn_params.c
+        ${NRF5_SDK_PATH}/components/ble/common/ble_conn_state.c
+        ${NRF5_SDK_PATH}/components/ble/common/ble_srv_common.c
+        ${NRF5_SDK_PATH}/components/ble/ble_advertising/ble_advertising.c
+        ${NRF5_SDK_PATH}/components/ble/nrf_ble_gatt/nrf_ble_gatt.c
+        ${NRF5_SDK_PATH}/components/ble/nrf_ble_qwr/nrf_ble_qwr.c
+        ${NRF5_SDK_PATH}/components/ble/peer_manager/auth_status_tracker.c
+        ${NRF5_SDK_PATH}/components/ble/peer_manager/gatt_cache_manager.c
+        ${NRF5_SDK_PATH}/components/ble/peer_manager/gatts_cache_manager.c
+        ${NRF5_SDK_PATH}/components/ble/peer_manager/id_manager.c
+        ${NRF5_SDK_PATH}/components/ble/peer_manager/peer_data_storage.c
+        ${NRF5_SDK_PATH}/components/ble/peer_manager/peer_database.c
+        ${NRF5_SDK_PATH}/components/ble/peer_manager/peer_id.c
+        ${NRF5_SDK_PATH}/components/ble/peer_manager/peer_manager.c
+        ${NRF5_SDK_PATH}/components/ble/peer_manager/peer_manager_handler.c
+        ${NRF5_SDK_PATH}/components/ble/peer_manager/pm_buffer.c
+        ${NRF5_SDK_PATH}/components/ble/peer_manager/security_dispatcher.c
+        ${NRF5_SDK_PATH}/components/ble/peer_manager/security_manager.c
+        ${NRF5_SDK_PATH}/components/softdevice/common/nrf_sdh.c
+        ${NRF5_SDK_PATH}/components/softdevice/common/nrf_sdh_ble.c
+        ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_clock.c
+        ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_gpiote.c
+        ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_pwm.c
+        ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_saadc.c
+        ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_twi.c
+        ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_uart.c
+        ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_uarte.c
+        ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/prs/nrfx_prs.c
+        ${NRF5_SDK_PATH}/external/fprintf/nrf_fprintf.c
+        ${NRF5_SDK_PATH}/external/fprintf/nrf_fprintf_format.c
         #${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT.c
         #${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT_printf.c
         )
@@ -55,8 +100,10 @@ target_include_directories(nrf5_sdk
         ${NRF5_SDK_PATH}/integration/nrfx/legacy
         ${NRF5_SDK_PATH}/components/toolchain/cmsis/include
         ${NRF5_SDK_PATH}/components/libraries/util
+        ${NRF5_SDK_PATH}/components/libraries/fifo
         ${NRF5_SDK_PATH}/components/libraries/atomic
         ${NRF5_SDK_PATH}/components/libraries/atomic_fifo
+        ${NRF5_SDK_PATH}/components/libraries/atomic_flags
         ${NRF5_SDK_PATH}/components/libraries/queue
         ${NRF5_SDK_PATH}/components/libraries/cli
         ${NRF5_SDK_PATH}/components/libraries/timer
@@ -70,6 +117,10 @@ target_include_directories(nrf5_sdk
         ${NRF5_SDK_PATH}/components/libraries/sortlist
         ${NRF5_SDK_PATH}/components/libraries/scheduler
         ${NRF5_SDK_PATH}/components/libraries/pwr_mgmt
+        ${NRF5_SDK_PATH}/components/libraries/uart
+        ${NRF5_SDK_PATH}/components/libraries/mutex
+        ${NRF5_SDK_PATH}/components/libraries/fds
+        ${NRF5_SDK_PATH}/components/libraries/fstorage
         ${NRF5_SDK_PATH}/components/libraries/experimental_section_vars
         ${NRF5_SDK_PATH}/components/softdevice/common
         ${NRF5_SDK_PATH}/components/softdevice/mbr/headers

@@ -6,7 +6,20 @@
 #pragma once
 
 #include "ble_config.h"
+#include "tusb.h"
 
+const static uint8_t hid_report_descriptor [] = {
+    TUD_HID_REPORT_DESC_KEYBOARD( HID_REPORT_ID(NRF_REPORT_ID_KEYBOARD) ),
+#ifdef MOUSE_ENABLE
+    TUD_HID_REPORT_DESC_MOUSE   ( HID_REPORT_ID(NRF_REPORT_ID_MOUSE) ),
+#endif
+#ifdef EXTRAKEY_ENABLE
+    TUD_HID_REPORT_DESC_SYSTEM_CONTROL( HID_REPORT_ID(NRF_REPORT_ID_SYSTEM) ),
+    TUD_HID_REPORT_DESC_CONSUMER( HID_REPORT_ID(NRF_REPORT_ID_CONSUMER) ),
+#endif
+};
+
+#if 0
 #define WITH_LUFA 1
 #if WITH_LUFA
 #define ATTR_PACKED __attribute__((packed))
@@ -191,3 +204,5 @@ const static uint8_t hid_report_descriptor [] = {
 #endif
 
 };
+
+#endif
