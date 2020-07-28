@@ -14,7 +14,8 @@
 ble_driver_t ble_driver = {
     .peer_id = PM_PEER_ID_INVALID,
     .conn_handle = BLE_CONN_HANDLE_INVALID,
-    .keyboard_led = 0,
+    .ble_led = 0,
+    .usb_led = 0,
     .vbus_enabled = 0,
     //.output_target = OUTPUT_USB,
     .output_target = OUTPUT_BLE,

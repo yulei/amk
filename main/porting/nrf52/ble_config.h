@@ -182,12 +182,13 @@ typedef struct {
     pm_peer_id_t    peer_id;        /**< Device reference handle to the current bonded central. */
     uint16_t        conn_handle;    /**< Handle of the current connection. */
 
-    uint8_t         keyboard_led;   /**< keyboard led status */
+    uint8_t         ble_led;        /**< keyboard led status from ble */
+    uint8_t         usb_led;        /**< keyboard led status from usb */
     uint8_t         vbus_enabled;   /**< vbus status */
     uint8_t         output_target;  /**< target of output */
     uint8_t         matrix_changed; /**< matrix has changed */
     uint8_t         battery_power;  /**< power of the battery */
-    uint8_t         sleep_count;    /**< count for sleep or not, based on the battery sampling timer */
+    uint32_t        sleep_count;    /**< count for sleep or not, based on the battery sampling timer */
     uint32_t        scan_count;     /**< idle scan count */
 } ble_driver_t;
 

@@ -18,6 +18,8 @@ target_sources(tmk
         ${TMK_PATH}/common/util.c 
         ${TMK_PATH}/common/hook.c
         ${TMK_PATH}/common/keymap.c
+        ${TMK_PATH}/common/bootmagic.c
+        ${TMK_PATH}/common/mousekey.c
     ) 
 
 target_include_directories(tmk
@@ -29,6 +31,13 @@ target_include_directories(tmk
         ${CMAKE_CURRENT_LIST_DIR})
 
 message(STATUS ${CONFIG_INCLUDE_PATH})
+
+target_compile_definitions(tmk
+    PUBLIC
+        BOOTMAGIC_ENABLE
+        MOUSEKEY_ENABLE
+        EXTRAKEY_ENABLE
+    )
 
 target_compile_options(tmk
     PUBLIC   

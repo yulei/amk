@@ -199,7 +199,16 @@ static void keyboard_timer_stop(void)
 
 }
 
-static uint8_t keyboard_leds(void) { return ble_driver.keyboard_led; }
+static uint8_t keyboard_leds(void)
+{
+    if ( ble_driver.output_target == OUTPUT_BLE)
+        return ble_driver.ble_led;
+    
+    if (ble_driver.output_target == OUTPUT_USB)
+        return ble_driver.usb_led;
+
+    return 0;
+}
 
 static void send_keyboard(report_keyboard_t *report)
 {

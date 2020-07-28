@@ -15,7 +15,6 @@ target_include_directories(amk
 target_sources(amk
     PRIVATE         
         main.c 
-        usb_descriptors.c
         matrix_driver.c
         suspend.c
         xprintf.c)
@@ -37,7 +36,8 @@ if (MCU_TYPE MATCHES "NRF52840")
             porting/nrf52/timer.c
             porting/nrf52/bootloader.c
             porting/nrf52/gpio_pin.c
-            porting/nrf52/wait.c)
+            porting/nrf52/wait.c
+            porting/nrf52/eeconfig_fds.c)
 
     set(NRF5_MDK_PATH "${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nRF5_SDK_17.0.0_9d13099/modules/nrfx/mdk")
     target_link_options(amk PRIVATE "-L${NRF5_MDK_PATH}" "-T${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nrf52840_flash.ld")
@@ -48,7 +48,8 @@ elseif (MCU_TYPE MATCHES "NRF52832")
             porting/nrf52/timer.c
             porting/nrf52/bootloader.c
             porting/nrf52/gpio_pin.c
-            porting/nrf52/wait.c)
+            porting/nrf52/wait.c
+            porting/nrf52/eeconfig_fds.c)
 
      target_sources(amk
         PRIVATE 
