@@ -94,7 +94,12 @@ static void battery_level_sample_timeout_handler(void* p_context)
         err_code = nrf_drv_saadc_sample();
         APP_ERROR_CHECK(err_code);
         NRF_LOG_INFO("battery sampling triggered.");
-        ble_driver.sleep_count++;
+        if (!ble_driver.vbus_enabled) {
+            ble_driver.sleep_count++;
+            NRF_LOG_INFO("Sleep count increased: %d", ble_driver.sleep_count);
+        } else {
+            ble_driver.sleep_count=0;
+        }
     }
 }
 

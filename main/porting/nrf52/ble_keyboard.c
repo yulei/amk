@@ -329,10 +329,19 @@ static void usb_leds(uint8_t leds)
 // F21 for select usb/ble output
 // F22 for erase bond
 // F23 for enter bootloader mode
-/*bool process_record_kb(uint16_t keycode, keyrecord_t *record)
+#include "action.h"
+#include "action_layer.h"
+bool hook_process_action(keyrecord_t *record) {
 {
-    if (record->event.pressed) {
-        switch(keycode) {
+    if (IS_NOEVENT(record->event) || !record->event.pressed) { 
+        return false;
+    }
+    action_t action = layer_switch_get_action(record->event);
+    if (action.kind.id != ACT_MODS) {
+        return false;
+    }
+
+    switch(action.key.code) {
         case KC_F21: // toggle usb/ble output
             if (ble_driver.output_target == OUTPUT_BLE) {
                 if (ble_driver.vbus_enabled) {
@@ -345,27 +354,22 @@ static void usb_leds(uint8_t leds)
                 NRF_LOG_INFO("set output to BLE");
                 ble_driver.output_target = OUTPUT_BLE;
             }
-            return false;
+            return true;
 
         case KC_F22: // reset to erase bond mode
             NRF_LOG_INFO("reset to erase bond");
             sd_power_gpregret_set(RST_REGISTER, RST_ERASE_BOND);
             sd_nvic_SystemReset();
-            return false;
+            return true;
 
         case KC_F23: // usb mcu to bootloader mode
             NRF_LOG_INFO("send reboot command");
-            send_reboot_cmd();
-            return false;
-        #ifdef RGBLIGHT_ENABLE
-        case RGB_TOG:
-            keyboard_set_rgb(!keyboard_rgblight_on());
-            break;
-        #endif
-            default:
+            nrf_usb_reboot();
+            return true;
+        default:
             break;
         }
     }
-    return process_record_user(keycode, record);
+
+    return false;
 }
-*/
