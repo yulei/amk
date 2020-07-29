@@ -59,7 +59,7 @@ static void ee_evt_handler(fds_evt_t const *p_evt)
 
 void fds_eeprom_init(void)
 {
-    fds_init();
+    //fds_init();
 
     if (!ee_callback_registered) {
         fds_register(ee_evt_handler);

@@ -161,7 +161,7 @@ static void keyboard_timout_handler(void *p_context)
 
     if (ble_driver.matrix_changed) {
         ble_driver.scan_count = 0;
-        ble_driver.matrix_changed = false;
+        ble_driver.matrix_changed = 0;
     } else {
         if (!keyboard_rgb_on()) {
             ble_driver.scan_count++;
@@ -171,7 +171,7 @@ static void keyboard_timout_handler(void *p_context)
     }
 
     // scan count overflow, switch to trigger mode
-    if (ble_driver.scan_count >= MAX_SCAN_COUNT) {
+    if (key_matrix_is_off() && (ble_driver.scan_count >= MAX_SCAN_COUNT)) {
         keyboard_timer_stop();
         matrix_driver_scan_stop();
         matrix_driver_trigger_start(matrix_event_handler);

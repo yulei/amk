@@ -15,3 +15,5 @@ void matrix_driver_trigger_stop(void);
 void matrix_driver_scan_start(void);
 void matrix_driver_scan_stop(void);
 void matrix_driver_prepare_sleep(void);
+
+bool key_matrix_is_off(void);
