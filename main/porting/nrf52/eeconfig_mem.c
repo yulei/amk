@@ -1,9 +1,10 @@
 /**
- * @file eeprom.c
+ * @file eeconfig_mem.c
  *
  */
-
-#include "eeprom.h"
+#include <stddef.h>
+#include <stdint.h>
+#include "eeconfig.h"
 
 #define EEPROM_SIZE 64
 
