@@ -59,6 +59,7 @@ target_sources(nrf5_sdk
         ${NRF5_SDK_PATH}/components/ble/peer_manager/security_manager.c
         ${NRF5_SDK_PATH}/components/softdevice/common/nrf_sdh.c
         ${NRF5_SDK_PATH}/components/softdevice/common/nrf_sdh_ble.c
+        ${NRF5_SDK_PATH}/components/softdevice/common/nrf_sdh_soc.c
         ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_clock.c
         ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_gpiote.c
         ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_pwm.c
