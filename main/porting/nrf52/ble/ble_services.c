@@ -129,6 +129,24 @@ static void pm_evt_handler(pm_evt_t const * p_evt) {
             ble_pm_whitelist_set(PM_PEER_ID_LIST_SKIP_NO_ID_ADDR);
         }
         break;
+    case PM_EVT_CONN_SEC_FAILED: {
+        if (p_evt->params.conn_sec_failed.error == PM_CONN_SEC_ERROR_PIN_OR_KEY_MISSING) {
+            ret_code_t err_code;
+            // Rebond if one party has lost its keys.
+            err_code = pm_conn_secure(p_evt->conn_handle, false);
+
+            if (err_code != NRF_ERROR_BUSY) {
+                APP_ERROR_CHECK(err_code);
+            }
+        }
+    }
+        break;
+    case PM_EVT_CONN_SEC_CONFIG_REQ: {
+        // allow pairing request from an already bonded peer.
+        pm_conn_sec_config_t conn_sec_config = { .allow_repairing = true };
+        pm_conn_sec_config_reply(p_evt->conn_handle, &conn_sec_config);
+    }
+        break;
 
     default:
         break;

@@ -40,7 +40,7 @@ if (MCU_TYPE MATCHES "NRF52840")
             porting/nrf52/eeconfig_fds.c)
 
     set(NRF5_MDK_PATH "${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nRF5_SDK_17.0.0_9d13099/modules/nrfx/mdk")
-    target_link_options(amk PRIVATE "-L${NRF5_MDK_PATH}" "-T${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nrf52840_flash.ld")
+    target_link_options(amk PRIVATE "-L${NRF5_MDK_PATH}" "-T${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nrf52840.ld")
     target_compile_definitions(amk PRIVATE MCU_NRF5X)
 elseif (MCU_TYPE MATCHES "NRF52832")
     target_sources(amk
