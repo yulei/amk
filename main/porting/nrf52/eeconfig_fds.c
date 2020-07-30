@@ -8,6 +8,8 @@
 #include "eeconfig.h"
 #include "fds.h"
 #include "app_timer.h"
+#include "app_scheduler.h"
+#include "nrf_log.h"
 
 #define EECONFIG_SIZE 64
 
@@ -17,11 +19,17 @@ APP_TIMER_DEF(m_eeprom_update_timer_id);        // timer for update the eeprom
 #define EE_FILEID 0x6565                        //"ee"
 #define EE_EEPROM_KEY 0x00AB                    // should in rage 0x0001-0xBFFF
 
-static bool ee_callback_registered = false;
-static bool ee_update_timer_created = false;
+static volatile bool ee_fds_initialized = false;
 static volatile bool eeprom_dirty = false;
 
-static uint8_t eeprom_buf[(EECONFIG_SIZE+3)&(~3)] __attribute__((aligned(4))); // pad to word size
+static void wait_for_fds_ready(void)
+{
+    while(!ee_fds_initialized) {
+        app_sched_execute();
+    }
+}
+
+__ALIGN(4) static uint8_t eeprom_buf[(EECONFIG_SIZE + 3) & (~3)];  // pad to word size
 
 static fds_record_t ee_record = {
     .file_id = EE_FILEID,
@@ -51,30 +59,31 @@ static void ee_evt_handler(fds_evt_t const *p_evt)
         }
         break;
     case FDS_EVT_INIT:
+        if (p_evt->result == NRF_SUCCESS) {
+            ee_fds_initialized = true;
+            NRF_LOG_INFO("FDS initialized.");
+        } else {
+            NRF_LOG_INFO("Failed to initialized FDS, code: %d", p_evt->result);
+        } break;
     default:
         break;
     }
 }
 
-
 void fds_eeprom_init(void)
 {
-    //fds_init();
+    ret_code_t err_code;
+    NRF_LOG_INFO("Initializing fds...");
+    ee_fds_initialized = false;
+    fds_register(ee_evt_handler);
+    err_code = fds_init();
+    APP_ERROR_CHECK(err_code);
+    wait_for_fds_ready();
 
-    if (!ee_callback_registered) {
-        fds_register(ee_evt_handler);
-        ee_callback_registered = true;
-    }
-
-    // create eeprom update timer
-    if (!ee_update_timer_created) {
-        ret_code_t err_code;
-        err_code = app_timer_create(&m_eeprom_update_timer_id,
+    err_code = app_timer_create(&m_eeprom_update_timer_id,
                                 APP_TIMER_MODE_SINGLE_SHOT,
                                 eeprom_update_timeout_handler);
-        APP_ERROR_CHECK(err_code);
-        ee_update_timer_created = true;
-    }
+    APP_ERROR_CHECK(err_code);
 }
 
 static void eeprom_update_timeout_handler(void* p_context)
@@ -209,8 +218,6 @@ void eeprom_update_block(const void *buf, void *addr, size_t len) {
 
 void eeconfig_init(void)
 {
-    fds_eeprom_init();
-
     eeprom_write_word(EECONFIG_MAGIC, EECONFIG_MAGIC_NUMBER);
     eeprom_write_byte(EECONFIG_DEBUG,          0);
     eeprom_write_byte(EECONFIG_DEFAULT_LAYER,  0);

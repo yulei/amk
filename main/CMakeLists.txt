@@ -49,8 +49,8 @@ elseif (MCU_TYPE MATCHES "NRF52832")
             porting/nrf52/bootloader.c
             porting/nrf52/gpio_pin.c
             porting/nrf52/wait.c
-            porting/nrf52/eeconfig_mem.c)
-            #porting/nrf52/eeconfig_fds.c)
+            #porting/nrf52/eeconfig_mem.c)
+            porting/nrf52/eeconfig_fds.c)
 
      target_sources(amk
         PRIVATE 

@@ -10,6 +10,7 @@
 #include "ble_adv_service.h"
 #include "ble_hids_service.h"
 #include "ble_keyboard.h"
+#include "eeconfig_fds.h"
 
 ble_driver_t ble_driver = {
     .peer_id = PM_PEER_ID_INVALID,
@@ -192,6 +193,7 @@ void board_init(void)
 {
     bool erase_bonds = false;
     uint32_t reason = 0;
+    
 #if CONFIG_JLINK_MONITOR_ENABLED
     NVIC_SetPriority(DebugMonitor_IRQn, _PRIO_SD_LOW);
 #endif
@@ -202,6 +204,9 @@ void board_init(void)
     power_management_init();
     ble_stack_init();
     scheduler_init();
+
+    fds_eeprom_init();
+
     ble_services_init();
     ble_keyboard_init();
 

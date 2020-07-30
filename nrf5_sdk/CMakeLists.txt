@@ -4,40 +4,34 @@ set(NRF5_SDK_PATH "nRF5_SDK_17.0.0_9d13099")
 add_library(nrf5_sdk STATIC "")
 target_sources(nrf5_sdk
     PRIVATE
-        ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_backend_rtt.c
-        ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_backend_serial.c
-        ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_backend_uart.c
-        ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_default_backends.c
-        ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_frontend.c
-        ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_str_formatter.c
-        ${NRF5_SDK_PATH}/components/libraries/timer/app_timer.c
-        ${NRF5_SDK_PATH}/components/libraries/ringbuf/nrf_ringbuf.c
         ${NRF5_SDK_PATH}/components/libraries/atomic/nrf_atomic.c
         ${NRF5_SDK_PATH}/components/libraries/atomic_fifo/nrf_atfifo.c
         ${NRF5_SDK_PATH}/components/libraries/atomic_flags/nrf_atflags.c
-        ${NRF5_SDK_PATH}/components/libraries/queue/nrf_queue.c
+        ${NRF5_SDK_PATH}/components/libraries/balloc/nrf_balloc.c
+        ${NRF5_SDK_PATH}/components/libraries/experimental_section_vars/nrf_section_iter.c
         ${NRF5_SDK_PATH}/components/libraries/fds/fds.c
         ${NRF5_SDK_PATH}/components/libraries/fstorage/nrf_fstorage.c
         ${NRF5_SDK_PATH}/components/libraries/fstorage/nrf_fstorage_sd.c
-        ${NRF5_SDK_PATH}/components/libraries/memobj/nrf_memobj.c
         ${NRF5_SDK_PATH}/components/libraries/fifo/app_fifo.c
-        ${NRF5_SDK_PATH}/components/libraries/uart/app_uart_fifo.c
-        ${NRF5_SDK_PATH}/components/libraries/balloc/nrf_balloc.c
+        ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_backend_rtt.c
+        ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_backend_serial.c
+        ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_default_backends.c
+        ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_frontend.c
+        ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_str_formatter.c
+        ${NRF5_SDK_PATH}/components/libraries/memobj/nrf_memobj.c
+        ${NRF5_SDK_PATH}/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c
+        ${NRF5_SDK_PATH}/components/libraries/queue/nrf_queue.c
+        ${NRF5_SDK_PATH}/components/libraries/ringbuf/nrf_ringbuf.c
         ${NRF5_SDK_PATH}/components/libraries/sortlist/nrf_sortlist.c
+        ${NRF5_SDK_PATH}/components/libraries/strerror/nrf_strerror.c
         ${NRF5_SDK_PATH}/components/libraries/scheduler/app_scheduler.c
+        ${NRF5_SDK_PATH}/components/libraries/timer/app_timer2.c
+        ${NRF5_SDK_PATH}/components/libraries/timer/drv_rtc.c
+        ${NRF5_SDK_PATH}/components/libraries/uart/app_uart_fifo.c
         ${NRF5_SDK_PATH}/components/libraries/util/app_error.c
         ${NRF5_SDK_PATH}/components/libraries/util/app_error_weak.c
+        ${NRF5_SDK_PATH}/components/libraries/util/app_error_handler_gcc.c
         ${NRF5_SDK_PATH}/components/libraries/util/app_util_platform.c
-        ${NRF5_SDK_PATH}/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c
-        ${NRF5_SDK_PATH}/components/libraries/strerror/nrf_strerror.c
-        ${NRF5_SDK_PATH}/components/libraries/experimental_section_vars/nrf_section_iter.c
-        ${NRF5_SDK_PATH}/integration/nrfx/legacy/nrf_drv_clock.c
-        ${NRF5_SDK_PATH}/integration/nrfx/legacy/nrf_drv_uart.c
-        ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_clock.c
-        ${NRF5_SDK_PATH}/components/ble/ble_link_ctx_manager/ble_link_ctx_manager.c
-        ${NRF5_SDK_PATH}/components/ble/ble_services/ble_bas/ble_bas.c
-        ${NRF5_SDK_PATH}/components/ble/ble_services/ble_dis/ble_dis.c
-        ${NRF5_SDK_PATH}/components/ble/ble_services/ble_hids/ble_hids.c
         ${NRF5_SDK_PATH}/components/ble/common/ble_advdata.c
         ${NRF5_SDK_PATH}/components/ble/common/ble_conn_params.c
         ${NRF5_SDK_PATH}/components/ble/common/ble_conn_state.c
@@ -45,6 +39,10 @@ target_sources(nrf5_sdk
         ${NRF5_SDK_PATH}/components/ble/ble_advertising/ble_advertising.c
         ${NRF5_SDK_PATH}/components/ble/nrf_ble_gatt/nrf_ble_gatt.c
         ${NRF5_SDK_PATH}/components/ble/nrf_ble_qwr/nrf_ble_qwr.c
+        ${NRF5_SDK_PATH}/components/ble/ble_link_ctx_manager/ble_link_ctx_manager.c
+        ${NRF5_SDK_PATH}/components/ble/ble_services/ble_bas/ble_bas.c
+        ${NRF5_SDK_PATH}/components/ble/ble_services/ble_dis/ble_dis.c
+        ${NRF5_SDK_PATH}/components/ble/ble_services/ble_hids/ble_hids.c
         ${NRF5_SDK_PATH}/components/ble/peer_manager/auth_status_tracker.c
         ${NRF5_SDK_PATH}/components/ble/peer_manager/gatt_cache_manager.c
         ${NRF5_SDK_PATH}/components/ble/peer_manager/gatts_cache_manager.c
@@ -60,6 +58,9 @@ target_sources(nrf5_sdk
         ${NRF5_SDK_PATH}/components/softdevice/common/nrf_sdh.c
         ${NRF5_SDK_PATH}/components/softdevice/common/nrf_sdh_ble.c
         ${NRF5_SDK_PATH}/components/softdevice/common/nrf_sdh_soc.c
+        ${NRF5_SDK_PATH}/integration/nrfx/legacy/nrf_drv_clock.c
+        ${NRF5_SDK_PATH}/integration/nrfx/legacy/nrf_drv_uart.c
+        ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_clock.c
         ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_clock.c
         ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_gpiote.c
         ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_pwm.c
@@ -85,6 +86,20 @@ elseif (MCU_TYPE MATCHES "NRF52832")
         PRIVATE
             ${NRF5_SDK_PATH}/modules/nrfx/mdk/system_nrf52.c 
             ${NRF5_SDK_PATH}/modules/nrfx/mdk/gcc_startup_nrf52.S)
+    target_compile_definitions(nrf5_sdk
+        PUBLIC
+            FLOAT_ABI_HARD
+            NRF52
+            NRF52832_XXAA
+            CONFIG_NFCT_PINS_AS_GPIOS
+            NRF52_PAN_74
+            NRF_SD_BLE_API_VERSION=7
+            S132
+            SOFTDEVICE_PRESENT
+            APP_TIMER_V2
+            APP_TIMER_V2_RTC1_ENABLED
+            __HEAP_SIZE=8192
+            __STACK_SIZE=8192)
 else()
 message(ERROR "could not find valid nrf chips")
 endif()
