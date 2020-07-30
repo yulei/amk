@@ -2,6 +2,10 @@ add_executable(nrf52_kbd nrf52kbd.c)
 target_link_libraries(nrf52_kbd PRIVATE nrf5_sdk)
 
 add_executable(amk "")
+set_target_properties(
+    amk 
+    PROPERTIES 
+        SUFFIX ".elf")
 
 target_link_libraries(amk PRIVATE tmk kbd)
 
@@ -109,5 +113,5 @@ add_custom_command(
     COMMAND
         ${CMAKE_COMMAND} -E  echo "Final size summary:"
     COMMAND
-        ${CMAKE_SIZE_BIN} amk 
+        ${CMAKE_SIZE_BIN} ${TARGET_FULLNAME}
     )
