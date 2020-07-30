@@ -1,3 +1,6 @@
+add_executable(nrf52_kbd nrf52kbd.c)
+target_link_libraries(nrf52_kbd PRIVATE nrf5_sdk)
+
 add_executable(amk "")
 
 target_link_libraries(amk PRIVATE tmk kbd)
@@ -19,10 +22,10 @@ target_sources(amk
         suspend.c
         xprintf.c)
 
-target_sources(amk
-    PRIVATE         
-        rtt/SEGGER_RTT.c
-        rtt/SEGGER_RTT_printf.c)
+#target_sources(amk
+#    PRIVATE         
+#        rtt/SEGGER_RTT.c
+#        rtt/SEGGER_RTT_printf.c)
 
 target_compile_definitions(amk
     PRIVATE
@@ -49,8 +52,8 @@ elseif (MCU_TYPE MATCHES "NRF52832")
             porting/nrf52/bootloader.c
             porting/nrf52/gpio_pin.c
             porting/nrf52/wait.c
-            #porting/nrf52/eeconfig_mem.c)
-            porting/nrf52/eeconfig_fds.c)
+            porting/nrf52/eeconfig_mem.c)
+            #porting/nrf52/eeconfig_fds.c)
 
      target_sources(amk
         PRIVATE 
@@ -70,6 +73,8 @@ elseif (MCU_TYPE MATCHES "NRF52832")
     set(NRF5_MDK_PATH "${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nRF5_SDK_17.0.0_9d13099/modules/nrfx/mdk")
     target_link_options(amk PRIVATE "-L${NRF5_MDK_PATH}" "-T${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nrf52832.ld")
     target_compile_definitions(amk PRIVATE MCU_NRF5X MATRIX_USE_GPIO)
+
+    target_link_options(nrf52_kbd PRIVATE "-L${NRF5_MDK_PATH}" "-T${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nrf52832.ld")
 elseif(MCU_TYPE MATCHES "STM32F411")
     target_sources(amk
         PRIVATE 

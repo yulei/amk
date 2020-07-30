@@ -1,5 +1,6 @@
 
-set(NRF5_SDK_PATH "nRF5_SDK_17.0.0_9d13099")
+#set(NRF5_SDK_PATH "nRF5_SDK_17.0.0_9d13099")
+set(NRF5_SDK_PATH "nRF5_SDK_16.0.0_98a08e2")
 
 add_library(nrf5_sdk STATIC "")
 target_sources(nrf5_sdk
@@ -8,11 +9,13 @@ target_sources(nrf5_sdk
         ${NRF5_SDK_PATH}/components/libraries/atomic_fifo/nrf_atfifo.c
         ${NRF5_SDK_PATH}/components/libraries/atomic_flags/nrf_atflags.c
         ${NRF5_SDK_PATH}/components/libraries/balloc/nrf_balloc.c
+        ${NRF5_SDK_PATH}/components/libraries/crc16/crc16.c
         ${NRF5_SDK_PATH}/components/libraries/experimental_section_vars/nrf_section_iter.c
         ${NRF5_SDK_PATH}/components/libraries/fds/fds.c
         ${NRF5_SDK_PATH}/components/libraries/fstorage/nrf_fstorage.c
         ${NRF5_SDK_PATH}/components/libraries/fstorage/nrf_fstorage_sd.c
         ${NRF5_SDK_PATH}/components/libraries/fifo/app_fifo.c
+        ${NRF5_SDK_PATH}/components/libraries/hardfault/hardfault_implementation.c
         ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_backend_rtt.c
         ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_backend_serial.c
         ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_default_backends.c
@@ -32,6 +35,7 @@ target_sources(nrf5_sdk
         ${NRF5_SDK_PATH}/components/libraries/util/app_error_weak.c
         ${NRF5_SDK_PATH}/components/libraries/util/app_error_handler_gcc.c
         ${NRF5_SDK_PATH}/components/libraries/util/app_util_platform.c
+        ${NRF5_SDK_PATH}/components/libraries/util/nrf_assert.c
         ${NRF5_SDK_PATH}/components/ble/common/ble_advdata.c
         ${NRF5_SDK_PATH}/components/ble/common/ble_conn_params.c
         ${NRF5_SDK_PATH}/components/ble/common/ble_conn_state.c
@@ -69,10 +73,19 @@ target_sources(nrf5_sdk
         ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_uart.c
         ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_uarte.c
         ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/prs/nrfx_prs.c
+        ${NRF5_SDK_PATH}/modules/nrfx/soc/nrfx_atomic.c
         ${NRF5_SDK_PATH}/external/fprintf/nrf_fprintf.c
         ${NRF5_SDK_PATH}/external/fprintf/nrf_fprintf_format.c
-        #${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT.c
-        #${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT_printf.c
+        ${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT.c
+        ${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT_printf.c
+        ${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c
+        ${NRF5_SDK_PATH}/components/libraries/sensorsim/sensorsim.c
+        ${NRF5_SDK_PATH}/components/libraries/bsp/bsp.c
+        ${NRF5_SDK_PATH}/components/libraries/bsp/bsp_btn_ble.c
+        ${NRF5_SDK_PATH}/components/libraries/button/app_button.c
+        ${NRF5_SDK_PATH}/components/boards/boards.c
+    PUBLIC
+        sdk_config.h
         )
 
 if (MCU_TYPE MATCHES "NRF52840")
@@ -88,6 +101,8 @@ elseif (MCU_TYPE MATCHES "NRF52832")
             ${NRF5_SDK_PATH}/modules/nrfx/mdk/gcc_startup_nrf52.S)
     target_compile_definitions(nrf5_sdk
         PUBLIC
+            DEBUG
+            BOARD_PCA10040
             FLOAT_ABI_HARD
             NRF52
             NRF52832_XXAA
@@ -96,6 +111,7 @@ elseif (MCU_TYPE MATCHES "NRF52832")
             NRF_SD_BLE_API_VERSION=7
             S132
             SOFTDEVICE_PRESENT
+            APP_UART
             APP_TIMER_V2
             APP_TIMER_V2_RTC1_ENABLED
             __HEAP_SIZE=8192
@@ -153,5 +169,9 @@ target_include_directories(nrf5_sdk
         ${NRF5_SDK_PATH}/components/ble/nrf_ble_gatt
         ${NRF5_SDK_PATH}/components/ble/nrf_ble_qwr
         ${NRF5_SDK_PATH}/components/ble/peer_manager 
+        ${NRF5_SDK_PATH}/components/libraries/sensorsim
+        ${NRF5_SDK_PATH}/components/libraries/bsp
+        ${NRF5_SDK_PATH}/components/libraries/button
+        ${NRF5_SDK_PATH}/components/boards
         ${NRF5_SDK_PATH}/external/segger_rtt
         ${NRF5_SDK_PATH}/external/fprintf)

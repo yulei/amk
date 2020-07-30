@@ -205,7 +205,7 @@ void board_init(void)
     ble_stack_init();
     scheduler_init();
 
-    fds_eeprom_init();
+//    fds_eeprom_init();
 
     ble_services_init();
     ble_keyboard_init();
