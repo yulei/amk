@@ -101,7 +101,6 @@ elseif (MCU_TYPE MATCHES "NRF52832")
             ${NRF5_SDK_PATH}/modules/nrfx/mdk/gcc_startup_nrf52.S)
     target_compile_definitions(nrf5_sdk
         PUBLIC
-            DEBUG
             APP_UART
             APP_TIMER_V2
             APP_TIMER_V2_RTC1_ENABLED
@@ -114,7 +113,9 @@ elseif (MCU_TYPE MATCHES "NRF52832")
             S132
             SOFTDEVICE_PRESENT
             __HEAP_SIZE=8192
-            __STACK_SIZE=8192)
+            __STACK_SIZE=8192
+            $<$<STREQUAL:$<UPPER_CASE:${CMAKE_BUILD_TYPE}>,"DEBUG">:DEBUG>
+            )
 else()
 message(ERROR "could not find valid nrf chips")
 endif()
