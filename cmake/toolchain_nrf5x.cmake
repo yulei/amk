@@ -1,14 +1,11 @@
 # Target definition
 set(CMAKE_SYSTEM_NAME  Generic)
 set(CMAKE_SYSTEM_PROCESSOR ARM)
-set(CMAKE_CROSSCOMPILING 1)
+#set(CMAKE_CROSSCOMPILING 1)
 
 # Set toolchain paths
 set(TOOLCHAIN "arm-none-eabi-")
 
-#set(TOOLCHAIN_BIN_DIR "${TOOLCHAIN_PREFIX}/bin")
-#set(TOOLCHAIN_INC_DIR "${TOOLCHAIN_PREFIX}/${TOOLCHAIN}/include")
-#set(TOOLCHAIN_LIB_DIR "${TOOLCHAIN_PREFIX}/${TOOLCHAIN}/lib")
 # Set system depended extensions
 if(WIN32)
   set(TOOLCHAIN_EXT ".exe" )
@@ -53,15 +50,7 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -flto" CACHE INTERNAL "C++ Compiler options 
 set(CMAKE_ASM_FLAGS_MINSIZEREL "" CACHE INTERNAL "ASM Compiler options for minsize release build type")
 set(CMAKE_EXE_LINKER_FLAGS_MINSIZEREL "-flto" CACHE INTERNAL "Linker options for minsize release build type")
 
-# Link configuration
-#set(CMAKE_EXE_LINKER_FLAGS "-T\"${NRF5_SDK_PATH}/modules/nrfx/mdk/nrf52840_xxaa.ld\"")
-
 # Setup compilers
-#set(CMAKE_C_COMPILER ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}-gcc${TOOLCHAIN_EXT} CACHE INTERNAL "C Compiler")
-#set(CMAKE_CXX_COMPILER ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}-g++${TOOLCHAIN_EXT} CACHE INTERNAL "C++ Compiler")
-#set(CMAKE_ASM_COMPILER ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}-gcc${TOOLCHAIN_EXT} CACHE INTERNAL "ASM Compiler")
-#set(CMAKE_OBJCOPY_BIN ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}-objcopy${TOOLCHAIN_EXT} CACHE INTERNAL "objcopy executable")
-#set(CMAKE_SIZE_BIN ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}-size${TOOLCHAIN_EXT} CACHE INTERNAL "size executable")
 set(CMAKE_C_COMPILER ${TOOLCHAIN}gcc${TOOLCHAIN_EXT} CACHE INTERNAL "C Compiler")
 set(CMAKE_CXX_COMPILER ${TOOLCHAIN}g++${TOOLCHAIN_EXT} CACHE INTERNAL "C++ Compiler")
 set(CMAKE_ASM_COMPILER ${TOOLCHAIN}gcc${TOOLCHAIN_EXT} CACHE INTERNAL "ASM Compiler")
