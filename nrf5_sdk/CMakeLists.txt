@@ -30,23 +30,23 @@ target_sources(nrf5_sdk
         ${NRF5_SDK_PATH}/components/libraries/scheduler/app_scheduler.c
         ${NRF5_SDK_PATH}/components/libraries/timer/app_timer2.c
         ${NRF5_SDK_PATH}/components/libraries/timer/drv_rtc.c
-        ${NRF5_SDK_PATH}/components/libraries/uart/app_uart_fifo.c
         ${NRF5_SDK_PATH}/components/libraries/util/app_error.c
         ${NRF5_SDK_PATH}/components/libraries/util/app_error_weak.c
         ${NRF5_SDK_PATH}/components/libraries/util/app_error_handler_gcc.c
+        ${NRF5_SDK_PATH}/components/libraries/uart/app_uart_fifo.c
         ${NRF5_SDK_PATH}/components/libraries/util/app_util_platform.c
         ${NRF5_SDK_PATH}/components/libraries/util/nrf_assert.c
-        ${NRF5_SDK_PATH}/components/ble/common/ble_advdata.c
-        ${NRF5_SDK_PATH}/components/ble/common/ble_conn_params.c
-        ${NRF5_SDK_PATH}/components/ble/common/ble_conn_state.c
-        ${NRF5_SDK_PATH}/components/ble/common/ble_srv_common.c
         ${NRF5_SDK_PATH}/components/ble/ble_advertising/ble_advertising.c
-        ${NRF5_SDK_PATH}/components/ble/nrf_ble_gatt/nrf_ble_gatt.c
-        ${NRF5_SDK_PATH}/components/ble/nrf_ble_qwr/nrf_ble_qwr.c
         ${NRF5_SDK_PATH}/components/ble/ble_link_ctx_manager/ble_link_ctx_manager.c
         ${NRF5_SDK_PATH}/components/ble/ble_services/ble_bas/ble_bas.c
         ${NRF5_SDK_PATH}/components/ble/ble_services/ble_dis/ble_dis.c
         ${NRF5_SDK_PATH}/components/ble/ble_services/ble_hids/ble_hids.c
+        ${NRF5_SDK_PATH}/components/ble/common/ble_advdata.c
+        ${NRF5_SDK_PATH}/components/ble/common/ble_conn_params.c
+        ${NRF5_SDK_PATH}/components/ble/common/ble_conn_state.c
+        ${NRF5_SDK_PATH}/components/ble/common/ble_srv_common.c
+        ${NRF5_SDK_PATH}/components/ble/nrf_ble_gatt/nrf_ble_gatt.c
+        ${NRF5_SDK_PATH}/components/ble/nrf_ble_qwr/nrf_ble_qwr.c
         ${NRF5_SDK_PATH}/components/ble/peer_manager/auth_status_tracker.c
         ${NRF5_SDK_PATH}/components/ble/peer_manager/gatt_cache_manager.c
         ${NRF5_SDK_PATH}/components/ble/peer_manager/gatts_cache_manager.c

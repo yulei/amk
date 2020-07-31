@@ -1,9 +1,0 @@
-{
-  "files.associations": {
-    "nrf.h": "c",
-    "gpio_pin.h": "c",
-    "nrf_gpio.h": "c",
-    "nrf_delay.h": "c",
-    "nrf_atflags.h": "c"
-  }
-}

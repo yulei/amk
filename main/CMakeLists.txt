@@ -78,6 +78,20 @@ elseif (MCU_TYPE MATCHES "NRF52832")
     target_link_options(amk PRIVATE "-L${NRF5_MDK_PATH}" "-T${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nrf52832.ld")
     target_compile_definitions(amk PRIVATE MCU_NRF5X MATRIX_USE_GPIO)
 
+    if (MMD) 
+        target_sources(amk
+            PRIVATE 
+                porting/nrf52/mmd/JLINK_MONITOR.c
+                porting/nrf52/mmd/JLINK_MONITOR_ISR_SES.s)
+        target_include_directories(amk
+            PRIVATE 
+                porting/nrf52/mmd)
+        target_compile_options(amk
+            PRIVATE
+                CONFIG_JLINK_MONITOR_ENABLED)
+    endif()
+
+
     #target_link_options(nrf52_kbd PRIVATE "-L${NRF5_MDK_PATH}" "-T${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nrf52832.ld")
 elseif(MCU_TYPE MATCHES "STM32F411")
     target_sources(amk
