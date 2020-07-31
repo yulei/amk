@@ -7370,7 +7370,7 @@
 
 
 #ifndef BUTTON_ENABLED
-#define BUTTON_ENABLED 1
+#define BUTTON_ENABLED 0
 #endif
 
 // <q> BUTTON_HIGH_ACCURACY_ENABLED  - Enables GPIOTE high accuracy for buttons
@@ -7693,7 +7693,7 @@
 // <4=> Debug
 
 #ifndef NRF_LOG_DEFAULT_LEVEL
-#define NRF_LOG_DEFAULT_LEVEL 4
+#define NRF_LOG_DEFAULT_LEVEL 3
 #endif
 
 // <q> NRF_LOG_DEFERRED  - Enable deffered logger.
@@ -10314,7 +10314,7 @@
 // <4=> Debug
 
 #ifndef NRF_SDH_SOC_LOG_LEVEL
-#define NRF_SDH_SOC_LOG_LEVEL 4
+#define NRF_SDH_SOC_LOG_LEVEL 3
 #endif
 
 // <o> NRF_SDH_SOC_INFO_COLOR  - ANSI escape code prefix.
@@ -10346,7 +10346,7 @@
 // <8=> White
 
 #ifndef NRF_SDH_SOC_DEBUG_COLOR
-#define NRF_SDH_SOC_DEBUG_COLOR 4
+#define NRF_SDH_SOC_DEBUG_COLOR 0
 #endif
 
 // </e>
@@ -10467,7 +10467,7 @@
 // <4=> Debug
 
 #ifndef PM_LOG_LEVEL
-#define PM_LOG_LEVEL 4
+#define PM_LOG_LEVEL 3
 #endif
 
 // <o> PM_LOG_INFO_COLOR  - ANSI escape code prefix.
@@ -10499,7 +10499,7 @@
 // <8=> White
 
 #ifndef PM_LOG_DEBUG_COLOR
-#define PM_LOG_DEBUG_COLOR 7
+#define PM_LOG_DEBUG_COLOR 0
 #endif
 
 // </e>

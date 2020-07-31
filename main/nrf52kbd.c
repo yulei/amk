@@ -1571,6 +1571,7 @@ int main(void)
     log_init();
     timers_init();
     buttons_leds_init(&erase_bonds);
+    erase_bonds = true;
     power_management_init();
     ble_stack_init();
     scheduler_init();

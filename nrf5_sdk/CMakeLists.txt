@@ -17,6 +17,7 @@ target_sources(nrf5_sdk
         ${NRF5_SDK_PATH}/components/libraries/fifo/app_fifo.c
         ${NRF5_SDK_PATH}/components/libraries/hardfault/hardfault_implementation.c
         ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_backend_rtt.c
+        ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_backend_uart.c
         ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_backend_serial.c
         ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_default_backends.c
         ${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_frontend.c
@@ -79,11 +80,11 @@ target_sources(nrf5_sdk
         ${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT.c
         ${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT_printf.c
         ${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c
-        #${NRF5_SDK_PATH}/components/libraries/sensorsim/sensorsim.c
-        #${NRF5_SDK_PATH}/components/libraries/bsp/bsp.c
-        #${NRF5_SDK_PATH}/components/libraries/bsp/bsp_btn_ble.c
-        #${NRF5_SDK_PATH}/components/libraries/button/app_button.c
-        #${NRF5_SDK_PATH}/components/boards/boards.c
+        ${NRF5_SDK_PATH}/components/libraries/sensorsim/sensorsim.c
+        ${NRF5_SDK_PATH}/components/libraries/bsp/bsp.c
+        ${NRF5_SDK_PATH}/components/libraries/bsp/bsp_btn_ble.c
+        ${NRF5_SDK_PATH}/components/libraries/button/app_button.c
+        ${NRF5_SDK_PATH}/components/boards/boards.c
     PUBLIC
         sdk_config.h
         )
@@ -101,6 +102,7 @@ elseif (MCU_TYPE MATCHES "NRF52832")
             ${NRF5_SDK_PATH}/modules/nrfx/mdk/gcc_startup_nrf52.S)
     target_compile_definitions(nrf5_sdk
         PUBLIC
+            BOARD_PCA10040
             APP_UART
             APP_TIMER_V2
             APP_TIMER_V2_RTC1_ENABLED

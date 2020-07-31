@@ -1,5 +1,9 @@
-#add_executable(nrf52_kbd nrf52kbd.c)
-#target_link_libraries(nrf52_kbd PRIVATE nrf5_sdk)
+add_executable(nrf52_kbd nrf52kbd.c)
+set_target_properties(
+    nrf52_kbd
+    PROPERTIES 
+        SUFFIX ".elf")
+target_link_libraries(nrf52_kbd PRIVATE nrf5_sdk)
 
 add_executable(amk "")
 set_target_properties(
@@ -56,8 +60,8 @@ elseif (MCU_TYPE MATCHES "NRF52832")
             porting/nrf52/bootloader.c
             porting/nrf52/gpio_pin.c
             porting/nrf52/wait.c
-            #porting/nrf52/eeconfig_mem.c)
-            porting/nrf52/eeconfig_fds.c)
+            porting/nrf52/eeconfig_mem.c)
+            #porting/nrf52/eeconfig_fds.c)
 
      target_sources(amk
         PRIVATE 
@@ -92,7 +96,7 @@ elseif (MCU_TYPE MATCHES "NRF52832")
     endif()
 
 
-    #target_link_options(nrf52_kbd PRIVATE "-L${NRF5_MDK_PATH}" "-T${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nrf52832.ld")
+    target_link_options(nrf52_kbd PRIVATE "-L${NRF5_MDK_PATH}" "-T${CMAKE_CURRENT_LIST_DIR}/../nrf5_sdk/nrf52832.ld")
 elseif(MCU_TYPE MATCHES "STM32F411")
     target_sources(amk
         PRIVATE 
