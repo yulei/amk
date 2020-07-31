@@ -130,6 +130,9 @@
 #define KEYBOARD_SCAN_INTERVAL              APP_TIMER_TICKS(10)                        /**< Normal keyboard scan interval */
 #define KEYBOARD_SLOW_SCAN_INTERVAL         APP_TIMER_TICKS(100)                       /**< Slow keyboard scan interval */
 
+#define LEDS_NUMBER 0
+#define BUTTONS_NUMBER 0
+
 // UART communication
 #define SYNC_BYTE_1 0xAA
 #define SYNC_BYTE_2 0x55

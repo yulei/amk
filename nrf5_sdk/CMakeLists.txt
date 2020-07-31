@@ -1,6 +1,6 @@
 
-#set(NRF5_SDK_PATH "nRF5_SDK_17.0.0_9d13099")
-set(NRF5_SDK_PATH "nRF5_SDK_16.0.0_98a08e2")
+set(NRF5_SDK_PATH "nRF5_SDK_17.0.0_9d13099")
+#set(NRF5_SDK_PATH "nRF5_SDK_16.0.0_98a08e2")
 
 add_library(nrf5_sdk STATIC "")
 target_sources(nrf5_sdk
@@ -65,7 +65,6 @@ target_sources(nrf5_sdk
         ${NRF5_SDK_PATH}/integration/nrfx/legacy/nrf_drv_clock.c
         ${NRF5_SDK_PATH}/integration/nrfx/legacy/nrf_drv_uart.c
         ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_clock.c
-        ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_clock.c
         ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_gpiote.c
         ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_pwm.c
         ${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_saadc.c
@@ -76,14 +75,15 @@ target_sources(nrf5_sdk
         ${NRF5_SDK_PATH}/modules/nrfx/soc/nrfx_atomic.c
         ${NRF5_SDK_PATH}/external/fprintf/nrf_fprintf.c
         ${NRF5_SDK_PATH}/external/fprintf/nrf_fprintf_format.c
+        ${NRF5_SDK_PATH}/external/utf_converter/utf.c 
         ${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT.c
         ${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT_printf.c
         ${NRF5_SDK_PATH}/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c
-        ${NRF5_SDK_PATH}/components/libraries/sensorsim/sensorsim.c
-        ${NRF5_SDK_PATH}/components/libraries/bsp/bsp.c
-        ${NRF5_SDK_PATH}/components/libraries/bsp/bsp_btn_ble.c
-        ${NRF5_SDK_PATH}/components/libraries/button/app_button.c
-        ${NRF5_SDK_PATH}/components/boards/boards.c
+        #${NRF5_SDK_PATH}/components/libraries/sensorsim/sensorsim.c
+        #${NRF5_SDK_PATH}/components/libraries/bsp/bsp.c
+        #${NRF5_SDK_PATH}/components/libraries/bsp/bsp_btn_ble.c
+        #${NRF5_SDK_PATH}/components/libraries/button/app_button.c
+        #${NRF5_SDK_PATH}/components/boards/boards.c
     PUBLIC
         sdk_config.h
         )
@@ -102,18 +102,17 @@ elseif (MCU_TYPE MATCHES "NRF52832")
     target_compile_definitions(nrf5_sdk
         PUBLIC
             DEBUG
-            BOARD_PCA10040
+            APP_UART
+            APP_TIMER_V2
+            APP_TIMER_V2_RTC1_ENABLED
+            CONFIG_NFCT_PINS_AS_GPIOS
             FLOAT_ABI_HARD
             NRF52
             NRF52832_XXAA
-            CONFIG_NFCT_PINS_AS_GPIOS
             NRF52_PAN_74
             NRF_SD_BLE_API_VERSION=7
             S132
             SOFTDEVICE_PRESENT
-            APP_UART
-            APP_TIMER_V2
-            APP_TIMER_V2_RTC1_ENABLED
             __HEAP_SIZE=8192
             __STACK_SIZE=8192)
 else()

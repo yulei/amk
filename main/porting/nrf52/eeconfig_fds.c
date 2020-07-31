@@ -46,7 +46,10 @@ static void ee_evt_handler(fds_evt_t const *p_evt)
     switch(p_evt->id) {
     case FDS_EVT_WRITE:
     case FDS_EVT_UPDATE:
-        eeprom_dirty = false;
+        if (p_evt->write.file_id == EE_FILEID && p_evt->write.record_key == EE_EEPROM_KEY) {
+            eeprom_dirty = false;
+            NRF_LOG_INFO("EEPROM write result: %d", p_evt->result);
+        }
         break;
     case FDS_EVT_DEL_RECORD:
     case FDS_EVT_DEL_FILE:
