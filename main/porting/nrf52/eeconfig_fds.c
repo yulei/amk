@@ -9,9 +9,13 @@
 #include "fds.h"
 #include "app_timer.h"
 #include "app_scheduler.h"
+#include "nrf_pwr_mgmt.h"
 #include "nrf_log.h"
+#include "nrf_log_ctrl.h"
 
-#define EECONFIG_SIZE 64
+#ifndef EECONFIG_SIZE
+    #define EECONFIG_SIZE 64
+#endif
 
 APP_TIMER_DEF(m_eeprom_update_timer_id);        // timer for update the eeprom
 #define EEPROM_UPDATE_DELAY APP_TIMER_TICKS(10) // timeout delay
@@ -26,6 +30,9 @@ static void wait_for_fds_ready(void)
 {
     while(!ee_fds_initialized) {
         app_sched_execute();
+        if (NRF_LOG_PROCESS() == false) {
+            nrf_pwr_mgmt_run();
+        }
     }
 }
 
