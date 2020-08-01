@@ -126,7 +126,7 @@
 #define BATTERY_SHUTDOWN_THRESHHOLD         5                                          /**< Turn off keyboard if battery power under this */
 
 // matrix scanning parameters
-#define MAX_SCAN_COUNT 100                                                             /**< Maximum scan count before turn to trigger mode */
+#define MAX_SCAN_COUNT                      1000                                       /**< Maximum scan count before turn to trigger mode */
 #define KEYBOARD_SCAN_INTERVAL              APP_TIMER_TICKS(10)                        /**< Normal keyboard scan interval */
 #define KEYBOARD_SLOW_SCAN_INTERVAL         APP_TIMER_TICKS(100)                       /**< Slow keyboard scan interval */
 

@@ -46,10 +46,7 @@ void nrf_usb_send_report(nrf_report_id report, const void *data, size_t size)
     switch(report) {
         case NRF_REPORT_ID_KEYBOARD: 
             uart_send_cmd(CMD_KEY_REPORT, (uint8_t*)data, size);
-            NRF_LOG_INFO("Key report:");
-            for (int i = 0; i < size; i++) {
-                NRF_LOG_INFO("0x%x", ((uint8_t*)data)[i]);
-            }
+            NRF_LOG_INFO("Key report:[%x%x]", ((uint32_t*)data)[0], ((uint32_t*)data)[1]);
             break;
 #ifdef MOUSEKEY_ENABLE
         case NRF_REPORT_ID_MOUSE:
@@ -63,11 +60,11 @@ void nrf_usb_send_report(nrf_report_id report, const void *data, size_t size)
 #ifdef EXTRAKEY_ENABLE
         case NRF_REPORT_ID_SYSTEM:
             uart_send_cmd(CMD_SYSTEM_REPORT, (uint8_t*)data, size);
-            NRF_LOG_INFO("system report: 0x%x", data);
+            NRF_LOG_INFO("system report: 0x%x", *((uint32_t*)data));
             break;
         case NRF_REPORT_ID_CONSUMER:
             uart_send_cmd(CMD_CONSUMER_REPORT, (uint8_t*)data, size);
-            NRF_LOG_INFO("consumer report: 0x%x", data);
+            NRF_LOG_INFO("consumer report: 0x%x", *((uint32_t*)data));
             break;
 #endif
         default:

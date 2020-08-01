@@ -27,7 +27,6 @@ target_include_directories(tmk
         ${CONFIG_INCLUDE_PATH}
     PUBLIC
         ${TMK_PATH}/common
-        ${TMK_PATH}/
         ${CMAKE_CURRENT_LIST_DIR})
 
 message(STATUS ${CONFIG_INCLUDE_PATH})
