@@ -1,7 +1,7 @@
 
-
 SRC_FILES += \
 	$(NRF5SDK_DIR)/modules/nrfx/mdk/gcc_startup_nrf52.S \
+	$(NRF5SDK_DIR)/modules/nrfx/mdk/system_nrf52.c \
 	$(NRF5SDK_DIR)/components/libraries/log/src/nrf_log_backend_rtt.c \
 	$(NRF5SDK_DIR)/components/libraries/log/src/nrf_log_backend_serial.c \
 	$(NRF5SDK_DIR)/components/libraries/log/src/nrf_log_default_backends.c \
@@ -10,22 +10,20 @@ SRC_FILES += \
 	$(NRF5SDK_DIR)/components/libraries/util/app_error.c \
 	$(NRF5SDK_DIR)/components/libraries/util/app_error_handler_gcc.c \
 	$(NRF5SDK_DIR)/components/libraries/util/app_error_weak.c \
+	$(NRF5SDK_DIR)/components/libraries/util/app_util_platform.c \
+	$(NRF5SDK_DIR)/components/libraries/util/nrf_assert.c \
 	$(NRF5SDK_DIR)/components/libraries/scheduler/app_scheduler.c \
 	$(NRF5SDK_DIR)/components/libraries/timer/app_timer2.c \
+	$(NRF5SDK_DIR)/components/libraries/timer/drv_rtc.c \
 	$(NRF5SDK_DIR)/components/libraries/fifo/app_fifo.c \
 	$(NRF5SDK_DIR)/components/libraries/uart/app_uart_fifo.c \
-	$(NRF5SDK_DIR)/components/libraries/util/app_util_platform.c \
 	$(NRF5SDK_DIR)/components/libraries/crc16/crc16.c \
-	$(NRF5SDK_DIR)/components/libraries/timer/drv_rtc.c \
 	$(NRF5SDK_DIR)/components/libraries/fds/fds.c \
 	$(NRF5SDK_DIR)/components/libraries/hardfault/hardfault_implementation.c \
-	$(NRF5SDK_DIR)/components/libraries/util/nrf_assert.c \
 	$(NRF5SDK_DIR)/components/libraries/atomic_fifo/nrf_atfifo.c \
 	$(NRF5SDK_DIR)/components/libraries/atomic_flags/nrf_atflags.c \
 	$(NRF5SDK_DIR)/components/libraries/atomic/nrf_atomic.c \
 	$(NRF5SDK_DIR)/components/libraries/balloc/nrf_balloc.c \
-	$(NRF5SDK_DIR)/external/fprintf/nrf_fprintf.c \
-	$(NRF5SDK_DIR)/external/fprintf/nrf_fprintf_format.c \
 	$(NRF5SDK_DIR)/components/libraries/fstorage/nrf_fstorage.c \
 	$(NRF5SDK_DIR)/components/libraries/fstorage/nrf_fstorage_sd.c \
 	$(NRF5SDK_DIR)/components/libraries/memobj/nrf_memobj.c \
@@ -34,28 +32,18 @@ SRC_FILES += \
 	$(NRF5SDK_DIR)/components/libraries/experimental_section_vars/nrf_section_iter.c \
 	$(NRF5SDK_DIR)/components/libraries/sortlist/nrf_sortlist.c \
 	$(NRF5SDK_DIR)/components/libraries/strerror/nrf_strerror.c \
-	$(NRF5SDK_DIR)/modules/nrfx/mdk/system_nrf52.c \
 	$(NRF5SDK_DIR)/components/boards/boards.c \
-	$(NRF5SDK_DIR)/integration/nrfx/legacy/nrf_drv_clock.c \
-	$(NRF5SDK_DIR)/integration/nrfx/legacy/nrf_drv_uart.c \
-	$(NRF5SDK_DIR)/modules/nrfx/soc/nrfx_atomic.c \
-	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_clock.c \
-	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_saadc.c \
-	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_gpiote.c \
-	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
-	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_uart.c \
-	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_uarte.c \
-	$(NRF5SDK_DIR)/external/segger_rtt/SEGGER_RTT.c \
-	$(NRF5SDK_DIR)/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c \
-	$(NRF5SDK_DIR)/external/segger_rtt/SEGGER_RTT_printf.c \
 	$(NRF5SDK_DIR)/components/ble/ble_advertising/ble_advertising.c \
 	$(NRF5SDK_DIR)/components/ble/ble_link_ctx_manager/ble_link_ctx_manager.c \
+	$(NRF5SDK_DIR)/components/ble/ble_services/ble_bas/ble_bas.c \
+	$(NRF5SDK_DIR)/components/ble/ble_services/ble_dis/ble_dis.c \
+	$(NRF5SDK_DIR)/components/ble/ble_services/ble_hids/ble_hids.c \
+	$(NRF5SDK_DIR)/components/ble/nrf_ble_gatt/nrf_ble_gatt.c \
+	$(NRF5SDK_DIR)/components/ble/nrf_ble_qwr/nrf_ble_qwr.c \
 	$(NRF5SDK_DIR)/components/ble/common/ble_advdata.c \
 	$(NRF5SDK_DIR)/components/ble/common/ble_conn_params.c \
 	$(NRF5SDK_DIR)/components/ble/common/ble_conn_state.c \
 	$(NRF5SDK_DIR)/components/ble/common/ble_srv_common.c \
-	$(NRF5SDK_DIR)/components/ble/nrf_ble_gatt/nrf_ble_gatt.c \
-	$(NRF5SDK_DIR)/components/ble/nrf_ble_qwr/nrf_ble_qwr.c \
 	$(NRF5SDK_DIR)/components/ble/peer_manager/auth_status_tracker.c \
 	$(NRF5SDK_DIR)/components/ble/peer_manager/gatt_cache_manager.c \
 	$(NRF5SDK_DIR)/components/ble/peer_manager/gatts_cache_manager.c \
@@ -68,13 +56,24 @@ SRC_FILES += \
 	$(NRF5SDK_DIR)/components/ble/peer_manager/pm_buffer.c \
 	$(NRF5SDK_DIR)/components/ble/peer_manager/security_dispatcher.c \
 	$(NRF5SDK_DIR)/components/ble/peer_manager/security_manager.c \
-	$(NRF5SDK_DIR)/external/utf_converter/utf.c \
-	$(NRF5SDK_DIR)/components/ble/ble_services/ble_bas/ble_bas.c \
-	$(NRF5SDK_DIR)/components/ble/ble_services/ble_dis/ble_dis.c \
-	$(NRF5SDK_DIR)/components/ble/ble_services/ble_hids/ble_hids.c \
 	$(NRF5SDK_DIR)/components/softdevice/common/nrf_sdh.c \
 	$(NRF5SDK_DIR)/components/softdevice/common/nrf_sdh_ble.c \
 	$(NRF5SDK_DIR)/components/softdevice/common/nrf_sdh_soc.c \
+	$(NRF5SDK_DIR)/modules/nrfx/soc/nrfx_atomic.c \
+	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_clock.c \
+	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_saadc.c \
+	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_gpiote.c \
+	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
+	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_uart.c \
+	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_uarte.c \
+	$(NRF5SDK_DIR)/integration/nrfx/legacy/nrf_drv_clock.c \
+	$(NRF5SDK_DIR)/integration/nrfx/legacy/nrf_drv_uart.c \
+	$(NRF5SDK_DIR)/external/utf_converter/utf.c \
+	$(NRF5SDK_DIR)/external/fprintf/nrf_fprintf.c \
+	$(NRF5SDK_DIR)/external/fprintf/nrf_fprintf_format.c \
+	$(NRF5SDK_DIR)/external/segger_rtt/SEGGER_RTT.c \
+	$(NRF5SDK_DIR)/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c \
+	$(NRF5SDK_DIR)/external/segger_rtt/SEGGER_RTT_printf.c \
 
 INC_FOLDERS += \
 	$(NRF5SDK_DIR)/components/nfc/ndef/generic/message \

@@ -46,7 +46,7 @@
 #   PASS_LINKER_INPUT_VIA_FILE=0  (default is 1) - don't use <target>.in file
 #     to pass the list of linker input files
 VERBOSE ?= 0
-PRETTY  ?= 0
+PRETTY  ?= 1
 ABSOLUTE_PATHS ?= 0
 PASS_INCLUDE_PATHS_VIA_FILE ?= 0
 PASS_LINKER_INPUT_VIA_FILE  ?= 1

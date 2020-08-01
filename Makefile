@@ -1,4 +1,4 @@
-PROJECT_NAME     := ble_app_hids_keyboard_pca10040_s132
+PROJECT_NAME     := amk
 TARGETS          := nrf52832_xxaa
 OUTPUT_DIRECTORY := _build
 
