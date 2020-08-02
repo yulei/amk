@@ -33,7 +33,7 @@ void ble_adv_service_init(void) {
     init.advdata.uuids_complete.p_uuids  = m_adv_uuids;
 
     init.config.ble_adv_whitelist_enabled          = true;
-    init.config.ble_adv_directed_high_duty_enabled = true;
+    init.config.ble_adv_directed_high_duty_enabled = false;
     init.config.ble_adv_directed_enabled           = false;
     init.config.ble_adv_directed_interval          = 0;
     init.config.ble_adv_directed_timeout           = 0;

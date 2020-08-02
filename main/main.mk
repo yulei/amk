@@ -6,7 +6,6 @@ SRC_FILES += \
 	$(MAIN_DIR)/matrix_driver.c \
 	$(MAIN_DIR)/suspend.c \
 	$(MAIN_DIR)/xprintf.c \
-	$(MAIN_DIR)/rgb_effects.c \
 	$(MAIN_DIR)/porting/nrf52/timer.c \
 	$(MAIN_DIR)/porting/nrf52/bootloader.c \
 	$(MAIN_DIR)/porting/nrf52/gpio_pin.c \
@@ -21,6 +20,7 @@ SRC_FILES += \
 	$(MAIN_DIR)/porting/nrf52/usb_backend_uart.c \
 	$(MAIN_DIR)/drivers/aw9523b.c \
 	$(MAIN_DIR)/drivers/i2c.c \
+	$(MAIN_DIR)/rgb_effects.c \
 
 INC_FOLDERS += \
 	$(MAIN_DIR) \

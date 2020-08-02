@@ -49,7 +49,7 @@ VERBOSE ?= 0
 PRETTY  ?= 1
 ABSOLUTE_PATHS ?= 0
 PASS_INCLUDE_PATHS_VIA_FILE ?= 0
-PASS_LINKER_INPUT_VIA_FILE  ?= 1
+PASS_LINKER_INPUT_VIA_FILE  ?= 0
 
 .SUFFIXES: # ignore built-in rules
 %.d:       # don't try to make .d files
@@ -292,7 +292,7 @@ LD_INPUT               = $^ $(LIB_FILES)
 endif
 
 # Link object files
-%.out:
+%.out: 
 	$(info $(call PROGRESS,Linking target: $@))
 	$(NO_ECHO)$(GENERATE_LD_INPUT_FILE)
 	$(NO_ECHO)$(CC) $(LDFLAGS) $(LD_INPUT) -Wl,-Map=$(@:.out=.map) -o $@
