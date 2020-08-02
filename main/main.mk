@@ -21,6 +21,10 @@ SRC_FILES += \
 	$(MAIN_DIR)/drivers/aw9523b.c \
 	$(MAIN_DIR)/drivers/i2c.c \
 	$(MAIN_DIR)/rgb_effects.c \
+	$(MAIN_DIR)/rgb_driver.c \
+	$(MAIN_DIR)/rgb_color.c \
+	$(MAIN_DIR)/custom_action.c \
+	$(MAIN_DIR)/eeprom_manager.c \
 
 INC_FOLDERS += \
 	$(MAIN_DIR) \

@@ -5,7 +5,9 @@
 
 #pragma once
 
+#include <stdbool.h>
 #include <stdint.h>
+#include "rgb_driver.h"
 
 #ifndef EFFECTS_LED_NUM
 #define EFFECTS_LED_NUM     4
@@ -23,11 +25,7 @@
 #define EFFECTS_VAL_STEP    8
 #endif
 
-typedef void (*effects_set_color)(uint8_t index, uint8_t hue, uint8_t sat, uint8_t val);
-typedef void (*effects_set_color_all)(uint8_t hue, uint8_t sat, uint8_t val);
-
-
-void rgb_effects_init(effects_set_color set_color, effects_set_color_all set_color_all);
+void rgb_effects_init(rgb_driver_t* driver);
 bool rgb_effects_enabled(void);
 void rgb_effects_inc_hue(void);
 void rgb_effects_dec_hue(void);

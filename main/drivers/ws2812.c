@@ -123,7 +123,10 @@ void ws2812_uninit(void)
 
 #else
 
-void ws2812_setleds(LED_TYPE* leds, uint16_t number)
+void ws2812_init(void)
+{}
+
+void ws2812_setleds(rgb_led_t* leds, uint16_t number)
 {}
 void ws2812_uninit(void)
 {}

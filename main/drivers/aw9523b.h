@@ -12,7 +12,7 @@
 #endif
 
 #ifndef AW9523B_RGB_NUM
-    #define AW9523B_RGB_NUM RGBLED_NUM
+    #define AW9523B_RGB_NUM RGB_LED_NUM
 #endif
 
 #define AW9523B_PWM_BASE    0x20

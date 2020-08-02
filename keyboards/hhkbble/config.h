@@ -41,7 +41,6 @@
 #define RGBLIGHT_EN_PIN             22
 #define RGBLIGHT_EN_HIGH
 
-#define RGBLED_NUM 4
-#define RGBLIGHT_ANIMATIONS
+#define RGB_LED_NUM 4
 
 #define AW9523B_ADDR 0xB6
