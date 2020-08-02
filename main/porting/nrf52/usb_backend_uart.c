@@ -15,13 +15,22 @@ typedef struct {
     bool uart_enabled;
 } nrf_usb_config_t;
 
+#define NRF_RECV_BUF_SIZE   64
+typedef struct {
+    uint8_t data[NRF_RECV_BUF_SIZE];
+    uint32_t count;
+} nrf_usb_buf_t;
+
 static nrf_usb_config_t usb_config;
+static nrf_usb_buf_t usb_buffer;
+
 static void vbus_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
 static void usb_update_state();
 static void uart_init(void);
 static void uart_uninit(void);
 static void uart_event_handle(app_uart_evt_t * p_event);
 static void uart_send_cmd(command_t cmd, const uint8_t* report, uint32_t size);
+static void uart_process(uint8_t data);
 static uint8_t compute_checksum(const uint8_t* data, uint32_t size);
 
 void nrf_usb_init(nrf_usb_event_handler_t* eh)
@@ -31,6 +40,11 @@ void nrf_usb_init(nrf_usb_event_handler_t* eh)
     usb_config.event.suspend_cb = eh->suspend_cb;
     usb_config.event.resume_cb  = eh->resume_cb;
     usb_config.event.leds_cb    = eh->leds_cb;
+
+    for(int i = 0; i < NRF_RECV_BUF_SIZE; i++) {
+        usb_buffer.data[i] = 0;
+    }
+    usb_buffer.count = 0;
 
     ret_code_t err_code;
     nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
@@ -128,7 +142,12 @@ static void uart_event_handle(app_uart_evt_t *p_event)
         case APP_UART_FIFO_ERROR:
             app_uart_flush();
             break;
-        case APP_UART_DATA_READY:
+        case APP_UART_DATA_READY: {
+            uint8_t d = 0;
+            if (NRF_SUCCESS == app_uart_get(&d)) {
+                uart_process(d);
+            }
+            }
             break;
         case APP_UART_TX_EMPTY:
             break;
@@ -198,6 +217,45 @@ static void uart_send_cmd(command_t cmd, const uint8_t* report, uint32_t size)
     app_uart_put(cmd);
     for (uint32_t i = 0; i < size; i++) {
         app_uart_put(report[i]);
+    }
+}
+
+static void uart_process(uint8_t data)
+{
+    switch(usb_buffer.count) {
+    case 0:
+    // first byte
+        if (data == SYNC_BYTE_1) {
+            usb_buffer.data[usb_buffer.count++] = data;
+        }
+        break;
+    case 1:
+    // second byte
+        if (data == SYNC_BYTE_2) {
+            usb_buffer.data[usb_buffer.count++] = data;
+        }
+        break;
+    default:
+        usb_buffer.data[usb_buffer.count++] = data;
+        if ((usb_buffer.count > 2) && (usb_buffer.count == (usb_buffer.data[2] + 2))) {
+            // full packet received
+            uint8_t* cmd = &usb_buffer.data[2];
+            uint8_t checksum = compute_checksum(cmd + 2, cmd[0] - 2);
+            if (checksum != cmd[1]) {
+                // invalid checksum
+                NRF_LOG_WARNING("Checksum mismatch: SRC:%x, CUR:%x", cmd[1], checksum);
+                return;
+            }
+            if (cmd[2] != CMD_SET_LEDS) {
+                // invalid command
+                NRF_LOG_WARNING("Invalid command from usb master: %x", cmd[2]);
+            } else {
+                NRF_LOG_INFO("Led setting from usb master: %x", cmd[3]);
+                usb_config.event.leds_cb(cmd[3]);
+            }
+            usb_buffer.count = 0;
+        }
+        break;
     }
 }
 
