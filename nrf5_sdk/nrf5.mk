@@ -66,6 +66,7 @@ SRC_FILES += \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_uart.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_uarte.c \
+	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_twi.c \
 	$(NRF5SDK_DIR)/integration/nrfx/legacy/nrf_drv_clock.c \
 	$(NRF5SDK_DIR)/integration/nrfx/legacy/nrf_drv_uart.c \
 	$(NRF5SDK_DIR)/external/utf_converter/utf.c \

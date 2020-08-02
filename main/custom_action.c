@@ -7,6 +7,8 @@
 
 #include "action.h"
 
+extern void keyboard_set_rgb(bool on);
+
 void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
     if (!record->event.pressed) return; // do not press key released event
@@ -14,6 +16,7 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
     switch (id) {
         case AF_RGB_TOG:
             rgb_effects_toggle();
+            keyboard_set_rgb(rgb_effects_enabled());
             break;
         case AF_RGB_MOD:
             rgb_effects_inc_mode();

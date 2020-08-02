@@ -347,3 +347,8 @@ void rgb_effects_task(void)
         }
     }
 }
+
+bool rgb_effects_enabled(void)
+{
+    return effects_state.config.enable ? true :false;
+}

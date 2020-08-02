@@ -13,6 +13,7 @@ $(OUTPUT_DIRECTORY)/nrf52832_xxaa.out: \
 # Source files
 SRC_FILES += \
   $(KBD_DIR)/hhkbble/hhkbble.c \
+  $(KBD_DIR)/hhkbble/hhkbble_keymap.c \
 
 # Include folders
 INC_FOLDERS += \
