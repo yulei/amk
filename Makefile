@@ -24,6 +24,10 @@ include nrf5_sdk/nrf5.mk
 include tmk/tmk.mk
 include main/main.mk
 
+APP_DEFS += $(NRF5_DEFS)
+APP_DEFS += $(TMK_DEFS)
+APP_DEFS += $(MAIN_DEFS)
+
 # Libraries common to all targets
 LIB_FILES += \
 
@@ -34,7 +38,7 @@ OPT = -O3 -g3
 
 # C flags common to all targets
 CFLAGS += $(OPT)
-CFLAGS += $(NRF5_DEFS)
+CFLAGS += $(APP_DEFS)
 CFLAGS += -mcpu=cortex-m4
 CFLAGS += -mthumb -mabi=aapcs
 CFLAGS += -Wall -Werror
@@ -46,7 +50,7 @@ CFLAGS += -fno-builtin -fshort-enums
 # C++ flags common to all targets
 CXXFLAGS += $(OPT)
 # Assembler flags common to all targets
-ASMFLAGS += $(NRF5_DEFS)
+ASMFLAGS += $(APP_DEFS)
 ASMFLAGS += -g3
 ASMFLAGS += -mcpu=cortex-m4
 ASMFLAGS += -mthumb -mabi=aapcs
