@@ -1,28 +1,39 @@
 
-TMK_DIR := $(TOP_DIR)/tmk
+TMK_DIR := $(TOP_DIR)/tmk/tmk/tmk_core
 
 SRC_FILES += \
-	$(TMK_DIR)/tmk/tmk_core/common/host.c \
-	$(TMK_DIR)/tmk/tmk_core/common/keyboard.c \
-	$(TMK_DIR)/tmk/tmk_core/common/matrix.c \
-	$(TMK_DIR)/tmk/tmk_core/common/action.c \
-	$(TMK_DIR)/tmk/tmk_core/common/action_tapping.c  \
-	$(TMK_DIR)/tmk/tmk_core/common/action_macro.c \
-	$(TMK_DIR)/tmk/tmk_core/common/action_layer.c \
-	$(TMK_DIR)/tmk/tmk_core/common/action_util.c  \
-	$(TMK_DIR)/tmk/tmk_core/common/print.c  \
-	$(TMK_DIR)/tmk/tmk_core/common/debug.c \
-	$(TMK_DIR)/tmk/tmk_core/common/util.c  \
-	$(TMK_DIR)/tmk/tmk_core/common/hook.c \
-	$(TMK_DIR)/tmk/tmk_core/common/keymap.c \
-	$(TMK_DIR)/tmk/tmk_core/common/bootmagic.c \
-	$(TMK_DIR)/tmk/tmk_core/common/mousekey.c \
+	$(TMK_DIR)/common/host.c \
+	$(TMK_DIR)/common/keyboard.c \
+	$(TMK_DIR)/common/matrix.c \
+	$(TMK_DIR)/common/action.c \
+	$(TMK_DIR)/common/action_tapping.c  \
+	$(TMK_DIR)/common/action_macro.c \
+	$(TMK_DIR)/common/action_layer.c \
+	$(TMK_DIR)/common/action_util.c  \
+	$(TMK_DIR)/common/print.c  \
+	$(TMK_DIR)/common/debug.c \
+	$(TMK_DIR)/common/util.c  \
+	$(TMK_DIR)/common/hook.c \
+	$(TMK_DIR)/common/keymap.c \
 
 INC_FOLDERS += \
-	$(TMK_DIR) \
-	$(TMK_DIR)/tmk/tmk_core/common \
+	$(TOP_DIR)/tmk \
+	$(TMK_DIR)/common \
 
-TMK_DEFS += -include config.h
-TMK_DEFS += -DBOOTMAGIC_ENABLE
-TMK_DEFS += -DMOUSEKEY_ENABLE
-TMK_DEFS += -DEXTRAKEY_ENABLE
+APP_DEFS += \
+	-include config.h \
+
+ifeq (yes,$(strip $(BOOTMAGIC_ENABLE)))
+    SRC_FILES += $(TMK_DIR)/common/bootmagic.c
+    APP_DEFS += -DBOOTMAGIC_ENABLE
+endif
+
+ifeq (yes,$(strip $(MOUSEKEY_ENABLE)))
+    SRC_FILES += $(TMK_DIR)/common/mousekey.c
+    APP_DEFS += -DMOUSEKEY_ENABLE
+    APP_DEFS += -DMOUSE_ENABLE
+endif
+
+ifeq (yes,$(strip $(EXTRAKEY_ENABLE)))
+    APP_DEFS += -DEXTRAKEY_ENABLE
+endif

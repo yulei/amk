@@ -5,12 +5,12 @@
 
 #pragma once
 
-#if defined(MCU_NRF5X)
+#if CFG_TUSB_MCU == OPT_MCU_NRF5X
 #include "nrf_gpio.h"
 typedef uint32_t pin_t;
 #define MAKE_PIN(port, pin) NRF_GPIO_PIN_MAP(port, pin)
 
-#elif defined(MCU_STM32F4)
+#elif CFG_TUSB_MCU == OPT_MCU_STM32F4
 #include "stm32f4xx_hal.h"
 typedef struct {
     GPIO_TypeDef *port;

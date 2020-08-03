@@ -5,3 +5,6 @@ SRC_FILES += \
 INC_FOLDERS += \
 	$(TINYUSB_DIR) \
 	$(TINYUSB_DIR)/tinyusb/src \
+
+APP_DEFS += \
+	-DCFG_TUSB_MCU=OPT_MCU_NRF5X

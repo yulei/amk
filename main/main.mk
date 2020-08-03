@@ -9,7 +9,6 @@ SRC_FILES += \
 	$(MAIN_DIR)/porting/nrf52/bootloader.c \
 	$(MAIN_DIR)/porting/nrf52/gpio_pin.c \
 	$(MAIN_DIR)/porting/nrf52/wait.c \
-	$(MAIN_DIR)/porting/nrf52/eeconfig_fds.c \
 	$(MAIN_DIR)/porting/nrf52/ble/ble_adv_service.c \
 	$(MAIN_DIR)/porting/nrf52/ble/ble_bas_service.c \
 	$(MAIN_DIR)/porting/nrf52/ble/ble_hids_service.c \
@@ -23,8 +22,6 @@ SRC_FILES += \
 	$(MAIN_DIR)/rgb_driver.c \
 	$(MAIN_DIR)/rgb_color.c \
 	$(MAIN_DIR)/custom_action.c \
-	$(MAIN_DIR)/eeprom_manager.c \
-	#MAIN_DIR)/suspend.c \
 
 INC_FOLDERS += \
 	$(MAIN_DIR) \
@@ -33,5 +30,10 @@ INC_FOLDERS += \
 	$(MAIN_DIR)/porting/nrf52/ble \
 	$(MAIN_DIR)/drivers \
 
-MAIN_DEFS += -DMCU_NRF5X
-MAIN_DEFS += -DMATRIX_USE_GPIO
+APP_DEFS += \
+	-DMATRIX_USE_GPIO \
+
+ifeq (yes,$(strip $(BOOTMAGIC_ENABLE)))
+	SRC_FILES += $(MAIN_DIR)/porting/nrf52/eeconfig_fds.c
+	SRC_FILES += $(MAIN_DIR)/eeprom_manager.c
+endif

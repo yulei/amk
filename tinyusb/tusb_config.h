@@ -33,7 +33,7 @@
 //--------------------------------------------------------------------
 // COMMON CONFIGURATION
 //--------------------------------------------------------------------
-#define CFG_TUSB_MCU OPT_MCU_NRF5X
+
 // defined by board.mk
 #ifndef CFG_TUSB_MCU
   #error CFG_TUSB_MCU must be defined

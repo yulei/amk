@@ -211,7 +211,7 @@ INC_FOLDERS += \
 	$(NRF5SDK_DIR)/components/libraries/log/src \
 	$(NRF5SDK_DIR)/.. \
 
-NRF5_DEFS += \
+APP_DEFS += \
 	-DAPP_UART \
 	-DAPP_TIMER_V2 \
 	-DAPP_TIMER_V2_RTC1_ENABLED \

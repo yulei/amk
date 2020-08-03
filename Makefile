@@ -1,40 +1,50 @@
 PROJECT_NAME     := amk
-#TARGETS          := nrf52832_xxaa
 OUTPUT_DIRECTORY := _build
 
 TOP_DIR ?= .
 
-TARGET := $(filter-out clean flash flash_softdevice sdk_config help, $(MAKECMDGOALS))
+TARGET := $(filter-out clean flash flash_softdevice sdk_config help erase, $(MAKECMDGOALS))
 
 NRF5SDK_DIR := $(TOP_DIR)/nrf5_sdk/nRF5_SDK_17.0.0_9d13099
 
 $(OUTPUT_DIRECTORY)/$(TARGET).out: \
   LINKER_SCRIPT  := $(TOP_DIR)/nrf5_sdk/nrf52832.ld
 
+# Source files
+SRC_FILES += \
+
+# Include folders
+INC_FOLDERS += \
+
+# Libraries
+LIB_FILES += \
+
+# Definitions
+APP_DEFS += \
+
+ifneq (, $(TARGET))
+	include $(TOP_DIR)/keyboards/$(TARGET)/$(TARGET).mk
+endif
 include $(TOP_DIR)/nrf5_sdk/nrf5.mk
 include $(TOP_DIR)/tinyusb/tinyusb.mk
 include $(TOP_DIR)/tmk/tmk.mk
 include $(TOP_DIR)/main/main.mk
 
-ifneq (, $(TARGET))
-	include $(TOP_DIR)/keyboards/$(TARGET)/$(TARGET).mk
-endif
-
-APP_DEFS += $(NRF5_DEFS)
-APP_DEFS += $(TMK_DEFS)
-APP_DEFS += $(MAIN_DEFS)
-
-# Libraries common to all targets
-LIB_FILES += \
 
 # Optimization flags
 OPT = -O3 -g3
+
+# Debug flags
+#OPT = -Og -g3 -DDEBUG
+
 # Uncomment the line below to enable link time optimization
 #OPT += -flto
 
 # C flags common to all targets
 CFLAGS += $(OPT)
 CFLAGS += $(APP_DEFS)
+CFLAGS += -D__HEAP_SIZE=8192
+CFLAGS += -D__STACK_SIZE=8192
 CFLAGS += -mcpu=cortex-m4
 CFLAGS += -mthumb -mabi=aapcs
 CFLAGS += -Wall -Werror
@@ -45,8 +55,11 @@ CFLAGS += -fno-builtin -fshort-enums
 
 # C++ flags common to all targets
 CXXFLAGS += $(OPT)
+
 # Assembler flags common to all targets
 ASMFLAGS += $(APP_DEFS)
+ASMFLAGS += -D__HEAP_SIZE=8192
+ASMFLAGS += -D__STACK_SIZE=8192
 ASMFLAGS += -g3
 ASMFLAGS += -mcpu=cortex-m4
 ASMFLAGS += -mthumb -mabi=aapcs
@@ -62,11 +75,6 @@ LDFLAGS += -Wl,--gc-sections
 # use newlib in nano version
 LDFLAGS += --specs=nano.specs
 
-$(TARGET): CFLAGS += -D__HEAP_SIZE=8192
-$(TARGET): CFLAGS += -D__STACK_SIZE=8192
-$(TARGET): ASMFLAGS += -D__HEAP_SIZE=8192
-$(TARGET): ASMFLAGS += -D__STACK_SIZE=8192
-
 # Add standard libraries at the very end of the linker input, after all objects
 # that may need symbols provided by these libraries.
 LIB_FILES += -lc -lnosys -lm
@@ -74,15 +82,20 @@ LIB_FILES += -lc -lnosys -lm
 .PHONY: default help
 
 # Default target - first one defined
-default: $(TARGET)
+ifneq (,$(TARGET))
+	default: $(TARGET)
+else
+	default: help
+endif
 
 # Print all targets that can be built
 help:
 	@echo following targets are available:
-	@echo		keyboard
-	@echo		flash_softdevice
-	@echo		sdk_config - starting external tool for editing sdk_config.h
-	@echo		flash      - flashing binary
+	@echo		keyboard 			- your keyboard name
+	@echo		sdk_config 			- starting external tool for editing sdk_config.h
+	@echo		flash      			- flashing binary
+	@echo		flash_softdevice	- flashing the softdevice
+	@echo		erase				- erase the chip
 
 #TEMPLATE_PATH := $(SDK_ROOT)/components/toolchain/gcc
 include $(TOP_DIR)/common.mk
