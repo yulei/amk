@@ -17,6 +17,7 @@ SRC_FILES += \
 	$(MAIN_DIR)/porting/nrf52/ble_keyboard.c \
 	$(MAIN_DIR)/porting/nrf52/usb_backend_uart.c \
 	$(MAIN_DIR)/drivers/aw9523b.c \
+	$(MAIN_DIR)/drivers/ws2812.c \
 	$(MAIN_DIR)/drivers/i2c.c \
 	$(MAIN_DIR)/rgb_effects.c \
 	$(MAIN_DIR)/rgb_driver.c \
@@ -25,6 +26,7 @@ SRC_FILES += \
 
 INC_FOLDERS += \
 	$(MAIN_DIR) \
+	$(MAIN_DIR)/rtt \
 	$(MAIN_DIR)/porting \
 	$(MAIN_DIR)/porting/nrf52 \
 	$(MAIN_DIR)/porting/nrf52/ble \

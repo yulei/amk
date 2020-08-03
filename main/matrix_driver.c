@@ -9,6 +9,8 @@
 #include "keyboard.h"
 #include "wait.h"
 #include "timer.h"
+#include "rgb_driver.h"
+#include "rgb_effects.h"
 
 typedef struct {
     matrix_event_callback   event_callback;
@@ -247,6 +249,9 @@ void matrix_init(void)
     // initialize matrix state: all keys off
     memset(&matrix[0], 0, sizeof(matrix));
     memset(&raw_matrix[0], 0, sizeof(raw_matrix));
+
+    rgb_driver_t* driver = rgb_driver_create(RGB_DRIVER_AW9523B);
+    rgb_effects_init(driver);
 }
 
 uint8_t matrix_scan(void)
@@ -286,6 +291,7 @@ uint8_t matrix_scan(void)
         debouncing = false;
     }
 
+    rgb_effects_task();
     return 1;
 }
 

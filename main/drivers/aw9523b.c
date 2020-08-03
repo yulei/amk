@@ -7,6 +7,7 @@
 #include "aw9523b.h"
 #include "wait.h"
 #include "i2c.h"
+#include "rtt.h"
 
 #define AW9523B_P0_INPUT    0x00
 #define AW9523B_P1_INPUT    0x01
@@ -58,13 +59,22 @@ void aw9523b_init(uint8_t addr)
 
 void aw9523b_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
 {
+    //rtt_printf("set color: index:%d, %d, %d, %d\n", index, red, green, blue);
     if (index >= AW9523B_RGB_NUM) return;
 
     aw9523b_led led = g_aw9523b_leds[index];
-    aw9523b_pwm_buf[PWM2BUF(led.r)] = red;
-    aw9523b_pwm_buf[PWM2BUF(led.g)] = green;
-    aw9523b_pwm_buf[PWM2BUF(led.b)] = blue;
-    aw9523b_pwm_dirty = true;
+    if (aw9523b_pwm_buf[PWM2BUF(led.r)] != red) {
+        aw9523b_pwm_buf[PWM2BUF(led.r)] = red;
+        aw9523b_pwm_dirty = true;
+    }
+     if (aw9523b_pwm_buf[PWM2BUF(led.g)] != green) {
+        aw9523b_pwm_buf[PWM2BUF(led.g)] = green;
+        aw9523b_pwm_dirty = true;
+    }
+     if (aw9523b_pwm_buf[PWM2BUF(led.b)] != blue) {
+        aw9523b_pwm_buf[PWM2BUF(led.b)] = blue;
+        aw9523b_pwm_dirty = true;
+    }
 }
 
 void aw9523b_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
@@ -85,6 +95,7 @@ void aw9523b_update_pwm_buffers(uint8_t addr)
             i2c_write_reg(addr, led.b, &aw9523b_pwm_buf[PWM2BUF(led.b)], 1, TIMEOUT);
         }
         aw9523b_pwm_dirty = false;
+        //rtt_printf("aw9523b flushed\n");
     }
 }
 

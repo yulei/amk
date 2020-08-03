@@ -9,6 +9,7 @@
 #include "rgb_effects.h"
 #include "timer.h"
 #include "eeprom_manager.h"
+#include "rtt.h"
 
 #define DELAY_MIN   0
 #define DELAY_DEFAULT 1500
@@ -124,8 +125,18 @@ static uint32_t effects_delay(void)
     return DELAY_DEFAULT;
 }
 
-static bool effects_need_update(void) { return timer_elapsed(effects_state.last_ticks)*effects_state.config.speed >= effects_delay(); }
-static void effects_update_timer(void) { effects_state.last_ticks = timer_read(); }
+static bool effects_need_update(void)
+{
+    /*uint32_t elapsed = timer_elapsed32(effects_state.last_ticks);
+    uint32_t interval = elapsed * effects_state.config.speed;
+    if (interval >= effects_delay()){
+        rtt_printf("elapsed:%d, interval:%d, delay:%d\n", elapsed, interval, effects_delay());
+    }*/
+
+    return timer_elapsed32(effects_state.last_ticks)*effects_state.config.speed >= effects_delay();
+}
+
+static void effects_update_timer(void) { effects_state.last_ticks = timer_read32(); }
 
 //effects
 static void effects_mode_static(void)
@@ -234,8 +245,8 @@ static void effects_set_enable(uint8_t enable)
 
 static void effects_update_default(void)
 {
-    effects_state.config.enable = 0;
-    effects_state.config.mode = RGB_EFFECT_STATIC;
+    effects_state.config.enable = 1;
+    effects_state.config.mode = RGB_EFFECT_SCAN;
     effects_state.config.speed = SPEED_DEFAULT;
     effects_state.config.hue = HUE_DEFAULT;
     effects_state.config.sat = SAT_DEFAULT;
@@ -254,11 +265,14 @@ void rgb_effects_init(rgb_driver_t* driver)
     }
 
     effects_state.driver        = driver;
+    if (effects_state.config.enable)
+        effects_state.driver->init();
+
     effects_state.counter       = 0;
     effects_state.wipe_on       = true;
     effects_state.gradient_step = GRADIENT_STEP_DEFAULT;
     effects_state.breath_step   = BREATH_STEP_DEFAULT;
-    effects_state.last_ticks    = timer_read();
+    effects_state.last_ticks    = timer_read32();
     srand(effects_state.last_ticks);
     effects_state.effects[RGB_EFFECT_STATIC]    = effects_mode_static;
     effects_state.effects[RGB_EFFECT_BLINK]     = effects_mode_blink;
@@ -333,18 +347,23 @@ void rgb_effects_dec_mode(void)
 void rgb_effects_toggle(void)
 {
     effects_state.config.enable = !effects_state.config.enable;
+    if (effects_state.config.enable) {
+        effects_state.driver->init();
+    } else {
+        effects_state.driver->uninit();
+    }
     effects_set_enable(effects_state.config.enable);
 }
 
 void rgb_effects_task(void)
 {
-    if (!effects_state.config.enable) {
-        effects_state.driver->set_color_all(0, 0, 0);
-    } else {
+    if (effects_state.config.enable) {
         if (effects_need_update() ) {
             effects_state.effects[effects_state.config.mode]();
             effects_update_timer();
+            //rtt_printf("effects last ticks: %d\n", effects_state.last_ticks);
         }
+        effects_state.driver->flush();
     }
 }
 

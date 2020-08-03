@@ -6,6 +6,8 @@
 #include <stddef.h>
 #include "rgb_driver.h"
 #include "rgb_color.h"
+#include "gpio_pin.h"
+#include "wait.h"
 
 #include "drivers/ws2812.h"
 #include "drivers/aw9523b.h"
@@ -97,12 +99,16 @@ void rd_ws2812_flush(void)
 
 void rd_aw9523b_init(void)
 {
+    gpio_set_output_pushpull(RGBLIGHT_EN_PIN);
+    gpio_write_pin(RGBLIGHT_EN_PIN, 1);
+    wait_ms(1);
     aw9523b_init(AW9523B_ADDR);
 }
 
 void rd_aw9523b_uninit(void)
 {
     aw9523b_uninit(AW9523B_ADDR);
+    gpio_write_pin(RGBLIGHT_EN_PIN, 0);
 }
 
 void rd_aw9523b_set_color(uint32_t index, uint8_t red, uint8_t blue, uint8_t green)

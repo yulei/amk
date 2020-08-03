@@ -30,6 +30,8 @@ uint16_t timer_elapsed(uint16_t last)
 
 uint32_t timer_elapsed32(uint32_t last)
 {
-  uint32_t ticks = app_timer_cnt_diff_compute(app_timer_cnt_get(), APP_TIMER_TICKS(last));
-  return (ticks / TICKS_PER_MS);
+    uint32_t current = timer_read32();
+    return TIMER_DIFF_32(current, last);
+  //uint32_t ticks = app_timer_cnt_diff_compute(app_timer_cnt_get(), APP_TIMER_TICKS(last));
+  //return (ticks / TICKS_PER_MS);
 }

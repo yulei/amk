@@ -6,6 +6,7 @@
 #include "rgb_effects.h"
 
 #include "action.h"
+#include "rtt.h"
 
 extern void keyboard_set_rgb(bool on);
 
@@ -17,6 +18,7 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
         case AF_RGB_TOG:
             rgb_effects_toggle();
             keyboard_set_rgb(rgb_effects_enabled());
+            rtt_printf("Toggle rgb: %d\n", rgb_effects_enabled());
             break;
         case AF_RGB_MOD:
             rgb_effects_inc_mode();

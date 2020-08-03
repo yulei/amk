@@ -16,9 +16,7 @@
 #include "keyboard.h"
 #include "matrix_driver.h"
 
-#ifdef RGBLIGHT_ENABLE
-#include "rgblight.h"
-#endif
+#include "rgb_effects.h"
 
 
 APP_TIMER_DEF(m_keyboard_timer_id); // keyboard scan timer id
@@ -36,23 +34,7 @@ static void matrix_event_handler(bool changed);
 /** the fllowing function can be overrided by the keyboard codes */
 __attribute__((weak)) void keyboard_set_rgb(bool on)
 {
-    if (!on) {
-#ifdef RGBLIGHT_ENABLE
-    rgblight_disable();
-#endif
-
-#ifdef RGB_MATRIX_ENABLE
-    rgb_matrix_disable();
-#endif
-    } else {
-#ifdef RGBLIGHT_ENABLE
-    rgblight_enable();
-#endif
-
-#ifdef RGB_MATRIX_ENABLE
-    rgb_matrix_enable();
-#endif
-    }
+    (void)on;
 }
 
 __attribute__((weak)) void keyboard_prepare_sleep(void)
@@ -137,11 +119,7 @@ static void keyboard_timer_init(void)
 
 static bool keyboard_rgblight_on(void)
 {
-#if defined(RGBLIGHT_ENABLE)
-    extern rgblight_config_t rgblight_config;
-    if (rgblight_config.enable ) return true;
-#endif
-    return false;
+    return rgb_effects_enabled();
 }
 
 static bool keyboard_rgbmatrix_on(void)
@@ -158,6 +136,11 @@ static bool keyboard_rgb_on(void) { return keyboard_rgblight_on() || keyboard_rg
 static void keyboard_timout_handler(void *p_context)
 {
     keyboard_task();
+
+    if (ble_driver.vbus_enabled) {
+        // do not make the power related stuff
+        return;
+    }
 
     if (ble_driver.matrix_changed) {
         ble_driver.scan_count = 0;
