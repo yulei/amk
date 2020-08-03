@@ -1,29 +1,24 @@
 PROJECT_NAME     := amk
-TARGETS          := nrf52832_xxaa
+#TARGETS          := nrf52832_xxaa
 OUTPUT_DIRECTORY := _build
 
-TOP_DIR = ./
-NRF5SDK_DIR := ./nrf5_sdk/nRF5_SDK_17.0.0_9d13099
-TINYUSB_DIR := ./tinyusb
-KBD_DIR := ./keyboards
+TOP_DIR ?= .
 
-$(OUTPUT_DIRECTORY)/nrf52832_xxaa.out: \
-  LINKER_SCRIPT  := ./nrf5_sdk/nrf52832.ld
+TARGET := $(filter-out clean flash flash_softdevice sdk_config help, $(MAKECMDGOALS))
 
-# Source files
-SRC_FILES += \
-  $(KBD_DIR)/hhkbble/hhkbble.c \
-  $(KBD_DIR)/hhkbble/hhkbble_keymap.c \
+NRF5SDK_DIR := $(TOP_DIR)/nrf5_sdk/nRF5_SDK_17.0.0_9d13099
 
-# Include folders
-INC_FOLDERS += \
-  $(TINYUSB_DIR) \
-  $(TINYUSB_DIR)/tinyusb/src \
-  $(KBD_DIR)/hhkbble \
+$(OUTPUT_DIRECTORY)/$(TARGET).out: \
+  LINKER_SCRIPT  := $(TOP_DIR)/nrf5_sdk/nrf52832.ld
 
-include nrf5_sdk/nrf5.mk
-include tmk/tmk.mk
-include main/main.mk
+include $(TOP_DIR)/nrf5_sdk/nrf5.mk
+include $(TOP_DIR)/tinyusb/tinyusb.mk
+include $(TOP_DIR)/tmk/tmk.mk
+include $(TOP_DIR)/main/main.mk
+
+ifneq (, $(TARGET))
+	include $(TOP_DIR)/keyboards/$(TARGET)/$(TARGET).mk
+endif
 
 APP_DEFS += $(NRF5_DEFS)
 APP_DEFS += $(TMK_DEFS)
@@ -67,10 +62,10 @@ LDFLAGS += -Wl,--gc-sections
 # use newlib in nano version
 LDFLAGS += --specs=nano.specs
 
-nrf52832_xxaa: CFLAGS += -D__HEAP_SIZE=8192
-nrf52832_xxaa: CFLAGS += -D__STACK_SIZE=8192
-nrf52832_xxaa: ASMFLAGS += -D__HEAP_SIZE=8192
-nrf52832_xxaa: ASMFLAGS += -D__STACK_SIZE=8192
+$(TARGET): CFLAGS += -D__HEAP_SIZE=8192
+$(TARGET): CFLAGS += -D__STACK_SIZE=8192
+$(TARGET): ASMFLAGS += -D__HEAP_SIZE=8192
+$(TARGET): ASMFLAGS += -D__STACK_SIZE=8192
 
 # Add standard libraries at the very end of the linker input, after all objects
 # that may need symbols provided by these libraries.
@@ -79,27 +74,28 @@ LIB_FILES += -lc -lnosys -lm
 .PHONY: default help
 
 # Default target - first one defined
-default: nrf52832_xxaa
+default: $(KEYBOARDS)
 
 # Print all targets that can be built
 help:
 	@echo following targets are available:
-	@echo		nrf52832_xxaa
+	@echo		keyboard
 	@echo		flash_softdevice
 	@echo		sdk_config - starting external tool for editing sdk_config.h
 	@echo		flash      - flashing binary
 
 #TEMPLATE_PATH := $(SDK_ROOT)/components/toolchain/gcc
-include common.mk
-$(foreach target, $(TARGETS), $(call define_target, $(target)))
+include $(TOP_DIR)/common.mk
+#$(foreach target, $(TARGETS), $(call define_target, $(target)))
+$(call define_target, $(TARGET))
 
 
 .PHONY: flash flash_softdevice erase
 
 # Flash the program
 flash: default
-	@echo Flashing: $(OUTPUT_DIRECTORY)/nrf52832_xxaa.hex
-	nrfjprog -f nrf52 --program $(OUTPUT_DIRECTORY)/nrf52832_xxaa.hex --sectorerase
+	@echo Flashing: $(OUTPUT_DIRECTORY)/$(TARGET).hex
+	nrfjprog -f nrf52 --program $(OUTPUT_DIRECTORY)/$(TARGET).hex --sectorerase
 	nrfjprog -f nrf52 --reset
 
 # Flash softdevice
