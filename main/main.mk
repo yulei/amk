@@ -4,7 +4,6 @@ MAIN_DIR := $(TOP_DIR)/main
 SRC_FILES += \
 	$(MAIN_DIR)/main.c  \
 	$(MAIN_DIR)/matrix_driver.c \
-	$(MAIN_DIR)/suspend.c \
 	$(MAIN_DIR)/xprintf.c \
 	$(MAIN_DIR)/porting/nrf52/timer.c \
 	$(MAIN_DIR)/porting/nrf52/bootloader.c \
@@ -25,6 +24,7 @@ SRC_FILES += \
 	$(MAIN_DIR)/rgb_color.c \
 	$(MAIN_DIR)/custom_action.c \
 	$(MAIN_DIR)/eeprom_manager.c \
+	#MAIN_DIR)/suspend.c \
 
 INC_FOLDERS += \
 	$(MAIN_DIR) \

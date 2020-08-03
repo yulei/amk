@@ -5,7 +5,7 @@
  */
 
 #include <string.h>
-#include "eeconfig.h"
+#include "eeprom_manager.h"
 #include "fds.h"
 #include "app_timer.h"
 #include "app_scheduler.h"

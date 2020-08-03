@@ -74,7 +74,7 @@ LIB_FILES += -lc -lnosys -lm
 .PHONY: default help
 
 # Default target - first one defined
-default: $(KEYBOARDS)
+default: $(TARGET)
 
 # Print all targets that can be built
 help:
