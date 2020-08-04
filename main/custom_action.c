@@ -3,6 +3,7 @@
  *      action function defintion for custom behavior
  */
 #include "custom_action.h"
+#include "eeconfig.h"
 #include "rgb_effects.h"
 
 #include "action.h"
@@ -40,6 +41,11 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
             break;
         case AF_RGB_VALD:
             rgb_effects_dec_val();
+            break;
+        case AF_EEPROM_RESET:
+            eeconfig_init();
+            break;
+        default:
             break;
     }
 }

@@ -124,10 +124,6 @@ static bool keyboard_rgblight_on(void)
 
 static bool keyboard_rgbmatrix_on(void)
 {
-#if defined(RGB_MATRIX_ENABLE)
-    extern rgb_config_t rgb_matrix_config;
-    if (rgb_matrix_config.enable) return true;
-#endif
     return false;
 }
 
@@ -154,7 +150,7 @@ static void keyboard_timout_handler(void *p_context)
     }
 
     // scan count overflow, switch to trigger mode
-    if (key_matrix_is_off() && (ble_driver.scan_count >= MAX_SCAN_COUNT)) {
+    if (matrix_driver_keys_off() && (ble_driver.scan_count >= MAX_SCAN_COUNT)) {
         keyboard_timer_stop();
         matrix_driver_scan_stop();
         matrix_driver_trigger_start(matrix_event_handler);

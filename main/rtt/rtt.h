@@ -11,5 +11,5 @@
     #include "SEGGER_RTT.h"
     #define rtt_printf(fmt, ...) SEGGER_RTT_printf(0, fmt, ##__VA_ARGS__)
 #else
-    #define rtt_printf(...) 1
+    #define rtt_printf(...)
 #endif

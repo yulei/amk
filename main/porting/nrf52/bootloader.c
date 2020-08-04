@@ -1,6 +1,12 @@
 /**
  * bootloader.c
- *  jump to bootloader
+ *  reset usb to bootloader mode
  */
 
-void bootloader_jump(void) { }
+#include "bootloader.h"
+#include "usb_interface.h"
+
+void bootloader_jump(void)
+{
+    nrf_usb_reboot();
+}

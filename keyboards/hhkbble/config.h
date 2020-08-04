@@ -44,3 +44,5 @@
 #define RGB_LED_NUM 4
 
 #define AW9523B_ADDR 0xB6
+
+#define CAPS_LED_PIN                18

@@ -333,7 +333,7 @@ matrix_row_t matrix_get_row(uint8_t row)
     return matrix[row];
 }
 
-bool key_matrix_is_off(void)
+bool matrix_driver_keys_off(void)
 {
     for (int i = 0; i < MATRIX_ROWS; i++) {
         if (matrix[i] != 0) {
