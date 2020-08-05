@@ -9,9 +9,12 @@
 
 #include "eeconfig.h"
 
-#define EECONFIG_ADDRESS(base, offset) ((void*)((uint8_t*)(base)+(offset)))
-#define EECONFIG_RGB_EFFECTS (void*)16
-#define EECONFIG_RGB_MATRIX (void*)24
+#define EECONFIG_KEYBOARD   (uint32_t*)16
+
+uint32_t eeconfig_read_kb(void);
+void eeconfig_write_kb(uint32_t data);
+void eeconfig_update_kb(uint32_t data);
+
 
 // wrapper functions
 uint8_t eeprom_read_byte(const uint8_t *Address);
