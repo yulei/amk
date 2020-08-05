@@ -48,15 +48,12 @@ enum rgb_effects_type {
 };
 
 typedef union {
-    uint32_t raw;
-    struct __attribute__((__packed__)) {
-        uint8_t enable : 1;
-        uint8_t mode : 3;
-        uint8_t speed : 4;
-        uint8_t hue;
-        uint8_t sat;
-        uint8_t val;
-    };
+    uint8_t enable;
+    uint8_t mode;
+    uint8_t speed;
+    uint8_t hue;
+    uint8_t sat;
+    uint8_t val;
 } rgb_effects_config_t;
 
 typedef void (*RGB_EFFECT_FUN)(void);
@@ -77,6 +74,31 @@ static rgb_effects_state_t effects_state;
 // utilities
 #define RANDOM_DISTANCE 17
 static uint8_t get_random_hue(uint8_t hue) { return (rand() % HUE_MAX) + RANDOM_DISTANCE; }
+
+static void eeconfig_read_effects(rgb_effects_config_t *config)
+{
+    config->enable  = eeprom_read_byte(EECONFIG_ADDRESS(EECONFIG_RGB_EFFECTS,0));
+    config->mode    = eeprom_read_byte(EECONFIG_ADDRESS(EECONFIG_RGB_EFFECTS,1));
+    config->speed   = eeprom_read_byte(EECONFIG_ADDRESS(EECONFIG_RGB_EFFECTS,2));
+    config->hue     = eeprom_read_byte(EECONFIG_ADDRESS(EECONFIG_RGB_EFFECTS,3));
+    config->sat     = eeprom_read_byte(EECONFIG_ADDRESS(EECONFIG_RGB_EFFECTS,4));
+    config->val     = eeprom_read_byte(EECONFIG_ADDRESS(EECONFIG_RGB_EFFECTS,5));
+}
+
+static void eeconfig_write_effects(rgb_effects_config_t *config)
+{
+    eeprom_write_byte(EECONFIG_ADDRESS(EECONFIG_RGB_EFFECTS,0), config->enable);
+    eeprom_write_byte(EECONFIG_ADDRESS(EECONFIG_RGB_EFFECTS,1), config->mode);
+    eeprom_write_byte(EECONFIG_ADDRESS(EECONFIG_RGB_EFFECTS,2), config->speed);
+    eeprom_write_byte(EECONFIG_ADDRESS(EECONFIG_RGB_EFFECTS,3), config->hue);
+    eeprom_write_byte(EECONFIG_ADDRESS(EECONFIG_RGB_EFFECTS,4), config->sat);
+    eeprom_write_byte(EECONFIG_ADDRESS(EECONFIG_RGB_EFFECTS,5), config->val);
+}
+
+static void eeconfig_update_effects(rgb_effects_config_t *config)
+{
+    eeconfig_write_effects(config);
+}
 
 static void effects_mode_init(void)
 {
@@ -127,12 +149,6 @@ static uint32_t effects_delay(void)
 
 static bool effects_need_update(void)
 {
-    /*uint32_t elapsed = timer_elapsed32(effects_state.last_ticks);
-    uint32_t interval = elapsed * effects_state.config.speed;
-    if (interval >= effects_delay()){
-        rtt_printf("elapsed:%d, interval:%d, delay:%d\n", elapsed, interval, effects_delay());
-    }*/
-
     return timer_elapsed32(effects_state.last_ticks)*effects_state.config.speed >= effects_delay();
 }
 
@@ -209,38 +225,38 @@ static void effects_mode_scan(void)
 static void effects_set_hue(uint8_t hue)
 {
     effects_state.config.hue = hue;
-    eeconfig_update_kb(effects_state.config.raw);
+    eeconfig_update_effects(&effects_state.config);
 }
 
 static void effects_set_sat(uint8_t sat)
 {
     effects_state.config.sat = sat;
-    eeconfig_update_kb(effects_state.config.raw);
+    eeconfig_update_effects(&effects_state.config);
 }
 
 static void effects_set_val(uint8_t val)
 {
     effects_state.config.val = val;
-    eeconfig_update_kb(effects_state.config.raw);
+    eeconfig_update_effects(&effects_state.config);
 }
 
 static void effects_set_speed(uint8_t speed)
 {
     effects_state.config.speed = !speed ? 1 : speed;
-    eeconfig_update_kb(effects_state.config.raw);
+    eeconfig_update_effects(&effects_state.config);
 }
 
 static void effects_set_mode(uint8_t mode)
 {
     effects_state.config.mode = mode;
     effects_mode_init();
-    eeconfig_update_kb(effects_state.config.raw);
+    eeconfig_update_effects(&effects_state.config);
 }
 
 static void effects_set_enable(uint8_t enable)
 {
     effects_state.config.enable = enable;
-    eeconfig_update_kb(effects_state.config.raw);
+    eeconfig_update_effects(&effects_state.config);
 }
 
 static void effects_update_default(void)
@@ -251,7 +267,7 @@ static void effects_update_default(void)
     effects_state.config.hue = HUE_DEFAULT;
     effects_state.config.sat = SAT_DEFAULT;
     effects_state.config.val = VAL_DEFAULT;
-    eeconfig_update_kb(effects_state.config.raw);
+    eeconfig_update_effects(&effects_state.config);
 }
 
 // interface
@@ -261,7 +277,7 @@ void rgb_effects_init(rgb_driver_t* driver)
         eeconfig_init();
         effects_update_default();
     } else {
-        effects_state.config.raw = eeconfig_read_kb();
+        eeconfig_read_effects(&effects_state.config);
     }
 
     effects_state.driver        = driver;
