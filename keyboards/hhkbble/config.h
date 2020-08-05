@@ -41,8 +41,9 @@
 #define RGBLIGHT_EN_PIN             22
 #define RGBLIGHT_EN_HIGH
 
-#define RGB_LED_NUM 4
+#define RGB_LED_NUM                 4
+#define WS2812_LED_PIN              18
 
-#define AW9523B_ADDR 0xB6
+#define AW9523B_ADDR                0xB6
 
 #define CAPS_LED_PIN                18

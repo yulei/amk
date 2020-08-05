@@ -16,12 +16,10 @@
 #error "RGB_LED_NUM must be defined"
 #endif
 
-static rgb_led_t rgb_leds[RGB_LED_NUM];
-
 static void rd_ws2812_init(void);
 static void rd_ws2812_uninit(void);
-static void rd_ws2812_set_color(uint32_t index, uint8_t red, uint8_t blue, uint8_t green);
-static void rd_ws2812_set_color_all(uint8_t red, uint8_t blue, uint8_t green);
+static void rd_ws2812_set_color(uint32_t index, uint8_t red, uint8_t green, uint8_t blue);
+static void rd_ws2812_set_color_all(uint8_t red, uint8_t green, uint8_t blue);
 static void rd_ws2812_flush(void);
 
 static rgb_driver_t ws2812_driver = {
@@ -34,8 +32,8 @@ static rgb_driver_t ws2812_driver = {
 
 static void rd_aw9523b_init(void);
 static void rd_aw9523b_uninit(void);
-static void rd_aw9523b_set_color(uint32_t index, uint8_t red, uint8_t blue, uint8_t green);
-static void rd_aw9523b_set_color_all(uint8_t red, uint8_t blue, uint8_t green);
+static void rd_aw9523b_set_color(uint32_t index, uint8_t red, uint8_t green, uint8_t blue);
+static void rd_aw9523b_set_color_all(uint8_t red, uint8_t green, uint8_t blue);
 static void rd_aw9523b_flush(void);
 
 static rgb_driver_t aw9523b_driver = {
@@ -66,35 +64,27 @@ void rgb_driver_destroy(rgb_driver_t* driver)
 
 void rd_ws2812_init(void)
 {
-    ws2812_init();
+    ws2812_init(WS2812_LED_PIN);
 }
 
 void rd_ws2812_uninit(void)
 {
-    ws2812_uninit();
+    ws2812_uninit(WS2812_LED_PIN);
 }
 
-void rd_ws2812_set_color(uint32_t index, uint8_t red, uint8_t blue, uint8_t green)
+void rd_ws2812_set_color(uint32_t index, uint8_t red, uint8_t green, uint8_t blue)
 {
-    if( index < RGB_LED_NUM) {
-        rgb_leds[index].r = red;
-        rgb_leds[index].g = green;
-        rgb_leds[index].b = blue;
-    }
+    ws2812_set_color(index, red, green, blue);
 }
 
-void rd_ws2812_set_color_all(uint8_t red, uint8_t blue, uint8_t green)
+void rd_ws2812_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
 {
-    for (int i = 0; i < RGB_LED_NUM; i++) {
-        rgb_leds[i].r = red;
-        rgb_leds[i].g = green;
-        rgb_leds[i].b = blue;
-    }
+    ws2812_set_color_all(red, green, blue);
 }
 
 void rd_ws2812_flush(void)
 {
-    ws2812_setleds(rgb_leds, RGB_LED_NUM);
+    ws2812_update_buffers(WS2812_LED_PIN);
 }
 
 void rd_aw9523b_init(void)
@@ -111,17 +101,17 @@ void rd_aw9523b_uninit(void)
     gpio_write_pin(RGBLIGHT_EN_PIN, 0);
 }
 
-void rd_aw9523b_set_color(uint32_t index, uint8_t red, uint8_t blue, uint8_t green)
+void rd_aw9523b_set_color(uint32_t index, uint8_t red, uint8_t green, uint8_t blue)
 {
     aw9523b_set_color(index, red, green, blue);
 }
 
-void rd_aw9523b_set_color_all(uint8_t red, uint8_t blue, uint8_t green)
+void rd_aw9523b_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
 {
-    aw9523b_set_color_all(red, blue, green);
+    aw9523b_set_color_all(red, green, blue);
 }
 
 void rd_aw9523b_flush(void)
 {
-    aw9523b_update_pwm_buffers(AW9523B_ADDR);
+    aw9523b_update_buffers(AW9523B_ADDR);
 }

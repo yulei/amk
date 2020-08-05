@@ -11,8 +11,8 @@
     #define AW9523B_ADDR 0xB6
 #endif
 
-#ifndef AW9523B_RGB_NUM
-    #define AW9523B_RGB_NUM RGB_LED_NUM
+#ifndef AW9523B_LED_NUM
+    #define AW9523B_LED_NUM RGB_LED_NUM
 #endif
 
 #define AW9523B_PWM_BASE    0x20
@@ -40,14 +40,14 @@ typedef struct {
     uint8_t r;
     uint8_t g;
     uint8_t b;
-} aw9523b_led;
+} aw9523b_led_t;
 
-extern const aw9523b_led g_aw9523b_leds[AW9523B_RGB_NUM];
+extern const aw9523b_led_t g_aw9523b_leds[AW9523B_LED_NUM];
 
 void aw9523b_init(uint8_t addr);
 
 void aw9523b_set_color(int index, uint8_t red, uint8_t green, uint8_t blue);
 void aw9523b_set_color_all(uint8_t red, uint8_t green, uint8_t blue);
-void aw9523b_update_pwm_buffers(uint8_t addr);
+void aw9523b_update_buffers(uint8_t addr);
 
 void aw9523b_uninit(uint8_t addr);

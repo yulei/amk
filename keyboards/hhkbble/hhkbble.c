@@ -30,7 +30,7 @@ void keyboard_prepare_sleep(void)
     keyboard_set_rgb(false);
 }
 
-const aw9523b_led g_aw9523b_leds[AW9523B_RGB_NUM] = {
+const aw9523b_led_t g_aw9523b_leds[AW9523B_LED_NUM] = {
     {AW9523B_P12_PWM, AW9523B_P11_PWM, AW9523B_P10_PWM},
     {AW9523B_P01_PWM, AW9523B_P00_PWM, AW9523B_P13_PWM},
     {AW9523B_P04_PWM, AW9523B_P03_PWM, AW9523B_P02_PWM},

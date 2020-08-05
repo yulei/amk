@@ -1,0 +1,13 @@
+
+M20ADD_DIR := $(TOP_DIR)/keyboards/m20add
+
+SRC_FILES += \
+	$(M20ADD_DIR)/m20add.c \
+
+INC_FOLDERS += \
+	$(M20ADD_DIR) \
+
+MCU = STM32F411 
+BOOTMAGIC_ENABLE = yes
+MOUSEKEY_ENABLE = yes
+EXTRAKEY_ENABLE = yes
