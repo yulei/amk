@@ -5,11 +5,6 @@ TOP_DIR ?= .
 
 TARGET := $(filter-out clean flash flash_softdevice sdk_config help erase, $(MAKECMDGOALS))
 
-NRF5SDK_DIR := $(TOP_DIR)/nrf5_sdk/nRF5_SDK_17.0.0_9d13099
-
-$(OUTPUT_DIRECTORY)/$(TARGET).out: \
-  LINKER_SCRIPT  := $(TOP_DIR)/nrf5_sdk/nrf52832.ld
-
 # Source files
 SRC_FILES += \
 
@@ -28,9 +23,19 @@ endif
 
 include $(TOP_DIR)/main/main.mk
 include $(TOP_DIR)/tmk/tmk.mk
-include $(TOP_DIR)/nrf5_sdk/nrf5.mk
+
+ifeq (NRF52832, $(strip $(MCU)))
+include $(TOP_DIR)/nrf5_sdk/nrf5_sdk.mk
+endif
+
+ifeq (STM32F411, $(strip $(MCU)))
+include $(TOP_DIR)/stm32_sdk/stm32_sdk.mk
+endif
+
 include $(TOP_DIR)/tinyusb/tinyusb.mk
 
+
+#$(OUTPUT_DIRECTORY)/$(TARGET).out: $(LINKER_SCRIPT)
 
 # Optimization flags
 OPT = -O3 -g3
@@ -44,8 +49,6 @@ OPT = -O3 -g3
 # C flags common to all targets
 CFLAGS += $(OPT)
 CFLAGS += $(APP_DEFS)
-CFLAGS += -D__HEAP_SIZE=8192
-CFLAGS += -D__STACK_SIZE=8192
 CFLAGS += -mcpu=cortex-m4
 CFLAGS += -mthumb -mabi=aapcs
 CFLAGS += -Wall -Werror
@@ -59,8 +62,6 @@ CXXFLAGS += $(OPT)
 
 # Assembler flags common to all targets
 ASMFLAGS += $(APP_DEFS)
-ASMFLAGS += -D__HEAP_SIZE=8192
-ASMFLAGS += -D__STACK_SIZE=8192
 ASMFLAGS += -g3
 ASMFLAGS += -mcpu=cortex-m4
 ASMFLAGS += -mthumb -mabi=aapcs
@@ -68,7 +69,7 @@ ASMFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
 # Linker flags
 LDFLAGS += $(OPT)
-LDFLAGS += -mthumb -mabi=aapcs -L$(NRF5SDK_DIR)/modules/nrfx/mdk -T$(LINKER_SCRIPT)
+LDFLAGS += -mthumb -mabi=aapcs -L$(LINKER_PATH) -T$(LINKER_SCRIPT)
 LDFLAGS += -mcpu=cortex-m4
 LDFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 # let linker dump unused sections

@@ -5,9 +5,38 @@
 #include "stm32f4xx_hal.h"
 #include "board.h"
 #include "tusb.h"
+#include "usb_descriptors.h"
 
+#include "report.h"
+#include "host.h"
+#include "keyboard.h"
+
+/**
+ * tmk related stuff
+ */
+static uint8_t keyboard_leds(void);
+static void send_keyboard(report_keyboard_t *report);
+static void send_mouse(report_mouse_t *report);
+static void send_system(uint16_t data);
+static void send_consumer(uint16_t data);
+
+static uint8_t amk_led_state;
+
+/* host struct */
+host_driver_t amk_driver = {
+  keyboard_leds,
+  send_keyboard,
+  send_mouse,
+  send_system,
+  send_consumer
+};
+
+volatile uint32_t system_ticks = 0;
 static void DWT_Delay_Init(void);
 static void Error_Handler(void);
+static void amk_init(void);
+
+
 //--------------------------------------------------------------------+
 // Forward USB interrupt events to TinyUSB IRQ Handler
 //--------------------------------------------------------------------+
@@ -119,9 +148,24 @@ void board_init(void)
   USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSBSEN;
   USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSASEN;
   DWT_Delay_Init();
+  amk_init();
 }
 
-volatile uint32_t system_ticks = 0;
+void board_task(void)
+{
+  tud_task();
+
+  keyboard_task();
+}
+
+static void amk_init(void)
+{
+  tusb_init();
+
+  keyboard_init();
+  host_set_driver(&amk_driver);
+}
+
 void SysTick_Handler (void)
 {
   system_ticks++;
@@ -149,4 +193,79 @@ static void DWT_Delay_Init(void)
         DWT->CYCCNT = 0;
         DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
     }
+}
+
+// tmk integration
+
+uint8_t keyboard_leds(void)
+{
+  return amk_led_state;
+}
+
+void send_keyboard(report_keyboard_t *report)
+{
+  tud_hid_keyboard_report(REPORT_ID_KEYBOARD, report->mods, report->keys);
+}
+
+void send_mouse(report_mouse_t *report)
+{
+  tud_hid_mouse_report(REPORT_ID_MOUSE, report->buttons, report->x, report->y, report->v, report->h);
+}
+
+void send_system(uint16_t data)
+{
+  tud_hid_report(REPORT_ID_SYSTEM, &data, sizeof(data));
+}
+
+void send_consumer(uint16_t data)
+{
+  tud_hid_report(REPORT_ID_CONSUMER, &data, sizeof(data));
+}
+
+// tusb integration
+// Invoked when device is mounted
+void tud_mount_cb(void)
+{
+}
+
+// Invoked when device is unmounted
+void tud_umount_cb(void)
+{
+}
+
+// Invoked when usb bus is suspended
+// remote_wakeup_en : if host allow us  to perform remote wakeup
+// Within 7ms, device must draw an average of current less than 2.5 mA from bus
+void tud_suspend_cb(bool remote_wakeup_en)
+{
+  (void) remote_wakeup_en;
+}
+
+// Invoked when usb bus is resumed
+void tud_resume_cb(void)
+{
+}
+
+// Invoked when received GET_REPORT control request
+// Application must fill buffer report's content and return its length.
+// Return zero will cause the stack to STALL request
+uint16_t tud_hid_get_report_cb(uint8_t report_id, hid_report_type_t report_type, uint8_t* buffer, uint16_t reqlen)
+{
+  // TODO not Implemented
+  (void) report_id;
+  (void) report_type;
+  (void) buffer;
+  (void) reqlen;
+
+  return 0;
+}
+
+// Invoked when received SET_REPORT control request or
+// received data on OUT endpoint ( Report ID = 0, Type = 0 )
+void tud_hid_set_report_cb(uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize)
+{
+  (void) report_id;
+  if (report_type == HID_REPORT_TYPE_OUTPUT) {
+    memcpy(&amk_led_state, buffer, 1);
+  }
 }

@@ -1,6 +1,6 @@
 /**
  * matrix_driver.c
- * default matrix implementation
+ *  matrix_driver implementation for nrf52
  */
 
 #include "ble_config.h"
@@ -11,6 +11,7 @@
 #include "timer.h"
 #include "rgb_driver.h"
 #include "rgb_effects.h"
+#include "rtt.h"
 
 typedef struct {
     matrix_event_callback   event_callback;
