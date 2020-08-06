@@ -3,9 +3,6 @@ STM32SDK_DIR := $(TOP_DIR)/stm32_sdk
 SRC_FILES += \
 	$(STM32SDK_DIR)/startup_stm32f411xe.s \
 	$(STM32SDK_DIR)/system_stm32f4xx.c \
-	$(STM32SDK_DIR)/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c \
-	$(STM32SDK_DIR)/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c \
-	$(STM32SDK_DIR)/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c \
 	$(STM32SDK_DIR)/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
 	$(STM32SDK_DIR)/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
 	$(STM32SDK_DIR)/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c \
@@ -34,6 +31,7 @@ INC_FOLDERS += \
 APP_DEFS += \
 	-DUSE_HAL_DRIVER \
 	-DSTM32F411xE \
+	-DGPIO_STM32 \
 
 LINKER_PATH		:= $(STM32SDK_DIR)
 LINKER_SCRIPT	:= $(STM32SDK_DIR)/stm32f411xe.ld

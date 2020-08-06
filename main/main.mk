@@ -33,6 +33,7 @@ ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))
 	SRC_FILES += $(MAIN_DIR)/rgb/rgb_effects.c
 	SRC_FILES += $(MAIN_DIR)/rgb/rgb_driver.c
 	SRC_FILES += $(MAIN_DIR)/rgb/rgb_color.c
+	APP_DEFS += -DRGB_EFFECTS_ENABLE
 endif
 
 ifeq (NRF52832, $(strip $(MCU)))
@@ -41,6 +42,8 @@ ifeq (NRF52832, $(strip $(MCU)))
 endif
 
 ifeq (STM32F411, $(strip $(MCU)))
-	SRC_FILES += $(MAIN_DIR)/matrix.c
+	SRC_FILES += $(MAIN_DIR)/matrix_amk.c
+	SRC_FILES += $(MAIN_DIR)/rtt/SEGGER_RTT.c
+	SRC_FILES += $(MAIN_DIR)/rtt/SEGGER_RTT_printf.c
 	include $(MAIN_DIR)/porting/stm32.mk
 endif

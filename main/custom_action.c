@@ -11,6 +11,7 @@
 
 extern void keyboard_set_rgb(bool on);
 
+#ifdef RGB_EFFECTS_ENABLE
 void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
     if (!record->event.pressed) return; // do not press key released event
@@ -49,3 +50,4 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
             break;
     }
 }
+#endif
