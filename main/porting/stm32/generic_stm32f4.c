@@ -5,11 +5,13 @@
 #include "stm32f4xx_hal.h"
 #include "board.h"
 #include "tusb.h"
+#include "rtt.h"
 #include "usb_descriptors.h"
 
 #include "report.h"
 #include "host.h"
 #include "keyboard.h"
+#include "suspend.h"
 
 /**
  * tmk related stuff
@@ -20,7 +22,8 @@ static void send_mouse(report_mouse_t *report);
 static void send_system(uint16_t data);
 static void send_consumer(uint16_t data);
 
-static uint8_t amk_led_state;
+static uint8_t amk_led_state  = 0;
+static bool amk_remote_wakeup = false;
 
 /* host struct */
 host_driver_t amk_driver = {
@@ -33,9 +36,8 @@ host_driver_t amk_driver = {
 
 volatile uint32_t system_ticks = 0;
 static void DWT_Delay_Init(void);
-static void Error_Handler(void);
 static void amk_init(void);
-
+static void Error_Handler(void);
 
 //--------------------------------------------------------------------+
 // Forward USB interrupt events to TinyUSB IRQ Handler
@@ -98,6 +100,7 @@ static void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLQ = 3;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
+    rtt_printf("Failed to config RCC\n");
     Error_Handler();
   }
   /** Initializes the CPU, AHB and APB busses clocks 
@@ -111,12 +114,14 @@ static void SystemClock_Config(void)
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
+    rtt_printf("Failed to config Clock\n");
     Error_Handler();
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
   PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
+    rtt_printf("Failed to config Peripheral Clock\n");
     Error_Handler();
   }
 }
@@ -155,7 +160,17 @@ void board_task(void)
 {
   tud_task();
 
-  keyboard_task();
+  if (tud_suspended()) {
+    if (suspend_wakeup_condition()) {
+      // Wake up host if we are in suspend mode
+      // and REMOTE_WAKEUP feature is enabled by host
+      tud_remote_wakeup();
+    }
+  }
+
+  if (tud_hid_ready()) {
+    keyboard_task();
+  }
 }
 
 static void amk_init(void)
@@ -171,20 +186,15 @@ void SysTick_Handler (void)
   system_ticks++;
 }
 
-void HardFault_Handler (void)
+/*void HardFault_Handler (void)
 {
-  //asm("bkpt");
-}
+  __asm__("BKPT");
+}*/
 
 void Error_Handler(void)
-{}
-
-// Required by __libc_init_array in startup code if we are compiling using
-// -nostdlib/-nostartfiles.
-/*void _init(void)
 {
-
-}*/
+  __asm__("BKPT");
+}
 
 static void DWT_Delay_Init(void)
 {
@@ -238,7 +248,7 @@ void tud_umount_cb(void)
 // Within 7ms, device must draw an average of current less than 2.5 mA from bus
 void tud_suspend_cb(bool remote_wakeup_en)
 {
-  (void) remote_wakeup_en;
+  amk_remote_wakeup = remote_wakeup_en;
 }
 
 // Invoked when usb bus is resumed
