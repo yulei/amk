@@ -72,9 +72,34 @@ static void rgb_matrix_update_default(void)
     matrix_state.config.val = VAL_DEFAULT;
 }
 
-void rgb_matrix_init(rgb_driver_t *driver)
+static bool rgb_matrix_need_update(void)
 {
+    return false;
 }
+
+static void rgb_matrix_update_timer(void)
+{}
+
+static void rgb_matrix_mode_static(void)
+{}
+
+static void rgb_matrix_mode_breath(void)
+{}
+
+static void rgb_matrix_mode_gradient(void)
+{}
+
+static void rgb_matrix_mode_rotate(void)
+{}
+
+static void rgb_matrix_mode_snake(void)
+{}
+
+static void rgb_matrix_mode_keyhit(void)
+{}
+
+void rgb_matrix_init(rgb_driver_t *driver)
+{}
 
 bool rgb_matrix_enabled(void)
 {
@@ -110,6 +135,10 @@ void rgb_matrix_toggle(void)
 void rgb_matrix_task(void)
 {
     if (matrix_state.config.enable) {
+        if (rgb_matrix_need_update() ) {
+            matrix_state.effects[matrix_state.config.mode]();
+            rgb_matrix_update_timer();
+        }
     } else {
         matrix_state.driver->set_color_all(0, 0, 0);
     }

@@ -128,6 +128,8 @@ static void SystemClock_Config(void)
 
 void board_init(void)
 {
+  HAL_Init();
+
   SystemClock_Config();
   all_rcc_clk_enable();
 
@@ -279,4 +281,11 @@ void tud_hid_set_report_cb(uint8_t report_id, hid_report_type_t report_type, uin
   if (bufsize) {
     memcpy(&amk_led_state, buffer, 1);
   }
+}
+
+// HAL MSP
+void HAL_MspInit(void)
+{
+  __HAL_RCC_SYSCFG_CLK_ENABLE();
+  __HAL_RCC_PWR_CLK_ENABLE();
 }
