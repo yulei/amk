@@ -2,81 +2,8 @@
   * i2c.c
   */
 
-#include <stdbool.h>
-#include <string.h>
-
-#include "i2c.h"
-#include "app_util_platform.h"
-#include "app_error.h"
-#include "nrfx_twi.h"
-
-/* TWI instance. */
-static const nrfx_twi_t m_twi = NRFX_TWI_INSTANCE(I2C_INSTANCE_ID);
-static bool twi_ready = false;
-
-#define TWI_ADDR(addr) ((addr)>>1)
-
-void i2c_init(void)
-{
-    ret_code_t err_code = NRFX_SUCCESS;
-
-    nrfx_twi_config_t twi_config = NRFX_TWI_DEFAULT_CONFIG;
-    twi_config.scl = I2C_SCL_PIN;
-    twi_config.sda = I2C_SDA_PIN;
-
-    if (!twi_ready) {
-        err_code = nrfx_twi_init(&m_twi, &twi_config, NULL, NULL);
-        APP_ERROR_CHECK(err_code);
-        twi_ready = true;
-    }
-    nrfx_twi_enable(&m_twi);
-}
-
-amk_i2c_error_t i2c_send(uint8_t addr, const void* data, size_t length, size_t timeout)
-{
-    (void)timeout;
-    ret_code_t err_code = nrfx_twi_tx(&m_twi, TWI_ADDR(addr), data, length, false);
-    if (err_code != NRFX_SUCCESS) {
-        return AMK_I2C_ERROR;
-    }
-    return AMK_SUCCESS;
-}
-
-amk_i2c_error_t i2c_recv(uint8_t addr, void* data, size_t length, size_t timeout)
-{
-    (void)timeout;
-    ret_code_t err_code = nrfx_twi_rx(&m_twi, TWI_ADDR(addr), data, length);
-    if (err_code != NRFX_SUCCESS) {
-        return AMK_I2C_ERROR;
-    }
-    return AMK_SUCCESS;
-}
-
-amk_i2c_error_t i2c_write_reg(uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
-{
-    (void)timeout;
-    uint8_t packet[length + 1];
-    memcpy(&packet[1], data, length);
-    packet[0] = reg;
-    return i2c_send(addr, packet, length + 1, 0);
-}
-
-amk_i2c_error_t i2c_read_reg(uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
-{
-    (void)timeout;
-    nrfx_twi_xfer_desc_t txrx = NRFX_TWI_XFER_DESC_TXRX(TWI_ADDR(addr), &reg, 1, data, length);
-    ret_code_t err_code = nrfx_twi_xfer(&m_twi, &txrx, 0);
-    if (err_code != NRFX_SUCCESS) {
-        return AMK_I2C_ERROR;
-    }
-    return AMK_SUCCESS;
-}
-
-void i2c_uninit(void)
-{
-    if (!twi_ready) return;
-
-    nrfx_twi_disable(&m_twi);
-    nrfx_twi_uninit(&m_twi);
-    twi_ready = false;
-}
+#if defined(NRF52832_XXAA)
+#   include "i2c_nrf52.c"
+#elif defined(STM32F411xE)
+#   include "i2c_stm32.c"
+#endif

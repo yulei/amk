@@ -10,19 +10,7 @@
 #include "rtt.h"
 #include "led.h"
 
-void keyboard_set_rgb(bool on)
-{
-    rtt_printf("keyboard_set_rgb: %d\n", on);
-    if (on) {
-        if (!rgb_effects_enabled()) {
-            rgb_effects_toggle();
-        }
-    } else {
-        if (rgb_effects_enabled()) {
-            rgb_effects_toggle();
-        }
-    }
-}
+extern void keyboard_set_rgb(bool on);
 
 void keyboard_prepare_sleep(void)
 {

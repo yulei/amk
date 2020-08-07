@@ -24,7 +24,6 @@ ifeq (yes, $(strip $(BOOTMAGIC_ENABLE)))
 		SRC_FILES += $(MAIN_DIR)/porting/eeconfig_mem.c
 	endif
 	SRC_FILES += $(MAIN_DIR)/eeprom_manager.c
-	APP_DEFS += -DBOOTMAGIC_ENABLE
 endif
 
 ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))

@@ -9,7 +9,21 @@
 #include "action.h"
 #include "rtt.h"
 
-extern void keyboard_set_rgb(bool on);
+
+__attribute__((weak))
+void keyboard_set_rgb(bool on)
+{
+    rtt_printf("keyboard_set_rgb: %d\n", on);
+    if (on) {
+        if (!rgb_effects_enabled()) {
+            rgb_effects_toggle();
+        }
+    } else {
+        if (rgb_effects_enabled()) {
+            rgb_effects_toggle();
+        }
+    }
+}
 
 #ifdef RGB_EFFECTS_ENABLE
 void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)

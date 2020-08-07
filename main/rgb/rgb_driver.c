@@ -64,12 +64,14 @@ void rgb_driver_destroy(rgb_driver_t* driver)
 
 void rd_ws2812_init(void)
 {
-    ws2812_init(WS2812_LED_PIN);
+    pin_t p = WS2812_LED_PIN;
+    ws2812_init(p);
 }
 
 void rd_ws2812_uninit(void)
 {
-    ws2812_uninit(WS2812_LED_PIN);
+    pin_t p = WS2812_LED_PIN;
+    ws2812_uninit(p);
 }
 
 void rd_ws2812_set_color(uint32_t index, uint8_t red, uint8_t green, uint8_t blue)
@@ -84,21 +86,26 @@ void rd_ws2812_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
 
 void rd_ws2812_flush(void)
 {
-    ws2812_update_buffers(WS2812_LED_PIN);
+    pin_t p = WS2812_LED_PIN;
+    ws2812_update_buffers(p);
 }
 
 void rd_aw9523b_init(void)
 {
+#ifdef RGBLIGHT_EN_PIN
     gpio_set_output_pushpull(RGBLIGHT_EN_PIN);
     gpio_write_pin(RGBLIGHT_EN_PIN, 1);
     wait_ms(1);
+#endif
     aw9523b_init(AW9523B_ADDR);
 }
 
 void rd_aw9523b_uninit(void)
 {
     aw9523b_uninit(AW9523B_ADDR);
+#ifdef RGBLIGHT_EN_PIN
     gpio_write_pin(RGBLIGHT_EN_PIN, 0);
+#endif
 }
 
 void rd_aw9523b_set_color(uint32_t index, uint8_t red, uint8_t green, uint8_t blue)

@@ -3,8 +3,6 @@ OUTPUT_DIRECTORY := _build
 
 TOP_DIR ?= .
 
-TARGET := $(filter-out clean flash flash_softdevice sdk_config help erase, $(MAKECMDGOALS))
-
 # Source files
 SRC_FILES += \
 
@@ -16,6 +14,8 @@ LIB_FILES += \
 
 # Definitions
 APP_DEFS += \
+
+TARGET := $(filter-out clean flash erase flash_softdevice sdk_config help, $(MAKECMDGOALS))
 
 ifneq (, $(TARGET))
 	include $(TOP_DIR)/keyboards/$(TARGET)/$(TARGET).mk
@@ -94,9 +94,9 @@ endif
 help:
 	@echo following targets are available:
 	@echo		keyboard 			- your keyboard name
-	@echo		sdk_config 			- starting external tool for editing sdk_config.h
+#	@echo		sdk_config 			- starting external tool for editing sdk_config.h
 	@echo		flash      			- flashing binary
-	@echo		flash_softdevice	- flashing the softdevice
+#	@echo		flash_softdevice	- flashing the softdevice
 	@echo		erase				- erase the chip
 
 #TEMPLATE_PATH := $(SDK_ROOT)/components/toolchain/gcc
@@ -105,7 +105,10 @@ include $(TOP_DIR)/common.mk
 $(call define_target, $(TARGET))
 
 
-.PHONY: flash flash_softdevice erase
+.PHONY: flash erase
+
+ifeq (NRF52832, $(strip $(MCU)))
+.PHONY: flash_softdevice
 
 # Flash the program
 flash: default
@@ -126,3 +129,16 @@ SDK_CONFIG_FILE := ./nrf5_sdk/sdk_config.h
 CMSIS_CONFIG_TOOL := $(NRF5SDK_DIR)/external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar
 sdk_config:
 	java -jar $(CMSIS_CONFIG_TOOL) $(SDK_CONFIG_FILE)
+
+endif
+
+ifeq (STM32F411, $(strip $(MCU)))
+
+flash: default
+	@echo Flashing: $(OUTPUT_DIRECTORY)/$(TARGET).hex
+	pylink flash -t swd -d STM32F411xE $(OUTPUT_DIRECTORY)/$(TARGET).hex
+
+erase:
+	pylink erase -t swd -d STM32F411xE
+
+endif

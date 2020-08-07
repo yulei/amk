@@ -1,6 +1,6 @@
 .vscode/
 _build/
 build/
-nrf5_sdk/nRF5_SDK*
+nrf5_sdk/nRF5_SDK_*
 stm32_sdk/CMSIS/
 stm32_sdk/STM32F4xx_HAL_Driver/

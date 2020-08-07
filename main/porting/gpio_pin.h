@@ -6,14 +6,14 @@
 #pragma once
 
 
-#ifdef GPIO_NRF5X
+//#ifdef GPIO_NRF5X
+#if defined(NRF52832_XXAA)
     #include "nrf_gpio.h"
     typedef uint32_t pin_t;
     #define MAKE_PIN(port, pin) NRF_GPIO_PIN_MAP(port, pin)
-#else
-    #ifdef GPIO_STM32 
+#elif defined(STM32F411xE)
     #include "stm32f4xx_hal.h"
-            typedef struct {
+    typedef struct {
         GPIO_TypeDef *port;
         uint16_t pin;
     } pin_t;
@@ -69,9 +69,8 @@
     #define C13 MAKE_PIN(GPIOC, 13)
     #define C14 MAKE_PIN(GPIOC, 14)
     #define C15 MAKE_PIN(GPIOC, 15)
-    #else
+#else
     #error "MCU_TYPE not defined"
-    #endif
 #endif
 
 int gpio_read_pin(pin_t pin);
