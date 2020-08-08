@@ -22,8 +22,9 @@ static void adv_error_handler(uint32_t nrf_error);
 static void sleep_mode_enter(void);
 
 void ble_adv_service_init(void) {
-    uint32_t               err_code;
-    ble_advertising_init_t init;
+    uint32_t                err_code;
+    ble_advertising_init_t  init;
+    int8_t                  tx_power = DEFAULT_TX_POWER_LEVEL;
 
     memset(&init, 0, sizeof(init));
     init.advdata.name_type               = BLE_ADVDATA_FULL_NAME;
@@ -31,6 +32,7 @@ void ble_adv_service_init(void) {
     init.advdata.flags                   = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
     init.advdata.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
     init.advdata.uuids_complete.p_uuids  = m_adv_uuids;
+    init.advdata.p_tx_power_level        = &tx_power;
 
     init.config.ble_adv_whitelist_enabled          = true;
     init.config.ble_adv_directed_high_duty_enabled = true;

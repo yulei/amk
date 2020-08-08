@@ -57,6 +57,7 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             NRF_LOG_INFO("Connected");
             ble_driver.conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
             ble_qwr_update_handle(ble_driver.conn_handle);
+            sd_ble_gap_tx_power_set(BLE_GAP_TX_POWER_ROLE_CONN, ble_driver.conn_handle, DEFAULT_TX_POWER_LEVEL);
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
