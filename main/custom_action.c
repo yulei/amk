@@ -13,6 +13,7 @@
 __attribute__((weak))
 void keyboard_set_rgb(bool on)
 {
+#ifdef RGB_EFFECTS_ENABLE
     rtt_printf("keyboard_set_rgb: %d\n", on);
     if (on) {
         if (!rgb_effects_enabled()) {
@@ -23,6 +24,7 @@ void keyboard_set_rgb(bool on)
             rgb_effects_toggle();
         }
     }
+#endif
 }
 
 #ifdef RGB_EFFECTS_ENABLE

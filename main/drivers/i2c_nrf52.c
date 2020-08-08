@@ -91,4 +91,10 @@ void i2c_uninit(void)
     nrfx_twi_disable(&m_twi);
     nrfx_twi_uninit(&m_twi);
     twi_ready = false;
+
+/*  // anomaly [89] work around
+    *(volatile uint32_t *)0x40003FFC = 0;
+    *(volatile uint32_t *)0x40003FFC;
+    *(volatile uint32_t *)0x40003FFC = 1;
+*/
 }

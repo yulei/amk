@@ -115,7 +115,38 @@ static void  init_pins(void)
 
 static void matrix_prepare_sleep(void)
 {
-    matrix_trigger_stop();
+    nrf_drv_gpiote_uninit();
+
+    for (uint32_t i = 0; i < NUMBER_OF_PINS; i++) {
+        nrf_gpio_cfg_default(i);
+    }
+
+    nrf_gpio_cfg_output(CAPS_LED_PIN);
+    nrf_gpio_pin_clear(CAPS_LED_PIN);
+    
+    nrf_gpio_cfg_output(RGBLIGHT_EN_PIN);
+    nrf_gpio_pin_clear(RGBLIGHT_EN_PIN);
+    
+    
+    nrf_gpio_cfg_output(27);
+    nrf_gpio_pin_clear(27);
+    /*nrf_gpio_cfg_output(BATTERY_SAADC_ENABLE_PIN);
+    nrf_gpio_pin_clear(BATTERY_SAADC_ENABLE_PIN);
+    
+
+    nrf_gpio_cfg_output(19);
+    nrf_gpio_pin_clear(19);
+
+    nrf_gpio_cfg_output(20);
+    nrf_gpio_pin_clear(20);
+    
+    nrf_gpio_cfg_output(11);
+    nrf_gpio_pin_set(11);
+
+    nrf_gpio_cfg_output(12);
+    nrf_gpio_pin_set(12);
+    */
+
     for (uint32_t i = 0; i < MATRIX_COLS; i++) {
         nrf_gpio_cfg_output(col_pins[i]);
         nrf_gpio_pin_set(col_pins[i]);
@@ -124,6 +155,7 @@ static void matrix_prepare_sleep(void)
     for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
         nrf_gpio_cfg_sense_input(row_pins[i], NRF_GPIO_PIN_PULLDOWN, NRF_GPIO_PIN_SENSE_HIGH);
     }
+
 }
 
 static void matrix_scan_start(void) { init_pins(); }
@@ -242,6 +274,9 @@ static void matrix_prepare_sleep(void)
 #endif
 ;
 
+__attribute__((weak))
+void matrix_init_kb(void){}
+
 void matrix_init(void)
 {
     // initialize matrix
@@ -251,10 +286,16 @@ void matrix_init(void)
     memset(&matrix[0], 0, sizeof(matrix));
     memset(&raw_matrix[0], 0, sizeof(raw_matrix));
 
+#ifdef RGB_EFFECTS_ENABLE
     rgb_driver_t* driver = rgb_driver_create(RGB_DRIVER_AW9523B);
     rgb_effects_init(driver);
+#endif
+
+    matrix_init_kb();
 }
 
+__attribute__((weak))
+void matrix_scan_kb(void) {}
 uint8_t matrix_scan(void)
 {
     bool changed = false;
@@ -292,7 +333,11 @@ uint8_t matrix_scan(void)
         debouncing = false;
     }
 
+#ifdef RGB_EFFECTS_ENABLE
     rgb_effects_task();
+#endif
+
+    matrix_scan_kb();
     return 1;
 }
 

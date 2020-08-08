@@ -88,6 +88,7 @@ static void battery_level_sample_timeout_handler(void* p_context)
     UNUSED_PARAMETER(p_context);
     if (ble_driver.sleep_count >= SLEEP_COUNT_THRESHHOLD) {
         NRF_LOG_INFO("Sleep count overflow, goto system off mode");
+        nrf_drv_saadc_uninit();
         nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_GOTO_SYSOFF);
     } else {
         ret_code_t err_code;

@@ -47,3 +47,5 @@
 #define AW9523B_ADDR                0xB6
 
 #define CAPS_LED_PIN                18
+
+#define INDICATOR_PIN               25

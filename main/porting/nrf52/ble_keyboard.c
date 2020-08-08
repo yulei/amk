@@ -32,10 +32,7 @@ static void keyboard_timer_stop(void);
 static void matrix_event_handler(bool changed);
 
 /** the fllowing function can be overrided by the keyboard codes */
-__attribute__((weak)) void keyboard_set_rgb(bool on)
-{
-    (void)on;
-}
+extern void keyboard_set_rgb(bool on);
 
 __attribute__((weak)) void keyboard_prepare_sleep(void)
 {}
@@ -119,7 +116,11 @@ static void keyboard_timer_init(void)
 
 static bool keyboard_rgblight_on(void)
 {
+#ifdef RGB_EFFECTS_ENABLE
     return rgb_effects_enabled();
+#else
+    return false;
+#endif
 }
 
 static bool keyboard_rgbmatrix_on(void)

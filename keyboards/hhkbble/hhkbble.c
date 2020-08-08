@@ -12,10 +12,17 @@
 
 extern void keyboard_set_rgb(bool on);
 
+void matrix_init_kb(void)
+{
+    //gpio_set_output_pushpull(INDICATOR_PIN);
+    //gpio_write_pin(INDICATOR_PIN, 1);
+}
+
 void keyboard_prepare_sleep(void)
 {
     // turn off rgb
     keyboard_set_rgb(false);
+    //gpio_write_pin(INDICATOR_PIN, 0);
 }
 
 const aw9523b_led_t g_aw9523b_leds[AW9523B_LED_NUM] = {
