@@ -9,6 +9,7 @@
 #include "app_util_platform.h"
 #include "app_error.h"
 #include "nrfx_twi.h"
+#include "nrf_log.h"
 
 #ifndef I2C_INSTANCE_ID
     #define I2C_INSTANCE_ID     0
@@ -89,12 +90,11 @@ void i2c_uninit(void)
     if (!twi_ready) return;
 
     nrfx_twi_disable(&m_twi);
-    nrfx_twi_uninit(&m_twi);
-    twi_ready = false;
-
-/*  // anomaly [89] work around
+    // anomaly [89] work around
     *(volatile uint32_t *)0x40003FFC = 0;
     *(volatile uint32_t *)0x40003FFC;
     *(volatile uint32_t *)0x40003FFC = 1;
-*/
+    nrfx_twi_uninit(&m_twi);
+    NRF_LOG_INFO("twi disabled");
+    twi_ready = false;
 }

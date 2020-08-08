@@ -7,7 +7,8 @@
 #include "ble_bas_service.h"
 
 #include "nrf_gpio.h"
-#include "nrf_drv_saadc.h"
+#include "nrf_saadc.h"
+#include "nrfx_saadc.h"
 
 #include "nrf_pwr_mgmt.h"
 
@@ -23,7 +24,7 @@ static void battery_level_meas_timeout_handler(void* p_context);
 static void battery_level_sample_timeout_handler(void* p_context);
 
 static void battery_saadc_init(void);
-static void battery_saadc_handler(nrf_drv_saadc_evt_t const * p_event);
+static void battery_saadc_handler(nrfx_saadc_evt_t const * p_event);
 static void battery_process_saadc_result(uint32_t result);
 
 void ble_bas_service_init(void) {
@@ -88,11 +89,11 @@ static void battery_level_sample_timeout_handler(void* p_context)
     UNUSED_PARAMETER(p_context);
     if (ble_driver.sleep_count >= SLEEP_COUNT_THRESHHOLD) {
         NRF_LOG_INFO("Sleep count overflow, goto system off mode");
-        nrf_drv_saadc_uninit();
+        nrfx_saadc_uninit();
         nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_GOTO_SYSOFF);
     } else {
         ret_code_t err_code;
-        err_code = nrf_drv_saadc_sample();
+        err_code = nrfx_saadc_sample();
         APP_ERROR_CHECK(err_code);
         NRF_LOG_INFO("battery sampling triggered.");
         if (!ble_driver.vbus_enabled) {
@@ -170,10 +171,10 @@ static void battery_process_saadc_result(uint32_t result)
     battery_level_update(percent);
 }
 
-static void battery_saadc_handler(nrf_drv_saadc_evt_t const * p_event)
+static void battery_saadc_handler(nrfx_saadc_evt_t const * p_event)
 {
     NRF_LOG_INFO("battery saadc handler event type: %d", p_event->type);
-    if (p_event->type == NRF_DRV_SAADC_EVT_DONE) {
+    if (p_event->type == NRFX_SAADC_EVT_DONE) {
         ret_code_t err_code;
 
         nrf_saadc_value_t value = 0;
@@ -187,7 +188,7 @@ static void battery_saadc_handler(nrf_drv_saadc_evt_t const * p_event)
         }
         battery_process_saadc_result(value);
 
-        err_code = nrf_drv_saadc_buffer_convert(p_event->data.done.p_buffer, SAADC_SAMPLES);
+        err_code = nrfx_saadc_buffer_convert(p_event->data.done.p_buffer, SAADC_SAMPLES);
         APP_ERROR_CHECK(err_code);
         // turn off battery and sampling timer
         nrf_gpio_pin_clear(BATTERY_SAADC_ENABLE_PIN);
@@ -200,19 +201,19 @@ static void battery_saadc_init(void)
     NRF_LOG_INFO("batter sampling enable pin: %d, ADC pin: %d", BATTERY_SAADC_ENABLE_PIN, BATTERY_SAADC_PIN);
 
     ret_code_t err_code;
-    nrf_saadc_channel_config_t channel_config = NRF_DRV_SAADC_DEFAULT_CHANNEL_CONFIG_SE(BATTERY_SAADC_PIN);
+    nrf_saadc_channel_config_t channel_config = NRFX_SAADC_DEFAULT_CHANNEL_CONFIG_SE(BATTERY_SAADC_PIN);
     channel_config.gain = NRF_SAADC_GAIN1_4;
 
-    err_code = nrf_drv_saadc_init(NULL, battery_saadc_handler);
+    err_code = nrfx_saadc_init(NULL, battery_saadc_handler);
     APP_ERROR_CHECK(err_code);
 
-    err_code = nrf_drv_saadc_channel_init(0, &channel_config);
+    err_code = nrfx_saadc_channel_init(0, &channel_config);
     APP_ERROR_CHECK(err_code);
 
-    err_code = nrf_drv_saadc_buffer_convert(m_saadc_buffers[0], SAADC_SAMPLES);
+    err_code = nrfx_saadc_buffer_convert(m_saadc_buffers[0], SAADC_SAMPLES);
     APP_ERROR_CHECK(err_code);
 
-    err_code = nrf_drv_saadc_buffer_convert(m_saadc_buffers[1], SAADC_SAMPLES);
+    err_code = nrfx_saadc_buffer_convert(m_saadc_buffers[1], SAADC_SAMPLES);
     APP_ERROR_CHECK(err_code);
 
     nrf_gpio_cfg_output(BATTERY_SAADC_ENABLE_PIN);

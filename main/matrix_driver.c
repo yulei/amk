@@ -12,6 +12,7 @@
 #include "rgb_driver.h"
 #include "rgb_effects.h"
 #include "rtt.h"
+#include "wait.h"
 
 typedef struct {
     matrix_event_callback   event_callback;
@@ -128,8 +129,8 @@ static void matrix_prepare_sleep(void)
     nrf_gpio_pin_clear(RGBLIGHT_EN_PIN);
     
     
-    nrf_gpio_cfg_output(27);
-    nrf_gpio_pin_clear(27);
+    //nrf_gpio_cfg_output(27);
+    //nrf_gpio_pin_clear(27);
     /*nrf_gpio_cfg_output(BATTERY_SAADC_ENABLE_PIN);
     nrf_gpio_pin_clear(BATTERY_SAADC_ENABLE_PIN);
     

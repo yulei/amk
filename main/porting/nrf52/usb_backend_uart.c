@@ -8,6 +8,7 @@
 #include "nrf_gpio.h"
 #include "nrf_drv_gpiote.h"
 #include "nrf_uart.h"
+#include "nrf_delay.h"
 
 typedef struct {
     nrf_usb_event_handler_t event;
@@ -92,6 +93,7 @@ void nrf_usb_wakeup(void) {}
 void nrf_usb_prepare_sleep(void)
 {
     nrf_gpio_cfg_sense_input(VBUS_DETECT_PIN, NRF_GPIO_PIN_PULLDOWN, NRF_GPIO_PIN_SENSE_HIGH);
+    nrf_delay_ms(1);
 }
 
 void nrf_usb_reboot(void)

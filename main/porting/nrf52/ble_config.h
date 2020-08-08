@@ -80,7 +80,7 @@
 #define BATTERY_LEVEL_MEAS_INTERVAL         APP_TIMER_TICKS(60*1000)                   /**< Battery level measurement interval (ticks). */
 
 // sleep count threadhold
-#define SLEEP_COUNT_THRESHHOLD              10                                         /**< In minutes */
+#define SLEEP_COUNT_THRESHHOLD              2                                         /**< In minutes */
 
 /*lint -emacro(524, MIN_CONN_INTERVAL) // Loss of precision */
 #define MIN_CONN_INTERVAL                   MSEC_TO_UNITS(7.5, UNIT_1_25_MS)           /**< Minimum connection interval (7.5 ms) */

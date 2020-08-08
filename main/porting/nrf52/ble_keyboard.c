@@ -281,6 +281,10 @@ static bool keyboard_pwr_mgmt_shutdown_handler(nrf_pwr_mgmt_evt_t event)
             break;
     }
     ble_keyboard_prepare_sleep();
+    /**(volatile uint32_t *)0x40003FFC = 0;
+    *(volatile uint32_t *)0x40003FFC;
+    *(volatile uint32_t *)0x40003FFC = 1;
+    */
     return true;
 }
 
