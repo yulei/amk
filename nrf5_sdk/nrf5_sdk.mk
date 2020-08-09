@@ -58,9 +58,6 @@ SRC_FILES += \
 	$(NRF5SDK_DIR)/components/ble/peer_manager/pm_buffer.c \
 	$(NRF5SDK_DIR)/components/ble/peer_manager/security_dispatcher.c \
 	$(NRF5SDK_DIR)/components/ble/peer_manager/security_manager.c \
-	$(NRF5SDK_DIR)/components/softdevice/common/nrf_sdh.c \
-	$(NRF5SDK_DIR)/components/softdevice/common/nrf_sdh_ble.c \
-	$(NRF5SDK_DIR)/components/softdevice/common/nrf_sdh_soc.c \
 	$(NRF5SDK_DIR)/modules/nrfx/soc/nrfx_atomic.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_clock.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_gpiote.c \
@@ -78,6 +75,9 @@ SRC_FILES += \
 	$(NRF5SDK_DIR)/external/segger_rtt/SEGGER_RTT.c \
 	$(NRF5SDK_DIR)/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c \
 	$(NRF5SDK_DIR)/external/segger_rtt/SEGGER_RTT_printf.c \
+	$(NRF5SDK_DIR)/components/softdevice/common/nrf_sdh.c \
+	$(NRF5SDK_DIR)/components/softdevice/common/nrf_sdh_ble.c \
+	$(NRF5SDK_DIR)/components/softdevice/common/nrf_sdh_soc.c \
 
 INC_FOLDERS += \
 	$(NRF5SDK_DIR)/components \
@@ -202,6 +202,7 @@ APP_DEFS += \
 	-D__HEAP_SIZE=8192 \
 	-D__STACK_SIZE=8192 \
 	-DGPIO_NRF5X \
+	#-DCONFIG_GPIO_AS_PINRESET \
 
 LINKER_PATH		:= $(NRF5SDK_DIR)/modules/nrfx/mdk
 LINKER_SCRIPT	:= $(TOP_DIR)/nrf5_sdk/nrf52832.ld

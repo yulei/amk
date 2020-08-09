@@ -12,6 +12,7 @@
 #include "nrf_pwr_mgmt.h"
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
+#include "nrf_delay.h"
 
 #ifndef EECONFIG_SIZE
     #define EECONFIG_SIZE 64
@@ -26,15 +27,12 @@ APP_TIMER_DEF(m_eeprom_update_timer_id);        // timer for update the eeprom
 static volatile bool ee_fds_initialized = false;
 static volatile bool eeprom_dirty = false;
 
-static void wait_for_fds_ready(void)
+/*static void wait_for_fds_ready(void)
 {
     while(!ee_fds_initialized) {
-        app_sched_execute();
-        if (NRF_LOG_PROCESS() == false) {
-            nrf_pwr_mgmt_run();
-        }
+        nrf_delay_ms(1);
     }
-}
+}*/
 
 __ALIGN(4) static uint8_t eeprom_buf[(EECONFIG_SIZE + 3) & (~3)];  // pad to word size
 
@@ -82,18 +80,20 @@ static void ee_evt_handler(fds_evt_t const *p_evt)
 
 void fds_eeprom_init(void)
 {
-    ret_code_t err_code;
-    NRF_LOG_INFO("Initializing fds...");
-    ee_fds_initialized = false;
-    fds_register(ee_evt_handler);
-    err_code = fds_init();
-    APP_ERROR_CHECK(err_code);
-    wait_for_fds_ready();
+    if (!ee_fds_initialized) {
+        ret_code_t err_code;
+        NRF_LOG_INFO("Initializing fds...");
+        ee_fds_initialized = false;
+        fds_register(ee_evt_handler);
+        err_code = fds_init();
+        APP_ERROR_CHECK(err_code);
+        //wait_for_fds_ready();
 
-    err_code = app_timer_create(&m_eeprom_update_timer_id,
-                                APP_TIMER_MODE_SINGLE_SHOT,
-                                eeprom_update_timeout_handler);
-    APP_ERROR_CHECK(err_code);
+        err_code = app_timer_create(&m_eeprom_update_timer_id,
+                                    APP_TIMER_MODE_SINGLE_SHOT,
+                                    eeprom_update_timeout_handler);
+        APP_ERROR_CHECK(err_code);
+    }
 }
 
 static void eeprom_update_timeout_handler(void* p_context)
@@ -228,6 +228,8 @@ void eeprom_update_block(const void *buf, void *addr, size_t len) {
 
 void eeconfig_init(void)
 {
+    fds_eeprom_init();
+
     eeprom_write_word(EECONFIG_MAGIC, EECONFIG_MAGIC_NUMBER);
     eeprom_write_byte(EECONFIG_DEBUG,          0);
     eeprom_write_byte(EECONFIG_DEFAULT_LAYER,  0);

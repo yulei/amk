@@ -127,26 +127,33 @@ static void matrix_prepare_sleep(void)
     
     nrf_gpio_cfg_output(RGBLIGHT_EN_PIN);
     nrf_gpio_pin_clear(RGBLIGHT_EN_PIN);
+
     
+    //nrf_gpio_cfg_output(INDICATOR_PIN);
+    //nrf_gpio_pin_clear(INDICATOR_PIN);
+    //nrf_gpio_cfg_output(28);
+    //nrf_gpio_pin_clear(28);
     
     //nrf_gpio_cfg_output(27);
     //nrf_gpio_pin_clear(27);
-    /*nrf_gpio_cfg_output(BATTERY_SAADC_ENABLE_PIN);
-    nrf_gpio_pin_clear(BATTERY_SAADC_ENABLE_PIN);
+    //nrf_gpio_cfg_output(BATTERY_SAADC_ENABLE_PIN);
+    //nrf_gpio_pin_clear(BATTERY_SAADC_ENABLE_PIN);
     
+    //nrf_gpio_cfg_output(21);
+    //nrf_gpio_pin_set(21);
 
-    nrf_gpio_cfg_output(19);
+    /*nrf_gpio_cfg_output(19);
     nrf_gpio_pin_clear(19);
 
     nrf_gpio_cfg_output(20);
     nrf_gpio_pin_clear(20);
-    
-    nrf_gpio_cfg_output(11);
-    nrf_gpio_pin_set(11);
-
-    nrf_gpio_cfg_output(12);
-    nrf_gpio_pin_set(12);
     */
+    
+    //nrf_gpio_cfg_output(11);
+    //nrf_gpio_pin_set(11);
+
+    //nrf_gpio_cfg_output(12);
+    //nrf_gpio_pin_set(12);
 
     for (uint32_t i = 0; i < MATRIX_COLS; i++) {
         nrf_gpio_cfg_output(col_pins[i]);
