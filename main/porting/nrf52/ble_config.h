@@ -190,6 +190,7 @@ typedef struct {
     uint8_t         ble_led;        /**< keyboard led status from ble */
     uint8_t         usb_led;        /**< keyboard led status from usb */
     uint8_t         vbus_enabled;   /**< vbus status */
+    uint8_t         trigger_enabled;/**< enable trigger mode or not */     
     uint8_t         output_target;  /**< target of output */
     uint8_t         matrix_changed; /**< matrix has changed */
     uint8_t         battery_power;  /**< power of the battery */

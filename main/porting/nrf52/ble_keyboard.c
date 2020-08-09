@@ -142,6 +142,7 @@ static void keyboard_timout_handler(void *p_context)
     if (ble_driver.matrix_changed) {
         ble_driver.scan_count = 0;
         ble_driver.matrix_changed = 0;
+        ble_driver.sleep_count = 0;
     } else {
         if (!keyboard_rgb_on()) {
             ble_driver.scan_count++;
@@ -150,16 +151,17 @@ static void keyboard_timout_handler(void *p_context)
         }
     }
 
-    // scan count overflow, switch to trigger mode
-    if (matrix_driver_keys_off() && (ble_driver.scan_count >= MAX_SCAN_COUNT)) {
-        keyboard_timer_stop();
-        matrix_driver_scan_stop();
-        matrix_driver_trigger_start(matrix_event_handler);
+    if (ble_driver.trigger_enabled) {
+        // scan count overflow, switch to trigger mode
+        if (matrix_driver_keys_off() && (ble_driver.scan_count >= MAX_SCAN_COUNT)) {
+            keyboard_timer_stop();
+            matrix_driver_scan_stop();
+            matrix_driver_trigger_start(matrix_event_handler);
 
-        NRF_LOG_INFO("keyboard matrix swtiched to trigger mode");
-        ble_driver.scan_count = 0;
+            NRF_LOG_INFO("keyboard matrix swtiched to trigger mode");
+            ble_driver.scan_count = 0;
+        }
     }
-    ble_driver.sleep_count = 0;
 }
 
 static void keyboard_timer_start(void)
@@ -281,10 +283,6 @@ static bool keyboard_pwr_mgmt_shutdown_handler(nrf_pwr_mgmt_evt_t event)
             break;
     }
     ble_keyboard_prepare_sleep();
-    /**(volatile uint32_t *)0x40003FFC = 0;
-    *(volatile uint32_t *)0x40003FFC;
-    *(volatile uint32_t *)0x40003FFC = 1;
-    */
     return true;
 }
 

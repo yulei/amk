@@ -18,7 +18,11 @@ ble_driver_t ble_driver = {
     .ble_led = 0,
     .usb_led = 0,
     .vbus_enabled = 0,
-    //.output_target = OUTPUT_USB,
+#ifdef MATRIX_USE_GPIO 
+    .trigger_enabled = 0,
+#else
+    .trigger_enabled = 1,
+#endif
     .output_target = OUTPUT_BLE,
     .matrix_changed = 0,
     .battery_power = 100,
