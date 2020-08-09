@@ -229,12 +229,17 @@ static void uart_process(uint8_t data)
     // first byte
         if (data == SYNC_BYTE_1) {
             usb_buffer.data[usb_buffer.count++] = data;
+        } else {
+            NRF_LOG_WARNING("Invalid sync 1 received");
         }
         break;
     case 1:
     // second byte
         if (data == SYNC_BYTE_2) {
             usb_buffer.data[usb_buffer.count++] = data;
+        } else {
+            NRF_LOG_WARNING("Invalid sync 2 received");
+            usb_buffer.count = 0;
         }
         break;
     default:
@@ -246,14 +251,14 @@ static void uart_process(uint8_t data)
             if (checksum != cmd[1]) {
                 // invalid checksum
                 NRF_LOG_WARNING("Checksum mismatch: SRC:%x, CUR:%x", cmd[1], checksum);
-                return;
-            }
-            if (cmd[2] != CMD_SET_LEDS) {
-                // invalid command
-                NRF_LOG_WARNING("Invalid command from usb master: %x", cmd[2]);
             } else {
-                NRF_LOG_INFO("Led setting from usb master: %x", cmd[3]);
-                usb_config.event.leds_cb(cmd[3]);
+                if (cmd[2] != CMD_SET_LEDS) {
+                    // invalid command
+                    NRF_LOG_WARNING("Invalid command from usb master: %x", cmd[2]);
+                } else {
+                    NRF_LOG_INFO("Led setting from usb master: %x", cmd[3]);
+                    usb_config.event.leds_cb(cmd[3]);
+                }
             }
             usb_buffer.count = 0;
         }
