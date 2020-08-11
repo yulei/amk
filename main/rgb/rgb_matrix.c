@@ -72,16 +72,27 @@ static void rgb_matrix_update_default(void)
     matrix_state.config.val = VAL_DEFAULT;
 }
 
-static bool rgb_matrix_need_update(void)
+static uint32_t update_delay(void)
 {
-    return false;
+    switch(matrix.config.mode) {
+        default:
+            break;
+    }
+
+    return DELAY_DEFAULT;
 }
 
-static void rgb_matrix_update_timer(void)
-{}
+static bool rgb_matrix_need_update(void)
+{
+    return timer_elapsed32(matrix_state.last_ticks)*matrix_state.config.speed >= update_delay();
+}
+
+static void rgb_matrix_update_timer(void) { matrix_state.last_ticks = timer_read32(); }
 
 static void rgb_matrix_mode_static(void)
-{}
+{
+    matrix_state.driver->set_color_all(matrix_state.config.hue, matrix_state.config.sat, matrix_state.config.val);
+}
 
 static void rgb_matrix_mode_breath(void)
 {}
