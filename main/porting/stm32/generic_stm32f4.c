@@ -256,6 +256,7 @@ void tud_suspend_cb(bool remote_wakeup_en)
 // Invoked when usb bus is resumed
 void tud_resume_cb(void)
 {
+  suspend_wakeup_init();
 }
 
 // Invoked when received GET_REPORT control request
