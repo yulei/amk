@@ -38,10 +38,10 @@ endif
 #$(OUTPUT_DIRECTORY)/$(TARGET).out: $(LINKER_SCRIPT)
 
 # Optimization flags
-OPT = -O3 -g3
+#OPT = -O3 -g3
 
 # Debug flags
-#OPT = -Og -g3 -DDEBUG
+OPT = -Og -g3 -DDEBUG
 
 # Uncomment the line below to enable link time optimization
 #OPT += -flto

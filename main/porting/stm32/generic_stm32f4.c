@@ -34,7 +34,6 @@ host_driver_t amk_driver = {
   send_consumer
 };
 
-volatile uint32_t system_ticks = 0;
 static void DWT_Delay_Init(void);
 static void amk_init(void);
 static void Error_Handler(void);
@@ -185,7 +184,7 @@ static void amk_init(void)
 
 void SysTick_Handler (void)
 {
-  system_ticks++;
+    HAL_IncTick();
 }
 
 /*void HardFault_Handler (void)
