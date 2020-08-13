@@ -27,7 +27,7 @@ static void send_mouse(report_mouse_t *report);
 static void send_system(uint16_t data);
 static void send_consumer(uint16_t data);
 
-static uint8_t amk_led_state  = 0;
+uint8_t amk_led_state = 0;
 //static bool amk_remote_wakeup = false;
 
 /* host struct */
@@ -42,6 +42,7 @@ host_driver_t amk_driver = {
 static void DWT_Delay_Init(void);
 static void amk_init(void);
 static void remote_wakeup(void);
+static bool usb_ready(void);
 
 // enable all gpio clock
 static void gpio_rcc_clk_enable(void)
@@ -50,7 +51,6 @@ static void gpio_rcc_clk_enable(void)
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
     __HAL_RCC_GPIOC_CLK_ENABLE();
-    __HAL_RCC_GPIOD_CLK_ENABLE();
 }
 
 /**
@@ -171,7 +171,6 @@ static void DWT_Delay_Init(void)
 }
 
 // tmk integration
-
 uint8_t keyboard_leds(void)
 {
   return amk_led_state;
@@ -181,6 +180,8 @@ uint8_t keyboard_leds(void)
 static uint8_t report_buf[REPORT_BUF_SIZE];
 void send_keyboard(report_keyboard_t *report)
 {
+    if (!usb_ready()) return;
+
     report_buf[0] = REPORT_ID_KEYBOARD;
     memcpy(&report_buf[1], report, sizeof(report_keyboard_t));
     USBD_HID_SendReport(&hUsbDeviceFS, report_buf, sizeof(report_keyboard_t) + 1);
@@ -188,6 +189,8 @@ void send_keyboard(report_keyboard_t *report)
 
 void send_mouse(report_mouse_t *report)
 {
+    if (!usb_ready()) return;
+
     report_buf[0] = REPORT_ID_MOUSE;
     memcpy(&report_buf[1], report, sizeof(report_mouse_t));
     USBD_HID_SendReport(&hUsbDeviceFS, report_buf, sizeof(report_mouse_t) + 1);
@@ -195,6 +198,8 @@ void send_mouse(report_mouse_t *report)
 
 void send_system(uint16_t data)
 {
+    if (!usb_ready()) return;
+
     report_buf[0] = REPORT_ID_SYSTEM;
     memcpy(&report_buf[1], &data, sizeof(data));
     USBD_HID_SendReport(&hUsbDeviceFS, report_buf, sizeof(data) + 1);
@@ -202,6 +207,8 @@ void send_system(uint16_t data)
 
 void send_consumer(uint16_t data)
 {
+    if (!usb_ready()) return;
+
     report_buf[0] = REPORT_ID_CONSUMER;
     memcpy(&report_buf[1], &data, sizeof(data));
     USBD_HID_SendReport(&hUsbDeviceFS, report_buf, sizeof(data) + 1);
@@ -230,4 +237,9 @@ void usb_resume_cb(void)
 void usb_suspend_cb(void)
 {
 
+}
+
+bool usb_ready(void)
+{
+    return hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED;
 }
