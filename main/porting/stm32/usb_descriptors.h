@@ -25,12 +25,11 @@
 #ifndef USB_DESCRIPTORS_H_
 #define USB_DESCRIPTORS_H_
 
-enum
-{
+typedef enum {
   REPORT_ID_KEYBOARD = 1,
   REPORT_ID_MOUSE,
   REPORT_ID_SYSTEM,
   REPORT_ID_CONSUMER,
-};
+} report_id_t ;
 
 #endif /* USB_DESCRIPTORS_H_ */

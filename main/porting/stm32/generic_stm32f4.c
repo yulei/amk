@@ -7,11 +7,14 @@
 #include "rtt.h"
 #include "usb_descriptors.h"
 #include "usb_device.h"
+#include "usbd_hid.h"
 
 #include "report.h"
 #include "host.h"
 #include "keyboard.h"
 #include "suspend.h"
+
+extern USBD_HandleTypeDef hUsbDeviceFS;
 
 /**
  * tmk related stuff
@@ -125,19 +128,22 @@ void board_init(void)
 
 void board_task(void)
 {
-  /*tud_task();
-
-  if (tud_suspended()) {
-    if (suspend_wakeup_condition()) {
-      // Wake up host if we are in suspend mode
-      // and REMOTE_WAKEUP feature is enabled by host
-      tud_remote_wakeup();
+    switch (hUsbDeviceFS.dev_state) {
+    case USBD_STATE_CONFIGURED:
+        keyboard_task();
+        break;
+    case USBD_STATE_SUSPENDED:
+        // in suspend state
+        if (suspend_wakeup_condition()) {
+            // wake up remote
+        }
+        break;
+    case USBD_STATE_DEFAULT:
+    case USBD_STATE_ADDRESSED:
+    default:
+        // do nothing
+        break;
     }
-  }
-
-  if (tud_hid_ready()) {
-    keyboard_task();
-  }*/
 }
 
 static void amk_init(void)
@@ -167,18 +173,32 @@ uint8_t keyboard_leds(void)
   return amk_led_state;
 }
 
+#define REPORT_BUF_SIZE 16
+static uint8_t report_buf[REPORT_BUF_SIZE];
 void send_keyboard(report_keyboard_t *report)
 {
+    report_buf[0] = REPORT_ID_KEYBOARD;
+    memcpy(&report_buf[1], report, sizeof(report_keyboard_t));
+    USBD_HID_SendReport(&hUsbDeviceFS, report_buf, sizeof(report_keyboard_t) + 1);
 }
 
 void send_mouse(report_mouse_t *report)
 {
+    report_buf[0] = REPORT_ID_MOUSE;
+    memcpy(&report_buf[1], report, sizeof(report_mouse_t));
+    USBD_HID_SendReport(&hUsbDeviceFS, report_buf, sizeof(report_mouse_t) + 1);
 }
 
 void send_system(uint16_t data)
 {
+    report_buf[0] = REPORT_ID_SYSTEM;
+    memcpy(&report_buf[1], &data, sizeof(data));
+    USBD_HID_SendReport(&hUsbDeviceFS, report_buf, sizeof(data) + 1);
 }
 
 void send_consumer(uint16_t data)
 {
+    report_buf[0] = REPORT_ID_CONSUMER;
+    memcpy(&report_buf[1], &data, sizeof(data));
+    USBD_HID_SendReport(&hUsbDeviceFS, report_buf, sizeof(data) + 1);
 }

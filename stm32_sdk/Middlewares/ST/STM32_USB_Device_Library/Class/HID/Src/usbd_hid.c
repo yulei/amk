@@ -61,6 +61,17 @@ EndBSPDependencies */
 /** @defgroup USBD_HID_Private_TypesDefinitions
   * @{
   */
+#include "tusb.h"
+#include "usb_descriptors.h"
+
+static uint8_t hid_report_desc[] =
+{
+  TUD_HID_REPORT_DESC_KEYBOARD        ( HID_REPORT_ID(REPORT_ID_KEYBOARD) ),
+  TUD_HID_REPORT_DESC_MOUSE           ( HID_REPORT_ID(REPORT_ID_MOUSE) ),
+  TUD_HID_REPORT_DESC_SYSTEM_CONTROL  ( HID_REPORT_ID(REPORT_ID_SYSTEM) ),
+  TUD_HID_REPORT_DESC_CONSUMER        ( HID_REPORT_ID(REPORT_ID_CONSUMER) ),
+};
+
 /**
   * @}
   */
@@ -70,6 +81,7 @@ EndBSPDependencies */
   * @{
   */
 
+#define HID_REPORT_DESC_SIZE sizeof(hid_report_desc)
 /**
   * @}
   */
@@ -143,8 +155,8 @@ __ALIGN_BEGIN static uint8_t USBD_HID_CfgFSDesc[USB_HID_CONFIG_DESC_SIZ] __ALIGN
   0x00,                                               /* bAlternateSetting: Alternate setting */
   0x01,                                               /* bNumEndpoints */
   0x03,                                               /* bInterfaceClass: HID */
-  0x01,                                               /* bInterfaceSubClass : 1=BOOT, 0=no boot */
-  0x02,                                               /* nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse */
+  0x00,                                               /* bInterfaceSubClass : 1=BOOT, 0=no boot */
+  0x01,                                               /* nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse */
   0,                                                  /* iInterface: Index of string descriptor */
   /******************** Descriptor of Joystick Mouse HID ********************/
   /* 18 */
@@ -155,7 +167,7 @@ __ALIGN_BEGIN static uint8_t USBD_HID_CfgFSDesc[USB_HID_CONFIG_DESC_SIZ] __ALIGN
   0x00,                                               /* bCountryCode: Hardware target country */
   0x01,                                               /* bNumDescriptors: Number of HID class descriptors to follow */
   0x22,                                               /* bDescriptorType */
-  HID_MOUSE_REPORT_DESC_SIZE,                         /* wItemLength: Total length of Report descriptor */
+  HID_REPORT_DESC_SIZE,                               /* wItemLength: Total length of Report descriptor */
   0x00,
   /******************** Descriptor of Mouse endpoint ********************/
   /* 27 */
@@ -191,8 +203,8 @@ __ALIGN_BEGIN static uint8_t USBD_HID_CfgHSDesc[USB_HID_CONFIG_DESC_SIZ] __ALIGN
   0x00,                                               /* bAlternateSetting: Alternate setting */
   0x01,                                               /* bNumEndpoints */
   0x03,                                               /* bInterfaceClass: HID */
-  0x01,                                               /* bInterfaceSubClass : 1=BOOT, 0=no boot */
-  0x02,                                               /* nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse */
+  0x00,                                               /* bInterfaceSubClass : 1=BOOT, 0=no boot */
+  0x01,                                               /* nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse */
   0,                                                  /* iInterface: Index of string descriptor */
   /******************** Descriptor of Joystick Mouse HID ********************/
   /* 18 */
@@ -203,7 +215,7 @@ __ALIGN_BEGIN static uint8_t USBD_HID_CfgHSDesc[USB_HID_CONFIG_DESC_SIZ] __ALIGN
   0x00,                                               /* bCountryCode: Hardware target country */
   0x01,                                               /* bNumDescriptors: Number of HID class descriptors to follow */
   0x22,                                               /* bDescriptorType */
-  HID_MOUSE_REPORT_DESC_SIZE,                         /* wItemLength: Total length of Report descriptor */
+  HID_REPORT_DESC_SIZE,                               /* wItemLength: Total length of Report descriptor */
   0x00,
   /******************** Descriptor of Mouse endpoint ********************/
   /* 27 */
@@ -239,8 +251,8 @@ __ALIGN_BEGIN static uint8_t USBD_HID_OtherSpeedCfgDesc[USB_HID_CONFIG_DESC_SIZ]
   0x00,                                               /* bAlternateSetting: Alternate setting */
   0x01,                                               /* bNumEndpoints */
   0x03,                                               /* bInterfaceClass: HID */
-  0x01,                                               /* bInterfaceSubClass : 1=BOOT, 0=no boot */
-  0x02,                                               /* nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse */
+  0x00,                                               /* bInterfaceSubClass : 1=BOOT, 0=no boot */
+  0x01,                                               /* nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse */
   0,                                                  /* iInterface: Index of string descriptor */
   /******************** Descriptor of Joystick Mouse HID ********************/
   /* 18 */
@@ -251,7 +263,7 @@ __ALIGN_BEGIN static uint8_t USBD_HID_OtherSpeedCfgDesc[USB_HID_CONFIG_DESC_SIZ]
   0x00,                                               /* bCountryCode: Hardware target country */
   0x01,                                               /* bNumDescriptors: Number of HID class descriptors to follow */
   0x22,                                               /* bDescriptorType */
-  HID_MOUSE_REPORT_DESC_SIZE,                         /* wItemLength: Total length of Report descriptor */
+  HID_REPORT_DESC_SIZE,                               /* wItemLength: Total length of Report descriptor */
   0x00,
   /******************** Descriptor of Mouse endpoint ********************/
   /* 27 */
@@ -277,7 +289,7 @@ __ALIGN_BEGIN static uint8_t USBD_HID_Desc[USB_HID_DESC_SIZ] __ALIGN_END = {
   0x00,                                               /* bCountryCode: Hardware target country */
   0x01,                                               /* bNumDescriptors: Number of HID class descriptors to follow */
   0x22,                                               /* bDescriptorType */
-  HID_MOUSE_REPORT_DESC_SIZE,                         /* wItemLength: Total length of Report descriptor */
+  HID_REPORT_DESC_SIZE,                               /* wItemLength: Total length of Report descriptor */
   0x00,
 };
 
@@ -295,7 +307,7 @@ __ALIGN_BEGIN static uint8_t USBD_HID_DeviceQualifierDesc[USB_LEN_DEV_QUALIFIER_
   0x00,
 };
 
-__ALIGN_BEGIN static uint8_t HID_MOUSE_ReportDesc[HID_MOUSE_REPORT_DESC_SIZE] __ALIGN_END = {
+/*__ALIGN_BEGIN static uint8_t HID_MOUSE_ReportDesc[HID_MOUSE_REPORT_DESC_SIZE] __ALIGN_END = {
   0x05,   0x01,
   0x09,   0x02,
   0xA1,   0x01,
@@ -342,7 +354,7 @@ __ALIGN_BEGIN static uint8_t HID_MOUSE_ReportDesc[HID_MOUSE_REPORT_DESC_SIZE] __
   0x01,   0xb1,
 
   0x01,   0xc0
-};
+};*/
 
 /**
   * @}
@@ -479,8 +491,8 @@ static uint8_t USBD_HID_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *re
     case USB_REQ_GET_DESCRIPTOR:
       if ((req->wValue >> 8) == HID_REPORT_DESC)
       {
-        len = MIN(HID_MOUSE_REPORT_DESC_SIZE, req->wLength);
-        pbuf = HID_MOUSE_ReportDesc;
+        len = MIN(HID_REPORT_DESC_SIZE, req->wLength);
+        pbuf = hid_report_desc;
       }
       else if ((req->wValue >> 8) == HID_DESCRIPTOR_TYPE)
       {
