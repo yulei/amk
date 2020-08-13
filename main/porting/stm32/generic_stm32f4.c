@@ -13,6 +13,8 @@
 #include "host.h"
 #include "keyboard.h"
 #include "suspend.h"
+#include "action_util.h"
+#include "mousekey.h"
 
 extern USBD_HandleTypeDef hUsbDeviceFS;
 
@@ -39,6 +41,7 @@ host_driver_t amk_driver = {
 
 static void DWT_Delay_Init(void);
 static void amk_init(void);
+static void remote_wakeup(void);
 
 // enable all gpio clock
 static void gpio_rcc_clk_enable(void)
@@ -136,6 +139,7 @@ void board_task(void)
         // in suspend state
         if (suspend_wakeup_condition()) {
             // wake up remote
+            remote_wakeup();
         }
         break;
     case USBD_STATE_DEFAULT:
@@ -201,4 +205,29 @@ void send_consumer(uint16_t data)
     report_buf[0] = REPORT_ID_CONSUMER;
     memcpy(&report_buf[1], &data, sizeof(data));
     USBD_HID_SendReport(&hUsbDeviceFS, report_buf, sizeof(data) + 1);
+}
+
+void remote_wakeup(void)
+{
+    HAL_PCD_ActivateRemoteWakeup(hUsbDeviceFS.pData);
+    // remote wakeup between 1-15ms according to the usb spec
+    HAL_Delay(5);
+    HAL_PCD_DeActivateRemoteWakeup(hUsbDeviceFS.pData);
+
+    suspend_wakeup_init();
+    // cleanup the host keyboard state
+    send_keyboard_report();
+#ifdef MOUSEKEY_ENABLE
+    mousekey_send();
+#endif
+}
+
+void usb_resume_cb(void)
+{
+    suspend_wakeup_init();
+}
+
+void usb_suspend_cb(void)
+{
+
 }
