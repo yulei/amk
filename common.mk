@@ -57,6 +57,7 @@ PASS_LINKER_INPUT_VIA_FILE  ?= 0
 
 MK := mkdir
 RM := rm -rf
+CP := cp
 
 # echo suspend
 ifeq ($(VERBOSE),1)
@@ -223,7 +224,7 @@ endef
 # $1 target name
 define define_target
 $(eval OUTPUT_FILE := $(OUTPUT_DIRECTORY)/$(strip $(1))) \
-$(eval $(1): $(OUTPUT_FILE).out $(OUTPUT_FILE).hex $(OUTPUT_FILE).bin \
+$(eval $(1): $(OUTPUT_FILE).out $(OUTPUT_FILE).hex $(OUTPUT_FILE).bin  $(OUTPUT_FILE).elf \
            ; @echo DONE $(strip $(1))) \
 $(call prepare_build, $(1), $(OUTPUT_FILE).inc, $(OUTPUT_FILE).out)
 endef
@@ -307,5 +308,10 @@ endif
 %.hex: %.out
 	$(info Preparing: $@)
 	$(NO_ECHO)$(OBJCOPY) -O ihex $< $@
+
+# Copy file to elf
+%.elf: %.out
+	$(info Preparing: $@)
+	$(NO_ECHO)$(CP)  $< $@
 
 endif # ifneq (,$(filter clean, $(MAKECMDGOALS)))

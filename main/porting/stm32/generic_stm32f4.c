@@ -47,10 +47,10 @@ static bool usb_ready(void);
 // enable all gpio clock
 static void gpio_rcc_clk_enable(void)
 {
+    __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_GPIOH_CLK_ENABLE();
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
-    __HAL_RCC_GPIOC_CLK_ENABLE();
 }
 
 /**
@@ -117,14 +117,13 @@ static void SystemClock_Config(void)
 void board_init(void)
 {
     HAL_Init();
+    DWT_Delay_Init();
 
     SystemClock_Config();
     
     gpio_rcc_clk_enable();
 
     MX_USB_DEVICE_Init();
-
-    DWT_Delay_Init();
 
     amk_init();
 }
@@ -180,6 +179,7 @@ uint8_t keyboard_leds(void)
 static uint8_t report_buf[REPORT_BUF_SIZE];
 void send_keyboard(report_keyboard_t *report)
 {
+    rtt_printf("start send keyboard\n");
     if (!usb_ready()) return;
 
     report_buf[0] = REPORT_ID_KEYBOARD;

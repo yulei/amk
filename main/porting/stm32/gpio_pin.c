@@ -18,8 +18,7 @@ void gpio_write_pin(pin_t pin, int value)
 
 void gpio_set_output_pushpull(pin_t pin)
 {
-    GPIO_InitTypeDef init_param;
-    memset(&init_param, 0, sizeof(init_param));
+    GPIO_InitTypeDef init_param = {0};
     init_param.Pin = pin.pin;
     init_param.Speed = GPIO_SPEED_HIGH;
     init_param.Mode = GPIO_MODE_OUTPUT_PP;
@@ -28,8 +27,7 @@ void gpio_set_output_pushpull(pin_t pin)
 
 void gpio_set_output_opendrain(pin_t pin)
 {
-    GPIO_InitTypeDef init_param;
-    memset(&init_param, 0, sizeof(init_param));
+    GPIO_InitTypeDef init_param = {0};
     init_param.Pin = pin.pin;
     init_param.Speed = GPIO_SPEED_HIGH;
     init_param.Mode = GPIO_MODE_OUTPUT_OD;
@@ -38,8 +36,7 @@ void gpio_set_output_opendrain(pin_t pin)
 
 void gpio_set_input_floating(pin_t pin)
 {
-    GPIO_InitTypeDef init_param;
-    memset(&init_param, 0, sizeof(init_param));
+    GPIO_InitTypeDef init_param = {0};
     init_param.Pin = pin.pin;
     init_param.Speed = GPIO_SPEED_HIGH;
     init_param.Mode = GPIO_MODE_INPUT;
@@ -49,8 +46,7 @@ void gpio_set_input_floating(pin_t pin)
 
 void gpio_set_input_pullup(pin_t pin)
 {
-    GPIO_InitTypeDef init_param;
-    memset(&init_param, 0, sizeof(init_param));
+    GPIO_InitTypeDef init_param = {0};
     init_param.Pin = pin.pin;
     init_param.Speed = GPIO_SPEED_HIGH;
     init_param.Mode = GPIO_MODE_INPUT;
@@ -60,8 +56,7 @@ void gpio_set_input_pullup(pin_t pin)
 
 void gpio_set_input_pulldown(pin_t pin)
 {
-    GPIO_InitTypeDef init_param;
-    memset(&init_param, 0, sizeof(init_param));
+    GPIO_InitTypeDef init_param = {0};
     init_param.Pin = pin.pin;
     init_param.Speed = GPIO_SPEED_HIGH;
     init_param.Mode = GPIO_MODE_INPUT;
