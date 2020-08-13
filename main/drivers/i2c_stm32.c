@@ -25,51 +25,6 @@
 static I2C_HandleTypeDef i2c_handle;
 static bool i2c_ready = false;
 
-static void activate_port_clock(GPIO_TypeDef* port)
-{
-    if (port == GPIOA) {
-        __HAL_RCC_GPIOA_CLK_ENABLE();
-    }
-    if (port == GPIOB) {
-        __HAL_RCC_GPIOB_CLK_ENABLE();
-    }
-    if (port == GPIOC) {
-        __HAL_RCC_GPIOC_CLK_ENABLE();
-    }
-}
-
-static void activate_i2c_clock(I2C_TypeDef* i2c)
-{
-    if (i2c == I2C1) {
-        __HAL_RCC_I2C1_CLK_ENABLE();
-    }
-}
-
-void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
-{
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-    if(hi2c->Instance==I2C_INSTANCE_ID)
-    {
-        pin_t scl = I2C_SCL_PIN;
-        pin_t sda = I2C_SDA_PIN;
-        activate_port_clock(scl.port);
-        activate_port_clock(sda.port);
-
-        GPIO_InitStruct.Pin = scl.pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-        GPIO_InitStruct.Pull = GPIO_PULLUP;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
-        HAL_GPIO_Init(scl.port, &GPIO_InitStruct);
-
-        GPIO_InitStruct.Pin = sda.pin;
-        HAL_GPIO_Init(sda.port, &GPIO_InitStruct);
-
-        /* Peripheral clock enable */
-        activate_i2c_clock(I2C_INSTANCE_ID);
-    }
-}
-
 void i2c_init(void)
 {
     i2c_handle.Instance = I2C_INSTANCE_ID;

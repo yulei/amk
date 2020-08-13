@@ -24,7 +24,7 @@ static void sleep_mode_enter(void);
 void ble_adv_service_init(void) {
     uint32_t                err_code;
     ble_advertising_init_t  init;
-    int8_t                  tx_power = DEFAULT_TX_POWER_LEVEL;
+    static int8_t           tx_power = DEFAULT_TX_POWER_LEVEL;
 
     memset(&init, 0, sizeof(init));
     init.advdata.name_type               = BLE_ADVDATA_FULL_NAME;
@@ -53,6 +53,9 @@ void ble_adv_service_init(void) {
     APP_ERROR_CHECK(err_code);
 
     ble_advertising_conn_cfg_tag_set(&m_advertising, APP_BLE_CONN_CFG_TAG);
+    
+     err_code = sd_ble_gap_tx_power_set(BLE_GAP_TX_POWER_ROLE_ADV, m_advertising.adv_handle, DEFAULT_TX_POWER_LEVEL);
+    APP_ERROR_CHECK(err_code);
 }
 
 void ble_adv_service_start(bool erase_bonds) {
