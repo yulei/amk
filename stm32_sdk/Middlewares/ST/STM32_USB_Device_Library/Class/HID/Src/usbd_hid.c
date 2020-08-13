@@ -102,6 +102,7 @@ static uint8_t hid_report_desc[] =
 static uint8_t USBD_HID_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx);
 static uint8_t USBD_HID_DeInit(USBD_HandleTypeDef *pdev, uint8_t cfgidx);
 static uint8_t USBD_HID_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
+static uint8_t USBD_HID_CtrlIn(USBD_HandleTypeDef *pdev);
 static uint8_t USBD_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum);
 
 static uint8_t *USBD_HID_GetFSCfgDesc(uint16_t *length);
@@ -122,7 +123,7 @@ USBD_ClassTypeDef USBD_HID = {
   USBD_HID_DeInit,
   USBD_HID_Setup,
   NULL,              /* EP0_TxSent */
-  NULL,              /* EP0_RxReady */
+  USBD_HID_CtrlIn,   /* EP0_RxReady */
   USBD_HID_DataIn,   /* DataIn */
   NULL,              /* DataOut */
   NULL,              /* SOF */
@@ -669,6 +670,14 @@ static uint8_t USBD_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum)
   return (uint8_t)USBD_OK;
 }
 
+/**
+ * led state from the ep0 endpoint
+ */
+static uint8_t USBD_HID_CtrlIn(USBD_HandleTypeDef *pdev)
+{
+  UNUSED(pdev);
+  return (uint8_t)USBD_OK;
+}
 
 /**
 * @brief  DeviceQualifierDescriptor
