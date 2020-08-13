@@ -1,39 +1,39 @@
 
-
-Breakpoint=3471312545: 51: 0, State=BP_STATE_ON
-Breakpoint=3784769629: 183: 0, State=BP_STATE_ON
-Breakpoint=2481451919: 54: 0, State=BP_STATE_ON
-OpenDocument="wait.c", FilePath="D:/msys64/home/astro/amk/main/porting/stm32/wait.c", Line=0
-OpenDocument="action.c", FilePath="D:/msys64/home/astro/amk/tmk/tmk/tmk_core/common/action.c", Line=63
-OpenDocument="action_util.c", FilePath="D:/msys64/home/astro/amk/tmk/tmk/tmk_core/common/action_util.c", Line=46
-OpenDocument="host.c", FilePath="D:/msys64/home/astro/amk/tmk/tmk/tmk_core/common/host.c", Line=28
-OpenDocument="stm32f4xx_hal_gpio.c", FilePath="D:/msys64/home/astro/amk/stm32_sdk/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c", Line=359
-OpenDocument="gpio_pin.c", FilePath="D:/msys64/home/astro/amk/main/porting/stm32/gpio_pin.c", Line=0
-OpenDocument="matrix_amk.c", FilePath="D:/msys64/home/astro/amk/main/matrix_amk.c", Line=56
-OpenDocument="generic_stm32f4.c", FilePath="D:/msys64/home/astro/amk/main/porting/stm32/generic_stm32f4.c", Line=164
+OpenDocument="stm32f4xx_hal_pcd.c", FilePath="D:/msys64/home/astro/amk/stm32_sdk/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c", Line=1780
+OpenDocument="usbd_conf.c", FilePath="D:/msys64/home/astro/amk/stm32_sdk/USB_DEVICE/Target/usbd_conf.c", Line=541
+OpenDocument="usbd_hid.c", FilePath="D:/msys64/home/astro/amk/stm32_sdk/Middlewares/ST/STM32_USB_Device_Library/Class/HID/Src/usbd_hid.c", Line=557
+OpenDocument="host.c", FilePath="D:/msys64/home/astro/amk/tmk/tmk/tmk_core/common/host.c", Line=40
+OpenDocument="startup_stm32f411xe.s", FilePath="D:/msys64/home/astro/amk/stm32_sdk/startup_stm32f411xe.s", Line=48
 OpenDocument="main.c", FilePath="D:/msys64/home/astro/amk/main/main.c", Line=0
+OpenDocument="gpio_pin.c", FilePath="D:/msys64/home/astro/amk/main/porting/stm32/gpio_pin.c", Line=0
+OpenDocument="matrix_amk.c", FilePath="D:/msys64/home/astro/amk/main/matrix_amk.c", Line=27
+OpenDocument="generic_stm32f4.c", FilePath="D:/msys64/home/astro/amk/main/porting/stm32/generic_stm32f4.c", Line=168
 OpenToolbar="View", Floating=0, x=0, y=0
 OpenToolbar="Debug", Floating=0, x=1, y=0
-OpenWindow="Call Stack", DockArea=RIGHT, x=0, y=3, w=1314, h=318, FilterBarShown=0, ToolBarShown=0
-OpenWindow="Registers 1", DockArea=RIGHT, x=0, y=4, w=1314, h=163, FilterBarShown=0, ToolBarShown=0, FilteredItems=[], RefreshRate=1
-OpenWindow="Source Files", DockArea=LEFT, x=0, y=1, w=367, h=650, FilterBarShown=1, ToolBarShown=0
-OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=0, w=1314, h=199, FilterBarShown=0, ToolBarShown=0, ExecCountersShown=0, InstEncodingsShown=0
+OpenWindow="Call Stack", DockArea=RIGHT, x=0, y=3, w=1314, h=315, FilterBarShown=0, ToolBarShown=0
+OpenWindow="Registers 1", DockArea=RIGHT, x=0, y=4, w=1314, h=171, FilterBarShown=0, ToolBarShown=0, FilteredItems=[], RefreshRate=1
+OpenWindow="Source Files", DockArea=LEFT, x=0, y=1, w=367, h=651, FilterBarShown=1, ToolBarShown=0
+OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=0, w=1314, h=204, FilterBarShown=0, ToolBarShown=0, ExecCountersShown=0, InstEncodingsShown=0
 OpenWindow="Source", x=0, y=0, w=0, h=0, FilterBarShown=0, ToolBarShown=0, ExecCountersShown=0
 OpenWindow="Memory 1", DockArea=BOTTOM, x=2, y=0, w=1569, h=634, FilterBarShown=0, ToolBarShown=0, EditorAddress=0x20001640
-OpenWindow="Global Data", DockArea=RIGHT, x=0, y=1, w=1314, h=318, FilterBarShown=1, ToolBarShown=0
-OpenWindow="Watched Data", DockArea=RIGHT, x=0, y=2, w=1314, h=316, FilterBarShown=0, ToolBarShown=0
-OpenWindow="Functions", DockArea=LEFT, x=0, y=0, w=367, h=667, FilterBarShown=1, ToolBarShown=0
+OpenWindow="Global Data", DockArea=RIGHT, x=0, y=1, w=1314, h=313, FilterBarShown=1, ToolBarShown=0
+OpenWindow="Watched Data", DockArea=RIGHT, x=0, y=2, w=1314, h=311, FilterBarShown=0, ToolBarShown=0
+OpenWindow="Functions", DockArea=LEFT, x=0, y=0, w=367, h=666, FilterBarShown=1, ToolBarShown=0
 OpenWindow="Terminal", DockArea=BOTTOM, x=1, y=0, w=1099, h=634, FilterBarShown=0, ToolBarShown=0
 OpenWindow="Console", DockArea=BOTTOM, x=0, y=0, w=1170, h=634, FilterBarShown=0, ToolBarShown=0
 TableHeader="Global Data", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Location";"Size";"Type";"Scope"], ColWidths=[699;105;138;94;94;399]
-TableHeader="Watched Data", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Value";"Location";"Refresh"], ColWidths=[190;191;131;802]
+TableHeader="Watched Data", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Value";"Location";"Refresh"], ColWidths=[190;191;131;768]
 TableHeader="Functions", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Address";"Size";"#Insts";"Source"], ColWidths=[471;131;94;116;333]
 TableHeader="Call Stack", SortCol="Function", SortOrder="ASCENDING", VisibleCols=["Function";"Stack Frame";"Source";"PC";"Return Address";"Stack Used"], ColWidths=[291;145;90;46;178;564]
 TableHeader="Source Files", SortCol="File", SortOrder="ASCENDING", VisibleCols=["File";"Status";"Size";"#Insts";"Path"], ColWidths=[306;116;94;116;1235]
-TableHeader="Power Sampling", SortCol="None", SortOrder="ASCENDING", VisibleCols=["Index";"Time";"Ch 0"], ColWidths=[100;100;100]
+TableHeader="Power Sampling", SortCol="Index", SortOrder="ASCENDING", VisibleCols=["Index";"Time";"Ch 0"], ColWidths=[100;100;100]
 TableHeader="Registers 1", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Description"], ColWidths=[103;183;994]
+TableHeader="RegisterSelectionDialog", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Auto";"Name";"Address";"Description"], ColWidths=[26;26;26;29]
 WatchedExpression="changed"
 WatchedExpression="col_pins[col]"
 WatchedExpression="current_row_value"
 WatchedExpression="last_row_value"
 WatchedExpression="col"
+WatchedExpression="report"
+WatchedExpression="report_buf"
+WatchedExpression="ep"
