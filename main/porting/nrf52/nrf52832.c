@@ -10,7 +10,8 @@
 #include "ble_adv_service.h"
 #include "ble_hids_service.h"
 #include "ble_keyboard.h"
-#include "eeconfig_fds.h"
+//#include "eeconfig_fds.h"
+#include "eeconfig_fd.h"
 
 ble_driver_t ble_driver = {
     .peer_id = PM_PEER_ID_INVALID,
@@ -184,7 +185,7 @@ static void power_management_init(void)
  *
  * @details If there is no pending log operation, then sleep until next the next event occurs.
  */
-static void idle_state_handle(void)
+void idle_state_handle(void)
 {
     app_sched_execute();
     if (NRF_LOG_PROCESS() == false)
@@ -210,6 +211,7 @@ void board_init(void)
     ble_stack_init();
     scheduler_init();
 
+    fd_eeprom_init();
     //fds_eeprom_init();
 
     ble_services_init();
