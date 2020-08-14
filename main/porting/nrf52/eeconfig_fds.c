@@ -72,6 +72,10 @@ static void ee_evt_handler(fds_evt_t const *p_evt)
         if (p_evt->result == NRF_SUCCESS) {
             ee_fds_initialized = true;
             NRF_LOG_INFO("FDS initialized.");
+            ret_code_t err_code;
+            err_code = app_timer_start(m_eeprom_update_timer_id, EEPROM_UPDATE_DELAY, NULL);
+            APP_ERROR_CHECK(err_code);
+            NRF_LOG_INFO("kickoff eeprom update time for FDS init");
         } else {
             NRF_LOG_INFO("Failed to initialized FDS, code: %d", p_evt->result);
         } break;
@@ -89,18 +93,20 @@ void fds_eeprom_init(void)
         fds_register(ee_evt_handler);
         err_code = fds_init();
         APP_ERROR_CHECK(err_code);
-        wait_for_fds_ready();
 
         err_code = app_timer_create(&m_eeprom_update_timer_id,
                                     APP_TIMER_MODE_SINGLE_SHOT,
                                     eeprom_update_timeout_handler);
         APP_ERROR_CHECK(err_code);
+        wait_for_fds_ready();
     }
     fds_eeprom_restore();
 }
 
 static void eeprom_update_timeout_handler(void* p_context)
 {
+    NRF_LOG_INFO("eeprom update time out, dirty=%d", eeprom_dirty);
+
     if (!eeprom_dirty) return;
 
     fds_eeprom_update();
