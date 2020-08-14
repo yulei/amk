@@ -10,8 +10,8 @@
 #include "ble_adv_service.h"
 #include "ble_hids_service.h"
 #include "ble_keyboard.h"
-//#include "eeconfig_fds.h"
-#include "eeconfig_fd.h"
+#include "eeconfig_fds.h"
+//#include "eeconfig_fd.h"
 
 ble_driver_t ble_driver = {
     .peer_id = PM_PEER_ID_INVALID,
@@ -211,8 +211,8 @@ void board_init(void)
     ble_stack_init();
     scheduler_init();
 
-    fd_eeprom_init();
-    //fds_eeprom_init();
+    //fd_eeprom_init();
+    fds_eeprom_init();
 
     ble_services_init();
     ble_keyboard_init();

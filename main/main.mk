@@ -18,8 +18,8 @@ APP_DEFS += \
 
 ifeq (yes, $(strip $(BOOTMAGIC_ENABLE)))
 	ifeq (NRF52832, $(strip $(MCU)))
-		#SRC_FILES += $(MAIN_DIR)/porting/nrf52/eeconfig_fds.c
-		SRC_FILES += $(MAIN_DIR)/porting/nrf52/eeconfig_fd.c
+		SRC_FILES += $(MAIN_DIR)/porting/nrf52/eeconfig_fds.c
+		#SRC_FILES += $(MAIN_DIR)/porting/nrf52/eeconfig_fd.c
 	endif
 	ifeq (STM32F411, $(strip $(MCU)))
 		SRC_FILES += $(MAIN_DIR)/porting/eeconfig_mem.c

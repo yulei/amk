@@ -27,12 +27,13 @@ APP_TIMER_DEF(m_eeprom_update_timer_id);        // timer for update the eeprom
 static volatile bool ee_fds_initialized = false;
 static volatile bool eeprom_dirty = false;
 
-/*static void wait_for_fds_ready(void)
+extern void idle_state_handle(void);
+static void wait_for_fds_ready(void)
 {
     while(!ee_fds_initialized) {
-        nrf_delay_ms(1);
+        idle_state_handle();
     }
-}*/
+}
 
 __ALIGN(4) static uint8_t eeprom_buf[(EECONFIG_SIZE + 3) & (~3)];  // pad to word size
 
@@ -43,6 +44,7 @@ static fds_record_t ee_record = {
     .data.length_words = sizeof(eeprom_buf)/sizeof(uint32_t),
 };
 
+static void fds_eeprom_restore(void);
 static void fds_eeprom_update(void);
 static void eeprom_update_timeout_handler(void *p_context);
 
@@ -87,13 +89,14 @@ void fds_eeprom_init(void)
         fds_register(ee_evt_handler);
         err_code = fds_init();
         APP_ERROR_CHECK(err_code);
-        //wait_for_fds_ready();
+        wait_for_fds_ready();
 
         err_code = app_timer_create(&m_eeprom_update_timer_id,
                                     APP_TIMER_MODE_SINGLE_SHOT,
                                     eeprom_update_timeout_handler);
         APP_ERROR_CHECK(err_code);
     }
+    fds_eeprom_restore();
 }
 
 static void eeprom_update_timeout_handler(void* p_context)
@@ -101,6 +104,25 @@ static void eeprom_update_timeout_handler(void* p_context)
     if (!eeprom_dirty) return;
 
     fds_eeprom_update();
+}
+
+static void fds_eeprom_restore(void)
+{
+    fds_record_desc_t desc = {0};
+    fds_find_token_t token = {0};
+    uint16_t key = EE_EEPROM_KEY;
+    ret_code_t err_code = fds_record_find_by_key(key, &desc, &token);
+    if (err_code == FDS_ERR_NOT_FOUND) {
+        // no such record, initialized the buffered data to zero
+        memset(eeprom_buf, 0, sizeof(eeprom_buf));
+    } else {
+        fds_flash_record_t record = {0};
+        err_code = fds_record_open(&desc, &record);
+        APP_ERROR_CHECK(err_code);
+        memcpy(eeprom_buf, record.p_data, sizeof(eeprom_buf));
+        err_code = fds_record_close(&desc);
+        APP_ERROR_CHECK(err_code);
+    }
 }
 
 static void fds_eeprom_update(void)
@@ -228,7 +250,7 @@ void eeprom_update_block(const void *buf, void *addr, size_t len) {
 
 void eeconfig_init(void)
 {
-    fds_eeprom_init();
+    //fds_eeprom_init();
 
     eeprom_write_word(EECONFIG_MAGIC, EECONFIG_MAGIC_NUMBER);
     eeprom_write_byte(EECONFIG_DEBUG,          0);
