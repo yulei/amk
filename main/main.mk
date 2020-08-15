@@ -38,6 +38,15 @@ ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))
 	APP_DEFS += -DRGB_EFFECTS_ENABLE
 endif
 
+ifneq (yes, $(strip $(CUSTOM_MATRIX)))
+	ifeq (NRF52832, $(strip $(MCU)))
+		SRC_FILES += $(MAIN_DIR)/matrix_driver.c
+	endif
+	ifeq (STM32F411, $(strip $(MCU)))
+		SRC_FILES += $(MAIN_DIR)/matrix_amk.c
+	endif
+	APP_DEFS += -DCUSTOM_MATRIX
+endif
 
 ifeq (NRF52832, $(strip $(MCU)))
 	SRC_FILES += $(MAIN_DIR)/matrix_driver.c
@@ -45,7 +54,6 @@ ifeq (NRF52832, $(strip $(MCU)))
 endif
 
 ifeq (STM32F411, $(strip $(MCU)))
-	SRC_FILES += $(MAIN_DIR)/matrix_amk.c
 	SRC_FILES += $(MAIN_DIR)/suspend.c
 	SRC_FILES += $(MAIN_DIR)/rtt/SEGGER_RTT.c
 	SRC_FILES += $(MAIN_DIR)/rtt/SEGGER_RTT_printf.c
