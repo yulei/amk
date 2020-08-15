@@ -54,8 +54,15 @@ static void ee_evt_handler(fds_evt_t const *p_evt)
     case FDS_EVT_WRITE:
     case FDS_EVT_UPDATE:
         if (p_evt->write.file_id == EE_FILEID && p_evt->write.record_key == EE_EEPROM_KEY) {
-            eeprom_dirty = false;
-            NRF_LOG_INFO("EEPROM write result: %d", p_evt->result);
+            if (p_evt->result != NRF_SUCCESS) {
+                NRF_LOG_INFO("EEPROM write/update failed: %d, restart again", p_evt->result);
+                ret_code_t err_code;
+                err_code = app_timer_start(m_eeprom_update_timer_id, EEPROM_UPDATE_DELAY, NULL);
+                APP_ERROR_CHECK(err_code);
+            } else {
+                NRF_LOG_INFO("EEPROM write/update success");
+                eeprom_dirty = false;
+            }
         }
         break;
     case FDS_EVT_DEL_RECORD:
@@ -75,7 +82,7 @@ static void ee_evt_handler(fds_evt_t const *p_evt)
             ret_code_t err_code;
             err_code = app_timer_start(m_eeprom_update_timer_id, EEPROM_UPDATE_DELAY, NULL);
             APP_ERROR_CHECK(err_code);
-            NRF_LOG_INFO("kickoff eeprom update time for FDS init");
+            NRF_LOG_INFO("kickoff eeprom update timer for FDS init");
         } else {
             NRF_LOG_INFO("Failed to initialized FDS, code: %d", p_evt->result);
         } break;

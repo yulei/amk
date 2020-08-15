@@ -21,7 +21,7 @@ ifneq (, $(TARGET))
 	include $(TOP_DIR)/keyboards/$(TARGET)/$(TARGET).mk
 endif
 
-include $(TOP_DIR)/tinyusb/tinyusb.mk
+#include $(TOP_DIR)/tinyusb/tinyusb.mk
 include $(TOP_DIR)/main/main.mk
 include $(TOP_DIR)/tmk/tmk.mk
 

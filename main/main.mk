@@ -12,6 +12,7 @@ INC_FOLDERS += \
 	$(MAIN_DIR)/porting \
 	$(MAIN_DIR)/drivers \
 	$(MAIN_DIR)/rgb \
+	$(MAIN_DIR)/hid_desc \
 
 APP_DEFS += \
 	-DMATRIX_USE_GPIO \

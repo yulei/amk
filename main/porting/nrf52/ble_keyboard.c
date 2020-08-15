@@ -305,7 +305,9 @@ static void usb_resume(void)
 {}
 
 static void usb_leds(uint8_t leds)
-{}
+{
+    ble_driver.usb_led = leds;
+}
 
 // bluetooth control command
 // F21 for select usb/ble output
