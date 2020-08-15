@@ -71,9 +71,9 @@
 // Tinyusb Common Headers
 #include "tusb_option.h"
 #include "tusb_compiler.h"
-#include "tusb_verify.h"
-#include "tusb_error.h" // TODO remove
-#include "tusb_timeout.h"
+//#include "tusb_verify.h"
+//#include "tusb_error.h" // TODO remove
+//#include "tusb_timeout.h"
 #include "tusb_types.h"
 
 //--------------------------------------------------------------------+
