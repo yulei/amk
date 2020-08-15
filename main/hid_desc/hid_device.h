@@ -28,7 +28,7 @@
 #define _TUSB_HID_DEVICE_H_
 
 //#include "common/tusb_common.h"
-//#include "device/usbd.h"
+#include "usbd.h"
 #include "hid.h"
 
 #ifdef __cplusplus

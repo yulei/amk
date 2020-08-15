@@ -157,7 +157,7 @@ static void amk_init(void)
 
 void Error_Handler(void)
 {
-  __asm__("BKPT");
+    __asm__("BKPT");
 }
 
 static void DWT_Delay_Init(void)
@@ -172,7 +172,7 @@ static void DWT_Delay_Init(void)
 // tmk integration
 uint8_t keyboard_leds(void)
 {
-  return amk_led_state;
+    return amk_led_state;
 }
 
 #define REPORT_BUF_SIZE 16

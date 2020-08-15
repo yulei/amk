@@ -61,7 +61,6 @@ EndBSPDependencies */
 /** @defgroup USBD_HID_Private_TypesDefinitions
   * @{
   */
-#include "tusb.h"
 #include "usb_descriptors.h"
 
 static uint8_t hid_report_desc[] =
