@@ -27,6 +27,10 @@ static bool i2c_ready = false;
 
 void i2c_init(void)
 {
+    if (i2c_ready) {
+        return;
+    }
+
     i2c_handle.Instance = I2C_INSTANCE_ID;
     i2c_handle.Init.ClockSpeed = 400000;
     i2c_handle.Init.DutyCycle = I2C_DUTYCYCLE_2;
@@ -36,10 +40,10 @@ void i2c_init(void)
     i2c_handle.Init.OwnAddress2 = 0;
     i2c_handle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
     i2c_handle.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-    if (HAL_I2C_Init(&i2c_handle) != HAL_OK) {
-        //Error_Handler();
-    } else {
+    if (HAL_I2C_Init(&i2c_handle) == HAL_OK) {
         i2c_ready = true;
+    } else {
+        //Error_Handler();
     }
 }
 
@@ -97,4 +101,7 @@ amk_i2c_error_t i2c_read_reg(uint8_t addr, uint8_t reg, void* data, size_t lengt
 
 void i2c_uninit(void)
 {
+    if(!i2c_ready) {
+        return;
+    }
 }
