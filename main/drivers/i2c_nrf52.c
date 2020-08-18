@@ -29,6 +29,8 @@ static bool twi_ready = false;
 
 #define TWI_ADDR(addr) ((addr)>>1)
 
+bool i2c_ready(void) { return twi_ready; }
+
 void i2c_init(void)
 {
     ret_code_t err_code = NRFX_SUCCESS;

@@ -3,6 +3,7 @@
  *  driver implementation for is31fl3731
  */
 
+#include <stdbool.h>
 #include "is31fl3731.h"
 #include "i2c.h"
 
@@ -29,7 +30,8 @@
 typedef struct {
     is31fl3731_t is31;
     uint8_t pwm_buffer[PWM_BUFFER_SIZE+1];
-    uint8_t control_buffer[CONTROL_BUFFER_SIZE+1];
+    bool pwm_dirty;
+    uint8_t control_buffer[CONTROL_BUFFER_SIZE + 1];
 } is31fl3731_driver_t;
 
 static is31fl3731_driver_t is31_drivers[IS31_DRIVER_NUM] = {{0}};
@@ -62,6 +64,7 @@ void is31fl3731_set_color(is31fl3731_t* driver, uint8_t index, uint8_t red, uint
     is31->pwm_buffer[r-PWM_REG+ 1] = r;
     is31->pwm_buffer[g-PWM_REG+ 1] = g;
     is31->pwm_buffer[b-PWM_REG+ 1] = b;
+    is31->pwm_dirty;
 }
 
 void is31fl3731_set_color_all(is31fl3731_t* driver, uint8_t red, uint8_t green, uint8_t blue)
@@ -74,21 +77,26 @@ void is31fl3731_set_color_all(is31fl3731_t* driver, uint8_t red, uint8_t green, 
 void is31fl3731_update_buffers(is31fl3731_t* driver)
 {
     is31fl3731_driver_t *is31 = find_driver(driver);
-    i2c_send(driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1, DEFAULT_TIMEOUT);
-}
+    if (is31->pwm_dirty) {
+        i2c_send(driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1, DEFAULT_TIMEOUT);
+        is31->pwm_dirty = false;
+    }
 
-void is31fl3731_uninit(is31fl3731_t *led_driver)
+void is31fl3731_uninit(is31fl3731_t* driver)
 {
+    // shutdonw driver
 }
 
 void init_drive(is31fl3731_driver_t *driver)
 {
+    if (!i2c_ready()) i2c_init();
+
     memset(driver->pwm_buffer, 0, PWM_BUFFER_SIZE);
     driver->pwm_buffer[0] = PWM_REG;
+    driver->pwm_dirty = false;
     memset(driver->control_buffer, 0, CONTROL_BUFFER_SIZE);
     driver->control_buffer[0] = CONTROL_REG;
 
-    i2c_init();
     // reset the 3731 to initial state
     write_register(driver->is31.addr, COMMAND_REG, BANK_FUNCTION_REG);
     write_register(driver->is31.addr, SHUTDOWN_REG, 0);

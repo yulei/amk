@@ -25,6 +25,8 @@
 static I2C_HandleTypeDef i2c_handle;
 static bool i2c_ready = false;
 
+bool i2c_ready(void) { return i2c_ready; }
+
 void i2c_init(void)
 {
     if (i2c_ready) {
