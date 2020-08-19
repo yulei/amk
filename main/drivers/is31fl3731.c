@@ -37,7 +37,8 @@ typedef struct {
 static is31fl3731_driver_t is31_drivers[IS31_DRIVER_NUM] = {{0}};
 
 static void write_register(uint8_t addr, uint8_t reg, uint8_t data);
-static void init_drive(is31fl3731_driver_t *driver);
+static void init_driver(is31fl3731_driver_t *driver);
+static void uninit_driver(is31fl3731_t *driver);
 static is31fl3731_driver_t *find_driver(is31fl3731_t *driver);
 
 is31fl3731_t* is31fl3731_init(uint8_t addr, uint8_t led_num, map_led_t map_led)
@@ -84,10 +85,16 @@ void is31fl3731_update_buffers(is31fl3731_t* driver)
 
 void is31fl3731_uninit(is31fl3731_t* driver)
 {
-    // shutdonw driver
+    uninit_driver(driver);
+    for (int i = 0; i < IS31_DRIVER_NUM; i++) {
+        if (is31_drivers[i].is31.addr != 0)
+            return;
+    }
+    // all drivers uninited, release the i2c interface
+    if (i2c_ready()) i2c_uninit();
 }
 
-void init_drive(is31fl3731_driver_t *driver)
+void init_driver(is31fl3731_driver_t *driver)
 {
     if (!i2c_ready()) i2c_init();
 
@@ -130,6 +137,24 @@ void init_drive(is31fl3731_driver_t *driver)
         driver->control_buffer[reg_b+1] |= (1 << bit_b);
     }
     i2c_send(driver->is31.addr, driver->control_buffer, CONTROL_BUFFER_SIZE+1, DEFAULT_TIMEOUT);
+}
+
+void uninit_driver(is31fl3731_t* driver)
+{
+    // shutdonw driver
+    write_register(driver->addr, COMMAND_REG, BANK_FUNCTION_REG);
+    write_register(driver->addr, SHUTDOWN_REG, 0);
+
+    int i;
+    for ( i = 0; i < IS31_DRIVER_NUM; i++) {
+        if (&(is31_drivers[i].is31) == driver) {
+            break;
+        }
+    }
+
+    if ( i!= IS31_DRIVER_NUM) {
+        memset(&is31_drivers[i], 0, sizeof(is31fl3731_driver_t));
+    }
 }
 
 void write_register(uint8_t addr, uint8_t reg, uint8_t data)
