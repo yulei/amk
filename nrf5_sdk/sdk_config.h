@@ -5883,7 +5883,7 @@
 // <e> USBD_ENABLED - nrf_drv_usbd - Software Component
 //==========================================================
 #ifndef USBD_ENABLED
-#define USBD_ENABLED 0
+#define USBD_ENABLED 1
 #endif
 // <o> USBD_CONFIG_IRQ_PRIORITY  - Interrupt priority
 
@@ -6216,7 +6216,7 @@
 // <e> APP_USBD_ENABLED - app_usbd - USB Device library
 //==========================================================
 #ifndef APP_USBD_ENABLED
-#define APP_USBD_ENABLED 0
+#define APP_USBD_ENABLED 1
 #endif
 // <o> APP_USBD_VID - Vendor ID.  <0x0000-0xFFFF>
 
@@ -6225,7 +6225,7 @@
 // <i> Vendor ID ordered from USB IF: http://www.usb.org/developers/vendor/
 
 #ifndef APP_USBD_VID
-#define APP_USBD_VID 0
+#define APP_USBD_VID 16724
 #endif
 
 // <o> APP_USBD_PID - Product ID.  <0x0000-0xFFFF>
@@ -6235,7 +6235,7 @@
 // <i> Selected Product ID
 
 #ifndef APP_USBD_PID
-#define APP_USBD_PID 0
+#define APP_USBD_PID 16965
 #endif
 
 // <o> APP_USBD_DEVICE_VER_MAJOR - Major device version  <0-99>
@@ -6269,14 +6269,14 @@
 
 
 #ifndef APP_USBD_CONFIG_SELF_POWERED
-#define APP_USBD_CONFIG_SELF_POWERED 1
+#define APP_USBD_CONFIG_SELF_POWERED 0
 #endif
 
 // <o> APP_USBD_CONFIG_MAX_POWER - MaxPower field in configuration descriptor in milliamps.  <0-500>
 
 
 #ifndef APP_USBD_CONFIG_MAX_POWER
-#define APP_USBD_CONFIG_MAX_POWER 100
+#define APP_USBD_CONFIG_MAX_POWER 500
 #endif
 
 // <q> APP_USBD_CONFIG_POWER_EVENTS_PROCESS  - Process power events.
@@ -6389,7 +6389,7 @@
 // <i> Setting string to NULL disables that string.
 // <i> The order of manufacturer names must be the same like in @ref APP_USBD_STRINGS_LANGIDS.
 #ifndef APP_USBD_STRINGS_MANUFACTURER
-#define APP_USBD_STRINGS_MANUFACTURER APP_USBD_STRING_DESC("Nordic Semiconductor")
+#define APP_USBD_STRINGS_MANUFACTURER APP_USBD_STRING_DESC("astro")
 #endif
 
 // </e>
@@ -6413,7 +6413,7 @@
 // <i> Note: This value is not editable in Configuration Wizard.
 // <i> List of product names that is defined the same way like in @ref APP_USBD_STRINGS_MANUFACTURER.
 #ifndef APP_USBD_STRINGS_PRODUCT
-#define APP_USBD_STRINGS_PRODUCT APP_USBD_STRING_DESC("nRF52 USB Product")
+#define APP_USBD_STRINGS_PRODUCT APP_USBD_STRING_DESC("nRF52 USB Master")
 #endif
 
 // </e>
@@ -6423,7 +6423,7 @@
 // <i> Setting ID to 0 disables the string.
 //==========================================================
 #ifndef APP_USBD_STRING_ID_SERIAL
-#define APP_USBD_STRING_ID_SERIAL 3
+#define APP_USBD_STRING_ID_SERIAL 1
 #endif
 // <q> APP_USBD_STRING_SERIAL_EXTERN  - Define whether @ref APP_USBD_STRING_SERIAL is created by macro or declared as a global variable.
 
@@ -6490,7 +6490,7 @@
 // <e> APP_USBD_HID_ENABLED - app_usbd_hid - USB HID class
 //==========================================================
 #ifndef APP_USBD_HID_ENABLED
-#define APP_USBD_HID_ENABLED 0
+#define APP_USBD_HID_ENABLED 1
 #endif
 // <o> APP_USBD_HID_DEFAULT_IDLE_RATE - Default idle rate for HID class.   <0-255>
 
@@ -6516,7 +6516,7 @@
 
 
 #ifndef APP_USBD_HID_GENERIC_ENABLED
-#define APP_USBD_HID_GENERIC_ENABLED 0
+#define APP_USBD_HID_GENERIC_ENABLED 1
 #endif
 
 // <q> APP_USBD_HID_KBD_ENABLED  - app_usbd_hid_kbd - USB HID keyboard
