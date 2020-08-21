@@ -172,8 +172,6 @@ INC_FOLDERS += \
 	$(NRF5SDK_DIR)/components/libraries/usbd/class/hid/mouse \
 	$(NRF5SDK_DIR)/components/libraries/usbd/class/msc \
 	$(NRF5SDK_DIR)/components/softdevice/common \
-	$(NRF5SDK_DIR)/components/softdevice/s132/headers \
-	$(NRF5SDK_DIR)/components/softdevice/s132/headers/nrf52 \
 	$(NRF5SDK_DIR)/components/toolchain/cmsis/include \
 	$(NRF5SDK_DIR)/integration/nrfx/legacy \
 	$(NRF5SDK_DIR)/integration/nrfx \
@@ -193,15 +191,17 @@ APP_DEFS += \
 	-DBOARD_CUSTOM \
 	-DCONFIG_NFCT_PINS_AS_GPIOS \
 	-DFLOAT_ABI_HARD \
-	-DNRF52 \
 	-DNRF_SD_BLE_API_VERSION=7 \
 	-DSOFTDEVICE_PRESENT \
 	-D__HEAP_SIZE=8192 \
 	-D__STACK_SIZE=8192 \
-	-DGPIO_NRF5X \
 	#-DCONFIG_GPIO_AS_PINRESET \
 
 ifeq (NRF52832, $(strip $(MCU)))
+	INC_FOLDERS += $(NRF5SDK_DIR)/components/softdevice/s132/headers
+	INC_FOLDERS += $(NRF5SDK_DIR)/components/softdevice/s132/headers/nrf52
+	APP_DEFS += -DGPIO_NRF5X
+	APP_DEFS += -DNRF52
 	APP_DEFS += -DNRF52832_XXAA
 	APP_DEFS += -DNRF52_PAN_74
 	APP_DEFS += -DS132
@@ -214,6 +214,12 @@ ifeq (NRF52840, $(strip $(MCU)))
 	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/app_usbd_hid.c
 	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/generic/app_usbd_hid_generic.c
 	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd_string_desc.c
+	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/queue/nrf_queue.c
+	SRC_FILES += $(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_usbd.c
+	SRC_FILES += $(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_power.c
+	SRC_FILES += $(NRF5SDK_DIR)/integration/nrfx/legacy/nrf_drv_power.c
+	INC_FOLDERS += $(NRF5SDK_DIR)/components/softdevice/s140/headers
+	INC_FOLDERS += $(NRF5SDK_DIR)/components/softdevice/s140/headers/nrf52
 	INC_FOLDERS += $(NRF5SDK_DIR)/components/libraries/usbd
 	INC_FOLDERS += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/generic
 	INC_FOLDERS += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid

@@ -1,6 +1,6 @@
 /**
- * nrf52832.c
- * board implementation of nrf52832
+ * @file generic_nrf52.c
+ * board implementation of nrf52
  */
 
 #include "ble_config.h"
