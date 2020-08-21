@@ -1,0 +1,14 @@
+
+M20ADDBLE_DIR := $(TOP_DIR)/keyboards/m20addble
+
+SRC_FILES += \
+	$(M20ADDBLE_DIR)/m20addble.c \
+	$(M20ADDBLE_DIR)/m20addble_keymap.c \
+
+INC_FOLDERS += \
+	$(M20ADDBLE_DIR) \
+
+MCU = NRF52840
+BOOTMAGIC_ENABLE = yes
+MOUSEKEY_ENABLE = yes
+EXTRAKEY_ENABLE = yes

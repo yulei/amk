@@ -20,7 +20,9 @@ APP_DEFS += \
 ifeq (yes, $(strip $(BOOTMAGIC_ENABLE)))
 	ifeq (NRF52832, $(strip $(MCU)))
 		SRC_FILES += $(MAIN_DIR)/porting/nrf52/eeconfig_fds.c
-		#SRC_FILES += $(MAIN_DIR)/porting/nrf52/eeconfig_fd.c
+	endif
+	ifeq (NRF52840, $(strip $(MCU)))
+		SRC_FILES += $(MAIN_DIR)/porting/nrf52/eeconfig_fds.c
 	endif
 	ifeq (STM32F411, $(strip $(MCU)))
 		SRC_FILES += $(MAIN_DIR)/porting/eeconfig_mem.c
@@ -42,6 +44,9 @@ ifneq (yes, $(strip $(CUSTOM_MATRIX)))
 	ifeq (NRF52832, $(strip $(MCU)))
 		SRC_FILES += $(MAIN_DIR)/matrix_driver.c
 	endif
+	ifeq (NRF52840, $(strip $(MCU)))
+		SRC_FILES += $(MAIN_DIR)/matrix_driver.c
+	endif
 	ifeq (STM32F411, $(strip $(MCU)))
 		SRC_FILES += $(MAIN_DIR)/matrix_amk.c
 	endif
@@ -49,6 +54,11 @@ ifneq (yes, $(strip $(CUSTOM_MATRIX)))
 endif
 
 ifeq (NRF52832, $(strip $(MCU)))
+	SRC_FILES += $(MAIN_DIR)/matrix_driver.c
+	include $(MAIN_DIR)/porting/nrf52.mk
+endif
+
+ifeq (NRF52840, $(strip $(MCU)))
 	SRC_FILES += $(MAIN_DIR)/matrix_driver.c
 	include $(MAIN_DIR)/porting/nrf52.mk
 endif

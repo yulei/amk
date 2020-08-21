@@ -6,8 +6,88 @@
 #include "usb_interface.h"
 #include "nrf_delay.h"
 #include "app_usbd.h"
+#include "app_usbd_core.h"
+#include "app_usbd_hid_generic.h"
+#include "hid_desc.h"
 
-typedef struct {
+// event listener
+static void hid_user_ev_handler(app_usbd_class_inst_t const * p_inst,
+                                app_usbd_hid_user_event_t event);
+
+// HCK hid custom keyboard
+#define HCK_INTERFACE               0
+#define HCK_EP_IN                   NRF_DRV_USBD_EPIN1
+#define HCK_EP_OUT                  NRF_DRV_USBD_EPOUT1
+#define HCK_REPORT_IN_QUEUE_SIZE    1
+#define HCK_REPORT_OUT_MAXSIZE      1
+#define HCK_REPORT_FEATURE_MAXSIZE  0
+
+#define HCK_EPLIST() \
+{ \
+HCK_EP_IN, \
+HCK_EP_OUT \
+}
+
+static uint8_t const hck_report_desc[] = {TUD_HID_REPORT_DESC_KEYBOARD()};
+
+static const app_usbd_hid_subclass_desc_t hck_desc = {
+    .size = sizeof(hck_report_desc),
+    .type = APP_USBD_DESCRIPTOR_REPORT,
+    .data = hck_report_desc,
+}
+
+static const app_usbd_hid_subclass_desc_t * hck_reps[] = {&hck_desc};
+
+APP_USBD_HID_GENERIC_GLOBAL_DEF(m_hck,
+                                HID_GENERIC_INTERFACE,
+                                hid_user_ev_handler,
+                                HCK_EPLIST(),
+                                hck_reps,
+                                HCK_REPORT_IN_QUEUE_SIZE,
+                                HCK_REPORT_OUT_MAXSIZE,
+                                HCK_REPORT_FEATURE_MAXSIZE,
+                                APP_USBD_HID_SUBCLASS_NONE,
+                                APP_USBD_HID_PROTO_KEYBOARD);
+
+// HCO hid custom other
+#define HCO_INTERFACE               1
+#define HCO_EP_IN                   NRF_DRV_USBD_EPIN2
+#define HCO_REPORT_IN_QUEUE_SIZE    1
+#define HCO_REPORT_OUT_MAXSIZE      1
+#define HCO_REPORT_FEATURE_MAXSIZE  0
+#define HCK_REPORT_IN_QUEUE_SIZE    1
+#define HCK_REPORT_OUT_MAXSIZE      0
+#define HCK_REPORT_FEATURE_MAXSIZE  0
+
+#define HCO_EPLIST() \
+{ \
+HCO_EP_IN \
+}
+
+static uint8_t const hco_report_desc[] = {
+    TUD_HID_REPORT_DESC_MOUSE(HID_REPORT_ID(1)),
+    TUD_HID_REPORT_DESC_SYSTEM(HID_REPORT_ID(2)),
+    TUD_HID_REPORT_DESC_CONSUMER(HID_REPORT_ID(3))
+};
+
+static const app_usbd_hid_subclass_desc_t hco_desc = {
+    .size = sizeof(hco_report_desc),
+    .type = APP_USBD_DESCRIPTOR_REPORT,
+    .data = hco_report_desc,
+}
+
+APP_USBD_HID_GENERIC_GLOBAL_DEF(m_hco,
+                                HID_GENERIC_INTERFACE,
+                                hid_user_ev_handler,
+                                HCO_EPLIST(),
+                                hco_reps,
+                                HCO_REPORT_IN_QUEUE_SIZE,
+                                HCO_REPORT_OUT_MAXSIZE,
+                                HCO_REPORT_FEATURE_MAXSIZE,
+                                APP_USBD_HID_SUBCLASS_NONE);
+
+typedef struct
+{
     nrf_usb_event_handler_t event;
     app_usbd_config_t usbd_config;
 } nrf_usb_config_t;
@@ -29,7 +109,16 @@ void nrf_usb_init(nrf_usb_event_handler_t* eh)
 
     rc = app_usbd_init(&nrf_usb_config.usbd_config);
     APP_ERROR_CHECK(rc);
+
     // attach class instance
+    app_usbd_class_inst_t const * class_inst_generic;
+    class_inst_generic = app_usbd_hid_generic_class_inst_get(&m_hck);
+    rc = app_usbd_class_append(class_inst_generic);
+    APP_ERROR_CHECK(rc);
+
+    class_inst_generic = app_usbd_hid_generic_class_inst_get(&m_hco);
+    rc = app_usbd_class_append(class_inst_generic);
+    APP_ERROR_CHECK(rc);
 
     rc = app_usbd_power_events_enable();
     APP_ERROR_CHECK(rc);

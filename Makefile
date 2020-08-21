@@ -28,6 +28,10 @@ ifeq (NRF52832, $(strip $(MCU)))
 include $(TOP_DIR)/nrf5_sdk/nrf5_sdk.mk
 endif
 
+ifeq (NRF52840, $(strip $(MCU)))
+include $(TOP_DIR)/nrf5_sdk/nrf5_sdk.mk
+endif
+
 ifeq (STM32F411, $(strip $(MCU)))
 include $(TOP_DIR)/stm32_sdk/stm32_sdk.mk
 endif

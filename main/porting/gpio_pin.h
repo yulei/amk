@@ -7,7 +7,7 @@
 
 
 //#ifdef GPIO_NRF5X
-#if defined(NRF52832_XXAA)
+#if defined(NRF52832_XXAA) || defined(NRF52840_XXAA)
     #include "nrf_gpio.h"
     typedef uint32_t pin_t;
     #define MAKE_PIN(port, pin) NRF_GPIO_PIN_MAP(port, pin)

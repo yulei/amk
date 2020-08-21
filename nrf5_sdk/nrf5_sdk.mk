@@ -194,15 +194,32 @@ APP_DEFS += \
 	-DCONFIG_NFCT_PINS_AS_GPIOS \
 	-DFLOAT_ABI_HARD \
 	-DNRF52 \
-	-DNRF52832_XXAA \
-	-DNRF52_PAN_74 \
 	-DNRF_SD_BLE_API_VERSION=7 \
-	-DS132 \
 	-DSOFTDEVICE_PRESENT \
 	-D__HEAP_SIZE=8192 \
 	-D__STACK_SIZE=8192 \
 	-DGPIO_NRF5X \
 	#-DCONFIG_GPIO_AS_PINRESET \
 
-LINKER_PATH		:= $(NRF5SDK_DIR)/modules/nrfx/mdk
-LINKER_SCRIPT	:= $(TOP_DIR)/nrf5_sdk/nrf52832.ld
+ifeq (NRF52832, $(strip $(MCU)))
+	APP_DEFS += -DNRF52832_XXAA
+	APP_DEFS += -DNRF52_PAN_74
+	APP_DEFS += -DS132
+	LINKER_SCRIPT := $(TOP_DIR)/nrf5_sdk/nrf52832.ld
+endif
+
+ifeq (NRF52840, $(strip $(MCU)))
+	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd.c
+	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd_core.c
+	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/app_usbd_hid.c
+	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/generic/app_usbd_hid_generic.c
+	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd_string_desc.c
+	INC_FOLDERS += $(NRF5SDK_DIR)/components/libraries/usbd
+	INC_FOLDERS += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/generic
+	INC_FOLDERS += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid
+	APP_DEFS += -DNRF52840_XXAA
+	APP_DEFS += -DS140
+	LINKER_SCRIPT := $(TOP_DIR)/nrf5_sdk/nrf52840.ld
+endif
+
+LINKER_PATH := $(NRF5SDK_DIR)/modules/nrfx/mdk
