@@ -23,13 +23,13 @@
 
 
 static I2C_HandleTypeDef i2c_handle;
-static bool i2c_ready = false;
+static bool twi_ready = false;
 
-bool i2c_ready(void) { return i2c_ready; }
+bool i2c_ready(void) { return twi_ready; }
 
 void i2c_init(void)
 {
-    if (i2c_ready) {
+    if (i2c_ready()) {
         return;
     }
 
@@ -43,7 +43,7 @@ void i2c_init(void)
     i2c_handle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
     i2c_handle.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
     if (HAL_I2C_Init(&i2c_handle) == HAL_OK) {
-        i2c_ready = true;
+        twi_ready = true;
     } else {
         //Error_Handler();
     }
@@ -103,7 +103,7 @@ amk_i2c_error_t i2c_read_reg(uint8_t addr, uint8_t reg, void* data, size_t lengt
 
 void i2c_uninit(void)
 {
-    if(!i2c_ready) {
+    if(!i2c_ready()) {
         return;
     }
 }

@@ -12,6 +12,9 @@
 #include "ble_keyboard.h"
 #include "eeconfig_fds.h"
 //#include "eeconfig_fd.h"
+#ifdef NRF52840_XXAA
+#include "app_usbd.h"
+#endif
 
 ble_driver_t ble_driver = {
     .peer_id = PM_PEER_ID_INVALID,
@@ -238,5 +241,8 @@ void board_init(void)
 
 void board_task(void)
 {
+#ifdef NRF52840_XXAA
+    while (app_usbd_event_queue_process()) { /* Nothing to do */ }
+#endif
     idle_state_handle();
 }
