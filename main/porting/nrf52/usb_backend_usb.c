@@ -28,15 +28,6 @@ HCK_EP_IN, \
 HCK_EP_OUT \
 )
 
-/*static uint8_t const hck_report_desc[] = {TUD_HID_REPORT_DESC_KEYBOARD()};
-
-static const app_usbd_hid_subclass_desc_t hck_desc = {
-    .size = sizeof(hck_report_desc),
-    .type = APP_USBD_DESCRIPTOR_REPORT,
-    .p_data = hck_report_desc,
-}
-*/
-
 APP_USBD_HID_GENERIC_SUBCLASS_REPORT_DESC(hck_desc,{ TUD_HID_REPORT_DESC_KEYBOARD() });
 
 static const app_usbd_hid_subclass_desc_t * hck_reps[] = {&hck_desc};
