@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <stdbool.h>
 #include "amk_error.h"
 
 void i2c_init(void);

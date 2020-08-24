@@ -33,17 +33,17 @@ bool i2c_ready(void) { return twi_ready; }
 
 void i2c_init(void)
 {
+    if (i2c_ready())
+        return;
     ret_code_t err_code = NRFX_SUCCESS;
 
     nrfx_twi_config_t twi_config = NRFX_TWI_DEFAULT_CONFIG;
     twi_config.scl = I2C_SCL_PIN;
     twi_config.sda = I2C_SDA_PIN;
 
-    if (!twi_ready) {
-        err_code = nrfx_twi_init(&m_twi, &twi_config, NULL, NULL);
-        APP_ERROR_CHECK(err_code);
-        twi_ready = true;
-    }
+    err_code = nrfx_twi_init(&m_twi, &twi_config, NULL, NULL);
+    APP_ERROR_CHECK(err_code);
+    twi_ready = true;
     nrfx_twi_enable(&m_twi);
 }
 
@@ -89,7 +89,7 @@ amk_i2c_error_t i2c_read_reg(uint8_t addr, uint8_t reg, void* data, size_t lengt
 
 void i2c_uninit(void)
 {
-    if (!twi_ready) return;
+    if (!i2c_ready()) return;
 
     nrfx_twi_disable(&m_twi);
     // anomaly [89] work around

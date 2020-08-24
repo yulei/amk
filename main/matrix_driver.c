@@ -25,7 +25,7 @@ matrix_driver_t matrix_driver;
 #   ifndef MATRIX_DETECT_PIN
 #       error "the tca6424 interrupt detect pin must be defined first"
 #   endif
-#   include "i2c_master.h"
+#   include "i2c.h"
 #   include "tca6424.h"
 #endif
 

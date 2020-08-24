@@ -14,8 +14,16 @@ INC_FOLDERS += \
 	$(MAIN_DIR)/rgb \
 	$(MAIN_DIR)/hid_desc \
 
-APP_DEFS += \
-	-DMATRIX_USE_GPIO \
+
+ifeq (yes, $(strip $(MATRIX_USE_TCA6424)))
+	APP_DEFS += -DMATRIX_USE_TCA6424
+	SRC_FILES += $(MAIN_DIR)/drivers/tca6424.c
+	SRC_FILES += $(MAIN_DIR)/drivers/i2c.c
+endif
+
+ifeq (yes, $(strip $(MATRIX_USE_GPIO)))
+	APP_DEFS += -DMATRIX_USE_GPIO
+endif
 
 ifeq (yes, $(strip $(BOOTMAGIC_ENABLE)))
 	ifeq (NRF52832, $(strip $(MCU)))
