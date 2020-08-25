@@ -18,24 +18,20 @@ APP_DEFS += \
 TARGET := $(filter-out clean flash erase flash_softdevice sdk_config help, $(MAKECMDGOALS))
 
 ifneq (, $(TARGET))
-	include $(TOP_DIR)/keyboards/$(TARGET)/$(TARGET).mk
+include $(TOP_DIR)/keyboards/$(TARGET)/$(TARGET).mk
+ifeq (NRF52832, $(strip $(MCU)))
+include $(TOP_DIR)/nrf5_sdk/nrf5_sdk.mk
+else ifeq (NRF52840, $(strip $(MCU)))
+include $(TOP_DIR)/nrf5_sdk/nrf5_sdk.mk
+else ifeq (STM32F411, $(strip $(MCU)))
+include $(TOP_DIR)/stm32_sdk/stm32_sdk.mk
+else
+$(error Unsupported MCU: $(MCU))
+endif
 endif
 
 include $(TOP_DIR)/main/main.mk
 include $(TOP_DIR)/tmk/tmk.mk
-
-ifeq (NRF52832, $(strip $(MCU)))
-include $(TOP_DIR)/nrf5_sdk/nrf5_sdk.mk
-endif
-
-ifeq (NRF52840, $(strip $(MCU)))
-include $(TOP_DIR)/nrf5_sdk/nrf5_sdk.mk
-endif
-
-ifeq (STM32F411, $(strip $(MCU)))
-include $(TOP_DIR)/stm32_sdk/stm32_sdk.mk
-endif
-
 
 
 #$(OUTPUT_DIRECTORY)/$(TARGET).out: $(LINKER_SCRIPT)
@@ -110,7 +106,7 @@ $(call define_target, $(TARGET))
 
 .PHONY: flash erase
 
-ifeq (NRF52832, $(strip $(MCU)))
+ifneq (,$(filter $(strip $(MCU)),NRF52832 NRF52840))
 .PHONY: flash_softdevice
 
 # Flash the program
@@ -120,9 +116,14 @@ flash: default
 	nrfjprog -f nrf52 --reset
 
 # Flash softdevice
+ifeq (NRF52832, $(strip $(MCU)))
+SOFTDEVICE_FILE := $(NRF5SDK_DIR)/components/softdevice/s132/hex/s132_nrf52_7.0.1_softdevice.hex
+else
+SOFTDEVICE_FILE := $(NRF5SDK_DIR)/components/softdevice/s140/hex/s140_nrf52_7.0.1_softdevice.hex
+endif
 flash_softdevice:
-	@echo Flashing: s132_nrf52_7.0.1_softdevice.hex
-	nrfjprog -f nrf52 --program $(NRF5SDK_DIR)/components/softdevice/s132/hex/s132_nrf52_7.0.1_softdevice.hex --sectorerase
+	@echo Flashing: $(notdir $(SOFTDEVICE_FILE))
+	nrfjprog -f nrf52 --program $(SOFTDEVICE_FILE) --sectorerase
 	nrfjprog -f nrf52 --reset
 
 erase:

@@ -2,23 +2,19 @@
  * controller_matrix.c
  */
 
-#include <stdint.h>
 #include <stdbool.h>
-#include <util/delay.h>
-#include "print.h"
-#include "debug.h"
-#include "util.h"
-#include "timer.h"
-#include "matrix.h"
-#include "hhkb_avr.h"
-#include <avr/wdt.h>
-#include "suspend.h"
-#include "lufa.h"
 
+#include "app_timer.h"
+#include "gpio_pin.h"
+
+#include "matrix.h"
+#include "wait.h"
+#include "timer.h"
+#include "matrix_driver.h"
 
 // matrix power saving
-#define MATRIX_POWER_SAVE       10000
 static uint32_t matrix_last_modified = 0;
+static bool matrix_powered = false;
 
 // matrix state buffer(1:on, 0:off)
 static matrix_row_t *matrix;
@@ -26,15 +22,19 @@ static matrix_row_t *matrix_prev;
 static matrix_row_t _matrix0[MATRIX_ROWS];
 static matrix_row_t _matrix1[MATRIX_ROWS];
 
+static void init_pins(void);
+static void hhkb_power_enable(void);
+//static void hhkb_power_disable(void);
+static void hhkb_key_enable(void);
+static void hhkb_key_disable(void);
+static void hhkb_key_select(uint8_t row, uint8_t col);
+static void hhkb_key_prev_on(void);
+static void hhkb_key_prev_off(void);
+static bool hhkb_key_state(void);
 
 void matrix_init(void)
 {
-#ifdef DEBUG
-    debug_enable = true;
-    debug_keyboard = true;
-#endif
-
-    KEY_INIT();
+    init_pins();
 
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) _matrix0[i] = 0x00;
@@ -52,24 +52,25 @@ uint8_t matrix_scan(void)
     matrix = tmp;
 
     // power on
-    if (!KEY_POWER_STATE()) KEY_POWER_ON();
+    hhkb_power_enable();
+
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
         for (uint8_t col = 0; col < MATRIX_COLS; col++) {
-            KEY_SELECT(row, col);
-            _delay_us(5);
+            hhkb_key_select(row, col);
+            wait_us(5);
 
             // Not sure this is needed. This just emulates HHKB controller's behaviour.
             if (matrix_prev[row] & (1<<col)) {
-                KEY_PREV_ON();
+                hhkb_key_prev_on();
             }
-            _delay_us(10);
+            wait_us(10);
 
             // NOTE: KEY_STATE is valid only in 20us after KEY_ENABLE.
             // If V-USB interrupts in this section we could lose 40us or so
             // and would read invalid value from KEY_STATE.
-            uint8_t last = TIMER_RAW;
+            uint32_t last = app_timer_cnt_get();
 
-            KEY_ENABLE();
+            hhkb_key_enable();
 
             // Wait for KEY_STATE outputs its value.
             // 1us was ok on one HHKB, but not worked on another.
@@ -83,9 +84,9 @@ uint8_t matrix_scan(void)
             // 10us wait does    work on Teensy++ with pro
             // 10us wait does    work on 328p+iwrap with pro
             // 10us wait doesn't work on tmk PCB(8MHz) with pro2(very lagged scan)
-            _delay_us(5);
+            wait_us(5);
 
-            if (KEY_STATE()) {
+            if (hhkb_key_state()) {
                 matrix[row] &= ~(1<<col);
             } else {
                 matrix[row] |= (1<<col);
@@ -94,46 +95,161 @@ uint8_t matrix_scan(void)
             // Ignore if this code region execution time elapses more than 20us.
             // MEMO: 20[us] * (TIMER_RAW_FREQ / 1000000)[count per us]
             // MEMO: then change above using this rule: a/(b/c) = a*1/(b/c) = a*(c/b)
-            if (TIMER_DIFF_RAW(TIMER_RAW, last) > 20/(1000000/TIMER_RAW_FREQ)) {
+            uint32_t current = app_timer_cnt_get();
+            if (TIMER_DIFF_32(current, last) > 20*(APP_TIMER_TICKS(1)*1000)) {
                 matrix[row] = matrix_prev[row];
             }
 
-            _delay_us(5);
-            KEY_PREV_OFF();
-            KEY_UNABLE();
-
+            wait_us(5);
+            hhkb_key_prev_off();
+            hhkb_key_disable();
+            
             // NOTE: KEY_STATE keep its state in 20us after KEY_ENABLE.
             // This takes 25us or more to make sure KEY_STATE returns to idle state.
 #ifdef HHKB_JP
             // Looks like JP needs faster scan due to its twice larger matrix
             // or it can drop keys in fast key typing
-            _delay_us(30);
+            wait_us(30);
 #else
-            _delay_us(75);
+            wait_us(75);
 #endif
         }
         if (matrix[row] ^ matrix_prev[row]) matrix_last_modified = timer_read32();
     }
     // power off
-    if (KEY_POWER_STATE() &&
+    /*if (KEY_POWER_STATE() &&
             (USB_DeviceState == DEVICE_STATE_Suspended ||
              USB_DeviceState == DEVICE_STATE_Unattached ) &&
             timer_elapsed32(matrix_last_modified) > MATRIX_POWER_SAVE) {
         KEY_POWER_OFF();
         suspend_power_down();
-    }
+    }*/
     return 1;
 }
 
-inline
-matrix_row_t matrix_get_row(uint8_t row)
+matrix_row_t matrix_get_row(uint8_t row) { return matrix[row]; }
+
+static void init_pins(void)
 {
-    return matrix[row];
+    gpio_set_input_pullup(HHKB_KEY_IN);
+    gpio_set_output_pushpull(HHKB_POWER_EN);
+    gpio_write_pin(HHKB_POWER_EN, 0);
+    gpio_set_output_pushpull(HHKB_HYS);
+    gpio_write_pin(HHKB_HYS, 0);
+    gpio_set_output_pushpull(HHKB_HC_A);
+    gpio_write_pin(HHKB_HC_A, 0);
+    gpio_set_output_pushpull(HHKB_HC_B);
+    gpio_write_pin(HHKB_HC_B, 0);
+    gpio_set_output_pushpull(HHKB_HC_C);
+    gpio_write_pin(HHKB_HC_C, 0);
+    gpio_set_output_pushpull(HHKB_LS_A);
+    gpio_write_pin(HHKB_LS_A, 0);
+    gpio_set_output_pushpull(HHKB_LS_B);
+    gpio_write_pin(HHKB_LS_B, 0);
+    gpio_set_output_pushpull(HHKB_LS_C);
+    gpio_write_pin(HHKB_LS_C, 0);
+    gpio_set_output_pushpull(HHKB_LS_D);
+    gpio_write_pin(HHKB_LS_D, 1);
 }
 
-void matrix_power_up(void) {
-    KEY_POWER_ON();
+static void hhkb_power_enable(void)
+{
+    if (matrix_powered)
+        return;
+    gpio_write_pin(HHKB_POWER_EN, 1);
+    wait_ms(5);
+    matrix_powered = true;
 }
-void matrix_power_down(void) {
-    KEY_POWER_OFF();
+
+
+static void hhkb_power_disable(void)
+{
+    if (!matrix_powered)
+        return;
+    gpio_write_pin(HHKB_POWER_EN, 0);
+    matrix_powered = true;
+}
+
+static void hhkb_key_enable(void)
+{
+    gpio_write_pin(HHKB_LS_D, 0);
+}
+
+static void hhkb_key_disable(void)
+{
+    gpio_write_pin(HHKB_LS_D, 1);
+}
+
+static void hhkb_key_prev_on(void)
+{
+    gpio_write_pin(HHKB_HYS, 1);
+}
+
+static void hhkb_key_prev_off(void)
+{
+    gpio_write_pin(HHKB_HYS, 0);
+}
+
+static bool hhkb_key_state(void)
+{
+    return gpio_read_pin(HHKB_KEY_IN) == 0 ? false : true;
+}
+
+static void hhkb_key_select(uint8_t row, uint8_t col)
+{
+    gpio_write_pin(HHKB_HC_A, (row>>0) & 0x01);
+    gpio_write_pin(HHKB_HC_B, (row>>1) & 0x01);
+    gpio_write_pin(HHKB_HC_C, (row>>2) & 0x01);
+
+    gpio_write_pin(HHKB_LS_A, (col>>0) & 0x01);
+    gpio_write_pin(HHKB_LS_B, (col>>1) & 0x01);
+    gpio_write_pin(HHKB_LS_C, (col>>2) & 0x01);
+}
+
+//======================================
+// matrix driver interface
+typedef struct {
+    matrix_event_callback   event_callback;
+    bool                    trigger_mode;
+} matrix_driver_t;
+
+matrix_driver_t matrix_driver;
+
+void matrix_driver_init(void)
+{
+    matrix_driver.event_callback    = NULL;
+    matrix_driver.trigger_mode      = false;
+    matrix_init();
+}
+
+void matrix_driver_trigger_start(matrix_event_callback event_cb)
+{
+    matrix_driver.event_callback = event_cb;
+}
+
+void matrix_driver_trigger_stop(void)
+{
+}
+
+void matrix_driver_scan_start(void)
+{
+}
+
+void matrix_driver_scan_stop(void)
+{
+}
+
+void matrix_driver_prepare_sleep(void)
+{
+    hhkb_power_disable();
+}
+
+bool matrix_driver_keys_off(void)
+{
+    for (int i = 0; i < MATRIX_ROWS; i++) {
+        if (matrix[i] != 0) {
+            return false;
+        }
+    }
+    return true;
 }
