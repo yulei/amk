@@ -22,11 +22,13 @@ typedef struct {
 matrix_driver_t matrix_driver;
 
 #ifdef MATRIX_USE_TCA6424
-#   ifndef MATRIX_DETECT_PIN
-#       error "the tca6424 interrupt detect pin must be defined first"
-#   endif
-#   include "i2c.h"
-#   include "tca6424.h"
+    #ifndef MATRIX_DETECT_PIN
+        #error "the tca6424 interrupt detect pin must be defined first"
+    #endif
+#include "i2c.h"
+#include "tca6424.h"
+#include "nrf_gpio.h"
+#include "nrf_drv_gpiote.h"
 #endif
 
 #ifndef DEBOUNCE
@@ -128,33 +130,6 @@ static void matrix_prepare_sleep(void)
     nrf_gpio_cfg_output(RGBLIGHT_EN_PIN);
     nrf_gpio_pin_clear(RGBLIGHT_EN_PIN);
 
-    
-    //nrf_gpio_cfg_output(INDICATOR_PIN);
-    //nrf_gpio_pin_clear(INDICATOR_PIN);
-    //nrf_gpio_cfg_output(28);
-    //nrf_gpio_pin_clear(28);
-    
-    //nrf_gpio_cfg_output(27);
-    //nrf_gpio_pin_clear(27);
-    //nrf_gpio_cfg_output(BATTERY_SAADC_ENABLE_PIN);
-    //nrf_gpio_pin_clear(BATTERY_SAADC_ENABLE_PIN);
-    
-    //nrf_gpio_cfg_output(21);
-    //nrf_gpio_pin_set(21);
-
-    /*nrf_gpio_cfg_output(19);
-    nrf_gpio_pin_clear(19);
-
-    nrf_gpio_cfg_output(20);
-    nrf_gpio_pin_clear(20);
-    */
-    
-    //nrf_gpio_cfg_output(11);
-    //nrf_gpio_pin_set(11);
-
-    //nrf_gpio_cfg_output(12);
-    //nrf_gpio_pin_set(12);
-
     for (uint32_t i = 0; i < MATRIX_COLS; i++) {
         nrf_gpio_cfg_output(col_pins[i]);
         nrf_gpio_pin_set(col_pins[i]);
@@ -222,7 +197,7 @@ static void matrix_pin_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polari
     }
 }
 
-static void matrix_trigger_start(matrix_event_callback_f event_cb)
+static void matrix_trigger_start(void)
 {
     if (matrix_driver.trigger_mode) {
         return;
@@ -239,7 +214,6 @@ static void matrix_trigger_start(matrix_event_callback_f event_cb)
     APP_ERROR_CHECK(err_code);
     nrf_drv_gpiote_in_event_enable(MATRIX_DETECT_PIN, true);
     matrix_driver.trigger_mode = true;
-    matrix_driver.event_callback = event_cb;
     i2c_uninit();
     NRF_LOG_INFO("keyboard matrix trigger mode started");
 }
@@ -280,7 +254,6 @@ static void matrix_prepare_sleep(void)
 #else
 #error "Custom matrix implementation not supported"
 #endif
-;
 
 __attribute__((weak))
 void matrix_init_kb(void){}
@@ -308,14 +281,22 @@ uint8_t matrix_scan(void)
 {
     bool changed = false;
     for (int col = 0; col < MATRIX_COLS; col++) {
+        #ifdef MATRIX_USE_TCA6424
+        set_pin(col_pins[col]);
+        #else
         gpio_write_pin(col_pins[col], 1);
+        #endif
         wait_us(30);
 
         for(uint8_t row = 0; row < MATRIX_ROWS; row++) {
             matrix_row_t last_row_value    = raw_matrix[row];
             matrix_row_t current_row_value = last_row_value;
 
+        #ifdef MATRIX_USE_TCA6424
+            if (read_pin(row_pins[row])) {
+        #else
             if (gpio_read_pin(row_pins[row])) {
+        #endif
                 current_row_value |= (1 << col);
             } else {
                 current_row_value &= ~(1 << col);
@@ -326,7 +307,12 @@ uint8_t matrix_scan(void)
                 changed = true;
             }
         }
+
+        #ifdef MATRIX_USE_TCA6424
+        clear_pin(col_pins[col]);
+        #else
         gpio_write_pin(col_pins[col], 0);
+        #endif
     }
 
     if (changed && !debouncing) {
@@ -406,4 +392,3 @@ void hook_matrix_change(keyevent_t event)
         ble_driver.matrix_changed = 1;
     }
 }
-
