@@ -24,7 +24,7 @@ static matrix_row_t _matrix1[MATRIX_ROWS];
 
 static void init_pins(void);
 static void hhkb_power_enable(void);
-//static void hhkb_power_disable(void);
+static void hhkb_power_disable(void);
 static void hhkb_key_enable(void);
 static void hhkb_key_disable(void);
 static void hhkb_key_select(uint8_t row, uint8_t col);
@@ -132,24 +132,20 @@ matrix_row_t matrix_get_row(uint8_t row) { return matrix[row]; }
 static void init_pins(void)
 {
     gpio_set_input_pullup(HHKB_KEY_IN);
+
     gpio_set_output_pushpull(HHKB_POWER_EN);
-    gpio_write_pin(HHKB_POWER_EN, 0);
     gpio_set_output_pushpull(HHKB_HYS);
-    gpio_write_pin(HHKB_HYS, 0);
     gpio_set_output_pushpull(HHKB_HC_A);
-    gpio_write_pin(HHKB_HC_A, 0);
     gpio_set_output_pushpull(HHKB_HC_B);
-    gpio_write_pin(HHKB_HC_B, 0);
     gpio_set_output_pushpull(HHKB_HC_C);
-    gpio_write_pin(HHKB_HC_C, 0);
     gpio_set_output_pushpull(HHKB_LS_A);
-    gpio_write_pin(HHKB_LS_A, 0);
     gpio_set_output_pushpull(HHKB_LS_B);
-    gpio_write_pin(HHKB_LS_B, 0);
     gpio_set_output_pushpull(HHKB_LS_C);
-    gpio_write_pin(HHKB_LS_C, 0);
     gpio_set_output_pushpull(HHKB_LS_D);
-    gpio_write_pin(HHKB_LS_D, 1);
+
+    hhkb_key_disable();
+    hhkb_key_prev_off();
+    hhkb_power_disable();
 }
 
 static void hhkb_power_enable(void)
@@ -167,7 +163,7 @@ static void hhkb_power_disable(void)
     if (!matrix_powered)
         return;
     gpio_write_pin(HHKB_POWER_EN, 0);
-    matrix_powered = true;
+    matrix_powered = false;
 }
 
 static void hhkb_key_enable(void)
