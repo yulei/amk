@@ -23,6 +23,7 @@
  *
  */
 
+#include <string.h>
 #include "usb_descriptors.h"
 #include "util.h"
 

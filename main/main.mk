@@ -12,7 +12,6 @@ INC_FOLDERS += \
 	$(MAIN_DIR)/porting \
 	$(MAIN_DIR)/drivers \
 	$(MAIN_DIR)/rgb \
-	$(MAIN_DIR)/hid_desc \
 
 
 ifeq (yes, $(strip $(MATRIX_USE_TCA6424)))

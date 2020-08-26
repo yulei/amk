@@ -8,7 +8,7 @@
 #include "app_usbd.h"
 #include "app_usbd_core.h"
 #include "app_usbd_hid_generic.h"
-#include "hid_desc.h"
+#include "usb_def.h"
 
 // event listener
 static void hid_user_ev_handler(app_usbd_class_inst_t const * p_inst,

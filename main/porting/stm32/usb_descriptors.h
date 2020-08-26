@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "hid_desc.h"
+#include "usb_def.h"
 
 typedef enum {
   REPORT_ID_KEYBOARD = 1,

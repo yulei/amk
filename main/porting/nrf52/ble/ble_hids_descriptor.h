@@ -6,7 +6,7 @@
 #pragma once
 
 #include "ble_config.h"
-#include "hid_desc.h"
+#include "usb_def.h"
 
 const static uint8_t hid_report_descriptor [] = {
     TUD_HID_REPORT_DESC_KEYBOARD( HID_REPORT_ID(NRF_REPORT_ID_KEYBOARD) ),
