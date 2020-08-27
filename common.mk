@@ -49,7 +49,7 @@ VERBOSE ?= 0
 PRETTY  ?= 1
 ABSOLUTE_PATHS ?= 0
 PASS_INCLUDE_PATHS_VIA_FILE ?= 0
-PASS_LINKER_INPUT_VIA_FILE  ?= 0
+PASS_LINKER_INPUT_VIA_FILE  ?= 1
 
 .SUFFIXES: # ignore built-in rules
 %.d:       # don't try to make .d files
@@ -284,18 +284,20 @@ endef
 	$(call run,$(CC) -x assembler-with-cpp,$(ASMFLAGS),Assembling)
 
 ifeq ($(PASS_LINKER_INPUT_VIA_FILE),1)
-#GENERATE_LD_INPUT_FILE = $(call dump, $^ $(LIB_FILES)) > $(@:.out=.in)
-GENERATE_LD_INPUT_FILE = $(file >$(@:.out=.in), $^ $(LIB_FILES))
+define GENERATE_LD_INPUT_FILE
+@echo $2 $(LIB_FILES) > $1
+endef
 LD_INPUT               = @$(@:.out=.in)
 else
-GENERATE_LD_INPUT_FILE =
+define GENERATE_LD_INPUT_FILE
+endef
 LD_INPUT               = $^ $(LIB_FILES)
 endif
 
 # Link object files
 %.out: 
 	$(info $(call PROGRESS,Linking target: $@))
-	$(NO_ECHO)$(GENERATE_LD_INPUT_FILE)
+	$(call GENERATE_LD_INPUT_FILE,$(@:.out=.in),$^)
 	$(NO_ECHO)$(CC) $(LDFLAGS) $(LD_INPUT) -Wl,-Map=$(@:.out=.map) -o $@
 	$(NO_ECHO)$(SIZE) $@
 
