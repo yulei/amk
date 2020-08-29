@@ -16,6 +16,7 @@
 #include "action_util.h"
 #include "mousekey.h"
 
+extern void Error_Handler(void); 
 extern USBD_HandleTypeDef hUsbDeviceFS;
 
 /**

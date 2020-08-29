@@ -237,17 +237,6 @@ $(eval $(1) := $(2)) \
 $(call prepare_build, $(1), $(OUTPUT_FILE).inc, $(1))
 endef
 
-# $1 content to be dumped
-# Invokes another instance of MAKE to dump the specified content to stdout,
-# which may be then redirected in shell to a file and this way stored there.
-# MAKE in version prior to 4.0 does not provide the $(file ...) function.
-#define dump
-#$(eval CONTENT_TO_DUMP := $(1)) \
-#"$(MAKE)" -s --no-print-directory \
-#  -f "dump.mk" VARIABLE=CONTENT_TO_DUMP
-#endef
-#export CONTENT_TO_DUMP
-
 .PHONY: $(TARGETS) all
 
 all: $(TARGETS)
@@ -260,8 +249,7 @@ $(OUTPUT_DIRECTORY)/%/.: | $(OUTPUT_DIRECTORY)
 
 $(OUTPUT_DIRECTORY)/%.inc: Makefile | $(OUTPUT_DIRECTORY)
 	$(info Generating $@)
-	$(file >$@, $(call target_specific, INC_PATHS, $*))
-	#$(NO_ECHO)$(call dump, $(call target_specific, INC_PATHS, $*)) > $@
+	@echo $(call target_specific, INC_PATHS, $*) > $@
 
 # $1 command
 # $2 flags
