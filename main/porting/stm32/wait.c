@@ -2,7 +2,7 @@
  * wait.c
  */
 
-#include "stm32f4xx_hal.h"
+#include "generic_hal.h"
 #include "wait.h"
 
 void wait_ms(int ms)

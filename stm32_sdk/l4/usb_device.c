@@ -37,11 +37,12 @@
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-
+extern void Error_Handler(void);
 /* USER CODE END PFP */
 
 /* USB Device Core handle declaration. */
 USBD_HandleTypeDef hUsbDeviceFS;
+extern USBD_DescriptorsTypeDef FS_Desc;
 
 /*
  * -- Insert your variables declaration here --
@@ -80,7 +81,6 @@ void MX_USB_DEVICE_Init(void)
   {
     Error_Handler();
   }
-
   /* USER CODE BEGIN USB_DEVICE_Init_PostTreatment */
 
   /* USER CODE END USB_DEVICE_Init_PostTreatment */

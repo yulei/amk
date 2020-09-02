@@ -11,8 +11,8 @@
     #include "nrf_gpio.h"
     typedef uint32_t pin_t;
     #define MAKE_PIN(port, pin) NRF_GPIO_PIN_MAP(port, pin)
-#elif defined(STM32F411xE)
-    #include "stm32f4xx_hal.h"
+#elif defined(STM32F411xE) || defined(STM32L433xx) 
+    #include "generic_hal.h"
     typedef struct {
         GPIO_TypeDef *port;
         uint16_t pin;

@@ -3,7 +3,7 @@
  * timer based on systemtick
  */
 
-#include "stm32f4xx_hal.h"
+#include "generic_hal.h"
 #include "timer.h"
 
 void timer_init(void) {}

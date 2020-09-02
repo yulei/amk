@@ -1,7 +1,7 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    stm32l0xx_it.h
+  * @file    stm32l4xx_it.h
   * @brief   This file contains the headers of the interrupt handlers.
   ******************************************************************************
   * @attention
@@ -19,8 +19,8 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32L0xx_IT_H
-#define __STM32L0xx_IT_H
+#ifndef __STM32L4xx_IT_H
+#define __STM32L4xx_IT_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -49,7 +49,11 @@
 /* Exported functions prototypes ---------------------------------------------*/
 void NMI_Handler(void);
 void HardFault_Handler(void);
+void MemManage_Handler(void);
+void BusFault_Handler(void);
+void UsageFault_Handler(void);
 void SVC_Handler(void);
+void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
 void USB_IRQHandler(void);
@@ -61,6 +65,6 @@ void USB_IRQHandler(void);
 }
 #endif
 
-#endif /* __STM32L0xx_IT_H */
+#endif /* __STM32L4xx_IT_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

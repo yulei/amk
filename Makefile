@@ -25,6 +25,8 @@ else ifeq (NRF52840, $(strip $(MCU)))
 include $(TOP_DIR)/nrf5_sdk/nrf5_sdk.mk
 else ifeq (STM32F411, $(strip $(MCU)))
 include $(TOP_DIR)/stm32_sdk/stm32_sdk.mk
+else ifeq (STM32L433, $(strip $(MCU)))
+include $(TOP_DIR)/stm32_sdk/stm32_sdk.mk
 else
 $(error Unsupported MCU: $(MCU))
 endif

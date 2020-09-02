@@ -3,7 +3,7 @@
  */
 
 #include <string.h>
-#include "stm32f4xx_hal.h"
+#include "generic_hal.h"
 #include "gpio_pin.h"
 
 int gpio_read_pin(pin_t pin)

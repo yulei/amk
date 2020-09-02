@@ -263,27 +263,6 @@ enum {
 
 #define TUSB_DESC_CONFIG_POWER_MA(x)  ((x)/2)
 
-/// Device State TODO remove
-typedef enum
-{
-  TUSB_DEVICE_STATE_UNPLUG = 0  ,
-  TUSB_DEVICE_STATE_CONFIGURED  ,
-  TUSB_DEVICE_STATE_SUSPENDED   ,
-}tusb_device_state_t;
-
-typedef enum
-{
-  XFER_RESULT_SUCCESS,
-  XFER_RESULT_FAILED,
-  XFER_RESULT_STALLED,
-}xfer_result_t;
-
-enum // TODO remove
-{
-  DESC_OFFSET_LEN  = 0,
-  DESC_OFFSET_TYPE = 1
-};
-
 enum
 {
   INTERFACE_INVALID_NUMBER = 0xff

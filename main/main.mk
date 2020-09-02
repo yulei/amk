@@ -34,6 +34,9 @@ ifeq (yes, $(strip $(BOOTMAGIC_ENABLE)))
 	ifeq (STM32F411, $(strip $(MCU)))
 		SRC_FILES += $(MAIN_DIR)/porting/eeconfig_mem.c
 	endif
+	ifeq (STM32L433, $(strip $(MCU)))
+		SRC_FILES += $(MAIN_DIR)/porting/eeconfig_mem.c
+	endif
 	SRC_FILES += $(MAIN_DIR)/eeprom_manager.c
 endif
 
@@ -57,6 +60,9 @@ ifneq (yes, $(strip $(CUSTOM_MATRIX)))
 	ifeq (STM32F411, $(strip $(MCU)))
 		SRC_FILES += $(MAIN_DIR)/matrix_amk.c
 	endif
+	ifeq (STM32L433, $(strip $(MCU)))
+		SRC_FILES += $(MAIN_DIR)/matrix_amk.c
+	endif
 endif
 
 ifneq (,$(filter $(strip $(MCU)),NRF52832 NRF52840))
@@ -64,6 +70,13 @@ ifneq (,$(filter $(strip $(MCU)),NRF52832 NRF52840))
 endif
 
 ifeq (STM32F411, $(strip $(MCU)))
+	SRC_FILES += $(MAIN_DIR)/suspend.c
+	SRC_FILES += $(MAIN_DIR)/rtt/SEGGER_RTT.c
+	SRC_FILES += $(MAIN_DIR)/rtt/SEGGER_RTT_printf.c
+	include $(MAIN_DIR)/porting/stm32.mk
+endif
+
+ifeq (STM32L433, $(strip $(MCU)))
 	SRC_FILES += $(MAIN_DIR)/suspend.c
 	SRC_FILES += $(MAIN_DIR)/rtt/SEGGER_RTT.c
 	SRC_FILES += $(MAIN_DIR)/rtt/SEGGER_RTT_printf.c
