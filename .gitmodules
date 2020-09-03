@@ -1,3 +1,6 @@
 [submodule "tmk/tmk"]
 	path = tmk/tmk
 	url = https://github.com/tmk/tmk_keyboard.git
+[submodule "lvgl/core"]
+	path = lvgl/core
+	url = https://github.com/lvgl/lvgl.git
