@@ -18,3 +18,7 @@ endif
 ifeq (STM32L433, $(strip $(MCU)))
 	SRC_FILES += $(STM32_PORTING_DIR)/stm32l433xx.c
 endif
+
+ifeq (STM32F722, $(strip $(MCU)))
+	SRC_FILES += $(STM32_PORTING_DIR)/stm32f722xx.c
+endif

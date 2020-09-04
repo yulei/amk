@@ -1,0 +1,17 @@
+
+ONEKEY_DIR := $(TOP_DIR)/keyboards/onekey
+
+SRC_FILES += \
+	$(ONEKEY_DIR)/onekey.c \
+	$(ONEKEY_DIR)/onekey_keymap.c \
+
+INC_FOLDERS += \
+	$(ONEKEY_DIR) \
+
+#MCU = STM32F722
+#MCU = STM32F411 
+MCU = STM32L433
+BOOTMAGIC_ENABLE = yes
+MOUSEKEY_ENABLE = yes
+EXTRAKEY_ENABLE = yes
+#RGB_EFFECTS_ENABLE = yes

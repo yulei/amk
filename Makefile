@@ -1,5 +1,4 @@
 PROJECT_NAME     := amk
-OUTPUT_DIRECTORY := _build
 
 TOP_DIR ?= .
 
@@ -17,6 +16,8 @@ APP_DEFS += \
 
 TARGET := $(filter-out clean flash erase flash_softdevice sdk_config help, $(MAKECMDGOALS))
 
+OUTPUT_DIRECTORY := build/$(TARGET)
+
 ifneq (, $(TARGET))
 include $(TOP_DIR)/keyboards/$(TARGET)/$(TARGET).mk
 ifeq (NRF52832, $(strip $(MCU)))
@@ -26,6 +27,8 @@ include $(TOP_DIR)/nrf5_sdk/nrf5_sdk.mk
 else ifeq (STM32F411, $(strip $(MCU)))
 include $(TOP_DIR)/stm32_sdk/stm32_sdk.mk
 else ifeq (STM32L433, $(strip $(MCU)))
+include $(TOP_DIR)/stm32_sdk/stm32_sdk.mk
+else ifeq (STM32F722, $(strip $(MCU)))
 include $(TOP_DIR)/stm32_sdk/stm32_sdk.mk
 else
 $(error Unsupported MCU: $(MCU))
@@ -50,10 +53,13 @@ OPT = -Og -g3 -DDEBUG
 # C flags common to all targets
 CFLAGS += $(OPT)
 CFLAGS += $(APP_DEFS)
-CFLAGS += -mcpu=cortex-m4
-CFLAGS += -mthumb -mabi=aapcs
+CFLAGS += $(SDK_DEFS)
+#CFLAGS += -mcpu=cortex-m4
+#CFLAGS += -mthumb -mabi=aapcs
+#CFLAGS += -mthumb
+#CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
+#CFLAGS += -mfloat-abi=hard
 CFLAGS += -Wall -Werror
-CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 # keep every function in a separate section, this allows linker to discard unused ones
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin -fshort-enums
@@ -62,17 +68,14 @@ CFLAGS += -fno-builtin -fshort-enums
 CXXFLAGS += $(OPT)
 
 # Assembler flags common to all targets
+ASMFLAGS += $(OPT)
 ASMFLAGS += $(APP_DEFS)
-ASMFLAGS += -g3
-ASMFLAGS += -mcpu=cortex-m4
-ASMFLAGS += -mthumb -mabi=aapcs
-ASMFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
+ASMFLAGS += $(SDK_DEFS)
 
 # Linker flags
 LDFLAGS += $(OPT)
-LDFLAGS += -mthumb -mabi=aapcs -L$(LINKER_PATH) -T$(LINKER_SCRIPT)
-LDFLAGS += -mcpu=cortex-m4
-LDFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
+LDFLAGS += $(SDK_DEFS)
+LDFLAGS += -L$(LINKER_PATH) -T$(LINKER_SCRIPT)
 # let linker dump unused sections
 LDFLAGS += -Wl,--gc-sections
 # use newlib in nano version
@@ -138,13 +141,24 @@ sdk_config:
 
 endif
 
-ifeq (STM32F411, $(strip $(MCU)))
+
+FLASH_TARGET := $(filter $(strip $(MCU)),STM32F411 STM32F722 STM32L433)
+ifneq (,$(FLASH_TARGET))
+	ifeq (STM32F411, $(FLASH_TARGET))
+	FLASH_TARGET := STM32F411xE
+	endif
+	ifeq (STM32F722, $(FLASH_TARGET))
+	FLASH_TARGET := STM32F22xE
+	endif
+	ifeq (STM32L433, $(FLASH_TARGET))
+	FLASH_TARGET := STM32L433xC
+	endif
 
 flash: default
 	@echo Flashing: $(OUTPUT_DIRECTORY)/$(TARGET).hex
-	pylink flash -t swd -d STM32F411xE $(OUTPUT_DIRECTORY)/$(TARGET).hex
+	pylink flash -t swd -d $(FLASH_TARGET) $(OUTPUT_DIRECTORY)/$(TARGET).hex
 
 erase:
-	pylink erase -t swd -d STM32F411xE
+	pylink erase -t swd -d $(FLASH_TARGET) 
 
 endif

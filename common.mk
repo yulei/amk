@@ -55,7 +55,7 @@ PASS_LINKER_INPUT_VIA_FILE  ?= 1
 %.d:       # don't try to make .d files
 .PRECIOUS: %.d %.o
 
-MK := mkdir
+MK := mkdir -p
 RM := rm -rf
 CP := cp
 
@@ -291,17 +291,17 @@ endif
 
 # Create binary .bin file from the .out file
 %.bin: %.out
-	$(info Preparing: $@)
-	$(NO_ECHO)$(OBJCOPY) -O binary $< $@
+	$(info Preparing: $(notdir $@))
+	$(NO_ECHO)$(OBJCOPY) -O binary $< $(OUTPUT_DIRECTORY)/../$(notdir $@)
 
 # Create binary .hex file from the .out file
 %.hex: %.out
-	$(info Preparing: $@)
-	$(NO_ECHO)$(OBJCOPY) -O ihex $< $@
+	$(info Preparing: $(notdir $@))
+	$(NO_ECHO)$(OBJCOPY) -O ihex $< $(OUTPUT_DIRECTORY)/../$(notdir $@)
 
 # Copy file to elf
 %.elf: %.out
-	$(info Preparing: $@)
-	$(NO_ECHO)$(CP)  $< $@
+	$(info Preparing: $(notdir $@))
+	$(NO_ECHO)$(CP)  $< $(OUTPUT_DIRECTORY)/../$(notdir $@)
 
 endif # ifneq (,$(filter clean, $(MAKECMDGOALS)))

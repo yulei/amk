@@ -197,6 +197,8 @@ APP_DEFS += \
 	-D__STACK_SIZE=8192 \
 	#-DCONFIG_GPIO_AS_PINRESET \
 
+SDK_DEFS += -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16
+
 ifeq (NRF52832, $(strip $(MCU)))
 	INC_FOLDERS += $(NRF5SDK_DIR)/components/softdevice/s132/headers
 	INC_FOLDERS += $(NRF5SDK_DIR)/components/softdevice/s132/headers/nrf52
