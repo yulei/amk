@@ -40,7 +40,6 @@
 /* USER CODE END PV */
 
 PCD_HandleTypeDef hpcd_USB_FS;
-void Error_Handler(void);
 
 /* USER CODE BEGIN 0 */
 

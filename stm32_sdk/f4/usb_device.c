@@ -37,7 +37,6 @@
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-extern void Error_Handler(void);
 /* USER CODE END PFP */
 
 /* USB Device Core handle declaration. */

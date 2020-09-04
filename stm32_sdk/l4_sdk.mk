@@ -47,5 +47,7 @@ APP_DEFS += \
 	-DUSE_HAL_DRIVER \
 	-DSTM32L433xx \
 
+SDK_DEFS += -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16
+
 LINKER_PATH		:= $(STM32SDK_DIR)
 LINKER_SCRIPT	:= $(STM32SDK_DIR)/STM32L433RCTx_FLASH.ld
