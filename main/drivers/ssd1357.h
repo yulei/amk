@@ -1,5 +1,5 @@
 /**
- * ssd1331.h
+ * ssd1357.h
  */
 
 #pragma once
@@ -24,8 +24,8 @@ typedef struct {
     pin_t reset;
     pin_t cs;
     pin_t dc;
-} ssd1331_t;
+} ssd1357_t;
 
-bool ssd1331_init(ssd1331_t* driver);
-void ssd1331_fill_rect(ssd1331_t* driver, rect_t rect, const void *data, size_t size);
-void ssd1331_uninit(ssd1331_t* driver);
+bool ssd1357_init(ssd1357_t* driver);
+void ssd1357_fill_rect(ssd1357_t* driver, rect_t rect, const void *data, size_t size);
+void ssd1357_uninit(ssd1357_t* driver);

@@ -35,6 +35,7 @@ $(error Unsupported MCU: $(MCU))
 endif
 endif
 
+include $(TOP_DIR)/lvgl/lvgl.mk
 include $(TOP_DIR)/main/main.mk
 include $(TOP_DIR)/tmk/tmk.mk
 

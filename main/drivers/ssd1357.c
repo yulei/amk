@@ -1,7 +1,7 @@
 /**
- * ssd1331.c
+ * ssd1357.c
  */
-#include "ssd1331.h"
+#include "ssd1357.h"
 
 #define BRIGHTNESS 0x0F
 
@@ -151,7 +151,7 @@ static const uint8_t gamma_colorC[31] =
         0xB4,
 };
 
-static void write_command(ssd1331_t *driver, uint8_t command)
+static void write_command(ssd1357_t *driver, uint8_t command)
 {
     gpio_write_pin(driver->cs, 0);
     gpio_write_pin(driver->dc, 0);
@@ -162,7 +162,7 @@ static void write_command(ssd1331_t *driver, uint8_t command)
     gpio_write_pin(driver->dc, 1);
 }
 
-static void write_data(ssd1331_t *driver, uint8_t data)
+static void write_data(ssd1357_t *driver, uint8_t data)
 {
     gpio_write_pin(driver->cs, 0);
     gpio_write_pin(driver->dc, 1);
@@ -173,7 +173,7 @@ static void write_data(ssd1331_t *driver, uint8_t data)
     gpio_write_pin(driver->dc, 1);
 }
 
-static void write_data_buffer(ssd1331_t *driver, const void *data, size_t size)
+static void write_data_buffer(ssd1357_t *driver, const void *data, size_t size)
 {
     gpio_write_pin(driver->cs, 0);
     gpio_write_pin(driver->dc, 1);
@@ -187,31 +187,31 @@ static void write_data_buffer(ssd1331_t *driver, const void *data, size_t size)
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //  Instruction Setting
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-static void set_column_address(ssd1331_t *driver, uint8_t begin, uint8_t end)
+static void set_column_address(ssd1357_t *driver, uint8_t begin, uint8_t end)
 {
     write_command(driver, 0x15); // Set Column Address
     write_data(driver, begin);   // Default => 0x00
     write_data(driver, end);     // Default => 0x7F
 }
 
-static void set_row_address(ssd1331_t *driver, uint8_t begin, uint8_t end)
+static void set_row_address(ssd1357_t *driver, uint8_t begin, uint8_t end)
 {
     write_command(driver, 0x75); // Set Row Address
     write_data(driver, begin);   // Default => 0x00
     write_data(driver, end);     // Default => 0x7F
 }
 
-static void set_write_ram(ssd1331_t *driver)
+static void set_write_ram(ssd1357_t *driver)
 {
     write_command(driver, 0x5C); // Enable MCU to Write into RAM
 }
 
-static void set_read_ram(ssd1331_t *driver)
+static void set_read_ram(ssd1357_t *driver)
 {
     write_command(driver, 0x5D); // Enable MCU to Read from RAM
 }
 
-static void set_remap_format(ssd1331_t *driver, uint8_t format)
+static void set_remap_format(ssd1357_t *driver, uint8_t format)
 {
     write_command(driver, 0xA0);// A[0]=0b, Horizontal address increment [reset]
     write_data(driver, format); // DA[1]=0b, Column address 0 is mapped to SEG0 [reset]
@@ -223,19 +223,19 @@ static void set_remap_format(ssd1331_t *driver, uint8_t format)
     write_data(driver, 0x00);   // Default => 0x01 (Disable Dual COM Mode)
 }
 
-static void set_start_line(ssd1331_t *driver, uint8_t line)
+static void set_start_line(ssd1357_t *driver, uint8_t line)
 {
     write_command(driver, 0xA1); // Set Vertical Scroll by RAM
     write_data(driver, line);    // Default => 0x00
 }
 
-static void set_display_offset(ssd1331_t *driver, uint8_t offset)
+static void set_display_offset(ssd1357_t *driver, uint8_t offset)
 {
     write_command(driver, 0xA2); // Set Display Offset
     write_data(driver, offset);  // Default => 0x00
 }
 
-static void set_display_mode(ssd1331_t *driver, uint8_t mode)
+static void set_display_mode(ssd1357_t *driver, uint8_t mode)
 {
     write_command(driver, mode); // Set Display Mode
                                  // Default => 0xA4
@@ -245,7 +245,7 @@ static void set_display_mode(ssd1331_t *driver, uint8_t mode)
                                  // 0xA7 => Inverse Display
 }
 
-static void set_display_on_off(ssd1331_t *driver, uint8_t onoff)
+static void set_display_on_off(ssd1357_t *driver, uint8_t onoff)
 {
     write_command(driver, onoff); // Set Display On/Off
                                   // Default => 0xAE
@@ -253,7 +253,7 @@ static void set_display_on_off(ssd1331_t *driver, uint8_t onoff)
                                   // 0xAF (0x01) => Display On (Sleep Mode Off)
 }
 
-static void set_phase_length(ssd1331_t *driver, uint8_t phase)
+static void set_phase_length(ssd1357_t *driver, uint8_t phase)
 {
     write_command(driver, 0xB1); // Phase 1 (Reset) & Phase 2 (Pre-Charge) Period Adjustment
     write_data(driver, phase);   // Default => 0x84 (16 Display Clocks [Phase 2] / 8 Display Clocks [Phase 1])
@@ -261,7 +261,7 @@ static void set_phase_length(ssd1331_t *driver, uint8_t phase)
                                  // D[7:4] => Phase 2 Period in 2~30 Display Clocks
 }
 
-static void set_display_clock(ssd1331_t *driver, uint8_t clock)
+static void set_display_clock(ssd1357_t *driver, uint8_t clock)
 {
     write_command(dirver, 0xB3); // Set Display Clock Divider / Oscillator Frequency
     write_data(dirver, clock);   // Default => 0x20
@@ -269,53 +269,53 @@ static void set_display_clock(ssd1331_t *driver, uint8_t clock)
                                  // A[7:4] => Oscillator Frequency
 }
 
-static void set_precharge_period(ssd1331_t *driver, uint8_t period)
+static void set_precharge_period(ssd1357_t *driver, uint8_t period)
 {
     write_command(driver, 0xB6); // Set Second Pre-Charge Period
     write_data(driver, period);  // Default => 0x08 (8 Display Clocks)
 }
 
-static void set_gray_scale_table(ssd1331_t *driver)
+static void set_gray_scale_table(ssd1357_t *driver)
 {
     write_command(driver, 0xB8); // Set Gray Scale Table
 
     write_data_buffer(driver, gamma, sizeof(gamma));
 }
 
-static void set_linear_gray_scale_table(ssd1331_t *driver)
+static void set_linear_gray_scale_table(ssd1357_t *driver)
 {
     write_command(driver, 0xB9); // Set Default Linear Gray Scale Table
 }
 
-static void set_precharge_voltage(ssd1331_t *driver, unsigned char d)
+static void set_precharge_voltage(ssd1357_t *driver, unsigned char d)
 {
     write_command(driver, 0xBB); // Set Pre-Charge Voltage Level
     write_data(driver, d);       // Default => 0x1E (0.50*VCC)
 }
 
-static set_gray_pulse_width_color(ssd1331_t *driver, uint8_t command, const void *data, size_t size)
+static set_gray_pulse_width_color(ssd1357_t *driver, uint8_t command, const void *data, size_t size)
 {
     write_command(driver, command);
     write_data_buffer(driver, data, size);
 }
 
-static void set_gray_scale_pulse_width_colora(ssd1331_t *driver, void)
+static void set_gray_scale_pulse_width_colora(ssd1357_t *driver, void)
 {
     set_gray_pulse_width_color(driver, 0xBC, gamma_colorA, sizeof(gamma_colorA));
 }
 
-static void set_gray_scale_pulse_width_colorc(ssd1331_t *driver, void)
+static void set_gray_scale_pulse_width_colorc(ssd1357_t *driver, void)
 {
     set_gray_pulse_width_color(driver, 0xBD, gamma_colorC, sizeof(gamma_colorC));
 }
 
-static void set_vcomh(ssd1331_t *driver, uint8_t level)
+static void set_vcomh(ssd1357_t *driver, uint8_t level)
 {
     write_command(driver, 0xBE); // Set COM Deselect Voltage Level
     write_data(driver, level);   // Default => 0x05 (0.82*VCC)
 }
 
-static void set_contrast_current(ssd1331_t *driver, uint8_t color_a, uint8_t color_b, uint8_t color_c)
+static void set_contrast_current(ssd1357_t *driver, uint8_t color_a, uint8_t color_b, uint8_t color_c)
 {
     write_command(driver, 0xC1); // Set Contrast Current
     write_data(driver, color_a); // Contrast Value Color A Default => 0x7F
@@ -323,13 +323,13 @@ static void set_contrast_current(ssd1331_t *driver, uint8_t color_a, uint8_t col
     write_data(driver, color_c); // Contrast Value Color C Default => 0x7F
 }
 
-static void set_master_current(ssd1331_t *driver, uint8_t current)
+static void set_master_current(ssd1357_t *driver, uint8_t current)
 {
     write_command(driver, 0xC7); // Master Contrast Current Control
     write_data(driver, current); // Default => 0x0f (Maximum)
 }
 
-static void set_multiplex_ratio(ssd1331_t *driver, uint8_t ratio)
+static void set_multiplex_ratio(ssd1357_t *driver, uint8_t ratio)
 {
     write_command(driver, 0xCA); // Set Multiplex Ratio
     write_data(driver, ratio);   // Default => 0x7F (1/128 Duty)
@@ -340,10 +340,10 @@ static void set_nop(void)
     write_command(driver, 0xE3); // Command for No Operation
 }
 
-static void set_command_lock(ssd1331_t *driver, uint8_t lock)
+static void set_command_lock(ssd1357_t *driver, uint8_t lock)
 {
-    write_command(0xFD); // Set Command Lock
-    write_data(lock);    // Default => 0x12
+    write_command(driver, 0xFD); // Set Command Lock
+    write_data(driver, lock);    // Default => 0x12
                          // 0x12 => Driver IC interface is unlocked from entering command.
                          // 0x16 => All Commands are locked except 0xFD.
 }
@@ -351,31 +351,28 @@ static void set_command_lock(ssd1331_t *driver, uint8_t lock)
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //  Show Regular Pattern (Full Screen)
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-static void fill_screen(ssd1331_t *driver, uint16_t color)
+static void fill_screen(ssd1357_t *driver, uint16_t color)
 {
     set_column_address(driver, 0x20, 0x5F);
     set_row_address(driver, 0x00, 0x3F);
-    set_write_ram(driver, );
+    set_write_ram(driver);
 
-    for (i = 0; i < 64; i++)
-    {
-        for (j = 0; j < 64; j++)
-        {
+    for (int i = 0; i < 64; i++) {
+        for (intj = 0; j < 64; j++) {
             write_data_buffer(driver, &color, sizeof(color));
         }
     }
 }
 
-static void flush_screen(ssd1331_t *driver, const void *data, size_t size)
+static void flush_screen(ssd1357_t *driver, const void *data, size_t size)
 {
     set_column_address(driver, 0x20, 0x5F);
     set_row_address(driver, 0x00, 0x3F);
-    set_write_ram(driver, );
+    set_write_ram(driver);
     write_data_buffer(driver, data, size);
 }
-}
 
-bool ssd1331_init(ssd1331_t *driver)
+bool ssd1357_init(ssd1357_t *driver)
 {
     gpio_write_pin(driver->reset, 0);
     wait_ms(200);
@@ -410,8 +407,12 @@ bool ssd1331_init(ssd1331_t *driver)
     return true;
 }
 
-void ssd1331_fill_rect(ssd1331_t *driver, rect_t rect, const void *data, size_t size)
+void ssd1357_fill_rect(ssd1357_t *driver, rect_t rect, const void *data, size_t size)
 {
+    set_column_address(driver, 0x20+rect.pos.y, 0x20+rect.pos.y+rect.height);
+    set_column_address(driver, 0x00+rect.pos.x, 0x00+rect.pos.x+rect.width);
+    set_write_ram(driver);
+    write_data_buffer(driver, data, size);
 }
 
 void ssd1331_uninit(void)
