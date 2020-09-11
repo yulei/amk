@@ -105,6 +105,7 @@ SRC_FILES += \
 		$(LVGL_DIR)/core/src/lv_gpu/lv_gpu_stm32_dma2d.c \
 
 INC_FOLDERS += \
+		$(LVGL_DIR)/core \
 		$(LVGL_DIR)/core/src/lv_core \
 		$(LVGL_DIR)/core/src/lv_hal \
 		$(LVGL_DIR)/core/src/lv_widgets \
@@ -115,3 +116,4 @@ INC_FOLDERS += \
 		$(LVGL_DIR)/core/src/lv_gpu \
 
 APP_DEFS += \
+		-DLV_CONF_INCLUDE_SIMPLE

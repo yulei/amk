@@ -244,6 +244,7 @@ all: $(TARGETS)
 # Create build directories
 $(OUTPUT_DIRECTORY):
 	$(MK) $@
+
 $(OUTPUT_DIRECTORY)/%/.: | $(OUTPUT_DIRECTORY)
 	cd $(OUTPUT_DIRECTORY) && $(MK) $*
 
@@ -292,16 +293,16 @@ endif
 # Create binary .bin file from the .out file
 %.bin: %.out
 	$(info Preparing: $(notdir $@))
-	$(NO_ECHO)$(OBJCOPY) -O binary $< $(OUTPUT_DIRECTORY)/../$(notdir $@)
+	$(NO_ECHO)$(OBJCOPY) -O binary $< $(OUTPUT_DIRECTORY)/$(notdir $@)
 
 # Create binary .hex file from the .out file
 %.hex: %.out
 	$(info Preparing: $(notdir $@))
-	$(NO_ECHO)$(OBJCOPY) -O ihex $< $(OUTPUT_DIRECTORY)/../$(notdir $@)
+	$(NO_ECHO)$(OBJCOPY) -O ihex $< $(OUTPUT_DIRECTORY)/$(notdir $@)
 
 # Copy file to elf
 %.elf: %.out
 	$(info Preparing: $(notdir $@))
-	$(NO_ECHO)$(CP)  $< $(OUTPUT_DIRECTORY)/../$(notdir $@)
+	$(NO_ECHO)$(CP)  $< $(OUTPUT_DIRECTORY)/$(notdir $@)
 
 endif # ifneq (,$(filter clean, $(MAKECMDGOALS)))

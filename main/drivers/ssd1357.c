@@ -2,161 +2,51 @@
  * ssd1357.c
  */
 #include "ssd1357.h"
+#include "spi.h"
+#include "wait.h"
 
 #define BRIGHTNESS 0x0F
+#define DEFAULT_TIMEOUT 100
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //  Gray Scale Table Setting (Full Screen)
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-static const uint8_t gamma[63] =
-    {
-        0x02,
-        0x03,
-        0x04,
-        0x05,
-        0x06,
-        0x07,
-        0x08,
-        0x09,
-        0x0A,
-        0x0B,
-        0x0C,
-        0x0D,
-        0x0E,
-        0x0F,
-        0x10,
-        0x11,
-        0x12,
-        0x13,
-        0x15,
-        0x17,
-        0x19,
-        0x1B,
-        0x1D,
-        0x1F,
-        0x21,
-        0x23,
-        0x25,
-        0x27,
-        0x2A,
-        0x2D,
-        0x30,
-        0x33,
-        0x36,
-        0x39,
-        0x3C,
-        0x3F,
-        0x42,
-        0x45,
-        0x48,
-        0x4C,
-        0x50,
-        0x54,
-        0x58,
-        0x5C,
-        0x60,
-        0x64,
-        0x68,
-        0x6C,
-        0x70,
-        0x74,
-        0x78,
-        0x7D,
-        0x82,
-        0x87,
-        0x8C,
-        0x91,
-        0x96,
-        0x9B,
-        0xA0,
-        0xA5,
-        0xAA,
-        0xAF,
-        0xB4,
+static const uint8_t gamma[] = {
+    0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A,
+    0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13,
+    0x15, 0x17, 0x19, 0x1B, 0x1D, 0x1F, 0x21, 0x23, 0x25,
+    0x27, 0x2A, 0x2D, 0x30, 0x33, 0x36, 0x39, 0x3C, 0x3F,
+    0x42, 0x45, 0x48, 0x4C, 0x50, 0x54, 0x58, 0x5C, 0x60,
+    0x64, 0x68, 0x6C, 0x70, 0x74, 0x78, 0x7D, 0x82, 0x87,
+    0x8C, 0x91, 0x96, 0x9B, 0xA0, 0xA5, 0xAA, 0xAF, 0xB4,
 };
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //  Gray Scale Pulse Width for Color A
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-static const uint8_t gamma_colorA[31] =
-    {
-        0x02,
-        0x03,
-        0x04,
-        0x05,
-        0x06,
-        0x07,
-        0x08,
-        0x09,
-        0x0A,
-        0x0B,
-        0x0C,
-        0x0D,
-        0x0E,
-        0x0F,
-        0x10,
-        0x11,
-        0x12,
-        0x13,
-        0x15,
-        0x17,
-        0x19,
-        0x1B,
-        0x1D,
-        0x1F,
-        0x21,
-        0x23,
-        0x25,
-        0x27,
-        0x2A,
-        0x2D,
-        0xB4,
-};
+/*static const uint8_t gamma_colorA[] = {
+    0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+    0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11,
+    0x12, 0x13, 0x15, 0x17, 0x19, 0x1B, 0x1D, 0x1F,
+    0x21, 0x23, 0x25, 0x27, 0x2A, 0x2D, 0xB4,
+};*/
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //  Gray Scale Pulse Width for Color C
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-static const uint8_t gamma_colorC[31] =
-    {
-        0x02,
-        0x03,
-        0x04,
-        0x05,
-        0x06,
-        0x07,
-        0x08,
-        0x09,
-        0x0A,
-        0x0B,
-        0x0C,
-        0x0D,
-        0x0E,
-        0x0F,
-        0x10,
-        0x11,
-        0x12,
-        0x13,
-        0x15,
-        0x17,
-        0x19,
-        0x1B,
-        0x1D,
-        0x1F,
-        0x21,
-        0x23,
-        0x25,
-        0x27,
-        0x2A,
-        0x2D,
-        0xB4,
-};
+/*static const uint8_t gamma_colorC[] = {
+    0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+    0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11,
+    0x12, 0x13, 0x15, 0x17, 0x19, 0x1B, 0x1D, 0x1F,
+    0x21, 0x23, 0x25, 0x27, 0x2A, 0x2D, 0xB4,
+};*/
 
 static void write_command(ssd1357_t *driver, uint8_t command)
 {
     gpio_write_pin(driver->cs, 0);
     gpio_write_pin(driver->dc, 0);
 
-    spi_send(&command, sizeof(command));
+    spi_send(&command, sizeof(command), DEFAULT_TIMEOUT);
 
     gpio_write_pin(driver->cs, 1);
     gpio_write_pin(driver->dc, 1);
@@ -167,7 +57,7 @@ static void write_data(ssd1357_t *driver, uint8_t data)
     gpio_write_pin(driver->cs, 0);
     gpio_write_pin(driver->dc, 1);
 
-    spi_send(&data, sizeof(data));
+    spi_send(&data, sizeof(data), DEFAULT_TIMEOUT);
 
     gpio_write_pin(driver->cs, 1);
     gpio_write_pin(driver->dc, 1);
@@ -178,7 +68,7 @@ static void write_data_buffer(ssd1357_t *driver, const void *data, size_t size)
     gpio_write_pin(driver->cs, 0);
     gpio_write_pin(driver->dc, 1);
 
-    spi_send(&data, size);
+    spi_send(&data, size, DEFAULT_TIMEOUT);
 
     gpio_write_pin(driver->cs, 1);
     gpio_write_pin(driver->dc, 1);
@@ -206,10 +96,12 @@ static void set_write_ram(ssd1357_t *driver)
     write_command(driver, 0x5C); // Enable MCU to Write into RAM
 }
 
+/*
 static void set_read_ram(ssd1357_t *driver)
 {
     write_command(driver, 0x5D); // Enable MCU to Read from RAM
 }
+*/
 
 static void set_remap_format(ssd1357_t *driver, uint8_t format)
 {
@@ -263,8 +155,8 @@ static void set_phase_length(ssd1357_t *driver, uint8_t phase)
 
 static void set_display_clock(ssd1357_t *driver, uint8_t clock)
 {
-    write_command(dirver, 0xB3); // Set Display Clock Divider / Oscillator Frequency
-    write_data(dirver, clock);   // Default => 0x20
+    write_command(driver, 0xB3); // Set Display Clock Divider / Oscillator Frequency
+    write_data(driver, clock);   // Default => 0x20
                                  // A[3:0] => Display Clock Divider
                                  // A[7:4] => Oscillator Frequency
 }
@@ -281,19 +173,19 @@ static void set_gray_scale_table(ssd1357_t *driver)
 
     write_data_buffer(driver, gamma, sizeof(gamma));
 }
-
+/*
 static void set_linear_gray_scale_table(ssd1357_t *driver)
 {
     write_command(driver, 0xB9); // Set Default Linear Gray Scale Table
-}
+}*/
 
 static void set_precharge_voltage(ssd1357_t *driver, unsigned char d)
 {
     write_command(driver, 0xBB); // Set Pre-Charge Voltage Level
     write_data(driver, d);       // Default => 0x1E (0.50*VCC)
 }
-
-static set_gray_pulse_width_color(ssd1357_t *driver, uint8_t command, const void *data, size_t size)
+/*
+static void set_gray_pulse_width_color(ssd1357_t *driver, uint8_t command, const void *data, size_t size)
 {
     write_command(driver, command);
     write_data_buffer(driver, data, size);
@@ -308,6 +200,7 @@ static void set_gray_scale_pulse_width_colorc(ssd1357_t *driver, void)
 {
     set_gray_pulse_width_color(driver, 0xBD, gamma_colorC, sizeof(gamma_colorC));
 }
+*/
 
 static void set_vcomh(ssd1357_t *driver, uint8_t level)
 {
@@ -335,10 +228,10 @@ static void set_multiplex_ratio(ssd1357_t *driver, uint8_t ratio)
     write_data(driver, ratio);   // Default => 0x7F (1/128 Duty)
 }
 
-static void set_nop(void)
+/*static void set_nop(void)
 {
     write_command(driver, 0xE3); // Command for No Operation
-}
+}*/
 
 static void set_command_lock(ssd1357_t *driver, uint8_t lock)
 {
@@ -358,19 +251,19 @@ static void fill_screen(ssd1357_t *driver, uint16_t color)
     set_write_ram(driver);
 
     for (int i = 0; i < 64; i++) {
-        for (intj = 0; j < 64; j++) {
+        for (int j = 0; j < 64; j++) {
             write_data_buffer(driver, &color, sizeof(color));
         }
     }
 }
-
+/*
 static void flush_screen(ssd1357_t *driver, const void *data, size_t size)
 {
     set_column_address(driver, 0x20, 0x5F);
     set_row_address(driver, 0x00, 0x3F);
     set_write_ram(driver);
     write_data_buffer(driver, data, size);
-}
+}*/
 
 bool ssd1357_init(ssd1357_t *driver)
 {
@@ -407,10 +300,10 @@ bool ssd1357_init(ssd1357_t *driver)
     return true;
 }
 
-void ssd1357_fill_rect(ssd1357_t *driver, rect_t rect, const void *data, size_t size)
+void ssd1357_fill_rect(ssd1357_t* driver, uint32_t x, uint32_t y, uint32_t width, uint32_t height, const void *data, size_t size)
 {
-    set_column_address(driver, 0x20+rect.pos.y, 0x20+rect.pos.y+rect.height);
-    set_column_address(driver, 0x00+rect.pos.x, 0x00+rect.pos.x+rect.width);
+    set_row_address(driver, 0x00+x, 0x00+x+width-1);
+    set_column_address(driver, 0x20+y, 0x20+y+height-1);
     set_write_ram(driver);
     write_data_buffer(driver, data, size);
 }

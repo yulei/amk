@@ -12,6 +12,7 @@ INC_FOLDERS += \
 	$(MAIN_DIR)/porting \
 	$(MAIN_DIR)/drivers \
 	$(MAIN_DIR)/rgb \
+	$(MAIN_DIR)/screen \
 
 
 ifeq (yes, $(strip $(MATRIX_USE_TCA6424)))
@@ -33,6 +34,14 @@ ifeq (yes, $(strip $(BOOTMAGIC_ENABLE)))
 	endif
 
 	SRC_FILES += $(MAIN_DIR)/eeprom_manager.c
+endif
+
+ifeq (yes, $(strip $(SCREEN_ENABLE)))
+	LVGL_ENABLE = yes
+	APP_DEFS += -DSCREEN_ENABLE
+	SRC_FILES += $(MAIN_DIR)/drivers/spi.c
+	SRC_FILES += $(MAIN_DIR)/drivers/ssd1357.c
+	SRC_FILES += $(MAIN_DIR)/screen/lvgl_driver.c
 endif
 
 ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))

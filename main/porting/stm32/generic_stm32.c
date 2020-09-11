@@ -16,6 +16,10 @@
 #include "action_util.h"
 #include "mousekey.h"
 
+#ifdef SCREEN_ENABLE
+#include "lvgl_driver.h"
+#endif
+
 extern void Error_Handler(void); 
 extern USBD_HandleTypeDef hUsbDeviceFS;
 extern void custom_board_init(void);
@@ -166,4 +170,21 @@ void usb_suspend_cb(void)
 bool usb_ready(void)
 {
     return hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED;
+}
+
+/**
+  * @brief This function handles System tick timer.
+  */
+void SysTick_Handler(void)
+{
+    /* USER CODE BEGIN SysTick_IRQn 0 */
+
+    /* USER CODE END SysTick_IRQn 0 */
+    HAL_IncTick();
+    /* USER CODE BEGIN SysTick_IRQn 1 */
+    #ifdef SCREEN_ENABLE
+    lvgl_driver_ticks(1);
+    #endif
+
+    /* USER CODE END SysTick_IRQn 1 */
 }

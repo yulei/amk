@@ -16,7 +16,7 @@ APP_DEFS += \
 
 TARGET := $(filter-out clean flash erase flash_softdevice sdk_config help, $(MAKECMDGOALS))
 
-OUTPUT_DIRECTORY := build/$(TARGET)
+OUTPUT_DIRECTORY := build
 
 ifneq (, $(TARGET))
 include $(TOP_DIR)/keyboards/$(TARGET)/$(TARGET).mk
@@ -35,10 +35,12 @@ $(error Unsupported MCU: $(MCU))
 endif
 endif
 
-include $(TOP_DIR)/lvgl/lvgl.mk
 include $(TOP_DIR)/main/main.mk
 include $(TOP_DIR)/tmk/tmk.mk
 
+ifeq (yes,$(LVGL_ENABLE))
+include $(TOP_DIR)/lvgl/lvgl.mk
+endif
 
 #$(OUTPUT_DIRECTORY)/$(TARGET).out: $(LINKER_SCRIPT)
 
