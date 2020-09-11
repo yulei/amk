@@ -12,7 +12,8 @@ static ssd1357_t ssd1357_drivers[SCREEN_NUM] = {
     {SCREEN_1_RESET, SCREEN_1_CS, SCREEN_1_DC},
 };
 
-static void disp_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
+static lv_disp_drv_t screen_driver;
+static void disp_flush(struct _disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p);
 
 void screen_init(void)
 {
@@ -28,20 +29,16 @@ void screen_init(void)
     lv_disp_buf_init(&disp_buf, buf_1, buf_2, LV_HOR_RES_MAX * LV_VER_RES_MAX);
 
 
-    lv_disp_drv_t disp_drv;
-    lv_disp_drv_init(&disp_drv);
+    lv_disp_drv_init(&screen_driver);
 
-    disp_drv.hor_res = LV_HOR_RES_MAX;
-    disp_drv.ver_res = LV_VER_RES_MAX;
+    screen_driver.hor_res = LV_HOR_RES_MAX;
+    screen_driver.ver_res = LV_VER_RES_MAX;
 
-    /*Used to copy the buffer's content to the display*/
-    disp_drv.flush_cb = disp_flush;
-
-    /*Set a display buffer*/
-    disp_drv.buffer = &disp_buf;
+    screen_driver.flush_cb = disp_flush;
+    screen_driver.buffer = &disp_buf;
 
     /*Finally register the driver*/
-    lv_disp_drv_register(&disp_drv);
+    lv_disp_drv_register(&screen_driver);
 }
 
 void screen_task(void)
@@ -101,4 +98,11 @@ void disp_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_
         }
     }
     lv_disp_flush_ready(disp_drv);
+}
+
+void screen_test(void)
+{
+    lv_obj_t * label1 =  lv_label_create(lv_scr_act(), NULL);
+    lv_label_set_text(label1, "Hello world!");
+    lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
 }
