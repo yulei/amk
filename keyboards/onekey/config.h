@@ -17,5 +17,15 @@
 #define MATRIX_ROWS 1
 #define MATRIX_COLS 1
 
-#define MATRIX_ROW_PINS {  B0}
+#define MATRIX_ROW_PINS { B15}
 #define MATRIX_COL_PINS { C15}
+
+#define SCREEN_NUM      2
+
+#define SCREEN_0_RESET  A0
+#define SCREEN_0_CS     A1
+#define SCREEN_0_DC     A2
+
+#define SCREEN_1_RESET  B0
+#define SCREEN_1_CS     B1
+#define SCREEN_1_DC     B2

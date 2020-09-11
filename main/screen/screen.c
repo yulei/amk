@@ -1,16 +1,20 @@
 /**
- * lvgl_driver.c
+ * screen.c
  */
 
-#include "lvgl_driver.h"
+#include "screen.h"
+#include "gpio_pin.h"
 #include "ssd1357.h"
 #include "lvgl.h"
 
-static ssd1357_t ssd1357_drivers[2];
+static ssd1357_t ssd1357_drivers[SCREEN_NUM] = {
+    {SCREEN_0_RESET, SCREEN_0_CS, SCREEN_0_DC},
+    {SCREEN_1_RESET, SCREEN_1_CS, SCREEN_1_DC},
+};
 
 static void disp_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 
-void lvgl_driver_init(void)
+void screen_init(void)
 {
     lv_init();
 
@@ -40,15 +44,15 @@ void lvgl_driver_init(void)
     lv_disp_drv_register(&disp_drv);
 }
 
-void lvgl_driver_task(void)
+void screen_task(void)
 {
     lv_task_handler();
 }
 
-void lvgl_driver_uninit(void)
+void screen_uninit(void)
 {}
 
-void lvgl_driver_ticks(uint32_t ticks)
+void screen_ticks(uint32_t ticks)
 {
     lv_tick_inc(ticks);
 }
@@ -96,4 +100,5 @@ void disp_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_
                             sizeof(lv_color_t) * (width2*height));
         }
     }
+    lv_disp_flush_ready(disp_drv);
 }

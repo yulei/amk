@@ -17,7 +17,7 @@
 #include "mousekey.h"
 
 #ifdef SCREEN_ENABLE
-#include "lvgl_driver.h"
+#include "screen.h"
 #endif
 
 extern void Error_Handler(void); 
@@ -57,7 +57,6 @@ void board_init(void)
 
     custom_board_init();
 
-
     amk_init();
 }
 
@@ -66,6 +65,9 @@ void board_task(void)
     switch (hUsbDeviceFS.dev_state) {
     case USBD_STATE_CONFIGURED:
         keyboard_task();
+        #ifdef SCREEN_ENABLE
+        screen_task();
+        #endif
         break;
     case USBD_STATE_SUSPENDED:
         // in suspend state
@@ -86,6 +88,9 @@ static void amk_init(void)
 {
     keyboard_init();
     host_set_driver(&amk_driver);
+    #ifdef SCREEN_ENABLE
+    screen_init();
+    #endif
 }
 
 static void DWT_Delay_Init(void)
@@ -183,7 +188,7 @@ void SysTick_Handler(void)
     HAL_IncTick();
     /* USER CODE BEGIN SysTick_IRQn 1 */
     #ifdef SCREEN_ENABLE
-    lvgl_driver_ticks(1);
+    screen_ticks(1);
     #endif
 
     /* USER CODE END SysTick_IRQn 1 */

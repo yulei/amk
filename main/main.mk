@@ -41,7 +41,7 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 	APP_DEFS += -DSCREEN_ENABLE
 	SRC_FILES += $(MAIN_DIR)/drivers/spi.c
 	SRC_FILES += $(MAIN_DIR)/drivers/ssd1357.c
-	SRC_FILES += $(MAIN_DIR)/screen/lvgl_driver.c
+	SRC_FILES += $(MAIN_DIR)/screen/screen.c
 endif
 
 ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))
