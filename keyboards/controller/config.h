@@ -9,7 +9,7 @@
 #define PRODUCT_ID 0x4848   // HH
 #define DEVICE_VER 0x0001
 #define MANUFACTURER astro
-#define PRODUCT HHKB BLE controller
+#define PRODUCT HHKB BLE
 
 /* key matrix size */
 #define MATRIX_ROWS 8
