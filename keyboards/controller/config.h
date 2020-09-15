@@ -32,3 +32,7 @@
 #define HHKB_LS_B                   14
 #define HHKB_LS_C                   13
 #define HHKB_LS_D                   12
+
+// because hhkb need active scanning, just disable sleep currently 
+// because the power saving mode for hhkb was not implemented yet
+#define DISABLE_SLEEP

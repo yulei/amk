@@ -22,10 +22,15 @@ ble_driver_t ble_driver = {
     .ble_led = 0,
     .usb_led = 0,
     .vbus_enabled = 0,
-#ifdef MATRIX_USE_GPIO 
+#ifdef MATRIX_USE_GPIO
     .trigger_enabled = 0,
 #else
     .trigger_enabled = 1,
+#endif
+#ifdef DISABLE_SLEEP
+    .sleep_enabled = 0,
+#else
+    .sleep_enabled = 1,
 #endif
     .output_target = OUTPUT_BLE,
     .matrix_changed = 0,
