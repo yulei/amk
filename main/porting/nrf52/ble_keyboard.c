@@ -146,8 +146,10 @@ static void keyboard_timout_handler(void *p_context)
     } else {
         if (!keyboard_rgb_on()) {
             ble_driver.scan_count++;
-        } else if (ble_driver.battery_power <= BATTERY_LED_THRESHHOLD) {
-            keyboard_set_rgb(false);
+        } else {
+            if (ble_driver.battery_power <= BATTERY_LED_THRESHHOLD) {
+                keyboard_set_rgb(false);
+            }
         }
     }
 

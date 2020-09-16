@@ -14,15 +14,16 @@ extern void keyboard_set_rgb(bool on);
 
 void matrix_init_kb(void)
 {
-    //gpio_set_output_pushpull(INDICATOR_PIN);
-    //gpio_write_pin(INDICATOR_PIN, 1);
+    gpio_set_output_pushpull(CAPS_LED_PIN);
 }
 
 void keyboard_prepare_sleep(void)
 {
     // turn off rgb
     keyboard_set_rgb(false);
-    //gpio_write_pin(INDICATOR_PIN, 0);
+    // turn off caps
+    gpio_write_pin(CAPS_LED_PIN, 0);
+    gpio_set_input_floating(CAPS_LED_PIN);
 }
 
 const aw9523b_led_t g_aw9523b_leds[AW9523B_LED_NUM] = {
@@ -35,10 +36,8 @@ const aw9523b_led_t g_aw9523b_leds[AW9523B_LED_NUM] = {
 void led_set(uint8_t led)
 {
     if (led & (1 << USB_LED_CAPS_LOCK)) {
-        gpio_set_output_pushpull(CAPS_LED_PIN);
         gpio_write_pin(CAPS_LED_PIN, 1);
     } else {
-        gpio_set_output_pushpull(CAPS_LED_PIN);
         gpio_write_pin(CAPS_LED_PIN, 0);
     }
 }

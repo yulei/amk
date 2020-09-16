@@ -145,12 +145,11 @@ static void uart_event_handle(app_uart_evt_t *p_event)
             app_uart_flush();
             break;
         case APP_UART_DATA_READY: {
-            uint8_t d = 0;
-            if (NRF_SUCCESS == app_uart_get(&d)) {
-                uart_process(d);
-            }
-            }
-            break;
+                uint8_t d = 0;
+                if (NRF_SUCCESS == app_uart_get(&d)) {
+                    uart_process(d);
+                }
+            } break;
         case APP_UART_TX_EMPTY:
             break;
         default:
