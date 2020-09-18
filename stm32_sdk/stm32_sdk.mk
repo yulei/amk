@@ -11,3 +11,7 @@ endif
 ifeq (STM32F722, $(strip $(MCU)))
 include $(STM32SDK_DIR)/f7_sdk.mk
 endif
+
+ifeq (STM32F103, $(strip $(MCU)))
+include $(STM32SDK_DIR)/f1_sdk.mk
+endif

@@ -26,10 +26,10 @@ ifeq (yes, $(strip $(MATRIX_USE_GPIO)))
 endif
 
 ifeq (yes, $(strip $(BOOTMAGIC_ENABLE)))
-	ifneq (,$(filter $(strip $(MCU)),NRF52832 NRF52840))
+	ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
 		SRC_FILES += $(MAIN_DIR)/porting/nrf52/eeconfig_fds.c
 	endif
-	ifneq (,$(filter $(strip $(MCU)),STM32F411 STM32L433 STM32F722))
+	ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
 		SRC_FILES += $(MAIN_DIR)/porting/eeconfig_mem.c
 	endif
 
@@ -55,19 +55,19 @@ ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))
 endif
 
 ifneq (yes, $(strip $(CUSTOM_MATRIX)))
-	ifneq (,$(filter $(strip $(MCU)),NRF52832 NRF52840))
+	ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
 		SRC_FILES += $(MAIN_DIR)/matrix_driver.c
 	endif
-	ifneq (,$(filter $(strip $(MCU)),STM32F411 STM32L433 STM32F722))
+	ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
 		SRC_FILES += $(MAIN_DIR)/matrix_amk.c
 	endif
 endif
 
-ifneq (,$(filter $(strip $(MCU)),NRF52832 NRF52840))
+ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
 	include $(MAIN_DIR)/porting/nrf52.mk
 endif
 
-ifneq (,$(filter $(strip $(MCU)),STM32F411 STM32L433 STM32F722))
+ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
 	SRC_FILES += $(MAIN_DIR)/suspend.c
 	SRC_FILES += $(MAIN_DIR)/rtt/SEGGER_RTT.c
 	SRC_FILES += $(MAIN_DIR)/rtt/SEGGER_RTT_printf.c

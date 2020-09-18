@@ -11,7 +11,7 @@
     #include "nrf_gpio.h"
     typedef uint32_t pin_t;
     #define MAKE_PIN(port, pin) NRF_GPIO_PIN_MAP(port, pin)
-#elif defined(STM32F411xE) || defined(STM32L433xx) || defined(STM32F722xx)
+#elif defined(STM32F411xE) || defined(STM32L433xx) || defined(STM32F722xx) || defined(STM32F103xB)
     #include "generic_hal.h"
     typedef struct {
         GPIO_TypeDef *port;
@@ -69,6 +69,23 @@
     #define C13 MAKE_PIN(GPIOC, GPIO_PIN_13)
     #define C14 MAKE_PIN(GPIOC, GPIO_PIN_14)
     #define C15 MAKE_PIN(GPIOC, GPIO_PIN_15)
+
+    #define D0 MAKE_PIN(GPIOD, GPIO_PIN_0)
+    #define D1 MAKE_PIN(GPIOD, GPIO_PIN_1)
+    #define D2 MAKE_PIN(GPIOD, GPIO_PIN_2)
+    #define D3 MAKE_PIN(GPIOD, GPIO_PIN_3)
+    #define D4 MAKE_PIN(GPIOD, GPIO_PIN_4)
+    #define D5 MAKE_PIN(GPIOD, GPIO_PIN_5)
+    #define D6 MAKE_PIN(GPIOD, GPIO_PIN_6)
+    #define D7 MAKE_PIN(GPIOD, GPIO_PIN_7)
+    #define D8 MAKE_PIN(GPIOD, GPIO_PIN_8)
+    #define D9 MAKE_PIN(GPIOD, GPIO_PIN_9)
+    #define D10 MAKE_PIN(GPIOD, GPIO_PIN_10)
+    #define D11 MAKE_PIN(GPIOD, GPIO_PIN_11)
+    #define D12 MAKE_PIN(GPIOD, GPIO_PIN_12)
+    #define D13 MAKE_PIN(GPIOD, GPIO_PIN_13)
+    #define D14 MAKE_PIN(GPIOD, GPIO_PIN_14)
+    #define D15 MAKE_PIN(GPIOD, GPIO_PIN_15)
 #else
     #error "MCU_TYPE not defined"
 #endif

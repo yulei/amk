@@ -1,4 +1,6 @@
-PROJECT_NAME     := amk
+PROJECT_NAME := amk
+NRF_MCUS := NRF52832 NRF52840
+STM32_MCUS := STM32F103 STM32F411 STM32F722 STM32L433
 
 TOP_DIR ?= .
 
@@ -20,15 +22,9 @@ OUTPUT_DIRECTORY := build
 
 ifneq (, $(TARGET))
 include $(TOP_DIR)/keyboards/$(TARGET)/$(TARGET).mk
-ifeq (NRF52832, $(strip $(MCU)))
+ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
 include $(TOP_DIR)/nrf5_sdk/nrf5_sdk.mk
-else ifeq (NRF52840, $(strip $(MCU)))
-include $(TOP_DIR)/nrf5_sdk/nrf5_sdk.mk
-else ifeq (STM32F411, $(strip $(MCU)))
-include $(TOP_DIR)/stm32_sdk/stm32_sdk.mk
-else ifeq (STM32L433, $(strip $(MCU)))
-include $(TOP_DIR)/stm32_sdk/stm32_sdk.mk
-else ifeq (STM32F722, $(strip $(MCU)))
+else ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
 include $(TOP_DIR)/stm32_sdk/stm32_sdk.mk
 else
 $(error Unsupported MCU: $(MCU))
@@ -114,7 +110,7 @@ $(call define_target, $(TARGET))
 
 .PHONY: flash erase
 
-ifneq (,$(filter $(strip $(MCU)),NRF52832 NRF52840))
+ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
 .PHONY: flash_softdevice
 
 # Flash the program
@@ -145,7 +141,7 @@ sdk_config:
 endif
 
 
-FLASH_TARGET := $(filter $(strip $(MCU)),STM32F411 STM32F722 STM32L433)
+FLASH_TARGET := $(filter $(strip $(MCU)),$(STM32_MCUS))
 ifneq (,$(FLASH_TARGET))
 	ifeq (STM32F411, $(FLASH_TARGET))
 	FLASH_TARGET := STM32F411xE
@@ -155,6 +151,9 @@ ifneq (,$(FLASH_TARGET))
 	endif
 	ifeq (STM32L433, $(FLASH_TARGET))
 	FLASH_TARGET := STM32L433xC
+	endif
+	ifeq (STM32F103, $(FLASH_TARGET))
+	FLASH_TARGET := STM32F103xB
 	endif
 
 flash: default
