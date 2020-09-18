@@ -31,7 +31,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "main.h"
 #include "stm32f1xx.h"
 #include "stm32f1xx_hal.h"
 
@@ -73,7 +72,6 @@
 /*---------- -----------*/
 #define USBD_SELF_POWERED     1
 /*---------- -----------*/
-#define HID_FS_BINTERVAL     0xA
 
 /****************************************/
 /* #define for FS and HS identification */

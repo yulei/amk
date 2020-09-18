@@ -53,9 +53,14 @@ tusb_desc_device_t const desc_device =
 
 // Invoked when received GET DEVICE DESCRIPTOR
 // Application return pointer to descriptor
-uint8_t const * tud_descriptor_device_cb(void)
+uint8_t* tud_descriptor_device_cb(void)
 {
-  return (uint8_t const *) &desc_device;
+  return (uint8_t *) &desc_device;
+}
+
+uint32_t tud_descriptor_device_size(void)
+{
+  return sizeof(desc_device);
 }
 
 //--------------------------------------------------------------------+
@@ -73,48 +78,62 @@ uint8_t const desc_hid_report[] =
 // Invoked when received GET HID REPORT DESCRIPTOR
 // Application return pointer to descriptor
 // Descriptor contents must exist long enough for transfer to complete
-uint8_t const * tud_hid_descriptor_report_cb(void)
+uint8_t* tud_descriptor_hid_report_cb(void)
 {
-  return desc_hid_report;
+  return (uint8_t*)desc_hid_report;
+}
+
+uint32_t tud_descriptor_hid_report_size(void)
+{
+  return sizeof(desc_hid_report);
 }
 
 //--------------------------------------------------------------------+
 // Configuration Descriptor
 //--------------------------------------------------------------------+
 
-enum
-{
-  ITF_NUM_HID,
-  ITF_NUM_VENDOR,
-  ITF_NUM_TOTAL
-};
 
 #define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_VENDOR_DESC_LEN)
 
-#define EPNUM_HID     0x01
-#define EPNUM_VENDOR  0x02
 
 uint8_t const desc_configuration[] =
 {
   // Config number, interface count, string index, total length, attribute, power in mA
-  TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 100),
+  TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, DESC_STR_CONFIG_HID, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 100),
 
   // Interface number, string index, protocol, report descriptor len, EP In & Out address, size & polling interval
-  TUD_HID_INOUT_DESCRIPTOR(ITF_NUM_HID, 4, HID_PROTOCOL_NONE, sizeof(desc_hid_report), EPNUM_HID, 0x80|EPNUM_HID, CFG_TUD_HID_BUFSIZE, 10),
+  TUD_HID_INOUT_DESCRIPTOR(ITF_NUM_HID, DESC_STR_INTERFACE_HID, HID_PROTOCOL_NONE, sizeof(desc_hid_report), EPNUM_HID, 0x80|EPNUM_HID, CFG_TUD_HID_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
 
   // Interface number, string index, EP Out & IN address, EP size
-  TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, 5, EPNUM_VENDOR, 0x80 | EPNUM_VENDOR, CFG_TUD_VENDOR_EP_SIZE),
+  TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, DESC_STR_INTERFACE_WEBUSB, EPNUM_VENDOR, 0x80 | EPNUM_VENDOR, CFG_TUD_VENDOR_EP_SIZE),
+};
+
+uint8_t const desc_hid[] = {
+    TUD_HID_INOUT_DESCRIPTOR(ITF_NUM_HID, DESC_STR_INTERFACE_HID, HID_PROTOCOL_NONE, sizeof(desc_hid_report), EPNUM_HID, 0x80 | EPNUM_HID, CFG_TUD_HID_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
 };
 
 // Invoked when received GET CONFIGURATION DESCRIPTOR
 // Application return pointer to descriptor
 // Descriptor contents must exist long enough for transfer to complete
-uint8_t const * tud_descriptor_configuration_cb(uint8_t index)
+uint8_t* tud_descriptor_configuration_cb(void)
 {
-  (void) index; // for multiple configurations
-  return desc_configuration;
+  return (uint8_t*)desc_configuration;
 }
 
+uint32_t tud_descriptor_configuration_size(void)
+{
+  return sizeof(desc_configuration);
+}
+
+uint8_t* tud_descriptor_hid_cb(void)
+{
+  return (uint8_t*)desc_hid;
+}
+
+uint32_t tud_descriptor_hid_size(void)
+{
+  return sizeof(desc_hid);
+}
 
 //--------------------------------------------------------------------+
 // BOS Descriptor
@@ -149,11 +168,15 @@ uint8_t const desc_bos[] =
   TUD_BOS_MS_OS_20_DESCRIPTOR(MS_OS_20_DESC_LEN, VENDOR_REQUEST_MICROSOFT)
 };
 
-uint8_t const * tud_descriptor_bos_cb(void)
+uint8_t* tud_descriptor_bos_cb(void)
 {
-  return desc_bos;
+  return (uint8_t*)desc_bos;
 }
 
+uint32_t tud_descriptor_bos_size(void)
+{
+  return sizeof(desc_bos);
+}
 
 uint8_t const desc_ms_os_20[] =
 {
@@ -195,25 +218,25 @@ char const* string_desc_arr [] =
   STR(MANUFACTURER),              // 1: Manufacturer
   STR(PRODUCT),                   // 2: Product
   "123456",                       // 3: Serials, should use chip ID
-  "HID Keyboard",                 // 4: Hid keyboard
-  "WebUSB",                       // 5: webusb interface
+  "HID Config",                   // 4: Device configuration 
+  "HID Keyboard",                 // 5: Hid keyboard
+  "WebUSB",                       // 6: Webusb interface
 };
 
 static uint16_t _desc_str[32];
 
 // Invoked when received GET STRING DESCRIPTOR request
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
-uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
+uint8_t* tud_descriptor_string_cb(uint8_t index, uint16_t* length)
 {
-  (void) langid;
-
   uint8_t chr_count;
 
   if ( index == 0)
   {
     memcpy(&_desc_str[1], string_desc_arr[0], 2);
     chr_count = 1;
-  }else
+  }
+  else
   {
     // Convert ASCII string into UTF-16
 
@@ -233,6 +256,7 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 
   // first byte is length (including header), second byte is string type
   _desc_str[0] = (TUSB_DESC_STRING << 8 ) | (2*chr_count + 2);
+  *length = _desc_str[0] & 0xFF;
 
-  return _desc_str;
+  return (uint8_t*)_desc_str;
 }

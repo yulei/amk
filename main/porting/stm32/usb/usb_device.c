@@ -32,7 +32,7 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+extern void Error_Handler(void);
 /* USER CODE END PV */
 
 /* USER CODE BEGIN PFP */
