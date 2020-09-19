@@ -1,5 +1,5 @@
-
-NRF5SDK_DIR := $(TOP_DIR)/nrf5_sdk/nRF5_SDK_17.0.0_9d13099
+NRF5SDK_DIR := $(TOP_DIR)/nrf5_sdk/nRF5_SDK_17.0.2_d674dde
+#NRF5SDK_DIR := $(TOP_DIR)/nrf5_sdk/nRF5_SDK_17.0.0_9d13099
 
 SRC_FILES += \
 	$(NRF5SDK_DIR)/modules/nrfx/mdk/gcc_startup_nrf52.S \
