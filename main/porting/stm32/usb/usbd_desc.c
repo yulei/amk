@@ -25,6 +25,7 @@
 #include "usbd_conf.h"
 
 /* USER CODE BEGIN INCLUDE */
+#include "usb_descriptors.h"
 
 /* USER CODE END INCLUDE */
 
@@ -223,8 +224,10 @@ __ALIGN_BEGIN uint8_t USBD_StringSerial[USB_SIZ_STRING_SERIAL] __ALIGN_END = {
 uint8_t * USBD_FS_DeviceDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 {
   UNUSED(speed);
-  *length = sizeof(USBD_FS_DeviceDesc);
-  return USBD_FS_DeviceDesc;
+  //*length = sizeof(USBD_FS_DeviceDesc);
+  //return USBD_FS_DeviceDesc;
+  *length = tud_descriptor_device_size();
+  return tud_descriptor_device_cb();
 }
 
 /**
@@ -248,15 +251,8 @@ uint8_t * USBD_FS_LangIDStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
   */
 uint8_t * USBD_FS_ProductStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 {
-  if(speed == 0)
-  {
-    USBD_GetString((uint8_t *)USBD_PRODUCT_STRING_FS, USBD_StrDesc, length);
-  }
-  else
-  {
-    USBD_GetString((uint8_t *)USBD_PRODUCT_STRING_FS, USBD_StrDesc, length);
-  }
-  return USBD_StrDesc;
+    UNUSED(speed);
+    return tud_descriptor_string_cb(DESC_STR_PRODUCT, length);
 }
 
 /**
@@ -268,8 +264,9 @@ uint8_t * USBD_FS_ProductStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length
 uint8_t * USBD_FS_ManufacturerStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 {
   UNUSED(speed);
-  USBD_GetString((uint8_t *)USBD_MANUFACTURER_STRING, USBD_StrDesc, length);
-  return USBD_StrDesc;
+  //USBD_GetString((uint8_t *)USBD_MANUFACTURER_STRING, USBD_StrDesc, length);
+  //return USBD_StrDesc;
+  return tud_descriptor_string_cb(DESC_STR_MANUFACTURE, length);
 }
 
 /**

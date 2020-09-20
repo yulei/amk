@@ -1516,7 +1516,7 @@ enum {
   ITF_NUM_TOTAL
 };
 
-#define EPNUM_HID     0x01
+#define EPNUM_HID     0x81
 #define EPNUM_VENDOR  0x02
 
 #define CFG_TUD_HID_BUFSIZE       16

@@ -66,8 +66,7 @@ uint32_t tud_descriptor_device_size(void)
 //--------------------------------------------------------------------+
 // HID Report Descriptor
 //--------------------------------------------------------------------+
-
-uint8_t const desc_hid_report[] =
+ uint8_t const desc_hid_report[] __attribute__ ((aligned (4))) =
 {
   TUD_HID_REPORT_DESC_KEYBOARD        ( HID_REPORT_ID(REPORT_ID_KEYBOARD) ),
   TUD_HID_REPORT_DESC_MOUSE           ( HID_REPORT_ID(REPORT_ID_MOUSE) ),
@@ -80,7 +79,7 @@ uint8_t const desc_hid_report[] =
 // Descriptor contents must exist long enough for transfer to complete
 uint8_t* tud_descriptor_hid_report_cb(void)
 {
-  return (uint8_t*)desc_hid_report;
+  return (uint8_t*)(&desc_hid_report[0]);
 }
 
 uint32_t tud_descriptor_hid_report_size(void)
@@ -93,23 +92,22 @@ uint32_t tud_descriptor_hid_report_size(void)
 //--------------------------------------------------------------------+
 
 
-#define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_VENDOR_DESC_LEN)
+#define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN)// + TUD_VENDOR_DESC_LEN)
 
 
-uint8_t const desc_configuration[] =
+uint8_t const desc_configuration[] __attribute__ ((aligned (4))) =
 {
   // Config number, interface count, string index, total length, attribute, power in mA
-  TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, DESC_STR_CONFIG_HID, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 100),
-
+  TUD_CONFIG_DESCRIPTOR(1, 1, 0, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 100),
   // Interface number, string index, protocol, report descriptor len, EP In & Out address, size & polling interval
-  TUD_HID_INOUT_DESCRIPTOR(ITF_NUM_HID, DESC_STR_INTERFACE_HID, HID_PROTOCOL_NONE, sizeof(desc_hid_report), EPNUM_HID, 0x80|EPNUM_HID, CFG_TUD_HID_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+  TUD_HID_DESCRIPTOR(ITF_NUM_HID, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report), EPNUM_HID, CFG_TUD_HID_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
 
   // Interface number, string index, EP Out & IN address, EP size
-  TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, DESC_STR_INTERFACE_WEBUSB, EPNUM_VENDOR, 0x80 | EPNUM_VENDOR, CFG_TUD_VENDOR_EP_SIZE),
+  //TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, DESC_STR_INTERFACE_WEBUSB, EPNUM_VENDOR, 0x80 | EPNUM_VENDOR, CFG_TUD_VENDOR_EP_SIZE),
 };
 
-uint8_t const desc_hid[] = {
-    TUD_HID_INOUT_DESCRIPTOR(ITF_NUM_HID, DESC_STR_INTERFACE_HID, HID_PROTOCOL_NONE, sizeof(desc_hid_report), EPNUM_HID, 0x80 | EPNUM_HID, CFG_TUD_HID_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+uint8_t const desc_hid[] __attribute__ ((aligned (4))) = {
+  TUD_HID_DESCRIPTOR(ITF_NUM_HID, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report), EPNUM_HID, CFG_TUD_HID_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
 };
 
 // Invoked when received GET CONFIGURATION DESCRIPTOR
@@ -117,7 +115,7 @@ uint8_t const desc_hid[] = {
 // Descriptor contents must exist long enough for transfer to complete
 uint8_t* tud_descriptor_configuration_cb(void)
 {
-  return (uint8_t*)desc_configuration;
+  return (uint8_t*)(&desc_configuration[0]);
 }
 
 uint32_t tud_descriptor_configuration_size(void)
@@ -127,7 +125,7 @@ uint32_t tud_descriptor_configuration_size(void)
 
 uint8_t* tud_descriptor_hid_cb(void)
 {
-  return (uint8_t*)desc_hid;
+  return (uint8_t*)(&desc_hid[0]);
 }
 
 uint32_t tud_descriptor_hid_size(void)

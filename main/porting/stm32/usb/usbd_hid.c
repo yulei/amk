@@ -46,12 +46,20 @@ EndBSPDependencies */
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_hid.h"
 #include "usbd_ctlreq.h"
+#include "usb_descriptors.h"
 
 
 /** @addtogroup STM32_USB_DEVICE_LIBRARY
   * @{
   */
 
+uint8_t const desc_report[] =
+{
+  TUD_HID_REPORT_DESC_KEYBOARD        ( HID_REPORT_ID(REPORT_ID_KEYBOARD) ),
+  TUD_HID_REPORT_DESC_MOUSE           ( HID_REPORT_ID(REPORT_ID_MOUSE) ),
+  TUD_HID_REPORT_DESC_SYSTEM_CONTROL  ( HID_REPORT_ID(REPORT_ID_SYSTEM) ),
+  TUD_HID_REPORT_DESC_CONSUMER        ( HID_REPORT_ID(REPORT_ID_CONSUMER) ),
+};
 
 /** @defgroup USBD_HID
   * @brief usbd core module
@@ -157,8 +165,8 @@ __ALIGN_BEGIN static uint8_t USBD_HID_CfgFSDesc[USB_HID_CONFIG_DESC_SIZ]  __ALIG
   0x00,         /*bAlternateSetting: Alternate setting*/
   0x01,         /*bNumEndpoints*/
   0x03,         /*bInterfaceClass: HID*/
-  0x01,         /*bInterfaceSubClass : 1=BOOT, 0=no boot*/
-  0x02,         /*nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse*/
+  0x00,         /*bInterfaceSubClass : 1=BOOT, 0=no boot*/
+  0x01,         /*nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse*/
   0,            /*iInterface: Index of string descriptor*/
   /******************** Descriptor of Joystick Mouse HID ********************/
   /* 18 */
@@ -169,7 +177,8 @@ __ALIGN_BEGIN static uint8_t USBD_HID_CfgFSDesc[USB_HID_CONFIG_DESC_SIZ]  __ALIG
   0x00,         /*bCountryCode: Hardware target country*/
   0x01,         /*bNumDescriptors: Number of HID class descriptors to follow*/
   0x22,         /*bDescriptorType*/
-  HID_MOUSE_REPORT_DESC_SIZE,/*wItemLength: Total length of Report descriptor*/
+  //HID_MOUSE_REPORT_DESC_SIZE,/*wItemLength: Total length of Report descriptor*/
+  sizeof(desc_report),
   0x00,
   /******************** Descriptor of Mouse endpoint ********************/
   /* 27 */
@@ -483,13 +492,17 @@ static uint8_t  USBD_HID_Setup(USBD_HandleTypeDef *pdev,
         case USB_REQ_GET_DESCRIPTOR:
           if (req->wValue >> 8 == HID_REPORT_DESC)
           {
-            len = MIN(HID_MOUSE_REPORT_DESC_SIZE, req->wLength);
-            pbuf = HID_MOUSE_ReportDesc;
+            //len = MIN(HID_MOUSE_REPORT_DESC_SIZE, req->wLength);
+            //pbuf = HID_MOUSE_ReportDesc;
+            len = tud_descriptor_hid_report_size();
+            pbuf = tud_descriptor_hid_report_cb();
           }
           else if (req->wValue >> 8 == HID_DESCRIPTOR_TYPE)
           {
-            pbuf = USBD_HID_Desc;
-            len = MIN(USB_HID_DESC_SIZ, req->wLength);
+            //pbuf = USBD_HID_Desc;
+            //len = MIN(USB_HID_DESC_SIZ, req->wLength);
+            len = tud_descriptor_hid_size();
+            pbuf = tud_descriptor_hid_cb();
           }
           else
           {
@@ -604,8 +617,10 @@ uint32_t USBD_HID_GetPollingInterval(USBD_HandleTypeDef *pdev)
   */
 static uint8_t  *USBD_HID_GetFSCfgDesc(uint16_t *length)
 {
-  *length = sizeof(USBD_HID_CfgFSDesc);
-  return USBD_HID_CfgFSDesc;
+  // *length = sizeof(USBD_HID_CfgFSDesc);
+  //return USBD_HID_CfgFSDesc;
+    *length = tud_descriptor_configuration_size();
+    return tud_descriptor_configuration_cb();
 }
 
 /**
