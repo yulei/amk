@@ -208,6 +208,7 @@ static void send_keyboard(report_keyboard_t *report)
 
 static void send_mouse(report_mouse_t *report)
 {
+    NRF_LOG_INFO("Send mouse: real");
     if (ble_driver.output_target & OUTPUT_BLE) {
         ble_hids_service_send_report(NRF_REPORT_ID_MOUSE, (uint8_t *)report);
     }
@@ -218,14 +219,19 @@ static void send_mouse(report_mouse_t *report)
 
 #else
 
-static void send_mouse(report_mouse_t *report) { (void)report; }
+static void send_mouse(report_mouse_t *report)
+{ 
+    (void)report; 
+    NRF_LOG_INFO("Send mouse: fake");
+}
 
 #endif
 
-#ifdef EXTRAKEY_ENABELE
+#ifdef EXTRAKEY_ENABLE 
 
 static void send_system(uint16_t data)
 {
+    NRF_LOG_INFO("Send system: %d", data);
     if (ble_driver.output_target & OUTPUT_BLE) {
         ble_hids_service_send_report(NRF_REPORT_ID_SYSTEM, (uint8_t *)&data);
     }
@@ -236,6 +242,7 @@ static void send_system(uint16_t data)
 
 static void send_consumer(uint16_t data)
 {
+    NRF_LOG_INFO("Send consumer: %d", data);
     if (ble_driver.output_target & OUTPUT_BLE) {
         ble_hids_service_send_report(NRF_REPORT_ID_CONSUMER, (uint8_t *)&data);
     }
@@ -247,8 +254,17 @@ static void send_consumer(uint16_t data)
 
 #else
 
-static void send_system(uint16_t data) { (void)data; }
-static void send_consumer(uint16_t data) { (void)data; }
+static void send_system(uint16_t data)
+{
+    (void)data;
+    NRF_LOG_INFO("Send system: fake");
+}
+
+static void send_consumer(uint16_t data)
+{
+    (void)data;
+    NRF_LOG_INFO("Send consumer: fake");
+}
 
 #endif
 

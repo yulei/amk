@@ -34,7 +34,7 @@ tusb_desc_device_t const desc_device =
 {
     .bLength            = sizeof(tusb_desc_device_t),
     .bDescriptorType    = TUSB_DESC_DEVICE,
-    .bcdUSB             = 0x0210, // at least 2.1 or 3.x for BOS & webUSB
+    .bcdUSB             = 0x0200, // at least 2.1 or 3.x for BOS & webUSB
     .bDeviceClass       = 0x00,
     .bDeviceSubClass    = 0x00,
     .bDeviceProtocol    = 0x00,
