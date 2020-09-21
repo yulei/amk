@@ -141,8 +141,10 @@ void board_init(void)
         err_code = nrf_sdh_disable_request();
         APP_ERROR_CHECK(err_code);
 
+        rf_driver.is_ble = 0;
         gzll_keyboard_init();
     } else {
+        rf_driver.is_ble = 1;
         ble_keyboard_init();
     }
 

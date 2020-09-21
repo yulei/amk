@@ -369,6 +369,14 @@ bool hook_process_action(keyrecord_t *record) {
             nrf_usb_reboot();
             return true;
         case KC_F24: // toggle BLE or GAZELL
+            if (rf_driver.is_ble) {
+                sd_power_gpregret_set(RST_REGISTER, RST_USE_GZLL);
+                NRF_LOG_INFO("switch to gzll");
+            } else {
+                sd_power_gpregret_clr(RST_REGISTER, RST_USE_GZLL);
+                NRF_LOG_INFO("switch to ble");
+            }
+            sd_nvic_SystemReset();
             break;
         default:
             break;
