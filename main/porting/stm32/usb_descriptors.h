@@ -7,15 +7,15 @@
 #include "tusb_def.h"
 
 enum {
-  REPORT_ID_KEYBOARD = 1,
-  REPORT_ID_MOUSE,
-  REPORT_ID_SYSTEM,
-  REPORT_ID_CONSUMER,
+    REPORT_ID_KEYBOARD = 1,
+    REPORT_ID_MOUSE,
+    REPORT_ID_SYSTEM,
+    REPORT_ID_CONSUMER,
 };
 
 enum {
-  VENDOR_REQUEST_WEBUSB = 1,
-  VENDOR_REQUEST_MICROSOFT = 2
+    VENDOR_REQUEST_WEBUSB = 1,
+    VENDOR_REQUEST_MICROSOFT = 2
 };
 
 extern uint8_t const desc_ms_os_20[];
@@ -38,13 +38,13 @@ uint32_t tud_descriptor_bos_size(void);
 uint32_t tud_descriptor_bos_size(void);
 
 enum {
-  DESC_STR_LANGID,
-  DESC_STR_MANUFACTURE,
-  DESC_STR_PRODUCT,
-  DESC_STR_SERIAL,
-  DESC_STR_CONFIG_HID,
-  DESC_STR_INTERFACE_HID,
-  DESC_STR_INTERFACE_WEBUSB,
+    DESC_STR_LANGID,
+    DESC_STR_MANUFACTURE,
+    DESC_STR_PRODUCT,
+    DESC_STR_SERIAL,
+    DESC_STR_CONFIG_HID,
+    DESC_STR_INTERFACE_HID,
+    DESC_STR_INTERFACE_WEBUSB,
 };
 
 uint8_t* tud_descriptor_string_cb(uint8_t index, uint16_t* length);
