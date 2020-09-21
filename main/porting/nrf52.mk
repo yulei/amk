@@ -11,6 +11,8 @@ SRC_FILES += \
 	$(NRF52_PORTING_DIR)/ble/ble_hids_service.c \
 	$(NRF52_PORTING_DIR)/ble/ble_services.c \
 	$(NRF52_PORTING_DIR)/ble_keyboard.c \
+	$(NRF52_PORTING_DIR)/gzll_keyboard.c \
+	$(NRF52_PORTING_DIR)/rf_keyboard.c \
 
 INC_FOLDERS += \
 	$(NRF52_PORTING_DIR) \

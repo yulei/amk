@@ -3,375 +3,130 @@
  * 
  */
 
+#include "ble_config.h"
+
 #include "ble_keyboard.h"
 #include "ble_hids_service.h"
-#include "app_timer.h"
-#include "nrf_gpio.h"
-#include "nrf_drv_gpiote.h"
-#include "nrf_pwr_mgmt.h"
-#include "usb_interface.h"
+#include "ble_services.h"
+#include "eeconfig_fds.h"
+#include "rf_keyboard.h"
 
-#include "report.h"
-#include "host.h"
-#include "keyboard.h"
-#include "matrix_driver.h"
-
-#include "rgb_effects.h"
-
-
-APP_TIMER_DEF(m_keyboard_timer_id); // keyboard scan timer id
-
-static bool keyboard_pwr_mgmt_shutdown_handler(nrf_pwr_mgmt_evt_t event);
-NRF_PWR_MGMT_HANDLER_REGISTER(keyboard_pwr_mgmt_shutdown_handler, NRF_PWR_MGMT_CONFIG_HANDLER_PRIORITY_COUNT - 1);
-
-static void keyboard_timer_init(void);
-
-static void keyboard_timout_handler(void *p_context);
-static void keyboard_timer_start(void);
-static void keyboard_timer_stop(void);
-static void matrix_event_handler(bool changed);
-
-/** the fllowing function can be overrided by the keyboard codes */
-extern void keyboard_set_rgb(bool on);
-
-__attribute__((weak)) void keyboard_prepare_sleep(void)
-{}
-
-/* Host driver */
-static uint8_t keyboard_leds(void);
-static void    send_keyboard(report_keyboard_t *report);
-static void    send_mouse(report_mouse_t *report);
-static void    send_system(uint16_t data);
-static void    send_consumer(uint16_t data);
-
-host_driver_t kbd_driver = {
-    .keyboard_leds = keyboard_leds,
-    .send_keyboard = send_keyboard,
-    .send_mouse = send_mouse,
-    .send_system = send_system,
-    .send_consumer = send_consumer,
+ble_driver_t ble_driver = {
+    .peer_id = PM_PEER_ID_INVALID,
+    .conn_handle = BLE_CONN_HANDLE_INVALID,
 };
 
-static void usb_enabled(void);
-static void usb_disabled(void);
-static void usb_suspend(bool remote_wakeup_en);
-static void usb_resume(void);
-static void usb_leds(uint8_t leds);
+static void ble_send_report(uint8_t type, uint8_t *data, uint8_t size);
 
-static nrf_usb_event_handler_t usb_handler = {
-    .enable_cb = usb_enabled,
-    .disable_cb = usb_disabled,
-    .suspend_cb = usb_suspend,
-    .resume_cb = usb_resume,
-    .leds_cb = usb_leds,
-};
+/**@brief Function for handling BLE events.
+ *
+ * @param[in]   p_ble_evt   Bluetooth stack event.
+ * @param[in]   p_context   Unused.
+ */
+static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
+{
+    ret_code_t err_code;
+
+    switch (p_ble_evt->header.evt_id)
+    {
+        case BLE_GAP_EVT_CONNECTED:
+            NRF_LOG_INFO("Connected");
+            ble_driver.conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
+            ble_qwr_update_handle(ble_driver.conn_handle);
+            //sd_ble_gap_tx_power_set(BLE_GAP_TX_POWER_ROLE_CONN, ble_driver.conn_handle, DEFAULT_TX_POWER_LEVEL);
+            break;
+
+        case BLE_GAP_EVT_DISCONNECTED:
+            NRF_LOG_INFO("Disconnected");
+            // Dequeue all keys without transmission.
+            ble_hids_service_flush(false);
+
+            ble_driver.conn_handle = BLE_CONN_HANDLE_INVALID;
+
+            break; // BLE_GAP_EVT_DISCONNECTED
+
+        case BLE_GAP_EVT_PHY_UPDATE_REQUEST:
+        {
+            NRF_LOG_DEBUG("PHY update request.");
+            ble_gap_phys_t const phys =
+            {
+                .rx_phys = BLE_GAP_PHY_AUTO,
+                .tx_phys = BLE_GAP_PHY_AUTO,
+            };
+            err_code = sd_ble_gap_phy_update(p_ble_evt->evt.gap_evt.conn_handle, &phys);
+            APP_ERROR_CHECK(err_code);
+        } break;
+
+        case BLE_GATTS_EVT_HVN_TX_COMPLETE:
+            // Send next key event
+            ble_hids_service_flush(true);
+            break;
+
+        case BLE_GATTC_EVT_TIMEOUT:
+            // Disconnect on GATT Client timeout event.
+            NRF_LOG_DEBUG("GATT Client Timeout.");
+            err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gattc_evt.conn_handle,
+                                             BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+            APP_ERROR_CHECK(err_code);
+            break;
+
+        case BLE_GATTS_EVT_TIMEOUT:
+            // Disconnect on GATT Server timeout event.
+            NRF_LOG_DEBUG("GATT Server Timeout.");
+            err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gatts_evt.conn_handle,
+                                             BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+            APP_ERROR_CHECK(err_code);
+            break;
+
+        default:
+            // No implementation needed.
+            break;
+    }
+}
+
+
+/**@brief Function for initializing the BLE stack.
+ *
+ * @details Initializes the SoftDevice and the BLE event interrupt.
+ */
+static void ble_stack_init(void)
+{
+    ret_code_t err_code;
+
+    //err_code = nrf_sdh_enable_request();
+    //APP_ERROR_CHECK(err_code);
+
+    // Configure the BLE stack using the default settings.
+    // Fetch the start address of the application RAM.
+    uint32_t ram_start = 0;
+    err_code = nrf_sdh_ble_default_cfg_set(APP_BLE_CONN_CFG_TAG, &ram_start);
+    APP_ERROR_CHECK(err_code);
+
+    // Enable BLE stack.
+    err_code = nrf_sdh_ble_enable(&ram_start);
+    APP_ERROR_CHECK(err_code);
+
+    // Register a handler for BLE events.
+    NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler, NULL);
+}
 
 void ble_keyboard_init(void)
 {
-    ret_code_t err_code;
-    err_code = nrf_drv_gpiote_init();
-    APP_ERROR_CHECK(err_code);
+    ble_stack_init();
+    fds_eeprom_init();
+    ble_services_init();
 
-    keyboard_setup();
-    keyboard_init();
-    host_set_driver(&kbd_driver);
-    keyboard_timer_init();
-    nrf_usb_init(&usb_handler);
+    rf_keyboard_init(ble_send_report);
 }
 
-void ble_keyboard_start(void)
+void ble_keyboard_start(bool erase_bonds)
 {
-    matrix_driver_scan_start();
-    keyboard_timer_start();
-    ble_driver.scan_count = 0;
+    ble_services_start(erase_bonds);
+    rf_keyboard_start();
 }
 
-void ble_keyboard_prepare_sleep(void)
+static void ble_send_report(uint8_t type, uint8_t *data, uint8_t size)
 {
-    NRF_LOG_INFO("power down sleep preparing");
-    // stop all timer
-    app_timer_stop_all();
-    // keyboard sleep
-    keyboard_prepare_sleep();
-    // turn matrix to sense mode
-    matrix_driver_prepare_sleep();
-    // usb backend to sleep
-    nrf_usb_prepare_sleep();
-}
-
-void ble_keyboard_jump_bootloader(void)
-{
-    nrf_usb_reboot();
-}
-
-static void keyboard_timer_init(void)
-{
-    ret_code_t err_code;
-    err_code = app_timer_create(&m_keyboard_timer_id,
-                            APP_TIMER_MODE_REPEATED,
-                            keyboard_timout_handler);
-    APP_ERROR_CHECK(err_code);
-}
-
-
-static bool keyboard_rgblight_on(void)
-{
-#ifdef RGB_EFFECTS_ENABLE
-    return rgb_effects_enabled();
-#else
-    return false;
-#endif
-}
-
-static bool keyboard_rgbmatrix_on(void)
-{
-    return false;
-}
-
-static bool keyboard_rgb_on(void) { return keyboard_rgblight_on() || keyboard_rgbmatrix_on(); }
-
-static void keyboard_timout_handler(void *p_context)
-{
-    keyboard_task();
-
-    if (ble_driver.vbus_enabled) {
-        // do not make the power related stuff
-        return;
-    }
-
-    if (ble_driver.matrix_changed) {
-        ble_driver.scan_count = 0;
-        ble_driver.matrix_changed = 0;
-        ble_driver.sleep_count = 0;
-    } else {
-        if (!keyboard_rgb_on()) {
-            ble_driver.scan_count++;
-        } else {
-            if (ble_driver.battery_power <= BATTERY_LED_THRESHHOLD) {
-                keyboard_set_rgb(false);
-            }
-        }
-    }
-
-    if (ble_driver.trigger_enabled) {
-        // scan count overflow, switch to trigger mode
-        if (matrix_driver_keys_off() && (ble_driver.scan_count >= MAX_SCAN_COUNT)) {
-            keyboard_timer_stop();
-            matrix_driver_scan_stop();
-            matrix_driver_trigger_start(matrix_event_handler);
-
-            NRF_LOG_INFO("keyboard matrix swtiched to trigger mode");
-            ble_driver.scan_count = 0;
-        }
-    }
-}
-
-static void keyboard_timer_start(void)
-{
-    ret_code_t err_code;
-
-    err_code = app_timer_start(m_keyboard_timer_id, KEYBOARD_SCAN_INTERVAL, NULL);
-    APP_ERROR_CHECK(err_code);
-}
-
-static void keyboard_timer_stop(void)
-{
-    ret_code_t err_code;
-
-    err_code = app_timer_stop(m_keyboard_timer_id);
-    APP_ERROR_CHECK(err_code);
-
-}
-
-static uint8_t keyboard_leds(void)
-{
-    if ( ble_driver.output_target == OUTPUT_BLE)
-        return ble_driver.ble_led;
-    
-    if (ble_driver.output_target == OUTPUT_USB)
-        return ble_driver.usb_led;
-
-    return 0;
-}
-
-static void send_keyboard(report_keyboard_t *report)
-{
-    if (ble_driver.output_target & OUTPUT_BLE) {
-        ble_hids_service_send_report(NRF_REPORT_ID_KEYBOARD, &(report->raw[0]));
-    }
-    if (ble_driver.output_target & OUTPUT_USB) {
-        nrf_usb_send_report(NRF_REPORT_ID_KEYBOARD, report, sizeof(*report));
-    }
-}
-
-#ifdef MOUSEKEY_ENABLE
-
-static void send_mouse(report_mouse_t *report)
-{
-    NRF_LOG_INFO("Send mouse: real");
-    if (ble_driver.output_target & OUTPUT_BLE) {
-        ble_hids_service_send_report(NRF_REPORT_ID_MOUSE, (uint8_t *)report);
-    }
-    if (ble_driver.output_target & OUTPUT_USB) {
-        nrf_usb_send_report(NRF_REPORT_ID_MOUSE, report, sizeof(*report));
-    }
-}
-
-#else
-
-static void send_mouse(report_mouse_t *report)
-{ 
-    (void)report; 
-    NRF_LOG_INFO("Send mouse: fake");
-}
-
-#endif
-
-#ifdef EXTRAKEY_ENABLE 
-
-static void send_system(uint16_t data)
-{
-    NRF_LOG_INFO("Send system: %d", data);
-    if (ble_driver.output_target & OUTPUT_BLE) {
-        ble_hids_service_send_report(NRF_REPORT_ID_SYSTEM, (uint8_t *)&data);
-    }
-    if (ble_driver.output_target & OUTPUT_USB) {
-        nrf_usb_send_report(NRF_REPORT_ID_SYSTEM, &data, sizeof(data));
-    }
-}
-
-static void send_consumer(uint16_t data)
-{
-    NRF_LOG_INFO("Send consumer: %d", data);
-    if (ble_driver.output_target & OUTPUT_BLE) {
-        ble_hids_service_send_report(NRF_REPORT_ID_CONSUMER, (uint8_t *)&data);
-    }
-
-    if (ble_driver.output_target & OUTPUT_USB) {
-        nrf_usb_send_report(NRF_REPORT_ID_CONSUMER, &data, sizeof(data));
-    }
-}
-
-#else
-
-static void send_system(uint16_t data)
-{
-    (void)data;
-    NRF_LOG_INFO("Send system: fake");
-}
-
-static void send_consumer(uint16_t data)
-{
-    (void)data;
-    NRF_LOG_INFO("Send consumer: fake");
-}
-
-#endif
-
-static void matrix_event_handler(bool changed)
-{
-    if (!changed) return;
-
-    // disable row event
-    matrix_driver_trigger_stop();
-    matrix_driver_scan_start();
-    keyboard_timer_start();
-
-    keyboard_task();
-    ble_driver.scan_count = 0;
-    ble_driver.sleep_count = 0;
-}
-
-static bool keyboard_pwr_mgmt_shutdown_handler(nrf_pwr_mgmt_evt_t event)
-{
-    // currently we did not handle case by case
-    switch (event) {
-        case NRF_PWR_MGMT_EVT_PREPARE_WAKEUP:
-            break;
-
-        case NRF_PWR_MGMT_EVT_PREPARE_SYSOFF:
-            break;
-
-        case NRF_PWR_MGMT_EVT_PREPARE_DFU:
-            break;
-
-        case NRF_PWR_MGMT_EVT_PREPARE_RESET:
-            break;
-        default:
-            break;
-    }
-    ble_keyboard_prepare_sleep();
-    return true;
-}
-
-static void usb_enabled(void)
-{
-    ble_driver.vbus_enabled = true;
-    ble_driver.output_target = OUTPUT_USB;
-}
-
-static void usb_disabled(void)
-{
-    ble_driver.vbus_enabled = false;
-    ble_driver.output_target = OUTPUT_BLE;
-}
-
-static void usb_suspend(bool remote_wakeup_en)
-{}
-
-static void usb_resume(void)
-{}
-
-static void usb_leds(uint8_t leds)
-{
-    ble_driver.usb_led = leds;
-}
-
-// bluetooth control command
-// F21 for select usb/ble output
-// F22 for erase bond
-// F23 for enter bootloader mode
-#include "action.h"
-#include "action_layer.h"
-bool hook_process_action(keyrecord_t *record) {
-{
-    if (IS_NOEVENT(record->event) || !record->event.pressed) { 
-        return false;
-    }
-    action_t action = layer_switch_get_action(record->event);
-    if (action.kind.id != ACT_MODS) {
-        return false;
-    }
-
-    switch(action.key.code) {
-        case KC_F21: // toggle usb/ble output
-            if (ble_driver.output_target == OUTPUT_BLE) {
-                if (ble_driver.vbus_enabled) {
-                    NRF_LOG_INFO("set output to USB");
-                    ble_driver.output_target = OUTPUT_USB;
-                } else {
-                    NRF_LOG_INFO("vbus not enabled, still using BLE");
-                }
-            } else {
-                NRF_LOG_INFO("set output to BLE");
-                ble_driver.output_target = OUTPUT_BLE;
-            }
-            return true;
-
-        case KC_F22: // reset to erase bond mode
-            NRF_LOG_INFO("reset to erase bond");
-            sd_power_gpregret_set(RST_REGISTER, RST_ERASE_BOND);
-            sd_nvic_SystemReset();
-            return true;
-
-        case KC_F23: // usb mcu to bootloader mode
-            NRF_LOG_INFO("send reboot command");
-            nrf_usb_reboot();
-            return true;
-        default:
-            break;
-        }
-    }
-
-    return false;
+    (void)size;
+    ble_hids_service_send_report(type, data);
 }

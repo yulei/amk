@@ -380,7 +380,7 @@ static void on_hid_rep_char_write(ble_hids_evt_t * p_evt) {
                                              ble_driver.conn_handle,
                                              &report_val);
             APP_ERROR_CHECK(err_code);
-            ble_driver.ble_led = report_val;
+            rf_driver.ble_led = report_val;
         }
     }
 }

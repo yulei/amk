@@ -3,7 +3,7 @@
  *  matrix_driver implementation for nrf52
  */
 
-#include "ble_config.h"
+#include "common_config.h"
 #include "matrix_driver.h"
 #include "gpio_pin.h"
 #include "keyboard.h"
@@ -389,6 +389,6 @@ bool matrix_driver_keys_off(void)
 void hook_matrix_change(keyevent_t event)
 {
     if (!IS_NOEVENT(event)) {
-        ble_driver.matrix_changed = 1;
+        rf_driver.matrix_changed = 1;
     }
 }

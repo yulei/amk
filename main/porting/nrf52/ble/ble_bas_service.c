@@ -97,21 +97,21 @@ static void battery_level_sample_timeout_handler(void* p_context)
 
 static void battery_level_meas_timeout_handler(void * p_context) {
     UNUSED_PARAMETER(p_context);
-    if (ble_driver.sleep_count >= SLEEP_COUNT_THRESHHOLD) {
-        if (ble_driver.sleep_enabled) {
+    if (rf_driver.sleep_count >= SLEEP_COUNT_THRESHHOLD) {
+        if (rf_driver.sleep_enabled) {
             NRF_LOG_INFO("Sleep count overflow, goto system off mode");
             nrf_drv_saadc_uninit();
             nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_GOTO_SYSOFF);
             return;
         } else {
-            ble_driver.sleep_count = 0;
+            rf_driver.sleep_count = 0;
         }
     } else {
-        if (!ble_driver.vbus_enabled) {
-            ble_driver.sleep_count++;
-            NRF_LOG_INFO("Sleep count increased: %d", ble_driver.sleep_count);
+        if (!rf_driver.vbus_enabled) {
+            rf_driver.sleep_count++;
+            NRF_LOG_INFO("Sleep count increased: %d", rf_driver.sleep_count);
         } else {
-            ble_driver.sleep_count = 0;
+            rf_driver.sleep_count = 0;
         }
     }
     // turn battery on and kick off sampling timer
@@ -174,7 +174,7 @@ static void battery_process_saadc_result(uint32_t result)
     }
 
     NRF_LOG_INFO("battery sampling finished: value=%d, mV=%d, percent=%d.", result, mv, percent);
-    ble_driver.battery_power = percent;
+    rf_driver.battery_power = percent;
     battery_level_update(percent);
 }
 

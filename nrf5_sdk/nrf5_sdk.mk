@@ -171,6 +171,7 @@ INC_FOLDERS += \
 	$(NRF5SDK_DIR)/components/libraries/usbd/class/hid/kbd \
 	$(NRF5SDK_DIR)/components/libraries/usbd/class/hid/mouse \
 	$(NRF5SDK_DIR)/components/libraries/usbd/class/msc \
+	$(NRF5SDK_DIR)/components/proprietary_rf/gzll \
 	$(NRF5SDK_DIR)/components/softdevice/common \
 	$(NRF5SDK_DIR)/components/toolchain/cmsis/include \
 	$(NRF5SDK_DIR)/integration/nrfx/legacy \
@@ -229,5 +230,8 @@ ifeq (NRF52840, $(strip $(MCU)))
 	APP_DEFS += -DS140
 	LINKER_SCRIPT := $(TOP_DIR)/nrf5_sdk/nrf52840.ld
 endif
+
+LIB_FILES += \
+  $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52_gcc.a \
 
 LINKER_PATH := $(NRF5SDK_DIR)/modules/nrfx/mdk
