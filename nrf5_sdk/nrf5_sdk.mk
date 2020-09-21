@@ -232,6 +232,6 @@ ifeq (NRF52840, $(strip $(MCU)))
 endif
 
 LIB_FILES += \
-  $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52_gcc.a \
+  $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52_sd_resources_gcc.a \
 
 LINKER_PATH := $(NRF5SDK_DIR)/modules/nrfx/mdk
