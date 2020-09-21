@@ -18,8 +18,6 @@ enum {
     VENDOR_REQUEST_MICROSOFT = 2
 };
 
-extern uint8_t const desc_ms_os_20[];
-
 uint8_t* tud_descriptor_device_cb(void);
 uint32_t tud_descriptor_device_size(void);
 

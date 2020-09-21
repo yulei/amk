@@ -66,7 +66,7 @@ uint32_t tud_descriptor_device_size(void)
 //--------------------------------------------------------------------+
 // HID Report Descriptor
 //--------------------------------------------------------------------+
- uint8_t const desc_hid_report[] TU_ATTR_ALIGNED(4) =
+static uint8_t desc_hid_report[] =
 {
   TUD_HID_REPORT_DESC_KEYBOARD        ( HID_REPORT_ID(REPORT_ID_KEYBOARD) ),
   TUD_HID_REPORT_DESC_MOUSE           ( HID_REPORT_ID(REPORT_ID_MOUSE) ),
@@ -95,7 +95,7 @@ uint32_t tud_descriptor_hid_report_size(void)
 #define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN)// + TUD_VENDOR_DESC_LEN)
 
 
-uint8_t const desc_configuration[] TU_ATTR_ALIGNED(4) =
+static uint8_t desc_configuration[] =
 {
   // Config number, interface count, string index, total length, attribute, power in mA
   TUD_CONFIG_DESCRIPTOR(1, 1, 0, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 100),
@@ -106,7 +106,7 @@ uint8_t const desc_configuration[] TU_ATTR_ALIGNED(4) =
   //TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, DESC_STR_INTERFACE_WEBUSB, EPNUM_VENDOR, 0x80 | EPNUM_VENDOR, CFG_TUD_VENDOR_EP_SIZE),
 };
 
-uint8_t const desc_hid[] TU_ATTR_ALIGNED(4) = {
+static uint8_t desc_hid[] = {
   TUD_HID_DESCRIPTOR(ITF_NUM_HID, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report), EPNUM_HID, CFG_TUD_HID_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
 };
 
@@ -154,7 +154,7 @@ https://developers.google.com/web/fundamentals/native-hardware/build-for-webusb/
 #define MS_OS_20_DESC_LEN  0xB2
 
 // BOS Descriptor is required for webUSB
-uint8_t const desc_bos[] TU_ATTR_ALIGNED(4) =
+static uint8_t desc_bos[] =
 {
   // total length, number of device caps
   TUD_BOS_DESCRIPTOR(BOS_TOTAL_LEN, 2),
@@ -176,7 +176,7 @@ uint32_t tud_descriptor_bos_size(void)
   return sizeof(desc_bos);
 }
 
-uint8_t const desc_ms_os_20[] TU_ATTR_ALIGNED(4) =
+static uint8_t desc_ms_os_20[] =
 {
   // Set header: length, type, windows version, total length
   U16_TO_U8S_LE(0x000A), U16_TO_U8S_LE(MS_OS_20_SET_HEADER_DESCRIPTOR), U32_TO_U8S_LE(0x06030000), U16_TO_U8S_LE(MS_OS_20_DESC_LEN),
@@ -210,7 +210,7 @@ TU_VERIFY_STATIC(sizeof(desc_ms_os_20) == MS_OS_20_DESC_LEN, "Incorrect size");
 //--------------------------------------------------------------------+
 
 // array of pointer to string descriptors
-char const* string_desc_arr [] TU_ATTR_ALIGNED(4) =
+char const* string_desc_arr [] =
 {
   (const char[]) { 0x09, 0x04 },  // 0: is supported language is English (0x0409)
   STR(MANUFACTURER),              // 1: Manufacturer
@@ -221,7 +221,7 @@ char const* string_desc_arr [] TU_ATTR_ALIGNED(4) =
   "WebUSB",                       // 6: Webusb interface
 };
 
-static uint16_t _desc_str[32] TU_ATTR_ALIGNED(4);
+static uint16_t _desc_str[32];
 
 // Invoked when received GET STRING DESCRIPTOR request
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
