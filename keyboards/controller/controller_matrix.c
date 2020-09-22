@@ -10,7 +10,7 @@
 #include "matrix.h"
 #include "wait.h"
 #include "timer.h"
-#include "matrix_driver.h"
+#include "matrix_scan.h"
 
 // matrix power saving
 static uint32_t matrix_last_modified = 0;
@@ -202,45 +202,12 @@ static void hhkb_key_select(uint8_t row, uint8_t col)
     gpio_write_pin(HHKB_LS_C, (col>>2) & 0x01);
 }
 
-//======================================
-// matrix driver interface
-typedef struct {
-    matrix_event_callback   event_callback;
-    bool                    trigger_mode;
-} matrix_driver_t;
-
-matrix_driver_t matrix_driver;
-
-void matrix_driver_init(void)
-{
-    matrix_driver.event_callback    = NULL;
-    matrix_driver.trigger_mode      = false;
-    matrix_init();
-}
-
-void matrix_driver_trigger_start(matrix_event_callback event_cb)
-{
-    matrix_driver.event_callback = event_cb;
-}
-
-void matrix_driver_trigger_stop(void)
-{
-}
-
-void matrix_driver_scan_start(void)
-{
-}
-
-void matrix_driver_scan_stop(void)
-{
-}
-
-void matrix_driver_prepare_sleep(void)
+void matrix_prepare_sleep(void)
 {
     hhkb_power_disable();
 }
 
-bool matrix_driver_keys_off(void)
+bool matrix_keys_off(void)
 {
     for (int i = 0; i < MATRIX_ROWS; i++) {
         if (matrix[i] != 0) {

@@ -137,7 +137,11 @@ void board_init(void)
         APP_ERROR_CHECK(err_code);
 
         rf_driver.is_ble = 0;
-        gzll_keyboard_init();
+        #ifdef GZLL_HOST_RECEIVER
+        gzll_keyboard_init(true);
+        #else
+        gzll_keyboard_init(false);
+        #endif
     } else {
         rf_driver.is_ble = 1;
         ble_keyboard_init();

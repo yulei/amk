@@ -2,8 +2,6 @@ NRF5SDK_DIR := $(TOP_DIR)/nrf5_sdk/nRF5_SDK_17.0.2_d674dde
 #NRF5SDK_DIR := $(TOP_DIR)/nrf5_sdk/nRF5_SDK_17.0.0_9d13099
 
 SRC_FILES += \
-	$(NRF5SDK_DIR)/modules/nrfx/mdk/gcc_startup_nrf52.S \
-	$(NRF5SDK_DIR)/modules/nrfx/mdk/system_nrf52.c \
 	$(NRF5SDK_DIR)/components/libraries/log/src/nrf_log_backend_rtt.c \
 	$(NRF5SDK_DIR)/components/libraries/log/src/nrf_log_backend_serial.c \
 	$(NRF5SDK_DIR)/components/libraries/log/src/nrf_log_default_backends.c \
@@ -201,6 +199,8 @@ APP_DEFS += \
 SDK_DEFS += -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
 ifeq (NRF52832, $(strip $(MCU)))
+	SRC_FILES += $(NRF5SDK_DIR)/modules/nrfx/mdk/gcc_startup_nrf52.S
+	SRC_FILES += $(NRF5SDK_DIR)/modules/nrfx/mdk/system_nrf52.c
 	INC_FOLDERS += $(NRF5SDK_DIR)/components/softdevice/s132/headers
 	INC_FOLDERS += $(NRF5SDK_DIR)/components/softdevice/s132/headers/nrf52
 	APP_DEFS += -DGPIO_NRF5X
@@ -212,6 +212,8 @@ ifeq (NRF52832, $(strip $(MCU)))
 endif
 
 ifeq (NRF52840, $(strip $(MCU)))
+	SRC_FILES += $(NRF5SDK_DIR)/modules/nrfx/mdk/gcc_startup_nrf52840.S
+	SRC_FILES += $(NRF5SDK_DIR)/modules/nrfx/mdk/system_nrf52840.c
 	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd.c
 	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd_core.c
 	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/app_usbd_hid.c
