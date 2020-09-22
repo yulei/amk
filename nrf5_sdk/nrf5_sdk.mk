@@ -208,6 +208,7 @@ ifeq (NRF52832, $(strip $(MCU)))
 	APP_DEFS += -DNRF52832_XXAA
 	APP_DEFS += -DNRF52_PAN_74
 	APP_DEFS += -DS132
+	LIB_FILES += $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52_gcc.a
 	LINKER_SCRIPT := $(TOP_DIR)/nrf5_sdk/nrf52832.ld
 endif
 
@@ -230,10 +231,9 @@ ifeq (NRF52840, $(strip $(MCU)))
 	INC_FOLDERS += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid
 	APP_DEFS += -DNRF52840_XXAA
 	APP_DEFS += -DS140
+	LIB_FILES += $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52840_gcc.a
 	LINKER_SCRIPT := $(TOP_DIR)/nrf5_sdk/nrf52840.ld
 endif
 
-LIB_FILES += \
-  $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52_sd_resources_gcc.a \
 
 LINKER_PATH := $(NRF5SDK_DIR)/modules/nrfx/mdk
