@@ -86,6 +86,8 @@ void board_task(void)
 
 static void amk_init(void)
 {
+    extern void fee_init(void);
+    fee_init();
     keyboard_init();
     host_set_driver(&amk_driver);
     #ifdef SCREEN_ENABLE

@@ -38,43 +38,35 @@ ifeq (yes,$(LVGL_ENABLE))
 include $(TOP_DIR)/lvgl/lvgl.mk
 endif
 
-#$(OUTPUT_DIRECTORY)/$(TARGET).out: $(LINKER_SCRIPT)
-
 # Optimization flags
-#OPT = -O3 -g3
+OPT = -O3 -g3
 
 # Debug flags
-OPT = -Og -g3 -DDEBUG
+#OPT = -Og -g3 -DDEBUG
 
 # Uncomment the line below to enable link time optimization
 #OPT += -flto
 
+FLAGS_ALL := $(OPT) $(APP_DEFS) $(SDK_DEFS)
 # C flags common to all targets
-CFLAGS += $(OPT)
-CFLAGS += $(APP_DEFS)
-CFLAGS += $(SDK_DEFS)
-#CFLAGS += -mcpu=cortex-m4
-#CFLAGS += -mthumb -mabi=aapcs
-#CFLAGS += -mthumb
-#CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
-#CFLAGS += -mfloat-abi=hard
+CFLAGS += $(FLAGS_ALL)
 CFLAGS += -Wall
-#CFLAGS += -Werror
+CFLAGS += -Werror
 # keep every function in a separate section, this allows linker to discard unused ones
-CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
-CFLAGS += -fno-builtin -fshort-enums
+CFLAGS += -ffunction-sections
+CFLAGS += -fdata-sections
+CFLAGS += -fno-strict-aliasing
+CFLAGS += -fno-builtin
+CFLAGS += -fshort-enums
 
 # C++ flags common to all targets
 CXXFLAGS += $(OPT)
 
 # Assembler flags common to all targets
-ASMFLAGS += $(OPT)
-ASMFLAGS += $(APP_DEFS)
-ASMFLAGS += $(SDK_DEFS)
+ASMFLAGS += $(FLAGS_ALL)
 
 # Linker flags
-LDFLAGS += $(OPT)
-LDFLAGS += $(SDK_DEFS)
+LDFLAGS += $(FLAGS_ALL)
 LDFLAGS += -L$(LINKER_PATH) -T$(LINKER_SCRIPT)
 # let linker dump unused sections
 LDFLAGS += -Wl,--gc-sections
@@ -87,7 +79,7 @@ LIB_FILES += -lc -lnosys -lm
 
 .PHONY: default help
 
-# Default target - first one defined
+# Default target
 ifneq (,$(TARGET))
 	default: $(TARGET)
 else
@@ -103,9 +95,7 @@ help:
 #	@echo		flash_softdevice	- flashing the softdevice
 	@echo		erase				- erase the chip
 
-#TEMPLATE_PATH := $(SDK_ROOT)/components/toolchain/gcc
 include $(TOP_DIR)/common.mk
-#$(foreach target, $(TARGETS), $(call define_target, $(target)))
 $(call define_target, $(TARGET))
 
 

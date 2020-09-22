@@ -1,5 +1,5 @@
 /**
- * matrix.c
+ * @file matrix_scan.c
  *  keyboard matrix scanning implementation
  */
 

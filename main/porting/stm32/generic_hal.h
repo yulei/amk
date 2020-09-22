@@ -14,7 +14,7 @@
 #elif defined(STM32F103xB) 
     #include "stm32f1xx_hal.h"
 #else
-    #error "MCU_TYPE not defined"
+    #error "HAL MCU not defined"
 #endif
 
 extern void Error_Handler(void);

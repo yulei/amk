@@ -7,6 +7,7 @@ SRC_FILES += \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/system_$(MCU_FAMILY).c \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/$(MCU_FAMILY)_hal_msp.c \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/$(MCU_FAMILY)_it.c \
+	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_conf.c \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_core.c \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_ctlreq.c \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_ioreq.c \

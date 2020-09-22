@@ -26,7 +26,7 @@ ifeq (yes, $(strip $(BOOTMAGIC_ENABLE)))
 		SRC_FILES += $(MAIN_DIR)/porting/nrf52/eeconfig_fds.c
 	endif
 	ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
-		SRC_FILES += $(MAIN_DIR)/porting/eeconfig_mem.c
+		SRC_FILES += $(MAIN_DIR)/porting/stm32/eeconfig_flash.c
 	endif
 
 	SRC_FILES += $(MAIN_DIR)/eeprom_manager.c

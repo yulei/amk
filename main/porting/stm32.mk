@@ -9,7 +9,6 @@ SRC_FILES += \
 	$(STM32_PORTING_DIR)/usb_descriptors.c \
 	$(STM32_PORTING_DIR)/gpio_pin.c \
 	$(STM32_USB_DIR)/usb_device.c \
-	$(STM32_USB_DIR)/usbd_conf.c \
 	$(STM32_USB_DIR)/usbd_desc.c \
 	$(STM32_USB_DIR)/usbd_hid.c \
 
