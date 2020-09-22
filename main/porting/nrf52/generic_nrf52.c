@@ -106,7 +106,6 @@ void board_init(void)
 {
     bool erase_bonds = false;
     uint32_t reason = 0;
-    ret_code_t err_code;
     
 #if CONFIG_JLINK_MONITOR_ENABLED
     NVIC_SetPriority(DebugMonitor_IRQn, _PRIO_SD_LOW);
@@ -118,23 +117,19 @@ void board_init(void)
     power_management_init();
     scheduler_init();
 
-    err_code = nrf_sdh_enable_request();
-    APP_ERROR_CHECK(err_code);
     // Start execution.
-    NRF_LOG_INFO("NRF BLE Keyboard started.");
-    sd_power_gpregret_get(RST_REGISTER, &reason);
+    reason = NRF_POWER->GPREGRET;
+    NRF_LOG_INFO("NRF Keyboard start reason: %d.", reason);
+    // clear the register
+    NRF_POWER->GPREGRET = 0;
 
     if (reason & RST_ERASE_BOND) {
         NRF_LOG_INFO("RESET reason: erase bonds");
         erase_bonds = true;
-        sd_power_gpregret_clr(RST_REGISTER, RST_ERASE_BOND);
     }
 
     if (reason & RST_USE_GZLL) {
         NRF_LOG_INFO("use GAZELL protocol");
-        sd_power_gpregret_clr(RST_REGISTER, RST_USE_GZLL);
-        err_code = nrf_sdh_disable_request();
-        APP_ERROR_CHECK(err_code);
 
         rf_driver.is_ble = 0;
         #ifdef GZLL_HOST_RECEIVER
@@ -142,20 +137,11 @@ void board_init(void)
         #else
         gzll_keyboard_init(false);
         #endif
+
+        gzll_keyboard_start();
     } else {
         rf_driver.is_ble = 1;
         ble_keyboard_init();
-    }
-
-    /*if (reason & RST_BOOTLOADER) {
-        NRF_LOG_INFO("reset to bootloader");
-        sd_power_gpregret_clr(RST_REGISTER, RST_BOOTLOADER);
-    }*/
-
-
-    if (reason & RST_USE_GZLL) {
-        gzll_keyboard_start();
-    } else {
         ble_keyboard_start(erase_bonds);
     }
 }
