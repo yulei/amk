@@ -6453,7 +6453,7 @@
 // <i> Setting ID to 0 disables the string.
 //==========================================================
 #ifndef APP_USBD_STRING_ID_PRODUCT
-#define APP_USBD_STRING_ID_PRODUCT 2
+#define APP_USBD_STRING_ID_PRODUCT 1
 #endif
 // <q> APP_USBD_STRINGS_PRODUCT_EXTERN  - Define whether @ref APP_USBD_STRINGS_PRODUCT is created by macro or declared as a global variable.
 
@@ -6501,7 +6501,7 @@
 // <i> Setting ID to 0 disables the string.
 //==========================================================
 #ifndef APP_USBD_STRING_ID_CONFIGURATION
-#define APP_USBD_STRING_ID_CONFIGURATION 4
+#define APP_USBD_STRING_ID_CONFIGURATION 1
 #endif
 // <q> APP_USBD_STRING_CONFIGURATION_EXTERN  - Define whether @ref APP_USBD_STRINGS_CONFIGURATION is created by macro or declared as global variable.
 
@@ -6515,7 +6515,7 @@
 // <i> Note: This value is not editable in Configuration Wizard.
 // <i> Configuration string that is defined the same way like in @ref APP_USBD_STRINGS_MANUFACTURER.
 #ifndef APP_USBD_STRINGS_CONFIGURATION
-#define APP_USBD_STRINGS_CONFIGURATION APP_USBD_STRING_DESC("Default configuration")
+#define APP_USBD_STRINGS_CONFIGURATION APP_USBD_STRING_DESC("HID Composite")
 #endif
 
 // </e>
@@ -6536,7 +6536,7 @@
 // <i>                Then use X(USBD_STRING_WINUSB, =0xEE, (APP_USBD_STRING_DESC(...)))
 // <i> - @c ...     : List of string descriptors for each defined language.
 #ifndef APP_USBD_STRINGS_USER
-#define APP_USBD_STRINGS_USER X(APP_USER_1, , APP_USBD_STRING_DESC("User 1"))
+#define APP_USBD_STRINGS_USER X(APP_USER_1, , APP_USBD_STRING_DESC("astro"))
 #endif
 
 // </e>
