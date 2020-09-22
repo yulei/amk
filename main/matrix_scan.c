@@ -5,10 +5,16 @@
 
 #include <string.h>
 #include "gpio_pin.h"
-#include "matrix.h"
+#include "matrix_scan.h"
+#include "keyboard.h"
 #include "print.h"
 #include "timer.h"
 #include "wait.h"
+
+#ifdef RGB_EFFECTS_ENABLE
+#include "rgb_driver.h"
+#include "rgb_effects.h"
+#endif
 
 #ifndef DEBOUNCE
 #   define DEBOUNCE 5
@@ -34,6 +40,11 @@ void matrix_init(void)
     // initialize matrix state: all keys off
     memset(&matrix[0], 0, sizeof(matrix));
     memset(&matrix_debouncing[0], 0, sizeof(matrix_debouncing));
+
+#ifdef RGB_EFFECTS_ENABLE
+    rgb_driver_t* driver = rgb_driver_create(RGB_DRIVER_AW9523B);
+    rgb_effects_init(driver);
+#endif
 }
 
 uint8_t matrix_scan(void)
@@ -73,6 +84,10 @@ uint8_t matrix_scan(void)
         debouncing = false;
     }
 
+#ifdef RGB_EFFECTS_ENABLE
+    rgb_effects_task();
+#endif
+
     return 1;
 }
 
@@ -107,3 +122,53 @@ static void  init_pins(void)
         gpio_set_input_pulldown(row_pins[row]);
     }
 }
+
+bool matrix_is_off(void)
+{
+    for (int i = 0; i < MATRIX_ROWS; i++) {
+        if (matrix[i] != 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+#if defined(NRF52)
+#include "nrf_gpio.h"
+#include "common_config.h"
+void matrix_prepare_sleep(void)
+{
+    for (uint32_t i = 0; i < NUMBER_OF_PINS; i++) {
+        nrf_gpio_cfg_default(i);
+    }
+
+    nrf_gpio_cfg_output(CAPS_LED_PIN);
+    nrf_gpio_pin_clear(CAPS_LED_PIN);
+    
+    nrf_gpio_cfg_output(RGBLIGHT_EN_PIN);
+    nrf_gpio_pin_clear(RGBLIGHT_EN_PIN);
+
+    for (uint32_t i = 0; i < MATRIX_COLS; i++) {
+        nrf_gpio_cfg_output(col_pins[i]);
+        nrf_gpio_pin_set(col_pins[i]);
+    }
+
+    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
+        nrf_gpio_cfg_sense_input(row_pins[i], NRF_GPIO_PIN_PULLDOWN, NRF_GPIO_PIN_SENSE_HIGH);
+    }
+}
+
+// =======================
+// tmk hooking
+// =======================
+void hook_matrix_change(keyevent_t event)
+{
+    if (!IS_NOEVENT(event)) {
+        rf_driver.matrix_changed = 1;
+    }
+}
+#else
+
+void matrix_prepare_sleep(void) {}
+
+#endif

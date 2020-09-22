@@ -6,7 +6,6 @@
 #include "common_config.h"
 #include "app_timer.h"
 #include "nrf_gpio.h"
-#include "nrf_drv_gpiote.h"
 #include "nrf_pwr_mgmt.h"
 #include "usb_interface.h"
 #include "eeconfig_fds.h"
@@ -14,7 +13,7 @@
 #include "report.h"
 #include "host.h"
 #include "keyboard.h"
-#include "matrix_driver.h"
+#include "matrix_scan.h"
 
 #include "rgb_effects.h"
 
@@ -29,7 +28,6 @@ static void keyboard_timer_init(void);
 static void keyboard_timout_handler(void *p_context);
 static void keyboard_timer_start(void);
 static void keyboard_timer_stop(void);
-static void matrix_event_handler(bool changed);
 
 /** the fllowing function can be overrided by the keyboard codes */
 extern void keyboard_set_rgb(bool on);
@@ -67,9 +65,6 @@ static nrf_usb_event_handler_t usb_handler = {
 
 void rf_keyboard_init(rf_send_report_t send_report)
 {
-    ret_code_t err_code;
-    err_code = nrf_drv_gpiote_init();
-    APP_ERROR_CHECK(err_code);
     rf_send_report = send_report;
 
     keyboard_setup();
@@ -81,7 +76,6 @@ void rf_keyboard_init(rf_send_report_t send_report)
 
 void rf_keyboard_start()
 {
-    matrix_driver_scan_start();
     keyboard_timer_start();
     rf_driver.scan_count = 0;
 }
@@ -90,11 +84,12 @@ void rf_keyboard_prepare_sleep(void)
 {
     NRF_LOG_INFO("power down sleep preparing");
     // stop all timer
+    keyboard_timer_stop();
     app_timer_stop_all();
     // keyboard sleep
     keyboard_prepare_sleep();
     // turn matrix to sense mode
-    matrix_driver_prepare_sleep();
+    matrix_prepare_sleep();
     // usb backend to sleep
     nrf_usb_prepare_sleep();
 }
@@ -150,18 +145,6 @@ static void keyboard_timout_handler(void *p_context)
             if (rf_driver.battery_power <= BATTERY_LED_THRESHHOLD) {
                 keyboard_set_rgb(false);
             }
-        }
-    }
-
-    if (rf_driver.trigger_enabled) {
-        // scan count overflow, switch to trigger mode
-        if (matrix_driver_keys_off() && (rf_driver.scan_count >= MAX_SCAN_COUNT)) {
-            keyboard_timer_stop();
-            matrix_driver_scan_stop();
-            matrix_driver_trigger_start(matrix_event_handler);
-
-            NRF_LOG_INFO("keyboard matrix swtiched to trigger mode");
-            rf_driver.scan_count = 0;
         }
     }
 }
@@ -267,20 +250,6 @@ static void send_consumer(uint16_t data)
 }
 
 #endif
-
-static void matrix_event_handler(bool changed)
-{
-    if (!changed) return;
-
-    // disable row event
-    matrix_driver_trigger_stop();
-    matrix_driver_scan_start();
-    keyboard_timer_start();
-
-    keyboard_task();
-    rf_driver.scan_count = 0;
-    rf_driver.sleep_count = 0;
-}
 
 static bool keyboard_pwr_mgmt_shutdown_handler(nrf_pwr_mgmt_evt_t event)
 {

@@ -18,11 +18,6 @@ rf_driver_t rf_driver = {
     .ble_led = 0,
     .usb_led = 0,
     .vbus_enabled = 0,
-#ifdef MATRIX_USE_GPIO
-    .trigger_enabled = 0,
-#else
-    .trigger_enabled = 1,
-#endif
 #ifdef DISABLE_SLEEP
     .sleep_enabled = 0,
 #else

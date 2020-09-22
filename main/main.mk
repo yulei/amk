@@ -21,10 +21,6 @@ ifeq (yes, $(strip $(MATRIX_USE_TCA6424)))
 	SRC_FILES += $(MAIN_DIR)/drivers/i2c.c
 endif
 
-ifeq (yes, $(strip $(MATRIX_USE_GPIO)))
-	APP_DEFS += -DMATRIX_USE_GPIO
-endif
-
 ifeq (yes, $(strip $(BOOTMAGIC_ENABLE)))
 	ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
 		SRC_FILES += $(MAIN_DIR)/porting/nrf52/eeconfig_fds.c
@@ -55,12 +51,7 @@ ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))
 endif
 
 ifneq (yes, $(strip $(CUSTOM_MATRIX)))
-	ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
-		SRC_FILES += $(MAIN_DIR)/matrix_driver.c
-	endif
-	ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
-		SRC_FILES += $(MAIN_DIR)/matrix_amk.c
-	endif
+	SRC_FILES += $(MAIN_DIR)/matrix_scan.c
 endif
 
 ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
