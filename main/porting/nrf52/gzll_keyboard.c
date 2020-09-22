@@ -175,11 +175,14 @@ void nrf_gzll_host_rx_data_ready(uint32_t pipe, nrf_gzll_host_rx_info_t rx_info)
             memcpy(&report, dummy, sizeof(report));
             nrf_usb_send_report(NRF_REPORT_ID_KEYBOARD, &report, sizeof(report));
         } break;
+#ifdef MOUSEKEY_ENABLE
         case NRF_REPORT_ID_MOUSE: {
             report_mouse_t report;
             memcpy(&report, &dummy[2], sizeof(report));
             nrf_usb_send_report(NRF_REPORT_ID_MOUSE, &report, sizeof(report));
         } break;
+#endif
+#ifdef EXTRAKEY_ENABLE 
         case NRF_REPORT_ID_SYSTEM: {
             uint16_t report;
             memcpy(&report, &dummy[2], sizeof(report));
@@ -190,6 +193,7 @@ void nrf_gzll_host_rx_data_ready(uint32_t pipe, nrf_gzll_host_rx_info_t rx_info)
             memcpy(&report, &dummy[2], sizeof(report));
             nrf_usb_send_report(NRF_REPORT_ID_CONSUMER, &report, sizeof(report));
         } break;
+#endif
         default:
             NRF_LOG_INFO("GZLL HOST: unknown report type: %d", dummy[1]);
             break;
