@@ -6,8 +6,8 @@
 #include "common_config.h"
 #include "app_timer.h"
 #include "nrf_gpio.h"
-#include "nrf_drv_gpiote.h"
 #include "nrf_pwr_mgmt.h"
+#include "nrfx_gpiote.h"
 #include "usb_interface.h"
 #include "eeconfig_fds.h"
 
@@ -67,7 +67,7 @@ static nrf_usb_event_handler_t usb_handler = {
 void rf_keyboard_init(rf_send_report_t send_report)
 {
     rf_send_report = send_report;
-    nrf_drv_gpiote_init();
+    nrfx_gpiote_init();
 
     keyboard_setup();
     keyboard_init();
@@ -90,7 +90,7 @@ void rf_keyboard_prepare_sleep(void)
     // stop all timer
     app_timer_stop_all();
     // uninit gpiote
-    nrf_drv_gpiote_uninit();
+    nrfx_gpiote_uninit();
     // keyboard sleep
     keyboard_prepare_sleep();
     // turn matrix to sense mode

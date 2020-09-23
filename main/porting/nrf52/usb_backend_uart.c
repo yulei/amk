@@ -6,7 +6,7 @@
 #include "usb_interface.h"
 #include "app_uart.h"
 #include "nrf_gpio.h"
-#include "nrf_drv_gpiote.h"
+#include "nrfx_gpiote.h"
 #include "nrf_uart.h"
 #include "nrf_delay.h"
 
@@ -25,7 +25,7 @@ typedef struct {
 static nrf_usb_config_t usb_config;
 static nrf_usb_buf_t usb_buffer;
 
-static void vbus_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
+static void vbus_event_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
 static void usb_update_state();
 static void uart_init(void);
 static void uart_uninit(void);
@@ -48,10 +48,10 @@ void nrf_usb_init(nrf_usb_event_handler_t* eh)
     usb_buffer.count = 0;
 
     ret_code_t err_code;
-    nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
-    err_code = nrf_drv_gpiote_in_init(VBUS_DETECT_PIN, &in_config, vbus_event_handler);
+    nrfx_gpiote_in_config_t in_config = NRFX_GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
+    err_code = nrfx_gpiote_in_init(VBUS_DETECT_PIN, &in_config, vbus_event_handler);
     APP_ERROR_CHECK(err_code);
-    nrf_drv_gpiote_in_event_enable(VBUS_DETECT_PIN, true);
+    nrfx_gpiote_in_event_enable(VBUS_DETECT_PIN, true);
 
     usb_update_state();
 }
@@ -114,7 +114,7 @@ void nrf_usb_reboot(void)
 
 static void usb_update_state()
 {
-    usb_config.vbus_enabled = nrf_drv_gpiote_in_is_set(VBUS_DETECT_PIN) ? true : false;
+    usb_config.vbus_enabled = nrfx_gpiote_in_is_set(VBUS_DETECT_PIN) ? true : false;
 
     if (usb_config.vbus_enabled) {
         uart_init();
@@ -127,7 +127,7 @@ static void usb_update_state()
     }
 }
 
-static void vbus_event_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+static void vbus_event_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
     NRF_LOG_INFO("PIN EVENT: pin=%d, action=%d", pin, action);
     if (pin == VBUS_DETECT_PIN) {
