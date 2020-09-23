@@ -17,15 +17,13 @@ static void hid_user_ev_handler(app_usbd_class_inst_t const * p_inst,
 // HCK hid custom keyboard
 #define HCK_INTERFACE               0
 #define HCK_EP_IN                   NRF_DRV_USBD_EPIN1
-#define HCK_EP_OUT                  NRF_DRV_USBD_EPOUT1
 #define HCK_REPORT_IN_QUEUE_SIZE    1
 #define HCK_REPORT_OUT_MAXSIZE      1
 #define HCK_REPORT_FEATURE_MAXSIZE  31
 
 #define HCK_EPLIST() \
 ( \
-HCK_EP_IN, \
-HCK_EP_OUT \
+HCK_EP_IN \
 )
 
 APP_USBD_HID_GENERIC_SUBCLASS_REPORT_DESC(hck_desc,{ TUD_HID_REPORT_DESC_KEYBOARD() });
@@ -40,8 +38,8 @@ APP_USBD_HID_GENERIC_GLOBAL_DEF(m_hck,
                                 HCK_REPORT_IN_QUEUE_SIZE,
                                 HCK_REPORT_OUT_MAXSIZE,
                                 HCK_REPORT_FEATURE_MAXSIZE,
-                                APP_USBD_HID_SUBCLASS_NONE,
-                                APP_USBD_HID_PROTO_GENERIC);
+                                APP_USBD_HID_SUBCLASS_BOOT,
+                                APP_USBD_HID_PROTO_KEYBOARD);
 
 // HCO hid custom other
 #define HCO_INTERFACE               1
@@ -162,9 +160,7 @@ void nrf_usb_wakeup(void)
 
 void nrf_usb_prepare_sleep(void) { }
 
-void nrf_usb_reboot(void)
-{
-}
+void nrf_usb_reboot(void) { }
 
 static void usbd_user_ev_handler(app_usbd_event_type_t event)
 {

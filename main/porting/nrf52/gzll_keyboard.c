@@ -13,6 +13,7 @@
 #include "report.h"
 
 static uint8_t m_gzll_packet[GZLL_PAYLOAD_SIZE];
+static uint8_t m_gzll_keepalive[GZLL_PAYLOAD_SIZE];
 static bool m_gzll_host = false;
 
 #define GZLL_BUFFER_ENTRIES     16
@@ -71,13 +72,15 @@ void gzll_keyboard_init(bool host)
     m_gzll_host = host;
     if (m_gzll_host) {
         GAZELLE_ERROR_CODE_CHECK(nrf_gzll_init(NRF_GZLL_MODE_HOST));
-        nrf_gzll_set_max_tx_attempts(GZLL_MAX_TX_ATTEMPTS);
-        GAZELLE_ERROR_CODE_CHECK(nrf_gzll_enable());
     } else {
         GAZELLE_ERROR_CODE_CHECK(nrf_gzll_init(NRF_GZLL_MODE_DEVICE));
-        nrf_gzll_set_max_tx_attempts(GZLL_MAX_TX_ATTEMPTS);
-        GAZELLE_ERROR_CODE_CHECK(nrf_gzll_enable());
     }
+
+    nrf_gzll_set_max_tx_attempts(GZLL_MAX_TX_ATTEMPTS);
+    nrf_gzll_set_base_address_0(GZLL_BASE_ADDRESS_0);
+    nrf_gzll_set_base_address_1(GZLL_BASE_ADDRESS_1);
+
+    GAZELLE_ERROR_CODE_CHECK(nrf_gzll_enable());
     rf_keyboard_init(gzll_send_report);
     buffer_init();
 }
@@ -85,11 +88,9 @@ void gzll_keyboard_init(bool host)
 void gzll_keyboard_start(void)
 {
     if (!m_gzll_host) {
-    // Add a packet to the TX FIFO to start the data transfer.
-    // Next packets to send will be added.
-        m_gzll_packet[1] = GZLL_DUMMY_TYPE;
+        m_gzll_keepalive[1] = GZLL_KEEPALIVE_TYPE;
         GAZELLE_ERROR_CODE_CHECK(nrf_gzll_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST,
-                                                                m_gzll_packet,
+                                                                m_gzll_keepalive,
                                                                 GZLL_PAYLOAD_SIZE));
     }
     rf_keyboard_start();
@@ -101,9 +102,9 @@ void gzll_keyboard_keepalive(void)
         return;
 
     if (nrf_gzll_ok_to_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST)) {
-        m_gzll_packet[1] = GZLL_DUMMY_TYPE;
+        m_gzll_keepalive[1] = GZLL_KEEPALIVE_TYPE;
         GAZELLE_ERROR_CODE_CHECK(nrf_gzll_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST,
-                                                                m_gzll_packet,
+                                                                m_gzll_keepalive,
                                                                 GZLL_PAYLOAD_SIZE));
     }
 }

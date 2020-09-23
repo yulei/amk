@@ -85,9 +85,11 @@ void rf_keyboard_start()
 void rf_keyboard_prepare_sleep(void)
 {
     NRF_LOG_INFO("power down sleep preparing");
-    // stop all timer
+    // stop keyboard timer
     keyboard_timer_stop();
+    // stop all timer
     app_timer_stop_all();
+    // uninit gpiote
     nrf_drv_gpiote_uninit();
     // keyboard sleep
     keyboard_prepare_sleep();
@@ -133,7 +135,7 @@ static void keyboard_timout_handler(void *p_context)
     keyboard_task();
 
     if (rf_driver.vbus_enabled) {
-        // do not make the power related stuff
+        // do not run the power related stuff while have usb supply
         return;
     }
 
