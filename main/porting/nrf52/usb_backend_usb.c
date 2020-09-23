@@ -77,15 +77,9 @@ static nrf_usb_config_t nrf_usb_config = {
     .usbd_config.ev_state_proc= usbd_user_ev_handler,
 };
 
-void nrf_usb_init(nrf_usb_event_handler_t* eh)
+void nrf_app_usbd_init(void)
 {
     ret_code_t rc;
-    nrf_usb_config.event.disable_cb = eh->disable_cb;
-    nrf_usb_config.event.enable_cb  = eh->enable_cb;
-    nrf_usb_config.event.suspend_cb = eh->suspend_cb;
-    nrf_usb_config.event.resume_cb  = eh->resume_cb;
-    nrf_usb_config.event.leds_cb    = eh->leds_cb;
-
     app_usbd_serial_num_generate();
 
     rc = nrf_drv_clock_init();
@@ -94,7 +88,6 @@ void nrf_usb_init(nrf_usb_event_handler_t* eh)
     rc = app_usbd_init(&nrf_usb_config.usbd_config);
     APP_ERROR_CHECK(rc);
 
-    // attach class instance
     app_usbd_class_inst_t const * class_inst_generic;
     class_inst_generic = app_usbd_hid_generic_class_inst_get(&m_hck);
     rc = app_usbd_class_append(class_inst_generic);
@@ -103,10 +96,16 @@ void nrf_usb_init(nrf_usb_event_handler_t* eh)
     class_inst_generic = app_usbd_hid_generic_class_inst_get(&m_hco);
     rc = app_usbd_class_append(class_inst_generic);
     APP_ERROR_CHECK(rc);
-
-    rc = app_usbd_power_events_enable();
-    APP_ERROR_CHECK(rc);
     NRF_LOG_INFO("NRF USB device initialized");
+}
+
+void nrf_usb_init(nrf_usb_event_handler_t* eh)
+{
+    nrf_usb_config.event.disable_cb = eh->disable_cb;
+    nrf_usb_config.event.enable_cb  = eh->enable_cb;
+    nrf_usb_config.event.suspend_cb = eh->suspend_cb;
+    nrf_usb_config.event.resume_cb  = eh->resume_cb;
+    nrf_usb_config.event.leds_cb    = eh->leds_cb;
 }
 
 void nrf_usb_send_report(nrf_report_id report, const void *data, size_t size)
