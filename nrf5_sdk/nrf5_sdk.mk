@@ -180,6 +180,7 @@ ifeq (NRF52840, $(strip $(MCU)))
 	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd.c
 	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd_core.c
 	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd_string_desc.c
+	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd_serial_num.c
 	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/app_usbd_hid.c
 	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/generic/app_usbd_hid_generic.c
 	SRC_FILES += $(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_usbd.c

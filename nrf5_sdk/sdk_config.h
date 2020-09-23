@@ -6298,7 +6298,7 @@
 // <i> Major device version, will be converted automatically to BCD notation. Use just decimal values.
 
 #ifndef APP_USBD_DEVICE_VER_MAJOR
-#define APP_USBD_DEVICE_VER_MAJOR 1
+#define APP_USBD_DEVICE_VER_MAJOR 2
 #endif
 
 // <o> APP_USBD_DEVICE_VER_MINOR - Minor device version  <0-9>
