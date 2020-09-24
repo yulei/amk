@@ -17,6 +17,7 @@ ble_driver_t ble_driver = {
 };
 
 static void ble_send_report(uint8_t type, uint8_t *data, uint8_t size);
+static void ble_prepare_sleep(void);
 
 /**@brief Function for handling BLE events.
  *
@@ -116,7 +117,7 @@ void ble_keyboard_init(void)
     fds_eeprom_init();
     ble_services_init();
 
-    rf_keyboard_init(ble_send_report);
+    rf_keyboard_init(ble_send_report, ble_prepare_sleep);
 }
 
 void ble_keyboard_start(bool erase_bonds)
@@ -124,6 +125,9 @@ void ble_keyboard_start(bool erase_bonds)
     ble_services_start(erase_bonds);
     rf_keyboard_start();
 }
+
+void ble_prepare_sleep(void)
+{}
 
 static void ble_send_report(uint8_t type, uint8_t *data, uint8_t size)
 {

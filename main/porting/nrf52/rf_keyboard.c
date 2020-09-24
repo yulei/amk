@@ -19,6 +19,8 @@
 #include "rgb_effects.h"
 
 static rf_send_report_t rf_send_report = NULL;
+static rf_prepare_sleep_t rf_prepare_sleep = NULL;
+
 APP_TIMER_DEF(m_keyboard_timer_id);         // keyboard scan timer id
 
 static bool keyboard_pwr_mgmt_shutdown_handler(nrf_pwr_mgmt_evt_t event);
@@ -64,9 +66,11 @@ static nrf_usb_event_handler_t usb_handler = {
     .leds_cb = usb_leds,
 };
 
-void rf_keyboard_init(rf_send_report_t send_report)
+void rf_keyboard_init(rf_send_report_t send_report, rf_prepare_sleep_t prepare_sleep)
 {
     rf_send_report = send_report;
+    rf_prepare_sleep = prepare_sleep;
+
     nrfx_gpiote_init();
 
     keyboard_setup();
@@ -89,6 +93,8 @@ void rf_keyboard_prepare_sleep(void)
     keyboard_timer_stop();
     // stop all timer
     app_timer_stop_all();
+    // rf stack sleep
+    rf_prepare_sleep();
     // uninit gpiote
     nrfx_gpiote_uninit();
     // keyboard sleep
@@ -329,8 +335,7 @@ bool hook_process_action(keyrecord_t *record) {
             } else {
                 NRF_LOG_INFO("set output to BLE");
                 rf_driver.output_target = OUTPUT_RF;
-            }
-            return true;
+            } return true;
 
         case KC_F22: // reset to erase bond mode
             NRF_LOG_INFO("reset to erase bond");
@@ -342,6 +347,7 @@ bool hook_process_action(keyrecord_t *record) {
             NRF_LOG_INFO("send reboot command");
             nrf_usb_reboot();
             return true;
+
         case KC_F24: // toggle BLE or GAZELL
             if (rf_driver.is_ble) {
                 NRF_LOG_INFO("switch to gzll");
@@ -350,8 +356,7 @@ bool hook_process_action(keyrecord_t *record) {
             } else {
                 NRF_LOG_INFO("switch to ble");
                 NVIC_SystemReset();
-            }
-            break;
+            } return true;
         default:
             break;
         }

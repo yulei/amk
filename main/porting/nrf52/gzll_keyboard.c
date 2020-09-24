@@ -16,56 +16,9 @@ static uint8_t m_gzll_packet[GZLL_PAYLOAD_SIZE];
 static uint8_t m_gzll_keepalive[GZLL_PAYLOAD_SIZE];
 static bool m_gzll_host = false;
 
-#define GZLL_BUFFER_ENTRIES     16
-
-typedef struct {
-    uint8_t data[GZLL_PAYLOAD_SIZE];
-} gzll_entry_t;
-
-typedef struct {
-    gzll_entry_t    packets[GZLL_BUFFER_ENTRIES];   /**< Maximum number of entries that can enqueued in the list */
-    uint32_t        rp;                             /**< Index to the read location */
-    uint32_t        wp;                             /**< Index to the write location */
-} gzll_buffer_t;
-
-gzll_buffer_t gzll_packets;
-
-STATIC_ASSERT(sizeof(gzll_buffer_t) % 4 == 0);
-
-static void buffer_init(void)
-{
-    gzll_packets.rp = 0;
-    gzll_packets.wp = 0;
-}
-
-static bool buffer_enqueue(uint8_t* report_data, uint8_t report_len)
-{
-    if (((gzll_packets.wp+1) % GZLL_BUFFER_ENTRIES) == gzll_packets.rp ) {
-        // buffer is full
-        return false;
-    }
-    
-    gzll_entry_t* element = &gzll_packets.packets[gzll_packets.wp];
-    memcpy(&element->data[0], report_data, report_len);
-    gzll_packets.wp = (gzll_packets.wp + 1) % GZLL_BUFFER_ENTRIES;
-    return true;
-}
-
-static bool buffer_dequeue(void)
-{
-    if (gzll_packets.wp == gzll_packets.rp) {
-        // buffer is empty
-        return false;
-    }
-
-    gzll_entry_t* element = &gzll_packets.packets[gzll_packets.rp];
-    memcpy(&m_gzll_packet[0], &element->data[0], GZLL_PAYLOAD_SIZE);
-    gzll_packets.rp = (gzll_packets.rp + 1) % GZLL_BUFFER_ENTRIES;
-    return true;
-}
-
-
 static void gzll_send_report(uint8_t type, uint8_t *data, uint8_t size);
+static void gzll_prepare_sleep(void);
+static void gzll_keyboard_keepalive(void);
 
 void gzll_keyboard_init(bool host)
 {
@@ -81,19 +34,30 @@ void gzll_keyboard_init(bool host)
     nrf_gzll_set_base_address_1(GZLL_BASE_ADDRESS_1);
 
     GAZELLE_ERROR_CODE_CHECK(nrf_gzll_enable());
-    rf_keyboard_init(gzll_send_report);
-    buffer_init();
+    rf_keyboard_init(gzll_send_report, gzll_prepare_sleep);
 }
 
 void gzll_keyboard_start(void)
 {
-    if (!m_gzll_host) {
-        m_gzll_keepalive[1] = GZLL_KEEPALIVE_TYPE;
-        GAZELLE_ERROR_CODE_CHECK(nrf_gzll_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST,
-                                                                m_gzll_keepalive,
-                                                                GZLL_PAYLOAD_SIZE));
-    }
+    gzll_keyboard_keepalive();
     rf_keyboard_start();
+}
+
+void gzll_prepare_sleep(void)
+{
+    // Disable gazell.
+    nrf_gzll_disable();
+
+    // Wait for Gazell to shut down.
+    while (nrf_gzll_is_enabled()) { }
+
+    // Clean up after Gazell.
+    NVIC_DisableIRQ(RADIO_IRQn);
+    NVIC_DisableIRQ(NRF_GZLL_TIMER_IRQn);
+    NVIC_DisableIRQ(NRF_GZLL_SWI_IRQn);
+    NVIC_ClearPendingIRQ(RADIO_IRQn);
+    NVIC_ClearPendingIRQ(NRF_GZLL_TIMER_IRQn);
+    NVIC_ClearPendingIRQ(NRF_GZLL_SWI_IRQn);
 }
 
 void gzll_keyboard_keepalive(void)
@@ -102,7 +66,7 @@ void gzll_keyboard_keepalive(void)
         return;
 
     if (nrf_gzll_ok_to_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST)) {
-        m_gzll_keepalive[1] = GZLL_KEEPALIVE_TYPE;
+        m_gzll_keepalive[1] = GZLL_KEEPALIVE;
         GAZELLE_ERROR_CODE_CHECK(nrf_gzll_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST,
                                                                 m_gzll_keepalive,
                                                                 GZLL_PAYLOAD_SIZE));
@@ -125,10 +89,8 @@ void nrf_gzll_device_tx_success(uint32_t pipe, nrf_gzll_device_tx_info_t tx_info
     if (tx_info.payload_received_in_ack) {
         // if ack was sent with payload, pop them from rx fifo.
         GAZELLE_ERROR_CODE_CHECK(nrf_gzll_fetch_packet_from_rx_fifo(pipe, dummy, &dummy_length));
+        // update led status from host ack
         rf_driver.usb_led = dummy[1];
-    }
-    if (buffer_dequeue()) {
-        GAZELLE_ERROR_CODE_CHECK(nrf_gzll_add_packet_to_tx_fifo(pipe, m_gzll_packet, GZLL_PAYLOAD_SIZE));
     }
 }
 
@@ -140,12 +102,12 @@ void nrf_gzll_device_tx_failed(uint32_t pipe, nrf_gzll_device_tx_info_t tx_info)
     uint8_t  dummy[NRF_GZLL_CONST_MAX_PAYLOAD_LENGTH];
     uint32_t dummy_length = NRF_GZLL_CONST_MAX_PAYLOAD_LENGTH;
 
-    // If the transmission failed, send a new packet.
     if (tx_info.payload_received_in_ack) {
         // if ack was sent with payload, pop them from rx fifo.
         GAZELLE_ERROR_CODE_CHECK(nrf_gzll_fetch_packet_from_rx_fifo(pipe, dummy, &dummy_length));
     }
 
+    // If the transmission failed, re-send current packet.
     GAZELLE_ERROR_CODE_CHECK(nrf_gzll_add_packet_to_tx_fifo(pipe, m_gzll_packet, GZLL_PAYLOAD_SIZE));
 }
 
@@ -168,7 +130,7 @@ void nrf_gzll_host_rx_data_ready(uint32_t pipe, nrf_gzll_host_rx_info_t rx_info)
         NRF_LOG_ERROR("HOST RX fifo error ");
     }
 
-    if (dummy_length> 0) {
+    if (dummy_length > 1) {
         switch (dummy[1]) {
         case NRF_REPORT_ID_KEYBOARD: {
             dummy[1] = 0;
@@ -221,30 +183,28 @@ static void gzll_send_report(uint8_t type, uint8_t* data, uint8_t size)
         return;
     }
 
-    uint8_t packet[GZLL_PAYLOAD_SIZE];
-
+    m_gzll_packet[1] = GZLL_KEEPALIVE;
     switch (type) {
     case NRF_REPORT_ID_KEYBOARD:
-        memcpy(packet, data, size);
+        memcpy(m_gzll_packet, data, size);
+        m_gzll_packet[1] = type;
         break;
+#ifdef MOUSEKEY_ENABLE
     case NRF_REPORT_ID_MOUSE:
-        memcpy(&packet[2], data, size);
+        memcpy(&m_gzll_packet[2], data, size);
+        m_gzll_packet[1] = type;
         break;
+#endif
+#ifdef EXTRAKEY_ENABLE 
     case NRF_REPORT_ID_SYSTEM:
     case NRF_REPORT_ID_CONSUMER:
-        memcpy(&packet[2], data, size);
+        memcpy(&m_gzll_packet[2], data, size);
+        m_gzll_packet[1] = type;
         break;
     default:
         NRF_LOG_INFO("GZLL: unknown report type: %d", type);
         return;
     }
-    packet[1] = type;
-    if (nrf_gzll_ok_to_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST)) {
-        memcpy(m_gzll_packet, packet, GZLL_PAYLOAD_SIZE);
-        GAZELLE_ERROR_CODE_CHECK(nrf_gzll_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST, m_gzll_packet, GZLL_PAYLOAD_SIZE));
-    } else {
-        if (!buffer_enqueue(packet, GZLL_PAYLOAD_SIZE)) {
-            NRF_LOG_WARNING("GZLL: buffer queue full");
-        }
-    }
+#endif
+    GAZELLE_ERROR_CODE_CHECK(nrf_gzll_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST, m_gzll_packet, GZLL_PAYLOAD_SIZE));
 }

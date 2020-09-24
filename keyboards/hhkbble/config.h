@@ -49,3 +49,5 @@
 #define CAPS_LED_PIN                18
 
 #define INDICATOR_PIN               25
+
+#define GZLL_IS_HOST 1

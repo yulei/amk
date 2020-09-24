@@ -153,3 +153,4 @@ typedef struct {
 
 extern rf_driver_t rf_driver;
 typedef void (*rf_send_report_t)(uint8_t type, uint8_t* data, uint8_t size);
+typedef void (*rf_prepare_sleep_t)(void);

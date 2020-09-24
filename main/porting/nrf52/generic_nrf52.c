@@ -101,9 +101,6 @@ void idle_state_handle(void)
     }
 }
 
-#ifdef NRF52840_XXAA
-extern void nrf_app_usbd_init(void);
-#endif
 void board_init(void)
 {
     bool erase_bonds = false;
@@ -120,12 +117,11 @@ void board_init(void)
     scheduler_init();
 
 #ifdef NRF52840_XXAA
+    extern void nrf_app_usbd_init(void);
     nrf_app_usbd_init();
 #endif
-    // Start execution.
     reason = NRF_POWER->GPREGRET;
-    NRF_LOG_INFO("NRF Keyboard start reason: %d.", reason);
-    // clear the register
+    NRF_LOG_INFO("NRF Keyboard start reason: %x.", reason);
     NRF_POWER->GPREGRET = 0;
 
     if (reason & RST_ERASE_BOND) {
@@ -133,19 +129,11 @@ void board_init(void)
         erase_bonds = true;
     }
 
-#ifdef GZLL_HOST_RECEIVER
-    if (1) {
-#else
-    if (reason & RST_USE_GZLL) {
-#endif
+    if (GZLL_IS_HOST || GZLL_IS_CLIENT || (reason&RST_USE_GZLL)) {
         NRF_LOG_INFO("use GAZELL protocol");
 
         rf_driver.is_ble = 0;
-#ifdef GZLL_HOST_RECEIVER
-        gzll_keyboard_init(true);
-#else
-        gzll_keyboard_init(false);
-#endif
+        gzll_keyboard_init(GZLL_IS_HOST);
 
 #ifdef NRF52840_XXAA
         app_usbd_power_events_enable();

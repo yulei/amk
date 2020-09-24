@@ -17,10 +17,16 @@ LIB_FILES += \
 APP_DEFS += \
 
 TARGET := $(filter-out clean flash erase flash_softdevice sdk_config help, $(MAKECMDGOALS))
+KEYBOARDS := $(sort $(filter-out %.h %.c,$(notdir $(wildcard keyboards/*))))
 
 OUTPUT_DIRECTORY := build
 
 ifneq (, $(TARGET))
+ifeq ($(filter $(TARGET),$(KEYBOARDS)),)
+$(info A valid keyboard target must be provided, current available:)
+$(foreach kbd,$(KEYBOARDS),$(info $(kbd)))
+$(error Invalid Target specified)
+endif
 include $(TOP_DIR)/keyboards/$(TARGET)/$(TARGET).mk
 ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
 include $(TOP_DIR)/nrf5_sdk/nrf5_sdk.mk
@@ -77,14 +83,19 @@ LDFLAGS += --specs=nano.specs
 # that may need symbols provided by these libraries.
 LIB_FILES += -lc -lnosys -lm
 
-.PHONY: default help
+.PHONY: default help list
 
 # Default target
 ifneq (,$(TARGET))
 	default: $(TARGET)
 else
-	default: help
+	default: list 
 endif
+
+list:
+	$(info Following keyboards are available:)
+	$(foreach kbd,$(KEYBOARDS),$(info -- $(kbd)))
+	@echo
 
 # Print all targets that can be built
 help:

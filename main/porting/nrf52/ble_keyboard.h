@@ -9,3 +9,4 @@
 
 void ble_keyboard_init(void);
 void ble_keyboard_start(bool erase_bonds);
+void ble_keyboard_prepare_sleep(void);

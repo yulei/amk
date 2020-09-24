@@ -17,5 +17,5 @@
 
 //
 // rf host do not need sleep
-#define GZLL_HOST_RECEIVER
+#define GZLL_IS_HOST 1
 #define DISABLE_SLEEP
