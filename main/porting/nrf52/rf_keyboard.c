@@ -8,6 +8,7 @@
 #include "nrf_gpio.h"
 #include "nrf_pwr_mgmt.h"
 #include "nrfx_gpiote.h"
+#include "nrfx_wdt.h"
 #include "usb_interface.h"
 #include "eeconfig_fds.h"
 
@@ -20,8 +21,13 @@
 
 static rf_send_report_t rf_send_report = NULL;
 static rf_prepare_sleep_t rf_prepare_sleep = NULL;
+static nrfx_wdt_channel_id rf_wdt_channgel;
 
 APP_TIMER_DEF(m_keyboard_timer_id);         // keyboard scan timer id
+
+static void rf_wdt_event_handler(void);
+static void rf_wdt_init(void);
+static void rf_wdt_feed(void);
 
 static bool keyboard_pwr_mgmt_shutdown_handler(nrf_pwr_mgmt_evt_t event);
 NRF_PWR_MGMT_HANDLER_REGISTER(keyboard_pwr_mgmt_shutdown_handler, NRF_PWR_MGMT_CONFIG_HANDLER_PRIORITY_COUNT - 1);
@@ -78,6 +84,7 @@ void rf_keyboard_init(rf_send_report_t send_report, rf_prepare_sleep_t prepare_s
     host_set_driver(&kbd_driver);
     keyboard_timer_init();
     nrf_usb_init(&usb_handler);
+    rf_wdt_init();
 }
 
 void rf_keyboard_start()
@@ -138,6 +145,7 @@ static bool keyboard_rgb_on(void) { return keyboard_rgblight_on() || keyboard_rg
 
 static void keyboard_timout_handler(void *p_context)
 {
+    rf_wdt_feed();
     keyboard_task();
 
     if (rf_driver.vbus_enabled) {
@@ -180,7 +188,7 @@ static void keyboard_timer_stop(void)
 static uint8_t keyboard_leds(void)
 {
     if (rf_driver.output_target == OUTPUT_RF)
-        return rf_driver.ble_led;
+        return rf_driver.rf_led;
     
     if (rf_driver.output_target == OUTPUT_USB)
         return rf_driver.usb_led;
@@ -363,4 +371,25 @@ bool hook_process_action(keyrecord_t *record) {
     }
 
     return false;
+}
+
+void rf_wdt_init(void)
+{
+    ret_code_t err_code;
+    nrfx_wdt_config_t config = NRFX_WDT_DEAFULT_CONFIG;
+    err_code = nrfx_wdt_init(&config, rf_wdt_event_handler);
+    APP_ERROR_CHECK(err_code);
+    err_code = nrfx_wdt_channel_alloc(&rf_wdt_channgel);
+    APP_ERROR_CHECK(err_code);
+    nrfx_wdt_enable();
+}
+
+void rf_wdt_feed(void)
+{
+    nrfx_wdt_channel_feed(rf_wdt_channgel);
+}
+
+void rf_wdt_event_handler(void)
+{
+    NRF_LOG_WARNING("rf watchdog timeout!");
 }

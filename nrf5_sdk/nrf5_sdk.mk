@@ -1,5 +1,4 @@
 NRF5SDK_DIR := $(TOP_DIR)/nrf5_sdk/nRF5_SDK_17.0.2_d674dde
-#NRF5SDK_DIR := $(TOP_DIR)/nrf5_sdk/nRF5_SDK_17.0.0_9d13099
 
 SRC_FILES += \
 	$(NRF5SDK_DIR)/components/libraries/log/src/nrf_log_backend_rtt.c \
@@ -70,6 +69,7 @@ SRC_FILES += \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_uarte.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_power.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_twi.c \
+	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_wdt.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
 	$(NRF5SDK_DIR)/integration/nrfx/legacy/nrf_drv_clock.c \
 	$(NRF5SDK_DIR)/integration/nrfx/legacy/nrf_drv_power.c \

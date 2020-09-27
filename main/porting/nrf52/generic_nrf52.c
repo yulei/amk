@@ -15,7 +15,7 @@
 #endif
 
 rf_driver_t rf_driver = {
-    .ble_led = 0,
+    .rf_led = 0,
     .usb_led = 0,
     .vbus_enabled = 0,
 #ifdef DISABLE_SLEEP
@@ -95,8 +95,7 @@ static void power_management_init(void)
 void idle_state_handle(void)
 {
     app_sched_execute();
-    if (NRF_LOG_PROCESS() == false)
-    {
+    if (NRF_LOG_PROCESS() == false) {
         nrf_pwr_mgmt_run();
     }
 }

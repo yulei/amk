@@ -23,6 +23,9 @@ static void gzll_keyboard_keepalive(void);
 void gzll_keyboard_init(bool host)
 {
     m_gzll_host = host;
+    memset(m_gzll_packet, 0, sizeof(m_gzll_packet));
+    memset(m_gzll_keepalive, 0, sizeof(m_gzll_keepalive));
+
     if (m_gzll_host) {
         GAZELLE_ERROR_CODE_CHECK(nrf_gzll_init(NRF_GZLL_MODE_HOST));
     } else {
@@ -33,12 +36,12 @@ void gzll_keyboard_init(bool host)
     nrf_gzll_set_base_address_0(GZLL_BASE_ADDRESS_0);
     nrf_gzll_set_base_address_1(GZLL_BASE_ADDRESS_1);
 
-    GAZELLE_ERROR_CODE_CHECK(nrf_gzll_enable());
     rf_keyboard_init(gzll_send_report, gzll_prepare_sleep);
 }
 
 void gzll_keyboard_start(void)
 {
+    GAZELLE_ERROR_CODE_CHECK(nrf_gzll_enable());
     gzll_keyboard_keepalive();
     rf_keyboard_start();
 }
@@ -90,7 +93,7 @@ void nrf_gzll_device_tx_success(uint32_t pipe, nrf_gzll_device_tx_info_t tx_info
         // if ack was sent with payload, pop them from rx fifo.
         GAZELLE_ERROR_CODE_CHECK(nrf_gzll_fetch_packet_from_rx_fifo(pipe, dummy, &dummy_length));
         // update led status from host ack
-        rf_driver.usb_led = dummy[1];
+        rf_driver.rf_led = dummy[1];
     }
 }
 
