@@ -27,15 +27,21 @@ void gzll_keyboard_init(bool host)
     memset(m_gzll_keepalive, 0, sizeof(m_gzll_keepalive));
 
     if (m_gzll_host) {
-        GAZELLE_ERROR_CODE_CHECK(nrf_gzll_init(NRF_GZLL_MODE_HOST));
+        NRF_LOG_INFO("GZLL init to host");
+        bool result = nrf_gzll_init(NRF_GZLL_MODE_HOST);
+        GAZELLE_ERROR_CODE_CHECK(result);
     } else {
-        GAZELLE_ERROR_CODE_CHECK(nrf_gzll_init(NRF_GZLL_MODE_DEVICE));
+        NRF_LOG_INFO("GZLL init to device");
+        bool result = nrf_gzll_init(NRF_GZLL_MODE_DEVICE);
+        GAZELLE_ERROR_CODE_CHECK(result);
     }
 
     nrf_gzll_set_max_tx_attempts(GZLL_MAX_TX_ATTEMPTS);
     nrf_gzll_set_base_address_0(GZLL_BASE_ADDRESS_0);
     nrf_gzll_set_base_address_1(GZLL_BASE_ADDRESS_1);
 
+
+    NRF_LOG_INFO("Start to init rf keyboard");
     rf_keyboard_init(gzll_send_report, gzll_prepare_sleep);
 }
 
@@ -74,6 +80,7 @@ void gzll_keyboard_keepalive(void)
                                                                 m_gzll_keepalive,
                                                                 GZLL_PAYLOAD_SIZE));
     }
+    NRF_LOG_INFO("GZLL keep alive packet sent");
 }
 
 /**@brief Callback function for Gazell Disabled.
@@ -89,11 +96,13 @@ void nrf_gzll_device_tx_success(uint32_t pipe, nrf_gzll_device_tx_info_t tx_info
     uint8_t    dummy[NRF_GZLL_CONST_MAX_PAYLOAD_LENGTH];
     uint32_t   dummy_length = NRF_GZLL_CONST_MAX_PAYLOAD_LENGTH;
 
+    NRF_LOG_INFO("GZLL tx success");
     if (tx_info.payload_received_in_ack) {
         // if ack was sent with payload, pop them from rx fifo.
         GAZELLE_ERROR_CODE_CHECK(nrf_gzll_fetch_packet_from_rx_fifo(pipe, dummy, &dummy_length));
         // update led status from host ack
         rf_driver.rf_led = dummy[1];
+        NRF_LOG_INFO("GZLL rf led: %d", dummy[1]);
     }
 }
 
@@ -105,6 +114,7 @@ void nrf_gzll_device_tx_failed(uint32_t pipe, nrf_gzll_device_tx_info_t tx_info)
     uint8_t  dummy[NRF_GZLL_CONST_MAX_PAYLOAD_LENGTH];
     uint32_t dummy_length = NRF_GZLL_CONST_MAX_PAYLOAD_LENGTH;
 
+    NRF_LOG_INFO("GZLL tx failed");
     if (tx_info.payload_received_in_ack) {
         // if ack was sent with payload, pop them from rx fifo.
         GAZELLE_ERROR_CODE_CHECK(nrf_gzll_fetch_packet_from_rx_fifo(pipe, dummy, &dummy_length));

@@ -147,7 +147,7 @@ static void keyboard_timout_handler(void *p_context)
 {
     rf_wdt_feed();
     keyboard_task();
-
+    NRF_LOG_INFO("Keyboard scan timer handle");
     if (rf_driver.vbus_enabled) {
         // do not run the power related stuff while have usb supply
         return;

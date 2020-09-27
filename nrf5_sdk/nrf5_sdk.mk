@@ -156,6 +156,7 @@ APP_DEFS += \
 	-DSOFTDEVICE_PRESENT \
 	-D__HEAP_SIZE=8192 \
 	-D__STACK_SIZE=8192 \
+	-DGAZELL_PRESENT \
 	#-DCONFIG_GPIO_AS_PINRESET \
 
 SDK_DEFS += -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16

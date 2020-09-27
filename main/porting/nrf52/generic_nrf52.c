@@ -52,7 +52,7 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
 static void scheduler_init(void)
 {
     APP_SCHED_INIT(SCHED_MAX_EVENT_DATA_SIZE, SCHED_QUEUE_SIZE);
-    sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
+    //sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE);
 }
 
 /**@brief Function for initializing the nrf log module.
