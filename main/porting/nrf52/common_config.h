@@ -64,7 +64,6 @@
 #define BATTERY_LEVEL_MEAS_SAMPLE           APP_TIMER_TICKS(2)                         /**< Battery level measurement sampling (ticks). */
 #define BATTERY_LEVEL_MEAS_INTERVAL         APP_TIMER_TICKS(60*1000)                   /**< Battery level measurement interval (ticks). */
 
-#define SLEEP_COUNT_THRESHHOLD              10                                         /**< In minutes */
 
 #define DEAD_BEEF                           0xDEADBEEF                                 /**< Value used */
 
@@ -83,6 +82,8 @@
 #define MAX_SCAN_COUNT                      1000                                       /**< Maximum scan count before turn to trigger mode */
 #define KEYBOARD_SCAN_INTERVAL              APP_TIMER_TICKS(10)                        /**< Normal keyboard scan interval */
 #define KEYBOARD_SLOW_SCAN_INTERVAL         APP_TIMER_TICKS(100)                       /**< Slow keyboard scan interval */
+#define SLEEP_SCAN_OVERFLOW                 (60*100)                                   /**< increase sleep count while scan overlow */
+#define SLEEP_COUNT_THRESHHOLD              10                                         /**< In minutes */
 
 #define LEDS_NUMBER 0
 #define BUTTONS_NUMBER 0

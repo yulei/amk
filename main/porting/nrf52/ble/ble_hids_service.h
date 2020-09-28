@@ -9,5 +9,7 @@
 
 void ble_hids_service_init(void);
 void ble_hids_service_start(void);
+void ble_hids_service_prepare_sleep(void);
+
 void ble_hids_service_send_report(uint8_t report_id, uint8_t* report_data);
 void ble_hids_service_flush(bool send);

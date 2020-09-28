@@ -9,6 +9,7 @@
 
 void ble_services_init(void);
 void ble_services_start(bool erase_bond);
+void ble_services_prepare_sleep(void);
 
 void ble_pm_whitelist_set(pm_peer_id_list_skip_t skip);
 void ble_pm_identities_set(pm_peer_id_list_skip_t skip);

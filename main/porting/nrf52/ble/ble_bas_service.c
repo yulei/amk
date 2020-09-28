@@ -10,8 +10,6 @@
 #include "nrf_saadc.h"
 #include "nrf_drv_saadc.h"
 
-#include "nrf_pwr_mgmt.h"
-
 #define SAADC_SAMPLES 5
 static nrf_saadc_value_t m_saadc_buffers[2][SAADC_SAMPLES];
 
@@ -27,7 +25,8 @@ static void battery_saadc_init(void);
 static void battery_saadc_handler(nrf_drv_saadc_evt_t const * p_event);
 static void battery_process_saadc_result(uint32_t result);
 
-void ble_bas_service_init(void) {
+void ble_bas_service_init(void)
+{
     ret_code_t     err_code;
     ble_bas_init_t bas_init_obj;
 
@@ -59,15 +58,27 @@ void ble_bas_service_init(void) {
     battery_saadc_init();
 }
 
-void ble_bas_service_start(void) {
-    ret_code_t     err_code;
+void ble_bas_service_start(void)
+{
+    ret_code_t err_code;
+   
     err_code = app_timer_start(m_battery_timer_id, BATTERY_LEVEL_MEAS_INTERVAL, NULL);
     APP_ERROR_CHECK(err_code);
 }
 
+void ble_bas_service_prepare_sleep(void)
+{
+    app_timer_stop(m_battery_timer_id);
+    app_timer_stop(m_battery_sample_timer_id);
+    nrf_drv_saadc_abort();
+    nrf_drv_saadc_uninit();
+    nrf_gpio_pin_clear(BATTERY_SAADC_ENABLE_PIN);
+}
+
 /**@brief Function for performing a battery measurement, and update the Battery Level characteristic in the Battery Service.
  */
-static void battery_level_update(uint8_t level) {
+static void battery_level_update(uint8_t level)
+{
     ret_code_t err_code;
 
     err_code = ble_bas_battery_level_update(&m_bas, level, BLE_CONN_HANDLE_ALL);
@@ -95,25 +106,9 @@ static void battery_level_sample_timeout_handler(void* p_context)
     NRF_LOG_INFO("battery sampling triggered.");
 }
 
-static void battery_level_meas_timeout_handler(void * p_context) {
+static void battery_level_meas_timeout_handler(void * p_context)
+{
     UNUSED_PARAMETER(p_context);
-    if (rf_driver.sleep_count >= SLEEP_COUNT_THRESHHOLD) {
-        if (rf_driver.sleep_enabled) {
-            NRF_LOG_INFO("Sleep count overflow, goto system off mode");
-            nrf_drv_saadc_uninit();
-            nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_GOTO_SYSOFF);
-            return;
-        } else {
-            rf_driver.sleep_count = 0;
-        }
-    } else {
-        if (!rf_driver.vbus_enabled) {
-            rf_driver.sleep_count++;
-            NRF_LOG_INFO("Sleep count increased: %d", rf_driver.sleep_count);
-        } else {
-            rf_driver.sleep_count = 0;
-        }
-    }
     // turn battery on and kick off sampling timer
     nrf_gpio_pin_set(BATTERY_SAADC_ENABLE_PIN);
     app_timer_start(m_battery_sample_timer_id, BATTERY_LEVEL_MEAS_SAMPLE, NULL);

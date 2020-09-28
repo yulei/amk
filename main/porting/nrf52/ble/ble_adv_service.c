@@ -21,7 +21,8 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt);
 static void adv_error_handler(uint32_t nrf_error);
 static void sleep_mode_enter(void);
 
-void ble_adv_service_init(void) {
+void ble_adv_service_init(void)
+{
     uint32_t                err_code;
     ble_advertising_init_t  init;
     static int8_t           tx_power = DEFAULT_TX_POWER_LEVEL;
@@ -58,7 +59,8 @@ void ble_adv_service_init(void) {
     APP_ERROR_CHECK(err_code);
 }
 
-void ble_adv_service_start(bool erase_bonds) {
+void ble_adv_service_start(bool erase_bonds)
+{
     if (erase_bonds == true) {
         ble_pm_delete_bonds();
         // Advertising is started by PM_EVT_PEERS_DELETE_SUCCEEDED event.
@@ -70,11 +72,15 @@ void ble_adv_service_start(bool erase_bonds) {
     }
 }
 
+void ble_adv_service_prepare_sleep(void)
+{}
+
 /**@brief Function for handling advertising errors.
  *
  * @param[in] nrf_error  Error code containing information about what went wrong.
  */
-static void adv_error_handler(uint32_t nrf_error) {
+static void adv_error_handler(uint32_t nrf_error)
+{
     APP_ERROR_HANDLER(nrf_error);
 }
 
@@ -84,7 +90,8 @@ static void adv_error_handler(uint32_t nrf_error) {
  *
  * @param[in] ble_adv_evt  Advertising event.
  */
-static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
+static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
+{
     ret_code_t err_code;
 
     switch (ble_adv_evt) {
@@ -168,7 +175,8 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
  *
  * @note This function will not return.
  */
-static void sleep_mode_enter(void) {
+static void sleep_mode_enter(void)
+{
     // try to go to system-off mode
     nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_GOTO_SYSOFF);
 }

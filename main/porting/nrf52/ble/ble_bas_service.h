@@ -9,3 +9,4 @@
 
 void ble_bas_service_init(void);
 void ble_bas_service_start(void);
+void ble_bas_service_prepare_sleep(void);

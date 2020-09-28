@@ -160,6 +160,18 @@ static void keyboard_timout_handler(void *p_context)
     } else {
         if (!keyboard_rgb_on()) {
             rf_driver.scan_count++;
+            if (0 == (rf_driver.scan_count % SLEEP_SCAN_OVERFLOW)) {
+                rf_driver.sleep_count++;
+                NRF_LOG_INFO("Sleep count increased: %d", rf_driver.sleep_count);
+            }
+            if (rf_driver.sleep_count >= SLEEP_COUNT_THRESHHOLD) {
+                if (rf_driver.sleep_enabled) {
+                    NRF_LOG_INFO("Sleep count overflow, goto system off mode");
+                    nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_GOTO_SYSOFF);
+                } else {
+                    rf_driver.sleep_count = 0;
+                }
+            }
         } else {
             if (rf_driver.battery_power <= BATTERY_LED_THRESHHOLD) {
                 keyboard_set_rgb(false);

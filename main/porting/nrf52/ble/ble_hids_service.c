@@ -94,7 +94,8 @@ static void     buffer_init(void);
 static uint32_t buffer_enqueue(ble_hids_t *p_hids, uint8_t report_index, uint8_t *report_data, uint8_t report_len);
 static uint32_t buffer_dequeue(bool tx_flag);
 
-void ble_hids_service_init(void) {
+void ble_hids_service_init(void)
+{
     ret_code_t                    err_code;
     ble_hids_init_t               hids_init_obj;
     ble_hids_inp_rep_init_t     * p_input_report;
@@ -178,7 +179,10 @@ void ble_hids_service_init(void) {
 
 void ble_hids_service_start(void) {}
 
-void ble_hids_service_flush(bool send) {
+void ble_hids_service_prepare_sleep(void) {}
+
+void ble_hids_service_flush(bool send)
+{
     // flusing the pending report
     buffer_dequeue(send);
 }
@@ -188,7 +192,8 @@ void ble_hids_service_flush(bool send) {
  * @param[in]   report_id       id of the report.
  * @param[in]   report_data     data of the report.
  */
-void ble_hids_service_send_report(uint8_t report_id, uint8_t* report_data) {
+void ble_hids_service_send_report(uint8_t report_id, uint8_t* report_data)
+{
     if (report_id > NRF_REPORT_ID_MAX) {
         NRF_LOG_WARNING("Invalid report_id: %d", report_id);
         return;
@@ -228,7 +233,8 @@ void ble_hids_service_send_report(uint8_t report_id, uint8_t* report_data) {
  *             for failure.
  *
  */
-static uint32_t send_report(ble_hids_t * p_hids, uint8_t report_index, uint8_t* report_data, uint8_t report_len) {
+static uint32_t send_report(ble_hids_t * p_hids, uint8_t report_index, uint8_t* report_data, uint8_t report_len)
+{
     ret_code_t err_code = NRF_SUCCESS;
 
     NRF_LOG_INFO("BLE report: index=%d, size=%d", report_index, report_len);
@@ -259,7 +265,8 @@ static uint32_t send_report(ble_hids_t * p_hids, uint8_t report_index, uint8_t* 
  *          where encryption is not yet enabled or there was a momentary link loss or there were no
  *          Transmit buffers.
  */
-static void buffer_init(void) {
+static void buffer_init(void)
+{
     uint32_t buffer_count;
 
     BUFFER_LIST_INIT();
@@ -283,7 +290,8 @@ static void buffer_init(void) {
  *
  * @return     NRF_SUCCESS on success, else an error code indicating reason for failure.
  */
-static uint32_t buffer_enqueue(ble_hids_t * p_hids, uint8_t report_index, uint8_t* report_data, uint8_t report_len) {
+static uint32_t buffer_enqueue(ble_hids_t * p_hids, uint8_t report_index, uint8_t* report_data, uint8_t report_len)
+{
     buffer_entry_t * element;
     uint32_t         err_code = NRF_SUCCESS;
 
@@ -322,7 +330,8 @@ static uint32_t buffer_enqueue(ble_hids_t * p_hids, uint8_t report_index, uint8_
  *
  * @return     NRF_SUCCESS on success, else an error code indicating reason for failure.
  */
-static uint32_t buffer_dequeue(bool tx_flag) {
+static uint32_t buffer_dequeue(bool tx_flag)
+{
     buffer_entry_t * p_element;
     uint32_t         err_code = NRF_SUCCESS;
 
@@ -362,7 +371,8 @@ static uint32_t buffer_dequeue(bool tx_flag) {
  *
  * @param[in]   p_evt   HID service event.
  */
-static void on_hid_rep_char_write(ble_hids_evt_t * p_evt) {
+static void on_hid_rep_char_write(ble_hids_evt_t * p_evt)
+{
     if (p_evt->params.char_write.char_id.rep_type == BLE_HIDS_REP_TYPE_OUTPUT) {
         ret_code_t err_code;
         uint8_t  report_val = 0;
@@ -391,7 +401,8 @@ static void on_hid_rep_char_write(ble_hids_evt_t * p_evt) {
  * @param[in]   p_hids  HID service structure.
  * @param[in]   p_evt   Event received from the HID service.
  */
-static void on_hids_evt(ble_hids_t * p_hids, ble_hids_evt_t * p_evt) {
+static void on_hids_evt(ble_hids_t * p_hids, ble_hids_evt_t * p_evt)
+{
     switch (p_evt->evt_type) {
     case BLE_HIDS_EVT_BOOT_MODE_ENTERED:
         m_in_boot_mode = true;
@@ -424,6 +435,7 @@ static void on_hids_evt(ble_hids_t * p_hids, ble_hids_evt_t * p_evt) {
  *
  * @param[in]   nrf_error   Error code containing information about what went wrong.
  */
-static void service_error_handler(uint32_t nrf_error) {
+static void service_error_handler(uint32_t nrf_error)
+{
     APP_ERROR_HANDLER(nrf_error);
 }

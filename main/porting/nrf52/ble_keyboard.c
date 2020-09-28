@@ -127,7 +127,9 @@ void ble_keyboard_start(bool erase_bonds)
 }
 
 void ble_prepare_sleep(void)
-{}
+{
+    ble_services_prepare_sleep();
+}
 
 static void ble_send_report(uint8_t type, uint8_t *data, uint8_t size)
 {
