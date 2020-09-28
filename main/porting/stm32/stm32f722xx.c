@@ -91,3 +91,8 @@ void custom_board_init(void)
   MX_USB_DEVICE_Init();
   MX_USB_HOST_Init();
 }
+
+void custom_board_task(void)
+{
+  MX_USB_HOST_Process();
+}
