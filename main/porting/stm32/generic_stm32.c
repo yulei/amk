@@ -9,6 +9,10 @@
 #include "usb_device.h"
 #include "usbd_hid.h"
 
+#ifdef HAL_HCD_MODULE_ENABLED
+#include "usb_host.h"
+#endif
+
 #include "report.h"
 #include "host.h"
 #include "keyboard.h"
@@ -82,6 +86,9 @@ void board_task(void)
         // do nothing
         break;
     }
+#ifdef HAL_HCD_MODULE_ENABLED
+    MX_USB_HOST_Process();
+#endif
 }
 
 static void amk_init(void)
