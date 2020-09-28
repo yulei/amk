@@ -82,8 +82,10 @@ void nrf_app_usbd_init(void)
     ret_code_t rc;
     app_usbd_serial_num_generate();
 
-    rc = nrf_drv_clock_init();
-    APP_ERROR_CHECK(rc);
+    if (!nrf_drv_clock_init_check()) {
+        rc = nrf_drv_clock_init();
+        APP_ERROR_CHECK(rc);
+    }
 
     rc = app_usbd_init(&nrf_usb_config.usbd_config);
     APP_ERROR_CHECK(rc);
