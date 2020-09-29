@@ -26,11 +26,12 @@ void gzll_keyboard_init(bool host)
     m_gzll_host = host;
     memset(m_gzll_packet, 0, sizeof(m_gzll_packet));
     memset(m_gzll_keepalive, 0, sizeof(m_gzll_keepalive));
-    if (!nrf_drv_clock_init_check()) {
+    /*if (!nrf_drv_clock_init_check()) {
         ret_code_t err_code = nrf_drv_clock_init();
         APP_ERROR_CHECK(err_code);
     }
     nrf_drv_clock_lfclk_request(NULL);
+    */
 
     if (m_gzll_host) {
         NRF_LOG_INFO("GZLL init to host");

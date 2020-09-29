@@ -24,13 +24,13 @@ SRC_FILES += \
 	$(NRF5SDK_DIR)/components/libraries/atomic_flags/nrf_atflags.c \
 	$(NRF5SDK_DIR)/components/libraries/atomic/nrf_atomic.c \
 	$(NRF5SDK_DIR)/components/libraries/balloc/nrf_balloc.c \
+	$(NRF5SDK_DIR)/components/libraries/experimental_section_vars/nrf_section_iter.c \
 	$(NRF5SDK_DIR)/components/libraries/fstorage/nrf_fstorage.c \
 	$(NRF5SDK_DIR)/components/libraries/fstorage/nrf_fstorage_sd.c \
 	$(NRF5SDK_DIR)/components/libraries/memobj/nrf_memobj.c \
 	$(NRF5SDK_DIR)/components/libraries/queue/nrf_queue.c \
 	$(NRF5SDK_DIR)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c \
 	$(NRF5SDK_DIR)/components/libraries/ringbuf/nrf_ringbuf.c \
-	$(NRF5SDK_DIR)/components/libraries/experimental_section_vars/nrf_section_iter.c \
 	$(NRF5SDK_DIR)/components/libraries/sortlist/nrf_sortlist.c \
 	$(NRF5SDK_DIR)/components/libraries/strerror/nrf_strerror.c \
 	$(NRF5SDK_DIR)/components/boards/boards.c \
@@ -68,6 +68,7 @@ SRC_FILES += \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_uart.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_uarte.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_power.c \
+	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_timer.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_twi.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_wdt.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
