@@ -93,6 +93,7 @@ static void power_management_init(void)
  */
 void idle_state_handle(void)
 {
+    //NRF_LOG_INFO("app scheduler");
     app_sched_execute();
     if (NRF_LOG_PROCESS() == false) {
         nrf_pwr_mgmt_run();

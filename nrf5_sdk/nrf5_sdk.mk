@@ -68,6 +68,7 @@ SRC_FILES += \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_uart.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_uarte.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_power.c \
+	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_rtc.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_timer.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_twi.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_wdt.c \

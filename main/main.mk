@@ -23,7 +23,7 @@ endif
 
 ifeq (yes, $(strip $(BOOTMAGIC_ENABLE)))
 	ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
-		SRC_FILES += $(MAIN_DIR)/porting/nrf52/eeconfig_fds.c
+		SRC_FILES += $(MAIN_DIR)/porting/eeconfig_mem.c
 	endif
 	ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
 		SRC_FILES += $(MAIN_DIR)/porting/stm32/eeconfig_flash.c

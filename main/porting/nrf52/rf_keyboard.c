@@ -10,8 +10,9 @@
 #include "nrfx_wdt.h"
 #include "nrf_drv_timer.h"
 #include "nrf_drv_clock.h"
+#include "nrf_drv_rtc.h"
 #include "usb_interface.h"
-#include "eeconfig_fds.h"
+#include "app_scheduler.h"
 
 #include "report.h"
 #include "host.h"
@@ -24,9 +25,7 @@ static rf_send_report_t rf_send_report = NULL;
 static rf_prepare_sleep_t rf_prepare_sleep = NULL;
 static nrfx_wdt_channel_id rf_wdt_channgel;
 
-const nrf_drv_timer_t TIMER_KBD = NRF_DRV_TIMER_INSTANCE(1);
-
-//APP_TIMER_DEF(m_keyboard_timer_id);         // keyboard scan timer id
+APP_TIMER_DEF(m_keyboard_timer_id);         // keyboard scan timer id
 
 static void rf_wdt_event_handler(void);
 static void rf_wdt_init(void);
@@ -39,7 +38,7 @@ static void keyboard_timer_init(void);
 static void keyboard_timer_uninit(void);
 static void keyboard_timer_start(void);
 static void keyboard_timer_stop(void);
-static void keyboard_timer_handler(nrf_timer_event_t event_type, void *p_context);
+static void keyboard_timer_handler(void *p_context);
 
 /** the fllowing function can be overrided by the keyboard codes */
 extern void keyboard_set_rgb(bool on);
@@ -124,38 +123,26 @@ void rf_keyboard_jump_bootloader(void)
 static void keyboard_timer_init(void)
 {
     ret_code_t err_code;
-    //err_code = app_timer_create(&m_keyboard_timer_id,
-    //                        APP_TIMER_MODE_REPEATED,
-    //                        keyboard_timout_handler);
-    nrf_drv_timer_config_t timer_cfg = NRF_DRV_TIMER_DEFAULT_CONFIG;
-    err_code = nrf_drv_timer_init(&TIMER_KBD, &timer_cfg, keyboard_timer_handler);
+    err_code = app_timer_create(&m_keyboard_timer_id, APP_TIMER_MODE_REPEATED, keyboard_timer_handler);
     APP_ERROR_CHECK(err_code);
-
-    uint32_t ticks = nrf_drv_timer_ms_to_ticks(&TIMER_KBD, KEYBOARD_SCAN_INTERVAL);
-
-    nrf_drv_timer_extended_compare(&TIMER_KBD, NRF_TIMER_CC_CHANNEL0, ticks, NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK, true);
-
 }
 
 static void keyboard_timer_start(void)
 {
-    //ret_code_t err_code;
-    //err_code = app_timer_start(m_keyboard_timer_id, KEYBOARD_SCAN_INTERVAL, NULL);
-    //APP_ERROR_CHECK(err_code);
-    nrf_drv_timer_enable(&TIMER_KBD);
+    ret_code_t err_code;
+    err_code = app_timer_start(m_keyboard_timer_id, KEYBOARD_SCAN_INTERVAL, NULL);
+    APP_ERROR_CHECK(err_code);
 }
 
 static void keyboard_timer_stop(void)
 {
-    //ret_code_t err_code;
-    //err_code = app_timer_stop(m_keyboard_timer_id);
-    //APP_ERROR_CHECK(err_code);
-    nrf_drv_timer_disable(&TIMER_KBD);
+    ret_code_t err_code;
+    err_code = app_timer_stop(m_keyboard_timer_id);
+    APP_ERROR_CHECK(err_code);
 }
 
 static void keyboard_timer_uninit(void)
 {
-    nrf_drv_timer_uninit(&TIMER_KBD);
 }
 
 static bool keyboard_rgblight_on(void)
@@ -174,12 +161,8 @@ static bool keyboard_rgbmatrix_on(void)
 
 static bool keyboard_rgb_on(void) { return keyboard_rgblight_on() || keyboard_rgbmatrix_on(); }
 
-static void keyboard_timer_handler(nrf_timer_event_t event_type, void *p_context)
+static void keyboard_timer_handler(void *p_context)
 {
-    if (event_type != NRF_TIMER_EVENT_COMPARE0)
-        return;
-
-    NRF_LOG_INFO("Keyboard scan timer handle");
     rf_wdt_feed();
     keyboard_task();
     if (rf_driver.vbus_enabled) {
@@ -227,9 +210,9 @@ static uint8_t keyboard_leds(void)
 
 static void send_keyboard(report_keyboard_t *report)
 {
-    if (rf_driver.output_target & OUTPUT_RF) {
+    //if (rf_driver.output_target & OUTPUT_RF) {
         rf_send_report(NRF_REPORT_ID_KEYBOARD, &(report->raw[0]), sizeof(report_keyboard_t));
-    }
+    //}
     if (rf_driver.output_target & OUTPUT_USB) {
         nrf_usb_send_report(NRF_REPORT_ID_KEYBOARD, report, sizeof(*report));
     }
