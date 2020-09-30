@@ -142,7 +142,7 @@ typedef enum {
 typedef struct {
     uint8_t         rf_led;         /**< keyboard led status from ble */
     uint8_t         usb_led;        /**< keyboard led status from usb */
-    uint8_t         is_ble;         /**< current is ble stack */
+    //uint8_t         is_ble;         /**< current is ble stack */
     uint8_t         vbus_enabled;   /**< vbus status */
     uint8_t         sleep_enabled;  /**< enable sleep mode or not */
     uint8_t         output_target;  /**< target of output */
@@ -153,5 +153,6 @@ typedef struct {
 } rf_driver_t;
 
 extern rf_driver_t rf_driver;
-typedef void (*rf_send_report_t)(uint8_t type, uint8_t* data, uint8_t size);
+extern bool rf_is_ble;
+typedef void (*rf_send_report_t)(uint8_t type, uint8_t *data, uint8_t size);
 typedef void (*rf_prepare_sleep_t)(void);

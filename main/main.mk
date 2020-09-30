@@ -22,13 +22,6 @@ ifeq (yes, $(strip $(MATRIX_USE_TCA6424)))
 endif
 
 ifeq (yes, $(strip $(BOOTMAGIC_ENABLE)))
-	ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
-		SRC_FILES += $(MAIN_DIR)/porting/eeconfig_mem.c
-	endif
-	ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
-		SRC_FILES += $(MAIN_DIR)/porting/stm32/eeconfig_flash.c
-	endif
-
 	SRC_FILES += $(MAIN_DIR)/eeprom_manager.c
 endif
 

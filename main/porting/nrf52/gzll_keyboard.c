@@ -32,8 +32,6 @@ void gzll_keyboard_init(bool host)
     }
     nrf_drv_clock_lfclk_request(NULL);
     
-    
-
     if (m_gzll_host) {
         NRF_LOG_INFO("GZLL init to host");
         bool result = nrf_gzll_init(NRF_GZLL_MODE_HOST);
@@ -48,6 +46,7 @@ void gzll_keyboard_init(bool host)
     nrf_gzll_set_base_address_0(GZLL_BASE_ADDRESS_0);
     nrf_gzll_set_base_address_1(GZLL_BASE_ADDRESS_1);
 
+    fds_eeprom_init();
 
     NRF_LOG_INFO("Start to init rf keyboard");
     rf_keyboard_init(gzll_send_report, gzll_prepare_sleep);

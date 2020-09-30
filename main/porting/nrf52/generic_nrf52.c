@@ -30,6 +30,8 @@ rf_driver_t rf_driver = {
     .scan_count = 0,
 };
 
+bool rf_is_ble = true;
+
 /**@brief Callback function for asserts in the SoftDevice.
  *
  * @details This function will be called in case of an assert in the SoftDevice.
@@ -131,7 +133,8 @@ void board_init(void)
     if (GZLL_IS_HOST || GZLL_IS_CLIENT || (reason&RST_USE_GZLL)) {
         NRF_LOG_INFO("use GAZELL protocol");
 
-        rf_driver.is_ble = 0;
+        //rf_driver.is_ble = 0;
+        rf_is_ble = false;
         gzll_keyboard_init(GZLL_IS_HOST);
 
 #ifdef NRF52840_XXAA
@@ -141,7 +144,8 @@ void board_init(void)
     } else {
         NRF_LOG_INFO("use BLE protocol");
 
-        rf_driver.is_ble = 1;
+        //rf_driver.is_ble = 1;
+        rf_is_ble = true;
         ble_keyboard_init();
 
 #ifdef NRF52840_XXAA

@@ -13,6 +13,7 @@ SRC_FILES += \
 	$(NRF52_PORTING_DIR)/ble_keyboard.c \
 	$(NRF52_PORTING_DIR)/gzll_keyboard.c \
 	$(NRF52_PORTING_DIR)/rf_keyboard.c \
+	$(NRF52_PORTING_DIR)/eeconfig_fds.c \
 
 INC_FOLDERS += \
 	$(NRF52_PORTING_DIR) \

@@ -10,7 +10,6 @@
 #include "print.h"
 #include "timer.h"
 #include "wait.h"
-#include "nrf_log.h"
 #ifdef RGB_EFFECTS_ENABLE
 #include "rgb_driver.h"
 #include "rgb_effects.h"
@@ -49,7 +48,6 @@ void matrix_init(void)
 
 uint8_t matrix_scan(void)
 {
-    //NRF_LOG_INFO("matrix scan!");
     bool changed = false;
     for (int col = 0; col < MATRIX_COLS; col++) {
         gpio_write_pin(col_pins[col], 1);

@@ -199,10 +199,10 @@ static void keyboard_timer_handler(void *p_context)
 
 static uint8_t keyboard_leds(void)
 {
-    if (rf_driver.output_target == OUTPUT_RF)
+    if (rf_driver.output_target & OUTPUT_RF)
         return rf_driver.rf_led;
     
-    if (rf_driver.output_target == OUTPUT_USB)
+    if (rf_driver.output_target & OUTPUT_USB)
         return rf_driver.usb_led;
 
     return 0;
@@ -210,9 +210,9 @@ static uint8_t keyboard_leds(void)
 
 static void send_keyboard(report_keyboard_t *report)
 {
-    //if (rf_driver.output_target & OUTPUT_RF) {
+    if (rf_driver.output_target & OUTPUT_RF) {
         rf_send_report(NRF_REPORT_ID_KEYBOARD, &(report->raw[0]), sizeof(report_keyboard_t));
-    //}
+    }
     if (rf_driver.output_target & OUTPUT_USB) {
         nrf_usb_send_report(NRF_REPORT_ID_KEYBOARD, report, sizeof(*report));
     }
@@ -350,10 +350,10 @@ bool hook_process_action(keyrecord_t *record) {
                     NRF_LOG_INFO("set output to USB");
                     rf_driver.output_target = OUTPUT_USB;
                 } else {
-                    NRF_LOG_INFO("vbus not enabled, still using BLE");
+                    NRF_LOG_INFO("vbus not enabled, still using RF");
                 }
             } else {
-                NRF_LOG_INFO("set output to BLE");
+                NRF_LOG_INFO("set output to RF");
                 rf_driver.output_target = OUTPUT_RF;
             } return true;
 
@@ -369,7 +369,8 @@ bool hook_process_action(keyrecord_t *record) {
             return true;
 
         case KC_F24: // toggle BLE or GAZELL
-            if (rf_driver.is_ble) {
+            //if (rf_driver.is_ble) {
+            if (rf_is_ble) {
                 NRF_LOG_INFO("switch to gzll");
                 sd_power_gpregret_set(RST_REGISTER, RST_USE_GZLL);
                 sd_nvic_SystemReset();
