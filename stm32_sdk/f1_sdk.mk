@@ -11,6 +11,9 @@ SRC_FILES += \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_core.c \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_ctlreq.c \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_ioreq.c \
+	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usb_device.c \
+	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_desc.c \
+	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_hid.c \
 	$(STM32SDK_DIR)/Drivers/$(MCU_HAL_PATH)/Src/$(MCU_FAMILY)_hal_pcd.c \
 	$(STM32SDK_DIR)/Drivers/$(MCU_HAL_PATH)/Src/$(MCU_FAMILY)_hal_pcd_ex.c \
 	$(STM32SDK_DIR)/Drivers/$(MCU_HAL_PATH)/Src/$(MCU_FAMILY)_ll_usb.c \
