@@ -2,7 +2,6 @@ NRF5SDK_VERSION := nRF5_SDK_17.0.2_d674dde
 NRF5SDK_DIR := $(TOP_DIR)/nrf5_sdk/$(NRF5SDK_VERSION)
 
 SRC_FILES += \
-	$(TOP_DIR)/nrf5_sdk/fds/fds.c \
 	$(NRF5SDK_DIR)/components/boards/boards.c \
 	$(NRF5SDK_DIR)/components/ble/ble_advertising/ble_advertising.c \
 	$(NRF5SDK_DIR)/components/ble/ble_link_ctx_manager/ble_link_ctx_manager.c \
@@ -34,9 +33,9 @@ SRC_FILES += \
 	$(NRF5SDK_DIR)/components/libraries/crc16/crc16.c \
 	$(NRF5SDK_DIR)/components/libraries/experimental_section_vars/nrf_section_iter.c \
 	$(NRF5SDK_DIR)/components/libraries/fifo/app_fifo.c \
+	$(NRF5SDK_DIR)/components/libraries/fds/fds.c \
 	$(NRF5SDK_DIR)/components/libraries/fstorage/nrf_fstorage.c \
 	$(NRF5SDK_DIR)/components/libraries/fstorage/nrf_fstorage_sd.c \
-	$(NRF5SDK_DIR)/components/libraries/fstorage/nrf_fstorage_nvmc.c \
 	$(NRF5SDK_DIR)/components/libraries/hardfault/hardfault_implementation.c \
 	$(NRF5SDK_DIR)/components/libraries/hardfault/nrf52/handler/hardfault_handler_gcc.c \
 	$(NRF5SDK_DIR)/components/libraries/log/src/nrf_log_backend_rtt.c \
@@ -84,7 +83,6 @@ SRC_FILES += \
 	$(NRF5SDK_DIR)/external/utf_converter/utf.c \
 
 INC_FOLDERS += \
-	$(TOP_DIR)/nrf5_sdk/fds \
 	$(NRF5SDK_DIR)/components \
 	$(NRF5SDK_DIR)/components/boards \
 	$(NRF5SDK_DIR)/components/ble/common \
@@ -110,6 +108,7 @@ INC_FOLDERS += \
 	$(NRF5SDK_DIR)/components/libraries/ecc \
 	$(NRF5SDK_DIR)/components/libraries/experimental_section_vars \
 	$(NRF5SDK_DIR)/components/libraries/fifo \
+	$(NRF5SDK_DIR)/components/libraries/fds \
 	$(NRF5SDK_DIR)/components/libraries/fstorage \
 	$(NRF5SDK_DIR)/components/libraries/gpiote \
 	$(NRF5SDK_DIR)/components/libraries/hardfault \
