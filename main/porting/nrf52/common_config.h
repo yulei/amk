@@ -136,6 +136,7 @@ typedef enum {
 #define NRF_INPUT_REPORT_CONSUMER_MAX_LEN 2
 #endif
 
+#define WDT_ENABLE      0
 #define OUTPUT_RF       0x01
 #define OUTPUT_USB      0x02
 

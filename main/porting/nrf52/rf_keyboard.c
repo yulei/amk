@@ -23,13 +23,15 @@
 
 static rf_send_report_t rf_send_report = NULL;
 static rf_prepare_sleep_t rf_prepare_sleep = NULL;
-static nrfx_wdt_channel_id rf_wdt_channgel;
-
 APP_TIMER_DEF(m_keyboard_timer_id);         // keyboard scan timer id
+
+#if WDT_ENABLE
+static nrfx_wdt_channel_id rf_wdt_channgel;
 
 static void rf_wdt_event_handler(void);
 static void rf_wdt_init(void);
 static void rf_wdt_feed(void);
+#endif
 
 static bool keyboard_pwr_mgmt_shutdown_handler(nrf_pwr_mgmt_evt_t event);
 NRF_PWR_MGMT_HANDLER_REGISTER(keyboard_pwr_mgmt_shutdown_handler, NRF_PWR_MGMT_CONFIG_HANDLER_PRIORITY_COUNT - 1);
@@ -86,7 +88,9 @@ void rf_keyboard_init(rf_send_report_t send_report, rf_prepare_sleep_t prepare_s
     host_set_driver(&kbd_driver);
     keyboard_timer_init();
     nrf_usb_init(&usb_handler);
+#if WDT_ENABLE
     rf_wdt_init();
+#endif
 }
 
 void rf_keyboard_start()
@@ -163,7 +167,9 @@ static bool keyboard_rgb_on(void) { return keyboard_rgblight_on() || keyboard_rg
 
 static void keyboard_timer_handler(void *p_context)
 {
+#if WDT_ENABLE
     rf_wdt_feed();
+#endif
     keyboard_task();
     if (rf_driver.vbus_enabled) {
         // do not run the power related stuff while have usb supply
@@ -386,6 +392,7 @@ bool hook_process_action(keyrecord_t *record) {
     return false;
 }
 
+#if WDT_ENABLE
 void rf_wdt_init(void)
 {
     ret_code_t err_code;
@@ -412,3 +419,4 @@ void rf_wdt_event_handler(void)
 {
     NRF_LOG_WARNING("rf watchdog timeout!");
 }
+#endif
