@@ -60,6 +60,10 @@ void gzll_keyboard_start(void)
     rf_keyboard_start();
 }
 
+void gzll_keyboard_stop(void)
+{
+}
+
 void gzll_prepare_sleep(void)
 {
     // Disable gazell.

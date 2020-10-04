@@ -126,6 +126,12 @@ void ble_keyboard_start(bool erase_bonds)
     rf_keyboard_start();
 }
 
+void ble_keyboard_stop(void)
+{
+    //ble_services_stop();
+    //ble_stack_stop();
+}
+
 void ble_prepare_sleep(void)
 {
     ble_services_prepare_sleep();

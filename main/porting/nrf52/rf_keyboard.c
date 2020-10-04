@@ -379,6 +379,9 @@ bool hook_process_action(keyrecord_t *record) {
             if (rf_is_ble) {
                 NRF_LOG_INFO("switch to gzll");
                 sd_power_gpregret_set(RST_REGISTER, RST_USE_GZLL);
+                ret_code_t err_code;
+                err_code = nrf_sdh_disable_request();
+                APP_ERROR_CHECK(err_code);
                 sd_nvic_SystemReset();
             } else {
                 NRF_LOG_INFO("switch to ble");
@@ -396,11 +399,11 @@ bool hook_process_action(keyrecord_t *record) {
 void rf_wdt_init(void)
 {
     ret_code_t err_code;
-    if (!nrf_drv_clock_init_check()) {
+    /*if (!nrf_drv_clock_init_check()) {
         err_code = nrf_drv_clock_init();
         APP_ERROR_CHECK(err_code);
-    }
-    nrf_drv_clock_lfclk_request(NULL);
+        nrf_drv_clock_lfclk_request(NULL);
+    }*/
 
     nrfx_wdt_config_t config = NRFX_WDT_DEAFULT_CONFIG;
     err_code = nrfx_wdt_init(&config, rf_wdt_event_handler);
