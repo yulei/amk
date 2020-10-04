@@ -200,13 +200,16 @@ static void hid_user_ev_handler(app_usbd_class_inst_t const * p_inst,
 {
     switch (event) {
     case APP_USBD_HID_USER_EVT_OUT_REPORT_READY: {
+        NRF_LOG_INFO("USBD HID OUT report ready");
         app_usbd_class_inst_t const * kbd = app_usbd_hid_generic_class_inst_get(&m_hck);
         if (p_inst == kbd) {
             size_t size = 0;
             const void* data = app_usbd_hid_generic_out_report_get(&m_hck, &size);
-            if (size == 1) {
-                uint8_t led = *((uint8_t*)data);
-                nrf_usb_config.event.leds_cb(led);
+            NRF_LOG_INFO("USBD out report size=%d", size);
+            if (size == 2) {
+                uint8_t* pd = (uint8_t*)data;
+                NRF_LOG_INFO("USBD out report byte[0]=%d, byte[1]=%d", pd[0], pd[1]);
+                nrf_usb_config.event.leds_cb(pd[1]);
             }
         }
     } break;
