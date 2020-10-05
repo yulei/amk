@@ -72,8 +72,6 @@
 #define USBD_SELF_POWERED     0
 /*---------- -----------*/
 #define HID_FS_BINTERVAL     0xA
-/*---------- -----------*/
-#define USBD_LPM_ENABLED 1
 /****************************************/
 /* #define for FS and HS identification */
 #define DEVICE_FS 		0

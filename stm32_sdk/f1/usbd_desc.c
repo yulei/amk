@@ -60,7 +60,6 @@ __ALIGN_BEGIN uint8_t USBD_StringSerial[USB_SIZ_STRING_SERIAL] __ALIGN_END = {US
   */
 uint8_t *USBD_FS_DeviceDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 {
-    rtt_printf("get device descriptor");
   UNUSED(speed);
   *length = tud_descriptor_device_size();
   return tud_descriptor_device_cb();

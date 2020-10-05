@@ -53,10 +53,6 @@ extern "C" {
 #define USBD_MAX_NUM_CONFIGURATION                      1U
 #endif /* USBD_MAX_NUM_CONFIGURATION */
 
-#ifndef USBD_LPM_ENABLED
-#define USBD_LPM_ENABLED                                0U
-#endif /* USBD_LPM_ENABLED */
-
 #ifndef USBD_SELF_POWERED
 #define USBD_SELF_POWERED                               1U
 #endif /*USBD_SELF_POWERED */
@@ -224,9 +220,7 @@ typedef struct
   uint8_t  *(*GetSerialStrDescriptor)(USBD_SpeedTypeDef speed, uint16_t *length);
   uint8_t  *(*GetConfigurationStrDescriptor)(USBD_SpeedTypeDef speed, uint16_t *length);
   uint8_t  *(*GetInterfaceStrDescriptor)(USBD_SpeedTypeDef speed, uint16_t *length);
-#if (USBD_LPM_ENABLED == 1U)
   uint8_t  *(*GetBOSDescriptor)(USBD_SpeedTypeDef speed, uint16_t *length);
-#endif
 } USBD_DescriptorsTypeDef;
 
 /* USB Device handle structure */

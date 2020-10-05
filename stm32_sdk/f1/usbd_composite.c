@@ -163,19 +163,31 @@ static uint8_t  USBD_COMP_DeInit(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
 uint8_t USBD_COMP_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
 {
     USBD_StatusTypeDef ret = USBD_FAIL;
-    rtt_printf("request:%d, index:%d", req->bRequest, req->wIndex);
-    if (req->wIndex < usbd_composite.size) {
-        usbd_interface_t* interface = &usbd_composite.interfaces[req->wIndex];
+    rtt_printf("bmRequst=%d, request=%d, index=%d\n", req->bmRequest, req->bRequest, req->wIndex);
+    if ((req->bmRequest&USB_REQ_TYPE_MASK) == USB_REQ_TYPE_VENDOR) {
+        usbd_interface_t* interface = &usbd_composite.interfaces[2];
         ret = interface->instance->Setup(pdev, req, interface->data);
     } else {
-
-    }
+        uint8_t receipt = req->bmRequest&USB_REQ_RECIPIENT_MASK;
+        if (receipt == USB_REQ_RECIPIENT_INTERFACE)
+        {
+            if (req->wIndex < usbd_composite.size) {
+                usbd_interface_t* interface = &usbd_composite.interfaces[req->wIndex];
+                ret = interface->instance->Setup(pdev, req, interface->data);
+            } else {
+                rtt_printf("Setup requests to interface=%d not supported\n", receipt);
+                ret = USBD_FAIL;
+            }
+        } else {
+            rtt_printf("Setup request to receipt=%d not supported\n", receipt);
+            ret = USBD_FAIL;
+        }
+    } 
     return ret;
 }
 
 uint8_t* USBD_COMP_GetFSCfgDesc(uint16_t *length)
 {
-    rtt_printf("usbd get full spped configuration");
     *length = tud_descriptor_configuration_size();
     return tud_descriptor_configuration_cb();
 }

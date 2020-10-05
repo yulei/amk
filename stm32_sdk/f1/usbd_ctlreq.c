@@ -21,6 +21,7 @@
 #include "usbd_ctlreq.h"
 #include "usbd_ioreq.h"
 
+#include "rtt.h"
 
 /** @addtogroup STM32_USBD_STATE_DEVICE_LIBRARY
   * @{
@@ -411,8 +412,8 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev,
 
   switch (req->wValue >> 8)
   {
-#if (USBD_LPM_ENABLED == 1U)
     case USB_DESC_TYPE_BOS:
+    rtt_printf("USBD get BOS\n");
       if (pdev->pDesc->GetBOSDescriptor != NULL)
       {
         pbuf = pdev->pDesc->GetBOSDescriptor(pdev->dev_speed, &len);
@@ -423,8 +424,8 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev,
         err++;
       }
       break;
-#endif
     case USB_DESC_TYPE_DEVICE:
+    rtt_printf("USBD get DEVICE\n");
       pbuf = pdev->pDesc->GetDeviceDescriptor(pdev->dev_speed, &len);
       break;
 
@@ -436,6 +437,7 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev,
       }
       else
       {
+        rtt_printf("USBD get Configuration\n");
         pbuf = pdev->pClass->GetFSConfigDescriptor(&len);
         pbuf[1] = USB_DESC_TYPE_CONFIGURATION;
       }
