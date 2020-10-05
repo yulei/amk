@@ -5,8 +5,6 @@
 
 #pragma once
 
-
-//#ifdef GPIO_NRF5X
 #if defined(NRF52832_XXAA) || defined(NRF52840_XXAA)
     #include "nrf_gpio.h"
     typedef uint32_t pin_t;
@@ -17,6 +15,7 @@
         GPIO_TypeDef *port;
         uint16_t pin;
     } pin_t;
+
     #define MAKE_PIN(port, pin) {port, pin}
 
     #define A0 MAKE_PIN(GPIOA, GPIO_PIN_0)

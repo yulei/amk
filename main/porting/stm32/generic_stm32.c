@@ -7,7 +7,7 @@
 #include "rtt.h"
 #include "usb_descriptors.h"
 #include "usb_device.h"
-#include "usbd_hid.h"
+#include "usbd_composite.h"
 
 #include "report.h"
 #include "host.h"
@@ -120,9 +120,8 @@ void send_keyboard(report_keyboard_t *report)
     rtt_printf("start send keyboard\n");
     if (!usb_ready()) return;
 
-    report_buf[0] = REPORT_ID_KEYBOARD;
-    memcpy(&report_buf[1], report, sizeof(report_keyboard_t));
-    USBD_HID_SendReport(&hUsbDeviceFS, report_buf, sizeof(report_keyboard_t) + 1);
+    memcpy(&report_buf[0], report, sizeof(report_keyboard_t));
+    USBD_COMP_Send(&hUsbDeviceFS, REPORT_ID_KEYBOARD, report_buf, (uint16_t)sizeof(report_keyboard_t));
 }
 
 void send_mouse(report_mouse_t *report)
@@ -131,7 +130,7 @@ void send_mouse(report_mouse_t *report)
 
     report_buf[0] = REPORT_ID_MOUSE;
     memcpy(&report_buf[1], report, sizeof(report_mouse_t));
-    USBD_HID_SendReport(&hUsbDeviceFS, report_buf, sizeof(report_mouse_t) + 1);
+    USBD_COMP_Send(&hUsbDeviceFS, REPORT_ID_MOUSE, report_buf, (uint16_t)sizeof(report_mouse_t) + 1);
 }
 
 void send_system(uint16_t data)
@@ -140,7 +139,7 @@ void send_system(uint16_t data)
 
     report_buf[0] = REPORT_ID_SYSTEM;
     memcpy(&report_buf[1], &data, sizeof(data));
-    USBD_HID_SendReport(&hUsbDeviceFS, report_buf, sizeof(data) + 1);
+    USBD_COMP_Send(&hUsbDeviceFS, REPORT_ID_SYSTEM, report_buf, (uint16_t)sizeof(data) + 1);
 }
 
 void send_consumer(uint16_t data)
@@ -149,7 +148,7 @@ void send_consumer(uint16_t data)
 
     report_buf[0] = REPORT_ID_CONSUMER;
     memcpy(&report_buf[1], &data, sizeof(data));
-    USBD_HID_SendReport(&hUsbDeviceFS, report_buf, sizeof(data) + 1);
+    USBD_COMP_Send(&hUsbDeviceFS, REPORT_ID_CONSUMER, report_buf, (uint16_t)sizeof(data) + 1);
 }
 
 void remote_wakeup(void)

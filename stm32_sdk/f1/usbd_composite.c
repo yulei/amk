@@ -78,6 +78,7 @@ typedef struct {
 } usbd_composite_t;
 
 static usbd_interface_t* find_interface_by_epnum(uint32_t epnum);
+static usbd_interface_t* find_interface_by_type(uint32_t type);
 
 static USBD_HID_HandleTypeDef USBD_HID_DATA_KBD;
 static USBD_HID_HandleTypeDef USBD_HID_DATA_OTHER;
@@ -217,11 +218,20 @@ uint8_t USBD_COMP_DataOut(struct _USBD_HandleTypeDef *pdev, uint8_t epnum)
 {
     usbd_interface_t* interface = find_interface_by_epnum(epnum);
     
-    if (interface) {
+    if (interface && interface->instance->DataOut) {
         return interface->instance->DataOut(pdev, epnum, interface->data);
     }
 
     return USBD_FAIL;
+}
+
+uint8_t USBD_COMP_Send(USBD_HandleTypeDef *pdev, uint8_t type, uint8_t *report, uint16_t len)
+{
+    if (pdev->dev_state != USBD_STATE_CONFIGURED) {
+        return USBD_FAIL;
+    }
+    usbd_interface_t* interface = find_interface_by_type(type);
+    return interface->instance->Write(pdev, interface->epin, report, len, interface->data);
 }
 
 usbd_interface_t* find_interface_by_epnum(uint32_t epnum)
@@ -236,4 +246,17 @@ usbd_interface_t* find_interface_by_epnum(uint32_t epnum)
     }
 
     return NULL;
+}
+
+usbd_interface_t* find_interface_by_type(uint32_t type)
+{
+    if (type == REPORT_ID_KEYBOARD) {
+        return &usbd_composite.interfaces[0];
+    } else {
+        if (type == REPORT_ID_WEBUSB) {
+            return &usbd_composite.interfaces[2];
+        } else {
+            return &usbd_composite.interfaces[1];
+        }
+    }
 }

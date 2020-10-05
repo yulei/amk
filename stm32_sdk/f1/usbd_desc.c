@@ -49,7 +49,7 @@ USBD_DescriptorsTypeDef FS_Desc = {
     USBD_FS_InterfaceStrDescriptor,
     USBD_FS_BOSDescriptor};
 
-__ALIGN_BEGIN uint8_t USBD_StrDesc[USBD_MAX_STR_DESC_SIZ] __ALIGN_END;
+__ALIGN_BEGIN uint8_t USBD_StrDesc[USBD_MAX_STR_DESC_SIZE] __ALIGN_END;
 __ALIGN_BEGIN uint8_t USBD_StringSerial[USB_SIZ_STRING_SERIAL] __ALIGN_END = {USB_SIZ_STRING_SERIAL, USB_DESC_TYPE_STRING};
 
 /**

@@ -30,6 +30,7 @@ enum {
     REPORT_ID_MOUSE,
     REPORT_ID_SYSTEM,
     REPORT_ID_CONSUMER,
+    REPORT_ID_WEBUSB,
 };
 
 enum {

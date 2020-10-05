@@ -21,3 +21,5 @@
 
 #define S1_PIN A6
 #define S2_PIN A7
+
+#define RESET_PIN A6
