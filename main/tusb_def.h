@@ -1507,19 +1507,3 @@ enum
       HID_OUTPUT      ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE  ),\
     HID_COLLECTION_END \
 
-//=======================================================================
-// usb configuration
-//=======================================================================
-enum {
-  ITF_NUM_HID,
-  ITF_NUM_VENDOR,
-  ITF_NUM_TOTAL
-};
-
-#define EPNUM_HID     0x81
-#define EPNUM_VENDOR  0x02
-
-#define CFG_TUD_HID_BUFSIZE       16
-#define CFG_TUD_HID_POLL_INTERVAL 10
-#define CFG_TUD_ENDPOINT0_SIZE    64
-#define CFG_TUD_VENDOR_EP_SIZE    64

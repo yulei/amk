@@ -66,9 +66,13 @@ uint32_t tud_descriptor_device_size(void)
 //--------------------------------------------------------------------+
 // HID Report Descriptor
 //--------------------------------------------------------------------+
-static uint8_t desc_hid_report[] =
+static uint8_t desc_hid_report_kbd[] =
 {
-  TUD_HID_REPORT_DESC_KEYBOARD        ( HID_REPORT_ID(REPORT_ID_KEYBOARD) ),
+  TUD_HID_REPORT_DESC_KEYBOARD(),
+};
+
+static uint8_t desc_hid_report_other[] =
+{
   TUD_HID_REPORT_DESC_MOUSE           ( HID_REPORT_ID(REPORT_ID_MOUSE) ),
   TUD_HID_REPORT_DESC_SYSTEM_CONTROL  ( HID_REPORT_ID(REPORT_ID_SYSTEM) ),
   TUD_HID_REPORT_DESC_CONSUMER        ( HID_REPORT_ID(REPORT_ID_CONSUMER) ),
@@ -77,37 +81,51 @@ static uint8_t desc_hid_report[] =
 // Invoked when received GET HID REPORT DESCRIPTOR
 // Application return pointer to descriptor
 // Descriptor contents must exist long enough for transfer to complete
-uint8_t* tud_descriptor_hid_report_cb(void)
+uint8_t* tud_descriptor_hid_report_kbd_cb(void)
 {
-  return (uint8_t*)(&desc_hid_report[0]);
+  return (uint8_t*)(&desc_hid_report_kbd[0]);
 }
 
-uint32_t tud_descriptor_hid_report_size(void)
+uint32_t tud_descriptor_hid_report_kbd_size(void)
 {
-  return sizeof(desc_hid_report);
+  return sizeof(desc_hid_report_kbd);
 }
 
+uint8_t* tud_descriptor_hid_report_other_cb(void)
+{
+  return (uint8_t*)(&desc_hid_report_other[0]);
+}
+
+uint32_t tud_descriptor_hid_report_other_size(void)
+{
+  return sizeof(desc_hid_report_other);
+}
 //--------------------------------------------------------------------+
 // Configuration Descriptor
 //--------------------------------------------------------------------+
 
 
-#define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN)// + TUD_VENDOR_DESC_LEN)
+#define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN)// + TUD_VENDOR_DESC_LEN)
 
 
 static uint8_t desc_configuration[] =
 {
   // Config number, interface count, string index, total length, attribute, power in mA
-  TUD_CONFIG_DESCRIPTOR(1, 1, 0, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 100),
+  TUD_CONFIG_DESCRIPTOR(1, 2, 0, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 100),
   // Interface number, string index, protocol, report descriptor len, EP In & Out address, size & polling interval
-  TUD_HID_DESCRIPTOR(ITF_NUM_HID, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report), EPNUM_HID, CFG_TUD_HID_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+  TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_SIZE, CFG_TUD_HID_POLL_INTERVAL),
+  TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_SIZE, CFG_TUD_HID_POLL_INTERVAL),
 
   // Interface number, string index, EP Out & IN address, EP size
-  //TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, DESC_STR_INTERFACE_WEBUSB, EPNUM_VENDOR, 0x80 | EPNUM_VENDOR, CFG_TUD_VENDOR_EP_SIZE),
+  //TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, 0, EPNUM_VENDOR, 0x80|EPNUM_VENDOR, CFG_TUD_VENDOR_EP_SIZE),
 };
 
-static uint8_t desc_hid[] = {
-  TUD_HID_DESCRIPTOR(ITF_NUM_HID, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report), EPNUM_HID, CFG_TUD_HID_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+static uint8_t desc_hid_kbd[] = {
+  TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_SIZE, CFG_TUD_HID_POLL_INTERVAL),
+};
+
+static uint8_t desc_hid_other[] = {
+  TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_SIZE, CFG_TUD_HID_POLL_INTERVAL),
 };
 
 // Invoked when received GET CONFIGURATION DESCRIPTOR
@@ -123,16 +141,25 @@ uint32_t tud_descriptor_configuration_size(void)
   return sizeof(desc_configuration);
 }
 
-uint8_t* tud_descriptor_hid_cb(void)
+uint8_t* tud_descriptor_hid_kbd_cb(void)
 {
-  return (uint8_t*)(&desc_hid[0]);
+  return (uint8_t*)(&desc_hid_kbd[0]);
 }
 
-uint32_t tud_descriptor_hid_size(void)
+uint32_t tud_descriptor_hid_kbd_size(void)
 {
-  return sizeof(desc_hid);
+  return sizeof(desc_hid_kbd);
 }
 
+uint8_t* tud_descriptor_hid_other_cb(void)
+{
+  return (uint8_t*)(&desc_hid_other[0]);
+}
+
+uint32_t tud_descriptor_hid_other_size(void)
+{
+  return sizeof(desc_hid_other);
+}
 //--------------------------------------------------------------------+
 // BOS Descriptor
 //--------------------------------------------------------------------+
@@ -176,6 +203,25 @@ uint32_t tud_descriptor_bos_size(void)
   return sizeof(desc_bos);
 }
 
+#define URL  "iatkb.com"
+
+const tusb_desc_webusb_url_t desc_url = {
+  .bLength         = 3 + sizeof(URL) - 1,
+  .bDescriptorType = 3, // WEBUSB URL type
+  .bScheme         = 1, // 0: http, 1: https
+  .url             = URL
+};
+
+uint8_t* tud_descriptor_url_cb(void)
+{
+    return (uint8_t*)&desc_url;
+}
+
+uint32_t tud_descriptor_url_size(void)
+{
+    return desc_url.bLength;
+}
+
 static uint8_t desc_ms_os_20[] =
 {
   // Set header: length, type, windows version, total length
@@ -205,6 +251,17 @@ static uint8_t desc_ms_os_20[] =
 };
 
 TU_VERIFY_STATIC(sizeof(desc_ms_os_20) == MS_OS_20_DESC_LEN, "Incorrect size");
+
+uint8_t* tud_descriptor_msos20_cb(void)
+{
+    return desc_ms_os_20; 
+}
+
+uint32_t tud_descriptor_msos20_size(void)
+{
+    return MS_OS_20_DESC_LEN;
+}
+
 //--------------------------------------------------------------------+
 // String Descriptors
 //--------------------------------------------------------------------+

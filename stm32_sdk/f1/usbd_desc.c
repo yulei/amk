@@ -22,6 +22,7 @@
 #include "usbd_desc.h"
 #include "usbd_conf.h"
 #include "usb_descriptors.h"
+#include "rtt.h"
 
 #define USBD_CONFIGURATION_STRING_FS "HID Config"
 #define USBD_INTERFACE_STRING_FS "HID Interface"
@@ -36,6 +37,7 @@ static uint8_t *USBD_FS_ProductStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *
 static uint8_t *USBD_FS_SerialStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 static uint8_t *USBD_FS_ConfigStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 static uint8_t *USBD_FS_InterfaceStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
+static uint8_t *USBD_FS_BOSDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 
 USBD_DescriptorsTypeDef FS_Desc = {
     USBD_FS_DeviceDescriptor,
@@ -44,7 +46,8 @@ USBD_DescriptorsTypeDef FS_Desc = {
     USBD_FS_ProductStrDescriptor,
     USBD_FS_SerialStrDescriptor,
     USBD_FS_ConfigStrDescriptor,
-    USBD_FS_InterfaceStrDescriptor};
+    USBD_FS_InterfaceStrDescriptor,
+    USBD_FS_BOSDescriptor};
 
 __ALIGN_BEGIN uint8_t USBD_StrDesc[USBD_MAX_STR_DESC_SIZ] __ALIGN_END;
 __ALIGN_BEGIN uint8_t USBD_StringSerial[USB_SIZ_STRING_SERIAL] __ALIGN_END = {USB_SIZ_STRING_SERIAL, USB_DESC_TYPE_STRING};
@@ -57,6 +60,7 @@ __ALIGN_BEGIN uint8_t USBD_StringSerial[USB_SIZ_STRING_SERIAL] __ALIGN_END = {US
   */
 uint8_t *USBD_FS_DeviceDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 {
+    rtt_printf("get device descriptor");
   UNUSED(speed);
   *length = tud_descriptor_device_size();
   return tud_descriptor_device_cb();
@@ -138,6 +142,13 @@ uint8_t *USBD_FS_InterfaceStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *lengt
   (void)speed;
   USBD_GetString((uint8_t *)USBD_INTERFACE_STRING_FS, USBD_StrDesc, length);
   return USBD_StrDesc;
+}
+
+uint8_t *USBD_FS_BOSDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
+{
+    (void)speed;
+    *length = tud_descriptor_bos_size();
+    return tud_descriptor_bos_cb();
 }
 
 /**

@@ -90,18 +90,8 @@ EndBSPDependencies */
   */
 
 
-static uint8_t  USBD_HID_Init(USBD_HandleTypeDef *pdev,
-                              uint8_t cfgidx);
-
-static uint8_t  USBD_HID_DeInit(USBD_HandleTypeDef *pdev,
-                                uint8_t cfgidx);
-
-static uint8_t  USBD_HID_Setup(USBD_HandleTypeDef *pdev,
-                               USBD_SetupReqTypedef *req);
-
-static uint8_t  *USBD_HID_GetFSCfgDesc(uint16_t *length);
-
-static uint8_t  USBD_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum);
+static uint8_t  USBD_HID_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, void* user);
+static uint8_t  USBD_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user);
 /**
   * @}
   */
@@ -110,22 +100,11 @@ static uint8_t  USBD_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum);
   * @{
   */
 
-USBD_ClassTypeDef  USBD_HID =
+usbd_class_interface_t USBD_HID =
 {
-  USBD_HID_Init,
-  USBD_HID_DeInit,
   USBD_HID_Setup,
-  NULL, /*EP0_TxSent*/
-  NULL, /*EP0_RxReady*/
   USBD_HID_DataIn, /*DataIn*/
   NULL, /*DataOut*/
-  NULL, /*SOF */
-  NULL,
-  NULL,
-  NULL,
-  USBD_HID_GetFSCfgDesc,
-  NULL,
-  NULL,
 };
 
 /**
@@ -137,65 +116,15 @@ USBD_ClassTypeDef  USBD_HID =
   */
 
 /**
-  * @brief  USBD_HID_Init
-  *         Initialize the HID interface
-  * @param  pdev: device instance
-  * @param  cfgidx: Configuration index
-  * @retval status
-  */
-static uint8_t  USBD_HID_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
-{
-  /* Open EP IN */
-  USBD_LL_OpenEP(pdev, HID_EPIN_ADDR, USBD_EP_TYPE_INTR, HID_EPIN_SIZE);
-  pdev->ep_in[HID_EPIN_ADDR & 0xFU].is_used = 1U;
-
-  pdev->pClassData = USBD_malloc(sizeof(USBD_HID_HandleTypeDef));
-
-  if (pdev->pClassData == NULL)
-  {
-    return USBD_FAIL;
-  }
-
-  ((USBD_HID_HandleTypeDef *)pdev->pClassData)->state = HID_IDLE;
-
-  return USBD_OK;
-}
-
-/**
-  * @brief  USBD_HID_Init
-  *         DeInitialize the HID layer
-  * @param  pdev: device instance
-  * @param  cfgidx: Configuration index
-  * @retval status
-  */
-static uint8_t  USBD_HID_DeInit(USBD_HandleTypeDef *pdev,
-                                uint8_t cfgidx)
-{
-  /* Close HID EPs */
-  USBD_LL_CloseEP(pdev, HID_EPIN_ADDR);
-  pdev->ep_in[HID_EPIN_ADDR & 0xFU].is_used = 0U;
-
-  /* FRee allocated memory */
-  if (pdev->pClassData != NULL)
-  {
-    USBD_free(pdev->pClassData);
-    pdev->pClassData = NULL;
-  }
-
-  return USBD_OK;
-}
-
-/**
   * @brief  USBD_HID_Setup
   *         Handle the HID specific requests
   * @param  pdev: instance
   * @param  req: usb requests
   * @retval status
   */
-static uint8_t  USBD_HID_Setup(USBD_HandleTypeDef *pdev,
-                               USBD_SetupReqTypedef *req)
+static uint8_t  USBD_HID_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, void* user)
 {
-  USBD_HID_HandleTypeDef *hhid = (USBD_HID_HandleTypeDef *) pdev->pClassData;
+  USBD_HID_HandleTypeDef *hhid = (USBD_HID_HandleTypeDef *)user;
   uint16_t len = 0U;
   uint8_t *pbuf = NULL;
   uint16_t status_info = 0U;
@@ -246,17 +175,24 @@ static uint8_t  USBD_HID_Setup(USBD_HandleTypeDef *pdev,
         case USB_REQ_GET_DESCRIPTOR:
           if (req->wValue >> 8 == HID_REPORT_DESC)
           {
-            //len = MIN(HID_MOUSE_REPORT_DESC_SIZE, req->wLength);
-            //pbuf = HID_MOUSE_ReportDesc;
-            len = tud_descriptor_hid_report_size();
-            pbuf = tud_descriptor_hid_report_cb();
+            if (hhid->IsKeyboard) {
+              len = tud_descriptor_hid_report_kbd_size();
+              pbuf = tud_descriptor_hid_report_kbd_cb();
+            } else {
+              len = tud_descriptor_hid_report_other_size();
+              pbuf = tud_descriptor_hid_report_other_cb();
+            }
+
           }
           else if (req->wValue >> 8 == HID_DESCRIPTOR_TYPE)
           {
-            //pbuf = USBD_HID_Desc;
-            //len = MIN(USB_HID_DESC_SIZ, req->wLength);
-            len = tud_descriptor_hid_size();
-            pbuf = tud_descriptor_hid_cb();
+            if (hhid->IsKeyboard) {
+              len = tud_descriptor_hid_kbd_size();
+              pbuf = tud_descriptor_hid_kbd_cb();
+            } else {
+              len = tud_descriptor_hid_other_size();
+              pbuf = tud_descriptor_hid_other_cb();
+            }
           }
           else
           {
@@ -335,76 +271,17 @@ uint8_t USBD_HID_SendReport(USBD_HandleTypeDef  *pdev,
 }
 
 /**
-  * @brief  USBD_HID_GetPollingInterval
-  *         return polling interval from endpoint descriptor
-  * @param  pdev: device instance
-  * @retval polling interval
-  */
-uint32_t USBD_HID_GetPollingInterval(USBD_HandleTypeDef *pdev)
-{
-  uint32_t polling_interval = 0U;
-
-  /* HIGH-speed endpoints */
-  if (pdev->dev_speed == USBD_SPEED_HIGH)
-  {
-    /* Sets the data transfer polling interval for high speed transfers.
-     Values between 1..16 are allowed. Values correspond to interval
-     of 2 ^ (bInterval-1). This option (8 ms, corresponds to HID_HS_BINTERVAL */
-    polling_interval = (((1U << (HID_HS_BINTERVAL - 1U))) / 8U);
-  }
-  else   /* LOW and FULL-speed endpoints */
-  {
-    /* Sets the data transfer polling interval for low and full
-    speed transfers */
-    polling_interval =  HID_FS_BINTERVAL;
-  }
-
-  return ((uint32_t)(polling_interval));
-}
-
-/**
-  * @brief  USBD_HID_GetCfgFSDesc
-  *         return FS configuration descriptor
-  * @param  speed : current device speed
-  * @param  length : pointer data length
-  * @retval pointer to descriptor buffer
-  */
-static uint8_t  *USBD_HID_GetFSCfgDesc(uint16_t *length)
-{
-    *length = tud_descriptor_configuration_size();
-    return tud_descriptor_configuration_cb();
-}
-
-/**
   * @brief  USBD_HID_DataIn
   *         handle data IN Stage
   * @param  pdev: device instance
   * @param  epnum: endpoint index
   * @retval status
   */
-static uint8_t  USBD_HID_DataIn(USBD_HandleTypeDef *pdev,
-                                uint8_t epnum)
+static uint8_t  USBD_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user)
 {
 
   /* Ensure that the FIFO is empty before a new transfer, this condition could
   be caused by  a new transfer before the end of the previous transfer */
-  ((USBD_HID_HandleTypeDef *)pdev->pClassData)->state = HID_IDLE;
+  ((USBD_HID_HandleTypeDef *)user)->state = HID_IDLE;
   return USBD_OK;
 }
-
-
-/**
-  * @}
-  */
-
-
-/**
-  * @}
-  */
-
-
-/**
-  * @}
-  */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

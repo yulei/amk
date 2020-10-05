@@ -88,6 +88,7 @@ typedef struct
   uint32_t             Protocol;
   uint32_t             IdleState;
   uint32_t             AltSetting;
+  uint32_t             IsKeyboard;
   HID_StateTypeDef     state;
 }
 USBD_HID_HandleTypeDef;
@@ -109,8 +110,7 @@ USBD_HID_HandleTypeDef;
   * @{
   */
 
-extern USBD_ClassTypeDef  USBD_HID;
-#define USBD_HID_CLASS    &USBD_HID
+extern usbd_class_interface_t USBD_HID;
 /**
   * @}
   */
@@ -122,7 +122,6 @@ uint8_t USBD_HID_SendReport(USBD_HandleTypeDef *pdev,
                             uint8_t *report,
                             uint16_t len);
 
-uint32_t USBD_HID_GetPollingInterval(USBD_HandleTypeDef *pdev);
 
 /**
   * @}

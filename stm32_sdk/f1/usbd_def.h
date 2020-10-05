@@ -192,6 +192,12 @@ typedef struct _Device_cb
 
 } USBD_ClassTypeDef;
 
+typedef struct {
+  uint8_t (*Setup)(struct _USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef  *req, void* user);
+  uint8_t (*DataIn)(struct _USBD_HandleTypeDef *pdev, uint8_t epnum, void* user);
+  uint8_t (*DataOut)(struct _USBD_HandleTypeDef *pdev, uint8_t epnum, void* user);
+} usbd_class_interface_t;
+
 /* Following USB Device Speed */
 typedef enum
 {
