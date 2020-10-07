@@ -121,8 +121,12 @@ void board_init(void)
     extern void nrf_app_usbd_init(void);
     nrf_app_usbd_init();
 #endif
+    reason = NRF_POWER->RESETREAS;
+    NRF_LOG_INFO("NRF Keyboard reset reason: %x.", reason);
+    NRF_POWER->RESETREAS = 0;
+
     reason = NRF_POWER->GPREGRET;
-    NRF_LOG_INFO("NRF Keyboard start reason: %x.", reason);
+    NRF_LOG_INFO("NRF Keyboard app start reason: %x.", reason);
     NRF_POWER->GPREGRET = 0;
 
     if (reason & RST_ERASE_BOND) {
