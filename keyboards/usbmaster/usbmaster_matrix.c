@@ -29,7 +29,7 @@ typedef struct {
 } report_queue_t;
 
 static report_queue_t report_queue;
-static bool usb_suspended = false;
+//static bool usb_suspended = false;
 
 
 static bool report_queue_empty(report_queue_t* queue)
@@ -119,6 +119,7 @@ static void reset_to_bootloader(reset_reason_t reason)
 
 static void process_data(uint8_t d)
 {
+    rtt_printf("uart received: %d\n", d);
     static uint32_t count = 0;
     if (count == 0 && d != SYNC_BYTE_1) {
         rtt_printf("SYNC BYTE 1: %x\n", d);
@@ -276,35 +277,25 @@ uint8_t matrix_scan(void)
     }
 
     report_item_t item;
-    //chSysLock();
-    if (usb_suspended) {
-        if (!report_queue_empty(&report_queue)) {
-            // need to wakeup usb first
-            matrix[0] = 1;
-            //chSysUnlock();
-            usb_suspended = false;
-            return false;
-        }
-    }
     while (report_queue_get(&report_queue, &item)) {
-        //chSysUnlock();
-        matrix[0] = 1;
         process_command(&item);
-        //chSysLock();
     }
-    //chSysUnlock();
     return 1;
 }
 
 matrix_row_t matrix_get_row(uint8_t row) { return matrix[row]; }
+
+void matrix_print(void)
+{
+    rtt_printf("matrix_print\n");
+}
 
 void led_set(uint8_t usb_led)
 {
     send_set_leds(usb_led);
 }
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+void uart_recv_char(uint8_t c)
 {
-    process_data(recv_char);
-    HAL_UART_Receive_IT(huart, &recv_char, 1);
+    process_data(c);
 }

@@ -77,6 +77,8 @@ static void MX_USART1_UART_Init(void)
     if (HAL_UART_Init(&huart1) != HAL_OK) {
       Error_Handler();
     }
+
+    __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
 }
 
 static void MX_DMA_Init(void)

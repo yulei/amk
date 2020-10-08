@@ -5,6 +5,7 @@
 #include "usbd_hid.h"
 #include "usbd_ctlreq.h"
 #include "usb_descriptors.h"
+#include "rtt.h"
 
 static uint8_t  USBD_HID_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, void* user);
 static uint8_t  USBD_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user);
@@ -124,6 +125,7 @@ static uint8_t  USBD_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum, void* u
 static uint8_t  USBD_HID_Write(USBD_HandleTypeDef *pdev, uint8_t epnum, uint8_t* data, uint16_t size, void* user)
 {
     USBD_HID_HandleTypeDef* hhid = (USBD_HID_HandleTypeDef*)user;
+    rtt_printf("USBD HID Write: state=%d, size=%d\n", hhid->state, size);
     if (hhid->state == HID_IDLE) {
         hhid->state = HID_BUSY;
         return USBD_LL_Transmit(pdev, epnum, data, size);

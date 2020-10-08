@@ -31,10 +31,10 @@
 #define USBD_VENDOR_EPOUT_SIZE          USBD_VENDOR_EPIN_SIZE
 #define USBD_VENDOR_EPOUT_TYPE          USBD_EP_TYPE_BULK
 
-static uint8_t  USBD_COMP_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx);
-static uint8_t  USBD_COMP_DeInit(USBD_HandleTypeDef *pdev, uint8_t cfgidx);
-static uint8_t  USBD_COMP_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
-static uint8_t  *USBD_COMP_GetFSCfgDesc(uint16_t *length);
+static uint8_t USBD_COMP_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx);
+static uint8_t USBD_COMP_DeInit(USBD_HandleTypeDef *pdev, uint8_t cfgidx);
+static uint8_t USBD_COMP_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
+static uint8_t* USBD_COMP_GetFSCfgDesc(uint16_t *length);
 static uint8_t USBD_COMP_EP0_TxSent(struct _USBD_HandleTypeDef *pdev);
 static uint8_t USBD_COMP_EP0_RxReady(struct _USBD_HandleTypeDef *pdev);
 static uint8_t USBD_COMP_DataIn(struct _USBD_HandleTypeDef *pdev, uint8_t epnum);
@@ -58,9 +58,11 @@ USBD_ClassTypeDef  USBD_COMP =
   NULL,
 };
 
-
+typedef struct __usbd_interface usbd_interface_t;
+typedef void (*interface_init_t)(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
+typedef void (*interface_uninit_t)(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
 // one interface only support 1 epin and 1 epout
-typedef struct {
+typedef struct __usbd_interface{
     uint32_t index;         // interface index
     uint32_t epin;          // in endpoint index
     uint32_t epin_size;     // packet size of epin
@@ -69,6 +71,8 @@ typedef struct {
     uint32_t epout_size;    // packet size of epout
     uint32_t epout_type;    // type of the epout 
     usbd_class_interface_t* instance;
+    interface_init_t init;
+    interface_uninit_t uninit;
     void* data;
 } usbd_interface_t;
 
@@ -79,6 +83,11 @@ typedef struct {
 
 static usbd_interface_t* find_interface_by_epnum(uint32_t epnum);
 static usbd_interface_t* find_interface_by_type(uint32_t type);
+static void hid_kbd_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
+static void hid_other_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
+static void hid_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
+static void webusb_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
+static void webusb_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
 
 static USBD_HID_HandleTypeDef USBD_HID_DATA_KBD;
 static USBD_HID_HandleTypeDef USBD_HID_DATA_OTHER;
@@ -94,6 +103,8 @@ static usbd_composite_t usbd_composite = {
         .epout_size = USBD_HID_KBD_EPOUT_SIZE,
         .epout_type = USBD_HID_KBD_EPOUT_TYPE,
         .instance = &USBD_HID,
+        .init = hid_kbd_init,
+        .uninit = hid_uninit,
         .data = &USBD_HID_DATA_KBD},
 
         {.index = ITF_NUM_HID_OTHER,
@@ -104,6 +115,8 @@ static usbd_composite_t usbd_composite = {
         .epout_size = USBD_HID_OTHER_EPOUT_SIZE,
         .epout_type = USBD_HID_OTHER_EPOUT_TYPE,
         .instance = &USBD_HID,
+        .init = hid_other_init,
+        .uninit = hid_uninit,
         .data = &USBD_HID_DATA_OTHER},
 
         {.index = ITF_NUM_VENDOR,
@@ -114,6 +127,8 @@ static usbd_composite_t usbd_composite = {
         .epout_size = USBD_VENDOR_EPOUT_SIZE,
         .epout_type = USBD_VENDOR_EPOUT_TYPE,
         .instance = &USBD_WEBUSB,
+        .init = webusb_init,
+        .init = webusb_uninit,
         .data = &USBD_WEBUSB_DATA},
     },
     .size = USBD_MAX_NUM_INTERFACES
@@ -124,22 +139,10 @@ static uint8_t  USBD_COMP_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
     (void)cfgidx;
     for (int i = 0; i < usbd_composite.size; i++) {
         usbd_interface_t* interface = &usbd_composite.interfaces[i];
-        USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
-        pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
-        if (interface->epout) {
-            USBD_LL_OpenEP(pdev, interface->epout, interface->epout_type, interface->epout_size);
-            pdev->ep_out[interface->epout].is_used = 1U;
-        }
+        interface->init(pdev, interface);
     }
 
     pdev->pClassData = &usbd_composite;
-
-    ((USBD_HID_HandleTypeDef *)usbd_composite.interfaces[0].data)->state = HID_IDLE;
-    ((USBD_HID_HandleTypeDef *)usbd_composite.interfaces[0].data)->IsKeyboard = 1;
-    ((USBD_HID_HandleTypeDef *)usbd_composite.interfaces[1].data)->state = HID_IDLE;
-    ((USBD_HID_HandleTypeDef *)usbd_composite.interfaces[1].data)->IsKeyboard = 0;
-    ((USBD_WEBUSB_HandleTypeDef *)usbd_composite.interfaces[2].data)->state = WEBUSB_IDLE;
-
     return USBD_OK;
 }
 
@@ -149,12 +152,7 @@ static uint8_t  USBD_COMP_DeInit(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
 
     for (int i = 0; i < usbd_composite.size; i++) {
         usbd_interface_t* interface = &usbd_composite.interfaces[i];
-        USBD_LL_CloseEP(pdev, interface->epin);
-        pdev->ep_in[interface->epin & 0xFU].is_used = 0U;
-        if (interface->epout) {
-            USBD_LL_CloseEP(pdev, interface->epout);
-            pdev->ep_out[interface->epout].is_used = 0U;
-        }
+        interface->uninit(pdev, interface);
     }
 
     pdev->pClassData = NULL;
@@ -206,7 +204,8 @@ uint8_t USBD_COMP_EP0_RxReady(struct _USBD_HandleTypeDef *pdev)
 uint8_t USBD_COMP_DataIn(struct _USBD_HandleTypeDef *pdev, uint8_t epnum)
 {
     usbd_interface_t* interface = find_interface_by_epnum(epnum);
-    
+    rtt_printf("COMP DataIn: epnum=%d\n", epnum);
+
     if (interface) {
         return interface->instance->DataIn(pdev, epnum, interface->data);
     }
@@ -217,6 +216,7 @@ uint8_t USBD_COMP_DataIn(struct _USBD_HandleTypeDef *pdev, uint8_t epnum)
 uint8_t USBD_COMP_DataOut(struct _USBD_HandleTypeDef *pdev, uint8_t epnum)
 {
     usbd_interface_t* interface = find_interface_by_epnum(epnum);
+    rtt_printf("COMP DataOut: epnum=%d\n", epnum);
     
     if (interface && interface->instance->DataOut) {
         return interface->instance->DataOut(pdev, epnum, interface->data);
@@ -240,7 +240,7 @@ usbd_interface_t* find_interface_by_epnum(uint32_t epnum)
 
     for (int i = 0; i < usbd_composite.size; i++) {
         usbd_interface_t* interface = &usbd_composite.interfaces[i];
-        if ((epnum==interface->epin) || (epnum==interface->epout)) {
+        if ((epnum==(interface->epin&0x07)) || (epnum==interface->epout)) {
             return interface;
         }
     }
@@ -259,4 +259,48 @@ usbd_interface_t* find_interface_by_type(uint32_t type)
             return &usbd_composite.interfaces[1];
         }
     }
+}
+
+void hid_kbd_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
+{
+    USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
+    pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
+    ((USBD_HID_HandleTypeDef *)interface->data)->state = HID_IDLE;
+    ((USBD_HID_HandleTypeDef *)interface->data)->IsKeyboard = 1;
+}
+
+void hid_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
+{
+    USBD_LL_CloseEP(pdev, interface->epin);
+    pdev->ep_in[interface->epin & 0xFU].is_used = 0U;
+}
+
+void hid_other_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
+{
+    USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
+    pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
+    ((USBD_HID_HandleTypeDef *)interface->data)->state = HID_IDLE;
+    ((USBD_HID_HandleTypeDef *)interface->data)->IsKeyboard = 0;
+}
+
+void webusb_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
+{
+    USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
+    pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
+    USBD_LL_OpenEP(pdev, interface->epout, interface->epout_type, interface->epout_size);
+    pdev->ep_out[interface->epout].is_used = 1U;
+
+    USBD_WEBUSB_HandleTypeDef* ph = (USBD_WEBUSB_HandleTypeDef *)interface->data;
+
+    rtt_printf("WEBUSB init: prepare receive: epnum=%d\n", interface->epout);
+    USBD_LL_PrepareReceive(pdev, interface->epout, ph->recv_buffer, WEBUSB_PACKET_SIZE);
+    ph->state = WEBUSB_IDLE;
+}
+
+void webusb_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
+{
+    USBD_LL_CloseEP(pdev, interface->epin);
+    pdev->ep_in[interface->epin & 0xFU].is_used = 0U;
+    USBD_LL_CloseEP(pdev, interface->epout);
+    pdev->ep_out[interface->epout].is_used = 0U;
 }

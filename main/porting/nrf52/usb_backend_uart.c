@@ -4,6 +4,7 @@
  */
 
 #include "usb_interface.h"
+#include "amk_keymap.h"
 #include "app_uart.h"
 #include "nrf_gpio.h"
 #include "nrfx_gpiote.h"
@@ -31,7 +32,8 @@ static void uart_init(void);
 static void uart_uninit(void);
 static void uart_event_handle(app_uart_evt_t * p_event);
 static void uart_send_cmd(command_t cmd, const uint8_t* report, uint32_t size);
-static void uart_process(uint8_t data);
+static void uart_process_data(uint8_t data);
+static void uart_process_cmd(const uint8_t* cmd, uint32_t size);
 static uint8_t compute_checksum(const uint8_t* data, uint32_t size);
 
 void nrf_usb_init(nrf_usb_event_handler_t* eh)
@@ -147,7 +149,7 @@ static void uart_event_handle(app_uart_evt_t *p_event)
         case APP_UART_DATA_READY: {
                 uint8_t d = 0;
                 if (NRF_SUCCESS == app_uart_get(&d)) {
-                    uart_process(d);
+                    uart_process_data(d);
                 }
             } break;
         case APP_UART_TX_EMPTY:
@@ -199,7 +201,7 @@ static void uart_uninit(void)
     NRF_LOG_INFO("uart disabled.\n");
 }
 
-static void uart_send_cmd(command_t cmd, const uint8_t* report, uint32_t size)
+static void uart_send_cmd(command_t cmd, const uint8_t* data, uint32_t size)
 {
     if (!usb_config.vbus_enabled) {
         NRF_LOG_INFO("No VBUS power, can send command through UART");
@@ -210,18 +212,18 @@ static void uart_send_cmd(command_t cmd, const uint8_t* report, uint32_t size)
     }
 
     uint8_t checksum = cmd;
-    checksum += compute_checksum(report, size);
+    checksum += compute_checksum(data, size);
     app_uart_put(SYNC_BYTE_1);
     app_uart_put(SYNC_BYTE_2);
     app_uart_put(size+3);
     app_uart_put(checksum);
     app_uart_put(cmd);
     for (uint32_t i = 0; i < size; i++) {
-        app_uart_put(report[i]);
+        app_uart_put(data[i]);
     }
 }
 
-static void uart_process(uint8_t data)
+static void uart_process_data(uint8_t data)
 {
     switch(usb_buffer.count) {
     case 0:
@@ -251,17 +253,34 @@ static void uart_process(uint8_t data)
                 // invalid checksum
                 NRF_LOG_WARNING("Checksum mismatch: SRC:%x, CUR:%x", cmd[1], checksum);
             } else {
-                if (cmd[2] != CMD_SET_LEDS) {
-                    // invalid command
-                    NRF_LOG_WARNING("Invalid command from usb master: %x", cmd[2]);
-                } else {
-                    NRF_LOG_INFO("Led setting from usb master: %x", cmd[3]);
-                    usb_config.event.leds_cb(cmd[3]);
-                }
+                uart_process_cmd(&cmd[2], cmd[0]-2);
             }
             usb_buffer.count = 0;
         }
         break;
+    }
+}
+
+static void uart_process_cmd(const uint8_t* cmd, uint32_t size)
+{
+    switch(cmd[0]) {
+        case CMD_SET_LEDS: {
+            NRF_LOG_INFO("Led setting from usb master: %x", cmd[1]);
+            usb_config.event.leds_cb(cmd[1]);
+        } break;
+        case CMD_KEYMAP_SET: {
+            NRF_LOG_INFO("Keymap Set: layer=%d, row=%d, col=%d, key=%d", cmd[1], cmd[2], cmd[3], cmd[4]);
+            amk_keymap_set(cmd[1], cmd[2], cmd[3], cmd[4]);
+        } break;
+        case CMD_KEYMAP_GET: {
+            uint8_t keycode = amk_keymap_get(cmd[1], cmd[2], cmd[3]);
+            NRF_LOG_INFO("Keymap Get: layer=%d, row=%d, col=%d, key=%d", cmd[1], cmd[2], cmd[3], keycode);
+            uart_send_cmd(CMD_KEYMAP_GET_ACK, &keycode, 1);
+        } break;
+        default: {
+            // invalid command
+            NRF_LOG_WARNING("Invalid command from usb master: %x", cmd[0]);
+        } break;
     }
 }
 

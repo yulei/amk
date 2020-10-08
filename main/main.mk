@@ -5,6 +5,7 @@ SRC_FILES += \
 	$(MAIN_DIR)/main.c  \
 	$(MAIN_DIR)/xprintf.c \
 	$(MAIN_DIR)/custom_action.c \
+	$(MAIN_DIR)/amk_keymap.c \
 
 INC_FOLDERS += \
 	$(MAIN_DIR) \

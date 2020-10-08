@@ -31,3 +31,5 @@ const action_t PROGMEM fn_actions[] = {
     [2] = ACTION_FUNCTION(AF_RGB_TOG),
     [3] = ACTION_FUNCTION(AF_RGB_MOD),
 };
+
+const uint32_t keymaps_size = sizeof(keymaps);

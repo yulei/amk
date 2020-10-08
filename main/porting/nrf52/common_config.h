@@ -99,6 +99,9 @@ typedef enum {
     CMD_CONSUMER_REPORT,
     CMD_RESET_TO_BOOTLOADER,
     CMD_SET_LEDS,
+    CMD_KEYMAP_SET,
+    CMD_KEYMAP_GET,
+    CMD_KEYMAP_GET_ACK,
 } command_t;
 
 #define UART_TX_BUF_SIZE                    128                                        /**< UART TX buffer size. */
