@@ -10,12 +10,15 @@
 #include "matrix.h"
 #include "host.h"
 #include "gpio_pin.h"
+#include "usb_descriptors.h"
+#include "usbd_composite.h"
 #include "rtt.h"
 
 extern UART_HandleTypeDef huart1;
+extern USBD_HandleTypeDef hUsbDeviceFS;
 pin_t reset_pin = RESET_PIN;
 
-#define QUEUE_ITEM_SIZE   KEYBOARD_REPORT_SIZE      // maximum size of the queue item
+#define QUEUE_ITEM_SIZE   16                        // maximum size of the queue item
 typedef struct {
     uint32_t    type;                               // type of the item
     uint8_t     data[QUEUE_ITEM_SIZE];
@@ -90,6 +93,10 @@ typedef enum
     CMD_CONSUMER_REPORT,
     CMD_RESET_TO_BOOTLOADER,
     CMD_SET_LEDS,
+    CMD_KEYMAP_SET,
+    CMD_KEYMAP_SET_ACK,
+    CMD_KEYMAP_GET,
+    CMD_KEYMAP_GET_ACK,
 } command_t;
 
 static uint8_t command_buf[CMD_MAX_LEN];
@@ -161,7 +168,7 @@ static void process_command(report_item_t *item)
     case CMD_KEY_REPORT: {
         static report_keyboard_t report;
         rtt_printf("Send key report\n");
-        for (uint32_t i = 0; i < QUEUE_ITEM_SIZE; i++) {
+        for (uint32_t i = 0; i < sizeof(report); i++) {
             rtt_printf(" 0x%x", item->data[i]);
         }
         rtt_printf("\n");
@@ -173,7 +180,7 @@ static void process_command(report_item_t *item)
     case CMD_MOUSE_REPORT: {
         static report_mouse_t report;
         rtt_printf("Send mouse report\n");
-        for (uint32_t i = 0; i < QUEUE_ITEM_SIZE; i++) {
+        for (uint32_t i = 0; i < sizeof(report); i++) {
             rtt_printf(" 0x%x", item->data[i]);
         }
 
@@ -185,7 +192,7 @@ static void process_command(report_item_t *item)
     case CMD_SYSTEM_REPORT: {
         static uint16_t report;
         rtt_printf("Send system report\n");
-        for (uint32_t i = 0; i < QUEUE_ITEM_SIZE; i++) {
+        for (uint32_t i = 0; i < sizeof(report); i++) {
             rtt_printf(" 0x%x", item->data[i]);
         }
         memcpy(&report, &item->data[0], sizeof(report));
@@ -195,7 +202,7 @@ static void process_command(report_item_t *item)
     case CMD_CONSUMER_REPORT: {
         static uint16_t report;
         rtt_printf("Send consumer report\n");
-        for (uint32_t i = 0; i < QUEUE_ITEM_SIZE; i++) {
+        for (uint32_t i = 0; i < sizeof(report); i++) {
             rtt_printf(" 0x%x", item->data[i]);
         }
         memcpy(&report, &item->data[0], sizeof(report));
@@ -205,6 +212,13 @@ static void process_command(report_item_t *item)
     case CMD_RESET_TO_BOOTLOADER:
         reset_to_bootloader(USER_RESET);
         break;
+    case CMD_KEYMAP_SET_ACK:
+        USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 5);
+        break;
+    case CMD_KEYMAP_GET_ACK:
+        USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 7);
+        break;
+
     default:
         break;
     }
@@ -298,4 +312,38 @@ void led_set(uint8_t usb_led)
 void uart_recv_char(uint8_t c)
 {
     process_data(c);
+}
+
+void uart_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
+{
+    static uint8_t set_cmd[16];
+    set_cmd[0] = SYNC_BYTE_1;
+    set_cmd[1] = SYNC_BYTE_2;
+    set_cmd[2] = 8;                 // size
+    set_cmd[4] = CMD_KEYMAP_SET;    // command type
+    set_cmd[5] = layer;             
+    set_cmd[6] = row;
+    set_cmd[7] = col;
+    set_cmd[8] = (keycode&0xFF);
+    set_cmd[9] = ((keycode>>8)&0xFF);
+
+    set_cmd[3] = CMD_KEYMAP_SET+layer+row+col+set_cmd[8]+set_cmd[9]; // checksum
+
+    HAL_UART_Transmit_DMA(&huart1, &set_cmd[0], 10);
+}
+
+void uart_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
+{
+    static uint8_t set_cmd[16];
+    set_cmd[0] = SYNC_BYTE_1;
+    set_cmd[1] = SYNC_BYTE_2;
+    set_cmd[2] = 8;                 // size
+    set_cmd[4] = CMD_KEYMAP_GET;    // command type
+    set_cmd[5] = layer;             
+    set_cmd[6] = row;
+    set_cmd[7] = col;
+
+    set_cmd[3] = CMD_KEYMAP_SET+layer+row+col; // checksum
+
+    HAL_UART_Transmit_DMA(&huart1, &set_cmd[0], 8);
 }

@@ -8,6 +8,7 @@
 #include "usb_descriptors.h"
 #include "usb_device.h"
 #include "usbd_composite.h"
+#include "amk_keymap.h"
 
 #include "report.h"
 #include "host.h"
@@ -96,6 +97,7 @@ static void amk_init(void)
     #ifdef SCREEN_ENABLE
     screen_init();
     #endif
+    amk_keymap_init();
 }
 
 static void DWT_Delay_Init(void)
@@ -121,34 +123,34 @@ void send_keyboard(report_keyboard_t *report)
     if (!usb_ready()) return;
 
     memcpy(&report_buf[0], report, sizeof(report_keyboard_t));
-    USBD_COMP_Send(&hUsbDeviceFS, REPORT_ID_KEYBOARD, report_buf, (uint16_t)sizeof(report_keyboard_t));
+    USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_KEYBOARD, report_buf, (uint16_t)sizeof(report_keyboard_t));
 }
 
 void send_mouse(report_mouse_t *report)
 {
     if (!usb_ready()) return;
 
-    report_buf[0] = REPORT_ID_MOUSE;
+    report_buf[0] = HID_REPORT_ID_MOUSE;
     memcpy(&report_buf[1], report, sizeof(report_mouse_t));
-    USBD_COMP_Send(&hUsbDeviceFS, REPORT_ID_MOUSE, report_buf, (uint16_t)sizeof(report_mouse_t) + 1);
+    USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_MOUSE, report_buf, (uint16_t)sizeof(report_mouse_t) + 1);
 }
 
 void send_system(uint16_t data)
 {
     if (!usb_ready()) return;
 
-    report_buf[0] = REPORT_ID_SYSTEM;
+    report_buf[0] = HID_REPORT_ID_SYSTEM;
     memcpy(&report_buf[1], &data, sizeof(data));
-    USBD_COMP_Send(&hUsbDeviceFS, REPORT_ID_SYSTEM, report_buf, (uint16_t)sizeof(data) + 1);
+    USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_SYSTEM, report_buf, (uint16_t)sizeof(data) + 1);
 }
 
 void send_consumer(uint16_t data)
 {
     if (!usb_ready()) return;
 
-    report_buf[0] = REPORT_ID_CONSUMER;
+    report_buf[0] = HID_REPORT_ID_CONSUMER;
     memcpy(&report_buf[1], &data, sizeof(data));
-    USBD_COMP_Send(&hUsbDeviceFS, REPORT_ID_CONSUMER, report_buf, (uint16_t)sizeof(data) + 1);
+    USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_CONSUMER, report_buf, (uint16_t)sizeof(data) + 1);
 }
 
 void remote_wakeup(void)

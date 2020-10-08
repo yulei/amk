@@ -20,6 +20,7 @@
 #include "matrix_scan.h"
 
 #include "rgb_effects.h"
+#include "amk_keymap.h"
 
 static rf_send_report_t rf_send_report = NULL;
 static rf_prepare_sleep_t rf_prepare_sleep = NULL;
@@ -88,6 +89,7 @@ void rf_keyboard_init(rf_send_report_t send_report, rf_prepare_sleep_t prepare_s
     host_set_driver(&kbd_driver);
     keyboard_timer_init();
     nrf_usb_init(&usb_handler);
+    amk_keymap_init();
 #if WDT_ENABLE
     rf_wdt_init();
 #endif

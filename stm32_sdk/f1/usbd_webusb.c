@@ -12,6 +12,11 @@ static uint8_t  USBD_WEBUSB_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum, void
 static uint8_t  USBD_WEBUSB_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user);
 static uint8_t  USBD_WEBUSB_Write(USBD_HandleTypeDef *pdev, uint8_t epnum, uint8_t* data, uint16_t size, void* user);
 
+typedef enum {
+    WEBUSB_KEYMAP_SET,
+    WEBUSB_KEYMAP_GET,
+} webusb_command_t;
+
 usbd_class_interface_t USBD_WEBUSB = {
     USBD_WEBUSB_Setup,
     USBD_WEBUSB_DataIn,
@@ -61,6 +66,9 @@ static uint8_t  USBD_WEBUSB_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum, void
     return USBD_OK;
 }
 
+extern void uart_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode);
+extern void uart_keymap_get(uint8_t layer, uint8_t row, uint8_t col);
+
 static uint8_t  USBD_WEBUSB_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user)
 {
     USBD_WEBUSB_HandleTypeDef* hwusb = (USBD_WEBUSB_HandleTypeDef*)user;
@@ -73,7 +81,18 @@ static uint8_t  USBD_WEBUSB_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum, voi
             hwusb->recv_buffer[0]);
 
     // just write back
-    USBD_WEBUSB_Write(pdev, EPNUM_VENDOR_IN, hwusb->recv_buffer, WEBUSB_PACKET_SIZE, user);
+    switch (hwusb->recv_buffer[0]) {
+        case WEBUSB_KEYMAP_SET:
+            uart_keymap_set(hwusb->recv_buffer[1], hwusb->recv_buffer[2], hwusb->recv_buffer[3], (hwusb->recv_buffer[5]<<8) | hwusb->recv_buffer[4]);
+            break;
+            
+        case WEBUSB_KEYMAP_GET:
+            uart_keymap_get(hwusb->recv_buffer[1], hwusb->recv_buffer[2], hwusb->recv_buffer[3]);
+            break;
+        default:
+            rtt_printf("WEBUSB unknown command: %d\n",hwusb->recv_buffer[0]);
+            break;
+    }
 
     USBD_LL_PrepareReceive(pdev, epnum, hwusb->recv_buffer, WEBUSB_PACKET_SIZE);
     return USBD_OK;

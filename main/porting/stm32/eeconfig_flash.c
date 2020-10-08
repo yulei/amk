@@ -26,7 +26,8 @@
 #error "eeconfig: unsupported mcu"
 #endif
 
-#define EEPROM_SIZE             64
+#define EEPROM_SIZE             (64+MATRIX_ROWS*MATRIX_COLS*2*4)
+#define EEPROM_KEYMAP_START     (64)
 #define EEPROM_INVALID_ADDRESS  0xFFFF
 #define FLASH_EMPTY_VALUE       0xFF
 #define IS_VALID_ADDRESS(x)     ((x) >= FLASH_BASE_ADDRESS && (x) < (FLASH_BASE_ADDRESS+FLASH_TOTAL_SIZE))
@@ -328,4 +329,28 @@ void flash_erase_pages(void)
 #else
 #error "Flash Erase: unsupported mcu"
 #endif
+}
+
+//==================================================
+// flash store for keymaps
+//==================================================
+
+void flash_store_write(uint8_t key, const void* data, size_t size)
+{
+    uint32_t start = EEPROM_KEYMAP_START+key*MATRIX_ROWS*MATRIX_COLS*2;
+    const uint8_t* p = (const uint8_t*)data;
+    for(int i = 0; i < size; i++) {
+        fee_write(start+i, p[i]);
+    }
+}
+
+size_t flash_store_read(uint8_t key, void* data, size_t size)
+{
+    uint32_t start = EEPROM_KEYMAP_START+key*MATRIX_ROWS*MATRIX_COLS*2;
+    uint8_t* p = (uint8_t*)data;
+    for(int i = 0; i < size; i++) {
+        p[i] = fee_read(start+i);
+    }
+
+    return size;
 }

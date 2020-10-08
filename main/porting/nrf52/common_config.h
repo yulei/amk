@@ -100,6 +100,7 @@ typedef enum {
     CMD_RESET_TO_BOOTLOADER,
     CMD_SET_LEDS,
     CMD_KEYMAP_SET,
+    CMD_KEYMAP_SET_ACK,
     CMD_KEYMAP_GET,
     CMD_KEYMAP_GET_ACK,
 } command_t;

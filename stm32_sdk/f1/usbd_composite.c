@@ -247,10 +247,10 @@ usbd_interface_t* find_interface_by_epnum(uint32_t epnum)
 
 usbd_interface_t* find_interface_by_type(uint32_t type)
 {
-    if (type == REPORT_ID_KEYBOARD) {
+    if (type == HID_REPORT_ID_KEYBOARD) {
         return &usbd_composite.interfaces[0];
     } else {
-        if (type == REPORT_ID_WEBUSB) {
+        if (type == HID_REPORT_ID_WEBUSB) {
             return &usbd_composite.interfaces[2];
         } else {
             return &usbd_composite.interfaces[1];
