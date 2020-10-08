@@ -40,8 +40,11 @@ static uint8_t  USBD_WEBUSB_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef
             }
         } break;
         default:
+            rtt_printf("WEBUSB Setup unknow vender request: request=%d, index=%d\n", req->bRequest, req->wIndex);
             break;
         }
+    } else {
+        rtt_printf("WEBUSB Setup unknow interface request: request=%d, index=%d\n", req->bRequest, req->wIndex);
     }
 
     if (len > 0) {
@@ -61,15 +64,16 @@ static uint8_t  USBD_WEBUSB_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum, void
 static uint8_t  USBD_WEBUSB_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user)
 {
     USBD_WEBUSB_HandleTypeDef* hwusb = (USBD_WEBUSB_HandleTypeDef*)user;
-    rtt_printf("WEBUSB DataOut: epnum=%d status=%d, is_used=%d total_length=%d, rem_length=%d\n",
+    rtt_printf("WEBUSB DataOut: epnum=%d status=%d is_used=%d total_length=%d rem_length=%d fist_data=%c\n",
             epnum,
             pdev->ep_out[epnum].status,
             pdev->ep_out[epnum].is_used,
             pdev->ep_out[epnum].total_length,
-            pdev->ep_out[epnum].rem_length);
+            pdev->ep_out[epnum].rem_length,
+            hwusb->recv_buffer[0]);
 
     // just write back
-    USBD_WEBUSB_Write(pdev, epnum, hwusb->recv_buffer, WEBUSB_PACKET_SIZE, user);
+    USBD_WEBUSB_Write(pdev, EPNUM_VENDOR_IN, hwusb->recv_buffer, WEBUSB_PACKET_SIZE, user);
 
     USBD_LL_PrepareReceive(pdev, epnum, hwusb->recv_buffer, WEBUSB_PACKET_SIZE);
     return USBD_OK;
@@ -81,7 +85,7 @@ static uint8_t  USBD_WEBUSB_Write(USBD_HandleTypeDef *pdev, uint8_t epnum, uint8
     if (hwusb->state == WEBUSB_IDLE) {
         hwusb->state = WEBUSB_BUSY;
         memcpy(hwusb->send_buffer, data, size);
-        return USBD_LL_Transmit(pdev, epnum, hwusb->send_buffer, size);
+        return USBD_LL_Transmit(pdev, epnum|0x80, hwusb->send_buffer, size);
     } else {
         return USBD_BUSY;
     }

@@ -24,10 +24,10 @@
 #define USBD_HID_OTHER_EPOUT_TYPE       0
 
 // webusb 
-#define USBD_VENDOR_EPIN                (0x80|EPNUM_VENDOR)
+#define USBD_VENDOR_EPIN                (0x80|EPNUM_VENDOR_IN)
 #define USBD_VENDOR_EPIN_SIZE           CFG_TUD_VENDOR_EP_SIZE
 #define USBD_VENDOR_EPIN_TYPE           USBD_EP_TYPE_BULK 
-#define USBD_VENDOR_EPOUT               EPNUM_VENDOR
+#define USBD_VENDOR_EPOUT               (EPNUM_VENDOR_OUT)
 #define USBD_VENDOR_EPOUT_SIZE          USBD_VENDOR_EPIN_SIZE
 #define USBD_VENDOR_EPOUT_TYPE          USBD_EP_TYPE_BULK
 
@@ -40,22 +40,15 @@ static uint8_t USBD_COMP_EP0_RxReady(struct _USBD_HandleTypeDef *pdev);
 static uint8_t USBD_COMP_DataIn(struct _USBD_HandleTypeDef *pdev, uint8_t epnum);
 static uint8_t USBD_COMP_DataOut(struct _USBD_HandleTypeDef *pdev, uint8_t epnum);
 
-USBD_ClassTypeDef  USBD_COMP =
-{
-  USBD_COMP_Init,
-  USBD_COMP_DeInit,
-  USBD_COMP_Setup,
-  USBD_COMP_EP0_TxSent,
-  USBD_COMP_EP0_RxReady,
-  USBD_COMP_DataIn,
-  USBD_COMP_DataOut,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  USBD_COMP_GetFSCfgDesc,
-  NULL,
-  NULL,
+USBD_ClassTypeDef  USBD_COMP = {
+    .Init = USBD_COMP_Init,
+    .DeInit = USBD_COMP_DeInit,
+    .Setup = USBD_COMP_Setup,
+    .EP0_TxSent = USBD_COMP_EP0_TxSent,
+    .EP0_RxReady = USBD_COMP_EP0_RxReady,
+    .DataIn = USBD_COMP_DataIn,
+    .DataOut = USBD_COMP_DataOut,
+    .GetFSConfigDescriptor = USBD_COMP_GetFSCfgDesc,
 };
 
 typedef struct __usbd_interface usbd_interface_t;
@@ -128,7 +121,7 @@ static usbd_composite_t usbd_composite = {
         .epout_type = USBD_VENDOR_EPOUT_TYPE,
         .instance = &USBD_WEBUSB,
         .init = webusb_init,
-        .init = webusb_uninit,
+        .uninit = webusb_uninit,
         .data = &USBD_WEBUSB_DATA},
     },
     .size = USBD_MAX_NUM_INTERFACES
@@ -231,7 +224,11 @@ uint8_t USBD_COMP_Send(USBD_HandleTypeDef *pdev, uint8_t type, uint8_t *report, 
         return USBD_FAIL;
     }
     usbd_interface_t* interface = find_interface_by_type(type);
-    return interface->instance->Write(pdev, interface->epin, report, len, interface->data);
+    if (interface && interface->instance->Write) {
+        return interface->instance->Write(pdev, interface->epin, report, len, interface->data);
+    }
+
+    return USBD_FAIL;
 }
 
 usbd_interface_t* find_interface_by_epnum(uint32_t epnum)
@@ -285,15 +282,17 @@ void hid_other_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
 
 void webusb_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
 {
-    USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
+    USBD_StatusTypeDef ret = USBD_OK;
+    ret = USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
+    rtt_printf("WEBUSB init, Open epin=%d, status=%d\n", interface->epin, ret);
     pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
-    USBD_LL_OpenEP(pdev, interface->epout, interface->epout_type, interface->epout_size);
+    ret = USBD_LL_OpenEP(pdev, interface->epout, interface->epout_type, interface->epout_size);
+    rtt_printf("WEBUSB init, Open epout=%d, status=%d\n", interface->epout, ret);
     pdev->ep_out[interface->epout].is_used = 1U;
 
     USBD_WEBUSB_HandleTypeDef* ph = (USBD_WEBUSB_HandleTypeDef *)interface->data;
-
-    rtt_printf("WEBUSB init: prepare receive: epnum=%d\n", interface->epout);
-    USBD_LL_PrepareReceive(pdev, interface->epout, ph->recv_buffer, WEBUSB_PACKET_SIZE);
+    ret = USBD_LL_PrepareReceive(pdev, interface->epout, ph->recv_buffer, WEBUSB_PACKET_SIZE);
+    rtt_printf("WEBUSB init: prepare receive: epnum=%d, status=%d\n", interface->epout, ret);
     ph->state = WEBUSB_IDLE;
 }
 

@@ -18,7 +18,8 @@ enum {
 
 #define EPNUM_HID_KBD       0x01
 #define EPNUM_HID_OTHER     0x02
-#define EPNUM_VENDOR        0x03
+#define EPNUM_VENDOR_OUT    0x03
+#define EPNUM_VENDOR_IN     0x04
 
 #define CFG_TUD_HID_EP_SIZE         8
 #define CFG_TUD_HID_POLL_INTERVAL   10

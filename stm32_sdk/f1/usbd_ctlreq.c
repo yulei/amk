@@ -413,7 +413,7 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev,
   switch (req->wValue >> 8)
   {
     case USB_DESC_TYPE_BOS:
-    rtt_printf("USBD get BOS\n");
+        rtt_printf("USBD get BOS\n");
       if (pdev->pDesc->GetBOSDescriptor != NULL)
       {
         pbuf = pdev->pDesc->GetBOSDescriptor(pdev->dev_speed, &len);
@@ -425,7 +425,7 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev,
       }
       break;
     case USB_DESC_TYPE_DEVICE:
-    rtt_printf("USBD get DEVICE\n");
+        rtt_printf("USBD get DEVICE\n");
       pbuf = pdev->pDesc->GetDeviceDescriptor(pdev->dev_speed, &len);
       break;
 
@@ -577,6 +577,7 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev,
     if ((len != 0U) && (req->wLength != 0U))
     {
       len = MIN(len, req->wLength);
+      rtt_printf("USBD ctl send: len=%d\n", len);
       (void)USBD_CtlSendData(pdev, pbuf, len);
     }
 

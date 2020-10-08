@@ -117,7 +117,7 @@ static uint8_t desc_configuration[] =
   TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_SIZE, CFG_TUD_HID_POLL_INTERVAL),
 
   // Interface number, string index, EP Out & IN address, EP size
-  TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, 0, EPNUM_VENDOR, 0x80|EPNUM_VENDOR, CFG_TUD_VENDOR_EP_SIZE),
+  TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, 0, EPNUM_VENDOR_OUT, 0x80|EPNUM_VENDOR_IN, CFG_TUD_VENDOR_EP_SIZE),
 };
 
 static uint8_t desc_hid_kbd[] = {
