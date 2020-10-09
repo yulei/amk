@@ -29,14 +29,15 @@ APP_TIMER_DEF(m_eeprom_update_timer_id);        // timer for update the eeprom
 static volatile bool ee_fds_initialized = false;
 static volatile bool eeprom_dirty = false;
 static volatile bool keymap_dirty = false;
+#define KEYMAP_LAYER_SIZE   4
 
 extern void idle_state_handle(void);
-static void wait_for_fds_ready(void)
+/*static void wait_for_fds_ready(void)
 {
     while(!ee_fds_initialized) {
         idle_state_handle();
     }
-}
+}*/
 
 __ALIGN(4) static uint8_t eeprom_buf[(EECONFIG_SIZE + 3) & (~3)];  // pad to word size
 
@@ -68,7 +69,7 @@ static void ee_evt_handler(fds_evt_t const *p_evt)
                 eeprom_dirty = false;
             }
         }
-        if (p_evt->write.file_id == EE_FILEID && ((p_evt->write.record_key < EE_KEYMAP_KEY+4)&&(p_evt->write.record_key>=EE_KEYMAP_KEY))) {
+        if (p_evt->write.file_id == EE_FILEID && ((p_evt->write.record_key < EE_KEYMAP_KEY+KEYMAP_LAYER_SIZE)&&(p_evt->write.record_key>=EE_KEYMAP_KEY))) {
             if (p_evt->result != NRF_SUCCESS) {
                 NRF_LOG_INFO("KEYMAP write/update failed: %d, restart again", p_evt->result);
                 ret_code_t err_code;
@@ -97,10 +98,11 @@ static void ee_evt_handler(fds_evt_t const *p_evt)
         if (p_evt->result == NRF_SUCCESS) {
             ee_fds_initialized = true;
             NRF_LOG_INFO("FDS initialized.");
-            ret_code_t err_code;
+            /*ret_code_t err_code;
             err_code = app_timer_start(m_eeprom_update_timer_id, EEPROM_UPDATE_DELAY, NULL);
             APP_ERROR_CHECK(err_code);
             NRF_LOG_INFO("kickoff eeprom update timer for FDS init");
+            */
         } else {
             NRF_LOG_INFO("Failed to initialized FDS, code: %d", p_evt->result);
         } break;
@@ -123,7 +125,7 @@ void fds_eeprom_init(void)
                                     APP_TIMER_MODE_SINGLE_SHOT,
                                     eeprom_update_timeout_handler);
         APP_ERROR_CHECK(err_code);
-        wait_for_fds_ready();
+        //wait_for_fds_ready();
     }
     fds_eeprom_restore();
 }
@@ -330,12 +332,17 @@ void eeconfig_write_backlight(uint8_t val) { eeprom_write_byte(EECONFIG_BACKLIGH
 //==================================================
 #define KEYMAP_SIZE     ((MATRIX_ROWS*MATRIX_COLS*2+3)&3)
 
-__ALIGN(4) static uint8_t keymap_bufs[4][KEYMAP_SIZE]; 
+__ALIGN(4) static uint8_t keymap_buf_0[KEYMAP_SIZE]; 
+__ALIGN(4) static uint8_t keymap_buf_1[KEYMAP_SIZE]; 
+__ALIGN(4) static uint8_t keymap_buf_2[KEYMAP_SIZE]; 
+__ALIGN(4) static uint8_t keymap_buf_3[KEYMAP_SIZE]; 
+
+static uint8_t* keymap_bufs[] = {keymap_buf_0,keymap_buf_1, keymap_buf_2, keymap_buf_3}; 
 
 static fds_record_t keymap_record = {
     .file_id = EE_FILEID,
     .key = EE_KEYMAP_KEY,
-    .data.p_data = &keymap_bufs[0][0],
+    .data.p_data = keymap_buf_0,
     .data.length_words = KEYMAP_SIZE/sizeof(uint32_t),
 };
 
@@ -353,7 +360,9 @@ static void flash_store_update(void)
         APP_ERROR_CHECK(err_code);
         // no gc again
     }
-    keymap_dirty = false;
+    if (err_code == NRF_SUCCESS) {
+        keymap_dirty = false;
+    }
 }
 
 void flash_store_write(uint8_t key, const void* data, size_t size)
@@ -362,8 +371,8 @@ void flash_store_write(uint8_t key, const void* data, size_t size)
     fds_find_token_t token = {0};
 
     keymap_record.key = EE_KEYMAP_KEY+key;
-    memcpy(&keymap_bufs[key][0], data, size);
-    keymap_record.data.p_data = &keymap_bufs[key][0];
+    memcpy(keymap_bufs[key], data, size);
+    keymap_record.data.p_data = keymap_bufs[key];
     keymap_dirty = true;
 
     ret_code_t err_code = fds_record_find_by_key(keymap_record.key, &desc, &token);

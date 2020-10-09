@@ -577,7 +577,7 @@ static void USBD_GetDescriptor(USBD_HandleTypeDef *pdev,
     if ((len != 0U) && (req->wLength != 0U))
     {
       len = MIN(len, req->wLength);
-      rtt_printf("USBD ctl send: len=%d\n", len);
+      //rtt_printf("USBD ctl send: len=%d\n", len);
       (void)USBD_CtlSendData(pdev, pbuf, len);
     }
 
