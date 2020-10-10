@@ -11,3 +11,5 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 const action_t fn_actions[] = {
 };
+
+const uint32_t keymaps_size = sizeof(keymaps);

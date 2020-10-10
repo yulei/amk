@@ -15,7 +15,7 @@
 #define FLASH_INVALID_DATA      0xFFFFFFFF
 #define FLASH_INVALID_ADDRESS   0xFFFFFFFF
 #define FLASH_PAGE_NUM          1
-#elif defined(STM32F411xE) || defined(STM32F722xx)
+#elif defined(STM32F411xE) || defined(STM32F722xx) || defined(STM32F405xx)
 #define FLASH_BASE_ADDRESS      0x8060000
 #define FLASH_TOTAL_SIZE        0x20000
 #define FLASH_INVALID_DATA      0xFFFFFFFF
@@ -307,7 +307,7 @@ void flash_erase_pages(void)
     erase.NbPages = FLASH_PAGE_NUM;
     uint32_t error = 0;
     HAL_FLASHEx_Erase(&erase, &error);
-#elif defined(STM32F411xE)
+#elif defined(STM32F411xE) || defined(STM32F405xx)
     FLASH_EraseInitTypeDef erase;
     memset(&erase, 0, sizeof(erase));
     erase.TypeErase = FLASH_TYPEERASE_SECTORS;

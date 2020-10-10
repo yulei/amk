@@ -16,6 +16,10 @@ ifeq (STM32F411, $(strip $(MCU)))
 	SRC_FILES += $(STM32_PORTING_DIR)/stm32f411xe.c
 endif
 
+ifeq (STM32F405, $(strip $(MCU)))
+	SRC_FILES += $(STM32_PORTING_DIR)/stm32f405xx.c
+endif
+
 ifeq (STM32L433, $(strip $(MCU)))
 	SRC_FILES += $(STM32_PORTING_DIR)/stm32l433xx.c
 endif

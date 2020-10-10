@@ -1,5 +1,5 @@
 /**
- * stm32f411xe.c
+ * @file stm32f103xb.c
  */
 
 #include "generic_hal.h"

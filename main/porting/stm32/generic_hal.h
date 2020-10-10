@@ -5,7 +5,7 @@
 
 #pragma once
 
-#if defined(STM32F411xE) 
+#if defined(STM32F411xE) || defined(STM32F405xx)
     #include "stm32f4xx_hal.h"
 #elif defined(STM32L433xx) 
     #include "stm32l4xx_hal.h"

@@ -4,6 +4,10 @@ ifeq (STM32F411, $(strip $(MCU)))
 include $(STM32SDK_DIR)/f4_sdk.mk
 endif
 
+ifeq (STM32F405, $(strip $(MCU)))
+include $(STM32SDK_DIR)/f405_sdk.mk
+endif
+
 ifeq (STM32L433, $(strip $(MCU)))
 include $(STM32SDK_DIR)/l4_sdk.mk
 endif
