@@ -1,7 +1,7 @@
 STM32SDK_DIR := $(TOP_DIR)/stm32_sdk
 
 ifeq (STM32F411, $(strip $(MCU)))
-include $(STM32SDK_DIR)/f4_sdk.mk
+include $(STM32SDK_DIR)/f411_sdk.mk
 endif
 
 ifeq (STM32F405, $(strip $(MCU)))

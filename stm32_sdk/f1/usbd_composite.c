@@ -237,7 +237,7 @@ usbd_interface_t* find_interface_by_epnum(uint32_t epnum)
 
     for (int i = 0; i < usbd_composite.size; i++) {
         usbd_interface_t* interface = &usbd_composite.interfaces[i];
-        if ((epnum==(interface->epin&0x07)) || (epnum==interface->epout)) {
+        if ((epnum==(interface->epin&0xFU)) || (epnum==interface->epout)) {
             return interface;
         }
     }

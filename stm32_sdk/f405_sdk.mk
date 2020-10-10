@@ -8,26 +8,6 @@ SRC_FILES += \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/system_$(MCU_FAMILY).c \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/$(MCU_FAMILY)_hal_msp.c \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/$(MCU_FAMILY)_it.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usb_device.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_conf.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_core.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_ctlreq.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_desc.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_desc.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_hid.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_composite.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_webusb.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbd_ioreq.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usb_host.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbh_conf.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbh_core.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbh_ctlreq.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbh_hid.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbh_hid_keybd.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbh_hid_mouse.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbh_hid_parser.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbh_ioreq.c \
-	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/usbh_pipes.c \
 	$(STM32SDK_DIR)/Drivers/$(MCU_HAL_PATH)/Src/$(MCU_FAMILY)_hal_pcd.c \
 	$(STM32SDK_DIR)/Drivers/$(MCU_HAL_PATH)/Src/$(MCU_FAMILY)_hal_pcd_ex.c \
 	$(STM32SDK_DIR)/Drivers/$(MCU_HAL_PATH)/Src/$(MCU_FAMILY)_hal_hcd.c \
@@ -55,6 +35,8 @@ INC_FOLDERS += \
 	$(STM32SDK_DIR)/Drivers/$(MCU_HAL_PATH)/Inc/Legacy \
 	$(STM32SDK_DIR)/Drivers/CMSIS/Device/ST/STM32F4xx/Include \
 	$(STM32SDK_DIR)/Drivers/CMSIS/Include \
+
+include $(STM32SDK_DIR)/f4_usb.mk
 
 APP_DEFS += \
 	-DUSE_HAL_DRIVER \

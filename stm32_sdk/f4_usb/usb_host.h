@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : usb_device.h
+  * @file           : usb_host.h
   * @version        : v1.0_Cube
-  * @brief          : Header for usb_device.c file.
+  * @brief          : Header for usb_host.c file.
   ******************************************************************************
   * @attention
   *
@@ -20,8 +20,8 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __USB_DEVICE__H__
-#define __USB_DEVICE__H__
+#ifndef __USB_HOST__H__
+#define __USB_HOST__H__
 
 #ifdef __cplusplus
  extern "C" {
@@ -29,62 +29,49 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "generic_hal.h"
-#include "stm32f4xx.h"
-#include "stm32f4xx_hal.h"
-#include "usbd_def.h"
 
 /* USER CODE BEGIN INCLUDE */
 
 /* USER CODE END INCLUDE */
 
-/** @addtogroup USBD_OTG_DRIVER
+/** @addtogroup USBH_OTG_DRIVER
   * @{
   */
 
-/** @defgroup USBD_DEVICE USBD_DEVICE
-  * @brief Device file for Usb otg low level driver.
+/** @defgroup USBH_HOST USBH_HOST
+  * @brief Host file for Usb otg low level driver.
   * @{
   */
 
-/** @defgroup USBD_DEVICE_Exported_Variables USBD_DEVICE_Exported_Variables
+/** @defgroup USBH_HOST_Exported_Variables USBH_HOST_Exported_Variables
   * @brief Public variables.
   * @{
   */
 
-/* Private variables ---------------------------------------------------------*/
-/* USER CODE BEGIN PV */
-
-/* USER CODE END PV */
-
-/* Private function prototypes -----------------------------------------------*/
-/* USER CODE BEGIN PFP */
-
-/* USER CODE END PFP */
-
-/*
- * -- Insert your variables declaration here --
- */
-/* USER CODE BEGIN VARIABLES */
-
-/* USER CODE END VARIABLES */
 /**
   * @}
   */
 
-/** @defgroup USBD_DEVICE_Exported_FunctionsPrototype USBD_DEVICE_Exported_FunctionsPrototype
-  * @brief Declaration of public functions for Usb device.
+/** Status of the application. */
+typedef enum {
+  APPLICATION_IDLE = 0,
+  APPLICATION_START,
+  APPLICATION_READY,
+  APPLICATION_DISCONNECT
+}ApplicationTypeDef;
+
+/** @defgroup USBH_HOST_Exported_FunctionsPrototype USBH_HOST_Exported_FunctionsPrototype
+  * @brief Declaration of public functions for Usb host.
   * @{
   */
 
-/** USB Device initialization function. */
-void MX_USB_DEVICE_Init(void);
+/* Exported functions -------------------------------------------------------*/
 
-/*
- * -- Insert functions declaration here --
- */
-/* USER CODE BEGIN FD */
+/** @brief USB Host initialization function. */
+void MX_USB_HOST_Init(void);
 
-/* USER CODE END FD */
+void MX_USB_HOST_Process(void);
+
 /**
   * @}
   */
@@ -101,6 +88,6 @@ void MX_USB_DEVICE_Init(void);
 }
 #endif
 
-#endif /* __USB_DEVICE__H__ */
+#endif /* __USB_HOST__H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

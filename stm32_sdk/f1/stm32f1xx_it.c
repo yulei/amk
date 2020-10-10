@@ -242,7 +242,7 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
   /* USER CODE END USB_LP_CAN1_RX0_IRQn 1 */
 }
 
-extern void uart_recv_char(uint8_t c);
+__attribute__((weak)) void uart_recv_char(uint8_t c){}
 /**
   * @brief This function handles USART1 global interrupt.
   */

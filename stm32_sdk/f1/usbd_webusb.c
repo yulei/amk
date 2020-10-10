@@ -66,8 +66,8 @@ static uint8_t  USBD_WEBUSB_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum, void
     return USBD_OK;
 }
 
-extern void uart_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode);
-extern void uart_keymap_get(uint8_t layer, uint8_t row, uint8_t col);
+__attribute__((weak)) void uart_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode){}
+__attribute__((weak)) void uart_keymap_get(uint8_t layer, uint8_t row, uint8_t col){}
 
 static uint8_t  USBD_WEBUSB_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user)
 {
