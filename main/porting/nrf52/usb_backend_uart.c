@@ -273,9 +273,9 @@ static void uart_process_cmd(const uint8_t* cmd, uint32_t size)
             amk_keymap_set(cmd[1], cmd[2], cmd[3], cmd[4]);
         } break;
         case CMD_KEYMAP_GET: {
-            uint8_t keycode = amk_keymap_get(cmd[1], cmd[2], cmd[3]);
+            uint16_t keycode = amk_keymap_get(cmd[1], cmd[2], cmd[3]);
             NRF_LOG_INFO("Keymap Get: layer=%d, row=%d, col=%d, key=%d", cmd[1], cmd[2], cmd[3], keycode);
-            uart_send_cmd(CMD_KEYMAP_GET_ACK, &keycode, 1);
+            uart_send_cmd(CMD_KEYMAP_GET_ACK, (uint8_t*)(&keycode), 2);
         } break;
         default: {
             // invalid command

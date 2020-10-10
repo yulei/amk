@@ -216,7 +216,7 @@ static void process_command(report_item_t *item)
         USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 5);
         break;
     case CMD_KEYMAP_GET_ACK:
-        USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 7);
+        USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 5);
         break;
 
     default:
