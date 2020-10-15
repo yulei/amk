@@ -213,10 +213,10 @@ static void process_command(report_item_t *item)
         reset_to_bootloader(USER_RESET);
         break;
     case CMD_KEYMAP_SET_ACK:
-        USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 5);
+        USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 6);
         break;
     case CMD_KEYMAP_GET_ACK:
-        USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 5);
+        USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 6);
         break;
 
     default:
@@ -324,8 +324,8 @@ void uart_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
     set_cmd[5] = layer;             
     set_cmd[6] = row;
     set_cmd[7] = col;
-    set_cmd[8] = (keycode&0xFF);
-    set_cmd[9] = ((keycode>>8)&0xFF);
+    set_cmd[8] = ((keycode>>8)&0xFF);
+    set_cmd[9] = (keycode&0xFF);
 
     set_cmd[3] = CMD_KEYMAP_SET+layer+row+col+set_cmd[8]+set_cmd[9]; // checksum
 

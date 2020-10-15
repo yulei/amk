@@ -14,7 +14,6 @@ SRC_FILES += \
 	$(TMK_DIR)/common/debug.c \
 	$(TMK_DIR)/common/util.c  \
 	$(TMK_DIR)/common/hook.c \
-	$(TMK_DIR)/common/keymap.c \
 
 INC_FOLDERS += \
 	$(TOP_DIR)/tmk \
@@ -36,4 +35,11 @@ endif
 
 ifeq (yes,$(strip $(EXTRAKEY_ENABLE)))
     APP_DEFS += -DEXTRAKEY_ENABLE
+endif
+    
+ifeq (yes,$(strip $(ACTIONMAP_ENABLE)))
+	SRC_FILES += $(TMK_DIR)/common/actionmap.c
+	APP_DEFS += -DACTIONMAP_ENABLE
+else
+	SRC_FILES += $(TMK_DIR)/common/keymap.c
 endif

@@ -269,13 +269,21 @@ static void uart_process_cmd(const uint8_t* cmd, uint32_t size)
             usb_config.event.leds_cb(cmd[1]);
         } break;
         case CMD_KEYMAP_SET: {
-            NRF_LOG_INFO("Keymap Set: layer=%d, row=%d, col=%d, key=%d", cmd[1], cmd[2], cmd[3], cmd[4]);
-            amk_keymap_set(cmd[1], cmd[2], cmd[3], cmd[4]);
+            uint16_t key = (cmd[4] << 8) | (cmd[5]);
+            NRF_LOG_INFO("Keymap Set: layer=%d, row=%d, col=%d, key=%d", cmd[1], cmd[2], cmd[3], key);
+            amk_keymap_set(cmd[1], cmd[2], cmd[3], key);
+            uart_send_cmd(CMD_KEYMAP_SET_ACK, &cmd[1], 5);
         } break;
         case CMD_KEYMAP_GET: {
             uint16_t keycode = amk_keymap_get(cmd[1], cmd[2], cmd[3]);
             NRF_LOG_INFO("Keymap Get: layer=%d, row=%d, col=%d, key=%d", cmd[1], cmd[2], cmd[3], keycode);
-            uart_send_cmd(CMD_KEYMAP_GET_ACK, (uint8_t*)(&keycode), 2);
+            uint8_t buf[5];
+            buf[0] = cmd[1];
+            buf[1] = cmd[2];
+            buf[2] = cmd[3];
+            buf[3] = (keycode >> 8) & 0xFF;
+            buf[4] = keycode & 0xFF;
+            uart_send_cmd(CMD_KEYMAP_GET_ACK, buf, 5);
         } break;
         default: {
             // invalid command

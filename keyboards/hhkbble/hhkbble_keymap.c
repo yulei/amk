@@ -4,6 +4,7 @@
  */
 
 #include "hhkbble.h"
+#include "keymap.h"
 
 #define _______ KC_TRNS
 

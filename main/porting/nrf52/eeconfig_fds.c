@@ -32,12 +32,12 @@ static volatile bool keymap_dirty = false;
 #define KEYMAP_LAYER_SIZE   4
 
 extern void idle_state_handle(void);
-/*static void wait_for_fds_ready(void)
+static void wait_for_fds_ready(void)
 {
     while(!ee_fds_initialized) {
         idle_state_handle();
     }
-}*/
+}
 
 __ALIGN(4) static uint8_t eeprom_buf[(EECONFIG_SIZE + 3) & (~3)];  // pad to word size
 
@@ -125,7 +125,7 @@ void fds_eeprom_init(void)
                                     APP_TIMER_MODE_SINGLE_SHOT,
                                     eeprom_update_timeout_handler);
         APP_ERROR_CHECK(err_code);
-        //wait_for_fds_ready();
+        wait_for_fds_ready();
     }
     fds_eeprom_restore();
 }
