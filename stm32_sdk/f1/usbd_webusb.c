@@ -33,9 +33,11 @@ static uint8_t  USBD_WEBUSB_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef
     if ((req->bmRequest&USB_REQ_TYPE_MASK) == USB_REQ_TYPE_VENDOR) {
         switch (req->bRequest) {
         case VENDOR_REQUEST_WEBUSB: {
-            len = tud_descriptor_url_size();
-            pbuf = tud_descriptor_url_cb();
-            rtt_printf("WEBUSB Setup: size=%d\n", len);
+            if (req->wIndex == 2) {
+                len = tud_descriptor_url_size();
+                pbuf = tud_descriptor_url_cb();
+                rtt_printf("WEBUSB Setup: get_url, size=%d\n", len);
+            }
         } break;
         case VENDOR_REQUEST_MICROSOFT: {
             if ( req->wIndex == 7 ) {
@@ -54,6 +56,9 @@ static uint8_t  USBD_WEBUSB_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef
 
     if (len > 0) {
         ret = USBD_CtlSendData(pdev, pbuf, len);
+    } else {
+        USBD_CtlError(pdev, req);
+        ret = USBD_FAIL;
     }
 
     return ret;
@@ -89,7 +94,7 @@ static uint8_t  USBD_WEBUSB_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum, voi
             uart_keymap_get(hwusb->recv_buffer[1], hwusb->recv_buffer[2], hwusb->recv_buffer[3]);
             break;
         default:
-            rtt_printf("WEBUSB unknown command: %d\n",hwusb->recv_buffer[0]);
+            rtt_printf("WEBUSB unknown command: %d\n", hwusb->recv_buffer[0]);
             break;
     }
 

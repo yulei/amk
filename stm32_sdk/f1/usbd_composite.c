@@ -237,7 +237,7 @@ usbd_interface_t* find_interface_by_epnum(uint32_t epnum)
 
     for (int i = 0; i < usbd_composite.size; i++) {
         usbd_interface_t* interface = &usbd_composite.interfaces[i];
-        if ((epnum==(interface->epin&0xFU)) || (epnum==interface->epout)) {
+        if ((epnum==(interface->epin&EP_ADDR_MSK)) || (epnum==interface->epout)) {
             return interface;
         }
     }
@@ -261,7 +261,7 @@ usbd_interface_t* find_interface_by_type(uint32_t type)
 void hid_kbd_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
 {
     USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
-    pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
+    pdev->ep_in[interface->epin & EP_ADDR_MSK].is_used = 1U;
     ((USBD_HID_HandleTypeDef *)interface->data)->State = HID_IDLE;
     ((USBD_HID_HandleTypeDef *)interface->data)->IsKeyboard = 1;
 }
@@ -269,13 +269,13 @@ void hid_kbd_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
 void hid_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
 {
     USBD_LL_CloseEP(pdev, interface->epin);
-    pdev->ep_in[interface->epin & 0xFU].is_used = 0U;
+    pdev->ep_in[interface->epin & EP_ADDR_MSK].is_used = 0U;
 }
 
 void hid_other_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
 {
     USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
-    pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
+    pdev->ep_in[interface->epin & EP_ADDR_MSK].is_used = 1U;
     ((USBD_HID_HandleTypeDef *)interface->data)->State = HID_IDLE;
     ((USBD_HID_HandleTypeDef *)interface->data)->IsKeyboard = 0;
 }
@@ -285,7 +285,7 @@ void webusb_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
     USBD_StatusTypeDef ret = USBD_OK;
     ret = USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
     rtt_printf("WEBUSB init, Open epin=%d, status=%d\n", interface->epin, ret);
-    pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
+    pdev->ep_in[interface->epin & EP_ADDR_MSK].is_used = 1U;
     ret = USBD_LL_OpenEP(pdev, interface->epout, interface->epout_type, interface->epout_size);
     rtt_printf("WEBUSB init, Open epout=%d, status=%d\n", interface->epout, ret);
     pdev->ep_out[interface->epout].is_used = 1U;
@@ -299,7 +299,7 @@ void webusb_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
 void webusb_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
 {
     USBD_LL_CloseEP(pdev, interface->epin);
-    pdev->ep_in[interface->epin & 0xFU].is_used = 0U;
+    pdev->ep_in[interface->epin & EP_ADDR_MSK].is_used = 0U;
     USBD_LL_CloseEP(pdev, interface->epout);
     pdev->ep_out[interface->epout].is_used = 0U;
 }

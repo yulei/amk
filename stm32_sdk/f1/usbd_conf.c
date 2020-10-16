@@ -26,6 +26,7 @@
 #include "usbd_hid.h"
 
 /* USER CODE BEGIN Includes */
+#include "rtt.h"
 
 /* USER CODE END Includes */
 
@@ -130,6 +131,7 @@ static void PCD_DataOutStageCallback(PCD_HandleTypeDef *hpcd, uint8_t epnum)
 void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef *hpcd, uint8_t epnum)
 #endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
 {
+  rtt_printf("PCD dataout callback: epnum=%d\n", epnum);
   USBD_LL_DataOutStage((USBD_HandleTypeDef*)hpcd->pData, epnum, hpcd->OUT_ep[epnum].xfer_buff);
 }
 
