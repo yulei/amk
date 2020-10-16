@@ -13,7 +13,7 @@ static uint8_t  USBD_WEBUSB_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum, voi
 static uint8_t  USBD_WEBUSB_Write(USBD_HandleTypeDef *pdev, uint8_t epnum, uint8_t* data, uint16_t size, void* user);
 
 typedef enum {
-    WEBUSB_KEYMAP_SET,
+    WEBUSB_KEYMAP_SET = 1,
     WEBUSB_KEYMAP_GET,
 } webusb_command_t;
 
@@ -80,7 +80,6 @@ static uint8_t  USBD_WEBUSB_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum, voi
             pdev->ep_out[epnum].rem_length,
             hwusb->recv_buffer[0]);
 
-    // just write back
     switch (hwusb->recv_buffer[0]) {
         case WEBUSB_KEYMAP_SET:
             uart_keymap_set(hwusb->recv_buffer[1], hwusb->recv_buffer[2], hwusb->recv_buffer[3], (hwusb->recv_buffer[5]<<8) | hwusb->recv_buffer[4]);

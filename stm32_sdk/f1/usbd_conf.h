@@ -61,8 +61,6 @@
   */
 
 /*---------- -----------*/
-#define USBD_MAX_NUM_INTERFACES         3
-/*---------- -----------*/
 #define USBD_MAX_NUM_CONFIGURATION      1
 /*---------- -----------*/
 #define USBD_MAX_STR_DESC_SIZE          512

@@ -21,6 +21,7 @@
 #include "usbd_ctlreq.h"
 #include "usbd_ioreq.h"
 
+#include "usb_descriptors.h"
 #include "rtt.h"
 
 /** @addtogroup STM32_USBD_STATE_DEVICE_LIBRARY
@@ -192,7 +193,7 @@ USBD_StatusTypeDef  USBD_StdItfReq(USBD_HandleTypeDef *pdev,
         case USBD_STATE_ADDRESSED:
         case USBD_STATE_CONFIGURED:
 
-          if (LOBYTE(req->wIndex) <= USBD_MAX_NUM_INTERFACES)
+          if (LOBYTE(req->wIndex) < ITF_NUM_TOTAL)
           {
             ret = (USBD_StatusTypeDef)pdev->pClass->Setup(pdev, req);
 

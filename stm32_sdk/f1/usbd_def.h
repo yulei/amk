@@ -45,9 +45,9 @@ extern "C" {
 #define NULL                                            0U
 #endif /* NULL */
 
-#ifndef USBD_MAX_NUM_INTERFACES
-#define USBD_MAX_NUM_INTERFACES                         1U
-#endif /* USBD_MAX_NUM_CONFIGURATION */
+//#ifndef USBD_MAX_NUM_INTERFACES
+//#define USBD_MAX_NUM_INTERFACES                         1U
+//#endif /* USBD_MAX_NUM_CONFIGURATION */
 
 #ifndef USBD_MAX_NUM_CONFIGURATION
 #define USBD_MAX_NUM_CONFIGURATION                      1U
