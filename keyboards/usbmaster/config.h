@@ -6,8 +6,8 @@
 #pragma once
 
 // USB Device descriptor parameter
-#define VENDOR_ID  0x4D58   // MX
-//#define VENDOR_ID  0xcafe // MX
+//#define VENDOR_ID  0x4D58   // MX
+#define VENDOR_ID  0xcafe // MX
 #define PRODUCT_ID 0x5543   // UC
 #define DEVICE_VER 0x0001
 #define MANUFACTURER astro

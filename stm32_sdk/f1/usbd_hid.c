@@ -33,6 +33,10 @@ static uint8_t  USBD_HID_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *r
                 hhid->Protocol = (uint8_t)(req->wValue);
                 break;
 
+                case HID_REQ_CONTROL_SET_REPORT:
+                //rtt_printf("HID set report received\n");
+                break;
+
                 case HID_REQ_CONTROL_GET_PROTOCOL:
                 USBD_CtlSendData(pdev, (uint8_t *)(void *)&hhid->Protocol, 1U);
                 break;

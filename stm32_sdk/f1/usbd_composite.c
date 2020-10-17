@@ -155,7 +155,7 @@ static uint8_t  USBD_COMP_DeInit(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
 uint8_t USBD_COMP_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
 {
     USBD_StatusTypeDef ret = USBD_FAIL;
-    rtt_printf("bmRequst=%d, request=%d, index=%d\n", req->bmRequest, req->bRequest, req->wIndex);
+    //rtt_printf("COMP:bmRequst=%d, request=%d, index=%d, value=%d, length=%d\n", req->bmRequest, req->bRequest, req->wIndex, req->wValue, req->wLength);
     if ((req->bmRequest&USB_REQ_TYPE_MASK) == USB_REQ_TYPE_VENDOR) {
         usbd_interface_t* interface = &usbd_composite.interfaces[ITF_NUM_VENDOR];
         ret = interface->instance->Setup(pdev, req, interface->data);
