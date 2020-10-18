@@ -3,7 +3,7 @@
 [GENERAL]
   aATEModuleSel[10] = 0,0,0,0,0,0,0,0,0,0
   ConnectMode = 0
-  CurrentFile = "D:/msys64/home/astro/amk/build/pad.hex"
+  CurrentFile = "D:/msys64/home/astro/keyboard_bootloader/build/f4c.hex"
   DataFileSAddr = 0x00000000
   GUIMode = 0
   HostName = ""
