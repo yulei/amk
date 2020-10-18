@@ -5,6 +5,9 @@
 #include "generic_hal.h"
 #include "usb_device.h"
 #include "usb_host.h"
+#include "usbh_hid.h"
+#include "usb_descriptors.h"
+#include "usbd_composite.h"
 #include "rtt.h"
 
 void Error_Handler(void)
@@ -77,4 +80,17 @@ void custom_board_init(void)
 void custom_board_task(void)
 {
     MX_USB_HOST_Process();
+}
+
+
+void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
+{
+  HID_HandleTypeDef *HID_Handle = (HID_HandleTypeDef *) phost->pActiveClass->pData;
+  rtt_printf("HID event, ready=%d, size=%d\n", HID_Handle->DataReady, HID_Handle->length);
+
+  static uint8_t buf[16];
+  USBH_HID_FifoRead(&HID_Handle->fifo, buf, 8);
+  rtt_printf("HID data, [%x%x%x%x%x%x%x%x]\n", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7]);
+  extern USBD_HandleTypeDef hUsbDeviceFS;
+  USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_KEYBOARD, buf, 8);
 }

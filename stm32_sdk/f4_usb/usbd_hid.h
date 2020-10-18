@@ -7,9 +7,9 @@
 #include "usbd_ioreq.h"
 
 typedef enum {
-    HID_IDLE = 0,
-    HID_BUSY,
-} HID_StateTypeDef;
+    HIDD_IDLE = 0,
+    HIDD_BUSY,
+} HIDD_StateTypeDef;
 
 
 typedef struct {
@@ -17,7 +17,7 @@ typedef struct {
     uint32_t             IdleState;
     uint32_t             AltSetting;
     uint32_t             IsKeyboard;
-    HID_StateTypeDef     state;
+    HIDD_StateTypeDef     state;
 } USBD_HID_HandleTypeDef;
 
 extern usbd_class_interface_t USBD_HID;

@@ -239,7 +239,7 @@ static uint32_t fee_find_valid_address(void)
 bool fee_write(uintptr_t address, uint8_t data)
 {
     // exit if not a valid address
-    if (!IS_VALID_ADDRESS(address)) { return false; }
+    if (!IS_VALID_ADDRESS(address+FLASH_BASE_ADDRESS)) { return false; }
 
 // we are sure the address will not be out of bound
 #pragma GCC diagnostic ignored "-Warray-bounds"
@@ -263,7 +263,7 @@ bool fee_write(uintptr_t address, uint8_t data)
 
 uint8_t fee_read(uintptr_t address)
 {
-    if (!IS_VALID_ADDRESS(address)) {
+    if (!IS_VALID_ADDRESS(address+FLASH_BASE_ADDRESS)) {
         return FLASH_EMPTY_VALUE;
     }
 

@@ -13,7 +13,7 @@ static uint8_t  USBD_WEBUSB_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum, voi
 static uint8_t  USBD_WEBUSB_Write(USBD_HandleTypeDef *pdev, uint8_t epnum, uint8_t* data, uint16_t size, void* user);
 
 typedef enum {
-    WEBUSB_KEYMAP_SET,
+    WEBUSB_KEYMAP_SET = 1,
     WEBUSB_KEYMAP_GET,
 } webusb_command_t;
 
@@ -72,22 +72,38 @@ __attribute__((weak)) void uart_keymap_get(uint8_t layer, uint8_t row, uint8_t c
 static uint8_t  USBD_WEBUSB_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user)
 {
     USBD_WEBUSB_HandleTypeDef* hwusb = (USBD_WEBUSB_HandleTypeDef*)user;
-    rtt_printf("WEBUSB DataOut: epnum=%d status=%d is_used=%d total_length=%d rem_length=%d fist_data=%c\n",
+    rtt_printf("WEBUSB DataOut: epnum=%d status=%d is_used=%d total_length=%d rem_length=%d fist_data=%d, rxDataSize=%d\n",
             epnum,
             pdev->ep_out[epnum].status,
             pdev->ep_out[epnum].is_used,
             pdev->ep_out[epnum].total_length,
             pdev->ep_out[epnum].rem_length,
-            hwusb->recv_buffer[0]);
+            hwusb->recv_buffer[0],
+            USBD_LL_GetRxDataSize(pdev, epnum));
 
     // just write back
     switch (hwusb->recv_buffer[0]) {
         case WEBUSB_KEYMAP_SET:
-            uart_keymap_set(hwusb->recv_buffer[1], hwusb->recv_buffer[2], hwusb->recv_buffer[3], (hwusb->recv_buffer[5]<<8) | hwusb->recv_buffer[4]);
+            //uart_keymap_set(hwusb->recv_buffer[1], hwusb->recv_buffer[2], hwusb->recv_buffer[3], (hwusb->recv_buffer[5]<<8) | hwusb->recv_buffer[4]);
+            rtt_printf("cmd=%d, layer=%d, row=%d, col=%d, keycode=%d\n",
+                        hwusb->recv_buffer[0], 
+                        hwusb->recv_buffer[1],
+                        hwusb->recv_buffer[2],
+                        hwusb->recv_buffer[3],
+                        (hwusb->recv_buffer[5]<<8) | hwusb->recv_buffer[4]);
             break;
             
         case WEBUSB_KEYMAP_GET:
-            uart_keymap_get(hwusb->recv_buffer[1], hwusb->recv_buffer[2], hwusb->recv_buffer[3]);
+            //uart_keymap_get(hwusb->recv_buffer[1], hwusb->recv_buffer[2], hwusb->recv_buffer[3]);
+            rtt_printf("cmd=%d, layer=%d, row=%d, col=%d\n",
+                        hwusb->recv_buffer[0], 
+                        hwusb->recv_buffer[1],
+                        hwusb->recv_buffer[2],
+                        hwusb->recv_buffer[3]);
+            hwusb->recv_buffer[4] = 0;
+            hwusb->recv_buffer[5] = 4;
+            memcpy(hwusb->send_buffer, hwusb->recv_buffer, 32);
+            USBD_LL_Transmit(pdev, 0x83, hwusb->send_buffer, 32);
             break;
         default:
             rtt_printf("WEBUSB unknown command: %d\n",hwusb->recv_buffer[0]);

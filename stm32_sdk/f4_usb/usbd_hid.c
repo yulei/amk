@@ -118,7 +118,7 @@ static uint8_t  USBD_HID_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *r
 
 static uint8_t  USBD_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user)
 {
-    ((USBD_HID_HandleTypeDef *)user)->state = HID_IDLE;
+    ((USBD_HID_HandleTypeDef *)user)->state = HIDD_IDLE;
     return USBD_OK;
 }
 
@@ -126,8 +126,8 @@ static uint8_t  USBD_HID_Write(USBD_HandleTypeDef *pdev, uint8_t epnum, uint8_t*
 {
     USBD_HID_HandleTypeDef* hhid = (USBD_HID_HandleTypeDef*)user;
     rtt_printf("USBD HID Write: state=%d, size=%d\n", hhid->state, size);
-    if (hhid->state == HID_IDLE) {
-        hhid->state = HID_BUSY;
+    if (hhid->state == HIDD_IDLE) {
+        hhid->state = HIDD_BUSY;
         return USBD_LL_Transmit(pdev, epnum, data, size);
     } else {
         return USBD_BUSY;

@@ -130,6 +130,7 @@ static usbd_composite_t usbd_composite = {
 static uint8_t  USBD_COMP_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
 {
     (void)cfgidx;
+    rtt_printf("COMP Init: cfgidx=%d\n", cfgidx);
     for (int i = 0; i < usbd_composite.size; i++) {
         usbd_interface_t* interface = &usbd_composite.interfaces[i];
         interface->init(pdev, interface);
@@ -260,9 +261,11 @@ usbd_interface_t* find_interface_by_type(uint32_t type)
 
 void hid_kbd_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
 {
-    USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
+    USBD_StatusTypeDef ret = USBD_OK;
+    ret = USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
+    rtt_printf("HID KBD init, Open epin=%d, status=%d\n", interface->epin, ret);
     pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
-    ((USBD_HID_HandleTypeDef *)interface->data)->state = HID_IDLE;
+    ((USBD_HID_HandleTypeDef *)interface->data)->state = HIDD_IDLE;
     ((USBD_HID_HandleTypeDef *)interface->data)->IsKeyboard = 1;
 }
 
@@ -274,9 +277,11 @@ void hid_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
 
 void hid_other_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
 {
-    USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
+    USBD_StatusTypeDef ret = USBD_OK;
+    ret = USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
+    rtt_printf("HID OTHER init, Open epin=%d, status=%d\n", interface->epin, ret);
     pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
-    ((USBD_HID_HandleTypeDef *)interface->data)->state = HID_IDLE;
+    ((USBD_HID_HandleTypeDef *)interface->data)->state = HIDD_IDLE;
     ((USBD_HID_HandleTypeDef *)interface->data)->IsKeyboard = 0;
 }
 
