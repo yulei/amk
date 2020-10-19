@@ -10,6 +10,7 @@
 #include "action.h"
 #include "keymap.h"
 
+#ifdef WEBUSB_ENABLE
 
 static uint16_t amk_keymaps[AMK_KEYMAP_MAX_LAYER][MATRIX_ROWS][MATRIX_COLS];
 
@@ -80,3 +81,8 @@ uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
 {
     return amk_keymaps[layer][row][col];
 }
+
+#else
+void amk_keymap_init(void){}
+
+#endif
