@@ -46,6 +46,8 @@ uint32_t tud_descriptor_device_size(void);
 uint8_t const* tud_descriptor_configuration_cb(uint8_t index);
 uint32_t tud_descriptor_configuration_size(uint8_t index);
 
+uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf);
+
 uint8_t const* tud_descriptor_hid_report_kbd_cb(void);
 uint32_t tud_descriptor_hid_report_kbd_size(void);
 

@@ -139,6 +139,16 @@ uint32_t tud_descriptor_configuration_size(uint8_t index)
   return sizeof(desc_configuration);
 }
 
+uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf)
+{
+    if (itf == ITF_NUM_HID_KBD) {
+        return tud_descriptor_hid_kbd_cb();
+    } else if (itf == ITF_NUM_HID_OTHER) {
+        return tud_descriptor_hid_other_cb();
+    }
+    return NULL;
+}
+
 uint8_t const* tud_descriptor_hid_kbd_cb(void)
 {
   return (uint8_t*)(&desc_hid_kbd[0]);

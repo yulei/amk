@@ -54,7 +54,7 @@ void board_init(void)
     DWT_Delay_Init();
 
     custom_board_init();
-
+    tusb_init();
     amk_init();
 }
 
@@ -62,33 +62,26 @@ __attribute__((weak)) void custom_board_task(void) {}
 
 void board_task(void)
 {
-/*    switch (hUsbDeviceFS.dev_state) {
-    case USBD_STATE_CONFIGURED:
-        keyboard_task();
-        #ifdef SCREEN_ENABLE
-        screen_task();
-        #endif
-        break;
-    case USBD_STATE_SUSPENDED:
-        // in suspend state
+    tud_task();
+
+    if (tud_suspended()) {
         if (suspend_wakeup_condition()) {
             // wake up remote
             remote_wakeup();
         }
-        break;
-    case USBD_STATE_DEFAULT:
-    case USBD_STATE_ADDRESSED:
-    default:
-        // do nothing
-        break;
+    } else if (tud_hid_ready()) {
+        keyboard_task();
     }
+
+#ifdef SCREEN_ENABLE
+    screen_task();
+#endif
     custom_board_task();
-    */
 }
 
+extern void fee_init(void);
 static void amk_init(void)
 {
-    extern void fee_init(void);
     fee_init();
     keyboard_init();
     host_set_driver(&amk_driver);
@@ -121,7 +114,7 @@ void send_keyboard(report_keyboard_t *report)
     if (!usb_ready()) return;
 
     memcpy(&report_buf[0], report, sizeof(report_keyboard_t));
-    //USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_KEYBOARD, report_buf, (uint16_t)sizeof(report_keyboard_t));
+    tud_hid_n_report(ITF_NUM_HID_KBD, HID_REPORT_ID_KEYBOARD, report_buf, (uint8_t)sizeof(report_keyboard_t));
 }
 
 void send_mouse(report_mouse_t *report)
@@ -130,7 +123,7 @@ void send_mouse(report_mouse_t *report)
 
     report_buf[0] = HID_REPORT_ID_MOUSE;
     memcpy(&report_buf[1], report, sizeof(report_mouse_t));
-    //USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_MOUSE, report_buf, (uint16_t)sizeof(report_mouse_t) + 1);
+    tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_MOUSE, report_buf, (uint8_t)sizeof(report_mouse_t));
 }
 
 void send_system(uint16_t data)
@@ -139,7 +132,7 @@ void send_system(uint16_t data)
 
     report_buf[0] = HID_REPORT_ID_SYSTEM;
     memcpy(&report_buf[1], &data, sizeof(data));
-    //USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_SYSTEM, report_buf, (uint16_t)sizeof(data) + 1);
+    tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_SYSTEM, report_buf, (uint8_t)sizeof(data));
 }
 
 void send_consumer(uint16_t data)
@@ -148,7 +141,7 @@ void send_consumer(uint16_t data)
 
     report_buf[0] = HID_REPORT_ID_CONSUMER;
     memcpy(&report_buf[1], &data, sizeof(data));
-    //USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_CONSUMER, report_buf, (uint16_t)sizeof(data) + 1);
+    tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_SYSTEM, report_buf, (uint8_t)sizeof(data));
 }
 
 void remote_wakeup(void)
@@ -208,4 +201,58 @@ void USB_LP_IRQHandler(void)
 void USBWakeUp_IRQHandler(void)
 {
     tud_int_handler(0);
+}
+
+//=============================
+// tusb callback
+//=============================
+// Invoked when device is mounted
+void tud_mount_cb(void)
+{
+}
+
+// Invoked when device is unmounted
+void tud_umount_cb(void)
+{
+}
+
+// Invoked when usb bus is suspended
+// remote_wakeup_en : if host allow us  to perform remote wakeup
+// Within 7ms, device must draw an average of current less than 2.5 mA from bus
+void tud_suspend_cb(bool remote_wakeup_en)
+{
+    (void) remote_wakeup_en;
+}
+
+// Invoked when usb bus is resumed
+void tud_resume_cb(void)
+{
+}
+
+
+// Invoked when received GET_REPORT control request
+// Application must fill buffer report's content and return its length.
+// Return zero will cause the stack to STALL request
+uint16_t tud_hid_get_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t report_type, uint8_t* buffer, uint16_t reqlen)
+{
+  // TODO not Implemented
+  (void) itf;
+  (void) report_id;
+  (void) report_type;
+  (void) buffer;
+  (void) reqlen;
+
+  return 0;
+}
+
+// Invoked when received SET_REPORT control request or
+// received data on OUT endpoint ( Report ID = 0, Type = 0 )
+void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize)
+{
+  // TODO set LED based on CAPLOCK, NUMLOCK etc...
+  (void) itf;
+  (void) report_id;
+  (void) report_type;
+  (void) buffer;
+  (void) bufsize;
 }
