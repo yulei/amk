@@ -1,6 +1,9 @@
-[submodule "tmk/tmk"]
-	path = tmk/tmk
-	url = https://github.com/tmk/tmk_keyboard.git
-[submodule "lvgl/core"]
-	path = lvgl/core
-	url = https://github.com/lvgl/lvgl.git
+[submodule "lib/lvgl"]
+	path = lib/lvgl
+	url = https://github.com/yulei/lvgl.git
+[submodule "lib/tmk"]
+	path = lib/tmk
+	url = https://github.com/yulei/tmk_keyboard.git
+[submodule "lib/tinyusb"]
+	path = lib/tinyusb
+	url = https://github.com/yulei/tinyusb.git

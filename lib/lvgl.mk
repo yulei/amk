@@ -1,4 +1,4 @@
-LVGL_DIR := $(TOP_DIR)/lvgl
+LVGL_DIR := $(TOP_DIR)/lib/lvgl
 
 SRC_FILES += \
 		$(LVGL_DIR)/core/src/lv_core/lv_group.c \

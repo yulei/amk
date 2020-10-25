@@ -38,10 +38,10 @@ endif
 endif
 
 include $(TOP_DIR)/main/main.mk
-include $(TOP_DIR)/tmk/tmk.mk
+include $(TOP_DIR)/lib/tmk.mk
 
 ifeq (yes,$(LVGL_ENABLE))
-include $(TOP_DIR)/lvgl/lvgl.mk
+include $(TOP_DIR)/lib/lvgl.mk
 endif
 
 # Optimization flags
