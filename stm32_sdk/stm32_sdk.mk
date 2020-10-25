@@ -18,4 +18,5 @@ endif
 
 ifeq (STM32F103, $(strip $(MCU)))
 include $(STM32SDK_DIR)/f1_sdk.mk
+include $(TOP_DIR)/lib/tinyusb.mk
 endif

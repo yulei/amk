@@ -262,7 +262,7 @@ endef
 
 # Create object files from C source files
 %.c.o:
-	$(call run,$(CC) -std=c99,$(CFLAGS),Compiling)
+	$(call run,$(CC) -std=gnu99,$(CFLAGS),Compiling)
 
 # Create object files from C++ source files
 %.cpp.o:

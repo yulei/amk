@@ -11,11 +11,9 @@
 #include "host.h"
 #include "gpio_pin.h"
 #include "usb_descriptors.h"
-#include "usbd_composite.h"
 #include "rtt.h"
 
 extern UART_HandleTypeDef huart1;
-extern USBD_HandleTypeDef hUsbDeviceFS;
 pin_t reset_pin = RESET_PIN;
 
 #define QUEUE_ITEM_SIZE   16                        // maximum size of the queue item
@@ -213,10 +211,10 @@ static void process_command(report_item_t *item)
         reset_to_bootloader(USER_RESET);
         break;
     case CMD_KEYMAP_SET_ACK:
-        USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 6);
+        //USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 6);
         break;
     case CMD_KEYMAP_GET_ACK:
-        USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 6);
+        //USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 6);
         break;
 
     default:

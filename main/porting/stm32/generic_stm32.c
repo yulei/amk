@@ -6,8 +6,6 @@
 #include "board.h"
 #include "rtt.h"
 #include "usb_descriptors.h"
-#include "usb_device.h"
-#include "usbd_composite.h"
 #include "amk_keymap.h"
 
 #include "report.h"
@@ -22,7 +20,6 @@
 #endif
 
 extern void Error_Handler(void); 
-extern USBD_HandleTypeDef hUsbDeviceFS;
 extern void custom_board_init(void);
 
 /**
@@ -48,7 +45,7 @@ host_driver_t amk_driver = {
 
 static void DWT_Delay_Init(void);
 static void amk_init(void);
-static void remote_wakeup(void);
+void remote_wakeup(void);
 static bool usb_ready(void);
 
 void board_init(void)
@@ -65,7 +62,7 @@ __attribute__((weak)) void custom_board_task(void) {}
 
 void board_task(void)
 {
-    switch (hUsbDeviceFS.dev_state) {
+/*    switch (hUsbDeviceFS.dev_state) {
     case USBD_STATE_CONFIGURED:
         keyboard_task();
         #ifdef SCREEN_ENABLE
@@ -86,6 +83,7 @@ void board_task(void)
         break;
     }
     custom_board_task();
+    */
 }
 
 static void amk_init(void)
@@ -123,7 +121,7 @@ void send_keyboard(report_keyboard_t *report)
     if (!usb_ready()) return;
 
     memcpy(&report_buf[0], report, sizeof(report_keyboard_t));
-    USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_KEYBOARD, report_buf, (uint16_t)sizeof(report_keyboard_t));
+    //USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_KEYBOARD, report_buf, (uint16_t)sizeof(report_keyboard_t));
 }
 
 void send_mouse(report_mouse_t *report)
@@ -132,7 +130,7 @@ void send_mouse(report_mouse_t *report)
 
     report_buf[0] = HID_REPORT_ID_MOUSE;
     memcpy(&report_buf[1], report, sizeof(report_mouse_t));
-    USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_MOUSE, report_buf, (uint16_t)sizeof(report_mouse_t) + 1);
+    //USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_MOUSE, report_buf, (uint16_t)sizeof(report_mouse_t) + 1);
 }
 
 void send_system(uint16_t data)
@@ -141,7 +139,7 @@ void send_system(uint16_t data)
 
     report_buf[0] = HID_REPORT_ID_SYSTEM;
     memcpy(&report_buf[1], &data, sizeof(data));
-    USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_SYSTEM, report_buf, (uint16_t)sizeof(data) + 1);
+    //USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_SYSTEM, report_buf, (uint16_t)sizeof(data) + 1);
 }
 
 void send_consumer(uint16_t data)
@@ -150,15 +148,12 @@ void send_consumer(uint16_t data)
 
     report_buf[0] = HID_REPORT_ID_CONSUMER;
     memcpy(&report_buf[1], &data, sizeof(data));
-    USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_CONSUMER, report_buf, (uint16_t)sizeof(data) + 1);
+    //USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_CONSUMER, report_buf, (uint16_t)sizeof(data) + 1);
 }
 
 void remote_wakeup(void)
 {
-    HAL_PCD_ActivateRemoteWakeup(hUsbDeviceFS.pData);
-    // remote wakeup between 1-15ms according to the usb spec
-    HAL_Delay(5);
-    HAL_PCD_DeActivateRemoteWakeup(hUsbDeviceFS.pData);
+    tud_remote_wakeup();
 
     suspend_wakeup_init();
     // cleanup the host keyboard state
@@ -180,7 +175,7 @@ void usb_suspend_cb(void)
 
 bool usb_ready(void)
 {
-    return hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED;
+    return false;
 }
 
 /**
@@ -198,4 +193,19 @@ void SysTick_Handler(void)
     #endif
 
     /* USER CODE END SysTick_IRQn 1 */
+}
+
+void USB_HP_IRQHandler(void)
+{
+    tud_int_handler(0);
+}
+
+void USB_LP_IRQHandler(void)
+{
+    tud_int_handler(0);
+}
+
+void USBWakeUp_IRQHandler(void)
+{
+    tud_int_handler(0);
 }

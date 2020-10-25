@@ -23,9 +23,7 @@
  *
  */
 
-#include <string.h>
 #include "usb_descriptors.h"
-#include "util.h"
 
 //--------------------------------------------------------------------+
 // Device Descriptors
@@ -53,7 +51,7 @@ tusb_desc_device_t const desc_device TU_ATTR_ALIGNED(4) =
 
 // Invoked when received GET DEVICE DESCRIPTOR
 // Application return pointer to descriptor
-uint8_t* tud_descriptor_device_cb(void)
+uint8_t const* tud_descriptor_device_cb(void)
 {
   return (uint8_t *) &desc_device;
 }
@@ -81,7 +79,7 @@ static uint8_t desc_hid_report_other[] =
 // Invoked when received GET HID REPORT DESCRIPTOR
 // Application return pointer to descriptor
 // Descriptor contents must exist long enough for transfer to complete
-uint8_t* tud_descriptor_hid_report_kbd_cb(void)
+uint8_t const* tud_descriptor_hid_report_kbd_cb(void)
 {
   return (uint8_t*)(&desc_hid_report_kbd[0]);
 }
@@ -91,7 +89,7 @@ uint32_t tud_descriptor_hid_report_kbd_size(void)
   return sizeof(desc_hid_report_kbd);
 }
 
-uint8_t* tud_descriptor_hid_report_other_cb(void)
+uint8_t const* tud_descriptor_hid_report_other_cb(void)
 {
   return (uint8_t*)(&desc_hid_report_other[0]);
 }
@@ -131,17 +129,17 @@ static uint8_t desc_hid_other[] = {
 // Invoked when received GET CONFIGURATION DESCRIPTOR
 // Application return pointer to descriptor
 // Descriptor contents must exist long enough for transfer to complete
-uint8_t* tud_descriptor_configuration_cb(void)
+uint8_t const* tud_descriptor_configuration_cb(uint8_t index)
 {
   return (uint8_t*)(&desc_configuration[0]);
 }
 
-uint32_t tud_descriptor_configuration_size(void)
+uint32_t tud_descriptor_configuration_size(uint8_t index)
 {
   return sizeof(desc_configuration);
 }
 
-uint8_t* tud_descriptor_hid_kbd_cb(void)
+uint8_t const* tud_descriptor_hid_kbd_cb(void)
 {
   return (uint8_t*)(&desc_hid_kbd[0]);
 }
@@ -151,7 +149,7 @@ uint32_t tud_descriptor_hid_kbd_size(void)
   return sizeof(desc_hid_kbd);
 }
 
-uint8_t* tud_descriptor_hid_other_cb(void)
+uint8_t const* tud_descriptor_hid_other_cb(void)
 {
   return (uint8_t*)(&desc_hid_other[0]);
 }
@@ -193,7 +191,7 @@ static uint8_t desc_bos[] =
   TUD_BOS_MS_OS_20_DESCRIPTOR(MS_OS_20_DESC_LEN, VENDOR_REQUEST_MICROSOFT)
 };
 
-uint8_t* tud_descriptor_bos_cb(void)
+uint8_t const* tud_descriptor_bos_cb(void)
 {
   return (uint8_t*)(&desc_bos[0]);
 }
@@ -212,7 +210,7 @@ const tusb_desc_webusb_url_t desc_url = {
   .url             = URL
 };
 
-uint8_t* tud_descriptor_url_cb(void)
+uint8_t const* tud_descriptor_url_cb(void)
 {
     return (uint8_t*)&desc_url;
 }
@@ -252,7 +250,7 @@ static uint8_t desc_ms_os_20[] =
 
 TU_VERIFY_STATIC(sizeof(desc_ms_os_20) == MS_OS_20_DESC_LEN, "Incorrect size");
 
-uint8_t* tud_descriptor_msos20_cb(void)
+uint8_t const* tud_descriptor_msos20_cb(void)
 {
     return desc_ms_os_20; 
 }
@@ -270,8 +268,8 @@ uint32_t tud_descriptor_msos20_size(void)
 char const* string_desc_arr [] =
 {
   (const char[]) { 0x09, 0x04 },  // 0: is supported language is English (0x0409)
-  STR(MANUFACTURER),              // 1: Manufacturer
-  STR(PRODUCT),                   // 2: Product
+  TU_XSTRING(MANUFACTURER),       // 1: Manufacturer
+  TU_XSTRING(PRODUCT),            // 2: Product
   "123456",                       // 3: Serials, should use chip ID
   "HID Config",                   // 4: Device configuration 
   "HID Keyboard",                 // 5: Hid keyboard
@@ -282,7 +280,7 @@ static uint16_t _desc_str[32];
 
 // Invoked when received GET STRING DESCRIPTOR request
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
-uint8_t* tud_descriptor_string_cb(uint8_t index, uint16_t* length)
+uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 {
   uint8_t chr_count;
 
@@ -311,7 +309,7 @@ uint8_t* tud_descriptor_string_cb(uint8_t index, uint16_t* length)
 
   // first byte is length (including header), second byte is string type
   _desc_str[0] = (TUSB_DESC_STRING << 8 ) | (2*chr_count + 2);
-  *length = _desc_str[0] & 0xFF;
+//  *length = _desc_str[0] & 0xFF;
 
-  return (uint8_t*)_desc_str;
+  return (uint16_t*)_desc_str;
 }

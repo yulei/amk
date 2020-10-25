@@ -3,7 +3,6 @@
  */
 
 #include "generic_hal.h"
-#include "usb_device.h"
 #include "rtt.h"
 
 UART_HandleTypeDef huart1;
@@ -94,6 +93,8 @@ static void MX_DMA_Init(void)
     HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
 }
+
+extern void MX_USB_DEVICE_Init(void);
 
 void custom_board_init(void)
 {
