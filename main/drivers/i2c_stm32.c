@@ -49,7 +49,7 @@ void i2c_init(void)
     }
 }
 
-amk_i2c_error_t i2c_send(uint8_t addr, const void* data, size_t length, size_t timeout)
+amk_error_t i2c_send(uint8_t addr, const void* data, size_t length, size_t timeout)
 {
     HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&i2c_handle, addr, (void*)data, length, timeout);
     if (status == HAL_OK) {
@@ -62,7 +62,7 @@ amk_i2c_error_t i2c_send(uint8_t addr, const void* data, size_t length, size_t t
     return AMK_ERROR;
 }
 
-amk_i2c_error_t i2c_recv(uint8_t addr, void* data, size_t length, size_t timeout)
+amk_error_t i2c_recv(uint8_t addr, void* data, size_t length, size_t timeout)
 {
     HAL_StatusTypeDef status = HAL_I2C_Master_Receive(&i2c_handle, addr, data, length, timeout);
     if (status == HAL_OK) {
@@ -75,7 +75,7 @@ amk_i2c_error_t i2c_recv(uint8_t addr, void* data, size_t length, size_t timeout
     return AMK_ERROR;
 }
 
-amk_i2c_error_t i2c_write_reg(uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
+amk_error_t i2c_write_reg(uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
 {
     HAL_StatusTypeDef status = HAL_I2C_Mem_Write(&i2c_handle, addr, reg, 1, (void*)data, length, timeout);
     if (status == HAL_OK) {
@@ -88,7 +88,7 @@ amk_i2c_error_t i2c_write_reg(uint8_t addr, uint8_t reg, const void* data, size_
     return AMK_ERROR;
 }
 
-amk_i2c_error_t i2c_read_reg(uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
+amk_error_t i2c_read_reg(uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
 {
     HAL_StatusTypeDef status = HAL_I2C_Mem_Read(&i2c_handle, addr, reg, 1, data, length, timeout);
     if (status == HAL_OK) {

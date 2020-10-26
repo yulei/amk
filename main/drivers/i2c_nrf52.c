@@ -47,7 +47,7 @@ void i2c_init(void)
     nrfx_twi_enable(&m_twi);
 }
 
-amk_i2c_error_t i2c_send(uint8_t addr, const void* data, size_t length, size_t timeout)
+amk_error_t i2c_send(uint8_t addr, const void* data, size_t length, size_t timeout)
 {
     (void)timeout;
     ret_code_t err_code = nrfx_twi_tx(&m_twi, TWI_ADDR(addr), data, length, false);
@@ -57,7 +57,7 @@ amk_i2c_error_t i2c_send(uint8_t addr, const void* data, size_t length, size_t t
     return AMK_SUCCESS;
 }
 
-amk_i2c_error_t i2c_recv(uint8_t addr, void* data, size_t length, size_t timeout)
+amk_error_t i2c_recv(uint8_t addr, void* data, size_t length, size_t timeout)
 {
     (void)timeout;
     ret_code_t err_code = nrfx_twi_rx(&m_twi, TWI_ADDR(addr), data, length);
@@ -67,7 +67,7 @@ amk_i2c_error_t i2c_recv(uint8_t addr, void* data, size_t length, size_t timeout
     return AMK_SUCCESS;
 }
 
-amk_i2c_error_t i2c_write_reg(uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
+amk_error_t i2c_write_reg(uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
 {
     (void)timeout;
     uint8_t packet[length + 1];
@@ -76,7 +76,7 @@ amk_i2c_error_t i2c_write_reg(uint8_t addr, uint8_t reg, const void* data, size_
     return i2c_send(addr, packet, length + 1, 0);
 }
 
-amk_i2c_error_t i2c_read_reg(uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
+amk_error_t i2c_read_reg(uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
 {
     (void)timeout;
     nrfx_twi_xfer_desc_t txrx = NRFX_TWI_XFER_DESC_TXRX(TWI_ADDR(addr), &reg, 1, data, length);

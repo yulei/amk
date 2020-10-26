@@ -10,7 +10,7 @@
 #include "app_usbd_core.h"
 #include "app_usbd_hid_generic.h"
 #include "app_usbd_serial_num.h"
-#include "tusb_def.h"
+#include "tusb.h"
 
 // event listener
 static void hid_user_ev_handler(app_usbd_class_inst_t const * p_inst,

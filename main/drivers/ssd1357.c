@@ -6,7 +6,7 @@
 #include "wait.h"
 
 #define BRIGHTNESS 0x0F
-#define DEFAULT_TIMEOUT 100
+static spi_handle_t spi;
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //  Gray Scale Table Setting (Full Screen)
@@ -46,7 +46,7 @@ static void write_command(ssd1357_t *driver, uint8_t command)
     gpio_write_pin(driver->cs, 0);
     gpio_write_pin(driver->dc, 0);
 
-    spi_send(&command, sizeof(command), DEFAULT_TIMEOUT);
+    spi_send(spi, &command, sizeof(command));
 
     gpio_write_pin(driver->cs, 1);
     gpio_write_pin(driver->dc, 1);
@@ -57,7 +57,7 @@ static void write_data(ssd1357_t *driver, uint8_t data)
     gpio_write_pin(driver->cs, 0);
     gpio_write_pin(driver->dc, 1);
 
-    spi_send(&data, sizeof(data), DEFAULT_TIMEOUT);
+    spi_send(spi, &data, sizeof(data));
 
     gpio_write_pin(driver->cs, 1);
     gpio_write_pin(driver->dc, 1);
@@ -68,7 +68,7 @@ static void write_data_buffer(ssd1357_t *driver, const void *data, size_t size)
     gpio_write_pin(driver->cs, 0);
     gpio_write_pin(driver->dc, 1);
 
-    spi_send(&data, size, DEFAULT_TIMEOUT);
+    spi_send(spi, &data, size);
 
     gpio_write_pin(driver->cs, 1);
     gpio_write_pin(driver->dc, 1);
