@@ -85,14 +85,6 @@
 #define CFG_TUSB_MEM_ALIGN          __attribute__ ((aligned(4)))
 #endif
 
-//--------------------------------------------------------------------
-// DEVICE CONFIGURATION
-//--------------------------------------------------------------------
-
-#ifndef CFG_TUD_ENDPOINT0_SIZE
-#define CFG_TUD_ENDPOINT0_SIZE    64
-#endif
-
 //------------- CLASS -------------//
 #define CFG_TUD_HID               2
 #define CFG_TUD_CDC               0
@@ -100,6 +92,7 @@
 #define CFG_TUD_MIDI              0
 #define CFG_TUD_VENDOR            1
 
+// interface configuration
 #define CFG_TUD_HID_EP_SIZE         8
 #define CFG_TUD_HID_POLL_INTERVAL   10
 #define CFG_TUD_ENDPOINT0_SIZE      64
