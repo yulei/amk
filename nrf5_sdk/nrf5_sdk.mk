@@ -158,6 +158,7 @@ APP_DEFS += \
 	-D__HEAP_SIZE=8192 \
 	-D__STACK_SIZE=8192 \
 	-DGAZELL_PRESENT \
+    -DCFG_TUSB_MCU=OPT_MCU_NRF5X \
 	#-DCONFIG_GPIO_AS_PINRESET \
 
 SDK_DEFS += -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16
@@ -179,22 +180,14 @@ endif
 ifeq (NRF52840, $(strip $(MCU)))
 	SRC_FILES += $(NRF5SDK_DIR)/modules/nrfx/mdk/gcc_startup_nrf52840.S
 	SRC_FILES += $(NRF5SDK_DIR)/modules/nrfx/mdk/system_nrf52840.c
-	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd.c
-	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd_core.c
-	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd_string_desc.c
-	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd_serial_num.c
-	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/app_usbd_hid.c
-	SRC_FILES += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/generic/app_usbd_hid_generic.c
-	SRC_FILES += $(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_usbd.c
 	INC_FOLDERS += $(NRF5SDK_DIR)/components/softdevice/s140/headers
 	INC_FOLDERS += $(NRF5SDK_DIR)/components/softdevice/s140/headers/nrf52
-	INC_FOLDERS += $(NRF5SDK_DIR)/components/libraries/usbd
-	INC_FOLDERS += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid
-	INC_FOLDERS += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/generic
+	INC_FOLDERS += $(NRF5SDK_DIR)/modules/nrfx/drivers/src
 	APP_DEFS += -DNRF52840_XXAA
 	APP_DEFS += -DS140
 	LIB_FILES += $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52840_gcc.a
 	LINKER_SCRIPT := $(TOP_DIR)/nrf5_sdk/nrf52840.ld
+	include $(TOP_DIR)/lib/tinyusb.mk
 endif
 
 LINKER_PATH := $(NRF5SDK_DIR)/modules/nrfx/mdk

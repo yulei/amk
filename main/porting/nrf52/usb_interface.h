@@ -26,7 +26,10 @@ typedef struct {
     nrf_usb_leds leds_cb;
 } nrf_usb_event_handler_t;
 
-void nrf_usb_init(nrf_usb_event_handler_t* config);
+void nrf_usb_preinit(void);
+void nrf_usb_init(nrf_usb_event_handler_t *config);
+void nrf_usb_postinit(void);
+void nrf_usb_task(void);
 
 void nrf_usb_send_report(nrf_report_id report, const void *data, size_t size);
 

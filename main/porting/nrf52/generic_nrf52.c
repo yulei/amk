@@ -9,10 +9,7 @@
 #include "ble_keyboard.h"
 #include "gzll_keyboard.h"
 #include "eeconfig_fds.h"
-
-#ifdef NRF52840_XXAA
-#include "app_usbd.h"
-#endif
+#include "usb_interface.h"
 
 rf_driver_t rf_driver = {
     .rf_led = 0,
@@ -117,10 +114,8 @@ void board_init(void)
     power_management_init();
     scheduler_init();
 
-#ifdef NRF52840_XXAA
-    extern void nrf_app_usbd_init(void);
-    nrf_app_usbd_init();
-#endif
+    nrf_usb_preinit();
+
     reason = NRF_POWER->RESETREAS;
     NRF_LOG_INFO("NRF Keyboard reset reason: %x.", reason);
     NRF_POWER->RESETREAS = 0;
@@ -141,9 +136,7 @@ void board_init(void)
         rf_is_ble = false;
         gzll_keyboard_init(GZLL_IS_HOST);
 
-#ifdef NRF52840_XXAA
-        app_usbd_power_events_enable();
-#endif
+        nrf_usb_postinit();
         gzll_keyboard_start();
     } else {
         NRF_LOG_INFO("use BLE protocol");
@@ -152,17 +145,14 @@ void board_init(void)
         rf_is_ble = true;
         ble_keyboard_init();
 
-#ifdef NRF52840_XXAA
-        app_usbd_power_events_enable();
-#endif
+        nrf_usb_postinit();
         ble_keyboard_start(erase_bonds);
     }
 }
 
 void board_task(void)
 {
-#ifdef NRF52840_XXAA
-    while (app_usbd_event_queue_process()) { /* Nothing to do */ }
-#endif
+    nrf_usb_task();
+
     idle_state_handle();
 }

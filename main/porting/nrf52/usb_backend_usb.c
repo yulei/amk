@@ -77,7 +77,7 @@ static nrf_usb_config_t nrf_usb_config = {
     .usbd_config.ev_state_proc= usbd_user_ev_handler,
 };
 
-void nrf_app_usbd_init(void)
+void nrf_usb_preinit(void)
 {
     ret_code_t rc;
     app_usbd_serial_num_generate();
@@ -108,6 +108,16 @@ void nrf_usb_init(nrf_usb_event_handler_t* eh)
     nrf_usb_config.event.suspend_cb = eh->suspend_cb;
     nrf_usb_config.event.resume_cb  = eh->resume_cb;
     nrf_usb_config.event.leds_cb    = eh->leds_cb;
+}
+
+void nrf_usb_postinit(void)
+{
+    app_usbd_power_events_enable();
+}
+
+void nrf_usb_task(void)
+{
+    while (app_usbd_event_queue_process()) { /* Nothing to do */ }
 }
 
 void nrf_usb_send_report(nrf_report_id report, const void *data, size_t size)

@@ -36,7 +36,10 @@ static void uart_process_data(uint8_t data);
 static void uart_process_cmd(const uint8_t* cmd, uint32_t size);
 static uint8_t compute_checksum(const uint8_t* data, uint32_t size);
 
-void nrf_usb_init(nrf_usb_event_handler_t* eh)
+void nrf_usb_preinit(void) {}
+void nrf_usb_postinit(void) {}
+void nrf_usb_task(void) {}
+void nrf_usb_init(nrf_usb_event_handler_t *eh)
 {
     usb_config.event.enable_cb  = eh->enable_cb;
     usb_config.event.disable_cb = eh->disable_cb;

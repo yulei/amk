@@ -16,6 +16,7 @@ SRC_FILES += \
 	$(NRF52_PORTING_DIR)/eeconfig_fds.c \
 
 INC_FOLDERS += \
+	$(TOP_DIR)/lib/tinyusb/src \
 	$(NRF52_PORTING_DIR) \
 	$(NRF52_PORTING_DIR)/ble \
 
@@ -24,5 +25,5 @@ ifeq (NRF52832, $(strip $(MCU)))
 endif
 
 ifeq (NRF52840, $(strip $(MCU)))
-	SRC_FILES += $(NRF52_PORTING_DIR)/usb_backend_usb.c
+	SRC_FILES += $(NRF52_PORTING_DIR)/usb_backend_tinyusb.c
 endif

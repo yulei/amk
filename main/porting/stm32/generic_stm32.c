@@ -121,8 +121,7 @@ void send_mouse(report_mouse_t *report)
 {
     if (!usb_ready()) return;
 
-    report_buf[0] = HID_REPORT_ID_MOUSE;
-    memcpy(&report_buf[1], report, sizeof(report_mouse_t));
+    memcpy(&report_buf[0], report, sizeof(report_mouse_t));
     tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_MOUSE, report_buf, (uint8_t)sizeof(report_mouse_t));
 }
 
@@ -130,8 +129,7 @@ void send_system(uint16_t data)
 {
     if (!usb_ready()) return;
 
-    report_buf[0] = HID_REPORT_ID_SYSTEM;
-    memcpy(&report_buf[1], &data, sizeof(data));
+    memcpy(&report_buf[0], &data, sizeof(data));
     tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_SYSTEM, report_buf, (uint8_t)sizeof(data));
 }
 
@@ -139,8 +137,7 @@ void send_consumer(uint16_t data)
 {
     if (!usb_ready()) return;
 
-    report_buf[0] = HID_REPORT_ID_CONSUMER;
-    memcpy(&report_buf[1], &data, sizeof(data));
+    memcpy(&report_buf[0], &data, sizeof(data));
     tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_SYSTEM, report_buf, (uint8_t)sizeof(data));
 }
 
