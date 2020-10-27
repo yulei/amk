@@ -4,15 +4,16 @@
 
 #include "usb_interface.h"
 #include "usb_descriptors.h"
+#include "generic_hal.h"
 
 void usb_init(void)
 {
-  tud_init();
+    tud_init();
 }
 
 void usb_task(void)
 {
-  tud_task();
+    tud_task();
 }
 
 bool usb_ready(void)
@@ -22,12 +23,21 @@ bool usb_ready(void)
 
 bool usb_suspended(void)
 {
-  return tud_suspended();
+    return tud_suspended();
 }
 
 void usb_remote_wakeup(void)
 {
+#if defined(OPT_MCU_STM32F1)
     tud_remote_wakeup();
+#elif defined(OPT_MCU_STM32F4)
+#define USB_DEVICE     ((USB_OTG_DeviceTypeDef *)(USB_OTG_FS_PERIPH_BASE + USB_OTG_DEVICE_BASE))
+    USB_DEVICE->DCTL |= USB_OTG_DCTL_RWUSIG;
+    HAL_Delay(5);
+    USB_DEVICE->DCTL &= ~USB_OTG_DCTL_RWUSIG;
+#else
+
+#endif
 }
 
 void usb_send_report(uint8_t report_type, const void* data, size_t size)

@@ -27,19 +27,20 @@ void usb_task(void)
 
 bool usb_ready(void)
 {
-    //return tud_hid_ready();
-    return false;
+    return (hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED);
 }
 
 bool usb_suspended(void)
 {
-    //return tud_suspended();
-    return false;
+    return (hUsbDeviceFS.dev_state == USBD_STATE_SUSPENDED);
 }
 
 void usb_remote_wakeup(void)
 {
-    //tud_remote_wakeup();
+    PCD_HandleTypeDef *pcd = (PCD_HandleTypeDef *)(hUsbDeviceFS.data);
+    HAL_PCD_ActivateRemoteWakeup(pcd);
+    HAL_Delay(5);
+    HAL_PCD_DeActivateRemoteWakeup(pcd);
 }
 
 void usb_send_report(uint8_t report_type, const void* data, size_t size)

@@ -51,9 +51,14 @@ bool tud_vendor_control_complete_cb(uint8_t rhport, tusb_control_request_t const
     return true;
 }
 
+static uint8_t webusb_buffer[CFG_TUD_VENDOR_EPSIZE];
 void webusb_task(void)
 {
-    if (tud_vendor_available()) {
-
+    if (tud_vendor_n_available(ITF_NUM_VENDOR)) {
+        uint32_t readed = tud_vendor_n_read(ITF_NUM_VENDOR, webusb_buffer, CFG_TUD_VENDOR_EPSIZE);
+        if (readed > 0) {
+            // just write back
+            tud_vendor_n_write(ITF_NUM_VENDOR, webusb_buffer, readed);
+        }
     }
 }
