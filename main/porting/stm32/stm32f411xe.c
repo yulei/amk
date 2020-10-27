@@ -3,8 +3,13 @@
  */
 
 #include "generic_hal.h"
-#include "usb_device.h"
+#include "tusb.h"
 #include "rtt.h"
+
+void OTG_FS_IRQHandler(void)
+{
+    tud_int_handler(0);
+}
 
 void Error_Handler(void)
 {
@@ -58,20 +63,56 @@ void SystemClock_Config(void)
   */
 static void MX_GPIO_Init(void)
 {
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOH_CLK_ENABLE();
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-
+    /* GPIO Ports Clock Enable */
+    __HAL_RCC_GPIOH_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
 }
 
+static void MX_USB_DEVICE_Init(void)
+{
+    GPIO_InitTypeDef  GPIO_InitStruct;
+    /* Configure USB FS GPIOs */
+    /* Configure USB D+ D- Pins */
+    GPIO_InitStruct.Pin = GPIO_PIN_11 | GPIO_PIN_12;
+    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Alternate = GPIO_AF10_OTG_FS;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    /* Configure VBUS Pin */
+    //GPIO_InitStruct.Pin = GPIO_PIN_9;
+    //GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    //GPIO_InitStruct.Pull = GPIO_NOPULL;
+    //HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    /* This for ID line debug */
+    //GPIO_InitStruct.Pin = GPIO_PIN_10;
+    //GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+    //GPIO_InitStruct.Pull = GPIO_PULLUP;
+    //GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+    //GPIO_InitStruct.Alternate = GPIO_AF10_OTG_FS;
+    //HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    // Enable USB OTG clock
+    __HAL_RCC_USB_OTG_FS_CLK_ENABLE();
+
+    // explicitly disable VBUS sense 
+    USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_NOVBUSSENS;
+    USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSBSEN;
+    USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSASEN;
+}
 
 void custom_board_init(void)
 {
-  SystemClock_Config();
+    SystemClock_Config();
 
-  MX_GPIO_Init();
-  MX_USB_DEVICE_Init();
+    MX_GPIO_Init();
+    MX_USB_DEVICE_Init();
+}
+
+void custom_board_task(void)
+{
 }

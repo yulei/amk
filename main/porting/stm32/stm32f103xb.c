@@ -3,7 +3,23 @@
  */
 
 #include "generic_hal.h"
+#include "usb_descriptors.h"
 #include "rtt.h"
+
+void USB_HP_IRQHandler(void)
+{
+    tud_int_handler(0);
+}
+
+void USB_LP_IRQHandler(void)
+{
+    tud_int_handler(0);
+}
+
+void USBWakeUp_IRQHandler(void)
+{
+    tud_int_handler(0);
+}
 
 UART_HandleTypeDef huart1;
 DMA_HandleTypeDef hdma_usart1_rx;
@@ -94,7 +110,18 @@ static void MX_DMA_Init(void)
     HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
 }
 
-extern void MX_USB_DEVICE_Init(void);
+static void MX_USB_DEVICE_Init(void)
+{
+  GPIO_InitTypeDef  GPIO_InitStruct;
+  GPIO_InitStruct.Pin = (GPIO_PIN_11 | GPIO_PIN_12);
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  // USB Clock enable
+  __HAL_RCC_USB_CLK_ENABLE();
+}
 
 void custom_board_init(void)
 {
@@ -103,5 +130,10 @@ void custom_board_init(void)
     MX_DMA_Init();
     MX_USART1_UART_Init();
     MX_GPIO_Init();
+    
     MX_USB_DEVICE_Init();
+}
+
+void custom_board_task(void)
+{
 }

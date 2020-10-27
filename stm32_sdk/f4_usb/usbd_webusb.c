@@ -34,13 +34,13 @@ static uint8_t  USBD_WEBUSB_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef
         switch (req->bRequest) {
         case VENDOR_REQUEST_WEBUSB: {
             len = tud_descriptor_url_size();
-            pbuf = tud_descriptor_url_cb();
+            pbuf = (uint8_t*)tud_descriptor_url_cb();
             rtt_printf("WEBUSB Setup: size=%d\n", len);
         } break;
         case VENDOR_REQUEST_MICROSOFT: {
             if ( req->wIndex == 7 ) {
                 len = tud_descriptor_msos20_size();
-                pbuf = tud_descriptor_msos20_cb();
+                pbuf = (uint8_t*)tud_descriptor_msos20_cb();
                 rtt_printf("Microsoft Setup: size=%d\n", len);
             }
         } break;

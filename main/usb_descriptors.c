@@ -285,10 +285,17 @@ char const* string_desc_arr [] =
 
 static uint16_t _desc_str[32];
 
-static uint16_t *get_device_serial(void);
+static uint16_t *get_device_serial(uint16_t* length);
+uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
+{
+    (void)langid;
+    uint16_t length = 0;
+    return (uint16_t *)get_descriptor_str(index, &length);
+}
+
 // Invoked when received GET STRING DESCRIPTOR request
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
-uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
+uint8_t *get_descriptor_str(uint8_t index, uint16_t *length)
 {
     uint8_t chr_count;
 
@@ -296,7 +303,7 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
         memcpy(&_desc_str[1], string_desc_arr[0], 2);
         chr_count = 1;
     } else if (index == DESC_STR_SERIAL) {
-        return get_device_serial();
+        return (uint8_t*)get_device_serial(length);
     } else {
         // Convert ASCII string into UTF-16
 
@@ -315,9 +322,9 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 
   // first byte is length (including header), second byte is string type
   _desc_str[0] = (TUSB_DESC_STRING << 8 ) | (2*chr_count + 2);
-//  *length = _desc_str[0] & 0xFF;
+  *length = _desc_str[0] & 0xFF;
 
-  return (uint16_t*)_desc_str;
+  return (uint8_t*)_desc_str;
 }
 
 static uint8_t _desc_serial[64];
@@ -342,7 +349,7 @@ static void to_unicode(uint32_t value, uint8_t *pbuf, uint8_t len)
 #else
 #include "generic_hal.h"
 #endif
-uint16_t* get_device_serial(void)
+uint16_t* get_device_serial(uint16_t* length)
 {
   uint32_t d0, d1;
 
@@ -359,5 +366,6 @@ uint16_t* get_device_serial(void)
     to_unicode(d1, &_desc_serial[18], 8);
     _desc_serial[0] = TUSB_DESC_STRING;
     _desc_serial[1] = 2 * 16 + 2;
+    *length = _desc_serial[1];
     return (uint16_t *)_desc_serial;
 }

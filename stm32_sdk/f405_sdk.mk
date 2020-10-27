@@ -41,6 +41,7 @@ include $(STM32SDK_DIR)/f4_usb.mk
 APP_DEFS += \
 	-DUSE_HAL_DRIVER \
 	-DSTM32F405xx \
+    -DCFG_TUSB_MCU=OPT_MCU_STM32F4 \
 
 SDK_DEFS += -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16
 

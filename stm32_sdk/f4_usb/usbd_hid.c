@@ -63,18 +63,18 @@ static uint8_t  USBD_HID_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *r
                     if (req->wValue >> 8 == HID_DESC_TYPE_REPORT) {
                         if (hhid->IsKeyboard) {
                         len = tud_descriptor_hid_report_kbd_size();
-                        pbuf = tud_descriptor_hid_report_kbd_cb();
+                        pbuf = (uint8_t*)tud_descriptor_hid_report_kbd_cb();
                         } else {
                         len = tud_descriptor_hid_report_other_size();
-                        pbuf = tud_descriptor_hid_report_other_cb();
+                        pbuf = (uint8_t*)tud_descriptor_hid_report_other_cb();
                         }
                     } else if (req->wValue >> 8 == HID_DESC_TYPE_HID) {
                         if (hhid->IsKeyboard) {
                             len = tud_descriptor_hid_kbd_size();
-                            pbuf = tud_descriptor_hid_kbd_cb();
+                            pbuf = (uint8_t*)tud_descriptor_hid_kbd_cb();
                         } else {
                             len = tud_descriptor_hid_other_size();
-                            pbuf = tud_descriptor_hid_other_cb();
+                            pbuf = (uint8_t*)tud_descriptor_hid_other_cb();
                         }
                     } else {
                         USBD_CtlError(pdev, req);

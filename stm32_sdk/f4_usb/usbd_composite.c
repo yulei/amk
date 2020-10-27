@@ -181,8 +181,8 @@ uint8_t USBD_COMP_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
 
 uint8_t* USBD_COMP_GetFSCfgDesc(uint16_t *length)
 {
-    *length = tud_descriptor_configuration_size();
-    return tud_descriptor_configuration_cb();
+    *length = tud_descriptor_configuration_size(0);
+    return (uint8_t*)tud_descriptor_configuration_cb(0);
 }
 
 uint8_t USBD_COMP_EP0_TxSent(struct _USBD_HandleTypeDef *pdev)

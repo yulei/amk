@@ -15,6 +15,7 @@ SRC_FILES += \
 
 INC_FOLDERS += \
 	$(STM32SDK_DIR)/$(USB_SRC_PATH) \
+	$(TOP_DIR)/lib/tinyusb/src \
 
 ifeq (STM32F405, $(strip $(MCU)))
 SRC_FILES += \

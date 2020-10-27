@@ -25,8 +25,6 @@ enum {
 #define EPNUM_VENDOR_IN     0x03
 #endif
 
-
-
 enum {
     HID_REPORT_ID_KEYBOARD,
     HID_REPORT_ID_MOUSE,
@@ -80,3 +78,5 @@ enum {
 };
 
 uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid);
+
+uint8_t *get_descriptor_str(uint8_t index, uint16_t *length);

@@ -12,10 +12,12 @@ INC_FOLDERS += \
 	$(STM32_PORTING_DIR) \
 
 ifeq (STM32F411, $(strip $(MCU)))
+	SRC_FILES += $(STM32_PORTING_DIR)/usb_tinyusb.c
 	SRC_FILES += $(STM32_PORTING_DIR)/stm32f411xe.c
 endif
 
 ifeq (STM32F405, $(strip $(MCU)))
+	SRC_FILES += $(STM32_PORTING_DIR)/usb_hal.c
 	SRC_FILES += $(STM32_PORTING_DIR)/stm32f405xx.c
 endif
 
@@ -24,5 +26,6 @@ ifeq (STM32F722, $(strip $(MCU)))
 endif
 
 ifeq (STM32F103, $(strip $(MCU)))
+	SRC_FILES += $(STM32_PORTING_DIR)/usb_tinyusb.c
 	SRC_FILES += $(STM32_PORTING_DIR)/stm32f103xb.c
 endif

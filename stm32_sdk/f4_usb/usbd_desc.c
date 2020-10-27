@@ -62,7 +62,7 @@ uint8_t *USBD_FS_DeviceDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 {
   UNUSED(speed);
   *length = tud_descriptor_device_size();
-  return tud_descriptor_device_cb();
+  return (uint8_t*)tud_descriptor_device_cb();
 }
 
 /**
@@ -74,7 +74,7 @@ uint8_t *USBD_FS_DeviceDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 uint8_t *USBD_FS_LangIDStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 {
   UNUSED(speed);
-  return tud_descriptor_string_cb(DESC_STR_LANGID, length);
+  return (uint8_t*)get_descriptor_str(DESC_STR_LANGID, length);
 }
 
 /**
@@ -86,7 +86,8 @@ uint8_t *USBD_FS_LangIDStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 uint8_t *USBD_FS_ProductStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 {
   UNUSED(speed);
-  return tud_descriptor_string_cb(DESC_STR_PRODUCT, length);
+  
+  return (uint8_t*)get_descriptor_str(DESC_STR_PRODUCT, length);
 }
 
 /**
@@ -98,7 +99,7 @@ uint8_t *USBD_FS_ProductStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 uint8_t *USBD_FS_ManufacturerStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 {
   UNUSED(speed);
-  return tud_descriptor_string_cb(DESC_STR_MANUFACTURE, length);
+  return (uint8_t*)get_descriptor_str(DESC_STR_MANUFACTURE, length);
 }
 
 /**
@@ -147,7 +148,7 @@ uint8_t *USBD_FS_BOSDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 {
     (void)speed;
     *length = tud_descriptor_bos_size();
-    return tud_descriptor_bos_cb();
+    return (uint8_t*)tud_descriptor_bos_cb();
 }
 
 /**
