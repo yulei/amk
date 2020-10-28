@@ -5,7 +5,7 @@
 
 #include "ble_hids.h"
 #include "ble_hids_service.h"
-#include "tusb.h"
+#include "usb_descriptors.h"
 
 const static uint8_t hid_report_descriptor [] = {
     TUD_HID_REPORT_DESC_KEYBOARD( HID_REPORT_ID(NRF_REPORT_ID_KEYBOARD) ),
@@ -13,8 +13,7 @@ const static uint8_t hid_report_descriptor [] = {
     TUD_HID_REPORT_DESC_MOUSE   ( HID_REPORT_ID(NRF_REPORT_ID_MOUSE) ),
 #endif
 #ifdef EXTRAKEY_ENABLE
-    TUD_HID_REPORT_DESC_SYSTEM_CONTROL( HID_REPORT_ID(NRF_REPORT_ID_SYSTEM) ),
-    TUD_HID_REPORT_DESC_CONSUMER( HID_REPORT_ID(NRF_REPORT_ID_CONSUMER) ),
+    TUD_HID_REPORT_DESC_EXTRA( NRF_REPORT_ID_SYSTEM, NRF_REPORT_ID_CONSUMER),
 #endif
 };
 

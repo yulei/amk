@@ -6,6 +6,35 @@
 
 #include "tusb.h"
 
+// Extra key report
+#define TUD_HID_REPORT_DESC_EXTRA(system, consumer) \
+    HID_USAGE_PAGE ( HID_USAGE_PAGE_DESKTOP           )         ,\
+    HID_USAGE      ( HID_USAGE_DESKTOP_SYSTEM_CONTROL )         ,\
+    HID_COLLECTION ( HID_COLLECTION_APPLICATION       )         ,\
+    HID_REPORT_ITEM( system, 8, RI_TYPE_GLOBAL, 1     )         ,\
+    HID_LOGICAL_MIN_N( 0x0001, 2                           )    ,\
+    HID_LOGICAL_MAX_N( 0x0037, 2                           )    ,\
+    /* System Power Down */ \
+    HID_USAGE_MIN_N  ( 0x0081, 2                           )    ,\
+    /* System Display LCD Autoscale */ \
+    HID_USAGE_MAX_N  ( 0x00B7, 2                           )    ,\
+    HID_REPORT_COUNT ( 1                                   )    ,\
+    HID_REPORT_SIZE  ( 16                                  )    ,\
+    HID_INPUT        ( HID_DATA | HID_ARRAY | HID_ABSOLUTE )    ,\
+    HID_COLLECTION_END, \
+    HID_USAGE_PAGE ( HID_USAGE_PAGE_CONSUMER    )               ,\
+    HID_USAGE      ( HID_USAGE_CONSUMER_CONTROL )               ,\
+    HID_COLLECTION ( HID_COLLECTION_APPLICATION )               ,\
+    HID_REPORT_ITEM( consumer, 8, RI_TYPE_GLOBAL, 1        )    ,\
+    HID_LOGICAL_MIN_N( 0x0001, 2                           )    ,\
+    HID_LOGICAL_MAX_N( 0x029C, 2                           )    ,\
+    HID_USAGE_MIN_N  ( 0x0001, 2                           )    ,\
+    HID_USAGE_MAX_N  ( 0x029C, 2                           )    ,\
+    HID_REPORT_COUNT ( 1                                   )    ,\
+    HID_REPORT_SIZE  ( 16                                  )    ,\
+    HID_INPUT        ( HID_DATA | HID_ARRAY | HID_ABSOLUTE )    ,\
+    HID_COLLECTION_END \
+
 //=======================================================================
 // usb configuration
 //=======================================================================

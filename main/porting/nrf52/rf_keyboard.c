@@ -226,8 +226,6 @@ static void send_keyboard(report_keyboard_t *report)
     }
 }
 
-#ifdef MOUSEKEY_ENABLE
-
 static void send_mouse(report_mouse_t *report)
 {
     NRF_LOG_INFO("Send mouse: real");
@@ -238,18 +236,6 @@ static void send_mouse(report_mouse_t *report)
         nrf_usb_send_report(NRF_REPORT_ID_MOUSE, report, sizeof(*report));
     }
 }
-
-#else
-
-static void send_mouse(report_mouse_t *report)
-{ 
-    (void)report; 
-    NRF_LOG_INFO("Send mouse: fake");
-}
-
-#endif
-
-#ifdef EXTRAKEY_ENABLE 
 
 static void send_system(uint16_t data)
 {
@@ -273,22 +259,6 @@ static void send_consumer(uint16_t data)
         nrf_usb_send_report(NRF_REPORT_ID_CONSUMER, &data, sizeof(data));
     }
 }
-
-#else
-
-static void send_system(uint16_t data)
-{
-    (void)data;
-    NRF_LOG_INFO("Send system: fake");
-}
-
-static void send_consumer(uint16_t data)
-{
-    (void)data;
-    NRF_LOG_INFO("Send consumer: fake");
-}
-
-#endif
 
 static bool keyboard_pwr_mgmt_shutdown_handler(nrf_pwr_mgmt_evt_t event)
 {

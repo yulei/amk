@@ -10,7 +10,7 @@
 #include "app_usbd_core.h"
 #include "app_usbd_hid_generic.h"
 #include "app_usbd_serial_num.h"
-#include "tusb.h"
+#include "usb_descriptors.h"
 
 // event listener
 static void hid_user_ev_handler(app_usbd_class_inst_t const * p_inst,
@@ -49,9 +49,8 @@ APP_USBD_HID_GENERIC_GLOBAL_DEF(m_hck,
 
 #define HCO_EPLIST() (HCO_EP_IN)
 
-APP_USBD_HID_GENERIC_SUBCLASS_REPORT_DESC(hco_desc, { TUD_HID_REPORT_DESC_MOUSE( HID_REPORT_ID(NRF_REPORT_ID_MOUSE) ),
-                                                    TUD_HID_REPORT_DESC_SYSTEM_CONTROL( HID_REPORT_ID(NRF_REPORT_ID_SYSTEM) ),
-                                                    TUD_HID_REPORT_DESC_CONSUMER( HID_REPORT_ID(NRF_REPORT_ID_CONSUMER)) });
+APP_USBD_HID_GENERIC_SUBCLASS_REPORT_DESC(hco_desc, { TUD_HID_REPORT_DESC_MOUSE( HID_REPORT_ID(HID_REPORT_ID_MOUSE) ),
+                                                    TUD_HID_REPORT_DESC_EXTRA( HID_REPORT_ID_SYSTEM, HID_REPORT_ID_CONSUMER) });
 
 static const app_usbd_hid_subclass_desc_t * hco_reps[] = {&hco_desc};
 APP_USBD_HID_GENERIC_GLOBAL_DEF(m_hco,
@@ -130,9 +129,8 @@ void nrf_usb_send_report(nrf_report_id report, const void *data, size_t size)
             APP_ERROR_CHECK(rc);
             NRF_LOG_INFO("Key report:[%x%x]", ((uint32_t*)data)[0], ((uint32_t*)data)[1]);
             break;
-#ifdef MOUSEKEY_ENABLE
         case NRF_REPORT_ID_MOUSE:
-            buf[0] = report;
+            buf[0] = HID_REPORT_ID_MOUSE;
             memcpy(&buf[1], data, size);
             rc = app_usbd_hid_generic_in_report_set(&m_hco, buf, size+1);
             APP_ERROR_CHECK(rc);
@@ -142,23 +140,20 @@ void nrf_usb_send_report(nrf_report_id report, const void *data, size_t size)
                 NRF_LOG_INFO("0x%x", ((uint8_t*)data)[i]);
             }
             break;
-#endif
-#ifdef EXTRAKEY_ENABLE
         case NRF_REPORT_ID_SYSTEM:
-            buf[0] = report;
+            buf[0] = HID_REPORT_ID_SYSTEM;
             memcpy(&buf[1], data, size);
             rc = app_usbd_hid_generic_in_report_set(&m_hco, buf, size+1);
             APP_ERROR_CHECK(rc);
             NRF_LOG_INFO("system report: 0x%x", *((uint32_t*)data));
             break;
         case NRF_REPORT_ID_CONSUMER:
-            buf[0] = report;
+            buf[0] = HID_REPORT_ID_CONSUMER;
             memcpy(&buf[1], data, size);
             rc = app_usbd_hid_generic_in_report_set(&m_hco, buf, size+1);
             APP_ERROR_CHECK(rc);
             NRF_LOG_INFO("consumer report: 0x%x", *((uint32_t*)data));
             break;
-#endif
         default:
             NRF_LOG_INFO("Unknow report id: %d", report);
             break;

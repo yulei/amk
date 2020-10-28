@@ -59,3 +59,7 @@ ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
 	SRC_FILES += $(MAIN_DIR)/rtt/SEGGER_RTT_printf.c
 	include $(MAIN_DIR)/porting/stm32.mk
 endif
+
+#always enable mousekey and extra key
+MOUSEKEY_ENABLE = yes
+EXTRAKEY_ENABLE = yes

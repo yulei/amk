@@ -163,14 +163,11 @@ void nrf_gzll_host_rx_data_ready(uint32_t pipe, nrf_gzll_host_rx_info_t rx_info)
             memcpy(&report, dummy, sizeof(report));
             nrf_usb_send_report(NRF_REPORT_ID_KEYBOARD, &report, sizeof(report));
         } break;
-#ifdef MOUSEKEY_ENABLE
         case NRF_REPORT_ID_MOUSE: {
             report_mouse_t report;
             memcpy(&report, &dummy[2], sizeof(report));
             nrf_usb_send_report(NRF_REPORT_ID_MOUSE, &report, sizeof(report));
         } break;
-#endif
-#ifdef EXTRAKEY_ENABLE 
         case NRF_REPORT_ID_SYSTEM: {
             uint16_t report;
             memcpy(&report, &dummy[2], sizeof(report));
@@ -181,7 +178,6 @@ void nrf_gzll_host_rx_data_ready(uint32_t pipe, nrf_gzll_host_rx_info_t rx_info)
             memcpy(&report, &dummy[2], sizeof(report));
             nrf_usb_send_report(NRF_REPORT_ID_CONSUMER, &report, sizeof(report));
         } break;
-#endif
         default:
             NRF_LOG_INFO("GZLL HOST: unknown report type: %d", dummy[1]);
             break;
@@ -214,13 +210,10 @@ static void gzll_send_report(uint8_t type, uint8_t* data, uint8_t size)
         memcpy(m_gzll_packet, data, size);
         m_gzll_packet[1] = type;
         break;
-#ifdef MOUSEKEY_ENABLE
     case NRF_REPORT_ID_MOUSE:
         memcpy(&m_gzll_packet[2], data, size);
         m_gzll_packet[1] = type;
         break;
-#endif
-#ifdef EXTRAKEY_ENABLE 
     case NRF_REPORT_ID_SYSTEM:
     case NRF_REPORT_ID_CONSUMER:
         memcpy(&m_gzll_packet[2], data, size);
@@ -230,6 +223,5 @@ static void gzll_send_report(uint8_t type, uint8_t* data, uint8_t size)
         NRF_LOG_INFO("GZLL: unknown report type: %d", type);
         return;
     }
-#endif
     GAZELLE_ERROR_CODE_CHECK(nrf_gzll_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST, m_gzll_packet, GZLL_PAYLOAD_SIZE));
 }
