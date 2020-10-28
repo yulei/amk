@@ -38,8 +38,6 @@ void nrf_usb_init(nrf_usb_event_handler_t* eh)
     nrf_usb_event.suspend_cb = eh->suspend_cb;
     nrf_usb_event.resume_cb  = eh->resume_cb;
     nrf_usb_event.leds_cb    = eh->leds_cb;
-
-    tusb_init();
 }
 
 void nrf_usb_postinit(void)
@@ -57,6 +55,8 @@ void nrf_usb_postinit(void)
 
     ret = nrf_drv_power_usbevt_init(&config);
     APP_ERROR_CHECK(ret);
+
+    tusb_init();
 }
 
 void nrf_usb_task(void)

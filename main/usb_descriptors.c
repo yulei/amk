@@ -364,7 +364,7 @@ uint16_t* get_device_serial(uint16_t* length)
 
     memset(&_desc_serial[0], 0, sizeof(_desc_serial));
     to_unicode(d0, &_desc_serial[2], 8);
-    to_unicode(d1, &_desc_serial[18], 8);
+    to_unicode(d1, &_desc_serial[18], 4);
     _desc_serial[0] = TUSB_DESC_STRING;
     _desc_serial[1] = 2 * 16 + 2;
     *length = _desc_serial[1];
