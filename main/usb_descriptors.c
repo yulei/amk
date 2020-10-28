@@ -356,7 +356,7 @@ uint16_t* get_device_serial(uint16_t* length)
 
 #if defined(NRF52840_XXAA) || defined(NRF52)
     d0 = NRF_FICR->DEVICEADDR[0];
-    d1 = NRF_FICR->DEVICEADDR[1];
+    d1 = NRF_FICR->DEVICEADDR[1] | 0xC000;
 #else
     d0  = *(uint32_t *)(UID_BASE) + *(uint32_t *)(UID_BASE + 0x8);
     d1  = *(uint32_t *)(UID_BASE + 0x4);
