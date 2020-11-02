@@ -1,6 +1,6 @@
 STM32_PORTING_DIR := $(TOP_DIR)/main/porting/stm32
 
-SRC_FILES += \
+SRCS += \
 	$(STM32_PORTING_DIR)/timer.c \
 	$(STM32_PORTING_DIR)/bootloader.c \
 	$(STM32_PORTING_DIR)/wait.c \
@@ -8,24 +8,24 @@ SRC_FILES += \
 	$(STM32_PORTING_DIR)/gpio_pin.c \
 	$(STM32_PORTING_DIR)/eeconfig_flash.c \
 
-INC_FOLDERS += \
+INCS += \
 	$(STM32_PORTING_DIR) \
 
 ifeq (STM32F411, $(strip $(MCU)))
-	SRC_FILES += $(STM32_PORTING_DIR)/usb_tinyusb.c
-	SRC_FILES += $(STM32_PORTING_DIR)/stm32f411xe.c
+	SRCS += $(STM32_PORTING_DIR)/usb_tinyusb.c
+	SRCS += $(STM32_PORTING_DIR)/stm32f411xe.c
 endif
 
 ifeq (STM32F405, $(strip $(MCU)))
-	SRC_FILES += $(STM32_PORTING_DIR)/usb_hal.c
-	SRC_FILES += $(STM32_PORTING_DIR)/stm32f405xx.c
+	SRCS += $(STM32_PORTING_DIR)/usb_hal.c
+	SRCS += $(STM32_PORTING_DIR)/stm32f405xx.c
 endif
 
 ifeq (STM32F722, $(strip $(MCU)))
-	SRC_FILES += $(STM32_PORTING_DIR)/stm32f722xx.c
+	SRCS += $(STM32_PORTING_DIR)/stm32f722xx.c
 endif
 
 ifeq (STM32F103, $(strip $(MCU)))
-	SRC_FILES += $(STM32_PORTING_DIR)/usb_tinyusb.c
-	SRC_FILES += $(STM32_PORTING_DIR)/stm32f103xb.c
+	SRCS += $(STM32_PORTING_DIR)/usb_tinyusb.c
+	SRCS += $(STM32_PORTING_DIR)/stm32f103xb.c
 endif

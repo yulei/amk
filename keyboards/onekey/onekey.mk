@@ -1,11 +1,11 @@
 
 ONEKEY_DIR := $(TOP_DIR)/keyboards/onekey
 
-SRC_FILES += \
+SRCS += \
 	$(ONEKEY_DIR)/onekey.c \
 	$(ONEKEY_DIR)/onekey_keymap.c \
 
-INC_FOLDERS += \
+INCS += \
 	$(ONEKEY_DIR) \
 
 #MCU = STM32F103

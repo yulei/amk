@@ -1,6 +1,6 @@
 NRF52_PORTING_DIR := $(TOP_DIR)/main/porting/nrf52
 
-SRC_FILES += \
+SRCS += \
 	$(NRF52_PORTING_DIR)/generic_nrf52.c \
 	$(NRF52_PORTING_DIR)/timer.c \
 	$(NRF52_PORTING_DIR)/bootloader.c \
@@ -15,15 +15,15 @@ SRC_FILES += \
 	$(NRF52_PORTING_DIR)/rf_keyboard.c \
 	$(NRF52_PORTING_DIR)/eeconfig_fds.c \
 
-INC_FOLDERS += \
+INCS += \
 	$(TOP_DIR)/lib/tinyusb/src \
 	$(NRF52_PORTING_DIR) \
 	$(NRF52_PORTING_DIR)/ble \
 
 ifeq (NRF52832, $(strip $(MCU)))
-	SRC_FILES += $(NRF52_PORTING_DIR)/usb_backend_uart.c
+	SRCS += $(NRF52_PORTING_DIR)/usb_backend_uart.c
 endif
 
 ifeq (NRF52840, $(strip $(MCU)))
-	SRC_FILES += $(NRF52_PORTING_DIR)/usb_backend_tinyusb.c
+	SRCS += $(NRF52_PORTING_DIR)/usb_backend_tinyusb.c
 endif

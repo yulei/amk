@@ -1,16 +1,15 @@
 
 KEYBOARD_DIR := $(TOP_DIR)/keyboards/usbmaster
 
-SRC_FILES += \
+SRCS += \
 	$(KEYBOARD_DIR)/usbmaster.c \
 	$(KEYBOARD_DIR)/usbmaster_keymap.c \
+	$(KEYBOARD_DIR)/usbmaster_matrix.c
 
-INC_FOLDERS += \
+INCS += \
 	$(KEYBOARD_DIR) \
 
 MCU = STM32F103
 BOOTMAGIC_ENABLE = yes
 CUSTOM_MATRIX = yes
-
-SRC_FILES += \
-	$(KEYBOARD_DIR)/usbmaster_matrix.c
+WEBUSB_ENABLE = yes

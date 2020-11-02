@@ -1,7 +1,7 @@
 NRF5SDK_VERSION := nRF5_SDK_17.0.2_d674dde
 NRF5SDK_DIR := $(TOP_DIR)/nrf5_sdk/$(NRF5SDK_VERSION)
 
-SRC_FILES += \
+SRCS += \
 	$(NRF5SDK_DIR)/components/boards/boards.c \
 	$(NRF5SDK_DIR)/components/ble/ble_advertising/ble_advertising.c \
 	$(NRF5SDK_DIR)/components/ble/ble_link_ctx_manager/ble_link_ctx_manager.c \
@@ -82,7 +82,7 @@ SRC_FILES += \
 	$(NRF5SDK_DIR)/external/segger_rtt/SEGGER_RTT_printf.c \
 	$(NRF5SDK_DIR)/external/utf_converter/utf.c \
 
-INC_FOLDERS += \
+INCS += \
 	$(NRF5SDK_DIR)/components \
 	$(NRF5SDK_DIR)/components/boards \
 	$(NRF5SDK_DIR)/components/ble/common \
@@ -164,30 +164,29 @@ APP_DEFS += \
 SDK_DEFS += -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
 ifeq (NRF52832, $(strip $(MCU)))
-	SRC_FILES += $(NRF5SDK_DIR)/modules/nrfx/mdk/gcc_startup_nrf52.S
-	SRC_FILES += $(NRF5SDK_DIR)/modules/nrfx/mdk/system_nrf52.c
-	INC_FOLDERS += $(NRF5SDK_DIR)/components/softdevice/s132/headers
-	INC_FOLDERS += $(NRF5SDK_DIR)/components/softdevice/s132/headers/nrf52
+	SRCS += $(NRF5SDK_DIR)/modules/nrfx/mdk/gcc_startup_nrf52.S
+	SRCS += $(NRF5SDK_DIR)/modules/nrfx/mdk/system_nrf52.c
+	INCS += $(NRF5SDK_DIR)/components/softdevice/s132/headers
+	INCS += $(NRF5SDK_DIR)/components/softdevice/s132/headers/nrf52
 	APP_DEFS += -DGPIO_NRF5X
 	APP_DEFS += -DNRF52
 	APP_DEFS += -DNRF52832_XXAA
 	APP_DEFS += -DNRF52_PAN_74
 	APP_DEFS += -DS132
-	LIB_FILES += $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52_gcc.a
 	LINKER_SCRIPT := $(TOP_DIR)/nrf5_sdk/nrf52832.ld
 endif
 
 ifeq (NRF52840, $(strip $(MCU)))
-	SRC_FILES += $(NRF5SDK_DIR)/modules/nrfx/mdk/gcc_startup_nrf52840.S
-	SRC_FILES += $(NRF5SDK_DIR)/modules/nrfx/mdk/system_nrf52840.c
-	INC_FOLDERS += $(NRF5SDK_DIR)/components/softdevice/s140/headers
-	INC_FOLDERS += $(NRF5SDK_DIR)/components/softdevice/s140/headers/nrf52
-	INC_FOLDERS += $(NRF5SDK_DIR)/modules/nrfx/drivers/src
+	SRCS += $(NRF5SDK_DIR)/modules/nrfx/mdk/gcc_startup_nrf52840.S
+	SRCS += $(NRF5SDK_DIR)/modules/nrfx/mdk/system_nrf52840.c
+	INCS += $(NRF5SDK_DIR)/components/softdevice/s140/headers
+	INCS += $(NRF5SDK_DIR)/components/softdevice/s140/headers/nrf52
+	INCS += $(NRF5SDK_DIR)/modules/nrfx/drivers/src
 	APP_DEFS += -DNRF52840_XXAA
 	APP_DEFS += -DS140
-	LIB_FILES += $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52840_gcc.a
 	LINKER_SCRIPT := $(TOP_DIR)/nrf5_sdk/nrf52840.ld
 	include $(TOP_DIR)/lib/tinyusb.mk
 endif
 
+LIBS += $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52_gcc.a
 LINKER_PATH := $(NRF5SDK_DIR)/modules/nrfx/mdk

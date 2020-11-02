@@ -37,7 +37,7 @@ bool usb_suspended(void)
 
 void usb_remote_wakeup(void)
 {
-    PCD_HandleTypeDef *pcd = (PCD_HandleTypeDef *)(hUsbDeviceFS.data);
+    PCD_HandleTypeDef *pcd = (PCD_HandleTypeDef *)(hUsbDeviceFS.pData);
     HAL_PCD_ActivateRemoteWakeup(pcd);
     HAL_Delay(5);
     HAL_PCD_DeActivateRemoteWakeup(pcd);

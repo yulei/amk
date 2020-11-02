@@ -10,14 +10,14 @@
 //#define USBD_COMPOSITE_MAX_INTERFACE    ITF_NUM_TOTAL
 // hid keyboard and other(mouse, system, consumer)
 #define USBD_HID_KBD_EPIN               (0x80|EPNUM_HID_KBD)
-#define USBD_HID_KBD_EPIN_SIZE          CFG_TUD_HID_EP_SIZE
+#define USBD_HID_KBD_EPIN_SIZE          CFG_TUD_HID_EP_BUFSIZE
 #define USBD_HID_KBD_EPIN_TYPE          USBD_EP_TYPE_INTR 
 #define USBD_HID_KBD_EPOUT              0
 #define USBD_HID_KBD_EPOUT_SIZE         0
 #define USBD_HID_KBD_EPOUT_TYPE         0
 
 #define USBD_HID_OTHER_EPIN             (0x80|EPNUM_HID_OTHER)
-#define USBD_HID_OTHER_EPIN_SIZE        CFG_TUD_HID_EP_SIZE
+#define USBD_HID_OTHER_EPIN_SIZE        CFG_TUD_HID_EP_BUFSIZE
 #define USBD_HID_OTHER_EPIN_TYPE        USBD_EP_TYPE_INTR 
 #define USBD_HID_OTHER_EPOUT            0
 #define USBD_HID_OTHER_EPOUT_SIZE       0
@@ -25,7 +25,7 @@
 
 // webusb 
 #define USBD_VENDOR_EPIN                (0x80|EPNUM_VENDOR_IN)
-#define USBD_VENDOR_EPIN_SIZE           CFG_TUD_VENDOR_EP_SIZE
+#define USBD_VENDOR_EPIN_SIZE           CFG_TUD_VENDOR_EPSIZE
 #define USBD_VENDOR_EPIN_TYPE           USBD_EP_TYPE_BULK 
 #define USBD_VENDOR_EPOUT               (EPNUM_VENDOR_OUT)
 #define USBD_VENDOR_EPOUT_SIZE          USBD_VENDOR_EPIN_SIZE

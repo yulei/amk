@@ -1,12 +1,12 @@
 
 KBD_DIR := $(TOP_DIR)/keyboards/pad
 
-SRC_FILES += \
+SRCS += \
 	$(KBD_DIR)/pad.c \
 	$(KBD_DIR)/pad_keymap.c \
 	$(KBD_DIR)/pad_matrix.c \
 
-INC_FOLDERS += \
+INCS += \
 	$(KBD_DIR) \
 
 MCU = STM32F405 

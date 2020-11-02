@@ -1,16 +1,14 @@
 
 CONTROLLER_DIR := $(TOP_DIR)/keyboards/controller
 
-SRC_FILES += \
+SRCS += \
 	$(CONTROLLER_DIR)/controller.c \
 	$(CONTROLLER_DIR)/controller_keymap.c \
+	$(CONTROLLER_DIR)/controller_matrix.c \
 
-INC_FOLDERS += \
+INCS += \
 	$(CONTROLLER_DIR) \
 
 MCU = NRF52832
 BOOTMAGIC_ENABLE = yes
 CUSTOM_MATRIX = yes
-
-SRC_FILES += \
-	$(CONTROLLER_DIR)/controller_matrix.c \

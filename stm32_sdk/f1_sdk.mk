@@ -2,7 +2,7 @@ MCU_FAMILY := stm32f1xx
 MCU_SRC_PATH := f1
 MCU_HAL_PATH := STM32F1xx_HAL_Driver
 
-SRC_FILES += \
+SRCS += \
 	$(STM32SDK_DIR)/startup_stm32f103xb.s \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/system_$(MCU_FAMILY).c \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/$(MCU_FAMILY)_hal_msp.c \
@@ -22,7 +22,7 @@ SRC_FILES += \
 	$(STM32SDK_DIR)/Drivers/$(MCU_HAL_PATH)/Src/$(MCU_FAMILY)_hal_exti.c \
 	$(STM32SDK_DIR)/Drivers/$(MCU_HAL_PATH)/Src/$(MCU_FAMILY)_hal_uart.c \
 
-INC_FOLDERS += \
+INCS += \
 	$(STM32SDK_DIR) \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH) \
 	$(STM32SDK_DIR)/Drivers/$(MCU_HAL_PATH)/Inc \

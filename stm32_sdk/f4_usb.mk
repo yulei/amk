@@ -1,7 +1,7 @@
 
 USB_SRC_PATH := f4_usb
 
-SRC_FILES += \
+SRCS += \
 	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usb_device.c \
 	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbd_conf.c \
 	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbd_core.c \
@@ -13,12 +13,12 @@ SRC_FILES += \
 	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbd_webusb.c \
 	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbd_ioreq.c \
 
-INC_FOLDERS += \
+INCS += \
 	$(STM32SDK_DIR)/$(USB_SRC_PATH) \
 	$(TOP_DIR)/lib/tinyusb/src \
 
 ifeq (STM32F405, $(strip $(MCU)))
-SRC_FILES += \
+SRCS += \
 	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usb_host.c \
 	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbh_conf.c \
 	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbh_core.c \

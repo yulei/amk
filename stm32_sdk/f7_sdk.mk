@@ -1,5 +1,5 @@
 
-SRC_FILES += \
+SRCS += \
 	$(STM32SDK_DIR)/startup_stm32f722xx.s \
 	$(STM32SDK_DIR)/f7/Core/stm32f7xx_it.c \
 	$(STM32SDK_DIR)/f7/Core/stm32f7xx_hal_msp.c \
@@ -42,7 +42,7 @@ SRC_FILES += \
 	$(STM32SDK_DIR)/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.c \
 	$(STM32SDK_DIR)/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.c \
 
-INC_FOLDERS += \
+INCS += \
 	$(STM32SDK_DIR) \
 	$(STM32SDK_DIR)/f7 \
 	$(STM32SDK_DIR)/f7/Core \

@@ -1,15 +1,13 @@
 RFHOST_DIR := $(TOP_DIR)/keyboards/rfhost
 
-SRC_FILES += \
+SRCS += \
 	$(RFHOST_DIR)/rfhost.c \
 	$(RFHOST_DIR)/rfhost_keymap.c \
+	$(RFHOST_DIR)/rfhost_matrix.c \
 
-INC_FOLDERS += \
+INCS += \
 	$(RFHOST_DIR) \
 
 MCU = NRF52840
 BOOTMAGIC_ENABLE = yes
 CUSTOM_MATRIX = yes
-
-SRC_FILES += \
-	$(RFHOST_DIR)/rfhost_matrix.c \

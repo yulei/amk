@@ -1,11 +1,11 @@
 
 M20ADDBLE_DIR := $(TOP_DIR)/keyboards/m20addble
 
-SRC_FILES += \
+SRCS += \
 	$(M20ADDBLE_DIR)/m20addble.c \
 	$(M20ADDBLE_DIR)/m20addble_keymap.c \
 
-INC_FOLDERS += \
+INCS += \
 	$(M20ADDBLE_DIR) \
 
 MCU = NRF52840

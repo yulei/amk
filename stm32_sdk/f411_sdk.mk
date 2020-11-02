@@ -3,7 +3,7 @@ MCU_FAMILY := stm32f4xx
 MCU_SRC_PATH := f411
 MCU_HAL_PATH := STM32F4xx_HAL_Driver
 
-SRC_FILES += \
+SRCS += \
 	$(STM32SDK_DIR)/startup_stm32f411xe.s \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/system_$(MCU_FAMILY).c \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/$(MCU_FAMILY)_hal_msp.c \
@@ -27,7 +27,7 @@ SRC_FILES += \
 	$(STM32SDK_DIR)/Drivers/$(MCU_HAL_PATH)/Src/$(MCU_FAMILY)_hal_i2c_ex.c \
 	$(STM32SDK_DIR)/Drivers/$(MCU_HAL_PATH)/Src/$(MCU_FAMILY)_hal_spi.c \
 
-INC_FOLDERS += \
+INCS += \
 	$(STM32SDK_DIR) \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH) \
 	$(STM32SDK_DIR)/Drivers/$(MCU_HAL_PATH)/Inc \

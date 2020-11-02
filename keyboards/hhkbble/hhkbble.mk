@@ -1,18 +1,18 @@
 
 HHKBBLE_DIR := $(TOP_DIR)/keyboards/hhkbble
 
-SRC_FILES += \
+SRCS += \
 	$(HHKBBLE_DIR)/hhkbble.c \
 
-INC_FOLDERS += \
+INCS += \
 	$(HHKBBLE_DIR) \
 
 MCU = NRF52832
 BOOTMAGIC_ENABLE = yes
-RGB_EFFECTS_ENABLE = yes
+#RGB_EFFECTS_ENABLE = yes
 
 ifeq (yes,$(strip $(ACTIONMAP_ENABLE)))
-	SRC_FILES += $(HHKBBLE_DIR)/hhkbble_action.c
+	SRCS += $(HHKBBLE_DIR)/hhkbble_action.c
 else
-	SRC_FILES += $(HHKBBLE_DIR)/hhkbble_keymap.c
+	SRCS += $(HHKBBLE_DIR)/hhkbble_keymap.c
 endif

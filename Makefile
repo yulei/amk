@@ -5,18 +5,18 @@ STM32_MCUS := STM32F103 STM32F411 STM32F405 STM32F722
 TOP_DIR ?= .
 
 # Source files
-SRC_FILES += \
+SRCS += \
 
 # Include folders
-INC_FOLDERS += \
+INCS += \
 
 # Libraries
-LIB_FILES += \
+LIBS += \
 
 # Definitions
 APP_DEFS += \
 
-TARGET := $(filter-out clean flash erase flash_softdevice sdk_config help, $(MAKECMDGOALS))
+TARGET := $(filter-out clean flash erase flash_softdevice sdk_config, $(MAKECMDGOALS))
 KEYBOARDS := $(sort $(filter-out %.h %.c,$(notdir $(wildcard keyboards/*))))
 
 OUTPUT_DIRECTORY := build
@@ -81,9 +81,9 @@ LDFLAGS += --specs=nano.specs
 
 # Add standard libraries at the very end of the linker input, after all objects
 # that may need symbols provided by these libraries.
-LIB_FILES += -lc -lnosys -lm
+LIBS += -lc -lnosys -lm
 
-.PHONY: default help list
+.PHONY: default list
 
 # Default target
 ifneq (,$(TARGET))
@@ -97,17 +97,7 @@ list:
 	$(foreach kbd,$(KEYBOARDS),$(info -- $(kbd)))
 	@echo
 
-# Print all targets that can be built
-help:
-	@echo following targets are available:
-	@echo		keyboard 			- your keyboard name
-#	@echo		sdk_config 			- starting external tool for editing sdk_config.h
-	@echo		flash      			- flashing binary
-#	@echo		flash_softdevice	- flashing the softdevice
-	@echo		erase				- erase the chip
-
 include $(TOP_DIR)/common.mk
-$(call define_target, $(TARGET))
 
 
 .PHONY: flash erase
