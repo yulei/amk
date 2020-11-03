@@ -1,5 +1,5 @@
 
-TMK_DIR := $(TOP_DIR)/lib/tmk/tmk_core
+TMK_DIR := lib/tmk/tmk_core
 
 SRCS += \
 	$(TMK_DIR)/common/host.c \
@@ -16,7 +16,7 @@ SRCS += \
 	$(TMK_DIR)/common/hook.c \
 
 INCS += \
-	$(TOP_DIR)/lib \
+	lib \
 	$(TMK_DIR)/common \
 
 APP_DEFS += \

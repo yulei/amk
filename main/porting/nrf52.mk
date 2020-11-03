@@ -1,4 +1,4 @@
-NRF52_PORTING_DIR := $(TOP_DIR)/main/porting/nrf52
+NRF52_PORTING_DIR := main/porting/nrf52
 
 SRCS += \
 	$(NRF52_PORTING_DIR)/generic_nrf52.c \
@@ -16,7 +16,6 @@ SRCS += \
 	$(NRF52_PORTING_DIR)/eeconfig_fds.c \
 
 INCS += \
-	$(TOP_DIR)/lib/tinyusb/src \
 	$(NRF52_PORTING_DIR) \
 	$(NRF52_PORTING_DIR)/ble \
 

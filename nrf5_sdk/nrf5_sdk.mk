@@ -1,5 +1,5 @@
 NRF5SDK_VERSION := nRF5_SDK_17.0.2_d674dde
-NRF5SDK_DIR := $(TOP_DIR)/nrf5_sdk/$(NRF5SDK_VERSION)
+NRF5SDK_DIR := nrf5_sdk/$(NRF5SDK_VERSION)
 
 SRCS += \
 	$(NRF5SDK_DIR)/components/boards/boards.c \
@@ -173,7 +173,7 @@ ifeq (NRF52832, $(strip $(MCU)))
 	APP_DEFS += -DNRF52832_XXAA
 	APP_DEFS += -DNRF52_PAN_74
 	APP_DEFS += -DS132
-	LINKER_SCRIPT := $(TOP_DIR)/nrf5_sdk/nrf52832.ld
+	LINKER_SCRIPT := nrf5_sdk/nrf52832.ld
 endif
 
 ifeq (NRF52840, $(strip $(MCU)))
@@ -184,8 +184,8 @@ ifeq (NRF52840, $(strip $(MCU)))
 	INCS += $(NRF5SDK_DIR)/modules/nrfx/drivers/src
 	APP_DEFS += -DNRF52840_XXAA
 	APP_DEFS += -DS140
-	LINKER_SCRIPT := $(TOP_DIR)/nrf5_sdk/nrf52840.ld
-	include $(TOP_DIR)/lib/tinyusb.mk
+	LINKER_SCRIPT := nrf5_sdk/nrf52840.ld
+	include lib/tinyusb.mk
 endif
 
 LIBS += $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52_gcc.a

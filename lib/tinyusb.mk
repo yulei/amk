@@ -1,4 +1,4 @@
-TINYUSB_DIR := $(TOP_DIR)/lib/tinyusb/src
+TINYUSB_DIR := lib/tinyusb/src
 
 SRCS += \
 	$(TINYUSB_DIR)/tusb.c \
@@ -9,7 +9,7 @@ SRCS += \
 	$(TINYUSB_DIR)/device/usbd_control.c \
 
 INCS += \
-	$(TOP_DIR)/lib \
+	lib \
 	$(TINYUSB_DIR) \
 
 ifeq (STM32F103, $(strip $(MCU)))

@@ -1,4 +1,4 @@
-STM32_PORTING_DIR := $(TOP_DIR)/main/porting/stm32
+STM32_PORTING_DIR := main/porting/stm32
 
 SRCS += \
 	$(STM32_PORTING_DIR)/timer.c \

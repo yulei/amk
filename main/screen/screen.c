@@ -9,7 +9,9 @@
 
 static ssd1357_t ssd1357_drivers[SCREEN_NUM] = {
     {SCREEN_0_RESET, SCREEN_0_CS, SCREEN_0_DC},
+#ifdef SCREEN_1_PRESENT
     {SCREEN_1_RESET, SCREEN_1_CS, SCREEN_1_DC},
+#endif
 };
 
 static lv_disp_drv_t screen_driver;
@@ -19,8 +21,9 @@ void screen_init(void)
 {
     lv_init();
 
-    ssd1357_init(&ssd1357_drivers[0]);
-    ssd1357_init(&ssd1357_drivers[1]);
+    for (int i = 0; i < SCREEN_NUM; i++) {
+        ssd1357_init(&ssd1357_drivers[i]);
+    }
 
     // create two buffer on screen size
     static lv_disp_buf_t disp_buf;

@@ -27,21 +27,20 @@ $(info A valid keyboard target must be provided, current available:)
 $(foreach kbd,$(KEYBOARDS),$(info $(kbd)))
 $(error Invalid Target specified)
 endif
-include $(TOP_DIR)/keyboards/$(TARGET)/$(TARGET).mk
+include keyboards/$(TARGET)/$(TARGET).mk
+include main/main.mk
+include lib/tmk.mk
 ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
-include $(TOP_DIR)/nrf5_sdk/nrf5_sdk.mk
+include nrf5_sdk/nrf5_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
-include $(TOP_DIR)/stm32_sdk/stm32_sdk.mk
+include stm32_sdk/stm32_sdk.mk
 else
 $(error Unsupported MCU: $(MCU))
 endif
 endif
 
-include $(TOP_DIR)/main/main.mk
-include $(TOP_DIR)/lib/tmk.mk
-
-ifeq (yes,$(LVGL_ENABLE))
-include $(TOP_DIR)/lib/lvgl.mk
+ifeq (yes,$(SCREEN_ENABLE))
+include lib/lvgl.mk
 endif
 
 # Optimization flags
@@ -97,7 +96,7 @@ list:
 	$(foreach kbd,$(KEYBOARDS),$(info -- $(kbd)))
 	@echo
 
-include $(TOP_DIR)/common.mk
+include common.mk
 
 
 .PHONY: flash erase

@@ -1,5 +1,5 @@
 
-MAIN_DIR := $(TOP_DIR)/main
+MAIN_DIR := main
 
 SRCS += \
 	$(MAIN_DIR)/main.c  \
@@ -15,6 +15,7 @@ INCS += \
 	$(MAIN_DIR)/drivers \
 	$(MAIN_DIR)/rgb \
 	$(MAIN_DIR)/screen \
+	lib/tinyusb/src \
 
 
 ifeq (yes, $(strip $(MATRIX_USE_TCA6424)))

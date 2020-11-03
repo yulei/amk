@@ -1,8 +1,8 @@
-STM32SDK_DIR := $(TOP_DIR)/stm32_sdk
+STM32SDK_DIR := stm32_sdk
 
 ifeq (STM32F411, $(strip $(MCU)))
 include $(STM32SDK_DIR)/f411_sdk.mk
-include $(TOP_DIR)/lib/tinyusb.mk
+include lib/tinyusb.mk
 endif
 
 ifeq (STM32F405, $(strip $(MCU)))
@@ -16,5 +16,5 @@ endif
 
 ifeq (STM32F103, $(strip $(MCU)))
 include $(STM32SDK_DIR)/f1_sdk.mk
-include $(TOP_DIR)/lib/tinyusb.mk
+include lib/tinyusb.mk
 endif

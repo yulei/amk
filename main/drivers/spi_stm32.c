@@ -15,7 +15,7 @@ spi_handle_t spi_init(void)
     return &hspi1;
 }
 
-bool spi_ready(void)
+bool spi_ready(spi_handle_t spi)
 {
     return true;
 }
