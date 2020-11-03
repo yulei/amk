@@ -1,3 +1,18 @@
+
+ifneq ($(words $(MAKECMDGOALS)),1) # if no argument was given to make...
+.DEFAULT_GOAL = all # set the default goal to all
+%:                   # define a last resort default rule
+	@$(MAKE) $@ --no-print-directory -rRf $(firstword $(MAKEFILE_LIST)) # recursive make call, 
+else
+ifndef PROGRESS 
+T := $(shell $(MAKE) $(MAKECMDGOALS) --no-print-directory \
+      -nrRf $(firstword $(MAKEFILE_LIST)) \
+      PROGRESS="COUNTTHIS" | grep -c "COUNTTHIS")
+N := x
+C = $(words $N)$(eval N := x $N)
+PROGRESS = echo "[`expr $C '*' 100 / $T`%]"
+endif
+
 PROJECT_NAME := amk
 NRF_MCUS := NRF52832 NRF52840
 STM32_MCUS := STM32F103 STM32F411 STM32F405 STM32F722
@@ -153,5 +168,7 @@ flash: default
 
 erase:
 	pylink erase -t swd -d $(FLASH_TARGET) 
+
+endif
 
 endif

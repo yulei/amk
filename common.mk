@@ -54,12 +54,12 @@ ALL_LDFLAGS = $(LDFLAGS) -Xlinker -Map=$(OUTPUT_DIRECTORY)/$(TARGET).map
 # Create object files from C source files
 
 $(BUILD_DIR)/%.o : %.c
-	@echo Compiling: $<
+	@$(PROGRESS) Compiling: $<
 	$(NO_ECHO)$(CC) -c $(ALL_CFLAGS) $< -o $@ 
 
 # Create object files from C++ source files
 $(BUILD_DIR)/%.o : %.cpp
-	@echo Compiling: $<
+	@$(PROGRESS) Compiling: $<
 	$(NO_ECHO)$(CC) -c $(ALL_CPPFLAGS) $< -o $@ 
 
 # Create object files from assembly source files
@@ -67,29 +67,29 @@ define assembling
 	$(NO_ECHO)$(CC) -c $(ALL_ASFLAGS) $< -o $@
 endef
 $(BUILD_DIR)/%.o : %.s
-	@echo Assembling: $<
+	@$(PROGRESS) Assembling: $<
 	$(assembling)
 
 $(BUILD_DIR)/%.o : %.S
-	@echo Assembling: $<
+	@$(PROGRESS) Assembling: $<
 	$(assembling)
 
 $(TARGET): $(addprefix $(OUTPUT_DIRECTORY)/$(TARGET), .elf .bin .hex)
 
 # Create elf files 
 %.elf: $(OBJS)
-	$(info Preparing: $(notdir $@))
+	$(info Linking: $(notdir $@))
 	$(NO_ECHO)$(CC) -o $@ $(ALL_LDFLAGS) $^ $(LIBS)
 	$(NO_ECHO)$(SIZE) $@
 
 # Create binary .bin file from the .elf file
 %.bin: %.elf
-	$(info Preparing: $(notdir $@))
+	$(info Creating: $(notdir $@))
 	$(NO_ECHO)$(OBJCOPY) -O binary $< $@
 
 # Create binary .hex file from the .elf file
 %.hex: %.elf
-	$(info Preparing: $(notdir $@))
+	$(info Creating: $(notdir $@))
 	$(NO_ECHO)$(OBJCOPY) -O ihex $< $@
 
 # Include the dependency files
