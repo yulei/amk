@@ -8,7 +8,7 @@
 
 void usb_init(void)
 {
-    tud_init();
+    tusb_init();
 }
 
 void usb_task(void)

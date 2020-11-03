@@ -58,45 +58,6 @@ ifeq (yes,$(SCREEN_ENABLE))
 include lib/lvgl.mk
 endif
 
-# Optimization flags
-#OPT = -O3 -g3
-
-# Debug flags
-OPT = -Og -g3 -DDEBUG
-
-# Uncomment the line below to enable link time optimization
-#OPT += -flto
-
-FLAGS_ALL := $(OPT) $(APP_DEFS) $(SDK_DEFS)
-# C flags common to all targets
-CFLAGS += $(FLAGS_ALL)
-CFLAGS += -Wall
-CFLAGS += -Werror
-# keep every function in a separate section, this allows linker to discard unused ones
-CFLAGS += -ffunction-sections
-CFLAGS += -fdata-sections
-CFLAGS += -fno-strict-aliasing
-CFLAGS += -fno-builtin
-CFLAGS += -fshort-enums
-
-# C++ flags common to all targets
-CXXFLAGS += $(OPT)
-
-# Assembler flags common to all targets
-ASMFLAGS += $(FLAGS_ALL)
-
-# Linker flags
-LDFLAGS += $(FLAGS_ALL)
-LDFLAGS += -L$(LINKER_PATH) -T$(LINKER_SCRIPT)
-# let linker dump unused sections
-LDFLAGS += -Wl,--gc-sections
-# use newlib in nano version
-LDFLAGS += --specs=nano.specs
-
-# Add standard libraries at the very end of the linker input, after all objects
-# that may need symbols provided by these libraries.
-LIBS += -lc -lnosys -lm
-
 .PHONY: default list
 
 # Default target

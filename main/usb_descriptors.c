@@ -28,7 +28,7 @@
 //--------------------------------------------------------------------+
 // Device Descriptors
 //--------------------------------------------------------------------+
-tusb_desc_device_t const desc_device TU_ATTR_ALIGNED(4) =
+tusb_desc_device_t const desc_device =
 {
     .bLength            = sizeof(tusb_desc_device_t),
     .bDescriptorType    = TUSB_DESC_DEVICE,
@@ -286,7 +286,7 @@ char const* string_desc_arr [] =
 
 static uint16_t _desc_str[32];
 
-static uint16_t *get_device_serial(uint16_t* length);
+//static uint16_t *get_device_serial(uint16_t* length);
 uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 {
     (void)langid;
@@ -303,9 +303,9 @@ uint8_t *get_descriptor_str(uint8_t index, uint16_t *length)
     if ( index == 0) {
         memcpy(&_desc_str[1], string_desc_arr[0], 2);
         chr_count = 1;
-    } else if (index == DESC_STR_SERIAL) {
+    } /*else if (index == DESC_STR_SERIAL) {
         return (uint8_t*)get_device_serial(length);
-    } else {
+    }*/ else {
         // Convert ASCII string into UTF-16
 
         if ( !(index < sizeof(string_desc_arr)/sizeof(string_desc_arr[0])) ) return NULL;
@@ -328,6 +328,7 @@ uint8_t *get_descriptor_str(uint8_t index, uint16_t *length)
   return (uint8_t*)_desc_str;
 }
 
+#if 0
 static uint8_t _desc_serial[64];
 
 static void to_unicode(uint32_t value, uint8_t *pbuf, uint8_t len)
@@ -370,3 +371,4 @@ uint16_t* get_device_serial(uint16_t* length)
     *length = _desc_serial[1];
     return (uint16_t *)_desc_serial;
 }
+#endif

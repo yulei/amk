@@ -108,4 +108,5 @@ enum {
 
 uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid);
 
+//uint16_t *get_device_serial(uint16_t* length);
 uint8_t *get_descriptor_str(uint8_t index, uint16_t *length);
