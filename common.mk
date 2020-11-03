@@ -4,11 +4,7 @@ RM := rm -rf
 CP := cp
 
 # echo suspend
-ifeq ($(VERBOSE),1)
-  NO_ECHO :=
-else
-  NO_ECHO := @
-endif
+NO_ECHO := @
 
 GNU_PREFIX := arm-none-eabi
 
@@ -32,25 +28,28 @@ clean:
 
 BUILD_DIR := $(OUTPUT_DIRECTORY)/$(TARGET)
 
-OBJ = $(patsubst %.c,$(BUILD_DIR)/%.o,$(patsubst %.cpp,$(BUILD_DIR)/%.o,$(patsubst %.s,$(BUILD_DIR)/%.o,$(patsubst %.S,$(BUILD_DIR)/%.o,$(SRCS)))))
+OBJS += $(patsubst %.s,$(BUILD_DIR)/%.o,$(patsubst %.S,$(BUILD_DIR)/%.o,$(filter %.s %.S,$(SRCS))))
+OBJS += $(patsubst %.c,$(BUILD_DIR)/%.o,$(patsubst %.cpp,$(BUILD_DIR)/%.o,$(filter-out %.s %.S,$(SRCS))))
 
 # Create build directories
-OBJ_DIRS = $(sort $(dir $(OBJ)))
-$(OBJ): | $(OBJ_DIRS)
+OBJ_DIRS = $(sort $(dir $(OBJS)))
+$(OBJS): | $(OBJ_DIRS)
 $(OBJ_DIRS):
 	$(NO_ECHO)$(MK) $@
 
-#$(info $(SRC_FILES))
-#$(info $(OBJ))
+#$(info $(SRCS))
+#$(info $(INCS))
+#$(info $(LIBS))
+#$(info $(OBJS))
 
 # Compiler flags to generate dependency files.
-GENDEPFLAGS = -MD 
+GENDEPFLAGS = -MMD 
 
 INC_FLAGS = $(addprefix -I,$(INCS))
 
 ALL_CFLAGS = -std=gnu99 $(CFLAGS) $(GENDEPFLAGS) $(INC_FLAGS)
 ALL_CPPFLAGS = -x c++ $(CPPFLAGS) $(GENDEPFLAGS) $(INC_FLAGS)
-ALL_ASFLAGS = -x assembler-with-cpp $(ASMFLAGS) $(INC_FLAGS)
+ALL_ASFLAGS = -x assembler-with-cpp $(ASMFLAGS) $(GENDEPFLAGS) $(INC_FLAGS)
 ALL_LDFLAGS = $(LDFLAGS) -Xlinker -Map=$(OUTPUT_DIRECTORY)/$(TARGET).map
 # Create object files from C source files
 
@@ -75,19 +74,23 @@ $(BUILD_DIR)/%.o : %.S
 	@echo Assembling: $<
 	$(assembling)
 
-# Link object files
 $(TARGET): $(addprefix $(OUTPUT_DIRECTORY)/$(TARGET), .elf .bin .hex)
 
-%.elf: $(OBJ)
+# Create elf files 
+%.elf: $(OBJS)
 	$(info Preparing: $(notdir $@))
 	$(NO_ECHO)$(CC) -o $@ $(ALL_LDFLAGS) $^ $(LIBS)
+	$(NO_ECHO)$(SIZE) $@
 
-# Create binary .bin file from the .out file
+# Create binary .bin file from the .elf file
 %.bin: %.elf
 	$(info Preparing: $(notdir $@))
 	$(NO_ECHO)$(OBJCOPY) -O binary $< $@
 
-# Create binary .hex file from the .out file
+# Create binary .hex file from the .elf file
 %.hex: %.elf
 	$(info Preparing: $(notdir $@))
 	$(NO_ECHO)$(OBJCOPY) -O ihex $< $@
+
+# Include the dependency files
+-include $(OBJS:%.o=%.d)
