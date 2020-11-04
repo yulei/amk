@@ -11,7 +11,7 @@
 #include "host.h"
 #include "gpio_pin.h"
 #include "usb_descriptors.h"
-#include "rtt.h"
+#include "amk_printf.h"
 
 extern UART_HandleTypeDef huart1;
 pin_t reset_pin = RESET_PIN;
@@ -108,9 +108,9 @@ typedef enum
 static void reset_to_bootloader(reset_reason_t reason)
 {
     if ( reason == USER_RESET) {
-        rtt_printf("USER reset to bootloader\n");
+        amk_printf("USER reset to bootloader\n");
     } else {
-        rtt_printf("PIN reset to bootloader\n");
+        amk_printf("PIN reset to bootloader\n");
     }
     clear_jump_to_app();
 
@@ -124,14 +124,14 @@ static void reset_to_bootloader(reset_reason_t reason)
 
 static void process_data(uint8_t d)
 {
-    rtt_printf("uart received: %d\n", d);
+    amk_printf("uart received: %d\n", d);
     static uint32_t count = 0;
     if (count == 0 && d != SYNC_BYTE_1) {
-        rtt_printf("SYNC BYTE 1: %x\n", d);
+        amk_printf("SYNC BYTE 1: %x\n", d);
         return;
     } else if (count == 1 && d != SYNC_BYTE_2) {
         count = 0;
-        rtt_printf("SYNC BYTE 2: %x\n", d);
+        amk_printf("SYNC BYTE 2: %x\n", d);
         return;
     }
 
@@ -146,11 +146,11 @@ static void process_data(uint8_t d)
 
 static void enqueue_command(uint8_t *cmd)
 {
-    rtt_printf("Enqueue Command: %d\n", cmd[2]);
+    amk_printf("Enqueue Command: %d\n", cmd[2]);
     uint8_t checksum = compute_checksum(cmd + 2, cmd[0] - 2);
     if (checksum != cmd[1]) {
         // invalid checksum
-        rtt_printf("Checksum: SRC:%x, CUR:%x\n", cmd[1], checksum);
+        amk_printf("Checksum: SRC:%x, CUR:%x\n", cmd[1], checksum);
         return;
     }
 
@@ -165,11 +165,11 @@ static void process_command(report_item_t *item)
     switch (item->type) {
     case CMD_KEY_REPORT: {
         static report_keyboard_t report;
-        rtt_printf("Send key report\n");
+        amk_printf("Send key report\n");
         for (uint32_t i = 0; i < sizeof(report); i++) {
-            rtt_printf(" 0x%x", item->data[i]);
+            amk_printf(" 0x%x", item->data[i]);
         }
-        rtt_printf("\n");
+        amk_printf("\n");
 
         memcpy(&report.raw[0], &item->data[0], sizeof(report));
         host_keyboard_send(&report);
@@ -177,9 +177,9 @@ static void process_command(report_item_t *item)
 #ifdef MOUSE_ENABLE
     case CMD_MOUSE_REPORT: {
         static report_mouse_t report;
-        rtt_printf("Send mouse report\n");
+        amk_printf("Send mouse report\n");
         for (uint32_t i = 0; i < sizeof(report); i++) {
-            rtt_printf(" 0x%x", item->data[i]);
+            amk_printf(" 0x%x", item->data[i]);
         }
 
         memcpy(&report, &item->data[0], sizeof(report));
@@ -189,9 +189,9 @@ static void process_command(report_item_t *item)
 #ifdef EXTRAKEY_ENABLE
     case CMD_SYSTEM_REPORT: {
         static uint16_t report;
-        rtt_printf("Send system report\n");
+        amk_printf("Send system report\n");
         for (uint32_t i = 0; i < sizeof(report); i++) {
-            rtt_printf(" 0x%x", item->data[i]);
+            amk_printf(" 0x%x", item->data[i]);
         }
         memcpy(&report, &item->data[0], sizeof(report));
         host_system_send(report);
@@ -199,9 +199,9 @@ static void process_command(report_item_t *item)
     } break;
     case CMD_CONSUMER_REPORT: {
         static uint16_t report;
-        rtt_printf("Send consumer report\n");
+        amk_printf("Send consumer report\n");
         for (uint32_t i = 0; i < sizeof(report); i++) {
-            rtt_printf(" 0x%x", item->data[i]);
+            amk_printf(" 0x%x", item->data[i]);
         }
         memcpy(&report, &item->data[0], sizeof(report));
         host_consumer_send(report);
@@ -299,7 +299,7 @@ matrix_row_t matrix_get_row(uint8_t row) { return matrix[row]; }
 
 void matrix_print(void)
 {
-    rtt_printf("matrix_print\n");
+    amk_printf("matrix_print\n");
 }
 
 void led_set(uint8_t usb_led)

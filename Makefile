@@ -31,6 +31,7 @@ endif
 include keyboards/$(TARGET)/$(TARGET).mk
 include main/main.mk
 include lib/tmk.mk
+include lib/printf.mk
 ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
 include nrf5_sdk/nrf5_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))

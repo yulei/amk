@@ -122,7 +122,7 @@ $(BUILD_DIR)/%.o : %.s
 	$(assembling)
 
 $(BUILD_DIR)/%.o : %.S
-	@$(PROGRESS) Assembling: $<
+	@$(PROGRESS) Assembling: $(notdir $<)
 	$(assembling)
 
 $(TARGET): $(addprefix $(OUTPUT_DIRECTORY)/$(TARGET), .elf .bin .hex)

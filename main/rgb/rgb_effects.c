@@ -9,7 +9,7 @@
 #include "rgb_effects.h"
 #include "timer.h"
 #include "eeprom_manager.h"
-#include "rtt.h"
+#include "amk_printf.h"
 
 #define DELAY_MIN   0
 #define DELAY_DEFAULT 1500
@@ -130,7 +130,7 @@ static bool effects_need_update(void)
     /*uint32_t elapsed = timer_elapsed32(effects_state.last_ticks);
     uint32_t interval = elapsed * effects_state.config.speed;
     if (interval >= effects_delay()){
-        rtt_printf("elapsed:%d, interval:%d, delay:%d\n", elapsed, interval, effects_delay());
+        amk_printf("elapsed:%d, interval:%d, delay:%d\n", elapsed, interval, effects_delay());
     }*/
 
     return timer_elapsed32(effects_state.last_ticks)*effects_state.config.speed >= effects_delay();
@@ -361,7 +361,7 @@ void rgb_effects_task(void)
         if (effects_need_update() ) {
             effects_state.effects[effects_state.config.mode]();
             effects_update_timer();
-            //rtt_printf("effects last ticks: %d\n", effects_state.last_ticks);
+            //amk_printf("effects last ticks: %d\n", effects_state.last_ticks);
         }
         effects_state.driver->flush();
     }

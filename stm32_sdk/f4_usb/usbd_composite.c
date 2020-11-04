@@ -5,7 +5,7 @@
 #include "usbd_ctlreq.h"
 #include "usbd_composite.h"
 #include "usb_descriptors.h"
-#include "rtt.h"
+#include "amk_printf.h"
 
 //#define USBD_COMPOSITE_MAX_INTERFACE    ITF_NUM_TOTAL
 // hid keyboard and other(mouse, system, consumer)
@@ -130,7 +130,7 @@ static usbd_composite_t usbd_composite = {
 static uint8_t  USBD_COMP_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
 {
     (void)cfgidx;
-    rtt_printf("COMP Init: cfgidx=%d\n", cfgidx);
+    amk_printf("COMP Init: cfgidx=%d\n", cfgidx);
     for (int i = 0; i < usbd_composite.size; i++) {
         usbd_interface_t* interface = &usbd_composite.interfaces[i];
         interface->init(pdev, interface);
@@ -156,7 +156,7 @@ static uint8_t  USBD_COMP_DeInit(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
 uint8_t USBD_COMP_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
 {
     USBD_StatusTypeDef ret = USBD_FAIL;
-    rtt_printf("bmRequst=%d, request=%d, index=%d\n", req->bmRequest, req->bRequest, req->wIndex);
+    amk_printf("bmRequst=%d, request=%d, index=%d\n", req->bmRequest, req->bRequest, req->wIndex);
     if ((req->bmRequest&USB_REQ_TYPE_MASK) == USB_REQ_TYPE_VENDOR) {
         usbd_interface_t* interface = &usbd_composite.interfaces[2];
         ret = interface->instance->Setup(pdev, req, interface->data);
@@ -168,11 +168,11 @@ uint8_t USBD_COMP_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
                 usbd_interface_t* interface = &usbd_composite.interfaces[req->wIndex];
                 ret = interface->instance->Setup(pdev, req, interface->data);
             } else {
-                rtt_printf("Setup requests to interface=%d not supported\n", receipt);
+                amk_printf("Setup requests to interface=%d not supported\n", receipt);
                 ret = USBD_FAIL;
             }
         } else {
-            rtt_printf("Setup request to receipt=%d not supported\n", receipt);
+            amk_printf("Setup request to receipt=%d not supported\n", receipt);
             ret = USBD_FAIL;
         }
     } 
@@ -198,7 +198,7 @@ uint8_t USBD_COMP_EP0_RxReady(struct _USBD_HandleTypeDef *pdev)
 uint8_t USBD_COMP_DataIn(struct _USBD_HandleTypeDef *pdev, uint8_t epnum)
 {
     usbd_interface_t* interface = find_interface_by_epnum(epnum);
-    rtt_printf("COMP DataIn: epnum=%d\n", epnum);
+    amk_printf("COMP DataIn: epnum=%d\n", epnum);
 
     if (interface) {
         return interface->instance->DataIn(pdev, epnum, interface->data);
@@ -210,7 +210,7 @@ uint8_t USBD_COMP_DataIn(struct _USBD_HandleTypeDef *pdev, uint8_t epnum)
 uint8_t USBD_COMP_DataOut(struct _USBD_HandleTypeDef *pdev, uint8_t epnum)
 {
     usbd_interface_t* interface = find_interface_by_epnum(epnum);
-    rtt_printf("COMP DataOut: epnum=%d\n", epnum);
+    amk_printf("COMP DataOut: epnum=%d\n", epnum);
     
     if (interface && interface->instance->DataOut) {
         return interface->instance->DataOut(pdev, epnum, interface->data);
@@ -263,7 +263,7 @@ void hid_kbd_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
 {
     USBD_StatusTypeDef ret = USBD_OK;
     ret = USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
-    rtt_printf("HID KBD init, Open epin=%d, status=%d\n", interface->epin, ret);
+    amk_printf("HID KBD init, Open epin=%d, status=%d\n", interface->epin, ret);
     pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
     ((USBD_HID_HandleTypeDef *)interface->data)->state = HIDD_IDLE;
     ((USBD_HID_HandleTypeDef *)interface->data)->IsKeyboard = 1;
@@ -279,7 +279,7 @@ void hid_other_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
 {
     USBD_StatusTypeDef ret = USBD_OK;
     ret = USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
-    rtt_printf("HID OTHER init, Open epin=%d, status=%d\n", interface->epin, ret);
+    amk_printf("HID OTHER init, Open epin=%d, status=%d\n", interface->epin, ret);
     pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
     ((USBD_HID_HandleTypeDef *)interface->data)->state = HIDD_IDLE;
     ((USBD_HID_HandleTypeDef *)interface->data)->IsKeyboard = 0;
@@ -289,15 +289,15 @@ void webusb_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
 {
     USBD_StatusTypeDef ret = USBD_OK;
     ret = USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
-    rtt_printf("WEBUSB init, Open epin=%d, status=%d\n", interface->epin, ret);
+    amk_printf("WEBUSB init, Open epin=%d, status=%d\n", interface->epin, ret);
     pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
     ret = USBD_LL_OpenEP(pdev, interface->epout, interface->epout_type, interface->epout_size);
-    rtt_printf("WEBUSB init, Open epout=%d, status=%d\n", interface->epout, ret);
+    amk_printf("WEBUSB init, Open epout=%d, status=%d\n", interface->epout, ret);
     pdev->ep_out[interface->epout].is_used = 1U;
 
     USBD_WEBUSB_HandleTypeDef* ph = (USBD_WEBUSB_HandleTypeDef *)interface->data;
     ret = USBD_LL_PrepareReceive(pdev, interface->epout, ph->recv_buffer, WEBUSB_PACKET_SIZE);
-    rtt_printf("WEBUSB init: prepare receive: epnum=%d, status=%d\n", interface->epout, ret);
+    amk_printf("WEBUSB init: prepare receive: epnum=%d, status=%d\n", interface->epout, ret);
     ph->state = WEBUSB_IDLE;
 }
 

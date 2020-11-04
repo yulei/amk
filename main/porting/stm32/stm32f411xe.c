@@ -4,7 +4,7 @@
 
 #include "generic_hal.h"
 #include "tusb.h"
-#include "rtt.h"
+#include "amk_printf.h"
 
 void OTG_FS_IRQHandler(void)
 {
@@ -46,7 +46,7 @@ void SystemClock_Config(void)
     RCC_OscInitStruct.PLL.PLLQ = 8;
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
     {
-        rtt_printf("Failed to config RCC\n");
+        amk_printf("Failed to config RCC\n");
         Error_Handler();
     }
     /** Initializes the CPU, AHB and APB buses clocks
@@ -59,7 +59,7 @@ void SystemClock_Config(void)
     RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
     {
-        rtt_printf("Failed to config Clock\n");
+        amk_printf("Failed to config Clock\n");
         Error_Handler();
     }
 }

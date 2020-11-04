@@ -24,7 +24,7 @@
 #include "usb_host.h"
 #include "usbh_core.h"
 #include "usbh_hid.h"
-#include "rtt.h"
+#include "amk_printf.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -108,22 +108,22 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
   switch(id)
   {
   case HOST_USER_SELECT_CONFIGURATION:
-  rtt_printf("Host select configuration\n");
+  amk_printf("Host select configuration\n");
   break;
 
   case HOST_USER_DISCONNECTION:
   Appli_state = APPLICATION_DISCONNECT;
-  rtt_printf("Host disconnection\n");
+  amk_printf("Host disconnection\n");
   break;
 
   case HOST_USER_CLASS_ACTIVE:
   Appli_state = APPLICATION_READY;
-  rtt_printf("Host activate\n");
+  amk_printf("Host activate\n");
   break;
 
   case HOST_USER_CONNECTION:
   Appli_state = APPLICATION_START;
-  rtt_printf("Host connection\n");
+  amk_printf("Host connection\n");
   break;
 
   default:

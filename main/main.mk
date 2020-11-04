@@ -3,18 +3,18 @@ MAIN_DIR := main
 
 SRCS += \
 	$(MAIN_DIR)/main.c  \
-	$(MAIN_DIR)/xprintf.c \
 	$(MAIN_DIR)/custom_action.c \
 	$(MAIN_DIR)/amk_keymap.c \
 	$(MAIN_DIR)/usb_descriptors.c \
+	$(MAIN_DIR)/amk_printf.c \
 
 INCS += \
 	$(MAIN_DIR) \
-	$(MAIN_DIR)/rtt \
 	$(MAIN_DIR)/porting \
 	$(MAIN_DIR)/drivers \
 	$(MAIN_DIR)/rgb \
 	$(MAIN_DIR)/screen \
+	$(MAIN_DIR)/rtt \
 	lib/tinyusb/src \
 
 
@@ -57,7 +57,6 @@ endif
 ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
 	SRCS += $(MAIN_DIR)/suspend.c
 	SRCS += $(MAIN_DIR)/rtt/SEGGER_RTT.c
-	SRCS += $(MAIN_DIR)/rtt/SEGGER_RTT_printf.c
 	include $(MAIN_DIR)/porting/stm32.mk
 endif
 

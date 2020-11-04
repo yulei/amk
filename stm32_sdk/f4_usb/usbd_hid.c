@@ -5,7 +5,7 @@
 #include "usbd_hid.h"
 #include "usbd_ctlreq.h"
 #include "usb_descriptors.h"
-#include "rtt.h"
+#include "amk_printf.h"
 
 static uint8_t  USBD_HID_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, void* user);
 static uint8_t  USBD_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user);
@@ -70,11 +70,11 @@ static uint8_t  USBD_HID_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *r
                         }
                     } else if (req->wValue >> 8 == HID_DESC_TYPE_HID) {
                         if (hhid->IsKeyboard) {
-                            len = tud_descriptor_hid_kbd_size();
-                            pbuf = (uint8_t*)tud_descriptor_hid_kbd_cb();
+                            len = tud_descriptor_hid_interface_kbd_size();
+                            pbuf = (uint8_t*)tud_descriptor_hid_interface_kbd_cb();
                         } else {
-                            len = tud_descriptor_hid_other_size();
-                            pbuf = (uint8_t*)tud_descriptor_hid_other_cb();
+                            len = tud_descriptor_hid_interface_other_size();
+                            pbuf = (uint8_t*)tud_descriptor_hid_interface_other_cb();
                         }
                     } else {
                         USBD_CtlError(pdev, req);
@@ -125,7 +125,7 @@ static uint8_t  USBD_HID_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum, void* u
 static uint8_t  USBD_HID_Write(USBD_HandleTypeDef *pdev, uint8_t epnum, uint8_t* data, uint16_t size, void* user)
 {
     USBD_HID_HandleTypeDef* hhid = (USBD_HID_HandleTypeDef*)user;
-    rtt_printf("USBD HID Write: state=%d, size=%d\n", hhid->state, size);
+    amk_printf("USBD HID Write: state=%d, size=%d\n", hhid->state, size);
     if (hhid->state == HIDD_IDLE) {
         hhid->state = HIDD_BUSY;
         return USBD_LL_Transmit(pdev, epnum, data, size);

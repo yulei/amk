@@ -27,7 +27,7 @@
 #include "usbd_composite.h"
 
 /* USER CODE BEGIN Includes */
-#include "rtt.h"
+#include "amk_printf.h"
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN PV */
@@ -71,17 +71,17 @@ void MX_USB_DEVICE_Init(void)
   /* Init Device Library, add supported class and start the library. */
   if (USBD_Init(&hUsbDeviceFS, &FS_Desc, DEVICE_FS) != USBD_OK)
   {
-      rtt_printf("USBD_Init failed\n");
+    amk_printf("USBD_Init failed\n");
     Error_Handler();
   }
   if (USBD_RegisterClass(&hUsbDeviceFS, &USBD_COMP) != USBD_OK)
   {
-      rtt_printf("USBD_RegisterClass failed\n");
+    amk_printf("USBD_RegisterClass failed\n");
     Error_Handler();
   }
   if (USBD_Start(&hUsbDeviceFS) != USBD_OK)
   {
-      rtt_printf("USBD_Start failed\n");
+    amk_printf("USBD_Start failed\n");
     Error_Handler();
   }
 

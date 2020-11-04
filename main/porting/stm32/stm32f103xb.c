@@ -4,7 +4,7 @@
 
 #include "generic_hal.h"
 #include "usb_descriptors.h"
-#include "rtt.h"
+#include "amk_printf.h"
 
 void USB_HP_IRQHandler(void)
 {

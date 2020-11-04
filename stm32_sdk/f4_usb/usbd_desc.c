@@ -22,7 +22,7 @@
 #include "usbd_desc.h"
 #include "usbd_conf.h"
 #include "usb_descriptors.h"
-#include "rtt.h"
+#include "amk_printf.h"
 
 #define USBD_CONFIGURATION_STRING_FS "HID Config"
 #define USBD_INTERFACE_STRING_FS "HID Interface"

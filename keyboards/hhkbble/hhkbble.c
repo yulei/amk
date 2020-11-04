@@ -7,7 +7,7 @@
 #include "gpio_pin.h"
 #include "rgb_effects.h"
 #include "aw9523b.h"
-#include "rtt.h"
+#include "amk_printf.h"
 #include "led.h"
 
 extern void keyboard_set_rgb(bool on);

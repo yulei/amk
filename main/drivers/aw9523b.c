@@ -7,7 +7,7 @@
 #include "aw9523b.h"
 #include "wait.h"
 #include "i2c.h"
-#include "rtt.h"
+#include "amk_printf.h"
 
 #define AW9523B_P0_INPUT    0x00
 #define AW9523B_P1_INPUT    0x01

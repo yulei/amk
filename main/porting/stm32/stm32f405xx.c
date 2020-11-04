@@ -3,7 +3,7 @@
  */
 
 #include "generic_hal.h"
-#include "rtt.h"
+#include "amk_printf.h"
 
 void Error_Handler(void)
 {

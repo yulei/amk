@@ -7,14 +7,14 @@
 #include "rgb_effects.h"
 
 #include "action.h"
-#include "rtt.h"
+#include "amk_printf.h"
 
 
 __attribute__((weak))
 void keyboard_set_rgb(bool on)
 {
 #ifdef RGB_EFFECTS_ENABLE
-    rtt_printf("keyboard_set_rgb: %d\n", on);
+    amk_printf("keyboard_set_rgb: %d\n", on);
     if (on) {
         if (!rgb_effects_enabled()) {
             rgb_effects_toggle();
@@ -36,7 +36,7 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
         case AF_RGB_TOG:
             rgb_effects_toggle();
             keyboard_set_rgb(rgb_effects_enabled());
-            rtt_printf("Toggle rgb: %d\n", rgb_effects_enabled());
+            amk_printf("Toggle rgb: %d\n", rgb_effects_enabled());
             break;
         case AF_RGB_MOD:
             rgb_effects_inc_mode();

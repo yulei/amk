@@ -11,7 +11,7 @@
 #include "timer.h"
 #include "rgb_driver.h"
 #include "rgb_effects.h"
-#include "rtt.h"
+#include "amk_printf.h"
 #include "wait.h"
 
 typedef struct {

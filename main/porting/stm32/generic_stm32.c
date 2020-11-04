@@ -4,7 +4,7 @@
 
 #include "generic_hal.h"
 #include "board.h"
-#include "rtt.h"
+#include "amk_printf.h"
 #include "usb_interface.h"
 #include "amk_keymap.h"
 

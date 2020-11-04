@@ -5,7 +5,7 @@
 #include "usbd_webusb.h"
 #include "usbd_ctlreq.h"
 #include "usb_descriptors.h"
-#include "rtt.h"
+#include "amk_printf.h"
 
 static uint8_t  USBD_WEBUSB_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, void* user); 
 static uint8_t  USBD_WEBUSB_DataIn(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user);
@@ -35,21 +35,21 @@ static uint8_t  USBD_WEBUSB_Setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef
         case VENDOR_REQUEST_WEBUSB: {
             len = tud_descriptor_url_size();
             pbuf = (uint8_t*)tud_descriptor_url_cb();
-            rtt_printf("WEBUSB Setup: size=%d\n", len);
+            amk_printf("WEBUSB Setup: size=%d\n", len);
         } break;
         case VENDOR_REQUEST_MICROSOFT: {
             if ( req->wIndex == 7 ) {
                 len = tud_descriptor_msos20_size();
                 pbuf = (uint8_t*)tud_descriptor_msos20_cb();
-                rtt_printf("Microsoft Setup: size=%d\n", len);
+                amk_printf("Microsoft Setup: size=%d\n", len);
             }
         } break;
         default:
-            rtt_printf("WEBUSB Setup unknow vender request: request=%d, index=%d\n", req->bRequest, req->wIndex);
+            amk_printf("WEBUSB Setup unknow vender request: request=%d, index=%d\n", req->bRequest, req->wIndex);
             break;
         }
     } else {
-        rtt_printf("WEBUSB Setup unknow interface request: request=%d, index=%d\n", req->bRequest, req->wIndex);
+        amk_printf("WEBUSB Setup unknow interface request: request=%d, index=%d\n", req->bRequest, req->wIndex);
     }
 
     if (len > 0) {
@@ -72,7 +72,7 @@ __attribute__((weak)) void uart_keymap_get(uint8_t layer, uint8_t row, uint8_t c
 static uint8_t  USBD_WEBUSB_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user)
 {
     USBD_WEBUSB_HandleTypeDef* hwusb = (USBD_WEBUSB_HandleTypeDef*)user;
-    rtt_printf("WEBUSB DataOut: epnum=%d status=%d is_used=%d total_length=%d rem_length=%d fist_data=%d, rxDataSize=%d\n",
+    amk_printf("WEBUSB DataOut: epnum=%d status=%d is_used=%d total_length=%d rem_length=%d fist_data=%d, rxDataSize=%d\n",
             epnum,
             pdev->ep_out[epnum].status,
             pdev->ep_out[epnum].is_used,
@@ -85,7 +85,7 @@ static uint8_t  USBD_WEBUSB_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum, voi
     switch (hwusb->recv_buffer[0]) {
         case WEBUSB_KEYMAP_SET:
             //uart_keymap_set(hwusb->recv_buffer[1], hwusb->recv_buffer[2], hwusb->recv_buffer[3], (hwusb->recv_buffer[5]<<8) | hwusb->recv_buffer[4]);
-            rtt_printf("cmd=%d, layer=%d, row=%d, col=%d, keycode=%d\n",
+            amk_printf("cmd=%d, layer=%d, row=%d, col=%d, keycode=%d\n",
                         hwusb->recv_buffer[0], 
                         hwusb->recv_buffer[1],
                         hwusb->recv_buffer[2],
@@ -95,7 +95,7 @@ static uint8_t  USBD_WEBUSB_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum, voi
             
         case WEBUSB_KEYMAP_GET:
             //uart_keymap_get(hwusb->recv_buffer[1], hwusb->recv_buffer[2], hwusb->recv_buffer[3]);
-            rtt_printf("cmd=%d, layer=%d, row=%d, col=%d\n",
+            amk_printf("cmd=%d, layer=%d, row=%d, col=%d\n",
                         hwusb->recv_buffer[0], 
                         hwusb->recv_buffer[1],
                         hwusb->recv_buffer[2],
@@ -106,7 +106,7 @@ static uint8_t  USBD_WEBUSB_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum, voi
             USBD_LL_Transmit(pdev, 0x83, hwusb->send_buffer, 32);
             break;
         default:
-            rtt_printf("WEBUSB unknown command: %d\n",hwusb->recv_buffer[0]);
+            amk_printf("WEBUSB unknown command: %d\n",hwusb->recv_buffer[0]);
             break;
     }
 

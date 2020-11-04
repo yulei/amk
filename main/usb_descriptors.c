@@ -1,33 +1,10 @@
-/* 
- * The MIT License (MIT)
- *
- * Copyright (c) 2019 Ha Thach (tinyusb.org)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
+/** 
+ * @file usb_descriptors.c 
  */
 
 #include "usb_descriptors.h"
 
-//--------------------------------------------------------------------+
 // Device Descriptors
-//--------------------------------------------------------------------+
 tusb_desc_device_t const desc_device =
 {
     .bLength            = sizeof(tusb_desc_device_t),
@@ -50,7 +27,6 @@ tusb_desc_device_t const desc_device =
 };
 
 // Invoked when received GET DEVICE DESCRIPTOR
-// Application return pointer to descriptor
 uint8_t const* tud_descriptor_device_cb(void)
 {
     return (uint8_t *) &desc_device;
@@ -61,16 +37,13 @@ uint32_t tud_descriptor_device_size(void)
     return sizeof(desc_device);
 }
 
-//--------------------------------------------------------------------+
-// HID Report Descriptor
-//--------------------------------------------------------------------+
+// HID Keyboard Report Descriptor
 static uint8_t desc_hid_report_kbd[] =
 {
     TUD_HID_REPORT_DESC_KEYBOARD(),
 };
 
-
-
+// HID other report
 static uint8_t desc_hid_report_other[] =
 {
     TUD_HID_REPORT_DESC_MOUSE( HID_REPORT_ID(HID_REPORT_ID_MOUSE) ),
@@ -78,11 +51,9 @@ static uint8_t desc_hid_report_other[] =
 };
 
 // Invoked when received GET HID REPORT DESCRIPTOR
-// Application return pointer to descriptor
-// Descriptor contents must exist long enough for transfer to complete
 uint8_t const* tud_descriptor_hid_report_kbd_cb(void)
 {
-    return (uint8_t*)(&desc_hid_report_kbd[0]);
+    return desc_hid_report_kbd;
 }
 
 uint32_t tud_descriptor_hid_report_kbd_size(void)
@@ -90,22 +61,19 @@ uint32_t tud_descriptor_hid_report_kbd_size(void)
     return sizeof(desc_hid_report_kbd);
 }
 
+// Invoked when received GET HID REPORT DESCRIPTOR
 uint8_t const* tud_descriptor_hid_report_other_cb(void)
 {
-    return (uint8_t*)(&desc_hid_report_other[0]);
+    return desc_hid_report_other;
 }
 
 uint32_t tud_descriptor_hid_report_other_size(void)
 {
     return sizeof(desc_hid_report_other);
 }
-//--------------------------------------------------------------------+
+
 // Configuration Descriptor
-//--------------------------------------------------------------------+
-
-
 #define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + TUD_VENDOR_DESC_LEN)
-
 
 static uint8_t desc_configuration[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
@@ -118,6 +86,29 @@ static uint8_t desc_configuration[] = {
     TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, 0, EPNUM_VENDOR_OUT, 0x80|EPNUM_VENDOR_IN, CFG_TUD_VENDOR_EPSIZE),
 };
 
+
+// Invoked when received GET CONFIGURATION DESCRIPTOR
+uint8_t const* tud_descriptor_configuration_cb(uint8_t index)
+{
+    return desc_configuration;
+}
+
+uint32_t tud_descriptor_configuration_size(uint8_t index)
+{
+    return sizeof(desc_configuration);
+}
+
+// Invoked when received GET HID REPORT DESCRIPTOR
+uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf)
+{
+    if (itf == ITF_NUM_HID_KBD) {
+        return tud_descriptor_hid_report_kbd_cb();
+    } else if (itf == ITF_NUM_HID_OTHER) {
+        return tud_descriptor_hid_report_other_cb();
+    }
+    return NULL;
+}
+
 static uint8_t desc_hid_kbd[] = {
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
 };
@@ -126,64 +117,29 @@ static uint8_t desc_hid_other[] = {
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
 };
 
-// Invoked when received GET CONFIGURATION DESCRIPTOR
-// Application return pointer to descriptor
-// Descriptor contents must exist long enough for transfer to complete
-uint8_t const* tud_descriptor_configuration_cb(uint8_t index)
+// Invoded when received GET HID DESCRIPTOR
+uint8_t const* tud_descriptor_hid_interface_kbd_cb(void)
 {
-    return (uint8_t*)(&desc_configuration[0]);
+    return desc_hid_kbd;
 }
 
-uint32_t tud_descriptor_configuration_size(uint8_t index)
-{
-    return sizeof(desc_configuration);
-}
-
-uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf)
-{
-    if (itf == ITF_NUM_HID_KBD) {
-        return tud_descriptor_hid_kbd_cb();
-    } else if (itf == ITF_NUM_HID_OTHER) {
-        return tud_descriptor_hid_other_cb();
-    }
-    return NULL;
-}
-
-uint8_t const* tud_descriptor_hid_kbd_cb(void)
-{
-    return (uint8_t*)(&desc_hid_kbd[0]);
-}
-
-uint32_t tud_descriptor_hid_kbd_size(void)
+uint32_t tud_descriptor_hid_interface_kbd_size(void)
 {
     return sizeof(desc_hid_kbd);
 }
 
-uint8_t const* tud_descriptor_hid_other_cb(void)
+// Invoded when received GET HID DESCRIPTOR
+uint8_t const* tud_descriptor_hid_interface_other_cb(void)
 {
-    return (uint8_t*)(&desc_hid_other[0]);
+    return desc_hid_other;
 }
 
-uint32_t tud_descriptor_hid_other_size(void)
+uint32_t tud_descriptor_hid_interface_other_size(void)
 {
     return sizeof(desc_hid_other);
 }
-//--------------------------------------------------------------------+
+
 // BOS Descriptor
-//--------------------------------------------------------------------+
-
-/* Microsoft OS 2.0 registry property descriptor
-Per MS requirements https://msdn.microsoft.com/en-us/library/windows/hardware/hh450799(v=vs.85).aspx
-device should create DeviceInterfaceGUIDs. It can be done by driver and
-in case of real PnP solution device should expose MS "Microsoft OS 2.0
-registry property descriptor". Such descriptor can insert any record
-into Windows registry per device/configuration/interface. In our case it
-will insert "DeviceInterfaceGUIDs" multistring property.
-GUID is freshly generated and should be OK to use.
-https://developers.google.com/web/fundamentals/native-hardware/build-for-webusb/
-(Section Microsoft OS compatibility descriptors)
-*/
-
 #define BOS_TOTAL_LEN      (TUD_BOS_DESC_LEN + TUD_BOS_WEBUSB_DESC_LEN + TUD_BOS_MICROSOFT_OS_DESC_LEN)
 
 #define MS_OS_20_DESC_LEN  0xB2
@@ -202,7 +158,7 @@ static uint8_t desc_bos[] = {
 
 uint8_t const* tud_descriptor_bos_cb(void)
 {
-    return (uint8_t*)(&desc_bos[0]);
+    return desc_bos;
 }
 
 uint32_t tud_descriptor_bos_size(void)
@@ -268,9 +224,7 @@ uint32_t tud_descriptor_msos20_size(void)
     return MS_OS_20_DESC_LEN;
 }
 
-//--------------------------------------------------------------------+
 // String Descriptors
-//--------------------------------------------------------------------+
 
 // array of pointer to string descriptors
 char const* string_desc_arr [] =
@@ -279,9 +233,10 @@ char const* string_desc_arr [] =
     TU_XSTRING(MANUFACTURER),       // 1: Manufacturer
     TU_XSTRING(PRODUCT),            // 2: Product
     "123456",                       // 3: Serials, should use chip ID
-    "HID Config",                   // 4: Device configuration 
+    "Configuration",                // 4: Device configuration 
     "HID Keyboard",                 // 5: Hid keyboard
-    "WebUSB",                       // 6: Webusb interface
+    "HID Extra",                    // 6: Hid extra key
+    "WebUSB",                       // 7: Webusb interface
 };
 
 static uint16_t _desc_str[32];
@@ -295,7 +250,6 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 }
 
 // Invoked when received GET STRING DESCRIPTOR request
-// Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
 uint8_t *get_descriptor_str(uint8_t index, uint16_t *length)
 {
     uint8_t chr_count;
