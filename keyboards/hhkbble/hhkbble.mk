@@ -9,7 +9,7 @@ INCS += \
 
 MCU = NRF52832
 BOOTMAGIC_ENABLE = yes
-#RGB_EFFECTS_ENABLE = yes
+RGB_EFFECTS_ENABLE = yes
 
 ifeq (yes,$(strip $(ACTIONMAP_ENABLE)))
 	SRCS += $(HHKBBLE_DIR)/hhkbble_action.c

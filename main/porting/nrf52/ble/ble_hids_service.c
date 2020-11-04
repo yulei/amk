@@ -9,12 +9,8 @@
 
 const static uint8_t hid_report_descriptor [] = {
     TUD_HID_REPORT_DESC_KEYBOARD( HID_REPORT_ID(NRF_REPORT_ID_KEYBOARD) ),
-#ifdef MOUSE_ENABLE
     TUD_HID_REPORT_DESC_MOUSE   ( HID_REPORT_ID(NRF_REPORT_ID_MOUSE) ),
-#endif
-#ifdef EXTRAKEY_ENABLE
     TUD_HID_REPORT_DESC_EXTRA( NRF_REPORT_ID_SYSTEM, NRF_REPORT_ID_CONSUMER),
-#endif
 };
 
 typedef struct {
@@ -24,14 +20,10 @@ typedef struct {
 
 static report_entry_t report_entries[NRF_REPORT_ID_MAX] = {
     {NRF_REPORT_ID_KEYBOARD, NRF_INPUT_REPORT_KEYBOARD_MAX_LEN},
-#ifdef MOUSE_ENABLE
     {NRF_REPORT_ID_MOUSE, NRF_INPUT_REPORT_MOUSE_MAX_LEN},
-#endif
-#ifdef EXTRAKEY_ENABLE
     {NRF_REPORT_ID_SYSTEM, NRF_INPUT_REPORT_SYSTEM_MAX_LEN},
     {NRF_REPORT_ID_CONSUMER, NRF_INPUT_REPORT_CONSUMER_MAX_LEN},
-#endif
-    };
+};
 
 #define REPORT_ID_TO_INDEX(x) ((x)-1)
 
@@ -86,13 +78,9 @@ static bool              m_in_boot_mode = false;                    /**< Current
 BLE_HIDS_DEF(m_hids,                                                /**< Structure used to identify the HID service. */
              NRF_SDH_BLE_TOTAL_LINK_COUNT,
              NRF_INPUT_REPORT_KEYBOARD_MAX_LEN,
-            #ifdef MOUSE_ENABLE
              NRF_INPUT_REPORT_MOUSE_MAX_LEN,
-            #endif
-            #ifdef EXTRAKEY_ENABLE
              NRF_INPUT_REPORT_SYSTEM_MAX_LEN,
              NRF_INPUT_REPORT_CONSUMER_MAX_LEN,
-            #endif
              OUTPUT_REPORT_MAX_LEN,
              FEATURE_REPORT_MAX_LEN);
 

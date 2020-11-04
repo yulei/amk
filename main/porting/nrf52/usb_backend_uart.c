@@ -267,7 +267,6 @@ static void uart_process_cmd(const uint8_t* cmd, uint32_t size)
             NRF_LOG_INFO("Led setting from usb master: %x", cmd[1]);
             usb_config.event.leds_cb(cmd[1]);
         } break;
-#ifdef WEBUSB_ENABLE
         case CMD_KEYMAP_SET: {
             uint16_t key = (cmd[4] << 8) | (cmd[5]);
             NRF_LOG_INFO("Keymap Set: layer=%d, row=%d, col=%d, key=%d", cmd[1], cmd[2], cmd[3], key);
@@ -285,7 +284,6 @@ static void uart_process_cmd(const uint8_t* cmd, uint32_t size)
             buf[4] = keycode & 0xFF;
             uart_send_cmd(CMD_KEYMAP_GET_ACK, buf, 5);
         } break;
-#endif
         default: {
             // invalid command
             NRF_LOG_WARNING("Invalid command from usb master: %x", cmd[0]);

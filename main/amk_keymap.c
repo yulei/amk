@@ -84,5 +84,7 @@ uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
 
 #else
 void amk_keymap_init(void){}
+void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode) {}
+uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col) {return 0;}
 
 #endif
