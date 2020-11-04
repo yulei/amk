@@ -31,6 +31,15 @@ BUILD_DIR := $(OUTPUT_DIRECTORY)/$(TARGET)
 OBJS += $(patsubst %.s,$(BUILD_DIR)/%.o,$(patsubst %.S,$(BUILD_DIR)/%.o,$(filter %.s %.S,$(SRCS))))
 OBJS += $(patsubst %.c,$(BUILD_DIR)/%.o,$(patsubst %.cpp,$(BUILD_DIR)/%.o,$(filter-out %.s %.S,$(SRCS))))
 
+ifndef PROGRESS 
+T := $(shell $(MAKE) $(TARGET) --no-print-directory \
+      -nrRf $(firstword $(MAKEFILE_LIST)) \
+      PROGRESS="COUNTTHIS" | grep -c "COUNTTHIS")
+N := x
+C = $(words $N)$(eval N := x $N)
+PROGRESS = echo -n "[`expr $C '*' 100 / $T`%]"
+endif
+
 # Create build directories
 OBJ_DIRS = $(sort $(dir $(OBJS)))
 $(OBJS): | $(OBJ_DIRS)
@@ -91,22 +100,25 @@ ALL_CPPFLAGS = -x c++ $(CPPFLAGS) $(GENDEPFLAGS) $(INC_FLAGS)
 ALL_ASFLAGS = -x assembler-with-cpp $(ASMFLAGS) $(GENDEPFLAGS) $(INC_FLAGS)
 ALL_LDFLAGS = $(LDFLAGS) -Xlinker -Map=$(OUTPUT_DIRECTORY)/$(TARGET).map
 # Create object files from C source files
+define RES_STR 
+echo -ne "\033[60G[\033[32mok\033[0m]\n"
+endef
 
 $(BUILD_DIR)/%.o : %.c
-	@$(PROGRESS) Compiling: $<
-	$(NO_ECHO)$(CC) -c $(ALL_CFLAGS) $< -o $@ 
+	@$(PROGRESS) Compiling: $(notdir $<)
+	$(NO_ECHO)$(CC) -c $(ALL_CFLAGS) $< -o $@ && $(RES_STR)
 
 # Create object files from C++ source files
 $(BUILD_DIR)/%.o : %.cpp
-	@$(PROGRESS) Compiling: $<
-	$(NO_ECHO)$(CC) -c $(ALL_CPPFLAGS) $< -o $@ 
+	@$(PROGRESS) Compiling: $(notdir $<)
+	$(NO_ECHO)$(CC) -c $(ALL_CPPFLAGS) $< -o $@ && $(RES_STR)
 
 # Create object files from assembly source files
 define assembling
-	$(NO_ECHO)$(CC) -c $(ALL_ASFLAGS) $< -o $@
+	$(NO_ECHO)$(CC) -c $(ALL_ASFLAGS) $< -o $@ && $(RES_STR)
 endef
 $(BUILD_DIR)/%.o : %.s
-	@$(PROGRESS) Assembling: $<
+	@$(PROGRESS) Assembling: $(notdir $<)
 	$(assembling)
 
 $(BUILD_DIR)/%.o : %.S
