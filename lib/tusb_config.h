@@ -65,11 +65,11 @@
 #endif
 
 // This example doesn't use an RTOS
-#define CFG_TUSB_OS               OPT_OS_NONE
+#define CFG_TUSB_OS                 OPT_OS_NONE
 
 // CFG_TUSB_DEBUG is defined by compiler in DEBUG build
-#define CFG_TUSB_DEBUG           2
-
+#define CFG_TUSB_DEBUG              2
+#define CFG_TUSB_DEBUG_PRINTF       printf_
 /* USB DMA on some MCUs can only access a specific SRAM region with restriction on alignment.
  * Tinyusb use follows macros to declare transferring memory so that they can be put
  * into those specific section.
@@ -90,7 +90,7 @@
 #define CFG_TUD_CDC               0
 #define CFG_TUD_MSC               0
 #define CFG_TUD_MIDI              0
-#define CFG_TUD_VENDOR            1
+#define CFG_TUD_VENDOR            0
 
 // interface configuration
 #define CFG_TUD_HID_EP_BUFSIZE      16

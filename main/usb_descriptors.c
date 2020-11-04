@@ -9,7 +9,7 @@ tusb_desc_device_t const desc_device =
 {
     .bLength            = sizeof(tusb_desc_device_t),
     .bDescriptorType    = TUSB_DESC_DEVICE,
-    .bcdUSB             = 0x0210, // at least 2.1 or 3.x for BOS & webUSB
+    .bcdUSB             = 0x0200, // at least 2.1 or 3.x for BOS & webUSB
     .bDeviceClass       = 0x00,
     .bDeviceSubClass    = 0x00,
     .bDeviceProtocol    = 0x00,
@@ -73,7 +73,7 @@ uint32_t tud_descriptor_hid_report_other_size(void)
 }
 
 // Configuration Descriptor
-#define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + TUD_VENDOR_DESC_LEN)
+#define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN)// + TUD_VENDOR_DESC_LEN)
 
 static uint8_t desc_configuration[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
@@ -83,7 +83,7 @@ static uint8_t desc_configuration[] = {
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
 
     // Interface number, string index, EP Out & IN address, EP size
-    TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, 0, EPNUM_VENDOR_OUT, 0x80|EPNUM_VENDOR_IN, CFG_TUD_VENDOR_EPSIZE),
+    //TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, 0, EPNUM_VENDOR_OUT, 0x80|EPNUM_VENDOR_IN, CFG_TUD_VENDOR_EPSIZE),
 };
 
 
@@ -193,7 +193,7 @@ static uint8_t desc_ms_os_20[] = {
     U16_TO_U8S_LE(0x0008), U16_TO_U8S_LE(MS_OS_20_SUBSET_HEADER_CONFIGURATION), 0, 0, U16_TO_U8S_LE(MS_OS_20_DESC_LEN-0x0A),
 
     // Function Subset header: length, type, first interface, reserved, subset length
-    U16_TO_U8S_LE(0x0008), U16_TO_U8S_LE(MS_OS_20_SUBSET_HEADER_FUNCTION), ITF_NUM_VENDOR, 0, U16_TO_U8S_LE(MS_OS_20_DESC_LEN-0x0A-0x08),
+    U16_TO_U8S_LE(0x0008), U16_TO_U8S_LE(MS_OS_20_SUBSET_HEADER_FUNCTION), /*ITF_NUM_VENDOR*/0, 0, U16_TO_U8S_LE(MS_OS_20_DESC_LEN-0x0A-0x08),
 
     // MS OS 2.0 Compatible ID descriptor: length, type, compatible ID, sub compatible ID
     U16_TO_U8S_LE(0x0014), U16_TO_U8S_LE(MS_OS_20_FEATURE_COMPATBLE_ID), 'W', 'I', 'N', 'U', 'S', 'B', 0x00, 0x00,

@@ -39,7 +39,7 @@
 enum {
     ITF_NUM_HID_KBD,
     ITF_NUM_HID_OTHER,
-    ITF_NUM_VENDOR,
+    //ITF_NUM_VENDOR,
     ITF_NUM_TOTAL
 };
 
@@ -59,7 +59,6 @@ enum {
     HID_REPORT_ID_MOUSE,
     HID_REPORT_ID_SYSTEM,
     HID_REPORT_ID_CONSUMER,
-    HID_REPORT_ID_WEBUSB,
 };
 
 // Vendor request id

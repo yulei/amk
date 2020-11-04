@@ -1,37 +1,37 @@
 
 
 Breakpoint=0x00000000, State=BP_STATE_DISABLED
+OpenDocument="main.c", FilePath="D:/msys64/home/astro/amk/main/main.c", Line=0
 OpenDocument="tusb_common.h", FilePath="D:/msys64/home/astro/amk/lib/tinyusb/src/common/tusb_common.h", Line=81
 OpenDocument="usbd.c", FilePath="D:/msys64/home/astro/amk/lib/tinyusb/src/device/usbd.c", Line=877
 OpenDocument="tusb.c", FilePath="D:/msys64/home/astro/amk/lib/tinyusb/src/tusb.c", Line=35
 OpenDocument="stm32f103xb.c", FilePath="D:/msys64/home/astro/amk/main/porting/stm32/stm32f103xb.c", Line=91
 OpenDocument="generic_stm32.c", FilePath="D:/msys64/home/astro/amk/main/porting/stm32/generic_stm32.c", Line=45
-OpenDocument="main.c", FilePath="D:/msys64/home/astro/amk/main/main.c", Line=0
 OpenDocument="startup_stm32f103xb.s", FilePath="D:/msys64/home/astro/amk/stm32_sdk/startup_stm32f103xb.s", Line=50
 OpenDocument="usb_tinyusb.c", FilePath="D:/msys64/home/astro/amk/main/porting/stm32/usb_tinyusb.c", Line=0
-OpenDocument="usb_descriptors.c", FilePath="D:/msys64/home/astro/amk/main/usb_descriptors.c", Line=40
+OpenDocument="usb_descriptors.c", FilePath="D:/msys64/home/astro/amk/main/usb_descriptors.c", Line=0
 OpenToolbar="View", Floating=0, x=0, y=0
 OpenToolbar="Debug", Floating=0, x=1, y=0
-OpenWindow="Call Stack", DockArea=RIGHT, x=0, y=4, w=399, h=270, FilterBarShown=0, ToolBarShown=0
-OpenWindow="Registers 1", DockArea=RIGHT, x=0, y=5, w=399, h=233, FilterBarShown=0, ToolBarShown=0, FilteredItems=[], RefreshRate=1
-OpenWindow="Source Files", DockArea=LEFT, x=0, y=3, w=937, h=255, FilterBarShown=1, ToolBarShown=0
-OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=1, w=399, h=278, FilterBarShown=0, ToolBarShown=0, ExecCountersShown=0, InstEncodingsShown=0
+OpenWindow="Call Stack", DockArea=RIGHT, x=0, y=4, w=399, h=268, FilterBarShown=0, ToolBarShown=0
+OpenWindow="Registers 1", DockArea=RIGHT, x=0, y=5, w=399, h=232, FilterBarShown=0, ToolBarShown=0, FilteredItems=[], RefreshRate=1
+OpenWindow="Source Files", DockArea=LEFT, x=0, y=3, w=937, h=257, FilterBarShown=1, ToolBarShown=0
+OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=1, w=399, h=274, FilterBarShown=0, ToolBarShown=0, ExecCountersShown=0, InstEncodingsShown=0
 OpenWindow="Source", x=0, y=0, w=0, h=0, FilterBarShown=0, ToolBarShown=0, ExecCountersShown=0
 OpenWindow="Memory 1", DockArea=BOTTOM, x=2, y=0, w=1688, h=548, FilterBarShown=0, ToolBarShown=0, EditorAddress=0x20001640
-OpenWindow="Global Data", DockArea=RIGHT, x=0, y=2, w=399, h=271, FilterBarShown=1, ToolBarShown=0
-OpenWindow="Watched Data", DockArea=RIGHT, x=0, y=3, w=399, h=269, FilterBarShown=0, ToolBarShown=0
-OpenWindow="Functions", DockArea=LEFT, x=0, y=2, w=937, h=539, FilterBarShown=1, ToolBarShown=0
-OpenWindow="Call Graph", DockArea=LEFT, x=0, y=0, w=937, h=478, FilterBarShown=1, ToolBarShown=0
-OpenWindow="Memory Usage", DockArea=LEFT, x=0, y=1, w=937, h=129, FilterBarShown=0, ToolBarShown=0
+OpenWindow="Global Data", DockArea=RIGHT, x=0, y=2, w=399, h=267, FilterBarShown=1, ToolBarShown=0
+OpenWindow="Watched Data", DockArea=RIGHT, x=0, y=3, w=399, h=265, FilterBarShown=0, ToolBarShown=0
+OpenWindow="Functions", DockArea=LEFT, x=0, y=2, w=937, h=518, FilterBarShown=1, ToolBarShown=0
+OpenWindow="Call Graph", DockArea=LEFT, x=0, y=0, w=937, h=463, FilterBarShown=1, ToolBarShown=0
+OpenWindow="Memory Usage", DockArea=LEFT, x=0, y=1, w=937, h=163, FilterBarShown=0, ToolBarShown=0
 OpenWindow="Terminal", DockArea=BOTTOM, x=1, y=0, w=1042, h=548, FilterBarShown=0, ToolBarShown=0
-OpenWindow="Find Results", DockArea=RIGHT, x=0, y=0, w=399, h=78, FilterBarShown=0, ToolBarShown=0
+OpenWindow="Find Results", DockArea=RIGHT, x=0, y=0, w=399, h=93, FilterBarShown=0, ToolBarShown=0
 OpenWindow="Console", DockArea=BOTTOM, x=0, y=0, w=1108, h=548, FilterBarShown=0, ToolBarShown=0
 TableHeader="Global Data", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Location";"Size";"Type";"Scope"], ColWidths=[699;105;138;94;94;421]
 TableHeader="Watched Data", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Value";"Location";"Refresh"], ColWidths=[190;191;131;101]
 TableHeader="Functions", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Address";"Size";"#Insts";"Source"], ColWidths=[471;131;94;116;355]
 TableHeader="Call Stack", SortCol="Function", SortOrder="ASCENDING", VisibleCols=["Function";"Stack Frame";"Source";"PC";"Return Address";"Stack Used"], ColWidths=[291;145;90;46;178;134]
 TableHeader="Source Files", SortCol="File", SortOrder="ASCENDING", VisibleCols=["File";"Status";"Size";"#Insts";"Path"], ColWidths=[306;116;94;116;1235]
+TableHeader="Call Graph", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Stack Total";"Stack Local";"Code Total";"Code Local";"Depth";"Called From"], ColWidths=[472;171;171;160;160;185;171]
 TableHeader="Power Sampling", SortCol="Index", SortOrder="ASCENDING", VisibleCols=["Index";"Time";"Ch 0"], ColWidths=[100;100;100]
 TableHeader="Registers 1", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Description"], ColWidths=[103;183;399]
-TableHeader="RegisterSelectionDialog", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Auto";"Name";"Address";"Description"], ColWidths=[26;26;26;29]
-TableHeader="Call Graph", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Stack Total";"Stack Local";"Code Total";"Code Local";"Depth";"Called From"], ColWidths=[472;171;171;160;160;185;171]
+TableHeader="RegisterSelectionDialog", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Auto";"Name";"Address";"Description"], ColWidths=[27;27;27;29]
