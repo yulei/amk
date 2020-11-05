@@ -1,4 +1,5 @@
 .vscode/
 build/
+keyboards/amkbd/
 nrf5_sdk/nRF5_SDK_*
 *.DS_Store

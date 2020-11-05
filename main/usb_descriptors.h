@@ -61,6 +61,7 @@ enum {
     HID_REPORT_ID_MOUSE,
     HID_REPORT_ID_SYSTEM,
     HID_REPORT_ID_CONSUMER,
+    HID_REPORT_ID_WEBUSB,
 };
 
 // Vendor request id

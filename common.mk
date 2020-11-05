@@ -32,7 +32,7 @@ OBJS += $(patsubst %.s,$(BUILD_DIR)/%.o,$(patsubst %.S,$(BUILD_DIR)/%.o,$(filter
 OBJS += $(patsubst %.c,$(BUILD_DIR)/%.o,$(patsubst %.cpp,$(BUILD_DIR)/%.o,$(filter-out %.s %.S,$(SRCS))))
 
 ifndef PROGRESS 
-T := $(shell $(MAKE) $(TARGET) --no-print-directory \
+T := $(shell $(MAKE) $(GOAL) --no-print-directory \
       -nrRf $(firstword $(MAKEFILE_LIST)) \
       PROGRESS="COUNTTHIS" | grep -c "COUNTTHIS")
 N := x

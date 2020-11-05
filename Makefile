@@ -17,18 +17,27 @@ LIBS += \
 # Definitions
 APP_DEFS += \
 
-TARGET := $(filter-out clean flash erase flash_softdevice sdk_config, $(MAKECMDGOALS))
-KEYBOARDS := $(sort $(filter-out %.h %.c,$(notdir $(wildcard keyboards/*))))
+GOAL := $(filter-out clean flash erase flash_softdevice sdk_config, $(MAKECMDGOALS))
 
 OUTPUT_DIRECTORY := build
 
-ifneq (, $(TARGET))
-ifeq ($(filter $(TARGET),$(KEYBOARDS)),)
-$(info A valid keyboard target must be provided, current available:)
-$(foreach kbd,$(KEYBOARDS),$(info $(kbd)))
-$(error Invalid Target specified)
+ifneq (, $(GOAL))
+GOAL_P := $(subst /, ,$(GOAL))
+TARGET := $(lastword $(GOAL_P))
+ifeq ($(words $(GOAL_P)),1)
+BASE_DIR := keyboards
+else ifeq ($(words $(GOAL_P)),2)
+BASE_DIR := keyboards/$(firstword $(GOAL_P))
+$(GOAL): $(TARGET)
+else
+$(error Invalid target: $(GOAL))
 endif
-include keyboards/$(TARGET)/$(TARGET).mk
+
+KEYBOARDS := $(sort $(notdir $(wildcard $(BASE_DIR)/*)))
+ifneq (,$(filter $(TARGET),$(KEYBOARDS)))
+include $(BASE_DIR)/$(TARGET)/$(TARGET).mk
+endif
+
 include main/main.mk
 include lib/tmk.mk
 include lib/printf.mk
@@ -48,19 +57,17 @@ endif
 .PHONY: default list
 
 # Default target
-ifneq (,$(TARGET))
-	default: $(TARGET)
-else
-	default: list 
+ifeq (,$(TARGET))
+default: list 
 endif
 
+KEYBOARDS := $(sort $(filter-out dev,$(notdir $(wildcard keyboards/*))))
 list:
 	$(info Following keyboards are available:)
 	$(foreach kbd,$(KEYBOARDS),$(info -- $(kbd)))
 	@echo
 
 include common.mk
-
 
 .PHONY: flash erase
 

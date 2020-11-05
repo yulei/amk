@@ -7,25 +7,25 @@ OpenDocument="usbd.c", FilePath="D:/msys64/home/astro/amk/lib/tinyusb/src/device
 OpenDocument="tusb.c", FilePath="D:/msys64/home/astro/amk/lib/tinyusb/src/tusb.c", Line=35
 OpenDocument="stm32f103xb.c", FilePath="D:/msys64/home/astro/amk/main/porting/stm32/stm32f103xb.c", Line=91
 OpenDocument="generic_stm32.c", FilePath="D:/msys64/home/astro/amk/main/porting/stm32/generic_stm32.c", Line=45
-OpenDocument="startup_stm32f103xb.s", FilePath="D:/msys64/home/astro/amk/stm32_sdk/startup_stm32f103xb.s", Line=50
+OpenDocument="startup_stm32f103xb.s", FilePath="D:/msys64/home/astro/amk/stm32_sdk/startup_stm32f103xb.s", Line=56
 OpenDocument="usb_tinyusb.c", FilePath="D:/msys64/home/astro/amk/main/porting/stm32/usb_tinyusb.c", Line=0
 OpenDocument="usb_descriptors.c", FilePath="D:/msys64/home/astro/amk/main/usb_descriptors.c", Line=0
 OpenToolbar="View", Floating=0, x=0, y=0
 OpenToolbar="Debug", Floating=0, x=1, y=0
-OpenWindow="Call Stack", DockArea=RIGHT, x=0, y=4, w=399, h=268, FilterBarShown=0, ToolBarShown=0
-OpenWindow="Registers 1", DockArea=RIGHT, x=0, y=5, w=399, h=232, FilterBarShown=0, ToolBarShown=0, FilteredItems=[], RefreshRate=1
-OpenWindow="Source Files", DockArea=LEFT, x=0, y=3, w=937, h=257, FilterBarShown=1, ToolBarShown=0
-OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=1, w=399, h=274, FilterBarShown=0, ToolBarShown=0, ExecCountersShown=0, InstEncodingsShown=0
+OpenWindow="Call Stack", DockArea=RIGHT, x=0, y=4, w=399, h=163, FilterBarShown=0, ToolBarShown=0
+OpenWindow="Registers 1", DockArea=RIGHT, x=0, y=5, w=399, h=163, FilterBarShown=0, ToolBarShown=0, FilteredItems=[], RefreshRate=1
+OpenWindow="Source Files", DockArea=LEFT, x=0, y=3, w=937, h=163, FilterBarShown=1, ToolBarShown=0
+OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=1, w=399, h=199, FilterBarShown=0, ToolBarShown=0, ExecCountersShown=0, InstEncodingsShown=0
 OpenWindow="Source", x=0, y=0, w=0, h=0, FilterBarShown=0, ToolBarShown=0, ExecCountersShown=0
-OpenWindow="Memory 1", DockArea=BOTTOM, x=2, y=0, w=1688, h=548, FilterBarShown=0, ToolBarShown=0, EditorAddress=0x20001640
-OpenWindow="Global Data", DockArea=RIGHT, x=0, y=2, w=399, h=267, FilterBarShown=1, ToolBarShown=0
-OpenWindow="Watched Data", DockArea=RIGHT, x=0, y=3, w=399, h=265, FilterBarShown=0, ToolBarShown=0
-OpenWindow="Functions", DockArea=LEFT, x=0, y=2, w=937, h=518, FilterBarShown=1, ToolBarShown=0
-OpenWindow="Call Graph", DockArea=LEFT, x=0, y=0, w=937, h=463, FilterBarShown=1, ToolBarShown=0
+OpenWindow="Memory 1", DockArea=BOTTOM, x=2, y=0, w=1688, h=1131, FilterBarShown=0, ToolBarShown=0, EditorAddress=0x20001640
+OpenWindow="Global Data", DockArea=RIGHT, x=0, y=2, w=399, h=163, FilterBarShown=1, ToolBarShown=0
+OpenWindow="Watched Data", DockArea=RIGHT, x=0, y=3, w=399, h=90, FilterBarShown=0, ToolBarShown=0
+OpenWindow="Functions", DockArea=LEFT, x=0, y=2, w=937, h=259, FilterBarShown=1, ToolBarShown=0
+OpenWindow="Call Graph", DockArea=LEFT, x=0, y=0, w=937, h=233, FilterBarShown=1, ToolBarShown=0
 OpenWindow="Memory Usage", DockArea=LEFT, x=0, y=1, w=937, h=163, FilterBarShown=0, ToolBarShown=0
-OpenWindow="Terminal", DockArea=BOTTOM, x=1, y=0, w=1042, h=548, FilterBarShown=0, ToolBarShown=0
-OpenWindow="Find Results", DockArea=RIGHT, x=0, y=0, w=399, h=93, FilterBarShown=0, ToolBarShown=0
-OpenWindow="Console", DockArea=BOTTOM, x=0, y=0, w=1108, h=548, FilterBarShown=0, ToolBarShown=0
+OpenWindow="Terminal", DockArea=BOTTOM, x=1, y=0, w=1042, h=1131, FilterBarShown=0, ToolBarShown=0
+OpenWindow="Find Results", DockArea=RIGHT, x=0, y=0, w=399, h=38, FilterBarShown=0, ToolBarShown=0
+OpenWindow="Console", DockArea=BOTTOM, x=0, y=0, w=1108, h=1131, FilterBarShown=0, ToolBarShown=0
 TableHeader="Global Data", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Location";"Size";"Type";"Scope"], ColWidths=[699;105;138;94;94;421]
 TableHeader="Watched Data", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Value";"Location";"Refresh"], ColWidths=[190;191;131;101]
 TableHeader="Functions", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Address";"Size";"#Insts";"Source"], ColWidths=[471;131;94;116;355]

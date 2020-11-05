@@ -1,5 +1,5 @@
 
-ONEKEY_DIR := $(TOP_DIR)/keyboards/onekey
+ONEKEY_DIR := keyboards/onekey
 
 SRCS += \
 	$(ONEKEY_DIR)/onekey.c \
