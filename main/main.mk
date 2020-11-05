@@ -46,6 +46,11 @@ ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))
 	APP_DEFS += -DRGB_EFFECTS_ENABLE
 endif
 
+ifeq (yes, $(strip $(WEBUSB_ENABLE)))
+	SRCS += $(MAIN_DIR)/webusb.c
+	APP_DEFS += -DWEBUSB_ENABLE
+endif
+
 ifneq (yes, $(strip $(CUSTOM_MATRIX)))
 	SRCS += $(MAIN_DIR)/matrix_scan.c
 endif

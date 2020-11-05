@@ -90,7 +90,11 @@
 #define CFG_TUD_CDC               0
 #define CFG_TUD_MSC               0
 #define CFG_TUD_MIDI              0
+#if WEBUSB_ENABLE
+#define CFG_TUD_VENDOR            1
+#else
 #define CFG_TUD_VENDOR            0
+#endif
 
 // interface configuration
 #define CFG_TUD_HID_EP_BUFSIZE      16

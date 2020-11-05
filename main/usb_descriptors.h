@@ -39,7 +39,9 @@
 enum {
     ITF_NUM_HID_KBD,
     ITF_NUM_HID_OTHER,
-    //ITF_NUM_VENDOR,
+#ifdef WEBUSB_ENABLE
+    ITF_NUM_VENDOR,
+#endif
     ITF_NUM_TOTAL
 };
 
@@ -47,7 +49,7 @@ enum {
 #define EPNUM_HID_KBD       0x01
 #define EPNUM_HID_OTHER     0x02
 #define EPNUM_VENDOR_OUT    0x03
-#if defined(STM32F103xB)
+#if defined(STM32F103xB) || defined(NRF52840_XXAA)
 #define EPNUM_VENDOR_IN     0x04
 #else
 #define EPNUM_VENDOR_IN     0x03
@@ -87,6 +89,7 @@ uint32_t tud_descriptor_hid_interface_kbd_size(void);
 uint8_t const* tud_descriptor_hid_interface_other_cb(void);
 uint32_t tud_descriptor_hid_interface_other_size(void);
 
+#ifdef WEBUSB_ENABLE
 uint8_t const* tud_descriptor_bos_cb(void);
 uint32_t tud_descriptor_bos_size(void);
 
@@ -95,6 +98,7 @@ uint32_t tud_descriptor_url_size(void);
 
 uint8_t const* tud_descriptor_msos20_cb(void);
 uint32_t tud_descriptor_msos20_size(void);
+#endif
 
 // String index
 enum {
