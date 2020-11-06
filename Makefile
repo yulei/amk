@@ -17,25 +17,28 @@ LIBS += \
 # Definitions
 APP_DEFS += \
 
-GOAL := $(filter-out clean flash erase flash_softdevice sdk_config, $(MAKECMDGOALS))
+GOALS := $(filter-out clean flash erase flash_softdevice sdk_config, $(MAKECMDGOALS))
 
 OUTPUT_DIRECTORY := build
 
-ifneq (, $(GOAL))
-GOAL_P := $(subst /, ,$(GOAL))
-TARGET := $(lastword $(GOAL_P))
-ifeq ($(words $(GOAL_P)),1)
+ifneq (, $(GOALS))
+GOAL_LIST := $(subst /, ,$(GOALS))
+TARGET := $(lastword $(GOAL_LIST))
+ifeq ($(words $(GOAL_LIST)),1)
 BASE_DIR := keyboards
-else ifeq ($(words $(GOAL_P)),2)
-BASE_DIR := keyboards/$(firstword $(GOAL_P))
-$(GOAL): $(TARGET)
+else ifeq ($(words $(GOAL_LIST)),2)
+BASE_DIR := keyboards/$(firstword $(GOAL_LIST))
+$(GOALS): $(TARGET)
 else
-$(error Invalid target: $(GOAL))
+$(error Invalid target: $(GOALS))
 endif
 
 KEYBOARDS := $(sort $(notdir $(wildcard $(BASE_DIR)/*)))
+KEYBOARD_DIR := $(BASE_DIR)/$(TARGET)
 ifneq (,$(filter $(TARGET),$(KEYBOARDS)))
-include $(BASE_DIR)/$(TARGET)/$(TARGET).mk
+include $(KEYBOARD_DIR)/$(TARGET).mk
+else
+$(error Unsupported Target: $(GOALS))
 endif
 
 include main/main.mk
@@ -54,22 +57,19 @@ ifeq (yes,$(SCREEN_ENABLE))
 include lib/lvgl.mk
 endif
 
-.PHONY: default list
+.PHONY: default list flash erase
 
 # Default target
 ifeq (,$(TARGET))
 default: list 
 endif
 
-KEYBOARDS := $(sort $(filter-out dev,$(notdir $(wildcard keyboards/*))))
 list:
-	$(info Following keyboards are available:)
-	$(foreach kbd,$(KEYBOARDS),$(info -- $(kbd)))
+	$(info Available Keyboards:)
+	$(foreach kbd,$(sort $(notdir $(wildcard keyboards/*))),$(info -- $(kbd)))
 	@echo
 
 include common.mk
-
-.PHONY: flash erase
 
 ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
 .PHONY: flash_softdevice
@@ -82,9 +82,9 @@ flash: default
 
 # Flash softdevice
 ifeq (NRF52832, $(strip $(MCU)))
-SOFTDEVICE_FILE := $(NRF5SDK_DIR)/components/softdevice/s132/hex/s132_nrf52_7.0.1_softdevice.hex
+SOFTDEVICE_FILE := $(NRF5SDK_DIR)/components/softdevice/s132/hex/s132_nrf52_7.2.0_softdevice.hex
 else
-SOFTDEVICE_FILE := $(NRF5SDK_DIR)/components/softdevice/s140/hex/s140_nrf52_7.0.1_softdevice.hex
+SOFTDEVICE_FILE := $(NRF5SDK_DIR)/components/softdevice/s140/hex/s140_nrf52_7.2.0_softdevice.hex
 endif
 flash_softdevice:
 	@echo Flashing: $(notdir $(SOFTDEVICE_FILE))
@@ -99,23 +99,23 @@ CMSIS_CONFIG_TOOL := $(NRF5SDK_DIR)/external_tools/cmsisconfig/CMSIS_Configurati
 sdk_config:
 	java -jar $(CMSIS_CONFIG_TOOL) $(SDK_CONFIG_FILE)
 
-endif
+endif #NRF MCUS
 
 
 FLASH_TARGET := $(filter $(strip $(MCU)),$(STM32_MCUS))
 ifneq (,$(FLASH_TARGET))
-	ifeq (STM32F411, $(FLASH_TARGET))
-	FLASH_TARGET := STM32F411xE
-	endif
-	ifeq (STM32F405, $(FLASH_TARGET))
-	FLASH_TARGET := STM32F405xG
-	endif
-	ifeq (STM32F722, $(FLASH_TARGET))
-	FLASH_TARGET := STM32F22xE
-	endif
-	ifeq (STM32F103, $(FLASH_TARGET))
-	FLASH_TARGET := STM32F103xB
-	endif
+ifeq (STM32F411, $(FLASH_TARGET))
+FLASH_TARGET := STM32F411xE
+endif
+ifeq (STM32F405, $(FLASH_TARGET))
+FLASH_TARGET := STM32F405xG
+endif
+ifeq (STM32F722, $(FLASH_TARGET))
+FLASH_TARGET := STM32F722xE
+endif
+ifeq (STM32F103, $(FLASH_TARGET))
+FLASH_TARGET := STM32F103xB
+endif
 
 flash: default
 	@echo Flashing: $(OUTPUT_DIRECTORY)/$(TARGET).hex
@@ -124,4 +124,4 @@ flash: default
 erase:
 	pylink erase -t swd -d $(FLASH_TARGET) 
 
-endif
+endif #STM32 MCUS

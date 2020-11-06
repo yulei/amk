@@ -32,7 +32,7 @@ OBJS += $(patsubst %.s,$(BUILD_DIR)/%.o,$(patsubst %.S,$(BUILD_DIR)/%.o,$(filter
 OBJS += $(patsubst %.c,$(BUILD_DIR)/%.o,$(patsubst %.cpp,$(BUILD_DIR)/%.o,$(filter-out %.s %.S,$(SRCS))))
 
 ifndef PROGRESS 
-T := $(shell $(MAKE) $(GOAL) --no-print-directory \
+T := $(shell $(MAKE) $(GOALS) --no-print-directory \
       -nrRf $(firstword $(MAKEFILE_LIST)) \
       PROGRESS="COUNTTHIS" | grep -c "COUNTTHIS")
 N := x
@@ -60,9 +60,9 @@ OPT = -Og -g3 -DDEBUG
 # Uncomment the line below to enable link time optimization
 #OPT += -flto
 
-FLAGS_ALL := $(OPT) $(APP_DEFS) $(SDK_DEFS)
+COMMON_FLAGS := $(OPT) $(APP_DEFS) $(SDK_DEFS)
 # C flags common to all targets
-CFLAGS += $(FLAGS_ALL)
+CFLAGS += $(COMMON_FLAGS)
 CFLAGS += -Wall
 CFLAGS += -Werror
 # keep every function in a separate section, this allows linker to discard unused ones
@@ -73,13 +73,13 @@ CFLAGS += -fno-builtin
 CFLAGS += -fshort-enums
 
 # C++ flags common to all targets
-CXXFLAGS += $(OPT)
+CXXFLAGS += $(COMMON_FLAGS)
 
 # Assembler flags common to all targets
-ASMFLAGS += $(FLAGS_ALL)
+ASMFLAGS += $(COMMON_FLAGS)
 
 # Linker flags
-LDFLAGS += $(FLAGS_ALL)
+LDFLAGS += $(COMMON_FLAGS)
 LDFLAGS += -L$(LINKER_PATH) -T$(LINKER_SCRIPT)
 # let linker dump unused sections
 LDFLAGS += -Wl,--gc-sections
@@ -97,13 +97,15 @@ INC_FLAGS = $(addprefix -I,$(INCS))
 
 ALL_CFLAGS = -std=gnu99 $(CFLAGS) $(GENDEPFLAGS) $(INC_FLAGS)
 ALL_CPPFLAGS = -x c++ $(CPPFLAGS) $(GENDEPFLAGS) $(INC_FLAGS)
-ALL_ASFLAGS = -x assembler-with-cpp $(ASMFLAGS) $(GENDEPFLAGS) $(INC_FLAGS)
+ALL_ASMFLAGS = -x assembler-with-cpp $(ASMFLAGS) $(GENDEPFLAGS) $(INC_FLAGS)
 ALL_LDFLAGS = $(LDFLAGS) -Xlinker -Map=$(OUTPUT_DIRECTORY)/$(TARGET).map
-# Create object files from C source files
+
+# Success message
 define RES_STR 
 echo -ne "\033[60G[\033[32mok\033[0m]\n"
 endef
 
+# Create object files from C source files
 $(BUILD_DIR)/%.o : %.c
 	@$(PROGRESS) Compiling: $(notdir $<)
 	$(NO_ECHO)$(CC) -c $(ALL_CFLAGS) $< -o $@ && $(RES_STR)
@@ -114,16 +116,16 @@ $(BUILD_DIR)/%.o : %.cpp
 	$(NO_ECHO)$(CC) -c $(ALL_CPPFLAGS) $< -o $@ && $(RES_STR)
 
 # Create object files from assembly source files
-define assembling
-	$(NO_ECHO)$(CC) -c $(ALL_ASFLAGS) $< -o $@ && $(RES_STR)
+define ASSEMBLING 
+	$(NO_ECHO)$(CC) -c $(ALL_ASMFLAGS) $< -o $@ && $(RES_STR)
 endef
 $(BUILD_DIR)/%.o : %.s
 	@$(PROGRESS) Assembling: $(notdir $<)
-	$(assembling)
+	$(ASSEMBLING)
 
 $(BUILD_DIR)/%.o : %.S
 	@$(PROGRESS) Assembling: $(notdir $<)
-	$(assembling)
+	$(ASSEMBLING)
 
 $(TARGET): $(addprefix $(OUTPUT_DIRECTORY)/$(TARGET), .elf .bin .hex)
 

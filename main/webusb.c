@@ -5,6 +5,7 @@
 #include "tusb.h"
 #include "usb_descriptors.h"
 
+#if TINYUSB_ENABLE
 // Invoked when received VENDOR control request
 bool tud_vendor_control_request_cb(uint8_t rhport, tusb_control_request_t const * request)
 {
@@ -62,3 +63,5 @@ void webusb_task(void)
         }
     }
 }
+
+#endif

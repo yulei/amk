@@ -73,3 +73,8 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
     extern USBD_HandleTypeDef hUsbDeviceFS;
     USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_KEYBOARD, buf, 8);
 }
+
+#ifdef WEBUSB_ENABLE
+void webusb_task(void)
+{}
+#endif

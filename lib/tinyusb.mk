@@ -23,3 +23,5 @@ endif
 ifeq (NRF52840, $(strip $(MCU)))
 SRCS += $(TINYUSB_DIR)/portable/nordic/nrf5x/dcd_nrf5x.c
 endif
+
+APP_DEFS += -DTINYUSB_ENABLE

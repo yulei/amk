@@ -1,12 +1,10 @@
 
-ONEKEY_DIR := keyboards/onekey
-
 SRCS += \
-	$(ONEKEY_DIR)/onekey.c \
-	$(ONEKEY_DIR)/onekey_keymap.c \
+	$(KEYBOARD_DIR)/onekey.c \
+	$(KEYBOARD_DIR)/onekey_keymap.c \
 
 INCS += \
-	$(ONEKEY_DIR) \
+	$(KEYBOARD_DIR) \
 
 #MCU = STM32F103
 #MCU = STM32F405
