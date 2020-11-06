@@ -2,7 +2,6 @@
  * @file ble_services.c
  */
 
-#include "config.h"
 #include "nrf_ble_gatt.h"
 #include "nrf_ble_qwr.h"
 #include "peer_manager_handler.h"

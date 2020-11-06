@@ -132,7 +132,7 @@ bool matrix_is_off(void)
     return true;
 }
 
-#if defined(NRF52)
+#if defined(NRF52) || defined(NRF52840_XXAA)
 #include "nrf_gpio.h"
 #include "common_config.h"
 void matrix_prepare_sleep(void)

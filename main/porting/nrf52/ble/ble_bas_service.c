@@ -3,10 +3,10 @@
  * @brief ble battery service
  */
 
+#include "gpio_pin.h"
 #include "ble_bas.h"
 #include "ble_bas_service.h"
 
-#include "nrf_gpio.h"
 #include "nrf_saadc.h"
 #include "nrf_drv_saadc.h"
 
