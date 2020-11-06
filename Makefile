@@ -36,7 +36,7 @@ endif
 KEYBOARDS := $(sort $(notdir $(wildcard $(BASE_DIR)/*)))
 KEYBOARD_DIR := $(BASE_DIR)/$(TARGET)
 ifneq (,$(filter $(TARGET),$(KEYBOARDS)))
-include $(KEYBOARD_DIR)/$(TARGET).mk
+include $(wildcard $(KEYBOARD_DIR)/*.mk)
 else
 $(error Unsupported Target: $(GOALS))
 endif
