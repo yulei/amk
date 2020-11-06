@@ -1,4 +1,4 @@
-STM32_PORTING_DIR := main/porting/stm32
+STM32_PORTING_DIR := $(MAIN_DIR)/porting/stm32
 
 SRCS += \
 	$(STM32_PORTING_DIR)/timer.c \
@@ -22,6 +22,7 @@ ifeq (STM32F405, $(strip $(MCU)))
 endif
 
 ifeq (STM32F722, $(strip $(MCU)))
+	SRCS += $(STM32_PORTING_DIR)/usb_tinyusb.c
 	SRCS += $(STM32_PORTING_DIR)/stm32f722xx.c
 endif
 

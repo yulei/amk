@@ -1,4 +1,4 @@
-NRF52_PORTING_DIR := main/porting/nrf52
+NRF52_PORTING_DIR := $(MAIN_DIR)/porting/nrf52
 
 SRCS += \
 	$(NRF52_PORTING_DIR)/generic_nrf52.c \

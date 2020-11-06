@@ -3,8 +3,6 @@ PROJECT_NAME := amk
 NRF_MCUS := NRF52832 NRF52840
 STM32_MCUS := STM32F103 STM32F411 STM32F405 STM32F722
 
-TOP_DIR ?= .
-
 # Source files
 SRCS += \
 
@@ -20,6 +18,10 @@ APP_DEFS += \
 GOALS := $(filter-out clean flash erase flash_softdevice sdk_config, $(MAKECMDGOALS))
 
 OUTPUT_DIRECTORY := build
+MAIN_DIR := main
+LIB_DIR := lib
+NRF5_DIR := nrf5_sdk
+STM32_DIR := stm32_sdk
 
 ifneq (, $(GOALS))
 GOAL_LIST := $(subst /, ,$(GOALS))
@@ -41,20 +43,20 @@ else
 $(error Unsupported Target: $(GOALS))
 endif
 
-include main/main.mk
-include lib/tmk.mk
-include lib/printf.mk
+include $(MAIN_DIR)/main.mk
+include $(LIB_DIR)/tmk.mk
+include $(LIB_DIR)/printf.mk
 ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
-include nrf5_sdk/nrf5_sdk.mk
+include $(NRF5_DIR)/nrf5_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
-include stm32_sdk/stm32_sdk.mk
+include $(STM32_DIR)/stm32_sdk.mk
 else
 $(error Unsupported MCU: $(MCU))
 endif
 endif
 
 ifeq (yes,$(SCREEN_ENABLE))
-include lib/lvgl.mk
+include $(LIB_DIR)/lvgl.mk
 endif
 
 .PHONY: default list flash erase

@@ -20,6 +20,10 @@ ifeq (STM32F411, $(strip $(MCU)))
 SRCS += $(TINYUSB_DIR)/portable/st/synopsys/dcd_synopsys.c
 endif
 
+ifeq (STM32F722, $(strip $(MCU)))
+SRCS += $(TINYUSB_DIR)/portable/st/synopsys/dcd_synopsys.c
+endif
+
 ifeq (NRF52840, $(strip $(MCU)))
 SRCS += $(TINYUSB_DIR)/portable/nordic/nrf5x/dcd_nrf5x.c
 endif

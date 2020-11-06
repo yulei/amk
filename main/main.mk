@@ -1,6 +1,4 @@
 
-MAIN_DIR := main
-
 SRCS += \
 	$(MAIN_DIR)/main.c  \
 	$(MAIN_DIR)/custom_action.c \

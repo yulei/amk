@@ -3,7 +3,11 @@ MK := mkdir -p
 RM := rm -rf
 CP := cp
 
-# echo suspend
+# Build type
+NO_DEBUG ?= 0
+LTO_ENABLE ?= 0
+
+# Echo suspend
 NO_ECHO := @
 
 GNU_PREFIX := arm-none-eabi
@@ -51,14 +55,15 @@ $(OBJ_DIRS):
 #$(info $(LIBS))
 #$(info $(OBJS))
 
-# Optimization flags
-#OPT = -O3 -g3
-
-# Debug flags
+ifeq (1,$(NO_DEBUG))
+OPT = -O3 -g3
+else
 OPT = -Og -g3 -DDEBUG
+endif
 
-# Uncomment the line below to enable link time optimization
-#OPT += -flto
+ifeq (1,$(LTO_ENABLE))
+OPT += -flto
+endif
 
 COMMON_FLAGS := $(OPT) $(APP_DEFS) $(SDK_DEFS)
 # C flags common to all targets
