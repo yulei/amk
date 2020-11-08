@@ -15,9 +15,9 @@ LIBS += \
 # Definitions
 APP_DEFS += \
 
-GOALS := $(filter-out clean flash erase flash_softdevice sdk_config, $(MAKECMDGOALS))
+GOALS := $(filter-out default list clean flash erase flash_softdevice sdk_config, $(MAKECMDGOALS))
 
-OUTPUT_DIRECTORY := build
+OUTPUT_DIR := build
 MAIN_DIR := main
 LIB_DIR := lib
 NRF5_DIR := nrf5_sdk
@@ -37,6 +37,7 @@ endif
 
 KEYBOARDS := $(sort $(notdir $(wildcard $(BASE_DIR)/*)))
 KEYBOARD_DIR := $(BASE_DIR)/$(TARGET)
+INCS += $(KEYBOARD_DIR)
 ifneq (,$(filter $(TARGET),$(KEYBOARDS)))
 include $(wildcard $(KEYBOARD_DIR)/*.mk)
 else
@@ -59,12 +60,15 @@ ifeq (yes,$(SCREEN_ENABLE))
 include $(LIB_DIR)/lvgl.mk
 endif
 
-.PHONY: default list flash erase
+.PHONY: default list clean flash erase
 
 # Default target
 ifeq (,$(TARGET))
 default: list 
 endif
+
+clean:
+	$(RM) $(OUTPUT_DIR)
 
 list:
 	$(info Available Keyboards:)
@@ -78,8 +82,8 @@ ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
 
 # Flash the program
 flash: default
-	@echo Flashing: $(OUTPUT_DIRECTORY)/$(TARGET).hex
-	nrfjprog -f nrf52 --program $(OUTPUT_DIRECTORY)/$(TARGET).hex --sectorerase
+	@echo Flashing: $(OUTPUT_DIR)/$(TARGET).hex
+	nrfjprog -f nrf52 --program $(OUTPUT_DIR)/$(TARGET).hex --sectorerase
 	nrfjprog -f nrf52 --reset
 
 # Flash softdevice
@@ -120,8 +124,8 @@ FLASH_TARGET := STM32F103xB
 endif
 
 flash: default
-	@echo Flashing: $(OUTPUT_DIRECTORY)/$(TARGET).hex
-	pylink flash -t swd -d $(FLASH_TARGET) $(OUTPUT_DIRECTORY)/$(TARGET).hex
+	@echo Flashing: $(OUTPUT_DIR)/$(TARGET).hex
+	pylink flash -t swd -d $(FLASH_TARGET) $(OUTPUT_DIR)/$(TARGET).hex
 
 erase:
 	pylink erase -t swd -d $(FLASH_TARGET) 

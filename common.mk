@@ -23,14 +23,8 @@ OBJDUMP := $(GNU_INSTALL_ROOT)$(GNU_PREFIX)-objdump
 OBJCOPY := $(GNU_INSTALL_ROOT)$(GNU_PREFIX)-objcopy
 SIZE    := $(GNU_INSTALL_ROOT)$(GNU_PREFIX)-size
 
-.PHONY: all clean
 
-all: default
-
-clean:
-	$(RM) $(OUTPUT_DIRECTORY)
-
-BUILD_DIR := $(OUTPUT_DIRECTORY)/$(TARGET)
+BUILD_DIR := $(OUTPUT_DIR)/$(TARGET)
 
 OBJS += $(patsubst %.s,$(BUILD_DIR)/%.o,$(patsubst %.S,$(BUILD_DIR)/%.o,$(filter %.s %.S,$(SRCS))))
 OBJS += $(patsubst %.c,$(BUILD_DIR)/%.o,$(patsubst %.cpp,$(BUILD_DIR)/%.o,$(filter-out %.s %.S,$(SRCS))))
@@ -103,7 +97,7 @@ INC_FLAGS = $(addprefix -I,$(INCS))
 ALL_CFLAGS = -std=gnu99 $(CFLAGS) $(GENDEPFLAGS) $(INC_FLAGS)
 ALL_CPPFLAGS = -x c++ $(CPPFLAGS) $(GENDEPFLAGS) $(INC_FLAGS)
 ALL_ASMFLAGS = -x assembler-with-cpp $(ASMFLAGS) $(GENDEPFLAGS) $(INC_FLAGS)
-ALL_LDFLAGS = $(LDFLAGS) -Xlinker -Map=$(OUTPUT_DIRECTORY)/$(TARGET).map
+ALL_LDFLAGS = $(LDFLAGS) -Xlinker -Map=$(OUTPUT_DIR)/$(TARGET).map
 
 # Success message
 define RES_STR 
@@ -132,7 +126,7 @@ $(BUILD_DIR)/%.o : %.S
 	@$(PROGRESS) Assembling: $(notdir $<)
 	$(ASSEMBLING)
 
-$(TARGET): $(addprefix $(OUTPUT_DIRECTORY)/$(TARGET), .elf .bin .hex)
+$(TARGET): $(addprefix $(OUTPUT_DIR)/$(TARGET), .elf .bin .hex)
 
 # Create elf files 
 %.elf: $(OBJS)

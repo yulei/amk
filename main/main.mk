@@ -1,4 +1,9 @@
 
+#always enabled tmk feature
+BOOTMAGIC_ENABLE = yes
+MOUSEKEY_ENABLE = yes
+EXTRAKEY_ENABLE = yes
+
 SRCS += \
 	$(MAIN_DIR)/main.c  \
 	$(MAIN_DIR)/custom_action.c \
@@ -36,12 +41,21 @@ endif
 
 ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/aw9523b.c
-	SRCS += $(MAIN_DIR)/drivers/ws2812.c
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_effects.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_driver.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_color.c
 	APP_DEFS += -DRGB_EFFECTS_ENABLE
+	APP_DEFS += -DRGB_WITH_AW9523B
+endif
+
+ifeq (ws2812, $(strip $(RGB_EFFECTS_ENABLE)))
+	SRCS += $(MAIN_DIR)/drivers/ws2812.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_effects.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_driver.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_color.c
+	APP_DEFS += -DRGB_EFFECTS_ENABLE
+	APP_DEFS += -DRGB_WITH_WS2812
 endif
 
 ifeq (yes, $(strip $(WEBUSB_ENABLE)))
@@ -62,7 +76,3 @@ ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
 	SRCS += $(MAIN_DIR)/rtt/SEGGER_RTT.c
 	include $(MAIN_DIR)/porting/stm32.mk
 endif
-
-#always enable mousekey and extra key
-MOUSEKEY_ENABLE = yes
-EXTRAKEY_ENABLE = yes

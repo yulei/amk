@@ -1,8 +1,8 @@
 # AMK 
 Keyboard firmware for NRF52 and STM32. 
-[TMK](https://github.com/tmk/tmk_keyboard.git) was used for keycodes processing.
+[TMK](https://github.com/tmk/tmk_keyboard.git) was used for key processing.
 [tinyusb](https://github.com/hathach/tinyusb.git) was used for usb protocol handling.
-NRF5 SDK and STM32 HAL library were used for low level MCU peripharal handling.
+NRF5 SDK and STM32 HAL library were used for driving peripherals of the MCU.
 
 # How to build
 
@@ -21,5 +21,4 @@ make
 ```
 
 ## Note:
-If want to compile keyboards made by nrf52 (like the hhkbble), the [NRF5 SDK](https://www.nordicsemi.com/Software-and-Tools/Software/nRF5-SDK) must be downloaded and unzipped to ```nrf5_sdk```. The current version
-used by amk was 17.0.2
+If want to compile keyboards which were made by nrf52 (like the hhkbble), the [NRF5 SDK](https://www.nordicsemi.com/Software-and-Tools/Software/nRF5-SDK) must be downloaded and unzipped to the ```nrf5_sdk``` directory. The current version used by amk was 17.0.2.
