@@ -1,4 +1,4 @@
-
+# Command alias
 MK := mkdir -p
 RM := rm -rf
 CP := cp

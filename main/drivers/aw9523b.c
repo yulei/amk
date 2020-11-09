@@ -59,9 +59,9 @@ void aw9523b_init(uint8_t addr)
 
 void aw9523b_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
 {
-    if (index >= AW9523B_LED_NUM) return;
+    if (index >= RGB_LED_NUM) return;
 
-    aw9523b_led_t led = g_aw9523b_leds[index];
+    rgb_led_t led = g_aw9523b_leds[index];
     if (aw9523b_pwm_buf[PWM2BUF(led.r)] != red) {
         aw9523b_pwm_buf[PWM2BUF(led.r)] = red;
         aw9523b_pwm_dirty = true;
@@ -78,7 +78,7 @@ void aw9523b_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
 
 void aw9523b_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
 {
-    for (uint8_t i = 0; i < AW9523B_LED_NUM; i++) {
+    for (uint8_t i = 0; i < RGB_LED_NUM; i++) {
         aw9523b_set_color(i, red, green, blue);
     }
     aw9523b_pwm_dirty = true;
@@ -87,8 +87,8 @@ void aw9523b_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
 void aw9523b_update_buffers(uint8_t addr)
 {
     if (aw9523b_ready&&aw9523b_pwm_dirty) {
-        for (uint8_t i = 0; i < AW9523B_LED_NUM; i++){
-            aw9523b_led_t led = g_aw9523b_leds[i];
+        for (uint8_t i = 0; i < RGB_LED_NUM; i++){
+            rgb_led_t led = g_aw9523b_leds[i];
             i2c_write_reg(addr, led.r, &aw9523b_pwm_buf[PWM2BUF(led.r)], 1, TIMEOUT);
             i2c_write_reg(addr, led.g, &aw9523b_pwm_buf[PWM2BUF(led.g)], 1, TIMEOUT);
             i2c_write_reg(addr, led.b, &aw9523b_pwm_buf[PWM2BUF(led.b)], 1, TIMEOUT);
@@ -100,6 +100,7 @@ void aw9523b_update_buffers(uint8_t addr)
 void aw9523b_uninit(uint8_t addr)
 {
     if (!aw9523b_ready) return;
+
     i2c_uninit();
     aw9523b_ready = false;
 }

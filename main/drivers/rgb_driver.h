@@ -21,7 +21,6 @@ typedef struct {
     rgb_driver_flush flush;
 } rgb_driver_t;
 
-
 typedef enum {
     RGB_DRIVER_WS2812,
     RGB_DRIVER_AW9523B

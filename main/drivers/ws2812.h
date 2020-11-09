@@ -1,6 +1,6 @@
 /**
  * @file ws2812.h
- * @brief ws2812 driver on nrf52
+ * @brief ws2812 driver interface
  */
 
 #pragma once
@@ -8,11 +8,6 @@
 #include <stdint.h>
 #include "rgb_color.h"
 #include "gpio_pin.h"
-
-#ifndef WS2812_LED_NUM
-    #define WS2812_LED_NUM RGB_LED_NUM
-#endif
-
 
 void ws2812_init(pin_t pin);
 

@@ -6,13 +6,10 @@
 #pragma once
 
 #include <stdint.h>
+#include "rgb_color.h"
 
 #ifndef AW9523B_ADDR
     #define AW9523B_ADDR 0xB6
-#endif
-
-#ifndef AW9523B_LED_NUM
-    #define AW9523B_LED_NUM RGB_LED_NUM
 #endif
 
 #define AW9523B_PWM_BASE    0x20
@@ -36,13 +33,7 @@
 
 #define AW9523B_PWM_SIZE    16
 
-typedef struct {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-} aw9523b_led_t;
-
-extern const aw9523b_led_t g_aw9523b_leds[AW9523B_LED_NUM];
+extern const rgb_led_t g_aw9523b_leds[RGB_LED_NUM];
 
 void aw9523b_init(uint8_t addr);
 

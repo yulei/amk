@@ -11,7 +11,6 @@
 #define DEVICE_VER 0x0001
 #define MANUFACTURER astro
 #define PRODUCT One Key
-#define DESCRIPTION a keybaord for testing
 
 // key matrix
 #define MATRIX_ROWS 1
@@ -29,3 +28,6 @@
 #define SCREEN_1_RESET  B0
 #define SCREEN_1_CS     B1
 #define SCREEN_1_DC     B2
+
+#define RGB_LED_NUM     4
+#define WS2812_LED_PIN  A0

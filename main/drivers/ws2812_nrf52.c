@@ -6,26 +6,20 @@
 #include "nrf_gpio.h"
 #include "ws2812.h"
 #include "nrf_log.h"
+#include "rgb_color.h"
 #include "wait.h"
 
 #define WS2812_VAL_0        0x8002
 #define WS2812_VAL_1        0x8008
 
-#define WS2812_COLOR_SIZE   (WS2812_LED_NUM*24)
+#define WS2812_COLOR_SIZE   (RGB_LED_NUM*24)
 #define WS2812_RESET_SIZE   1
 #define WS2812_BUF_SIZE     (WS2812_COLOR_SIZE + WS2812_RESET_SIZE)
 
-typedef struct {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-} ws2812_led_t;
-
-static ws2812_led_t ws2812_leds[WS2812_LED_NUM];
+static rgb_led_t ws2812_leds[RGB_LED_NUM];
 static uint16_t ws2812_data[WS2812_BUF_SIZE];
 static bool ws2812_ready = false;
 static pin_t ws2812_pin;
-
 
 nrfx_pwm_t ws2812_pwm = NRFX_PWM_INSTANCE(0);
 nrf_pwm_sequence_t ws2812_pwm_seq = {
@@ -42,7 +36,7 @@ static void ws2812_write_color(uint8_t c, uint16_t offset)
     }
 }
 
-static void ws2812_write_led(uint8_t r, uint8_t g, uint8_t b, uint16_t index)
+static void ws2812_write_led(uint16_t index, uint8_t r, uint8_t g, uint8_t b)
 {
     ws2812_write_color(g, index*24);
     ws2812_write_color(r, index*24 + 8);
@@ -61,15 +55,6 @@ void ws2812_init(pin_t pin)
     gpio_set_output_pushpull(pin);
     gpio_write_pin(pin, 0);
     
-#ifdef WS2812_EN_PIN
-    gpio_set_output_pushpull(WS2812_EN_PIN);
-#   ifdef WS2812_EN_HIGH
-    gpio_write_pin(WS2812_EN_PIN, 1);
-#   else
-    gpio_write_pin(WS2812_EN_PIN, 0);
-#   endif
-#endif
-
     nrfx_pwm_config_t config;
     config.output_pins[0] = pin;
     config.output_pins[1] = NRFX_PWM_PIN_NOT_USED;
@@ -99,7 +84,7 @@ void ws2812_init(pin_t pin)
 
 void ws2812_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
 {
-    if (index < WS2812_LED_NUM) {
+    if (index < RGB_LED_NUM) {
         ws2812_leds[index].r = red;
         ws2812_leds[index].g = green;
         ws2812_leds[index].b = blue;
@@ -108,7 +93,7 @@ void ws2812_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
 
 void ws2812_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
 {
-    for (int i = 0; i < WS2812_LED_NUM; i++) {
+    for (int i = 0; i < RGB_LED_NUM; i++) {
         ws2812_leds[i].r = red;
         ws2812_leds[i].g = green;
         ws2812_leds[i].b = blue;
@@ -121,14 +106,14 @@ void ws2812_update_buffers(pin_t pin)
         ws2812_init(pin);
     }
 
-    for (int i = 0; i < WS2812_LED_NUM; i++) {
+    for (int i = 0; i < RGB_LED_NUM; i++) {
         ws2812_write_led(ws2812_leds[i].r, ws2812_leds[i].g, ws2812_leds[i].b, i);
     }
 
     for (int j = 0; j < WS2812_RESET_SIZE; j++) {
-        ws2812_data[WS2812_LED_NUM*24 + j] = 0x8000;
+        ws2812_data[WS2812_COLOR_SIZE + j] = 0x8000;
     }
-    ws2812_pwm_seq.length = WS2812_LED_NUM*24 + WS2812_RESET_SIZE;
+    ws2812_pwm_seq.length = WS2812_BUF_SIZE; 
     nrfx_pwm_simple_playback(&ws2812_pwm, &ws2812_pwm_seq, 1, NRFX_PWM_FLAG_STOP);
     wait_ms(2);
         //NRF_LOG_INFO("ws2812 setleds playback: number: %d", number);
@@ -139,13 +124,5 @@ void ws2812_uninit(pin_t pin)
     if (!ws2812_ready) return;
 
     nrfx_pwm_uninit(&ws2812_pwm);
-
-#ifdef WS2812_EN_PIN
-#   ifdef WS2812_EN_HIGH
-    gpio_write_pin(WS2812_EN_PIN, 0);
-#   else
-    gpio_write_pin(WS2812_EN_PIN, 1);
-#   endif
-#endif
     ws2812_ready = false;
 }

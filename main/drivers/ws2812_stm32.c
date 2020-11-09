@@ -7,14 +7,9 @@
 #include <stdbool.h>
 #include "gpio_pin.h"
 #include "ws2812.h"
+#include "rgb_color.h"
 
-typedef struct {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-} ws2812_led_t;
-
-static ws2812_led_t ws2812_leds[WS2812_LED_NUM];
+static rgb_led_t ws2812_leds[RGB_LED_NUM];
 static bool ws2812_ready = false;
 static pin_t ws2812_pin;
 
@@ -85,21 +80,12 @@ void ws2812_init(pin_t pin)
     gpio_set_output_pushpull(pin);
     gpio_write_pin(pin, 0);
     
-#ifdef WS2812_EN_PIN
-    gpio_set_output_pushpull(WS2812_EN_PIN);
-#   ifdef WS2812_EN_HIGH
-    gpio_write_pin(WS2812_EN_PIN, 1);
-#   else
-    gpio_write_pin(WS2812_EN_PIN, 0);
-#   endif
-#endif
-
     ws2812_ready = true;
 }
 
 void ws2812_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
 {
-    if (index < WS2812_LED_NUM) {
+    if (index < RGB_LED_NUM) {
         ws2812_leds[index].r = red;
         ws2812_leds[index].g = green;
         ws2812_leds[index].b = blue;
@@ -108,7 +94,7 @@ void ws2812_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
 
 void ws2812_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
 {
-    for (int i = 0; i < WS2812_LED_NUM; i++) {
+    for (int i = 0; i < RGB_LED_NUM; i++) {
         ws2812_leds[i].r = red;
         ws2812_leds[i].g = green;
         ws2812_leds[i].b = blue;
@@ -122,7 +108,7 @@ void ws2812_update_buffers(pin_t pin)
     }
 
     __disable_irq();
-    for (int i = 0; i < WS2812_LED_NUM; i++) {
+    for (int i = 0; i < RGB_LED_NUM; i++) {
         // WS2812 protocol dictates grb order
         sendByte(ws2812_leds[i].g);
         sendByte(ws2812_leds[i].r);
@@ -136,12 +122,5 @@ void ws2812_uninit(pin_t pin)
 {
     if (!ws2812_ready) return;
 
-#ifdef WS2812_EN_PIN
-#   ifdef WS2812_EN_HIGH
-    gpio_write_pin(WS2812_EN_PIN, 0);
-#   else
-    gpio_write_pin(WS2812_EN_PIN, 1);
-#   endif
-#endif
     ws2812_ready = false;
 }

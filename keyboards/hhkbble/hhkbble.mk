@@ -1,12 +1,7 @@
 
-SRCS += \
-	$(KEYBOARD_DIR)/hhkbble.c \
-
-INCS += \
-	$(KEYBOARD_DIR) \
+SRCS += $(KEYBOARD_DIR)/hhkbble.c
 
 MCU = NRF52832
-BOOTMAGIC_ENABLE = yes
 RGB_EFFECTS_ENABLE = yes
 
 ifeq (yes,$(strip $(ACTIONMAP_ENABLE)))

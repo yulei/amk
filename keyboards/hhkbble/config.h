@@ -10,7 +10,6 @@
 #define DEVICE_VER 0x0001
 #define MANUFACTURER astro
 #define PRODUCT Matrix Falcon
-#define DESCRIPTION 60% HHKB style keybaord with BLE support
 
 /* key matrix size */
 #define MATRIX_ROWS 5
@@ -26,7 +25,6 @@
 #define BATTERY_SAADC_ENABLE_PIN    27
 #define BATTERY_SAADC_PIN           NRF_SAADC_INPUT_AIN4
 
-
 #define I2C_INSTANCE_ID             0
 #define I2C_SCL_PIN                 11
 #define I2C_SDA_PIN                 12
@@ -35,7 +33,7 @@
 #define RGBLIGHT_EN_HIGH
 
 #define RGB_LED_NUM                 4
-#define WS2812_LED_PIN              18
+//#define WS2812_LED_PIN              18
 
 #define AW9523B_ADDR                0xB6
 

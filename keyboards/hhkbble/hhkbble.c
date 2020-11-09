@@ -26,7 +26,7 @@ void keyboard_prepare_sleep(void)
     gpio_set_input_floating(CAPS_LED_PIN);
 }
 
-const aw9523b_led_t g_aw9523b_leds[AW9523B_LED_NUM] = {
+const rgb_led_t g_aw9523b_leds[RGB_LED_NUM] = {
     {AW9523B_P12_PWM, AW9523B_P11_PWM, AW9523B_P10_PWM},
     {AW9523B_P01_PWM, AW9523B_P00_PWM, AW9523B_P13_PWM},
     {AW9523B_P04_PWM, AW9523B_P03_PWM, AW9523B_P02_PWM},
