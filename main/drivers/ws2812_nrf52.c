@@ -107,7 +107,7 @@ void ws2812_update_buffers(pin_t pin)
     }
 
     for (int i = 0; i < RGB_LED_NUM; i++) {
-        ws2812_write_led(ws2812_leds[i].r, ws2812_leds[i].g, ws2812_leds[i].b, i);
+        ws2812_write_led(i, ws2812_leds[i].r, ws2812_leds[i].g, ws2812_leds[i].b);
     }
 
     for (int j = 0; j < WS2812_RESET_SIZE; j++) {
