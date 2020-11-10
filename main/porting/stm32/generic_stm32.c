@@ -156,14 +156,9 @@ void remote_wakeup(void)
   */
 void SysTick_Handler(void)
 {
-    /* USER CODE BEGIN SysTick_IRQn 0 */
-
-    /* USER CODE END SysTick_IRQn 0 */
     HAL_IncTick();
-    /* USER CODE BEGIN SysTick_IRQn 1 */
+
     #ifdef SCREEN_ENABLE
     screen_ticks(1);
     #endif
-
-    /* USER CODE END SysTick_IRQn 1 */
 }

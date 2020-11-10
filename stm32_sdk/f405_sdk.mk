@@ -4,7 +4,7 @@ MCU_SRC_PATH := f405
 MCU_HAL_PATH := STM32F4xx_HAL_Driver
 
 SRCS += \
-	$(STM32SDK_DIR)/startup_stm32f405xx.s \
+	$(STM32SDK_DIR)/cmsis_device_$(MCU_SERIES)/Source/Templates/gcc/startup_stm32f405xx.s \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/system_$(MCU_FAMILY).c \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/$(MCU_FAMILY)_hal_msp.c \
 	$(STM32SDK_DIR)/$(MCU_SRC_PATH)/$(MCU_FAMILY)_it.c \

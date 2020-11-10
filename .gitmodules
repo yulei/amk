@@ -10,3 +10,12 @@
 [submodule "libs/printf"]
 	path = libs/printf
 	url = https://github.com/yulei/printf.git
+[submodule "stm32_sdk/cmsis5"]
+	path = stm32_sdk/cmsis5
+	url = https://github.com/ARM-software/CMSIS_5.git
+[submodule "stm32_sdk/devices/f4"]
+	path = stm32_sdk/devices/f4
+	url = https://github.com/STMicroelectronics/cmsis_device_f4.git
+[submodule "stm32_sdk/drivers/f4"]
+	path = stm32_sdk/drivers/f4
+	url = https://github.com/STMicroelectronics/stm32f4xx_hal_driver.git
