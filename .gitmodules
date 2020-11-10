@@ -1,6 +1,6 @@
 [submodule "libs/lvgl"]
 	path = libs/lvgl
-	url = https://github.com/yulei/lvgl.git
+	url = https://github.com/yulei/lvgl
 [submodule "libs/tmk"]
 	path = libs/tmk
 	url = https://github.com/yulei/tmk_keyboard.git
@@ -9,4 +9,4 @@
 	url = https://github.com/yulei/tinyusb.git
 [submodule "libs/printf"]
 	path = libs/printf
-	url = https://github.com/yulei/printf
+	url = https://github.com/yulei/printf.git
