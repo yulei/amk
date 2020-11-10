@@ -9,25 +9,31 @@ include $(LIB_DIR)/tinyusb.mk
 endif
 
 ifeq (STM32F405, $(strip $(MCU)))
-MCU_FAMILY := f4
+MCU_SERIES := f4
+MCU_FAMILY := stm32f4xx
+MCU_PATH := f405
 include $(STM32SDK_DIR)/f405_sdk.mk
 include $(STM32SDK_DIR)/f4_usb.mk
 endif
 
 ifeq (STM32F722, $(strip $(MCU)))
-MCU_FAMILY := f7
-include $(STM32SDK_DIR)/f7_sdk.mk
+MCU_SERIES := f7
+MCU_FAMILY := stm32f7xx
+MCU_PATH := f722
+include $(STM32SDK_DIR)/f722_sdk.mk
 include $(LIB_DIR)/tinyusb.mk
 endif
 
 ifeq (STM32F103, $(strip $(MCU)))
 MCU_SERIES := f1
 MCU_FAMILY := stm32f1xx
-include $(STM32SDK_DIR)/f1_sdk.mk
+MCU_PATH := f103
+include $(STM32SDK_DIR)/f103_sdk.mk
 include $(LIB_DIR)/tinyusb.mk
 endif
 
 INCS += \
+	$(STM32SDK_DIR)/$(MCU_PATH) \
 	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Inc \
 	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Inc/Legacy \
 	$(STM32SDK_DIR)/devices/$(MCU_SERIES)/Include \

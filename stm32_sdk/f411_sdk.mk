@@ -23,8 +23,6 @@ SRCS += \
 	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_i2c_ex.c \
 	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_spi.c \
 
-INCS += $(STM32SDK_DIR)/$(MCU_SRC_PATH)
-
 APP_DEFS += \
 	-DSTM32F411xE \
     -DCFG_TUSB_MCU=OPT_MCU_STM32F4 \
