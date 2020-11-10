@@ -50,9 +50,9 @@ $(OBJ_DIRS):
 #$(info $(OBJS))
 
 ifeq (1,$(NO_DEBUG))
-OPT = -O3 -g3
+OPT = -Os -g3
 else
-OPT = -Og -g3 -DDEBUG
+OPT = -Og -gdwarf-2 -DDEBUG
 endif
 
 ifeq (1,$(LTO_ENABLE))

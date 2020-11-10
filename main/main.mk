@@ -18,7 +18,7 @@ INCS += \
 	$(MAIN_DIR)/rgb \
 	$(MAIN_DIR)/screen \
 	$(MAIN_DIR)/rtt \
-	lib/tinyusb/src \
+	$(LIB_DIR)/tinyusb/src \
 
 
 ifeq (yes, $(strip $(MATRIX_USE_TCA6424)))

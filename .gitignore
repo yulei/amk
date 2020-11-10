@@ -3,3 +3,4 @@ build/
 keyboards/amkbd/
 nrf5_sdk/nRF5_SDK_*
 *.DS_Store
+libs/tinyusb/hw/mcu/st/st_driver/

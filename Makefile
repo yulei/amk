@@ -19,7 +19,7 @@ GOALS := $(filter-out default list clean flash erase flash_softdevice sdk_config
 
 OUTPUT_DIR := build
 MAIN_DIR := main
-LIB_DIR := lib
+LIB_DIR := libs
 NRF5_DIR := nrf5_sdk
 STM32_DIR := stm32_sdk
 
@@ -38,6 +38,8 @@ endif
 KEYBOARDS := $(sort $(notdir $(wildcard $(BASE_DIR)/*)))
 KEYBOARD_DIR := $(BASE_DIR)/$(TARGET)
 INCS += $(KEYBOARD_DIR)
+INCS += $(LIB_DIR)/config
+
 ifneq (,$(filter $(TARGET),$(KEYBOARDS)))
 include $(wildcard $(KEYBOARD_DIR)/*.mk)
 else

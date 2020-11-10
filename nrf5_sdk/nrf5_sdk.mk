@@ -185,7 +185,7 @@ ifeq (NRF52840, $(strip $(MCU)))
 	APP_DEFS += -DNRF52840_XXAA
 	APP_DEFS += -DS140
 	LINKER_SCRIPT := $(NRF5_DIR)/nrf52840.ld
-	include lib/tinyusb.mk
+	include $(LIB_DIR)/tinyusb.mk
 endif
 
 LIBS += $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52_gcc.a
