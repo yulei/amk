@@ -23,6 +23,7 @@
 #define USBD_HID_OTHER_EPOUT_SIZE       0
 #define USBD_HID_OTHER_EPOUT_TYPE       0
 
+#ifdef WEBUSB_ENABLE
 // webusb 
 #define USBD_VENDOR_EPIN                (0x80|EPNUM_VENDOR_IN)
 #define USBD_VENDOR_EPIN_SIZE           CFG_TUD_VENDOR_EPSIZE
@@ -30,6 +31,7 @@
 #define USBD_VENDOR_EPOUT               (EPNUM_VENDOR_OUT)
 #define USBD_VENDOR_EPOUT_SIZE          USBD_VENDOR_EPIN_SIZE
 #define USBD_VENDOR_EPOUT_TYPE          USBD_EP_TYPE_BULK
+#endif
 
 static uint8_t USBD_COMP_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx);
 static uint8_t USBD_COMP_DeInit(USBD_HandleTypeDef *pdev, uint8_t cfgidx);
@@ -79,12 +81,14 @@ static usbd_interface_t* find_interface_by_type(uint32_t type);
 static void hid_kbd_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
 static void hid_other_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
 static void hid_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
-static void webusb_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
-static void webusb_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
-
 static USBD_HID_HandleTypeDef USBD_HID_DATA_KBD;
 static USBD_HID_HandleTypeDef USBD_HID_DATA_OTHER;
+
+#ifdef WEBUSB_ENABLE
+static void webusb_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
+static void webusb_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
 static USBD_WEBUSB_HandleTypeDef USBD_WEBUSB_DATA;
+#endif
 
 static usbd_composite_t usbd_composite = {
     .interfaces = {
@@ -112,6 +116,7 @@ static usbd_composite_t usbd_composite = {
         .uninit = hid_uninit,
         .data = &USBD_HID_DATA_OTHER},
 
+#ifdef WEBUSB_ENABLE
         {.index = ITF_NUM_VENDOR,
         .epin = USBD_VENDOR_EPIN,
         .epin_size = USBD_VENDOR_EPIN_SIZE,
@@ -123,6 +128,7 @@ static usbd_composite_t usbd_composite = {
         .init = webusb_init,
         .uninit = webusb_uninit,
         .data = &USBD_WEBUSB_DATA},
+#endif
     },
     .size = USBD_MAX_NUM_INTERFACES
 };
@@ -251,9 +257,12 @@ usbd_interface_t* find_interface_by_type(uint32_t type)
     if (type == HID_REPORT_ID_KEYBOARD) {
         return &usbd_composite.interfaces[ITF_NUM_HID_KBD];
     } else {
+        #ifdef WEBUSB_ENABLE
         if (type == HID_REPORT_ID_WEBUSB) {
             return &usbd_composite.interfaces[ITF_NUM_VENDOR];
-        } else {
+        } else
+        #endif
+        {
             return &usbd_composite.interfaces[ITF_NUM_HID_OTHER];
         }
     }
@@ -284,7 +293,7 @@ void hid_other_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
     ((USBD_HID_HandleTypeDef *)interface->data)->state = HIDD_IDLE;
     ((USBD_HID_HandleTypeDef *)interface->data)->IsKeyboard = 0;
 }
-
+#ifdef WEBUSB_ENABLE
 void webusb_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
 {
     USBD_StatusTypeDef ret = USBD_OK;
@@ -308,3 +317,4 @@ void webusb_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
     USBD_LL_CloseEP(pdev, interface->epout);
     pdev->ep_out[interface->epout].is_used = 0U;
 }
+#endif

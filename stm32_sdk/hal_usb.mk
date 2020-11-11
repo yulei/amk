@@ -1,34 +1,39 @@
 
-USB_DEVICE_PATH := $(STM32_SDK_DIR)/usb_device
-USB_HOSTVICE_PATH := $(STM32_SDK_DIR)/usb_host
-HAL_USB_PATH :=$(STM32_SDK_DIR)/hal_usb
+USB_DEVICE_PATH := $(STM32SDK_DIR)/usb_device
+USB_HOST_PATH := $(STM32SDK_DIR)/usb_host
+HAL_USB_PATH :=$(STM32SDK_DIR)/hal_usb
 
 SRCS += \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usb_device.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbd_conf.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbd_core.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbd_ctlreq.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbd_desc.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbd_desc.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbd_hid.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbd_composite.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbd_webusb.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbd_ioreq.c \
+	$(HAL_USB_PATH)/usb_device.c \
+	$(HAL_USB_PATH)/usbd_conf.c \
+	$(HAL_USB_PATH)/usbd_desc.c \
+	$(HAL_USB_PATH)/usbd_hid.c \
+	$(HAL_USB_PATH)/usbd_composite.c \
+	$(USB_DEVICE_PATH)/Core/Src/usbd_core.c \
+	$(USB_DEVICE_PATH)/Core/Src/usbd_ctlreq.c \
+	$(USB_DEVICE_PATH)/Core/Src/usbd_ioreq.c
+
+ifeq (yes, $(strip $(USB_HOST_ENABLE)))
+SRCS += \
+	$(HAL_USB_PATH)/usb_host.c \
+	$(HAL_USB_PATH)/usbh_conf.c \
+	$(HAL_USB_PATH)/usbh_hid.c \
+	$(HAL_USB_PATH)/usbh_hid_keybd.c \
+	$(HAL_USB_PATH)/usbh_hid_mouse.c \
+	$(HAL_USB_PATH)/usbh_hid_parser.c \
+	$(USB_HOST_PATH)/Core/Src/usbh_core.c \
+	$(USB_HOST_PATH)/Core/Src/usbh_ctlreq.c \
+	$(USB_HOST_PATH)/Core/Src/usbh_ioreq.c \
+	$(USB_HOST_PATH)/Core/Src/usbh_pipes.c 
+endif
+
+ifeq (yes, $(strip $(WEBUSB_ENABLE)))
+	SRCS += $(HAL_USB_PATH)/usbd_webusb.c
+endif
 
 INCS += \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH) \
-	$(TOP_DIR)/lib/tinyusb/src \
-
-ifeq (STM32F405, $(strip $(MCU)))
-SRCS += \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usb_host.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbh_conf.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbh_core.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbh_ctlreq.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbh_hid.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbh_hid_keybd.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbh_hid_mouse.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbh_hid_parser.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbh_ioreq.c \
-	$(STM32SDK_DIR)/$(USB_SRC_PATH)/usbh_pipes.c 
-endif
+	$(HAL_USB_PATH) \
+	$(USB_DEVICE_PATH)/Core/Inc \
+	$(USB_HOST_PATH)/Core/Inc \
+	$(USB_HOST_PATH)/Class/HID/Inc \
+	$(LIB_DIR)/tinyusb/src 

@@ -31,13 +31,26 @@ SRCS += \
 	$(STM32SDK_DIR)/mcus/$(MCU_TYPE)/system_$(MCU_FAMILY).c \
 	$(STM32SDK_DIR)/mcus/$(MCU_TYPE)/$(MCU_FAMILY)_hal_msp.c \
 	$(STM32SDK_DIR)/mcus/$(MCU_TYPE)/$(MCU_FAMILY)_it.c \
+	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_tim.c \
+	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_tim_ex.c \
+	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_rcc.c \
+	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_rcc_ex.c \
+	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_flash.c \
+	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_flash_ex.c \
+	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_gpio.c \
+	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_dma.c \
+	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_pwr.c \
+	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_cortex.c \
+	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal.c \
+	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_exti.c \
+	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_uart.c
 
 INCS += \
 	$(STM32SDK_DIR)/mcus/$(MCU_TYPE) \
 	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Inc \
 	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Inc/Legacy \
 	$(STM32SDK_DIR)/devices/$(MCU_SERIES)/Include \
-	$(STM32SDK_DIR)/cmsis/Core/Include \
+	$(STM32SDK_DIR)/cmsis/Core/Include
 
 APP_DEFS += -DUSE_HAL_DRIVER
 
@@ -46,14 +59,5 @@ include $(STM32SDK_DIR)/mcus/$(MCU_TYPE)/$(MCU_TYPE)_sdk.mk
 ifeq (yes, $(strip $(USB_WITH_TINYUSB)))
 include $(LIB_DIR)/tinyusb.mk
 else
-include $(STM32_DIR)/f4_usb.mk
+include $(STM32SDK_DIR)/hal_usb.mk
 endif
-
-#include $(STM32SDK_DIR)/f405_sdk.mk
-#include $(STM32SDK_DIR)/f4_usb.mk
-
-#include $(STM32SDK_DIR)/f722_sdk.mk
-#include $(LIB_DIR)/tinyusb.mk
-
-#include $(STM32SDK_DIR)/f103_sdk.mk
-#include $(LIB_DIR)/tinyusb.mk

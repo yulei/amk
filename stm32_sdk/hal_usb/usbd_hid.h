@@ -5,7 +5,7 @@
 #pragma once
 
 #include "usbd_ioreq.h"
-
+#include "usb_misc.h"
 typedef enum {
     HIDD_IDLE = 0,
     HIDD_BUSY,

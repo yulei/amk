@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include  "usbd_ioreq.h"
+#include "usbd_ioreq.h"
+#include "usb_misc.h"
 
 typedef enum {
     WEBUSB_IDLE = 0,

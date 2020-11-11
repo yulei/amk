@@ -62,7 +62,11 @@
   */
 
 /*---------- -----------*/
+#ifdef WEBUSB_ENABLE
 #define USBD_MAX_NUM_INTERFACES     3U
+#else
+#define USBD_MAX_NUM_INTERFACES     2U
+#endif
 /*---------- -----------*/
 #define USBD_MAX_NUM_CONFIGURATION     1U
 /*---------- -----------*/

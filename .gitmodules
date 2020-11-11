@@ -30,4 +30,4 @@
 	url = https://github.com/STMicroelectronics/cmsis_device_f1.git
 [submodule "stm32_sdk/drivers/f1"]
 	path = stm32_sdk/drivers/f1
-	url = https://github.com/STMicroelectronics/stm32f4xx_hal_driver.git
+	url = https://github.com/STMicroelectronics/stm32f1xx_hal_driver.git

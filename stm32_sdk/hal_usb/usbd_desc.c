@@ -146,9 +146,14 @@ uint8_t *USBD_FS_InterfaceStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *lengt
 
 uint8_t *USBD_FS_BOSDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 {
-    (void)speed;
-    *length = tud_descriptor_bos_size();
-    return (uint8_t*)tud_descriptor_bos_cb();
+  (void)speed;
+#ifdef WEBUSB_ENABLE
+  *length = tud_descriptor_bos_size();
+  return (uint8_t*)tud_descriptor_bos_cb();
+#else
+  *length = 0;
+  return NULL;
+#endif
 }
 
 /**
