@@ -1,9 +1,6 @@
 
 SRCS += \
 	$(STM32SDK_DIR)/devices/$(MCU_SERIES)/Source/Templates/gcc/startup_stm32f411xe.s \
-	$(STM32SDK_DIR)/$(MCU_PATH)/system_$(MCU_FAMILY).c \
-	$(STM32SDK_DIR)/$(MCU_PATH)/$(MCU_FAMILY)_hal_msp.c \
-	$(STM32SDK_DIR)/$(MCU_PATH)/$(MCU_FAMILY)_it.c \
 	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_tim.c \
 	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_tim_ex.c \
 	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_rcc.c \
