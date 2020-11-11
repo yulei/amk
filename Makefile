@@ -90,10 +90,13 @@ flash: default
 
 # Flash softdevice
 ifeq (NRF52832, $(strip $(MCU)))
-SOFTDEVICE_FILE := $(NRF5SDK_DIR)/components/softdevice/s132/hex/s132_nrf52_7.2.0_softdevice.hex
+SOFTDEVICE_TYPE = 132
 else
-SOFTDEVICE_FILE := $(NRF5SDK_DIR)/components/softdevice/s140/hex/s140_nrf52_7.2.0_softdevice.hex
+SOFTDEVICE_TYPE = 140
 endif
+SOFTDEVICE_VERSION = 7.2.0 
+SOFTDEVICE_FILE := $(NRF5SDK_DIR)/components/softdevice/$(SOFTDEVICE_TYPE)/hex/s132_nrf52_$(SOFTDEVICE_VERSION)_softdevice.hex
+
 flash_softdevice:
 	@echo Flashing: $(notdir $(SOFTDEVICE_FILE))
 	nrfjprog -f nrf52 --program $(SOFTDEVICE_FILE) --sectorerase

@@ -16,8 +16,8 @@ SRCS += $(TINYUSB_DIR)/portable/st/stm32_fsdev/dcd_stm32_fsdev.c
 endif
 
 ifeq (STM32F411, $(strip $(MCU)))
-#SRCS += $(TINYUSB_DIR)/portable/st/synopsys/dcd_synopsys.c
-SRCS += $(STM32_DIR)/hal_usb/dcd_hal_stm32.c
+SRCS += $(TINYUSB_DIR)/portable/st/synopsys/dcd_synopsys.c
+#SRCS += $(STM32_DIR)/hal_usb/dcd_hal_stm32.c
 endif
 
 ifeq (STM32F722, $(strip $(MCU)))

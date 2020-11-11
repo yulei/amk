@@ -6,11 +6,13 @@
 #include "amk_printf.h"
 
 #if defined(STM32F103xB)
-    #define DCD_MAX_EP_NUM  8
-    #define DCD_USB_INSTANCE USB
+    #define DCD_MAX_EP_NUM      8
+    #define DCD_USB_INSTANCE    USB
+    #define DCD_USB_IRQn        USB_LP_CAN1_RX0_IRQn
 #elif defined(STM32F411xE) || defined(STM32F405xx)
-    #define DCD_MAX_EP_NUM  4
-    #define DCD_USB_INSTANCE USB_OTG_FS
+    #define DCD_MAX_EP_NUM      4
+    #define DCD_USB_INSTANCE    USB_OTG_FS
+    #define DCD_USB_IRQn        OTG_FS_IRQn
 #else
     #error "HAL USB unsupported mcu"
 #endif
@@ -47,13 +49,13 @@ void dcd_int_handler(uint8_t rhport)
 
 void dcd_int_enable (uint8_t rhport)
 {
-    HAL_NVIC_SetPriority(OTG_FS_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(OTG_FS_IRQn);
+    HAL_NVIC_SetPriority(DCD_USB_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DCD_USB_IRQn);
 }
 
 void dcd_int_disable(uint8_t rhport)
 {
-    HAL_NVIC_DisableIRQ(OTG_FS_IRQn);
+    HAL_NVIC_DisableIRQ(DCD_USB_IRQn);
 }
 
 void dcd_set_address(uint8_t rhport, uint8_t dev_addr)
