@@ -13,3 +13,15 @@
 [submodule "stm32_sdk/cmsis"]
 	path = stm32_sdk/cmsis
 	url = https://github.com/STMicroelectronics/cmsis_core.git
+[submodule "stm32_sdk/devices/f4"]
+	path = stm32_sdk/devices/f4
+	url = https://github.com/STMicroelectronics/cmsis_device_f4.git
+[submodule "stm32_sdk/drivers/f4"]
+	path = stm32_sdk/drivers/f4
+	url = https://github.com/STMicroelectronics/stm32f4xx_hal_driver.git
+[submodule "stm32_sdk/usb_device"]
+	path = stm32_sdk/usb_device
+	url = https://github.com/STMicroelectronics/stm32_mw_usb_device.git
+[submodule "stm32_sdk/usb_host"]
+	path = stm32_sdk/usb_host
+	url = https://github.com/STMicroelectronics/stm32_mw_usb_host.git
