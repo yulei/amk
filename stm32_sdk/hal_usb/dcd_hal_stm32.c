@@ -40,6 +40,10 @@ void dcd_init(uint8_t rhport)
     if (HAL_PCD_Init(&dcd_usb) != HAL_OK) {
         amk_printf("Failed to initialize HAL PCD\n");
     }
+
+    if (HAL_PCD_Start(&dcd_usb) != HAL_OK) {
+        amk_printf("Failed to start HAL PCD\n");
+    }
 }
 
 void dcd_int_handler(uint8_t rhport)
@@ -61,6 +65,7 @@ void dcd_int_disable(uint8_t rhport)
 void dcd_set_address(uint8_t rhport, uint8_t dev_addr)
 {
     HAL_PCD_SetAddress(&dcd_usb, dev_addr);
+    HAL_PCD_EP_Transmit(&dcd_usb, 0, NULL, 0);
 }
 
 void dcd_remote_wakeup(uint8_t rhport)
@@ -130,6 +135,9 @@ void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr)
 // PCD callback override
 void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef *usb, uint8_t epnum)
 {
+    if (tu_edpt_number(epnum) == 0) {
+        // preparing for next packet?
+    }
     dcd_event_xfer_complete(0, epnum, usb->OUT_ep[epnum & EP_ADDR_MSK].xfer_count, XFER_RESULT_SUCCESS, true); 
 }
 
