@@ -61,3 +61,6 @@ include $(LIB_DIR)/tinyusb.mk
 else
 include $(STM32SDK_DIR)/hal_usb.mk
 endif
+
+LINKER_PATH	?= $(STM32SDK_DIR)/mcus/linker
+LINKER_SCRIPT := $(LINKER_PATH)/$(MCU_LD)_FLASH.ld

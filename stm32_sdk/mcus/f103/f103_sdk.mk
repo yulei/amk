@@ -9,5 +9,4 @@ APP_DEFS += \
 
 SDK_DEFS += -mcpu=cortex-m3 -mthumb
 
-LINKER_PATH		:= $(STM32SDK_DIR)/linker
-LINKER_SCRIPT	:= $(STM32SDK_DIR)/linker/STM32F103CBTx_FLASH.ld
+MCU_LD = STM32F103CBTx

@@ -15,5 +15,4 @@ APP_DEFS += \
 
 SDK_DEFS += -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
-LINKER_PATH		:= $(STM32SDK_DIR)/linker
-LINKER_SCRIPT	:= $(STM32SDK_DIR)/linker/STM32F405RGTx_FLASH.ld
+MCU_LD = STM32F405RGTx
