@@ -25,3 +25,9 @@
 [submodule "stm32_sdk/usb_host"]
 	path = stm32_sdk/usb_host
 	url = https://github.com/STMicroelectronics/stm32_mw_usb_host.git
+[submodule "stm32_sdk/devices/f1"]
+	path = stm32_sdk/devices/f1
+	url = https://github.com/STMicroelectronics/cmsis_device_f1.git
+[submodule "stm32_sdk/drivers/f1"]
+	path = stm32_sdk/drivers/f1
+	url = https://github.com/STMicroelectronics/stm32f4xx_hal_driver.git
