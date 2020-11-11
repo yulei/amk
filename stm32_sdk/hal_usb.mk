@@ -25,6 +25,8 @@ SRCS += \
 	$(USB_HOST_PATH)/Core/Src/usbh_ctlreq.c \
 	$(USB_HOST_PATH)/Core/Src/usbh_ioreq.c \
 	$(USB_HOST_PATH)/Core/Src/usbh_pipes.c 
+
+APP_DEFS += -DUSB_HOST_ENABLE
 endif
 
 ifeq (yes, $(strip $(WEBUSB_ENABLE)))

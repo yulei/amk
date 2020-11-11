@@ -6,10 +6,19 @@
 #include "tusb.h"
 #include "amk_printf.h"
 
+#ifdef USB_WITH_TINYUSB
 void OTG_FS_IRQHandler(void)
 {
     tud_int_handler(0);
 }
+#else
+extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
+void OTG_FS_IRQHandler(void)
+{
+    //tud_int_handler(0);
+    HAL_PCD_IRQHandler(&hpcd_USB_OTG_FS);
+}
+#endif
 
 I2C_HandleTypeDef hi2c1;
 DMA_HandleTypeDef hdma_i2c1_tx;
@@ -150,13 +159,11 @@ static void MX_USB_DEVICE_Init(void)
     __HAL_RCC_USB_OTG_FS_CLK_ENABLE();
 
     // explicitly disable VBUS sense 
-#define USB_OTG_DEVICE     ((USB_OTG_DeviceTypeDef *)(USB_OTG_FS_PERIPH_BASE + USB_OTG_DEVICE_BASE))
-
-    USB_OTG_DEVICE->DCTL |= USB_OTG_DCTL_SDIS;
-
+#ifdef USB_WITH_TINYUSB
     USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_NOVBUSSENS;
     USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSBSEN;
     USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSASEN;
+#endif
 }
 
 void custom_board_init(void)

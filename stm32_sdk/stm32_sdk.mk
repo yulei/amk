@@ -5,7 +5,7 @@ ifeq (STM32F411, $(strip $(MCU)))
 MCU_SERIES := f4
 MCU_FAMILY := stm32f4xx
 MCU_TYPE := f411
-USB_WITH_TINYUSB := yes
+#USB_WITH_TINYUSB := yes
 endif
 
 ifeq (STM32F405, $(strip $(MCU)))
@@ -58,6 +58,7 @@ include $(STM32SDK_DIR)/mcus/$(MCU_TYPE)/$(MCU_TYPE)_sdk.mk
 
 ifeq (yes, $(strip $(USB_WITH_TINYUSB)))
 include $(LIB_DIR)/tinyusb.mk
+APP_DEFS += -DUSB_WITH_TINYUSB
 else
 include $(STM32SDK_DIR)/hal_usb.mk
 endif

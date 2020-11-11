@@ -17,12 +17,16 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 void usb_init(void)
 {
     MX_USB_DEVICE_Init();
+#ifdef USB_HOST_ENABLE
     MX_USB_HOST_Init();
+#endif
 }
 
 void usb_task(void)
 {
+#ifdef USB_HOST_ENABLE
     MX_USB_HOST_Process();
+#endif
 }
 
 bool usb_ready(void)
@@ -61,7 +65,7 @@ void usb_send_report(uint8_t report_type, const void* data, size_t size)
     }
 }
 
-
+#ifdef USB_HOST_ENABLE
 void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
 {
     HID_HandleTypeDef *HID_Handle = (HID_HandleTypeDef *) phost->pActiveClass->pData;
@@ -73,6 +77,7 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
     extern USBD_HandleTypeDef hUsbDeviceFS;
     USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_KEYBOARD, buf, 8);
 }
+#endif
 
 #ifdef WEBUSB_ENABLE
 void webusb_task(void)
