@@ -9,8 +9,12 @@
 #include "rgb_color.h"
 #include "wait.h"
 
-#define WS2812_VAL_0        0x8002
-#define WS2812_VAL_1        0x8008
+// data copied from the Adafruit NeoPixel lib
+#define PWM_DIVIDER         20
+#define WS2812_VAL_0        (0x8000 | 6)
+#define WS2812_VAL_1        (0x8000 | 13)
+#define WS2812_VAL_RESET    (0x8000)
+#define WS2812_RESET_PERIOD 256
 
 #define WS2812_COLOR_SIZE   (RGB_LED_NUM*24)
 #define WS2812_RESET_SIZE   1
@@ -26,7 +30,7 @@ nrf_pwm_sequence_t ws2812_pwm_seq = {
     .values.p_raw = ws2812_data,
     .length = WS2812_BUF_SIZE,
     .repeats = 0,
-    .end_delay = 32,
+    .end_delay = WS2812_RESET_PERIOD,
 };
 
 static void ws2812_write_color(uint8_t c, uint16_t offset)
@@ -51,6 +55,8 @@ static void pwm_handler(nrfx_pwm_evt_type_t event_type)
 
 void ws2812_init(pin_t pin)
 {
+    if (ws2812_ready) return;
+
     ws2812_pin = pin;
     gpio_set_output_pushpull(pin);
     gpio_write_pin(pin, 0);
@@ -60,8 +66,8 @@ void ws2812_init(pin_t pin)
     config.output_pins[1] = NRFX_PWM_PIN_NOT_USED;
     config.output_pins[2] = NRFX_PWM_PIN_NOT_USED;
     config.output_pins[3] = NRFX_PWM_PIN_NOT_USED;
-    config.base_clock = NRF_PWM_CLK_8MHz;
-    config.top_value = 10; // clock = 8 MHz, we need a 800 kHz signal
+    config.base_clock = NRF_PWM_CLK_16MHz;
+    config.top_value = PWM_DIVIDER;
     config.count_mode = NRF_PWM_MODE_UP;
     config.irq_priority = NRFX_PWM_DEFAULT_CONFIG_IRQ_PRIORITY;
     config.load_mode = NRF_PWM_LOAD_COMMON;
@@ -73,7 +79,7 @@ void ws2812_init(pin_t pin)
         ws2812_data[i] = WS2812_VAL_0;
     }
     for (int j = 0; j < WS2812_RESET_SIZE; j++) {
-        ws2812_data[WS2812_COLOR_SIZE+j] = 0x8000;
+        ws2812_data[WS2812_COLOR_SIZE+j] = WS2812_VAL_RESET;
     }
     ws2812_pwm_seq.length = WS2812_BUF_SIZE;
     //nrfx_pwm_simple_playback(&ws2812_pwm, &ws2812_pwm_seq, 1, NRFX_PWM_FLAG_STOP);
