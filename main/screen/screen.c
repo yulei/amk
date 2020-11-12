@@ -39,8 +39,11 @@ void screen_init(void)
     screen_driver.flush_cb = disp_flush;
     screen_driver.buffer = &disp_buf;
 
-    /*Finally register the driver*/
+    // register the driver
     lv_disp_drv_register(&screen_driver);
+
+    // test
+    screen_test();
 }
 
 void screen_task(void)
@@ -74,6 +77,6 @@ void disp_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_
 void screen_test(void)
 {
     lv_obj_t * label1 =  lv_label_create(lv_scr_act(), NULL);
-    lv_label_set_text(label1, "Hello world!");
+    lv_label_set_text(label1, "Hello babyfish!");
     lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
 }
