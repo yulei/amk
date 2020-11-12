@@ -110,9 +110,9 @@ bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t t
     uint8_t const dir   = tu_edpt_dir(ep_addr);
     HAL_StatusTypeDef status = HAL_OK;
     if (dir == TUSB_DIR_IN) {
-        status = HAL_PCD_EP_Receive(&dcd_usb, epnum, buffer, total_bytes);
-    } else {
         status = HAL_PCD_EP_Transmit(&dcd_usb, epnum, buffer, total_bytes);
+    } else {
+        status = HAL_PCD_EP_Receive(&dcd_usb, epnum, buffer, total_bytes);
     }
     if (status != HAL_OK) {
         amk_printf("Failed to xfer ep:%d, status:%d\n", ep_addr, status);
@@ -135,10 +135,7 @@ void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr)
 // PCD callback override
 void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef *usb, uint8_t epnum)
 {
-    if (tu_edpt_number(epnum) == 0) {
-        // preparing for next packet?
-    }
-    dcd_event_xfer_complete(0, epnum, usb->OUT_ep[epnum & EP_ADDR_MSK].xfer_count, XFER_RESULT_SUCCESS, true); 
+    dcd_event_xfer_complete(0, epnum, HAL_PCD_EP_GetRxCount(usb, epnum), XFER_RESULT_SUCCESS, true); 
 }
 
 void HAL_PCD_DataInStageCallback(PCD_HandleTypeDef *usb, uint8_t epnum)

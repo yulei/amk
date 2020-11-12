@@ -11,18 +11,22 @@ SRCS += \
 INCS += \
 	$(TINYUSB_DIR) \
 
+ifeq (yes, $(strip $(TINYUSB_USE_HAL)))
+SRCS += $(STM32_DIR)/hal_usb/dcd_hal_stm32.c
+else
+
 ifeq (STM32F103, $(strip $(MCU)))
 SRCS += $(TINYUSB_DIR)/portable/st/stm32_fsdev/dcd_stm32_fsdev.c
 endif
 
 ifeq (STM32F411, $(strip $(MCU)))
 SRCS += $(TINYUSB_DIR)/portable/st/synopsys/dcd_synopsys.c
-#SRCS += $(STM32_DIR)/hal_usb/dcd_hal_stm32.c
 endif
 
 ifeq (STM32F722, $(strip $(MCU)))
 SRCS += $(TINYUSB_DIR)/portable/st/synopsys/dcd_synopsys.c
 endif
+endif #TINYUSB_USE_HAL
 
 ifeq (NRF52840, $(strip $(MCU)))
 SRCS += $(TINYUSB_DIR)/portable/nordic/nrf5x/dcd_nrf5x.c

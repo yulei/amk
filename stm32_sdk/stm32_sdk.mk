@@ -1,17 +1,16 @@
 STM32SDK_DIR := $(STM32_DIR)
-USB_WITH_TINYUSB ?= no
 
 ifeq (STM32F411, $(strip $(MCU)))
 MCU_SERIES := f4
 MCU_FAMILY := stm32f4xx
 MCU_TYPE := f411
-#USB_WITH_TINYUSB := yes
 endif
 
 ifeq (STM32F405, $(strip $(MCU)))
 MCU_SERIES := f4
 MCU_FAMILY := stm32f4xx
 MCU_TYPE := f405
+TINYUSB_ENABLE := no
 endif
 
 ifeq (STM32F722, $(strip $(MCU)))
@@ -24,7 +23,6 @@ ifeq (STM32F103, $(strip $(MCU)))
 MCU_SERIES := f1
 MCU_FAMILY := stm32f1xx
 MCU_TYPE := f103
-USB_WITH_TINYUSB := yes
 endif
 
 SRCS += \
@@ -56,12 +54,22 @@ APP_DEFS += -DUSE_HAL_DRIVER
 
 include $(STM32SDK_DIR)/mcus/$(MCU_TYPE)/$(MCU_TYPE)_sdk.mk
 
-ifeq (yes, $(strip $(USB_WITH_TINYUSB)))
-include $(LIB_DIR)/tinyusb.mk
-APP_DEFS += -DUSB_WITH_TINYUSB
+ifeq (yes, $(strip $(TINYUSB_ENABLE)))
+	include $(LIB_DIR)/tinyusb.mk
+	APP_DEFS += -DTINYUSB_ENABLE
+	ifeq (yes, $(strip $(TINYUSB_USE_HAL)))
+		SRCS += $(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_pcd.c 
+		SRCS += $(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_pcd_ex.c
+		SRCS += $(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_ll_usb.c 
+		APP_DEFS += -DHAL_PCD_MODULE_ENABLED
+	endif #TINYUSB_USE_HAL
 else
-include $(STM32SDK_DIR)/hal_usb.mk
-endif
+	include $(STM32SDK_DIR)/hal_usb.mk
+	SRCS += $(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_pcd.c 
+	SRCS += $(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_pcd_ex.c
+	SRCS += $(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_ll_usb.c 
+	APP_DEFS += -DHAL_PCD_MODULE_ENABLED
+endif #TINYUSB_ENABLE
 
 LINKER_PATH	?= $(STM32SDK_DIR)/mcus/linker
 LINKER_SCRIPT := $(LINKER_PATH)/$(MCU_LD)_FLASH.ld

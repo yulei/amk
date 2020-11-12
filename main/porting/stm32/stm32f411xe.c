@@ -6,7 +6,7 @@
 #include "tusb.h"
 #include "amk_printf.h"
 
-#ifdef USB_WITH_TINYUSB
+#ifdef TINYUSB_ENABLE
 void OTG_FS_IRQHandler(void)
 {
     tud_int_handler(0);
@@ -159,7 +159,7 @@ static void MX_USB_DEVICE_Init(void)
     __HAL_RCC_USB_OTG_FS_CLK_ENABLE();
 
     // explicitly disable VBUS sense 
-#ifdef USB_WITH_TINYUSB
+#ifdef TINYUSB_ENABLE 
     USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_NOVBUSSENS;
     USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSBSEN;
     USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSASEN;

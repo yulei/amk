@@ -11,22 +11,24 @@ SRCS += \
 INCS += \
 	$(STM32_PORTING_DIR) \
 
-ifeq (STM32F411, $(strip $(MCU)))
+ifeq (yes, $(TINYUSB_ENABLE))
+	SRCS += $(STM32_PORTING_DIR)/usb_tinyusb.c
+else
 	SRCS += $(STM32_PORTING_DIR)/usb_hal.c
+endif
+
+ifeq (STM32F411, $(strip $(MCU)))
 	SRCS += $(STM32_PORTING_DIR)/stm32f411xe.c
 endif
 
 ifeq (STM32F405, $(strip $(MCU)))
-	SRCS += $(STM32_PORTING_DIR)/usb_hal.c
 	SRCS += $(STM32_PORTING_DIR)/stm32f405xx.c
 endif
 
 ifeq (STM32F722, $(strip $(MCU)))
-	SRCS += $(STM32_PORTING_DIR)/usb_tinyusb.c
 	SRCS += $(STM32_PORTING_DIR)/stm32f722xx.c
 endif
 
 ifeq (STM32F103, $(strip $(MCU)))
-	SRCS += $(STM32_PORTING_DIR)/usb_tinyusb.c
 	SRCS += $(STM32_PORTING_DIR)/stm32f103xb.c
 endif

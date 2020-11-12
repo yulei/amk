@@ -24,9 +24,11 @@ SRCS += \
 	$(USB_HOST_PATH)/Core/Src/usbh_core.c \
 	$(USB_HOST_PATH)/Core/Src/usbh_ctlreq.c \
 	$(USB_HOST_PATH)/Core/Src/usbh_ioreq.c \
-	$(USB_HOST_PATH)/Core/Src/usbh_pipes.c 
+	$(USB_HOST_PATH)/Core/Src/usbh_pipes.c \
+	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_hcd.c \
+	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_ll_usb.c
 
-APP_DEFS += -DUSB_HOST_ENABLE
+APP_DEFS += -DUSB_HOST_ENABLE -DHAL_HCD_MODULE_ENABLED
 endif
 
 ifeq (yes, $(strip $(WEBUSB_ENABLE)))
