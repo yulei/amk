@@ -106,7 +106,7 @@ static void write_data_buffer(ssd1357_t *driver, const void *data, size_t size)
     gpio_write_pin(driver->cs, 0);
     gpio_write_pin(driver->dc, 1);
 
-    spi_send(spi, &data, size);
+    spi_send(spi, data, size);
 
     gpio_write_pin(driver->cs, 1);
     gpio_write_pin(driver->dc, 1);
@@ -306,6 +306,7 @@ static void flush_screen(ssd1357_t *driver, const void *data, size_t size)
 
 void ssd1357_init(ssd1357_t *driver)
 {
+    spi = spi_init();
     gpio_write_pin(driver->reset, 0);
     wait_ms(5);
     gpio_write_pin(driver->reset, 1);
@@ -334,7 +335,7 @@ void ssd1357_init(ssd1357_t *driver)
     set_column_address(driver, COL_BEGIN, COL_END); // Set Column Address
     set_row_address(driver, ROW_BEGIN, ROW_END);    // Set Row Address
     set_display_mode(driver, 0xA6);                 // Normal Display Mode (0xA4/0xA5/0xA6/0xA7)
-    fill_screen(driver, 0);                         // Clear Screen
+    fill_screen(driver, 0x0000);                    // Clear Screen
     set_display_on_off(driver, 0xAF);               // Display On (0xAE/0xAF)
     // need to power up screen here
     // wait_ms(200);

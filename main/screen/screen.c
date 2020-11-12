@@ -22,6 +22,12 @@ void screen_init(void)
     lv_init();
 
     for (int i = 0; i < SCREEN_NUM; i++) {
+        gpio_write_pin(ssd1357_drivers[i].reset, 0);
+        gpio_write_pin(ssd1357_drivers[i].cs, 1);
+        gpio_write_pin(ssd1357_drivers[i].dc, 1);
+        gpio_set_output_pushpull(ssd1357_drivers[i].reset);
+        gpio_set_output_pushpull(ssd1357_drivers[i].cs);
+        gpio_set_output_pushpull(ssd1357_drivers[i].dc);
         ssd1357_init(&ssd1357_drivers[i]);
     }
 
@@ -77,6 +83,6 @@ void disp_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_
 void screen_test(void)
 {
     lv_obj_t * label1 =  lv_label_create(lv_scr_act(), NULL);
-    lv_label_set_text(label1, "Hello babyfish!");
+    lv_label_set_text(label1, "Hello \nbabyfish!");
     lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
 }
