@@ -143,7 +143,9 @@ static void MX_DMA_Init(void)
     HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
 }
 
-static void MX_USB_DEVICE_Init(void)
+
+#if defined(TINYUSB_ENABLE)
+void usb_port_init(void)
 {
     GPIO_InitTypeDef  GPIO_InitStruct;
     /* Configure USB FS GPIOs */
@@ -157,14 +159,23 @@ static void MX_USB_DEVICE_Init(void)
 
     // Enable USB OTG clock
     __HAL_RCC_USB_OTG_FS_CLK_ENABLE();
-
+}
+#if defined(TINYUSB_USE_HAL)
+void HAL_PCD_MspInit(PCD_HandleTypeDef *hpcd)
+{
+    usb_port_init();
+}
+#else
+static void MX_USB_DEVICE_Init(void)
+{
+    usb_port_init();
     // explicitly disable VBUS sense 
-#ifdef TINYUSB_ENABLE 
     USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_NOVBUSSENS;
     USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSBSEN;
     USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSASEN;
-#endif
 }
+#endif
+#endif
 
 void custom_board_init(void)
 {
@@ -172,7 +183,9 @@ void custom_board_init(void)
 
     MX_GPIO_Init();
     MX_DMA_Init();
+#if defined(TINYUSB_ENABLE) && !defined(TINYUUSB_USE_HAL)
     MX_USB_DEVICE_Init();
+#endif
     MX_I2C1_Init();
     MX_SPI1_Init();
 }
