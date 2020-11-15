@@ -57,15 +57,16 @@ void dcd_init(uint8_t rhport)
         amk_printf("Failed to initialize HAL PCD\n");
     }
 
-    HAL_PCDEx_SetRxFiFo(&dcd_usb, 0x80);
-    HAL_PCDEx_SetTxFiFo(&dcd_usb, 0, 0x40);
-    HAL_PCDEx_SetTxFiFo(&dcd_usb, 1, 0x80);
+    // NEED improve the buffer setting
+    HAL_PCDEx_SetRxFiFo(&dcd_usb, 0x80);        // shared rx buffer
+    HAL_PCDEx_SetTxFiFo(&dcd_usb, 0, 0x40);     // ep0 tx buffer    
+    HAL_PCDEx_SetTxFiFo(&dcd_usb, 1, 0x40);     // ep1 tx buffer (keyboard)
+    HAL_PCDEx_SetTxFiFo(&dcd_usb, 2, 0x40);     // ep2 tx buffer (mouse, system, consumer)
+    HAL_PCDEx_SetTxFiFo(&dcd_usb, 3, 0x80);     // ep3 tx buffer (webusb)
 
     if (HAL_PCD_Start(&dcd_usb) != HAL_OK) {
         amk_printf("Failed to start HAL PCD\n");
     }
-
-    //dcd_open_ep0(&dcd_usb);
 }
 
 void dcd_int_handler(uint8_t rhport)
