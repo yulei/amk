@@ -42,3 +42,5 @@
 #define INDICATOR_PIN               25
 
 //#define GZLL_IS_CLIENT              1
+
+#define WS2812_LED_PIN              12
