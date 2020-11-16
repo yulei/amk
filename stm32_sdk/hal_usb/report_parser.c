@@ -21,11 +21,12 @@ enum {
     RDI_SYSTEM,
     RDI_CONSUMER,
     RDI_NKRO,
+    RDI_RAW,
+    RDI_MAX,
 };
 
 #define KEYCODE_LEN_MAX    6            // boot keyboard use 1 byte for modified, 1 byte reserved, 6 bytes for keycodes, 1 byte for led 
 typedef struct {
-    uint8_t interface;
     uint8_t report_id;
     uint8_t modifier;                   // shift/ctrl/gui/alt
     uint8_t reserved;                   // reserved 
@@ -35,7 +36,6 @@ typedef struct {
 
 // boot mouse use 1 byte for button, 2 bytes for x/y, 2 bytes for wheel h/v
 typedef struct {
-    uint8_t interface;
     uint8_t report_id;
     uint8_t button;
     int8_t x;
@@ -46,14 +46,12 @@ typedef struct {
 
 #define SYSTEM_LEN_MAX      2
 typedef struct {
-    uint8_t interface;
     uint8_t report_id;
     uint16_t keycode;
 } system_descriptor_t;
 
 #define CONSUMER_LEN_MAX    2
 typedef struct {
-    uint8_t interface;
     uint8_t report_id;
     uint16_t keycode;
 } consumer_descriptor_t;
@@ -67,8 +65,8 @@ enum {
 };
 
 typedef struct {
-    uint8_t interface;
     uint8_t report_id;
+    uint8_t boot;
     uint8_t modifier;
     uint8_t led;
     uint8_t keycode_size;
@@ -87,25 +85,37 @@ typedef struct {
     uint8_t rd_type;
 } report_descriptor_t;
 
-#define ITF_MAX 4
-static report_descriptor_t descriptors[ITF_MAX];
+
+#define ITF_MAX 4       // tmk could have keyboard, mouse, extra and nkro, qmk can have, keyboard, shared, raw
+#define RD_MAX  5       // qmk can let keyboard, mouse, extra(system, consumer), nkro in one interface
+
+typedef struct {
+    uint8_t itf;
+    uint8_t valid;
+    report_descriptor_t desc[RD_MAX];
+} itf_report_desc;
+
+static itf_report_desc descriptors[ITF_MAX];
 static uint8_t avail_descs = 0;
 
 static uint32_t pase_desktop(report_descriptor_t* desc, uint8_t* p);
 static uint32_t pase_consumer(report_descriptor_t* desc, uint8_t* p);
 
+void init_report_parser(void)
+{}
+
 bool parse_report_descriptor(uint32_t itf, const void* data, uint32_t size)
 {
     uint8_t* p = (uint8_t*)data;
     uint8_t* end = p + size;
-    uint32_t parsed;
+    uint32_t parsed = 0;
     while(p < end) {
         switch(*p){
         case HID_USAGE_PAGE_GEN_DES:
-            parsed = parse_desktop(&descriptors[avail_descs], p);
+            parsed = parse_desktop(&descriptors[itf], p);
         break;
         case HID_USAGE_PAGE_CONSUMER:
-            parsed = parse_consumer(&descriptors[avail_descs], p);
+            parsed = parse_consumer(&descriptors[itf], p);
         break;
         default:
             return false; // unsupport usage page
@@ -121,5 +131,18 @@ bool parse_report_descriptor(uint32_t itf, const void* data, uint32_t size)
     return true;
 }
 
-void repport_decode(uint32_t itf, const void* data, uint32_t size)
+void report_decode(uint32_t itf, const void* data, uint32_t size)
 {}
+
+uint32_t pase_desktop(report_descriptor_t* desc, uint8_t* p)
+{
+    uint8_t* cur = ++p;
+    switch(*cur) {
+    case HID_USAGE_KBD:
+        break;
+    case HID_USAGE_MOUSE:
+        break;
+    case HID_USAGE_SYSCTL:
+        break;
+    }
+}
