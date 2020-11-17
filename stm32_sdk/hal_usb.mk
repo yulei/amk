@@ -15,6 +15,7 @@ SRCS += \
 
 ifeq (yes, $(strip $(USB_HOST_ENABLE)))
 SRCS += \
+	$(HAL_USB_PATH)/report_parser.c \
 	$(HAL_USB_PATH)/usb_host.c \
 	$(HAL_USB_PATH)/usbh_conf.c \
 	$(HAL_USB_PATH)/usbh_hid.c \
