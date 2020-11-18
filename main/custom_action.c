@@ -10,6 +10,7 @@
 #include "action_layer.h"
 #include "action_util.h"
 #include "amk_printf.h"
+#include "wait.h"
 
 
 __attribute__((weak))
@@ -70,7 +71,6 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 }
 #endif
 
-#define KC_GESC KC_POST_FAIL
 
 __attribute__((weak))
 bool hook_process_action_main(keyrecord_t *record)
@@ -82,11 +82,17 @@ bool hook_process_action(keyrecord_t *record)
 {
     keyevent_t event = record->event;
 
+#ifndef NO_ACTION_TAPPING
+    uint8_t tap_count = record->tap.count;
+#endif
+
     if (IS_NOEVENT(event)) { return false; }
 
     action_t action = layer_switch_get_action(event);
-    if (action.kind.id == ACT_MODS) {
-        static uint8_t last_gesc = KC_ESC;
+    switch (action.kind.id) {
+    case ACT_LMODS:
+    case ACT_RMODS: {
+        static uint8_t last_gesc = KC_NO;
         if (action.key.code == KC_GESC) {
             if (event.pressed) {
                 uint8_t mods = get_mods();
@@ -105,8 +111,68 @@ bool hook_process_action(keyrecord_t *record)
             }
 
             return true;
+        } else if (action.key.code == KC_MEH)  {
+            uint8_t mods = MOD_BIT(KC_LCTL) | MOD_BIT(KC_LSFT) | MOD_BIT(KC_LALT);
+            if (event.pressed) {
+                add_weak_mods(mods);
+            } else {
+                del_weak_mods(mods);
+            }
+            send_keyboard_report();
+            return true;
+        } else if (action.key.code == KC_HYPER) {
+            uint8_t mods = MOD_BIT(KC_LCTL) | MOD_BIT(KC_LSFT) | MOD_BIT(KC_LALT) | MOD_BIT(KC_LGUI);
+            if (event.pressed) {
+                add_weak_mods(mods);
+            } else {
+                del_weak_mods(mods);
+            }
+            send_keyboard_report();
+            return true;
         }
-
+    } break;
+    case ACT_LMODS_TAP:
+    case ACT_RMODS_TAP: {
+        uint8_t mods = (action.kind.id == ACT_LMODS_TAP) ?  action.key.mods : action.key.mods<<4;
+        uint8_t code = KC_NO;
+        switch (action.key.code) {
+        case KC_LCPO:
+        case KC_LSPO:
+        case KC_LAPO:
+            code = KC_9;
+            break;
+        case KC_RCPC:
+        case KC_RSPC:
+        case KC_RAPC:
+            code = KC_0;
+            break;
+        case KC_SFTENT:
+            code = KC_ENT;
+            break;
+        default:
+            return false; 
+        }
+        if (event.pressed) {
+            register_mods(mods);
+            if (tap_count > 0) {
+                if (record->tap.interrupted) {
+                    amk_printf("MODS_TAP: Tap: Cancel: add_mods\n");
+                    // ad hoc: set 0 to cancel tap
+                    record->tap.count = 0;
+                } else {
+                    amk_printf("MODS_TAP: Tap: register_code\n");
+                    register_code(code);
+                }
+            }
+        } else {
+            unregister_mods(mods);
+            if (tap_count > 0) {
+                amk_printf("MODS_TAP: Tap: unregister_code\n");
+                unregister_code(code);
+            }
+        }
+        return true;
+    } break;
     }
     return hook_process_action_main(record);
 }
