@@ -311,7 +311,7 @@ static void usb_leds(uint8_t leds)
 // F23 for enter bootloader mode
 #include "action.h"
 #include "action_layer.h"
-bool hook_process_action(keyrecord_t *record) {
+bool hook_process_action_main(keyrecord_t *record) {
 {
     if (IS_NOEVENT(record->event) || !record->event.pressed) { 
         return false;

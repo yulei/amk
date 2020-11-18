@@ -7,6 +7,8 @@
 #include "rgb_effects.h"
 
 #include "action.h"
+#include "action_layer.h"
+#include "action_util.h"
 #include "amk_printf.h"
 
 
@@ -67,3 +69,41 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
     }
 }
 #endif
+
+#define KC_GESC KC_POST_FAIL
+
+__attribute__((weak))
+bool hook_process_action_main(keyrecord_t *record);
+
+bool hook_process_action(keyrecord_t *record)
+{
+    keyevent_t event = record->event;
+
+    if (IS_NOEVENT(event)) { return false; }
+
+    action_t action = layer_switch_get_action(event);
+    if (action.kind.id == ACT_MODS) {
+        static uint8_t last_gesc = KC_ESC;
+        if (action.key.code == KC_GESC) {
+            if (event.pressed) {
+                uint8_t mods = get_mods();
+                if (   (mods & (MOD_BIT(KC_LSFT))) 
+                    || (mods & (MOD_BIT(KC_RSFT)))
+                    || (mods & (MOD_BIT(KC_LGUI)))
+                    || (mods & (MOD_BIT(KC_RGUI)))
+                    ) {
+                    last_gesc = KC_GRAVE;
+                } else {
+                    last_gesc = KC_ESC;
+                }
+                register_code(last_gesc);
+            } else {
+                unregister_code(last_gesc);
+            }
+
+            return true;
+        }
+
+    }
+    return false;
+}
