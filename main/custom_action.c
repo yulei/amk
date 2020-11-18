@@ -73,7 +73,10 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 #define KC_GESC KC_POST_FAIL
 
 __attribute__((weak))
-bool hook_process_action_main(keyrecord_t *record);
+bool hook_process_action_main(keyrecord_t *record)
+{
+    return false;
+}
 
 bool hook_process_action(keyrecord_t *record)
 {
@@ -105,5 +108,5 @@ bool hook_process_action(keyrecord_t *record)
         }
 
     }
-    return false;
+    return hook_process_action_main(record);
 }
