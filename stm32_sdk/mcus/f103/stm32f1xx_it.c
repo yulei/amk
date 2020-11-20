@@ -249,9 +249,14 @@ __attribute__((weak)) void uart_recv_char(uint8_t c){}
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
-  uint8_t d = huart1.Instance->DR & 0x000000FF;
-  uart_recv_char(d);
-  return;
+  uint32_t sr = huart1.Instance->SR;
+  uint32_t cr1 = huart1.Instance->CR1;
+  if (((sr & USART_SR_RXNE) != 0) && ((cr1 & USART_CR1_RXNEIE) != 0))
+  {// received one char
+    uint8_t d = huart1.Instance->DR & 0x000000FF;
+    uart_recv_char(d);
+    return;
+  }
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
   /* USER CODE BEGIN USART1_IRQn 1 */
