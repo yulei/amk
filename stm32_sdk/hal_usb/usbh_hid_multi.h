@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "usbh_hid_def.h"
 #include "usbh_core.h"
 #include "report_parser.h"
 
@@ -32,12 +33,12 @@ typedef enum {
 } HID_CtlStateTypeDef;
 
 typedef enum {
-    HID_MOUSE     = 0x01,
-    HID_KEYBOARD  = 0x02,
-    HID_EXTRA     = 0x03,
-    HID_RAW       = 0x04,
-    HID_CONSOLE   = 0x05,
-    HID_UNKNOWN   = 0xFF,
+    HID_UNKNOWN = 0,
+    HID_MOUSE,
+    HID_KEYBOARD,
+    HID_EXTRA,
+    HID_RAW,
+    HID_CONSOLE,
 } HID_TypeTypeDef;
 
 typedef struct {
@@ -62,8 +63,10 @@ typedef struct {
     uint8_t             OutPipe;
     uint8_t             InPipe;
     HID_StateTypeDef    state;
+    HID_CtlStateTypeDef ctl_state;
     uint8_t             OutEp;
     uint8_t             InEp;
+    uint8_t             ep_addr;
     FIFO_TypeDef        fifo;
     uint8_t             *pData;
     uint16_t            length;
@@ -72,15 +75,16 @@ typedef struct {
     uint8_t             DataReady;
     HID_DescTypeDef     HID_Desc;
     uint8_t             valid;
+    HID_TypeTypeDef     type;
 } HID_InterfaceTypeDef;
 
 
 typedef USBH_StatusTypeDef(* init_t)(USBH_HandleTypeDef *phost);
 typedef struct {
-    HID_InterfaceTypeDef  itfs[ITF_MAX];
-    HID_CtlStateTypeDef   ctl_state;
-    uint8_t               ep_addr;
-    init_t                Init;
+    HID_InterfaceTypeDef    itfs[ITF_MAX];
+    uint8_t                 itf_num;
+    uint8_t                 inited;
+    init_t                  Init;
 } HID_HandleTypeDef;
 
 // HID standard request
@@ -102,18 +106,17 @@ typedef struct {
 extern USBH_ClassTypeDef  HID_Multi_Class;
 #define USBH_HID_CLASS    &HID_Multi_Class
 
-USBH_StatusTypeDef USBH_HID_SetReport(USBH_HandleTypeDef *phost, uint8_t itf, uint8_t *reportBuff, uint8_t reportLen);
-USBH_StatusTypeDef USBH_HID_GetReport(USBH_HandleTypeDef *phost, uint8_t itf, uint8_t *reportBuff, uint8_t reportLen);
+USBH_StatusTypeDef USBH_HID_SetReport(USBH_HandleTypeDef *phost, uint8_t *reportBuff, uint8_t reportLen, uint8_t itf);
+USBH_StatusTypeDef USBH_HID_GetReport(USBH_HandleTypeDef *phost, uint8_t *reportBuff, uint8_t reportLen, uint8_t itf);
 USBH_StatusTypeDef USBH_HID_GetHIDReportDescriptor(USBH_HandleTypeDef *phost, uint8_t itf);
 USBH_StatusTypeDef USBH_HID_GetHIDDescriptor(USBH_HandleTypeDef *phost, uint8_t itf);
-USBH_StatusTypeDef USBH_HID_SetIdle(USBH_HandleTypeDef *phost, uint8_t itf, uint8_t duration, uint8_t reportId);
-USBH_StatusTypeDef USBH_HID_SetProtocol(USBH_HandleTypeDef *phost, uint8_t itf, uint8_t protocol); 
+USBH_StatusTypeDef USBH_HID_SetIdle(USBH_HandleTypeDef *phost, uint8_t duration, uint8_t reportId, uint8_t it);
+USBH_StatusTypeDef USBH_HID_SetProtocol(USBH_HandleTypeDef *phost, uint8_t protocol, uint8_t it); 
 uint8_t USBH_HID_GetPollInterval(USBH_HandleTypeDef *phost, uint8_t itf);
-
 HID_TypeTypeDef USBH_HID_GetDeviceType(USBH_HandleTypeDef *phost, uint8_t itf);
 
 void USBH_HID_FifoInit(FIFO_TypeDef *f, uint8_t *buf, uint16_t size);
-uint16_t  USBH_HID_FifoRead(FIFO_TypeDef *f, void *buf, uint16_t  nbytes);
-uint16_t  USBH_HID_FifoWrite(FIFO_TypeDef *f, void *buf, uint16_t nbytes);
+uint16_t USBH_HID_FifoRead(FIFO_TypeDef *f, void *buf, uint16_t  nbytes);
+uint16_t USBH_HID_FifoWrite(FIFO_TypeDef *f, void *buf, uint16_t nbytes);
 
 void USBH_HID_EventCallback(USBH_HandleTypeDef *phost, uint8_t itf);
