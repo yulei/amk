@@ -29,43 +29,45 @@ static const uint8_t CIE1931_CURVE[256] = {
 rgb_t hsv_to_rgb(hsv_t hsv)
 {
     rgb_t rgb;
-    unsigned char region, remainder, p, q, t;
-
+    uint8_t region, remainder, p, q, t;
+    uint16_t h, s, v;
     if (hsv.s == 0)
     {
         rgb.r = rgb.g = rgb.b = CIE1931_CURVE[hsv.v];
         return rgb;
     }
-    hsv.v  = CIE1931_CURVE[hsv.v];
-    region = hsv.h / 43;
-    remainder = (hsv.h - (region * 43)) * 6; 
+    h = hsv.h;
+    s = hsv.s;
+    v = CIE1931_CURVE[hsv.v];
 
-    p = (hsv.v * (255 - hsv.s)) >> 8;
-    q = (hsv.v * (255 - ((hsv.s * remainder) >> 8))) >> 8;
-    t = (hsv.v * (255 - ((hsv.s * (255 - remainder)) >> 8))) >> 8;
+    region = h / 43;
+    remainder = (h - (region * 43)) * 6; 
+
+    p = (v * (255 - s)) >> 8;
+    q = (v * (255 - ((s * remainder) >> 8))) >> 8;
+    t = (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
 
     switch (region)
     {
         case 0:
-            rgb.r = hsv.v; rgb.g = t; rgb.b = p;
+            rgb.r = v; rgb.g = t; rgb.b = p;
             break;
         case 1:
-            rgb.r = q; rgb.g = hsv.v; rgb.b = p;
+            rgb.r = q; rgb.g = v; rgb.b = p;
             break;
         case 2:
-            rgb.r = p; rgb.g = hsv.v; rgb.b = t;
+            rgb.r = p; rgb.g = v; rgb.b = t;
             break;
         case 3:
-            rgb.r = p; rgb.g = q; rgb.b = hsv.v;
+            rgb.r = p; rgb.g = q; rgb.b = v;
             break;
         case 4:
-            rgb.r = t; rgb.g = p; rgb.b = hsv.v;
+            rgb.r = t; rgb.g = p; rgb.b = v;
             break;
         default:
-            rgb.r = hsv.v; rgb.g = p; rgb.b = q;
+            rgb.r = v; rgb.g = p; rgb.b = q;
             break;
     }
-
     return rgb;
 }
 
