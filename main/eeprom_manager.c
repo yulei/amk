@@ -5,6 +5,7 @@
 #include "eeprom_manager.h"
 #include "eeconfig.h"
 #include "flash_store.h"
+#include "rgb_effects.h"
 
 uint32_t eeconfig_read_kb(void)
 {
@@ -19,6 +20,33 @@ void eeconfig_write_kb(uint32_t data)
 void eeconfig_update_kb(uint32_t data)
 {
     eeprom_update_dword(EECONFIG_KEYBOARD, data);
+}
+
+void eeconfig_read_rgb(void* rgb)
+{
+    rgb_effects_config_t *config = (rgb_effects_config_t*)rgb;
+    config->enable  = eeprom_read_byte(EECONFIG_RGB);
+    config->mode    = eeprom_read_byte(EECONFIG_RGB+1);
+    config->speed   = eeprom_read_byte(EECONFIG_RGB+2);
+    config->hue     = eeprom_read_byte(EECONFIG_RGB+3);
+    config->sat     = eeprom_read_byte(EECONFIG_RGB+4);
+    config->val     = eeprom_read_byte(EECONFIG_RGB+5);
+}
+
+void eeconfig_write_rgb(const void* rgb)
+{
+    rgb_effects_config_t *config = (rgb_effects_config_t*)rgb;
+    eeprom_write_byte(EECONFIG_RGB, config->enable);
+    eeprom_write_byte(EECONFIG_RGB+1, config->mode);
+    eeprom_write_byte(EECONFIG_RGB+2, config->speed);
+    eeprom_write_byte(EECONFIG_RGB+3, config->hue);
+    eeprom_write_byte(EECONFIG_RGB+4, config->sat);
+    eeprom_write_byte(EECONFIG_RGB+5, config->val);
+}
+
+void eeconfig_update_rgb(const void* rgb)
+{
+    eeconfig_write_rgb(rgb);
 }
 
 #define KEYMAP_MAGIC_VALUE      0x4D585438

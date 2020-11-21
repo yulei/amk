@@ -22,3 +22,5 @@ typedef struct {
 typedef rgb_t rgb_led_t;
 
 rgb_t hsv_to_rgb(hsv_t hsv);
+
+rgb_t pick_color(uint8_t hue);

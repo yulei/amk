@@ -25,6 +25,15 @@
 #define EFFECTS_VAL_STEP    8
 #endif
 
+typedef struct {
+    uint8_t enable;
+    uint8_t mode;
+    uint8_t speed;
+    uint8_t hue;
+    uint8_t sat;
+    uint8_t val;
+} rgb_effects_config_t;
+
 void rgb_effects_init(rgb_driver_t* driver);
 bool rgb_effects_enabled(void);
 void rgb_effects_inc_hue(void);
