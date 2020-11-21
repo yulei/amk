@@ -15,6 +15,7 @@ extern void keyboard_set_rgb(bool on);
 void matrix_init_kb(void)
 {
     gpio_set_output_pushpull(CAPS_LED_PIN);
+    gpio_write_pin(CAPS_LED_PIN, 0);
 }
 
 void keyboard_prepare_sleep(void)
@@ -36,8 +37,10 @@ const rgb_led_t g_aw9523b_leds[RGB_LED_NUM] = {
 void led_set(uint8_t led)
 {
     if (led & (1 << USB_LED_CAPS_LOCK)) {
+        amk_printf("turn caps on\n");
         gpio_write_pin(CAPS_LED_PIN, 1);
     } else {
+        amk_printf("turn caps off\n");
         gpio_write_pin(CAPS_LED_PIN, 0);
     }
 }

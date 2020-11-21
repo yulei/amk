@@ -91,7 +91,7 @@ static void battery_level_update(uint8_t level)
        ) {
         APP_ERROR_HANDLER(err_code);
     }
-    NRF_LOG_INFO("battery level update result: %d", err_code);
+    //NRF_LOG_INFO("battery level update result: %d", err_code);
 }
 
 
@@ -103,7 +103,7 @@ static void battery_level_sample_timeout_handler(void* p_context)
     APP_ERROR_CHECK(err_code);
     err_code = app_timer_start(m_battery_sample_timer_id, BATTERY_LEVEL_MEAS_SAMPLE, NULL);
     APP_ERROR_CHECK(err_code);
-    NRF_LOG_INFO("battery sampling triggered.");
+    //NRF_LOG_INFO("battery sampling triggered.");
 }
 
 static void battery_level_meas_timeout_handler(void * p_context)
@@ -175,7 +175,7 @@ static void battery_process_saadc_result(uint32_t result)
 
 static void battery_saadc_handler(nrf_drv_saadc_evt_t const * p_event)
 {
-    NRF_LOG_INFO("battery saadc handler event type: %d", p_event->type);
+    //NRF_LOG_INFO("battery saadc handler event type: %d", p_event->type);
     if (p_event->type == NRF_DRV_SAADC_EVT_DONE) {
         ret_code_t err_code;
 
