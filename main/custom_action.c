@@ -9,6 +9,7 @@
 #include "action.h"
 #include "action_layer.h"
 #include "action_util.h"
+#include "keymap.h"
 #include "amk_printf.h"
 #include "wait.h"
 
@@ -78,17 +79,40 @@ bool hook_process_action_main(keyrecord_t *record)
     return false;
 }
 
+static uint8_t current_layer(keypos_t key)
+{
+    action_t action = ACTION_TRANSPARENT;
+    uint32_t layers = layer_state | default_layer_state;
+    /* check top layer first */
+    for (int8_t i = 31; i >= 0; i--) {
+        if (layers & (1UL<<i)) {
+            action = action_for_key(i, key);
+            if (action.code != (action_t)ACTION_TRANSPARENT.code) {
+                return i;
+            }
+        }
+    }
+    /* fall back to layer 0 */
+    return 0;
+}
+
 bool hook_process_action(keyrecord_t *record)
 {
     keyevent_t event = record->event;
-
-#ifndef NO_ACTION_TAPPING
     uint8_t tap_count = record->tap.count;
-#endif
 
     if (IS_NOEVENT(event)) { return false; }
 
     action_t action = layer_switch_get_action(event);
+    if (action.code == 0) {
+        uint8_t layer = current_layer(event.key);
+        uint8_t keycode = keymap_key_to_keycode(layer, event.key);
+        if (keycode < KC_CTMB || keycode > KC_CTME) {
+            return false;
+        } else {
+            action = (action_t)ACTION_KEY(keycode);
+        }
+    }
     switch (action.kind.id) {
     case ACT_LMODS:
     case ACT_RMODS: {
@@ -136,16 +160,16 @@ bool hook_process_action(keyrecord_t *record)
         uint8_t mods = (action.kind.id == ACT_LMODS_TAP) ?  action.key.mods : action.key.mods<<4;
         uint8_t code = KC_NO;
         switch (action.key.code) {
-        case KC_LCPO:
-        case KC_LSPO:
-        case KC_LAPO:
-            code = KC_9;
-            break;
-        case KC_RCPC:
-        case KC_RSPC:
-        case KC_RAPC:
-            code = KC_0;
-            break;
+        //case KC_LCPO:
+        //case KC_LSPO:
+        //case KC_LAPO:
+        //    code = KC_9;
+        //    break;
+        //case KC_RCPC:
+        //case KC_RSPC:
+        //case KC_RAPC:
+        //    code = KC_0;
+        //    break;
         case KC_SFTENT:
             code = KC_ENT;
             break;

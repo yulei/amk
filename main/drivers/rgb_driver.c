@@ -51,14 +51,18 @@ void rd_ws2812_uninit(void)
 #endif
 }
 
-void rd_ws2812_set_color(uint32_t index, uint8_t red, uint8_t green, uint8_t blue)
+void rd_ws2812_set_color(uint32_t index, uint8_t hue, uint8_t sat, uint8_t val)
 {
-    ws2812_set_color(index, red, green, blue);
+    hsv_t hsv = {hue, sat, val};
+    rgb_t rgb = hsv_to_rgb(hsv);
+    ws2812_set_color(index, rgb.r, rgb.g, rgb.b);
 }
 
-void rd_ws2812_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
+void rd_ws2812_set_color_all(uint8_t hue, uint8_t sat, uint8_t val)
 {
-    ws2812_set_color_all(red, green, blue);
+    hsv_t hsv = {hue, sat, val};
+    rgb_t rgb = hsv_to_rgb(hsv);
+    ws2812_set_color_all(rgb.r, rgb.g, rgb.b);
 }
 
 void rd_ws2812_flush(void)
@@ -101,14 +105,18 @@ void rd_aw9523b_uninit(void)
 #endif
 }
 
-void rd_aw9523b_set_color(uint32_t index, uint8_t red, uint8_t green, uint8_t blue)
+void rd_aw9523b_set_color(uint32_t index, uint8_t hue, uint8_t sat, uint8_t val)
 {
-    aw9523b_set_color(index, red, green, blue);
+    hsv_t hsv = {hue, sat, val};
+    rgb_t rgb = hsv_to_rgb(hsv);
+    aw9523b_set_color(index, rgb.r, rgb.g, rgb.b);
 }
 
-void rd_aw9523b_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
+void rd_aw9523b_set_color_all(uint8_t hue, uint8_t sat, uint8_t val)
 {
-    aw9523b_set_color_all(red, green, blue);
+    hsv_t hsv = {hue, sat, val};
+    rgb_t rgb = hsv_to_rgb(hsv);
+    aw9523b_set_color_all(rgb.r, rgb.g, rgb.b);
 }
 
 void rd_aw9523b_flush(void)
