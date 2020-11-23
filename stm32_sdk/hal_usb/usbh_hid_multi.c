@@ -20,7 +20,7 @@ static uint8_t* report_desc_buf_alloc(report_desc_buf_t* buf, uint32_t size);
 
 static USBH_StatusTypeDef hid_multi_init(USBH_HandleTypeDef *phost);
 static USBH_StatusTypeDef hid_multi_deinit(USBH_HandleTypeDef *phost);
-static USBH_StatusTypeDef hid_multi_class_request(USBH_HandleTypeDef *phost);
+static USBH_StatusTypeDef hid_multi_request(USBH_HandleTypeDef *phost);
 static USBH_StatusTypeDef hid_multi_process(USBH_HandleTypeDef *phost);
 static USBH_StatusTypeDef hid_multi_sof(USBH_HandleTypeDef *phost);
 
@@ -37,7 +37,7 @@ USBH_ClassTypeDef  HID_Multi_Class = {
     USB_HID_CLASS,
     hid_multi_init,
     hid_multi_deinit,
-    hid_multi_class_request,
+    hid_multi_request,
     hid_multi_process,
     hid_multi_sof,
     NULL,
@@ -105,7 +105,7 @@ static USBH_StatusTypeDef hid_multi_deinit(USBH_HandleTypeDef *phost)
     return USBH_OK;
 }
 
-static USBH_StatusTypeDef hid_multi_class_request(USBH_HandleTypeDef *phost)
+static USBH_StatusTypeDef hid_multi_request(USBH_HandleTypeDef *phost)
 {
     HID_HandleTypeDef *phid = (HID_HandleTypeDef*)phost->pActiveClass->pData;
     for (int i = 0; i < phid->itf_num; i++) {

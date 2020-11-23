@@ -3,11 +3,9 @@
  *
  */
 #include <string.h>
+#include "usbh_hid_def.h"
 #include "report_parser.h"
-#include "usbh_hid_usage.h"
-#include "usbh_hid.h"
 #include "amk_printf.h"
-
 
 // from qmk
 #ifndef RAW_USAGE_PAGE

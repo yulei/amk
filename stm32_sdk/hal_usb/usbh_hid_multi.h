@@ -68,7 +68,7 @@ typedef struct {
     uint8_t             in_ep;
     FIFO_TypeDef        fifo;
     uint8_t             fifo_buf[HID_QUEUE_SIZE*HID_PACKET_SIZE];
-    uint8_t             report_buf[64];
+    uint8_t             report_buf[HID_REPORT_BUF_SIZE];
     uint8_t             report_size;
     uint16_t            packet_size;
     uint16_t            poll;

@@ -37,5 +37,4 @@ INCS += \
 	$(HAL_USB_PATH) \
 	$(USB_DEVICE_PATH)/Core/Inc \
 	$(USB_HOST_PATH)/Core/Inc \
-	$(USB_HOST_PATH)/Class/HID/Inc \
 	$(LIB_DIR)/tinyusb/src 
