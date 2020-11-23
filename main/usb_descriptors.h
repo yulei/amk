@@ -101,6 +101,7 @@ enum {
     HID_REPORT_ID_CONSUMER,
     HID_REPORT_ID_NKRO,
     HID_REPORT_ID_WEBUSB,
+    HID_REPORT_ID_UNKNOWN,
 };
 
 // Vendor request id

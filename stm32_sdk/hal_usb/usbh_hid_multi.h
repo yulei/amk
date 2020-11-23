@@ -48,7 +48,7 @@ typedef struct {
     uint8_t   bCountryCode;
     uint8_t   bNumDescriptors;
     uint8_t   bReportDescriptorType;
-    uint16_t  wItemLength;
+    uint16_t  wDescriptorLength;
 } HID_DescTypeDef;
 
 typedef struct {
@@ -60,20 +60,22 @@ typedef struct {
 } FIFO_TypeDef;
 
 typedef struct {
-    uint8_t             OutPipe;
-    uint8_t             InPipe;
+    uint8_t             out_pipe;
+    uint8_t             in_pipe;
     HID_StateTypeDef    state;
     HID_CtlStateTypeDef ctl_state;
-    uint8_t             OutEp;
-    uint8_t             InEp;
-    uint8_t             ep_addr;
+    uint8_t             out_ep;
+    uint8_t             in_ep;
     FIFO_TypeDef        fifo;
-    uint8_t             *pData;
-    uint16_t            length;
+    uint8_t             fifo_buf[HID_QUEUE_SIZE*HID_PACKET_SIZE];
+    uint8_t             report_buf[64];
+    uint8_t             report_size;
+    uint16_t            packet_size;
     uint16_t            poll;
     uint32_t            timer;
-    uint8_t             DataReady;
-    HID_DescTypeDef     HID_Desc;
+    uint8_t             data_ready;
+    HID_DescTypeDef     hid_desc;
+    uint8_t             *report_desc;
     uint8_t             valid;
     HID_TypeTypeDef     type;
 } HID_InterfaceTypeDef;
@@ -85,6 +87,8 @@ typedef struct {
     uint8_t                 itf_num;
     uint8_t                 inited;
     init_t                  Init;
+    uint8_t                 current;
+    void                    *host;
 } HID_HandleTypeDef;
 
 // HID standard request
@@ -106,10 +110,10 @@ typedef struct {
 extern USBH_ClassTypeDef  HID_Multi_Class;
 #define USBH_HID_CLASS    &HID_Multi_Class
 
-USBH_StatusTypeDef USBH_HID_SetReport(USBH_HandleTypeDef *phost, uint8_t *reportBuff, uint8_t reportLen, uint8_t itf);
-USBH_StatusTypeDef USBH_HID_GetReport(USBH_HandleTypeDef *phost, uint8_t *reportBuff, uint8_t reportLen, uint8_t itf);
-USBH_StatusTypeDef USBH_HID_GetHIDReportDescriptor(USBH_HandleTypeDef *phost, uint8_t itf);
-USBH_StatusTypeDef USBH_HID_GetHIDDescriptor(USBH_HandleTypeDef *phost, uint8_t itf);
+USBH_StatusTypeDef USBH_HID_SetReport(USBH_HandleTypeDef *phost, uint8_t type, uint8_t id, uint8_t *reportBuff, uint8_t reportLen, uint8_t itf);
+USBH_StatusTypeDef USBH_HID_GetReport(USBH_HandleTypeDef *phost, uint8_t type, uint8_t id, uint8_t *reportBuff, uint8_t reportLen, uint8_t itf);
+USBH_StatusTypeDef USBH_HID_GetHIDReportDescriptor(USBH_HandleTypeDef *phost, uint16_t length, uint8_t itf);
+USBH_StatusTypeDef USBH_HID_GetHIDDescriptor(USBH_HandleTypeDef *phost, uint16_t length, uint8_t itf);
 USBH_StatusTypeDef USBH_HID_SetIdle(USBH_HandleTypeDef *phost, uint8_t duration, uint8_t reportId, uint8_t it);
 USBH_StatusTypeDef USBH_HID_SetProtocol(USBH_HandleTypeDef *phost, uint8_t protocol, uint8_t it); 
 uint8_t USBH_HID_GetPollInterval(USBH_HandleTypeDef *phost, uint8_t itf);
@@ -119,4 +123,4 @@ void USBH_HID_FifoInit(FIFO_TypeDef *f, uint8_t *buf, uint16_t size);
 uint16_t USBH_HID_FifoRead(FIFO_TypeDef *f, void *buf, uint16_t  nbytes);
 uint16_t USBH_HID_FifoWrite(FIFO_TypeDef *f, void *buf, uint16_t nbytes);
 
-void USBH_HID_EventCallback(USBH_HandleTypeDef *phost, uint8_t itf);
+void USBH_HID_EventCallback(USBH_HandleTypeDef *phost);

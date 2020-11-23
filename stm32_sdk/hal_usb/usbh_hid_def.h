@@ -8,6 +8,7 @@
 //#define HID_REPORT_SIZE                             16U
 #define HID_MAX_USAGE                               10U
 #define HID_MAX_NBR_REPORT_FMT                      10U
+#define HID_PACKET_SIZE                             16U
 #define HID_QUEUE_SIZE                              10U
 
 #define  HID_ITEM_LONG                              0xFEU

@@ -16,12 +16,9 @@ SRCS += \
 ifeq (yes, $(strip $(USB_HOST_ENABLE)))
 SRCS += \
 	$(HAL_USB_PATH)/report_parser.c \
+	$(HAL_USB_PATH)/usbh_hid_multi.c \
 	$(HAL_USB_PATH)/usb_host.c \
 	$(HAL_USB_PATH)/usbh_conf.c \
-	$(HAL_USB_PATH)/usbh_hid.c \
-	$(HAL_USB_PATH)/usbh_hid_keybd.c \
-	$(HAL_USB_PATH)/usbh_hid_mouse.c \
-	$(HAL_USB_PATH)/usbh_hid_parser.c \
 	$(USB_HOST_PATH)/Core/Src/usbh_core.c \
 	$(USB_HOST_PATH)/Core/Src/usbh_ctlreq.c \
 	$(USB_HOST_PATH)/Core/Src/usbh_ioreq.c \
