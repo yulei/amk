@@ -10,7 +10,6 @@ SRCS += \
 	$(TMK_DIR)/common/action_macro.c \
 	$(TMK_DIR)/common/action_layer.c \
 	$(TMK_DIR)/common/action_util.c  \
-	$(TMK_DIR)/common/print.c  \
 	$(TMK_DIR)/common/debug.c \
 	$(TMK_DIR)/common/util.c  \
 	$(TMK_DIR)/common/hook.c \
@@ -20,11 +19,6 @@ INCS += \
 
 APP_DEFS += \
 	-include config.h \
-
-ifeq (yes,$(strip $(BOOTMAGIC_ENABLE)))
-    SRCS += $(TMK_DIR)/common/bootmagic.c
-    APP_DEFS += -DBOOTMAGIC_ENABLE
-endif
 
 ifeq (yes,$(strip $(MOUSEKEY_ENABLE)))
     SRCS += $(TMK_DIR)/common/mousekey.c
