@@ -9,7 +9,7 @@ int xprintf(char* fmt, ...)
     int result = 0;
     va_list va;
     va_start(va, fmt);
-    result = vprintf(fmt, va);
+    result = vprintf_(fmt, va);
     va_end(va);
     return result;
 }

@@ -87,6 +87,7 @@ static USBH_StatusTypeDef hid_multi_init(USBH_HandleTypeDef *phost)
     }
 
     phid->inited = 1; 
+    amk_printf("HID multiclass inited: itfnum=%d\n", phid->itf_num);
     return status;
 }
 
@@ -102,6 +103,7 @@ static USBH_StatusTypeDef hid_multi_deinit(USBH_HandleTypeDef *phost)
     report_desc_buf_init(&report_desc_buffer);
     memset(phid, 0, sizeof(HID_HandleTypeDef));
     phost->pActiveClass->pData = 0U;
+    amk_printf("HID multiclass deinited\n");
     return USBH_OK;
 }
 
@@ -122,6 +124,7 @@ static USBH_StatusTypeDef hid_multi_request(USBH_HandleTypeDef *phost)
         }
     }
 
+    amk_printf("HID multi class request all done\n");
     return USBH_OK;
 }
 
@@ -181,6 +184,7 @@ static USBH_StatusTypeDef hid_itf_init(USBH_HandleTypeDef *phost, uint8_t itf, U
             USBH_LL_SetToggle(phost, pitf->out_pipe, 0U);
         }
     }
+    amk_printf("HID interface [%d] inited\n", itf);
     return status;
 }
 
@@ -200,6 +204,7 @@ static USBH_StatusTypeDef hid_itf_deinit(USBH_HandleTypeDef *phost, uint8_t itf)
         pitf->out_pipe = 0U;
     }
 
+    amk_printf("HID interface [%d] deinited\n", itf);
     return USBH_OK;
 }
 
@@ -243,8 +248,9 @@ static USBH_StatusTypeDef hid_itf_request(USBH_HandleTypeDef *phost, uint8_t itf
                 }
             }
             pitf->ctl_state = HID_REQ_SET_IDLE;
+            amk_printf("HID interface[%d]: get report descriptor, type=%d\n", itf, pitf->type);
         } else if (classReqStatus == USBH_NOT_SUPPORTED) {
-            amk_printf("Control error: HID: Device Get Report Descriptor request failed\n");
+            amk_printf("HID interface[%d]: failed to get report descriptor\n", itf);
             status = USBH_FAIL;
         } else {
         }
@@ -269,7 +275,7 @@ static USBH_StatusTypeDef hid_itf_request(USBH_HandleTypeDef *phost, uint8_t itf
             phost->pUser(phost, HOST_USER_CLASS_ACTIVE);
             status = USBH_OK;
         } else if (classReqStatus == USBH_NOT_SUPPORTED) {
-            amk_printf("Control error: HID: Device Set protocol request failed\n");
+            amk_printf("HID interface[%]: failed to set protocol\n", itf);
             status = USBH_FAIL;
         } else {
         }
