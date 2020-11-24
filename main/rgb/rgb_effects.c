@@ -265,11 +265,9 @@ void rgb_effects_init(rgb_driver_t* driver)
 {
     if (!eeconfig_is_enabled()) {
         eeconfig_init();
-        effects_update_default();
-    } else {
-        eeconfig_read_rgb(&effects_state.config);
     }
 
+    eeconfig_read_rgb(&effects_state.config);
     effects_state.driver        = driver;
     if (effects_state.config.enable)
         effects_state.driver->init();
