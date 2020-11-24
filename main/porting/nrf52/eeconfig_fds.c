@@ -299,6 +299,7 @@ void eeconfig_init(void)
 
 #ifdef RGB_EFFECTS_ENABLE
     extern void effects_update_default(void);
+    effects_update_default();
 #endif
 }
 
