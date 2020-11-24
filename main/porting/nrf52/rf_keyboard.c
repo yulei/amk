@@ -18,6 +18,7 @@
 #include "host.h"
 #include "keyboard.h"
 #include "matrix_scan.h"
+#include "bootmagic.h"
 
 #include "rgb_effects.h"
 #include "amk_keymap.h"
@@ -86,6 +87,7 @@ void rf_keyboard_init(rf_send_report_t send_report, rf_prepare_sleep_t prepare_s
 
     keyboard_setup();
     keyboard_init();
+    bootmagic();
     host_set_driver(&kbd_driver);
     keyboard_timer_init();
     nrf_usb_init(&usb_handler);

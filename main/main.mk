@@ -1,6 +1,5 @@
 
 #always enabled tmk feature
-BOOTMAGIC_ENABLE = yes
 MOUSEKEY_ENABLE = yes
 EXTRAKEY_ENABLE = yes
 
@@ -10,6 +9,8 @@ SRCS += \
 	$(MAIN_DIR)/amk_keymap.c \
 	$(MAIN_DIR)/usb_descriptors.c \
 	$(MAIN_DIR)/amk_printf.c \
+	$(MAIN_DIR)/eeprom_manager.c \
+	$(MAIN_DIR)/amk_bootmagic.c \
 
 INCS += \
 	$(MAIN_DIR) \
@@ -25,10 +26,6 @@ ifeq (yes, $(strip $(MATRIX_USE_TCA6424)))
 	APP_DEFS += -DMATRIX_USE_TCA6424
 	SRCS += $(MAIN_DIR)/drivers/tca6424.c
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
-endif
-
-ifeq (yes, $(strip $(BOOTMAGIC_ENABLE)))
-	SRCS += $(MAIN_DIR)/eeprom_manager.c
 endif
 
 ifeq (yes, $(strip $(SCREEN_ENABLE)))

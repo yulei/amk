@@ -142,6 +142,11 @@ void eeconfig_init(void)
     eeprom_write_byte(EECONFIG_DEFAULT_LAYER,  0);
     eeprom_write_byte(EECONFIG_KEYMAP,         0);
     eeprom_write_byte(EECONFIG_MOUSEKEY_ACCEL, 0);
+
+#ifdef RGB_EFFECTS_ENABLE
+    extern void effects_update_default(void);
+    effects_update_default();
+#endif
 }
 
 void eeconfig_enable(void)

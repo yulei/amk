@@ -249,7 +249,7 @@ static void effects_set_enable(uint8_t enable)
     eeconfig_update_rgb(&effects_state.config);
 }
 
-static void effects_update_default(void)
+void effects_update_default(void)
 {
     effects_state.config.enable = 1;
     effects_state.config.mode = RGB_EFFECT_SCAN;

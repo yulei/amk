@@ -14,6 +14,7 @@
 #include "suspend.h"
 #include "action_util.h"
 #include "mousekey.h"
+#include "bootmagic.h"
 
 #ifdef SCREEN_ENABLE
 #include "screen.h"
@@ -91,6 +92,7 @@ static void amk_init(void)
 {
     fee_init();
     keyboard_init();
+    bootmagic();
     host_set_driver(&amk_driver);
 #ifdef SCREEN_ENABLE
     screen_init();
