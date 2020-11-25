@@ -205,9 +205,9 @@ bool rp_parse(uint32_t itf, const void* data, uint32_t size)
             }
         }
     }
-    descriptors[itf].valid = 1;
-    descriptors[itf].itf = itf;
-    descriptors[itf].desc_count = index-1;
+    descriptors[itf].valid      = 1;
+    descriptors[itf].itf        = itf;
+    descriptors[itf].desc_count = index;
     return true;
 }
 

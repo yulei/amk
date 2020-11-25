@@ -7,7 +7,6 @@ SRCS += \
 	$(HAL_USB_PATH)/usb_device.c \
 	$(HAL_USB_PATH)/usbd_conf.c \
 	$(HAL_USB_PATH)/usbd_desc.c \
-	$(HAL_USB_PATH)/usbd_hid.c \
 	$(HAL_USB_PATH)/usbd_composite.c \
 	$(USB_DEVICE_PATH)/Core/Src/usbd_core.c \
 	$(USB_DEVICE_PATH)/Core/Src/usbd_ctlreq.c \
@@ -27,10 +26,6 @@ SRCS += \
 	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_ll_usb.c
 
 APP_DEFS += -DUSB_HOST_ENABLE -DHAL_HCD_MODULE_ENABLED
-endif
-
-ifeq (yes, $(strip $(WEBUSB_ENABLE)))
-	SRCS += $(HAL_USB_PATH)/usbd_webusb.c
 endif
 
 INCS += \

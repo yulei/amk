@@ -121,11 +121,11 @@
 #define USBH_memcpy         memcpy
 
 /* DEBUG macros */
-
+#include "amk_printf.h"
 #if (USBH_DEBUG_LEVEL > 0U)
 #define  USBH_UsrLog(...)   do { \
-                            printf(__VA_ARGS__); \
-                            printf("\n"); \
+                            amk_printf(__VA_ARGS__); \
+                            amk_printf("\n"); \
 } while (0)
 #else
 #define USBH_UsrLog(...) do {} while (0)
@@ -134,9 +134,9 @@
 #if (USBH_DEBUG_LEVEL > 1U)
 
 #define  USBH_ErrLog(...) do { \
-                            printf("ERROR: ") ; \
-                            printf(__VA_ARGS__); \
-                            printf("\n"); \
+                            amk_printf("ERROR: ") ; \
+                            amk_printf(__VA_ARGS__); \
+                            amk_printf("\n"); \
 } while (0)
 #else
 #define USBH_ErrLog(...) do {} while (0)
@@ -144,9 +144,9 @@
 
 #if (USBH_DEBUG_LEVEL > 2U)
 #define  USBH_DbgLog(...)   do { \
-                            printf("DEBUG : ") ; \
-                            printf(__VA_ARGS__); \
-                            printf("\n"); \
+                            amk_printf("DEBUG : ") ; \
+                            amk_printf(__VA_ARGS__); \
+                            amk_printf("\n"); \
 } while (0)
 #else
 #define USBH_DbgLog(...) do {} while (0)

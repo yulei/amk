@@ -84,4 +84,4 @@ typedef struct {
 
 void rp_reset(void);
 bool rp_parse(uint32_t itf, const void* data, uint32_t size);
-itf_report_desc_t * rp_get(uint32_t itf);
+itf_report_desc_t *rp_get(uint32_t itf);

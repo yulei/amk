@@ -5,10 +5,8 @@
 
 #pragma once
 
-#include "usbd_ioreq.h"
-#include "usbd_hid.h"
-#include "usbd_webusb.h"
+#include "usbd_def.h"
 
 extern USBD_ClassTypeDef USBD_COMP;
 
-uint8_t USBD_COMP_Send(USBD_HandleTypeDef *pdev, uint8_t type, uint8_t *report, uint16_t len);
+uint8_t usbd_comp_send(USBD_HandleTypeDef *pdev, uint8_t type, uint8_t *report, uint16_t len);
