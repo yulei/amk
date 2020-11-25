@@ -30,7 +30,7 @@
 #define EEPROM_KEYMAP_START     (64)
 #define EEPROM_INVALID_ADDRESS  0xFFFF
 #define FLASH_EMPTY_VALUE       0xFF
-#define IS_VALID_ADDRESS(x)     ((x) >= FLASH_BASE_ADDRESS && (x) < (FLASH_BASE_ADDRESS+FLASH_TOTAL_SIZE))
+#define IS_VALID_ADDR(x)        ((x) >= 0 && (x) < EEPROM_SIZE)
 
 static uint8_t buffer[EEPROM_SIZE];
 
@@ -58,95 +58,95 @@ void eeprom_write_byte(uint8_t *addr, uint8_t value)
     fee_write(offset, value);
 }
 
+void eeprom_update_byte(uint8_t *addr, uint8_t value)
+{
+    eeprom_write_byte(addr, value);
+}
+
 uint16_t eeprom_read_word(const uint16_t *addr)
 {
     const uint8_t *p = (const uint8_t *)addr;
     return eeprom_read_byte(p) | (eeprom_read_byte(p + 1) << 8);
 }
 
-uint32_t eeprom_read_dword(const uint32_t *addr)
-{
-    const uint8_t *p = (const uint8_t *)addr;
-    return eeprom_read_byte(p) | (eeprom_read_byte(p + 1) << 8) | (eeprom_read_byte(p + 2) << 16) | (eeprom_read_byte(p + 3) << 24);
-}
-
-void eeprom_read_block(void *buf, const void *addr, size_t len)
-{
-    const uint8_t *p    = (const uint8_t *)addr;
-    uint8_t *      dest = (uint8_t *)buf;
-    while (len--) {
-        *dest++ = eeprom_read_byte(p++);
-    }
-}
-
 void eeprom_write_word(uint16_t *addr, uint16_t value)
 {
     uint8_t *p = (uint8_t *)addr;
-    eeprom_write_byte(p++, value);
-    eeprom_write_byte(p, value >> 8);
+    eeprom_write_byte(p++,  value >> 0);
+    eeprom_write_byte(p,    value >> 8);
+}
+
+void eeprom_update_word(uint16_t *addr, uint16_t value)
+{
+    eeprom_write_word(addr, value);
+}
+
+uint32_t eeprom_read_dword(const uint32_t *addr)
+{
+    const uint8_t *p = (const uint8_t *)addr;
+    return eeprom_read_byte(p) 
+        | (eeprom_read_byte(p + 1) << 8)
+        | (eeprom_read_byte(p + 2) << 16)
+        | (eeprom_read_byte(p + 3) << 24);
 }
 
 void eeprom_write_dword(uint32_t *addr, uint32_t value)
 {
     uint8_t *p = (uint8_t *)addr;
-    eeprom_write_byte(p++, value);
-    eeprom_write_byte(p++, value >> 8);
-    eeprom_write_byte(p++, value >> 16);
-    eeprom_write_byte(p, value >> 24);
-}
-
-void eeprom_write_block(const void *buf, void *addr, size_t len)
-{
-    uint8_t *      p   = (uint8_t *)addr;
-    const uint8_t *src = (const uint8_t *)buf;
-    while (len--) {
-        eeprom_write_byte(p++, *src++);
-    }
-}
-
-void eeprom_update_byte(uint8_t *addr, uint8_t value) { eeprom_write_byte(addr, value); }
-
-void eeprom_update_word(uint16_t *addr, uint16_t value)
-{
-    uint8_t *p = (uint8_t *)addr;
-    eeprom_write_byte(p++, value);
-    eeprom_write_byte(p, value >> 8);
+    eeprom_write_byte(p++,  value >> 0);
+    eeprom_write_byte(p++,  value >> 8);
+    eeprom_write_byte(p++,  value >> 16);
+    eeprom_write_byte(p,    value >> 24);
 }
 
 void eeprom_update_dword(uint32_t *addr, uint32_t value)
 {
-    uint8_t *p = (uint8_t *)addr;
-    eeprom_write_byte(p++, value);
-    eeprom_write_byte(p++, value >> 8);
-    eeprom_write_byte(p++, value >> 16);
-    eeprom_write_byte(p, value >> 24);
+    eeprom_write_dword(addr, value);
+}
+
+void eeprom_read_block(void *buf, const void *addr, size_t len)
+{
+    const uint8_t   *p    = (const uint8_t *)addr;
+    uint8_t         *dest = (uint8_t *)buf;
+    while (len--) {
+        *dest++ = eeprom_read_byte(p++);
+    }
+}
+
+void eeprom_write_block(const void *buf, void *addr, size_t len)
+{
+    uint8_t         *p      = (uint8_t *)addr;
+    const uint8_t   *src    = (const uint8_t *)buf;
+    while (len--) {
+        eeprom_write_byte(p++, *src++);
+    }
 }
 
 void eeprom_update_block(const void *buf, void *addr, size_t len)
 {
-    uint8_t *      p   = (uint8_t *)addr;
-    const uint8_t *src = (const uint8_t *)buf;
-    while (len--) {
-        eeprom_write_byte(p++, *src++);
-    }
+    eeprom_write_block(buf, addr, len);
 }
 
 //=======================================================
 // TMK functions
 //=======================================================
+__attribute__((weak))
+void hook_eeconfig_init(void) {}
+
 void eeconfig_init(void)
 {
     fee_erase();
-    eeprom_write_word(EECONFIG_MAGIC, EECONFIG_MAGIC_NUMBER);
-    eeprom_write_byte(EECONFIG_DEBUG,          0);
-    eeprom_write_byte(EECONFIG_DEFAULT_LAYER,  0);
-    eeprom_write_byte(EECONFIG_KEYMAP,         0);
-    eeprom_write_byte(EECONFIG_MOUSEKEY_ACCEL, 0);
+    eeprom_write_word(EECONFIG_MAGIC,           EECONFIG_MAGIC_NUMBER);
+    eeprom_write_byte(EECONFIG_DEBUG,           0);
+    eeprom_write_byte(EECONFIG_DEFAULT_LAYER,   0);
+    eeprom_write_byte(EECONFIG_KEYMAP,          0);
+    eeprom_write_byte(EECONFIG_MOUSEKEY_ACCEL,  0);
 
 #ifdef RGB_EFFECTS_ENABLE
     extern void effects_update_default(void);
     effects_update_default();
 #endif
+    hook_eeconfig_init();
 }
 
 void eeconfig_enable(void)
@@ -204,7 +204,7 @@ static void fee_backup(void)
         uint16_t addr = 0;
         uint16_t data = 0;
         flash_read(begin, &addr, &data);
-        if (IS_VALID_ADDRESS(addr)) {
+        if (IS_VALID_ADDR(addr)) {
             buffer[addr] = data;
         } else {
             // we reached the end of valid data
@@ -244,7 +244,7 @@ static uint32_t fee_find_valid_address(void)
 bool fee_write(uintptr_t address, uint8_t data)
 {
     // exit if not a valid address
-    if (!IS_VALID_ADDRESS(address+FLASH_BASE_ADDRESS)) { return false; }
+    if (!IS_VALID_ADDR(address)) { return false; }
 
 // we are sure the address will not be out of bound
 #pragma GCC diagnostic ignored "-Warray-bounds"
@@ -268,7 +268,7 @@ bool fee_write(uintptr_t address, uint8_t data)
 
 uint8_t fee_read(uintptr_t address)
 {
-    if (!IS_VALID_ADDRESS(address+FLASH_BASE_ADDRESS)) {
+    if (!IS_VALID_ADDR(address)) {
         return FLASH_EMPTY_VALUE;
     }
 

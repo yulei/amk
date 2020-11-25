@@ -52,16 +52,16 @@ void usb_send_report(uint8_t report_type, const void* data, size_t size)
 {
     switch(report_type) {
     case HID_REPORT_ID_KEYBOARD:
-        USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_KEYBOARD, (uint8_t*)data, size);
+        usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_KEYBOARD, (uint8_t*)data, size);
         break;
     case HID_REPORT_ID_MOUSE:
-        USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_MOUSE, (uint8_t*)data, size);
+        usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_MOUSE, (uint8_t*)data, size);
         break;
     case HID_REPORT_ID_SYSTEM:
-        USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_SYSTEM, (uint8_t*)data, size);
+        usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_SYSTEM, (uint8_t*)data, size);
         break;
     case HID_REPORT_ID_CONSUMER:
-        USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_CONSUMER, (uint8_t*)data, size);
+        usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_CONSUMER, (uint8_t*)data, size);
         break;
     }
 }
@@ -149,7 +149,7 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
     }
 
     extern USBD_HandleTypeDef hUsbDeviceFS;
-    USBD_COMP_Send(&hUsbDeviceFS, report_id, buf, report_size);
+    usbd_comp_send(&hUsbDeviceFS, report_id, buf, report_size);
 }
 #endif
 
