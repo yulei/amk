@@ -22,27 +22,18 @@
 /* matrix state(1:on, 0:off) */
 static matrix_row_t matrix[MATRIX_ROWS];
 static matrix_row_t matrix_debouncing[MATRIX_ROWS];
+
+#ifndef MATRIX_DIRECT_PINS
 static pin_t col_pins[] = MATRIX_COL_PINS;
 static pin_t row_pins[] = MATRIX_ROW_PINS;
+#endif
 
 static bool debouncing = false;
 static uint16_t debouncing_time = 0;
 
-static void init_pins(void);
-
-
 __attribute__((weak))
-void matrix_init_kb(void){}
-
-void matrix_init(void)
+void matrix_init_kb(void)
 {
-    // initialize row and col
-    init_pins();
-
-    // initialize matrix state: all keys off
-    memset(&matrix[0], 0, sizeof(matrix));
-    memset(&matrix_debouncing[0], 0, sizeof(matrix_debouncing));
-
 #ifdef RGB_EFFECTS_ENABLE
 #ifdef RGB_WITH_WS2812
     rgb_driver_t* driver = rgb_driver_create(RGB_DRIVER_WS2812);
@@ -52,18 +43,53 @@ void matrix_init(void)
 #endif
     rgb_effects_init(driver);
 #endif
+}
+
+__attribute__((weak))
+void matrix_scan_kb(void)
+{
+#ifdef RGB_EFFECTS_ENABLE
+    rgb_effects_task();
+#endif
+}
+
+__attribute__((weak))
+void matrix_init_custom(void)
+{
+#ifndef MATRIX_DIRECT_PINS
+    for (int col = 0; col < MATRIX_COLS; col++) {
+        gpio_set_output_pushpull(col_pins[col]);
+        gpio_write_pin(col_pins[col], 0);
+    }
+    for (int row = 0; row < MATRIX_ROWS; row++) {
+        gpio_set_input_pulldown(row_pins[row]);
+    }
+#endif
+}
+
+void matrix_init(void)
+{
+    // initialize row and col
+    matrix_init_custom();
+
+    // initialize matrix state: all keys off
+    memset(&matrix[0], 0, sizeof(matrix));
+    memset(&matrix_debouncing[0], 0, sizeof(matrix_debouncing));
+
     matrix_init_kb();
 }
 
-uint8_t matrix_scan(void)
+__attribute__((weak))
+bool matrix_scan_custom(matrix_row_t* raw)
 {
     bool changed = false;
+#ifndef MATRIX_DIRECT_PINS
     for (int col = 0; col < MATRIX_COLS; col++) {
         gpio_write_pin(col_pins[col], 1);
         wait_us(30);
 
-        for(uint8_t row = 0; row< MATRIX_ROWS; row++) {
-            matrix_row_t last_row_value    = matrix_debouncing[row];
+        for(uint8_t row = 0; row < MATRIX_ROWS; row++) {
+            matrix_row_t last_row_value    = raw[row];
             matrix_row_t current_row_value = last_row_value;
 
             if (gpio_read_pin(row_pins[row])) {
@@ -73,12 +99,19 @@ uint8_t matrix_scan(void)
             }
 
             if (last_row_value != current_row_value) {
-                matrix_debouncing[row] = current_row_value;
+                raw[row] = current_row_value;
                 changed = true;
             }
         }
         gpio_write_pin(col_pins[col], 0);
     }
+#endif
+    return changed;
+}
+
+uint8_t matrix_scan(void)
+{
+    bool changed = matrix_scan_custom(&matrix_debouncing[0]);
 
     if (changed && !debouncing) {
         debouncing = true;
@@ -92,10 +125,7 @@ uint8_t matrix_scan(void)
         debouncing = false;
     }
 
-#ifdef RGB_EFFECTS_ENABLE
-    rgb_effects_task();
-#endif
-
+    matrix_scan_kb();
     return 1;
 }
 
@@ -116,18 +146,6 @@ void matrix_print(void)
         phex(row); print(": ");
         pbin_reverse16(matrix_get_row(row));
         print("\n");
-    }
-}
-
-static void  init_pins(void)
-{
-    // don't need pullup/down, since it's pulled down in hardware
-    for (int col = 0; col < MATRIX_COLS; col++) {
-        gpio_set_output_pushpull(col_pins[col]);
-        gpio_write_pin(col_pins[col], 0);
-    }
-    for (int row = 0; row < MATRIX_ROWS; row++) {
-        gpio_set_input_pulldown(row_pins[row]);
     }
 }
 
