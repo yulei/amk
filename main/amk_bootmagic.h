@@ -10,7 +10,7 @@
 
 /* skip bootmagic and eeconfig */
 #ifndef BM_KEY_SKIP
-#define BM_KEY_SKIP             KC_B
+#define BM_KEY_SKIP             KC_ESC
 #endif
 
 /* eeprom clear */
@@ -20,7 +20,7 @@
 
 /* kick up bootloader */
 #ifndef BM_KEY_BOOTLOADER
-#define BM_KEY_BOOTLOADER       KC_ESC
+#define BM_KEY_BOOTLOADER       KC_B
 #endif
 
 void bootmagic(void);
