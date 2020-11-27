@@ -13,6 +13,7 @@
 #define EECONFIG_KEYBOARD           (uint32_t*)16
 #define EECONFIG_KEYMAP_MAGIC       (uint32_t*)20
 #define EECONFIG_RGB                (uint8_t*)24        // 6 bytes
+#define EECONFIG_RGB_MATRIX         (uint8_t*)30        // 6 bytes
 
 uint32_t eeconfig_read_kb(void);
 void eeconfig_write_kb(uint32_t data);
@@ -21,6 +22,10 @@ void eeconfig_update_kb(uint32_t data);
 void eeconfig_read_rgb(void* rgb);
 void eeconfig_write_rgb(const void* rgb);
 void eeconfig_update_rgb(const void* rgb);
+
+void eeconfig_read_rgb_matrix(void* rgb);
+void eeconfig_write_rgb_matrix(const void* rgb);
+void eeconfig_update_rgb_matrix(const void* rgb);
 
 // wrapper functions
 uint8_t eeprom_read_byte(const uint8_t *Address);

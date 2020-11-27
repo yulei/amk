@@ -23,6 +23,13 @@ void bootmagic(void)
     while (scan--) { matrix_scan(); wait_ms(10); }
     amk_printf("done.\n");
 
+    /* jump to bootloader */
+    if (matrix_get_row(0) & 0x01) {
+        // matrix(0,0)
+        amk_printf("bootmagic: jump to bootloader \n");
+        bootloader_jump();
+    }
+
     /* bootmagic skip */
     if (bootmagic_scan_key(BM_KEY_SKIP)) {
         return;

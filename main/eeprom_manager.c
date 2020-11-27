@@ -6,6 +6,7 @@
 #include "eeconfig.h"
 #include "flash_store.h"
 #include "rgb_effects.h"
+#include "rgb_matrix.h"
 
 uint32_t eeconfig_read_kb(void)
 {
@@ -47,6 +48,33 @@ void eeconfig_write_rgb(const void* rgb)
 void eeconfig_update_rgb(const void* rgb)
 {
     eeconfig_write_rgb(rgb);
+}
+
+void eeconfig_read_rgb_matrix(void* rgb)
+{
+    rgb_matrix_config_t *config = (rgb_matrix_config_t*)rgb;
+    config->enable  = eeprom_read_byte(EECONFIG_RGB_MATRIX);
+    config->mode    = eeprom_read_byte(EECONFIG_RGB_MATRIX+1);
+    config->speed   = eeprom_read_byte(EECONFIG_RGB_MATRIX+2);
+    config->hue     = eeprom_read_byte(EECONFIG_RGB_MATRIX+3);
+    config->sat     = eeprom_read_byte(EECONFIG_RGB_MATRIX+4);
+    config->val     = eeprom_read_byte(EECONFIG_RGB_MATRIX+5);
+}
+
+void eeconfig_write_rgb_matrix(const void* rgb)
+{
+    rgb_matrix_config_t *config = (rgb_matrix_config_t*)rgb;
+    eeprom_write_byte(EECONFIG_RGB_MATRIX, config->enable);
+    eeprom_write_byte(EECONFIG_RGB_MATRIX+1, config->mode);
+    eeprom_write_byte(EECONFIG_RGB_MATRIX+2, config->speed);
+    eeprom_write_byte(EECONFIG_RGB_MATRIX+3, config->hue);
+    eeprom_write_byte(EECONFIG_RGB_MATRIX+4, config->sat);
+    eeprom_write_byte(EECONFIG_RGB_MATRIX+5, config->val);
+}
+
+void eeconfig_update_rgb_matrix(const void* rgb)
+{
+    eeconfig_write_rgb_matrix(rgb);
 }
 
 #define KEYMAP_MAGIC_VALUE      0x4D585438

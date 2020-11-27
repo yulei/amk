@@ -10,9 +10,10 @@
 typedef void (*map_led_t)(uint8_t index, uint8_t *red_reg, uint8_t* green_reg, uint8_t *blue_reg);
 
 typedef struct {
-    uint8_t addr;
-    uint8_t led_num;
-    map_led_t map_led;
+    uint8_t     addr;
+    uint8_t     led_num;
+    void        *user;       
+    map_led_t   map_led;
 } is31fl3731_t;
 
 is31fl3731_t* is31fl3731_init(uint8_t addr, uint8_t led_num, map_led_t map_led);
