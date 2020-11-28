@@ -10,7 +10,7 @@ SRCS += \
 	$(MAIN_DIR)/usb_descriptors.c \
 	$(MAIN_DIR)/amk_printf.c \
 	$(MAIN_DIR)/eeprom_manager.c \
-	$(MAIN_DIR)/amk_bootmagic.c \
+	$(MAIN_DIR)/amk_boot.c \
 
 INCS += \
 	$(MAIN_DIR) \

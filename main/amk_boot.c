@@ -7,10 +7,34 @@
 #include "host.h"
 #include "action_layer.h"
 #include "eeconfig.h"
-#include "amk_bootmagic.h"
+#include "amk_boot.h"
 #include "amk_printf.h"
 
-void bootmagic(void)
+#ifdef RGB_EFFECTS_ENABLE
+#include "rgb_driver.h"
+#include "rgb_effects.h"
+#endif
+
+static bool boot_scan_key(uint16_t code);
+
+__attribute__((weak))
+void pre_boot_init(void) {}
+
+__attribute__((weak))
+void post_boot_init(void)
+{ 
+#ifdef RGB_EFFECTS_ENABLE
+#ifdef RGB_WITH_WS2812
+    rgb_driver_t* driver = rgb_driver_create(RGB_DRIVER_WS2812);
+#endif
+#ifdef RGB_WITH_AW9523B
+    rgb_driver_t* driver = rgb_driver_create(RGB_DRIVER_AW9523B);
+#endif
+    rgb_effects_init(driver);
+#endif
+}
+
+void boot_init(void)
 {
     /* check signature */
     if (!eeconfig_is_enabled()) {
@@ -18,7 +42,7 @@ void bootmagic(void)
     }
 
     /* do scans in case of bounce */
-    amk_printf("bootmagic scan: ... ");
+    amk_printf("boot scan: ... ");
     uint8_t scan = 100;
     while (scan--) { matrix_scan(); wait_ms(10); }
     amk_printf("done.\n");
@@ -26,24 +50,15 @@ void bootmagic(void)
     /* jump to bootloader */
     if (matrix_get_row(0) & 0x01) {
         // matrix(0,0)
-        amk_printf("bootmagic: jump to bootloader \n");
+        amk_printf("boot: jump to bootloader \n");
         bootloader_jump();
-    }
-
-    /* bootmagic skip */
-    if (bootmagic_scan_key(BM_KEY_SKIP)) {
-        return;
     }
 
     /* eeconfig clear */
-    if (bootmagic_scan_key(BM_KEY_EEPROM_CLEAR)) {
+    if (boot_scan_key(BM_KEY_EEPROM_CLEAR)) {
         eeconfig_init();
     }
-
-    /* bootloader */
-    if (bootmagic_scan_key(BM_KEY_BOOTLOADER)) {
-        bootloader_jump();
-    }
+    post_boot_init();
 }
 
 static bool scan_key(uint16_t code)
@@ -70,7 +85,7 @@ static bool scan_key(uint16_t code)
     return false;
 }
 
-bool bootmagic_scan_key(uint16_t code)
+static bool boot_scan_key(uint16_t code)
 {
     if (!scan_key(BM_KEY_SALT)) return false;
 

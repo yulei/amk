@@ -34,15 +34,6 @@ static uint16_t debouncing_time = 0;
 __attribute__((weak))
 void matrix_init_kb(void)
 {
-#ifdef RGB_EFFECTS_ENABLE
-#ifdef RGB_WITH_WS2812
-    rgb_driver_t* driver = rgb_driver_create(RGB_DRIVER_WS2812);
-#endif
-#ifdef RGB_WITH_AW9523B
-    rgb_driver_t* driver = rgb_driver_create(RGB_DRIVER_AW9523B);
-#endif
-    rgb_effects_init(driver);
-#endif
 }
 
 __attribute__((weak))
