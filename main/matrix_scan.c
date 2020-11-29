@@ -10,10 +10,6 @@
 #include "print.h"
 #include "timer.h"
 #include "wait.h"
-#ifdef RGB_EFFECTS_ENABLE
-#include "rgb_driver.h"
-#include "rgb_effects.h"
-#endif
 
 #ifndef DEBOUNCE
 #   define DEBOUNCE 5
@@ -39,9 +35,6 @@ void matrix_init_kb(void)
 __attribute__((weak))
 void matrix_scan_kb(void)
 {
-#ifdef RGB_EFFECTS_ENABLE
-    rgb_effects_task();
-#endif
 }
 
 __attribute__((weak))

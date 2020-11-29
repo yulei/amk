@@ -10,28 +10,16 @@
 #include "amk_boot.h"
 #include "amk_printf.h"
 
-#ifdef RGB_EFFECTS_ENABLE
-#include "rgb_driver.h"
-#include "rgb_effects.h"
-#endif
+#include "rgb_led.h"
 
 static bool boot_scan_key(uint16_t code);
 
 __attribute__((weak))
 void pre_boot_init(void) {}
 
-__attribute__((weak))
 void post_boot_init(void)
 { 
-#ifdef RGB_EFFECTS_ENABLE
-#ifdef RGB_WITH_WS2812
-    rgb_driver_t* driver = rgb_driver_create(RGB_DRIVER_WS2812);
-#endif
-#ifdef RGB_WITH_AW9523B
-    rgb_driver_t* driver = rgb_driver_create(RGB_DRIVER_AW9523B);
-#endif
-    rgb_effects_init(driver);
-#endif
+    rgb_led_init();
 }
 
 void boot_init(void)
