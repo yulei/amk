@@ -11,6 +11,7 @@ SRCS += \
 	$(MAIN_DIR)/amk_printf.c \
 	$(MAIN_DIR)/eeprom_manager.c \
 	$(MAIN_DIR)/amk_boot.c \
+	$(MAIN_DIR)/rgb/rgb_led.c
 
 INCS += \
 	$(MAIN_DIR) \
