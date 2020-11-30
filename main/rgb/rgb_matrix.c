@@ -39,7 +39,7 @@ typedef enum {
     RM_EFFECT_RAINBOW,
     RM_EFFECT_ROTATE,
     RM_EFFECT_SNAKE,
-    RM_EFFECT_KEY_HIT,
+    RM_EFFECT_KEYHIT,
     RM_EFFECT_TEST,
 #define RM_EFFECT_MAX RM_EFFECT_TEST
 } rgb_matrix_effect_type_t;
@@ -50,7 +50,7 @@ typedef struct {
     rgb_matrix_config_t config;
     rgb_driver_t*       driver;
     uint32_t            last_ticks;
-    RM_EFFECT_FUN effect_funs[RM_EFFECT_MAX];
+    RM_EFFECT_FUN       effects[RM_EFFECT_MAX];
 } rgb_matrix_state_t;
 
 static rgb_matrix_state_t matrix_state;
@@ -67,7 +67,7 @@ static void rgb_matrix_update_default(void)
 
 static uint32_t update_delay(void)
 {
-    switch(matrix.config.mode) {
+    switch(matrix_state.config.mode) {
         default:
             break;
     }
@@ -144,25 +144,20 @@ void rgb_matrix_init(rgb_driver_t *driver)
     }
     eeconfig_read_rgb_matrix(&matrix_state.config);
 
-    effects_state.driver        = driver;
-    if (effects_state.config.enable)
-        effects_state.driver->init();
+    matrix_state.driver        = driver;
+    if (matrix_state.config.enable)
+        matrix_state.driver->init();
 
-    effects_state.counter       = 0;
-    effects_state.wipe_on       = true;
-    effects_state.rainbow_step  = RAINBOW_STEP_DEFAULT;
-    effects_state.breath_step   = BREATH_STEP_DEFAULT;
-    effects_state.last_ticks    = timer_read32();
-    srand(effects_state.last_ticks);
-    effects_state.effects[RM_EFFECT_STATIC]     = rgb_matrix_mode_static;
-    effects_state.effects[RM_EFFECT_BREATH]     = rgb_matrix_mode_breath;
-    effects_state.effects[RM_EFFECT_GRADIENT]   = rgb_matrix_mode_gradient;
-    effects_state.effects[RM_EFFECT_RAINBOW]    = rgb_matrix_mode_rainbow;
-    effects_state.effects[RM_EFFECT_ROTATE]     = rgb_matrix_mode_gradient;
-    effects_state.effects[RM_EFFECT_SNAKE]      = rgb_matrix_mode_snake;
-    effects_state.effects[RM_EFFECT_KEYHIT]     = rgb_matrix_mode_keyhit;
-    effects_mode_init();
-
+    matrix_state.last_ticks    = timer_read32();
+    srand(matrix_state.last_ticks);
+    matrix_state.effects[RM_EFFECT_STATIC]     = rgb_matrix_mode_static;
+    matrix_state.effects[RM_EFFECT_BREATH]     = rgb_matrix_mode_breath;
+    matrix_state.effects[RM_EFFECT_GRADIENT]   = rgb_matrix_mode_gradient;
+    matrix_state.effects[RM_EFFECT_RAINBOW]    = rgb_matrix_mode_rainbow;
+    matrix_state.effects[RM_EFFECT_ROTATE]     = rgb_matrix_mode_gradient;
+    matrix_state.effects[RM_EFFECT_SNAKE]      = rgb_matrix_mode_snake;
+    matrix_state.effects[RM_EFFECT_KEYHIT]     = rgb_matrix_mode_keyhit;
+    //effects_mode_init();
 }
 
 bool rgb_matrix_enabled(void)
@@ -170,30 +165,101 @@ bool rgb_matrix_enabled(void)
     return matrix_state.config.enable ? true : false;
 }
 
+
+static void rgb_matrix_set_hue(uint8_t hue)
+{
+    matrix_state.config.hue = hue;
+    eeconfig_update_rgb(&matrix_state.config);
+}
+
+static void rgb_matrix_set_sat(uint8_t sat)
+{
+    matrix_state.config.sat = sat;
+    eeconfig_update_rgb(&matrix_state.config);
+}
+
+static void rgb_matrix_set_val(uint8_t val)
+{
+    matrix_state.config.val = val;
+    eeconfig_update_rgb(&matrix_state.config);
+}
+
+static void rgb_matrix_set_speed(uint8_t speed)
+{
+    matrix_state.config.speed = !speed ? 1 : speed;
+    eeconfig_update_rgb(&matrix_state.config);
+}
+
+static void rgb_matrix_set_mode(uint8_t mode)
+{
+    matrix_state.config.mode = mode;
+    //effects_mode_init();
+    eeconfig_update_rgb(&matrix_state.config);
+}
+
+static void rgb_matrix_set_enable(uint8_t enable)
+{
+    matrix_state.config.enable = enable;
+    eeconfig_update_rgb(&matrix_state.config);
+}
+
 void rgb_matrix_inc_hue(void)
-{}
+{
+    rgb_matrix_set_hue(matrix_state.config.hue + HUE_STEP);
+}
+
 void rgb_matrix_dec_hue(void)
-{}
+{
+    rgb_matrix_set_hue(matrix_state.config.hue - HUE_STEP);
+}
+
 void rgb_matrix_inc_sat(void)
-{}
+{
+    rgb_matrix_set_sat(matrix_state.config.sat + SAT_STEP);
+}
+
 void rgb_matrix_dec_sat(void)
-{}
+{
+    rgb_matrix_set_sat(matrix_state.config.sat - SAT_STEP);
+}
+
 void rgb_matrix_inc_val(void)
-{}
+{
+    rgb_matrix_set_val(matrix_state.config.val + VAL_STEP);
+}
+
 void rgb_matrix_dec_val(void)
-{}
+{
+    rgb_matrix_set_val(matrix_state.config.val - VAL_STEP);
+}
+
 void rgb_matrix_inc_speed(void)
-{}
+{
+    rgb_matrix_set_speed(matrix_state.config.speed + SPEED_STEP);
+}
+
 void rgb_matrix_dec_speed(void)
-{}
+{
+    rgb_matrix_set_speed(matrix_state.config.speed - SPEED_STEP);
+}
+
 void rgb_matrix_inc_mode(void)
-{}
+{
+    matrix_state.config.mode = (matrix_state.config.mode+1) % RM_EFFECT_MAX;
+    rgb_matrix_set_mode(matrix_state.config.mode);
+}
+
 void rgb_matrix_dec_mode(void)
-{}
+{
+    matrix_state.config.mode = (matrix_state.config.mode-1) % RM_EFFECT_MAX;
+    rgb_matrix_set_mode(matrix_state.config.mode);
+}
 
 void rgb_matrix_toggle(void)
 {
     matrix_state.config.enable = !matrix_state.config.enable;
+
+    rgb_matrix_set_enable(matrix_state.config.enable);
 }
 
 void rgb_matrix_task(void)
@@ -203,9 +269,6 @@ void rgb_matrix_task(void)
             matrix_state.effects[matrix_state.config.mode]();
             rgb_matrix_update_timer();
         }
-    } else {
-        matrix_state.driver->set_color_all(0, 0, 0);
+        matrix_state.driver->flush();
     }
-
-    matrix_state.driver->flush();
 }
