@@ -10,7 +10,7 @@
 #include "gpio_pin.h"
 
 #ifndef I2C_INSTANCE_ID
-    #define I2C_INSTANCE_ID     I2C1
+    #define I2C_INSTANCE_ID     I2C1 
 #endif
 
 #ifndef I2C_SCL_PIN
@@ -22,10 +22,11 @@
 #endif
 
 
-static I2C_HandleTypeDef i2c_handle;
-static bool twi_ready = false;
+I2C_HandleTypeDef i2c_handle;
 
+static bool twi_ready = false;
 bool i2c_ready(void) { return twi_ready; }
+
 
 void i2c_init(void)
 {
@@ -42,7 +43,7 @@ void i2c_init(void)
     i2c_handle.Init.OwnAddress2 = 0;
     i2c_handle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
     i2c_handle.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-    if (HAL_I2C_Init(&i2c_handle) == HAL_OK) {
+    if (HAL_I2C_Init(&hi2c2) == HAL_OK) {
         twi_ready = true;
     } else {
         //Error_Handler();
@@ -106,4 +107,7 @@ void i2c_uninit(void)
     if(!i2c_ready()) {
         return;
     }
+
+    HAL_I2C_DeInit(&i2c_handle);
+    twi_ready = false;
 }

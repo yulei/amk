@@ -99,10 +99,13 @@ ALL_CPPFLAGS = -x c++ $(CPPFLAGS) $(GENDEPFLAGS) $(INC_FLAGS)
 ALL_ASMFLAGS = -x assembler-with-cpp $(ASMFLAGS) $(GENDEPFLAGS) $(INC_FLAGS)
 ALL_LDFLAGS = $(LDFLAGS) -Xlinker -Map=$(OUTPUT_DIR)/$(TARGET).map
 
+PLATFORM := $(if $(filter Windows%,$(OS)),windows,posix)
 # Success message
-define RES_STR 
-echo -ne "\033[60G[\033[32mok\033[0m]\n"
-endef
+ifeq (posix, $(PLATFORM))
+RES_STR := echo "\033[60G[\033[32mok\033[0m]"
+else
+RES_STR := echo -e "\033[60G[\033[32mok\033[0m]"
+endif
 
 # Create object files from C source files
 $(BUILD_DIR)/%.o : %.c

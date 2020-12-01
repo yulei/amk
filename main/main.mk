@@ -42,6 +42,7 @@ ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_effects.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_led.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_color.c
 	APP_DEFS += -DRGB_EFFECTS_ENABLE
 	APP_DEFS += -DRGB_WITH_AW9523B
@@ -51,9 +52,32 @@ ifeq (ws2812, $(strip $(RGB_EFFECTS_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/ws2812.c
 	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_effects.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_led.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_color.c
 	APP_DEFS += -DRGB_EFFECTS_ENABLE
 	APP_DEFS += -DRGB_WITH_WS2812
+endif
+
+ifeq (yes, $(strip $(RGB_MATRIX_ENABLE)))
+	SRCS += $(MAIN_DIR)/drivers/is31fl3731.c
+	SRCS += $(MAIN_DIR)/drivers/i2c.c
+	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_matrix.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_led.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_color.c
+	APP_DEFS += -DRGB_MATRIX_ENABLE
+	APP_DEFS += -DRGB_WITH_IS31FL3731
+endif
+
+ifeq (is31fl3733, $(strip $(RGB_MATRIX_ENABLE)))
+	SRCS += $(MAIN_DIR)/drivers/is31fl3733.c
+	SRCS += $(MAIN_DIR)/drivers/i2c.c
+	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_matrix.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_led.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_color.c
+	APP_DEFS += -DRGB_MATRIX_ENABLE
+	APP_DEFS += -DRGB_WITH_IS31FL3733
 endif
 
 ifeq (yes, $(strip $(WEBUSB_ENABLE)))

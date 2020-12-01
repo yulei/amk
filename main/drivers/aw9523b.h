@@ -33,7 +33,7 @@
 
 #define AW9523B_PWM_SIZE    16
 
-extern const rgb_led_t g_aw9523b_leds[RGB_LED_NUM];
+extern const rgb_led_t g_aw9523b_leds[];
 
 void aw9523b_init(uint8_t addr);
 

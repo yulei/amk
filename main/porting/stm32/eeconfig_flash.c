@@ -146,6 +146,10 @@ void eeconfig_init(void)
     extern void effects_update_default(void);
     effects_update_default();
 #endif
+#ifdef RGB_MATRIX_ENABLE
+    extern void rgb_matrix_update_default(void);
+    rgb_matrix_update_default();
+#endif
     hook_eeconfig_init();
 }
 
