@@ -196,6 +196,7 @@ static void keyboard_timer_handler(void *p_context)
                     NRF_LOG_INFO("Sleep count overflow, goto system off mode");
                     nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_GOTO_SYSOFF);
                 } else {
+                    NRF_LOG_INFO("Sleep mode disabled, clear sleep count");
                     rf_driver.sleep_count = 0;
                 }
             }
@@ -312,9 +313,11 @@ static void usb_leds(uint8_t leds)
 }
 
 // bluetooth control command
-// F21 for select usb/ble output
-// F22 for erase bond
-// F23 for enter bootloader mode
+// F20 : disable sleep mode
+// F21 : select usb/rf output
+// F22 : erase bond
+// F23 : enter bootloader mode
+// F24 : toggle ble/gazell mode
 #include "action.h"
 #include "action_layer.h"
 bool hook_process_action_main(keyrecord_t *record) {
@@ -328,6 +331,9 @@ bool hook_process_action_main(keyrecord_t *record) {
     }
 
     switch(action.key.code) {
+        case KC_F20: // disable sleep mode
+            rf_driver.output_target &= ~SLEEP_ENABLED;
+            break;
         case KC_F21: // toggle usb/ble output
             if (rf_driver.output_target & OUTPUT_RF) {
                 if (rf_driver.vbus_enabled) {
