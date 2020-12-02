@@ -39,9 +39,9 @@ static void uninit_driver(is31_t *driver);
 static void map_led(uint8_t index, uint8_t *red_reg, uint8_t* green_reg, uint8_t *blue_reg)
 {
     is31_led_t *led = &g_rgb_matrix.leds[index];
-    *red_reg    = led->red - PWM_REG + 1;
-    *green_reg  = led->green - PWM_REG + 1;
-    *blue_reg   = led->blue - PWM_REG + 1;
+    *red_reg    = led->red - PWM_REG;
+    *green_reg  = led->green - PWM_REG;
+    *blue_reg   = led->blue - PWM_REG;
 }
 
 is31_t *is31fl3731_init(uint8_t addr, uint8_t led_num)
@@ -82,9 +82,9 @@ void is31fl3731_set_color(is31_t *driver, uint8_t index, uint8_t red, uint8_t gr
     uint8_t r, g, b;
     map_led(index, &r, &g, &b);
     is31fl3731_driver_t *is31 = (is31fl3731_driver_t*)(driver->user);
-    is31->pwm_buffer[r] = red;
-    is31->pwm_buffer[g] = green;
-    is31->pwm_buffer[b] = blue;
+    is31->pwm_buffer[r + 1] = red;
+    is31->pwm_buffer[g + 1] = green;
+    is31->pwm_buffer[b + 1] = blue;
     is31->pwm_dirty = true;
 }
 
@@ -140,12 +140,12 @@ void init_driver(is31fl3731_driver_t *driver)
         uint8_t r, g, b;
         map_led(i, &r, &g, &b);
 
-        uint8_t reg_r = (r - 1) / 8;
-        uint8_t reg_g = (g - 1) / 8;
-        uint8_t reg_b = (b - 1) / 8;
-        uint8_t bit_r = (r - 1) % 8;
-        uint8_t bit_g = (g - 1) % 8;
-        uint8_t bit_b = (b - 1) % 8;
+        uint8_t reg_r = r / 8;
+        uint8_t reg_g = g / 8;
+        uint8_t reg_b = b / 8;
+        uint8_t bit_r = r % 8;
+        uint8_t bit_g = g % 8;
+        uint8_t bit_b = b % 8;
         driver->control_buffer[reg_r+1] |= (1 << bit_r);
         driver->control_buffer[reg_g+1] |= (1 << bit_g);
         driver->control_buffer[reg_b+1] |= (1 << bit_b);

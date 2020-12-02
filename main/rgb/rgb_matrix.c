@@ -3,6 +3,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "rgb_color.h"
 #include "rgb_matrix.h"
@@ -40,7 +41,7 @@
 
 #define GRADIENT_STEP_DEFAULT   32
 #define BREATH_STEP_DEFAULT     32
-
+#define INVALID_LED             0xFF
 
 typedef enum {
     RM_EFFECT_STATIC,
@@ -56,9 +57,21 @@ typedef enum {
 
 typedef void (*RM_EFFECT_FUN)(void);
 
+#define SNAKE_SIZE 3
+
+typedef struct {
+    uint8_t row;
+    uint8_t column;
+    uint8_t dir;
+    uint8_t leds[SNAKE_SIZE];
+} snake_t;
+
 typedef struct {
     rgb_matrix_config_t config;
     rgb_driver_t*       driver;
+    union {
+        snake_t         snake;
+    } data;
     uint32_t            last_ticks;
     RM_EFFECT_FUN       effects[RM_EFFECT_MAX];
 } rgb_matrix_state_t;
@@ -80,10 +93,36 @@ static bool rgb_matrix_need_update(void)
     return timer_elapsed32(matrix_state.last_ticks)*matrix_state.config.speed >= update_delay();
 }
 
+static uint8_t key_to_led(uint8_t row, uint8_t col);
 static void rgb_matrix_update_timer(void) { matrix_state.last_ticks = timer_read32(); }
 
 static uint8_t get_random_hue(uint8_t hue) { return (rand() % HUE_MAX) + RANDOM_DISTANCE; }
 
+static void rgb_matrix_mode_init(void)
+{
+    switch(matrix_state.config.mode) {
+        case RM_EFFECT_STATIC:
+            break;
+        case RM_EFFECT_BREATH:
+            break;
+        case RM_EFFECT_GRADIENT:
+            break;
+        case RM_EFFECT_RAINBOW:
+            break;
+        case RM_EFFECT_ROTATE:
+            break;
+        case RM_EFFECT_SNAKE:
+            matrix_state.data.snake.row = 0;
+            matrix_state.data.snake.column = 0;
+            matrix_state.data.snake.dir = 1;
+            memset(&matrix_state.data.snake.leds, INVALID_LED, SNAKE_SIZE);
+            break;
+        case RM_EFFECT_KEYHIT:
+            break;
+        default:
+            break;
+    }
+}
 static void rgb_matrix_mode_test(void)
 {
     for (int i = 0; i < RGB_MATRIX_LED_NUM; i++) {
@@ -124,12 +163,53 @@ static void rgb_matrix_mode_rainbow(void)
 
 static void rgb_matrix_mode_rotate(void)
 {
+    
     rgb_matrix_mode_test();
+}
+
+static void step_snake(void)
+{
+    if (matrix_state.data.snake.dir) {
+        if (matrix_state.data.snake.row == MATRIX_ROWS-1) {
+            matrix_state.data.snake.dir = !matrix_state.data.snake.dir;
+            matrix_state.data.snake.column = (matrix_state.data.snake.column+1) % MATRIX_COLS;
+        } else {
+            matrix_state.data.snake.row++;
+        }
+    } else {
+        if (matrix_state.data.snake.row == 1) {
+            matrix_state.data.snake.dir = !matrix_state.data.snake.dir;
+            matrix_state.data.snake.column = (matrix_state.data.snake.column+1) % MATRIX_COLS;
+        } else {
+            matrix_state.data.snake.row--;
+        }
+    }
+}
+
+static void shift_snake(uint8_t cur)
+{
+    for (int i = SNAKE_SIZE-1; i > 0; i--) {
+        matrix_state.data.snake.leds[i] = matrix_state.data.snake.leds[i-1];
+    }
+    matrix_state.data.snake.leds[0] = cur;
 }
 
 static void rgb_matrix_mode_snake(void)
 {
-    rgb_matrix_mode_test();
+    uint8_t cur = INVALID_LED;
+    do {
+        cur = key_to_led(matrix_state.data.snake.row, matrix_state.data.snake.column);
+        if (cur != INVALID_LED && cur != matrix_state.data.snake.leds[0]) {
+            break;
+        } else {
+            step_snake();
+        }
+    } while(1);
+
+    shift_snake(cur);
+    for (int i = 0; i < SNAKE_SIZE; i++) {
+        matrix_state.driver->set_color(i, matrix_state.config.hue, matrix_state.config.sat, matrix_state.config.val);
+    }
 }
 
 static void rgb_matrix_mode_keyhit(void)
@@ -168,7 +248,7 @@ void rgb_matrix_init(rgb_driver_t *driver)
     matrix_state.effects[RM_EFFECT_ROTATE]     = rgb_matrix_mode_rotate;
     matrix_state.effects[RM_EFFECT_SNAKE]      = rgb_matrix_mode_snake;
     matrix_state.effects[RM_EFFECT_KEYHIT]     = rgb_matrix_mode_keyhit;
-    //effects_mode_init();
+    rgb_matrix_mode_init();
 }
 
 bool rgb_matrix_enabled(void)
@@ -204,7 +284,7 @@ static void rgb_matrix_set_speed(uint8_t speed)
 static void rgb_matrix_set_mode(uint8_t mode)
 {
     matrix_state.config.mode = mode;
-    //effects_mode_init();
+    rgb_matrix_mode_init();
     eeconfig_update_rgb_matrix(&matrix_state.config);
 }
 
@@ -282,4 +362,15 @@ void rgb_matrix_task(void)
         }
         matrix_state.driver->flush();
     }
+}
+
+static uint8_t key_to_led(uint8_t row, uint8_t col)
+{
+    for (int i = 0; i < RGB_MATRIX_LED_NUM; i++) {
+        if (g_rgb_matrix.attributes[i].x == row && g_rgb_matrix.attributes[i].y == col) {
+            return i;
+        }
+    }
+
+    return INVALID_LED;
 }

@@ -47,9 +47,9 @@ static void uninit_driver(is31_t *driver);
 static void map_led(uint8_t index, uint8_t *red_reg, uint8_t* green_reg, uint8_t *blue_reg)
 {
     is31_led_t *led = &g_rgb_matrix.leds[index];
-    *red_reg    = led->red + 1;
-    *green_reg  = led->green + 1;
-    *blue_reg   = led->blue + 1;
+    *red_reg    = led->red;
+    *green_reg  = led->green;
+    *blue_reg   = led->blue;
 }
 
 is31_t *is31fl3733_init(uint8_t addr, uint8_t led_num)
@@ -73,9 +73,9 @@ void is31fl3733_set_color(is31_t* driver, uint8_t index, uint8_t red, uint8_t gr
     uint8_t r, g, b;
     map_led(index, &r, &g, &b);
     is31fl3733_driver_t *is31 = (is31fl3733_driver_t*)(driver->user);
-    is31->pwm_buffer[r] = red;
-    is31->pwm_buffer[g] = green;
-    is31->pwm_buffer[b] = blue;
+    is31->pwm_buffer[r + 1] = red;
+    is31->pwm_buffer[g + 1] = green;
+    is31->pwm_buffer[b + 1] = blue;
     is31->pwm_dirty = true;
 }
 
@@ -122,7 +122,7 @@ static void init_driver(is31fl3733_driver_t *driver)
     if (!i2c_ready()) i2c_init();
 
     memset(driver->pwm_buffer, 0, PWM_BUFFER_SIZE+1);
-    driver->pwm_buffer[0] = 0;
+    driver->pwm_buffer[0]       = 0;
     driver->pwm_dirty           = false;
     memset(driver->control_buffer, 0, CONTROL_BUFFER_SIZE+1);
     driver->control_buffer[0]   = 0;
@@ -145,12 +145,12 @@ static void init_driver(is31fl3733_driver_t *driver)
         uint8_t r, g, b;
         map_led(i, &r, &g, &b);
 
-        uint8_t reg_r = (r - 1) / 8;
-        uint8_t reg_g = (g - 1) / 8;
-        uint8_t reg_b = (b - 1) / 8;
-        uint8_t bit_r = (r - 1) % 8;
-        uint8_t bit_g = (g - 1) % 8;
-        uint8_t bit_b = (b - 1) % 8;
+        uint8_t reg_r = r / 8;
+        uint8_t reg_g = g / 8;
+        uint8_t reg_b = b / 8;
+        uint8_t bit_r = r % 8;
+        uint8_t bit_g = g % 8;
+        uint8_t bit_b = b % 8;
         driver->control_buffer[reg_r + 1] |= (1 << bit_r);
         driver->control_buffer[reg_g + 1] |= (1 << bit_g);
         driver->control_buffer[reg_b + 1] |= (1 << bit_b);
