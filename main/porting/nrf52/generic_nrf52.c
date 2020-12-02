@@ -11,16 +11,25 @@
 #include "eeconfig_fds.h"
 #include "usb_interface.h"
 
+#if defined(DISABLE_SLEEP)
+    #if defined(DISABLE_USB)
+        #define OUTPUT_MASK 0
+    #else
+        #define OUTPUT_MASK USB_ENABLED
+    #endif
+#else
+    #if defined(DISABLE_USB)
+        #define OUTPUT_MASK SLEEP_ENABLED
+    #else
+        #define OUTPUT_MASK SLEEP_ENABLED|USB_ENABLED
+    #endif
+#endif
+
 rf_driver_t rf_driver = {
     .rf_led = 0,
     .usb_led = 0,
     .vbus_enabled = 0,
-#ifdef DISABLE_SLEEP
-    .sleep_enabled = 0,
-#else
-    .sleep_enabled = 1,
-#endif
-    .output_target = OUTPUT_RF,
+    .output_target = OUTPUT_RF | OUTPUT_MASK,
     .matrix_changed = 0,
     .battery_power = 100,
     .sleep_count = 0,
