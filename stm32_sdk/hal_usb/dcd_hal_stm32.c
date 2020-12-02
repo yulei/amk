@@ -13,6 +13,10 @@
     #define DCD_MAX_EP_NUM      4
     #define DCD_USB_INSTANCE    USB_OTG_FS
     #define DCD_USB_IRQn        OTG_FS_IRQn
+#elif defined(STM32F722xx)
+    #define DCD_MAX_EP_NUM      6
+    #define DCD_USB_INSTANCE    USB_OTG_FS
+    #define DCD_USB_IRQn        OTG_FS_IRQn
 #else
     #error "HAL USB unsupported mcu"
 #endif
