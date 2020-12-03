@@ -39,9 +39,6 @@ void matrix_init_kb(void)
 __attribute__((weak))
 void matrix_scan_kb(void)
 {
-#ifdef RGB_EFFECTS_ENABLE
-    rgb_effects_task();
-#endif
 }
 
 __attribute__((weak))

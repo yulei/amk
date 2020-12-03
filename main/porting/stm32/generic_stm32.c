@@ -83,6 +83,11 @@ void board_task(void)
 #ifdef WEBUSB_ENABLE
     webusb_task();
 #endif
+
+#ifdef RGB_EFFECTS_ENABLE
+    rgb_effects_task();
+#endif
+
     custom_board_task();
 }
 

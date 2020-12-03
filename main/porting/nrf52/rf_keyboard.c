@@ -175,6 +175,11 @@ static void keyboard_timer_handler(void *p_context)
     rf_wdt_feed();
 #endif
     keyboard_task();
+
+#ifdef RGB_EFFECTS_ENABLE
+    rgb_effects_task();
+#endif
+
     if (rf_driver.vbus_enabled && (rf_driver.output_target&USB_ENABLED)) {
         // do not run the power related stuff while have usb supply
         return;
