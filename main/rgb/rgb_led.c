@@ -15,11 +15,19 @@ void rgb_led_init(void)
 #endif
     rgb_effects_init(driver);
 #endif
+
+#ifdef RGB_MATRIX_ENABLE
+    rgb_driver_t* driver = rgb_driver_create(RGB_DRIVER_IS31FL3731);
+    rgb_matrix_init(driver);
+#endif
 }
 
 void rgb_led_task(void)
 {
 #ifdef RGB_EFFECTS_ENABLE
     rgb_effects_task();
+#endif
+#ifdef RGB_MATRIX_ENABLE
+    rgb_matrix_task();
 #endif
 }

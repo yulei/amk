@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "stm32f4xx_hal.h"
+#include "generic_hal.h"
 #include "i2c.h"
 #include "gpio_pin.h"
 
@@ -43,7 +43,7 @@ void i2c_init(void)
     i2c_handle.Init.OwnAddress2 = 0;
     i2c_handle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
     i2c_handle.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-    if (HAL_I2C_Init(&hi2c2) == HAL_OK) {
+    if (HAL_I2C_Init(&i2c_handle) == HAL_OK) {
         twi_ready = true;
     } else {
         //Error_Handler();
