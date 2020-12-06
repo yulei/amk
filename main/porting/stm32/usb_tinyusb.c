@@ -43,6 +43,8 @@ void usb_remote_wakeup(void)
 
 void usb_send_report(uint8_t report_type, const void* data, size_t size)
 {
+    uint32_t* d = (uint32_t*)data;
+    amk_printf("type:%d, %x-%x, size:%d \n", report_type, *d, *(d+1), size);
     switch(report_type) {
     case HID_REPORT_ID_KEYBOARD:
         tud_hid_n_report(ITF_NUM_HID_KBD, HID_REPORT_ID_KEYBOARD, data, (uint8_t)size);

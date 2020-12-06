@@ -10,6 +10,8 @@
 #include "print.h"
 #include "timer.h"
 #include "wait.h"
+#include "amk_printf.h"
+
 #ifdef RGB_EFFECTS_ENABLE
 #include "rgb_driver.h"
 #include "rgb_effects.h"
@@ -97,6 +99,11 @@ bool matrix_scan_custom(matrix_row_t* raw)
         gpio_write_pin(col_pins[col], 0);
     }
 #endif
+    if (changed) {
+        for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
+            amk_printf("row:%d-%x\n", row, matrix_get_row(row));
+        }
+    }
     return changed;
 }
 
@@ -132,11 +139,8 @@ matrix_row_t matrix_get_row(uint8_t row)
 
 void matrix_print(void)
 {
-    print("\nr/c 0123456789ABCDEF\n");
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-        phex(row); print(": ");
-        pbin_reverse16(matrix_get_row(row));
-        print("\n");
+        amk_printf("%x\n", matrix_get_row(row));
     }
 }
 

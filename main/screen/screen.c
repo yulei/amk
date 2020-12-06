@@ -80,6 +80,11 @@ void disp_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_
     lv_disp_flush_ready(disp_drv);
 }
 
+void screen_fill(const void* data)
+{
+    ssd1357_fill(&ssd1357_drivers[0], data);
+}
+
 void screen_test(void)
 {
     lv_obj_t * label1 =  lv_label_create(lv_scr_act(), NULL);

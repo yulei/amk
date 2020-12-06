@@ -20,8 +20,9 @@ void gpio_set_output_pushpull(pin_t pin)
 {
     GPIO_InitTypeDef init_param = {0};
     init_param.Pin = pin.pin;
-    init_param.Speed = GPIO_SPEED_FREQ_HIGH;
+    init_param.Speed = GPIO_SPEED_FREQ_LOW;
     init_param.Mode = GPIO_MODE_OUTPUT_PP;
+    init_param.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(pin.port, &init_param);
 }
 
@@ -29,8 +30,9 @@ void gpio_set_output_opendrain(pin_t pin)
 {
     GPIO_InitTypeDef init_param = {0};
     init_param.Pin = pin.pin;
-    init_param.Speed = GPIO_SPEED_FREQ_HIGH;
+    init_param.Speed = GPIO_SPEED_FREQ_LOW;
     init_param.Mode = GPIO_MODE_OUTPUT_OD;
+    init_param.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(pin.port, &init_param);
 }
 
