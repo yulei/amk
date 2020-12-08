@@ -122,28 +122,28 @@ uint8_t keyboard_leds(void)
 
 void send_keyboard(report_keyboard_t *report)
 {
-    if (!usb_ready()) return;
+    //if (!usb_ready()) return;
 
     usb_send_report(HID_REPORT_ID_KEYBOARD, report, sizeof(report_keyboard_t));
 }
 
 void send_mouse(report_mouse_t *report)
 {
-    if (!usb_ready()) return;
+    //if (!usb_ready()) return;
 
     usb_send_report(HID_REPORT_ID_MOUSE, report, sizeof(report_mouse_t));
 }
 
 void send_system(uint16_t data)
 {
-    if (!usb_ready()) return;
+    //if (!usb_ready()) return;
 
     usb_send_report(HID_REPORT_ID_SYSTEM, &data, sizeof(data));
 }
 
 void send_consumer(uint16_t data)
 {
-    if (!usb_ready()) return;
+    //if (!usb_ready()) return;
 
     usb_send_report(HID_REPORT_ID_CONSUMER, &data, sizeof(data));
 }
