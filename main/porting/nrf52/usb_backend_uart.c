@@ -203,7 +203,7 @@ static void uart_uninit(void)
 static void uart_send_cmd(command_t cmd, const uint8_t* data, uint32_t size)
 {
     if (!usb_config.vbus_enabled) {
-        NRF_LOG_INFO("No VBUS power, can send command through UART");
+        NRF_LOG_INFO("No VBUS power, can't send command through UART");
         return;
     }
     if (!usb_config.uart_enabled) {

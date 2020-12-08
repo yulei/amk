@@ -14,6 +14,7 @@ SRCS += \
 	$(NRF52_PORTING_DIR)/gzll_keyboard.c \
 	$(NRF52_PORTING_DIR)/rf_keyboard.c \
 	$(NRF52_PORTING_DIR)/eeconfig_fds.c \
+	$(MAIN_DIR)/porting/report_queue.c \
 
 INCS += \
 	$(NRF52_PORTING_DIR) \

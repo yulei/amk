@@ -120,7 +120,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
         break;
 
     case BLE_ADV_EVT_IDLE:
-        if (rf_driver.vbus_enabled) {
+        if (rf_driver.vbus_enabled && (rf_driver.output_target&USB_ENABLED)) {
             ble_advertising_start(&m_advertising, BLE_ADV_MODE_SLOW);
         } else {
             NRF_LOG_INFO("Enter sleep mode.");

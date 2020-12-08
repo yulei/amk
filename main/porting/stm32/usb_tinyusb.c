@@ -6,20 +6,52 @@
 #include "usb_descriptors.h"
 #include "generic_hal.h"
 #include "amk_printf.h"
+#include "report_queue.h"
+
+static hid_report_queue_t report_queue;
+
+static bool usb_itf_ready(uint32_t type);
 
 void usb_init(void)
 {
     tusb_init();
+    hid_report_queue_init(&report_queue);
 }
 
 void usb_task(void)
 {
+    if (!hid_report_queue_empty(&report_queue)) {
+        amk_printf("dequeue buffered report: size=%d, head=%d, tail=%d\n", hid_report_queue_size(&report_queue), report_queue.head, report_queue.tail);
+        hid_report_t* item = hid_report_queue_peek(&report_queue);
+        if (usb_itf_ready(item->type)) {
+            amk_printf("ITF ready, type:%d, send report\n", item->type);
+            hid_report_t report;
+            hid_report_queue_get(&report_queue, &report);
+            usb_send_report(report.type, report.data, report.size);
+        }
+    }
+
     tud_task();
+}
+
+static bool usb_itf_ready(uint32_t type)
+{
+    switch(type) {
+    case HID_REPORT_ID_KEYBOARD:
+        return tud_hid_n_ready(ITF_NUM_HID_KBD);
+    case HID_REPORT_ID_MOUSE:
+    case HID_REPORT_ID_SYSTEM:
+    case HID_REPORT_ID_CONSUMER:
+        return tud_hid_n_ready(ITF_NUM_HID_OTHER);
+    default:
+        break;
+    }
+    return false;
 }
 
 bool usb_ready(void)
 {
-    return tud_hid_ready();
+    return tud_ready();
 }
 
 bool usb_suspended(void)
@@ -43,19 +75,36 @@ void usb_remote_wakeup(void)
 
 void usb_send_report(uint8_t report_type, const void* data, size_t size)
 {
-    switch(report_type) {
-    case HID_REPORT_ID_KEYBOARD:
-        tud_hid_n_report(ITF_NUM_HID_KBD, HID_REPORT_ID_KEYBOARD, data, (uint8_t)size);
+    if (!usb_itf_ready(report_type)) {
+        amk_printf("Keyboard interface busy or not ready, enqueue report\n");
+        hid_report_t item;
+        memcpy(item.data, data, size);
+        item.type = report_type;
+        item.size = size;
+        hid_report_queue_put(&report_queue, &item);
+    } else {
+        switch(report_type) {
+        case HID_REPORT_ID_KEYBOARD:
+            if (!tud_hid_n_report(ITF_NUM_HID_KBD, HID_REPORT_ID_KEYBOARD, data, (uint8_t)size)) {
+                amk_printf("failed to sent keyboard report\n");
+            }
+            break;
+        case HID_REPORT_ID_MOUSE:
+           if (!tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_MOUSE, data, (uint8_t)size)) {
+                amk_printf("failed to sent mouse report\n");
+           }
+            break;
+        case HID_REPORT_ID_SYSTEM:
+            if (!tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_SYSTEM, data, (uint8_t)size)) {
+                amk_printf("failed to sent system report\n");
+            }
+            break;
+        case HID_REPORT_ID_CONSUMER:
+            if (!tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_CONSUMER, data, (uint8_t)size)) {
+                amk_printf("failed to sent consumer report\n");
+            }
         break;
-    case HID_REPORT_ID_MOUSE:
-        tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_MOUSE, data, (uint8_t)size);
-        break;
-    case HID_REPORT_ID_SYSTEM:
-        tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_SYSTEM, data, (uint8_t)size);
-        break;
-    case HID_REPORT_ID_CONSUMER:
-        tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_CONSUMER, data, (uint8_t)size);
-      break;
+        }
     }
 }
 

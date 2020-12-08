@@ -69,9 +69,9 @@
 
 #define SCHED_MAX_EVENT_DATA_SIZE           APP_TIMER_SCHED_EVENT_DATA_SIZE            /**< Maximum size of scheduler events. */
 #ifdef SVCALL_AS_NORMAL_FUNCTION
-#define SCHED_QUEUE_SIZE                    20                                         /**< Maximum number of events in the scheduler queue. More is needed in case of Serialization. */
+#define SCHED_QUEUE_SIZE                    64                                         /**< Maximum number of events in the scheduler queue. More is needed in case of Serialization. */
 #else
-#define SCHED_QUEUE_SIZE                    10                                         /**< Maximum number of events in the scheduler queue. */
+#define SCHED_QUEUE_SIZE                    64                                         /**< Maximum number of events in the scheduler queue. */
 #endif
 
 // battery threshhold
@@ -83,7 +83,9 @@
 #define KEYBOARD_SCAN_INTERVAL              APP_TIMER_TICKS(10)                        /**< Normal keyboard scan interval */
 #define KEYBOARD_SLOW_SCAN_INTERVAL         APP_TIMER_TICKS(100)                       /**< Slow keyboard scan interval */
 #define SLEEP_SCAN_OVERFLOW                 (60*100)                                   /**< increase sleep count while scan overlow */
-#define SLEEP_COUNT_THRESHHOLD              10                                         /**< In minutes */
+#ifndef SLEEP_COUNT_MAX
+#define SLEEP_COUNT_MAX                     10                                         /**< In minutes */
+#endif
 
 #define LEDS_NUMBER 0
 #define BUTTONS_NUMBER 0
@@ -133,13 +135,14 @@ typedef enum {
 #define WDT_ENABLE      0
 #define OUTPUT_RF       0x01
 #define OUTPUT_USB      0x02
+#define USB_ENABLED     0x80
+#define SLEEP_ENABLED   0x40 
 
 typedef struct {
     uint8_t         rf_led;         /**< keyboard led status from ble */
     uint8_t         usb_led;        /**< keyboard led status from usb */
     //uint8_t         is_ble;         /**< current is ble stack */
     uint8_t         vbus_enabled;   /**< vbus status */
-    uint8_t         sleep_enabled;  /**< enable sleep mode or not */
     uint8_t         output_target;  /**< target of output */
     uint8_t         matrix_changed; /**< matrix has changed */
     uint8_t         battery_power;  /**< power of the battery */

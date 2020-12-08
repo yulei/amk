@@ -177,7 +177,7 @@ static void keyboard_timer_handler(void *p_context)
     keyboard_task();
     rgb_led_task();
 
-    if (rf_driver.vbus_enabled) {
+    if (rf_driver.vbus_enabled && (rf_driver.output_target&USB_ENABLED)) {
         // do not run the power related stuff while have usb supply
         return;
     }
@@ -193,11 +193,12 @@ static void keyboard_timer_handler(void *p_context)
                 rf_driver.sleep_count++;
                 NRF_LOG_INFO("Sleep count increased: %d", rf_driver.sleep_count);
             }
-            if (rf_driver.sleep_count >= SLEEP_COUNT_THRESHHOLD) {
-                if (rf_driver.sleep_enabled) {
+            if (rf_driver.sleep_count >= SLEEP_COUNT_MAX) {
+                if ( rf_driver.output_target & SLEEP_ENABLED) {
                     NRF_LOG_INFO("Sleep count overflow, goto system off mode");
                     nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_GOTO_SYSOFF);
                 } else {
+                    NRF_LOG_INFO("Sleep mode disabled, clear sleep count");
                     rf_driver.sleep_count = 0;
                 }
             }
@@ -288,14 +289,18 @@ static bool keyboard_pwr_mgmt_shutdown_handler(nrf_pwr_mgmt_evt_t event)
 
 static void usb_enabled(void)
 {
-    rf_driver.vbus_enabled = true;
-    rf_driver.output_target = OUTPUT_USB;
+    if (rf_driver.output_target & USB_ENABLED) {
+        rf_driver.vbus_enabled = true;
+        rf_driver.output_target &= ~OUTPUT_RF;
+        rf_driver.output_target |= OUTPUT_USB;
+    }
 }
 
 static void usb_disabled(void)
 {
     rf_driver.vbus_enabled = false;
-    rf_driver.output_target = OUTPUT_RF;
+    rf_driver.output_target &= ~OUTPUT_USB;
+    rf_driver.output_target |= OUTPUT_RF;
 }
 
 static void usb_suspend(bool remote_wakeup_en)
@@ -310,9 +315,11 @@ static void usb_leds(uint8_t leds)
 }
 
 // bluetooth control command
-// F21 for select usb/ble output
-// F22 for erase bond
-// F23 for enter bootloader mode
+// F20 : disable sleep mode
+// F21 : select usb/rf output
+// F22 : erase bond
+// F23 : enter bootloader mode
+// F24 : toggle ble/gazell mode
 #include "action.h"
 #include "action_layer.h"
 bool hook_process_action_main(keyrecord_t *record) {
@@ -326,17 +333,22 @@ bool hook_process_action_main(keyrecord_t *record) {
     }
 
     switch(action.key.code) {
+        case KC_F20: // disable sleep mode
+            rf_driver.output_target &= ~SLEEP_ENABLED;
+            break;
         case KC_F21: // toggle usb/ble output
-            if (rf_driver.output_target == OUTPUT_RF) {
+            if (rf_driver.output_target & OUTPUT_RF) {
                 if (rf_driver.vbus_enabled) {
                     NRF_LOG_INFO("set output to USB");
-                    rf_driver.output_target = OUTPUT_USB;
+                    rf_driver.output_target &= ~OUTPUT_RF;
+                    rf_driver.output_target |= OUTPUT_USB;
                 } else {
                     NRF_LOG_INFO("vbus not enabled, still using RF");
                 }
             } else {
                 NRF_LOG_INFO("set output to RF");
-                rf_driver.output_target = OUTPUT_RF;
+                rf_driver.output_target &= ~OUTPUT_USB;
+                rf_driver.output_target |= OUTPUT_RF;
             } return true;
 
         case KC_F22: // reset to erase bond mode
