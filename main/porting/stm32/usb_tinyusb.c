@@ -6,78 +6,52 @@
 #include "usb_descriptors.h"
 #include "generic_hal.h"
 #include "amk_printf.h"
+#include "report_queue.h"
 
-#define QUEUE_ITEM_SIZE 16                          // maximum size of the queue item
-typedef struct {
-    uint32_t    type;                               // type of the item
-    uint32_t    size;
-    uint8_t     data[QUEUE_ITEM_SIZE];
-} report_item_t;
+static hid_report_queue_t report_queue;
 
-#define QUEUE_SIZE      16 
-typedef struct {
-    report_item_t   items[QUEUE_SIZE];
-    uint32_t        head;
-    uint32_t        tail;
-} report_queue_t;
-
-static report_queue_t report_queue;
-
-static bool report_queue_empty(report_queue_t* queue)
-{
-    return queue->head == queue->tail;
-}
-
-static bool report_queue_full(report_queue_t* queue)
-{
-    return ((queue->tail + 1) % QUEUE_SIZE) == queue->head;
-}
-
-static void report_queue_init(report_queue_t* queue)
-{
-    memset(&queue->items[0], 0, sizeof(queue->items));
-    queue->head = queue->tail = 0;
-}
-
-static bool report_queue_put(report_queue_t* queue, report_item_t* item)
-{
-    if (report_queue_full(queue)) return false;
-
-    queue->items[queue->tail] = *item;
-    queue->tail = (queue->tail + 1) % QUEUE_SIZE;
-    return true;
-}
-
-static bool report_queue_get(report_queue_t* queue, report_item_t* item)
-{
-    if (report_queue_empty(queue)) return false;
-
-    *item = queue->items[queue->head];
-    queue->head = (queue->head + 1) % QUEUE_SIZE;
-    return true;
-}
+static bool usb_itf_ready(uint32_t type);
 
 void usb_init(void)
 {
     tusb_init();
-    report_queue_init(&report_queue);
+    hid_report_queue_init(&report_queue);
 }
 
 void usb_task(void)
 {
-    tud_task();
-
-    if( !report_queue_empty(&report_queue)) {
-        amk_printf("dequeue buffered report\n");
-        report_item_t item;
-        report_queue_get(&report_queue, &item);
-        usb_send_report(item.type, item.data, item.size);
+    if (!hid_report_queue_empty(&report_queue)) {
+        amk_printf("dequeue buffered report: size=%d, head=%d, tail=%d\n", hid_report_queue_size(&report_queue), report_queue.head, report_queue.tail);
+        hid_report_t* item = hid_report_queue_peek(&report_queue);
+        if (usb_itf_ready(item->type)) {
+            amk_printf("ITF ready, type:%d, send report\n", item->type);
+            hid_report_t report;
+            hid_report_queue_get(&report_queue, &report);
+            usb_send_report(report.type, report.data, report.size);
+        }
     }
+
+    tud_task();
+}
+
+static bool usb_itf_ready(uint32_t type)
+{
+    switch(type) {
+    case HID_REPORT_ID_KEYBOARD:
+        return tud_hid_n_ready(ITF_NUM_HID_KBD);
+    case HID_REPORT_ID_MOUSE:
+    case HID_REPORT_ID_SYSTEM:
+    case HID_REPORT_ID_CONSUMER:
+        return tud_hid_n_ready(ITF_NUM_HID_OTHER);
+    default:
+        break;
+    }
+    return false;
 }
 
 bool usb_ready(void)
 {
-    return tud_hid_ready();
+    return tud_ready();
 }
 
 bool usb_suspended(void)
@@ -101,52 +75,36 @@ void usb_remote_wakeup(void)
 
 void usb_send_report(uint8_t report_type, const void* data, size_t size)
 {
-    static report_item_t item;
-    switch(report_type) {
-    case HID_REPORT_ID_KEYBOARD:
-        if (!tud_hid_n_ready(ITF_NUM_HID_KBD)) {
-            amk_printf("Keyboard interface busy or not ready, enqueue report\n");
-            memcpy(item.data, data, size);
-            item.type = report_type;
-            item.size = size;
-            report_queue_put(&report_queue, &item);
-        } else {
-            tud_hid_n_report(ITF_NUM_HID_KBD, HID_REPORT_ID_KEYBOARD, data, (uint8_t)size);
-        }
+    if (!usb_itf_ready(report_type)) {
+        amk_printf("Keyboard interface busy or not ready, enqueue report\n");
+        hid_report_t item;
+        memcpy(item.data, data, size);
+        item.type = report_type;
+        item.size = size;
+        hid_report_queue_put(&report_queue, &item);
+    } else {
+        switch(report_type) {
+        case HID_REPORT_ID_KEYBOARD:
+            if (!tud_hid_n_report(ITF_NUM_HID_KBD, HID_REPORT_ID_KEYBOARD, data, (uint8_t)size)) {
+                amk_printf("failed to sent keyboard report\n");
+            }
+            break;
+        case HID_REPORT_ID_MOUSE:
+           if (!tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_MOUSE, data, (uint8_t)size)) {
+                amk_printf("failed to sent mouse report\n");
+           }
+            break;
+        case HID_REPORT_ID_SYSTEM:
+            if (!tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_SYSTEM, data, (uint8_t)size)) {
+                amk_printf("failed to sent system report\n");
+            }
+            break;
+        case HID_REPORT_ID_CONSUMER:
+            if (!tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_CONSUMER, data, (uint8_t)size)) {
+                amk_printf("failed to sent consumer report\n");
+            }
         break;
-    case HID_REPORT_ID_MOUSE:
-        if (!tud_hid_n_ready(ITF_NUM_HID_OTHER)) {
-            amk_printf("Mouse interface busy or not ready, enqueue report\n");
-            memcpy(item.data, data, size);
-            item.type = report_type;
-            item.size = size;
-            report_queue_put(&report_queue, &item);
-        } else {
-            tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_MOUSE, data, (uint8_t)size);
         }
-        break;
-    case HID_REPORT_ID_SYSTEM:
-        if (!tud_hid_n_ready(ITF_NUM_HID_OTHER)) {
-            amk_printf("System interface busy or not ready, enqueue report\n");
-            memcpy(item.data, data, size);
-            item.type = report_type;
-            item.size = size;
-            report_queue_put(&report_queue, &item);
-        } else {
-            tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_SYSTEM, data, (uint8_t)size);
-        }
-        break;
-    case HID_REPORT_ID_CONSUMER:
-        if (!tud_hid_n_ready(ITF_NUM_HID_OTHER)) {
-            amk_printf("Consumer interface busy or not ready, enqueue report\n");
-            memcpy(item.data, data, size);
-            item.type = report_type;
-            item.size = size;
-            report_queue_put(&report_queue, &item);
-        } else {
-            tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_CONSUMER, data, (uint8_t)size);
-        }
-      break;
     }
 }
 

@@ -72,8 +72,10 @@ void board_task(void)
             // wake up remote
             remote_wakeup();
         }
-    } else if (usb_ready()) {
+    } else {
+        //if (usb_ready()) {
         keyboard_task();
+        //}
     }
 
 #ifdef SCREEN_ENABLE
