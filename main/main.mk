@@ -11,7 +11,8 @@ SRCS += \
 	$(MAIN_DIR)/amk_printf.c \
 	$(MAIN_DIR)/eeprom_manager.c \
 	$(MAIN_DIR)/amk_boot.c \
-	$(MAIN_DIR)/rgb/rgb_led.c
+	$(MAIN_DIR)/report_queue.c \
+	$(MAIN_DIR)/rgb/rgb_led.c \
 
 INCS += \
 	$(MAIN_DIR) \
@@ -42,7 +43,6 @@ ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_effects.c
-	SRCS += $(MAIN_DIR)/rgb/rgb_led.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_color.c
 	APP_DEFS += -DRGB_EFFECTS_ENABLE
 	APP_DEFS += -DRGB_WITH_AW9523B
@@ -52,7 +52,6 @@ ifeq (ws2812, $(strip $(RGB_EFFECTS_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/ws2812.c
 	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_effects.c
-	SRCS += $(MAIN_DIR)/rgb/rgb_led.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_color.c
 	APP_DEFS += -DRGB_EFFECTS_ENABLE
 	APP_DEFS += -DRGB_WITH_WS2812
@@ -63,7 +62,6 @@ ifeq (yes, $(strip $(RGB_MATRIX_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_matrix.c
-	SRCS += $(MAIN_DIR)/rgb/rgb_led.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_color.c
 	APP_DEFS += -DRGB_MATRIX_ENABLE
 	APP_DEFS += -DRGB_WITH_IS31FL3731
@@ -74,7 +72,6 @@ ifeq (is31fl3733, $(strip $(RGB_MATRIX_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_matrix.c
-	SRCS += $(MAIN_DIR)/rgb/rgb_led.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_color.c
 	APP_DEFS += -DRGB_MATRIX_ENABLE
 	APP_DEFS += -DRGB_WITH_IS31FL3733
