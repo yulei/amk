@@ -7,6 +7,7 @@ SRCS += \
 	$(STM32_PORTING_DIR)/generic_stm32.c \
 	$(STM32_PORTING_DIR)/gpio_pin.c \
 	$(STM32_PORTING_DIR)/eeconfig_flash.c \
+	$(MAIN_DIR)/porting/report_queue.c \
 
 INCS += \
 	$(STM32_PORTING_DIR) \

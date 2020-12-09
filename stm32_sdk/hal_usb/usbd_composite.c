@@ -292,6 +292,22 @@ static uint8_t comp_dataout(struct _USBD_HandleTypeDef *pdev, uint8_t epnum)
     return USBD_FAIL;
 }
 
+bool usbd_comp_itf_ready(USBD_HandleTypeDef *pdev, uint32_t itf)
+{
+    if (pdev->dev_state != USBD_STATE_CONFIGURED) {
+        return false;
+    }
+
+    for (int i = 0; i < usbd_composite.size; i++) {
+        usbd_interface_t* interface = &usbd_composite.interfaces[i];
+        if (interface->index == itf) {
+            return ((HID_HandleTypeDef *)interface->data)->state == ITF_IDLE;
+        }
+    }
+
+    return false;
+}
+
 uint8_t usbd_comp_send(USBD_HandleTypeDef *pdev, uint8_t type, uint8_t *report, uint16_t len)
 {
     if (pdev->dev_state != USBD_STATE_CONFIGURED) {
