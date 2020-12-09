@@ -313,7 +313,8 @@ static USBH_StatusTypeDef hid_itf_process(USBH_HandleTypeDef *phost, uint8_t itf
         if (phid->inited == 0) {
           phid->Init(phost);
         }
-        pitf->state = HID_IDLE;
+        //pitf->state = HID_IDLE;
+        pitf->state = HID_GET_DATA;
 
         PUT_EVENT(0U, NULL);
     break;
@@ -346,6 +347,7 @@ static USBH_StatusTypeDef hid_itf_process(USBH_HandleTypeDef *phost, uint8_t itf
 
     case HID_GET_DATA:
         USBH_InterruptReceiveData(phost, pitf->report_buf, (uint8_t)pitf->packet_size, pitf->in_pipe); 
+        //amk_printf("start receving data: itf=%d, size=%d, in_pipe=%d\n", itf, pitf->packet_size, pitf->in_pipe);
         pitf->state = HID_POLL;
         pitf->timer = phost->Timer;
         pitf->data_ready = 0U;
