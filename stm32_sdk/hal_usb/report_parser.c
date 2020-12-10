@@ -139,7 +139,7 @@ bool rp_parse(uint32_t itf, const void* data, uint32_t size)
                             itf_desc->desc[index].rd_type = RDI_RAW;
                         } else {
                             // do not support
-                            amk_printf("Unknown usage page: %x", usage_page);
+                            amk_printf("Unknown usage page: %x\n", usage_page);
                             return false;
                         }
                     }
@@ -231,8 +231,23 @@ bool next_token(uint8_t* p, uint8_t* type, uint8_t* tag, uint8_t* size, uint32_t
     *size = TOKEN_DATA(*p, TOKEN_SIZE_MASK, TOKEN_SIZE_POS);
     *type = TOKEN_DATA(*p, TOKEN_TYPE_MASK, TOKEN_TYPE_POS);
     *tag = TOKEN_DATA(*p, TOKEN_TAG_MASK, TOKEN_TAG_POS);
-    if (size)
-        memcpy(value, (p+1), *size);
+    // data in little endian
+    if (*size) {
+        switch(*size) {
+        case 1: {
+            *value = p[1];
+        } break;
+        case 2: {
+            *value = p[1] | (p[2] << 8);
+        } break;
+        case 4: {
+            *value = p[1] | (p[2] << 8) | (p[3] << 16) | (p[4] << 24);
+        } break;
+        default:
+            amk_printf("unknown token size:%d\n", *size);
+            return false;
+        }
+    }
 
     return true;
 }

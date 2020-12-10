@@ -5,12 +5,12 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "stm32f4xx_hal.h"
+#include "generic_hal.h"
 #include "i2c.h"
 #include "gpio_pin.h"
 
 #ifndef I2C_INSTANCE_ID
-    #define I2C_INSTANCE_ID     I2C1
+    #define I2C_INSTANCE_ID     I2C1 
 #endif
 
 #ifndef I2C_SCL_PIN
@@ -22,10 +22,11 @@
 #endif
 
 
-static I2C_HandleTypeDef i2c_handle;
-static bool twi_ready = false;
+I2C_HandleTypeDef i2c_handle;
 
+static bool twi_ready = false;
 bool i2c_ready(void) { return twi_ready; }
+
 
 void i2c_init(void)
 {
@@ -106,4 +107,7 @@ void i2c_uninit(void)
     if(!i2c_ready()) {
         return;
     }
+
+    HAL_I2C_DeInit(&i2c_handle);
+    twi_ready = false;
 }

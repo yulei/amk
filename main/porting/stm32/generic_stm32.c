@@ -24,6 +24,8 @@
 #include "webusb.h"
 #endif
 
+#include "rgb_led.h"
+
 extern void Error_Handler(void); 
 extern void custom_board_init(void);
 extern void custom_board_task(void);
@@ -86,10 +88,7 @@ void board_task(void)
     webusb_task();
 #endif
 
-#ifdef RGB_EFFECTS_ENABLE
-    rgb_effects_task();
-#endif
-
+    rgb_led_task();
     custom_board_task();
 }
 

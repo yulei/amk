@@ -10,10 +10,6 @@
 #include "print.h"
 #include "timer.h"
 #include "wait.h"
-#ifdef RGB_EFFECTS_ENABLE
-#include "rgb_driver.h"
-#include "rgb_effects.h"
-#endif
 
 #ifndef DEBOUNCE
 #   define DEBOUNCE 5

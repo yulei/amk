@@ -49,7 +49,7 @@ void screen_init(void)
     lv_disp_drv_register(&screen_driver);
 
     // test
-    screen_test();
+    //screen_test();
 }
 
 void screen_task(void)
@@ -67,7 +67,7 @@ void screen_ticks(uint32_t ticks)
 
 void disp_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
-    uint32_t width  = area->x2-area->x1+1;
+ /*   uint32_t width  = area->x2-area->x1+1;
     uint32_t height = area->y2-area->y1+1;
     ssd1357_fill_rect(&ssd1357_drivers[0],
                           area->x1,
@@ -76,6 +76,7 @@ void disp_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_
                           height,
                           color_p,
                           sizeof(lv_color_t) * (width*height));
+                          */
 
     lv_disp_flush_ready(disp_drv);
 }
@@ -85,4 +86,15 @@ void screen_test(void)
     lv_obj_t * label1 =  lv_label_create(lv_scr_act(), NULL);
     lv_label_set_text(label1, "Hello \nbabyfish!");
     lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
+}
+
+void screen_fill(void* data)
+{
+    ssd1357_fill_rect(&ssd1357_drivers[0],
+                        0,
+                        0,
+                        64,
+                        64,
+                        data,
+                        sizeof(lv_color_t) * (64*64));
 }
