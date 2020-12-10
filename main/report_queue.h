@@ -9,7 +9,7 @@
 #include <stdbool.h>
 
 // maximum size of the queue item
-#define HID_QUEUE_ITEM_SIZE 16
+#define HID_QUEUE_ITEM_SIZE         32
 
 typedef struct {
     uint32_t    type;
@@ -18,7 +18,7 @@ typedef struct {
 } hid_report_t;
 
 // maximum size of the queue
-#define HID_REPORT_QUEUE_SIZE      16 
+#define HID_REPORT_QUEUE_SIZE      16
 
 typedef struct {
     hid_report_t    items[HID_REPORT_QUEUE_SIZE];

@@ -19,6 +19,7 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 static hid_report_queue_t report_queue;
 
 static bool usb_itf_ready(uint32_t type);
+static bool usb_itf_send_report(uint32_t report_type, const void* data, uint32_t size);
 
 void usb_init(void)
 {
@@ -32,13 +33,12 @@ void usb_init(void)
 void usb_task(void)
 {
     if (!hid_report_queue_empty(&report_queue)) {
-        amk_printf("dequeue buffered report: size=%d, head=%d, tail=%d\n", hid_report_queue_size(&report_queue), report_queue.head, report_queue.tail);
         hid_report_t* item = hid_report_queue_peek(&report_queue);
         if (usb_itf_ready(item->type)) {
             amk_printf("ITF ready, type:%d, send report\n", item->type);
             hid_report_t report;
             hid_report_queue_get(&report_queue, &report);
-            usb_send_report(report.type, report.data, report.size);
+            usb_itf_send_report(report.type, report.data, report.size);
         }
     }
 
@@ -62,6 +62,25 @@ static bool usb_itf_ready(uint32_t type)
     return false;
 }
 
+static bool usb_itf_send_report(uint32_t report_type, const void* data, uint32_t size)
+{
+    switch(report_type) {
+    case HID_REPORT_ID_KEYBOARD:
+        usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_KEYBOARD, (uint8_t*)data, size);
+        break;
+    case HID_REPORT_ID_MOUSE:
+        usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_MOUSE, (uint8_t*)data, size);
+        break;
+    case HID_REPORT_ID_SYSTEM:
+        usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_SYSTEM, (uint8_t*)data, size);
+        break;
+    case HID_REPORT_ID_CONSUMER:
+        usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_CONSUMER, (uint8_t*)data, size);
+        break;
+    }
+    return true;
+}
+
 bool usb_ready(void)
 {
     return (hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED);
@@ -82,29 +101,11 @@ void usb_remote_wakeup(void)
 
 void usb_send_report(uint8_t report_type, const void* data, size_t size)
 {
-    if (!usb_itf_ready(report_type)) {
-        amk_printf("Keyboard interface busy or not ready, enqueue report\n");
-        hid_report_t item;
-        memcpy(item.data, data, size);
-        item.type = report_type;
-        item.size = size;
-        hid_report_queue_put(&report_queue, &item);
-    } else {
-        switch(report_type) {
-        case HID_REPORT_ID_KEYBOARD:
-            usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_KEYBOARD, (uint8_t*)data, size);
-            break;
-        case HID_REPORT_ID_MOUSE:
-            usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_MOUSE, (uint8_t*)data, size);
-            break;
-        case HID_REPORT_ID_SYSTEM:
-            usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_SYSTEM, (uint8_t*)data, size);
-            break;
-        case HID_REPORT_ID_CONSUMER:
-            usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_CONSUMER, (uint8_t*)data, size);
-            break;
-        }
-    }
+    hid_report_t item;
+    memcpy(item.data, data, size);
+    item.type = report_type;
+    item.size = size;
+    hid_report_queue_put(&report_queue, &item);
 }
 
 #ifdef USB_HOST_ENABLE
