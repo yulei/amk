@@ -10,6 +10,7 @@
 #include "eeprom_manager.h"
 #include "timer.h"
 #include "is31.h"
+#include "keyboard.h"
 
 #define MATRIX_HUE_STEP 10
 #define MATRIX_SAT_STEP 10
@@ -69,10 +70,16 @@ typedef struct {
 } snake_t;
 
 typedef struct {
+    uint8_t val_step;
+    uint8_t vals[RGB_MATRIX_LED_NUM];
+} keyhit_t;
+
+typedef struct {
     rgb_matrix_config_t config;
     rgb_driver_t*       driver;
     union {
         snake_t         snake;
+        keyhit_t        keyhit;
     } data;
     uint32_t            last_ticks;
     RM_EFFECT_FUN       effects[RM_EFFECT_MAX];
@@ -122,8 +129,12 @@ static void rgb_matrix_mode_init(void)
             matrix_state.data.snake.column = 0;
             matrix_state.data.snake.dir = 1;
             memset(&matrix_state.data.snake.leds, INVALID_LED, SNAKE_SIZE);
+            matrix_state.driver->set_color_all(0,0,0);
             break;
         case RM_EFFECT_KEYHIT:
+            memset(&matrix_state.data.keyhit.vals, 0, RGB_MATRIX_LED_NUM);
+            matrix_state.data.keyhit.val_step = 2*VAL_STEP;
+            matrix_state.driver->set_color_all(0,0,0);
             break;
         default:
             break;
@@ -189,7 +200,6 @@ static void rgb_matrix_mode_rainbow_v(void)
 
 static void rgb_matrix_mode_rotate(void)
 {
-    
     rgb_matrix_mode_test();
 }
 
@@ -203,13 +213,14 @@ static void step_snake(void)
             matrix_state.data.snake.row++;
         }
     } else {
-        if (matrix_state.data.snake.row == 1) {
+        if (matrix_state.data.snake.row == 0) {
             matrix_state.data.snake.dir = !matrix_state.data.snake.dir;
             matrix_state.data.snake.column = (matrix_state.data.snake.column+1) % MATRIX_COLS;
         } else {
             matrix_state.data.snake.row--;
         }
     }
+    matrix_state.config.hue += HUE_STEP;
 }
 
 static void shift_snake(uint8_t cur)
@@ -223,19 +234,40 @@ static void shift_snake(uint8_t cur)
 static void rgb_matrix_mode_snake(void)
 {
     uint8_t cur = key_to_led(matrix_state.data.snake.row, matrix_state.data.snake.column);
-    if (cur != INVALID_LED && cur != matrix_state.data.snake.leds[0]) {
+    if (cur != INVALID_LED) {
+        if (matrix_state.data.snake.leds[SNAKE_SIZE-1] != INVALID_LED) {
+            matrix_state.driver->set_color(matrix_state.data.snake.leds[SNAKE_SIZE-1], 0, 0, 0);
+        }
         shift_snake(cur);
         for (int i = 0; i < SNAKE_SIZE; i++) {
-            matrix_state.driver->set_color(i, matrix_state.config.hue, matrix_state.config.sat, matrix_state.config.val);
+            if (matrix_state.data.snake.leds[i] != INVALID_LED) {
+                matrix_state.driver->set_color(matrix_state.data.snake.leds[i], matrix_state.config.hue, matrix_state.config.sat, matrix_state.config.val);
+            }
         }
-    } else {
-        step_snake();
+    }
+    step_snake();
+}
+
+void hook_matrix_change_rgb(keyevent_t event)
+{
+    if (IS_PRESSED(event)) {
+        uint8_t cur = key_to_led(event.key.row, event.key.col);
+        if ( cur != INVALID_LED) {
+            matrix_state.data.keyhit.vals[cur] = VAL_MAX;
+        }
     }
 }
 
 static void rgb_matrix_mode_keyhit(void)
 {
-    rgb_matrix_mode_test();
+    for (int i = 0; i < RGB_MATRIX_LED_NUM; i++) {
+        matrix_state.driver->set_color(i, matrix_state.config.hue, matrix_state.config.sat, matrix_state.data.keyhit.vals[i]);
+        if (matrix_state.data.keyhit.vals[i] > matrix_state.data.keyhit.val_step) {
+            matrix_state.data.keyhit.vals[i] -= matrix_state.data.keyhit.val_step;
+        } else {
+            matrix_state.data.keyhit.vals[i] = 0;
+        }
+    }
 }
 
 void rgb_matrix_update_default(void)

@@ -14,6 +14,9 @@
 #include "amk_printf.h"
 #include "wait.h"
 
+#if defined(NRF52) || defined(NRF52840_XXAA)
+#include "common_config.h"
+#endif
 
 __attribute__((weak))
 void keyboard_set_rgb(bool on)
@@ -240,4 +243,18 @@ bool hook_process_action(keyrecord_t *record)
     } break;
     }
     return hook_process_action_main(record);
+}
+
+void hook_matrix_change(keyevent_t event)
+{
+#if defined(NRF52) || defined(NRF52840_XXAA)
+    if (!IS_NOEVENT(event)) {
+        rf_driver.matrix_changed = 1;
+    }
+#endif
+
+#ifdef RGB_MATRIX_ENABLE
+    extern void hook_matrix_change_rgb(keyevent_t event);
+    hook_matrix_change_rgb(event);
+#endif
 }
