@@ -172,15 +172,6 @@ void matrix_prepare_sleep(void)
     }
 }
 
-// =======================
-// tmk hooking
-// =======================
-void hook_matrix_change(keyevent_t event)
-{
-    if (!IS_NOEVENT(event)) {
-        rf_driver.matrix_changed = 1;
-    }
-}
 #else
 
 void matrix_prepare_sleep(void) {}
