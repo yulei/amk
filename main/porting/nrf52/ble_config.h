@@ -48,7 +48,7 @@
 #define FEATURE_REPORT_MAX_LEN              2                                          /**< Maximum length of Feature Report. */
 #define FEATURE_REP_REF_ID                  0                                          /**< ID of reference to Keyboard Feature Report. */
 
-#define MAX_BUFFER_ENTRIES                  6                                          /**< Number of elements that can be enqueued */
+#define MAX_BUFFER_ENTRIES                  16                                         /**< Number of elements that can be enqueued */
 
 #define BASE_USB_HID_SPEC_VERSION           0x0101                                     /**< Version number of base USB HID Specification implemented by this application. */
 

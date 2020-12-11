@@ -12,11 +12,6 @@
 #include "wait.h"
 #include "amk_printf.h"
 
-#ifdef RGB_EFFECTS_ENABLE
-#include "rgb_driver.h"
-#include "rgb_effects.h"
-#endif
-
 #ifndef DEBOUNCE
 #   define DEBOUNCE 5
 #endif
@@ -41,9 +36,6 @@ void matrix_init_kb(void)
 __attribute__((weak))
 void matrix_scan_kb(void)
 {
-#ifdef RGB_EFFECTS_ENABLE
-    rgb_effects_task();
-#endif
 }
 
 __attribute__((weak))
@@ -99,11 +91,11 @@ bool matrix_scan_custom(matrix_row_t* raw)
         gpio_write_pin(col_pins[col], 0);
     }
 #endif
-    if (changed) {
+    /*if (changed) {
         for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
             amk_printf("row:%d-%x\n", row, matrix_get_row(row));
         }
-    }
+    }*/
     return changed;
 }
 
@@ -183,15 +175,6 @@ void matrix_prepare_sleep(void)
     }
 }
 
-// =======================
-// tmk hooking
-// =======================
-void hook_matrix_change(keyevent_t event)
-{
-    if (!IS_NOEVENT(event)) {
-        rf_driver.matrix_changed = 1;
-    }
-}
 #else
 
 void matrix_prepare_sleep(void) {}

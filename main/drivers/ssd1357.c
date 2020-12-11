@@ -346,7 +346,14 @@ void ssd1357_fill_rect(ssd1357_t* driver, uint32_t x, uint32_t y, uint32_t width
     set_column_address(driver, COL_BEGIN+y, COL_BEGIN+y+height-1);
     set_row_address(driver, ROW_BEGIN+x, ROW_BEGIN+x+width-1);
     set_write_ram(driver);
-    write_data_buffer(driver, data, size);
+    //write_data_buffer(driver, data, size);
+    uint16_t* color = (uint16_t*)data;
+    for (int i = 0; i < 64; i++) {
+        for (int j = 0; j < 64; j++) {
+            write_data_buffer(driver, color, sizeof(*color));
+            ++color;
+        }
+    }
 }
 
 void ssd1357_fill(ssd1357_t* driver, const void* data)

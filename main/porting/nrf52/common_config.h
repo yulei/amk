@@ -69,9 +69,9 @@
 
 #define SCHED_MAX_EVENT_DATA_SIZE           APP_TIMER_SCHED_EVENT_DATA_SIZE            /**< Maximum size of scheduler events. */
 #ifdef SVCALL_AS_NORMAL_FUNCTION
-#define SCHED_QUEUE_SIZE                    20                                         /**< Maximum number of events in the scheduler queue. More is needed in case of Serialization. */
+#define SCHED_QUEUE_SIZE                    64                                         /**< Maximum number of events in the scheduler queue. More is needed in case of Serialization. */
 #else
-#define SCHED_QUEUE_SIZE                    10                                         /**< Maximum number of events in the scheduler queue. */
+#define SCHED_QUEUE_SIZE                    64                                         /**< Maximum number of events in the scheduler queue. */
 #endif
 
 // battery threshhold
@@ -132,7 +132,7 @@ typedef enum {
 #define NRF_INPUT_REPORT_SYSTEM_MAX_LEN     2
 #define NRF_INPUT_REPORT_CONSUMER_MAX_LEN   2
 
-#define WDT_ENABLE      0
+#define WDT_ENABLE      1
 #define OUTPUT_RF       0x01
 #define OUTPUT_USB      0x02
 #define USB_ENABLED     0x80

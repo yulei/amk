@@ -23,7 +23,8 @@ bool spi_ready(spi_handle_t spi)
 amk_error_t spi_send(spi_handle_t spi, const void *data, size_t length)
 {
     SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)spi;
-    HAL_StatusTypeDef status = HAL_SPI_Transmit(hspi, (uint8_t *)data, length, TIMEOUT_DEFAULT);
+    //HAL_StatusTypeDef status = HAL_SPI_Transmit(hspi, (uint8_t *)data, length, TIMEOUT_DEFAULT);
+    HAL_StatusTypeDef status = HAL_SPI_Transmit_DMA(hspi, (uint8_t *)data, length);
     if (status != HAL_OK) {
         return AMK_SPI_ERROR;
     }
@@ -33,7 +34,8 @@ amk_error_t spi_send(spi_handle_t spi, const void *data, size_t length)
 amk_error_t spi_recv(spi_handle_t spi, void* data, size_t length)
 {
     SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)spi;
-    HAL_StatusTypeDef status = HAL_SPI_Receive(hspi, (uint8_t*)data, length, TIMEOUT_DEFAULT);
+    //HAL_StatusTypeDef status = HAL_SPI_Receive_DMA(hspi, (uint8_t*)data, length, TIMEOUT_DEFAULT);
+    HAL_StatusTypeDef status = HAL_SPI_Receive_DMA(hspi, (uint8_t*)data, length);
     if (status != HAL_OK) {
         return AMK_SPI_ERROR;
     }
@@ -43,7 +45,8 @@ amk_error_t spi_recv(spi_handle_t spi, void* data, size_t length)
 amk_error_t spi_xfer(spi_handle_t spi, const void *tx_buffer, void *rx_buffer, size_t length)
 {
     SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)spi;
-    HAL_StatusTypeDef status = HAL_SPI_TransmitReceive(hspi, (uint8_t*)tx_buffer, (uint8_t*)rx_buffer, length, TIMEOUT_DEFAULT);
+    //HAL_StatusTypeDef status = HAL_SPI_TransmitReceive_DMA(hspi, (uint8_t*)tx_buffer, (uint8_t*)rx_buffer, length, TIMEOUT_DEFAULT);
+    HAL_StatusTypeDef status = HAL_SPI_TransmitReceive_DMA(hspi, (uint8_t*)tx_buffer, (uint8_t*)rx_buffer, length);
     if (status != HAL_OK) {
         return AMK_SPI_ERROR;
     }

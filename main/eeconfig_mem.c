@@ -98,6 +98,10 @@ void eeconfig_init(void)
 #ifdef BACKLIGHT_ENABLE
     eeprom_write_byte(EECONFIG_BACKLIGHT,      0);
 #endif
+#ifdef RGB_EFFECTS_ENABLE
+    extern void effects_update_default(void);
+    effects_update_default();
+#endif
 }
 
 void eeconfig_enable(void)

@@ -8,8 +8,11 @@
 #include "nrf_drv_clock.h"
 #include "nrf_drv_power.h"
 #include "usb_descriptors.h"
+#include "report_queue.h"
 
 static nrf_usb_event_handler_t nrf_usb_event;
+
+static hid_report_queue_t report_queue;
 
 // Forward USB interrupt events to TinyUSB IRQ Handler
 void USBD_IRQHandler(void)
@@ -21,6 +24,56 @@ extern void tusb_hal_nrf_power_event(uint32_t event);
 
 // power event handler
 static void nrf_usb_power_event_handler(nrf_drv_power_usb_evt_t event);
+
+static bool nrf_usb_itf_ready(uint32_t type)
+{
+    switch(type) {
+    case NRF_REPORT_ID_KEYBOARD:
+        return tud_hid_n_ready(ITF_NUM_HID_KBD);
+    case NRF_REPORT_ID_MOUSE:
+    case NRF_REPORT_ID_SYSTEM:
+    case NRF_REPORT_ID_CONSUMER:
+        return tud_hid_n_ready(ITF_NUM_HID_OTHER);
+    default:
+        break;
+    }
+    return false;
+}
+
+
+static bool usb_itf_send_report(uint32_t report_type, const void* data, uint32_t size)
+{
+    switch(report_type) {
+    case NRF_REPORT_ID_KEYBOARD:
+        if (!tud_hid_n_report(ITF_NUM_HID_KBD, HID_REPORT_ID_KEYBOARD, data, (uint8_t)size)) {
+            NRF_LOG_INFO("failed to sent keyboard report");
+            return false;
+        }
+        break;
+    case NRF_REPORT_ID_MOUSE:
+        if (!tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_MOUSE, data, (uint8_t)size)) {
+            NRF_LOG_INFO("failed to sent mouse report");
+            return false;
+        }
+        break;
+    case NRF_REPORT_ID_SYSTEM:
+        if (!tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_SYSTEM, data, (uint8_t)size)) {
+            NRF_LOG_INFO("failed to sent system report");
+            return false;
+        }
+        break;
+    case NRF_REPORT_ID_CONSUMER:
+        if (!tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_CONSUMER, data, (uint8_t)size)) {
+            NRF_LOG_INFO("failed to sent consumer report");
+            return false;
+        }
+        break;
+    default:
+        NRF_LOG_INFO("unknonw report type: %d", report_type);
+        return false;
+    }
+    return true;
+}
 
 void nrf_usb_preinit(void)
 {
@@ -38,6 +91,8 @@ void nrf_usb_init(nrf_usb_event_handler_t* eh)
     nrf_usb_event.suspend_cb = eh->suspend_cb;
     nrf_usb_event.resume_cb  = eh->resume_cb;
     nrf_usb_event.leds_cb    = eh->leds_cb;
+
+    hid_report_queue_init(&report_queue);
 }
 
 void nrf_usb_postinit(void)
@@ -61,6 +116,16 @@ void nrf_usb_postinit(void)
 
 void nrf_usb_task(void)
 {
+    if (!hid_report_queue_empty(&report_queue)) {
+        hid_report_t* item = hid_report_queue_peek(&report_queue);
+        if (nrf_usb_itf_ready(item->type)) {
+            NRF_LOG_INFO("ITF ready, type:%d, send report", item->type);
+            hid_report_t report;
+            hid_report_queue_get(&report_queue, &report);
+            usb_itf_send_report(report.type, report.data, report.size);
+        }
+    }
+
     tud_task();
 
 /*    if (tud_suspended()) {
@@ -74,37 +139,11 @@ void nrf_usb_task(void)
 
 void nrf_usb_send_report(nrf_report_id report, const void *data, size_t size)
 {
-    if (!tud_hid_ready()) {
-        NRF_LOG_INFO("tinyusb not ready, send report returned");
-        return;
-    }
-
-    switch(report) {
-        case NRF_REPORT_ID_KEYBOARD:
-            tud_hid_n_report(ITF_NUM_HID_KBD, HID_REPORT_ID_KEYBOARD, data, (uint8_t)size);
-
-            NRF_LOG_INFO("Key report:[%x%x]", ((uint32_t*)data)[0], ((uint32_t*)data)[1]);
-            break;
-        case NRF_REPORT_ID_MOUSE:
-            tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_MOUSE, data, (uint8_t)size);
-
-            NRF_LOG_INFO("Mouse report:");
-            for (int i = 0; i < size; i++) {
-                NRF_LOG_INFO("0x%x", ((uint8_t*)data)[i]);
-            }
-            break;
-        case NRF_REPORT_ID_SYSTEM:
-            tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_SYSTEM, data, (uint8_t)sizeof(data));
-            NRF_LOG_INFO("system report: 0x%x", *((uint32_t*)data));
-            break;
-        case NRF_REPORT_ID_CONSUMER:
-            tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_CONSUMER, data, (uint8_t)sizeof(data));
-            NRF_LOG_INFO("consumer report: 0x%x", *((uint32_t*)data));
-            break;
-        default:
-            NRF_LOG_INFO("Unknow report id: %d", report);
-            break;
-    }
+    hid_report_t item;
+    memcpy(item.data, data, size);
+    item.type = report;
+    item.size = size;
+    hid_report_queue_put(&report_queue, &item);
 }
 
 void nrf_usb_wakeup(void) 

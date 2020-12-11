@@ -20,7 +20,7 @@
 #include "matrix_scan.h"
 #include "amk_boot.h"
 
-#include "rgb_effects.h"
+#include "rgb_led.h"
 #include "amk_keymap.h"
 
 static rf_send_report_t rf_send_report = NULL;
@@ -175,6 +175,8 @@ static void keyboard_timer_handler(void *p_context)
     rf_wdt_feed();
 #endif
     keyboard_task();
+    rgb_led_task();
+
     if (rf_driver.vbus_enabled && (rf_driver.output_target&USB_ENABLED)) {
         // do not run the power related stuff while have usb supply
         return;

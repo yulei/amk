@@ -5,6 +5,7 @@
 #include "custom_action.h"
 #include "eeconfig.h"
 #include "rgb_effects.h"
+#include "rgb_matrix.h"
 
 #include "action.h"
 #include "action_layer.h"
@@ -13,6 +14,9 @@
 #include "amk_printf.h"
 #include "wait.h"
 
+#if defined(NRF52) || defined(NRF52840_XXAA)
+#include "common_config.h"
+#endif
 
 __attribute__((weak))
 void keyboard_set_rgb(bool on)
@@ -31,12 +35,12 @@ void keyboard_set_rgb(bool on)
 #endif
 }
 
-#ifdef RGB_EFFECTS_ENABLE
 void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
     if (!record->event.pressed) return; // do not press key released event
 
     switch (id) {
+#ifdef RGB_EFFECTS_ENABLE
         case AF_RGB_TOG:
             rgb_effects_toggle();
             keyboard_set_rgb(rgb_effects_enabled());
@@ -63,6 +67,47 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
         case AF_RGB_VALD:
             rgb_effects_dec_val();
             break;
+        case AF_RGB_SPDI:
+            rgb_effects_inc_speed();
+            break;
+        case AF_RGB_SPDD:
+            rgb_effects_dec_speed();
+            break;
+#endif
+#ifdef RGB_MATRIX_ENABLE
+        case AF_RGB_MATRIX_TOG:
+            rgb_matrix_toggle();
+            //keyboard_set_rgb(rgb_effects_enabled());
+            amk_printf("Toggle rgb matrix: %d\n", rgb_matrix_enabled());
+            break;
+        case AF_RGB_MATRIX_MOD:
+            rgb_matrix_inc_mode();
+            break;
+        case AF_RGB_MATRIX_HUEI:
+            rgb_matrix_inc_hue();
+            break;
+        case AF_RGB_MATRIX_HUED:
+            rgb_matrix_dec_hue();
+            break;
+        case AF_RGB_MATRIX_SATI:
+            rgb_matrix_inc_sat();
+            break;
+        case AF_RGB_MATRIX_SATD:
+            rgb_matrix_dec_sat();
+            break;
+        case AF_RGB_MATRIX_VALI:
+            rgb_matrix_inc_val();
+            break;
+        case AF_RGB_MATRIX_VALD:
+            rgb_matrix_dec_val();
+            break;
+        case AF_RGB_MATRIX_SPDI:
+            rgb_matrix_inc_speed();
+            break;
+        case AF_RGB_MATRIX_SPDD:
+            rgb_matrix_dec_speed();
+            break;
+#endif
         case AF_EEPROM_RESET:
             eeconfig_init();
             break;
@@ -70,7 +115,6 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
             break;
     }
 }
-#endif
 
 
 __attribute__((weak))
@@ -199,4 +243,18 @@ bool hook_process_action_no(keyrecord_t *record)
     } break;
     }
     return hook_process_action_main(record);
+}
+
+void hook_matrix_change(keyevent_t event)
+{
+#if defined(NRF52) || defined(NRF52840_XXAA)
+    if (!IS_NOEVENT(event)) {
+        rf_driver.matrix_changed = 1;
+    }
+#endif
+
+#ifdef RGB_MATRIX_ENABLE
+    extern void hook_matrix_change_rgb(keyevent_t event);
+    hook_matrix_change_rgb(event);
+#endif
 }

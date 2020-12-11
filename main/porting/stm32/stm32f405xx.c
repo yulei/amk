@@ -5,6 +5,10 @@
 #include "generic_hal.h"
 #include "amk_printf.h"
 
+
+DMA_HandleTypeDef hdma_i2c2_rx;
+DMA_HandleTypeDef hdma_i2c2_tx;
+
 void Error_Handler(void)
 {
     __asm__("BKPT");
@@ -57,17 +61,30 @@ void SystemClock_Config(void)
 static void MX_GPIO_Init(void)
 {
     __HAL_RCC_GPIOH_CLK_ENABLE();
+    __HAL_RCC_GPIOD_CLK_ENABLE();
     __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
 }
 
+static void MX_DMA_Init(void)
+{
+    __HAL_RCC_DMA1_CLK_ENABLE();
+    /* DMA interrupt init */
+    /* DMA1_Stream2_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA1_Stream2_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream2_IRQn);
+    /* DMA1_Stream7_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA1_Stream7_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream7_IRQn);
+}
 
 void custom_board_init(void)
 {
     SystemClock_Config();
 
     MX_GPIO_Init();
+    MX_DMA_Init();
 }
 
 void custom_board_task(void)

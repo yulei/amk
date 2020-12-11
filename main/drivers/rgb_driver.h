@@ -25,6 +25,7 @@ typedef enum {
     RGB_DRIVER_WS2812,
     RGB_DRIVER_AW9523B,
     RGB_DRIVER_IS31FL3731,
+    RGB_DRIVER_IS31FL3733,
 } RGB_DRIVER_TYPE;
 
 rgb_driver_t* rgb_driver_create(RGB_DRIVER_TYPE type);

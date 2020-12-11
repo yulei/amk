@@ -19,7 +19,7 @@ static void hid_user_ev_handler(app_usbd_class_inst_t const * p_inst,
 // HCK hid custom keyboard
 #define HCK_INTERFACE               0
 #define HCK_EP_IN                   NRF_DRV_USBD_EPIN1
-#define HCK_REPORT_IN_QUEUE_SIZE    1
+#define HCK_REPORT_IN_QUEUE_SIZE    8
 #define HCK_REPORT_OUT_MAXSIZE      1
 #define HCK_REPORT_FEATURE_MAXSIZE  31
 
@@ -43,7 +43,7 @@ APP_USBD_HID_GENERIC_GLOBAL_DEF(m_hck,
 // HCO hid custom other
 #define HCO_INTERFACE               1
 #define HCO_EP_IN                   NRF_DRV_USBD_EPIN2
-#define HCO_REPORT_IN_QUEUE_SIZE    1
+#define HCO_REPORT_IN_QUEUE_SIZE    8
 #define HCO_REPORT_OUT_MAXSIZE      1
 #define HCO_REPORT_FEATURE_MAXSIZE  31
 

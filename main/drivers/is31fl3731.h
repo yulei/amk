@@ -5,22 +5,13 @@
 
 #pragma once
 
-#include <stdint.h>
+#include "is31.h"
 
-typedef void (*map_led_t)(uint8_t index, uint8_t *red_reg, uint8_t* green_reg, uint8_t *blue_reg);
-
-typedef struct {
-    uint8_t     addr;
-    uint8_t     led_num;
-    void        *user;       
-    map_led_t   map_led;
-} is31fl3731_t;
-
-is31fl3731_t* is31fl3731_init(uint8_t addr, uint8_t led_num, map_led_t map_led);
-void is31fl3731_set_color(is31fl3731_t* driver, uint8_t index, uint8_t red, uint8_t green, uint8_t blue);
-void is31fl3731_set_color_all(is31fl3731_t* driver, uint8_t red, uint8_t green, uint8_t blue);
-void is31fl3731_update_buffers(is31fl3731_t* driver);
-void is31fl3731_uninit(is31fl3731_t *led_driver);
+is31_t *is31fl3731_init(uint8_t addr, uint8_t led_num);
+void is31fl3731_set_color(is31_t *driver, uint8_t index, uint8_t red, uint8_t green, uint8_t blue);
+void is31fl3731_set_color_all(is31_t *driver, uint8_t red, uint8_t green, uint8_t blue);
+void is31fl3731_update_buffers(is31_t *driver);
+void is31fl3731_uninit(is31_t *driver);
 
 // pwm register address
 #define C1_1 0x24

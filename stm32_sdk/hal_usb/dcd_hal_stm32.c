@@ -167,7 +167,7 @@ void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr)
 // PCD callback override
 void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef *usb, uint8_t epnum)
 {
-    amk_printf("PCD DataOut\n");
+    //amk_printf("PCD DataOut\n");
     if (last_out_size==0) {
         dcd_event_xfer_complete(0, epnum, 0, XFER_RESULT_SUCCESS, true); 
     } else {
@@ -177,7 +177,7 @@ void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef *usb, uint8_t epnum)
 
 void HAL_PCD_DataInStageCallback(PCD_HandleTypeDef *usb, uint8_t epnum)
 {
-    amk_printf("PCD DataIn\n");
+    //amk_printf("PCD DataIn\n");
     if (last_in_size==0) {
         dcd_event_xfer_complete(0, 0x80|epnum, 0, XFER_RESULT_SUCCESS, true); 
     } else {

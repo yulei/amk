@@ -382,13 +382,3 @@ bool matrix_driver_keys_off(void)
     }
     return true;
 }
-
-// =======================
-// tmk hooking
-// =======================
-void hook_matrix_change(keyevent_t event)
-{
-    if (!IS_NOEVENT(event)) {
-        rf_driver.matrix_changed = 1;
-    }
-}
