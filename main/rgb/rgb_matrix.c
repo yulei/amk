@@ -48,12 +48,13 @@ typedef enum {
     RM_EFFECT_STATIC,
     RM_EFFECT_BREATH,
     RM_EFFECT_GRADIENT,
-    RM_EFFECT_GRADIENT_V,
     RM_EFFECT_RAINBOW,
+    RM_EFFECT_GRADIENT_V,
     RM_EFFECT_RAINBOW_V,
     RM_EFFECT_ROTATE,
     RM_EFFECT_SNAKE,
     RM_EFFECT_KEYHIT,
+    RM_EFFECT_RANDOM,
     RM_EFFECT_TEST,
 #define RM_EFFECT_MAX RM_EFFECT_TEST
 } rgb_matrix_effect_type_t;
@@ -66,6 +67,7 @@ typedef struct {
     uint8_t row;
     uint8_t column;
     uint8_t dir;
+    uint8_t leds_hue[SNAKE_SIZE];
     uint8_t leds[SNAKE_SIZE];
 } snake_t;
 
@@ -109,17 +111,29 @@ static void rgb_matrix_update_timer(void) { matrix_state.last_ticks = timer_read
 
 static uint8_t get_random_hue(uint8_t hue) { return (rand() % HUE_MAX) + RANDOM_DISTANCE; }
 
+static void rgb_matrix_mode_preinit(void)
+{
+    matrix_state.config.sat = SAT_DEFAULT;
+    matrix_state.config.val = VAL_DEFAULT;
+}
+
+static void rgb_matrix_mode_postinit(void)
+{}
+
 static void rgb_matrix_mode_init(void)
 {
+    rgb_matrix_mode_preinit();
     switch(matrix_state.config.mode) {
         case RM_EFFECT_STATIC:
             break;
         case RM_EFFECT_BREATH:
             break;
         case RM_EFFECT_GRADIENT:
+            break;
         case RM_EFFECT_GRADIENT_V:
             break;
         case RM_EFFECT_RAINBOW:
+            break;
         case RM_EFFECT_RAINBOW_V:
             break;
         case RM_EFFECT_ROTATE:
@@ -128,6 +142,7 @@ static void rgb_matrix_mode_init(void)
             matrix_state.data.snake.row = 0;
             matrix_state.data.snake.column = 0;
             matrix_state.data.snake.dir = 1;
+            memset(&matrix_state.data.snake.leds_hue, 0, SNAKE_SIZE);
             memset(&matrix_state.data.snake.leds, INVALID_LED, SNAKE_SIZE);
             matrix_state.driver->set_color_all(0,0,0);
             break;
@@ -136,9 +151,12 @@ static void rgb_matrix_mode_init(void)
             matrix_state.data.keyhit.val_step = 2*VAL_STEP;
             matrix_state.driver->set_color_all(0,0,0);
             break;
+        case RM_EFFECT_RANDOM:
+            break;
         default:
             break;
     }
+    rgb_matrix_mode_postinit();
 }
 static void rgb_matrix_mode_test(void)
 {
@@ -198,9 +216,32 @@ static void rgb_matrix_mode_rainbow_v(void)
     matrix_state.config.hue += step;
 }
 
+static uint8_t rotate_hue(uint8_t x, uint8_t y, uint8_t hue) 
+{
+    int32_t x_off = x > 128? x-128 : -(128-x);
+    int32_t y_off = y > 128? y-128 : -(128-y);
+    if (x_off > 0) {
+        if (y_off > 0) {
+            return hue + y_off;
+        } else {
+            return hue + 256 + y_off;
+        }
+    } else {
+        if (y_off > 0) {
+            return hue + 64 + y_off;
+        } else {
+            return hue + 128 + y_off;
+        }
+    }
+}
+
 static void rgb_matrix_mode_rotate(void)
 {
-    rgb_matrix_mode_test();
+    for (int i = 0; i < RGB_MATRIX_LED_NUM; i++) {
+        is31_led_attribute_t *attr = &g_rgb_matrix.attributes[i];
+        matrix_state.driver->set_color( i, rotate_hue(attr->x, attr->y, matrix_state.config.hue), matrix_state.config.sat, matrix_state.config.val);
+    }
+    matrix_state.config.hue += HUE_STEP;
 }
 
 static void step_snake(void)
@@ -220,15 +261,17 @@ static void step_snake(void)
             matrix_state.data.snake.row--;
         }
     }
-    matrix_state.config.hue += HUE_STEP;
+    matrix_state.config.hue += HUE_STEP*3;
 }
 
 static void shift_snake(uint8_t cur)
 {
     for (int i = SNAKE_SIZE-1; i > 0; i--) {
         matrix_state.data.snake.leds[i] = matrix_state.data.snake.leds[i-1];
+        matrix_state.data.snake.leds_hue[i] = matrix_state.data.snake.leds_hue[i-1];
     }
     matrix_state.data.snake.leds[0] = cur;
+    matrix_state.data.snake.leds_hue[0] = matrix_state.config.hue;
 }
 
 static void rgb_matrix_mode_snake(void)
@@ -241,7 +284,7 @@ static void rgb_matrix_mode_snake(void)
         shift_snake(cur);
         for (int i = 0; i < SNAKE_SIZE; i++) {
             if (matrix_state.data.snake.leds[i] != INVALID_LED) {
-                matrix_state.driver->set_color(matrix_state.data.snake.leds[i], matrix_state.config.hue, matrix_state.config.sat, matrix_state.config.val);
+                matrix_state.driver->set_color(matrix_state.data.snake.leds[i], matrix_state.data.snake.leds_hue[i], matrix_state.config.sat, matrix_state.config.val);
             }
         }
     }
@@ -288,21 +331,22 @@ void rgb_matrix_init(rgb_driver_t *driver)
     }
     eeconfig_read_rgb_matrix(&matrix_state.config);
 
-    matrix_state.driver        = driver;
+    matrix_state.driver = driver;
     if (matrix_state.config.enable)
         matrix_state.driver->init();
 
-    matrix_state.last_ticks    = timer_read32();
+    matrix_state.last_ticks = timer_read32();
     srand(matrix_state.last_ticks);
     matrix_state.effects[RM_EFFECT_STATIC]     = rgb_matrix_mode_static;
     matrix_state.effects[RM_EFFECT_BREATH]     = rgb_matrix_mode_breath;
     matrix_state.effects[RM_EFFECT_GRADIENT]   = rgb_matrix_mode_gradient;
-    matrix_state.effects[RM_EFFECT_GRADIENT_V] = rgb_matrix_mode_gradient_v;
     matrix_state.effects[RM_EFFECT_RAINBOW]    = rgb_matrix_mode_rainbow;
+    matrix_state.effects[RM_EFFECT_GRADIENT_V] = rgb_matrix_mode_gradient_v;
     matrix_state.effects[RM_EFFECT_RAINBOW_V]  = rgb_matrix_mode_rainbow_v;
     matrix_state.effects[RM_EFFECT_ROTATE]     = rgb_matrix_mode_rotate;
     matrix_state.effects[RM_EFFECT_SNAKE]      = rgb_matrix_mode_snake;
     matrix_state.effects[RM_EFFECT_KEYHIT]     = rgb_matrix_mode_keyhit;
+    matrix_state.effects[RM_EFFECT_RANDOM]     = rgb_matrix_mode_test;
     rgb_matrix_mode_init();
 }
 
