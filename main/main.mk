@@ -20,6 +20,7 @@ INCS += \
 	$(MAIN_DIR)/drivers \
 	$(MAIN_DIR)/rgb \
 	$(MAIN_DIR)/screen \
+	$(MAIN_DIR)/imgcodec \
 	$(MAIN_DIR)/rtt \
 	$(LIB_DIR)/tinyusb/src \
 
@@ -36,6 +37,9 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/spi.c
 	SRCS += $(MAIN_DIR)/drivers/ssd1357.c
 	SRCS += $(MAIN_DIR)/screen/screen.c
+	SRCS += $(MAIN_DIR)/imgcodec/gifdec.c
+	SRCS += $(MAIN_DIR)/imgcodec/image.c
+	SRCS += $(MAIN_DIR)/imgcodec/upng.c
 endif
 
 ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))

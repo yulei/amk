@@ -5,6 +5,10 @@
 #include "generic_hal.h"
 #include "tusb.h"
 
+I2C_HandleTypeDef hi2c1;
+I2S_HandleTypeDef hi2s2;
+SPI_HandleTypeDef hspi1;
+
 #ifdef TINYUSB_ENABLE
 void OTG_FS_IRQHandler(void)
 {
@@ -22,10 +26,6 @@ void Error_Handler(void)
 {
     __asm__("BKPT");
 }
-
-I2C_HandleTypeDef hi2c1;
-I2S_HandleTypeDef hi2s2;
-SPI_HandleTypeDef hspi1;
 
 
 /**

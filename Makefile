@@ -60,7 +60,6 @@ endif
 
 ifeq (yes,$(SCREEN_ENABLE))
 include $(LIB_DIR)/lvgl.mk
-include $(LIB_DIR)/imgdec.mk
 endif
 
 .PHONY: default list clean flash erase
