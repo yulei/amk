@@ -5,9 +5,16 @@
 #include "generic_hal.h"
 #include "tusb.h"
 
+
 I2C_HandleTypeDef hi2c1;
+DMA_HandleTypeDef hdma_i2c1_rx;
+DMA_HandleTypeDef hdma_i2c1_tx;
+
 I2S_HandleTypeDef hi2s2;
+
 SPI_HandleTypeDef hspi1;
+DMA_HandleTypeDef hdma_spi1_rx;
+DMA_HandleTypeDef hdma_spi1_tx;
 
 #ifdef TINYUSB_ENABLE
 void OTG_FS_IRQHandler(void)
@@ -163,6 +170,26 @@ static void MX_SPI1_Init(void)
     }
 }
 
+static void MX_DMA_Init(void)
+{
+    __HAL_RCC_DMA2_CLK_ENABLE();
+    __HAL_RCC_DMA1_CLK_ENABLE();
+
+    /* DMA interrupt init */
+    /* DMA1_Stream0_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+    /* DMA1_Stream6_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
+    /* DMA2_Stream0_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
+    /* DMA2_Stream3_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
+}
+
 #if defined(TINYUSB_ENABLE)
 void usb_port_init(void)
 {
@@ -210,6 +237,7 @@ void custom_board_init(void)
     SystemClock_Config();
 
     MX_GPIO_Init();
+    MX_DMA_Init();
 #if defined(TINYUSB_ENABLE) && !defined(TINYUUSB_USE_HAL)
     MX_USB_DEVICE_Init();
 #endif

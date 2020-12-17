@@ -338,7 +338,7 @@ void ssd1357_init(ssd1357_t *driver)
     fill_screen(driver, 0x0000);                    // Clear Screen
     set_display_on_off(driver, 0xAF);               // Display On (0xAE/0xAF)
     // need to power up screen here
-    // wait_ms(200);
+     wait_ms(200);
 }
 
 void ssd1357_fill_rect(ssd1357_t* driver, uint32_t x, uint32_t y, uint32_t width, uint32_t height, const void *data, size_t size)
