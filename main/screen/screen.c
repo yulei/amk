@@ -49,12 +49,16 @@ void screen_init(void)
     lv_disp_drv_register(&screen_driver);
 
     // test
-    screen_test();
+    //screen_test();
 }
+
+__attribute__((weak))
+void screen_task_kb(void) {}
 
 void screen_task(void)
 {
     lv_task_handler();
+    screen_task_kb();
 }
 
 void screen_uninit(void)

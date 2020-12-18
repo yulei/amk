@@ -89,6 +89,7 @@ void board_task(void)
 #endif
 
     rgb_led_task();
+
     custom_board_task();
 }
 

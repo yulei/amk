@@ -6,7 +6,7 @@
 
 #include "generic_hal.h"
 
-#define TIMEOUT_DEFAULT 10
+#define TIMEOUT_DEFAULT 100
 
 extern SPI_HandleTypeDef hspi1;
 

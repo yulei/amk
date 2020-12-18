@@ -108,7 +108,7 @@ w25qxx_t *w25qxx_init(w25qxx_config_t *config)
     device->config.cs = config->cs;
     gpio_set_output_pushpull(config->cs);
     gpio_write_pin(config->cs, 0);
-    wait_ms(200);
+    wait_ms(100);
     uint32_t id = w25qxx_read_jedec(device);
 
     switch(id&0xFFFF) {
@@ -145,7 +145,15 @@ static uint32_t w25qxx_read_jedec(w25qxx_t *w25qxx)
 {
     uint8_t tx[4] = {WQCMD_JEDEC_ID, WQCMD_DUMMY, WQCMD_DUMMY, WQCMD_DUMMY};
     uint8_t rx[4] = {0, 0, 0, 0};
-    spi_xfer(w25qxx->config.spi, tx, rx, 4);
+    /*uint8_t src;
+    src = WQCMD_JEDEC_ID;
+    spi_xfer(w25qxx->config.spi, &src, &rx[0], 1);
+    src = WQCMD_DUMMY;
+    spi_xfer(w25qxx->config.spi, &src, &rx[1], 1);
+    spi_xfer(w25qxx->config.spi, &src, &rx[2], 1);
+    spi_xfer(w25qxx->config.spi, &src, &rx[3], 1);
+    */
+    spi_xfer(w25qxx->config.spi, &tx[0], &rx[0], 4);
     uint32_t id = (rx[1] << 16) | (rx[2] << 8) | rx[3];
     return id;
 }

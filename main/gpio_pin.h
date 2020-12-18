@@ -77,12 +77,21 @@
 #elif defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F722xx) || defined(STM32F103xB)
     #include "generic_hal.h"
 
-    typedef struct {
-        GPIO_TypeDef* port;
-        uint16_t pin;
-    } pin_t;
+    typedef uint32_t pin_t;
 
-    #define MAKE_PIN(port, pin) {port, pin}
+    #define PIN_BIT(pin, pos) ((((pin)>>(pos))&1) == 1 ? (pos) : (pin))
+    #define PIN_C(x) \
+    PIN_BIT(PIN_BIT(PIN_BIT(PIN_BIT(\
+    PIN_BIT(PIN_BIT(PIN_BIT(PIN_BIT(\
+    PIN_BIT(PIN_BIT(PIN_BIT(PIN_BIT(\
+    PIN_BIT(PIN_BIT(PIN_BIT(PIN_BIT((x),\
+    0),1),2),3),4),5),6),7),8),9),10),11),12),13),14),15)
+
+    #define PIN_P(x) (1<<(x))
+
+    #define MAKE_PIN(port, pin) (((uint32_t)(port))|((PIN_C(pin))&0x0F))
+    #define GET_PIN(port_pin) PIN_P(((port_pin)&0x0F))
+    #define GET_PORT(port_pin) ((GPIO_TypeDef*)((port_pin)&~0x0F))
 
     #define A0 MAKE_PIN(GPIOA, GPIO_PIN_0)
     #define A1 MAKE_PIN(GPIOA, GPIO_PIN_1)
