@@ -168,21 +168,21 @@ void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr)
 void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef *usb, uint8_t epnum)
 {
     //amk_printf("PCD DataOut\n");
-    if (last_out_size==0) {
-        dcd_event_xfer_complete(0, epnum, 0, XFER_RESULT_SUCCESS, true); 
-    } else {
+    //if (last_out_size==0) {
+    //    dcd_event_xfer_complete(0, epnum, 0, XFER_RESULT_SUCCESS, true); 
+    //} else {
         dcd_event_xfer_complete(0, epnum, HAL_PCD_EP_GetRxCount(usb, epnum), XFER_RESULT_SUCCESS, true); 
-    }
+    //}
 }
 
 void HAL_PCD_DataInStageCallback(PCD_HandleTypeDef *usb, uint8_t epnum)
 {
-    //amk_printf("PCD DataIn\n");
-    if (last_in_size==0) {
-        dcd_event_xfer_complete(0, 0x80|epnum, 0, XFER_RESULT_SUCCESS, true); 
-    } else {
-        dcd_event_xfer_complete(0, 0x80|epnum, usb->OUT_ep[epnum & EP_ADDR_MSK].xfer_len, XFER_RESULT_SUCCESS, true); 
-    }
+    //amk_printf("PCD DataIn, last in size: %d\n", last_in_size);
+    //if (last_in_size==0) {
+    //    dcd_event_xfer_complete(0, 0x80|epnum, 0, XFER_RESULT_SUCCESS, true); 
+    //} else {
+        dcd_event_xfer_complete(0, 0x80|epnum, usb->IN_ep[epnum & EP_ADDR_MSK].xfer_count, XFER_RESULT_SUCCESS, true); 
+    //}
 }
 
 void HAL_PCD_SetupStageCallback(PCD_HandleTypeDef *usb)
