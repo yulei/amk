@@ -24,4 +24,5 @@ enum {
 enum {
     AMK_SPI_TIMEOUT = AMK_SPI_ERROR_START,
     AMK_SPI_ERROR,
+    AMK_SPI_BUSY,
 };

@@ -31,8 +31,9 @@ int img_seek(image_t *image, int offset, img_seek_t pos)
         break;
     case IMG_END:
         if (offset < 0) {
-            image->total += offset;
+            image->pos = image->total + offset;
         } else {
+            image->pos = image->total;
         }
         break;
     default:

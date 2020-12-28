@@ -77,6 +77,9 @@
 enum {
     ITF_NUM_HID_KBD,
     ITF_NUM_HID_OTHER,
+#ifdef MSC_ENABLE
+    ITF_NUM_MSC,
+#endif
 #ifdef WEBUSB_ENABLE
     ITF_NUM_VENDOR,
 #endif
@@ -84,14 +87,27 @@ enum {
 };
 
 // Endpoint number
-#define EPNUM_HID_KBD       0x01
-#define EPNUM_HID_OTHER     0x02
-#define EPNUM_VENDOR_OUT    0x03
-#if defined(STM32F103xB) || defined(NRF52840_XXAA)
-#define EPNUM_VENDOR_IN     0x04
-#else
-#define EPNUM_VENDOR_IN     0x03
+enum {
+    EPNUM_HID_KBD       = 0x01,
+    EPNUM_HID_OTHER     = 0x02,
+#ifdef WEBUSB_ENABLE
+    EPNUM_VENDOR_OUT    = 0x03,
+    #if defined(STM32F103xB) || defined(NRF52840_XXAA)
+    EPNUM_VENDOR_IN     = 0x04,
+    #else
+        #define EPNUM_VENDOR_IN EPNUM_VENDOR_OUT
+    #endif
 #endif
+#ifdef MSC_ENABLE
+    EPNUM_MSC_OUT       = 0x03,
+    #if defined(STM32F103xB) || defined(NRF52840_XXAA)
+    EPNUM_MSC_IN        = 0x04,
+    #else
+        #define EPNUM_MSC_IN    EPNUM_MSC_OUT
+    #endif
+#endif
+    EPNUM_MAX
+};
 
 // Report id
 enum {

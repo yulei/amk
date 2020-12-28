@@ -71,7 +71,7 @@ void screen_ticks(uint32_t ticks)
 
 void disp_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
-    uint32_t width  = area->x2-area->x1+1;
+    /*uint32_t width  = area->x2-area->x1+1;
     uint32_t height = area->y2-area->y1+1;
     ssd1357_fill_rect(&ssd1357_drivers[0],
                           area->x1,
@@ -81,6 +81,7 @@ void disp_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_
                           color_p,
                           sizeof(lv_color_t) * (width*height));
                           
+                          */
 
     lv_disp_flush_ready(disp_drv);
 }

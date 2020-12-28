@@ -100,6 +100,12 @@
 static w25qxx_t w25qxxs[W25QXX_NUM];
 
 static uint32_t w25qxx_read_jedec(w25qxx_t *w25qxx);
+static amk_error_t w25qxx_erase_sector(w25qxx_t *w25qxx, uint32_t address);
+static uint8_t w25qxx_spi_write(w25qxx_t *w25qxx, uint8_t data);
+static amk_error_t w25qxx_enable_write(w25qxx_t *w25qxx);
+static amk_error_t w25qxx_wait(w25qxx_t *w25qxx);
+static amk_error_t w25qxx_write_address(w25qxx_t *w25qxx, uint8_t cmd, uint32_t address);
+static bool w25qxx_sector_empty(w25qxx_t *w25qxx, uint32_t address);
 
 w25qxx_t *w25qxx_init(w25qxx_config_t *config)
 {
@@ -114,7 +120,7 @@ w25qxx_t *w25qxx_init(w25qxx_config_t *config)
     switch(id&0xFFFF) {
     case 0x4018:
         // W25Q128
-        amk_printf("W25Q128 device identified: %d\n", id);
+        amk_printf("W25Q128 device identified: %x\n", id);
         device->page_size = 256;
         device->page_count = 65536;
         device->sector_size = 4096;
@@ -131,14 +137,71 @@ w25qxx_t *w25qxx_init(w25qxx_config_t *config)
     return device;
 }
 
-amk_error_t w25qxx_write_byte(w25qxx_t* w25qxx, uint8_t data)
+static amk_error_t w25qxx_erase_sector(w25qxx_t *w25qxx, uint32_t address)
 {
-    return AMK_ERROR;
+    w25qxx_wait(w25qxx);
+    w25qxx_enable_write(w25qxx);
+
+    gpio_write_pin(w25qxx->config.cs, 0);
+    w25qxx_write_address(w25qxx, WQCMD_SECTOR_ERASE_4K, address);
+    gpio_write_pin(w25qxx->config.cs, 1);
+
+    w25qxx_wait(w25qxx);
+    return AMK_SUCCESS;
 }
 
-amk_error_t w25qxx_read_byte(w25qxx_t* w25qxx, uint8_t *data)
+static void w25qxx_write_page(w25qxx_t *w25qxx, uint32_t address, const uint8_t *data, uint32_t size)
 {
-    return AMK_ERROR;
+    w25qxx_wait(w25qxx);
+    w25qxx_enable_write(w25qxx);
+
+    gpio_write_pin(w25qxx->config.cs, 0);
+    w25qxx_write_address(w25qxx, WQCMD_PAGE_PROGRAM, address);
+    spi_send(w25qxx->config.spi, data, size);
+    gpio_write_pin(w25qxx->config.cs, 1);
+
+    w25qxx_wait(w25qxx);
+}
+
+amk_error_t w25qxx_write_sector(w25qxx_t* w25qxx, uint32_t address, const uint8_t *data, uint32_t size)
+{
+    if (address % w25qxx->sector_size) {
+        amk_printf("unsupport wrtie operation: address=%d, size=%d\n", address, size);
+        return AMK_ERROR;
+    }
+
+    // check if the sector empty
+    if (!w25qxx_sector_empty(w25qxx, address)) {
+        // ease the sector first
+        if (w25qxx_erase_sector(w25qxx, address) != AMK_SUCCESS) {
+            amk_printf("failed to erase flash sector at: 0x%x\n", address);
+            return AMK_SPI_ERROR;
+        }
+    }
+
+    for (int i = 0; i < w25qxx->sector_size/w25qxx->page_size; i++) {
+		w25qxx_write_page(w25qxx, address, data, w25qxx->page_size);
+        address += w25qxx->page_size;
+        data += w25qxx->page_size;
+    }
+
+    return AMK_SUCCESS;
+}
+
+amk_error_t w25qxx_read_sector(w25qxx_t* w25qxx, uint32_t address, uint8_t *data, uint32_t size)
+{
+    if (address % w25qxx->sector_size) {
+        amk_printf("unsupport read operation: address=%d, size=%d\n", address, size);
+        return AMK_ERROR;
+    }
+
+    gpio_write_pin(w25qxx->config.cs, 0);
+    w25qxx_write_address(w25qxx, WQCMD_FAST_READ, address);
+	w25qxx_spi_write(w25qxx, 0);
+    spi_recv(w25qxx->config.spi, data, size);
+    gpio_write_pin(w25qxx->config.cs, 1);
+
+    return AMK_SUCCESS;
 }
 
 static uint32_t w25qxx_read_jedec(w25qxx_t *w25qxx)
@@ -156,4 +219,46 @@ static uint32_t w25qxx_read_jedec(w25qxx_t *w25qxx)
     spi_xfer(w25qxx->config.spi, &tx[0], &rx[0], 4);
     uint32_t id = (rx[1] << 16) | (rx[2] << 8) | rx[3];
     return id;
+}
+
+static uint8_t w25qxx_spi_write(w25qxx_t *w25qxx, uint8_t data)
+{
+	uint8_t	ret;
+    spi_xfer(w25qxx->config.spi, &data, &ret, 1);
+	return ret;	
+}
+
+static amk_error_t w25qxx_enable_write(w25qxx_t *w25qxx)
+{
+    gpio_write_pin(w25qxx->config.cs, 0);
+    w25qxx_spi_write(w25qxx, WQCMD_WRITE_ENABLE);
+    gpio_write_pin(w25qxx->config.cs, 1);
+    return AMK_SUCCESS;
+}
+
+static amk_error_t w25qxx_wait(w25qxx_t *w25qxx)
+{
+    gpio_write_pin(w25qxx->config.cs, 0);
+    uint8_t status = w25qxx_spi_write(w25qxx, WQCMD_READ_STATUS_1);
+    do {
+        status = w25qxx_spi_write(w25qxx, WQCMD_DUMMY);
+		wait_ms(1);
+    } while (( status & 0x01) == 0x01);
+    gpio_write_pin(w25qxx->config.cs, 1);
+    return AMK_SUCCESS;
+}
+
+static bool w25qxx_sector_empty(w25qxx_t *w25qxx, uint32_t address)
+{
+    return false;
+}
+
+static amk_error_t w25qxx_write_address(w25qxx_t *w25qxx, uint8_t cmd, uint32_t address)
+{
+	w25qxx_spi_write(w25qxx, cmd);
+    w25qxx_spi_write(w25qxx, (address & 0x00FF0000) >> 16);
+    w25qxx_spi_write(w25qxx, (address & 0x0000FF00) >> 8);
+    w25qxx_spi_write(w25qxx, (address & 0x000000FF) >> 0);
+
+    return AMK_SUCCESS;
 }
