@@ -149,13 +149,22 @@ int32_t tud_msc_scsi_cb (uint8_t lun, uint8_t const scsi_cmd[16], void* buffer, 
     return resplen;
 }
 
+__attribute__((weak))
+void msc_init_kb(void) {}
 
 void msc_init(void)
 {
     w25qxx_config.cs = FLASH_CS;
     w25qxx_config.spi = spi_init();
     w25qxx = w25qxx_init(&w25qxx_config);
+
+    msc_init_kb();
 }
 
+__attribute__((weak))
+void msc_task_kb(void) {}
+
 void msc_task(void)
-{}
+{
+    msc_task_kb();
+}

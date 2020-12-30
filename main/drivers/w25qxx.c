@@ -107,6 +107,11 @@ static amk_error_t w25qxx_wait(w25qxx_t *w25qxx);
 static amk_error_t w25qxx_write_address(w25qxx_t *w25qxx, uint8_t cmd, uint32_t address);
 static bool w25qxx_sector_empty(w25qxx_t *w25qxx, uint32_t address);
 
+w25qxx_t *w25qxx_current(void)
+{
+    return &w25qxxs[0];
+}
+
 w25qxx_t *w25qxx_init(w25qxx_config_t *config)
 {
     w25qxx_t *device = &w25qxxs[0];
@@ -195,6 +200,11 @@ amk_error_t w25qxx_read_sector(w25qxx_t* w25qxx, uint32_t address, uint8_t *data
         return AMK_ERROR;
     }
 
+    return w25qxx_read_bytes(w25qxx, address, data, size);
+}
+
+amk_error_t w25qxx_read_bytes(w25qxx_t* w25qxx, uint32_t address, uint8_t *data, uint32_t size)
+{
     gpio_write_pin(w25qxx->config.cs, 0);
     w25qxx_write_address(w25qxx, WQCMD_FAST_READ, address);
 	w25qxx_spi_write(w25qxx, 0);

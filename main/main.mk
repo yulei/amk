@@ -40,6 +40,7 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/gifdec.c
 	SRCS += $(MAIN_DIR)/screen/image.c
 	SRCS += $(MAIN_DIR)/screen/upng.c
+	SRCS += $(MAIN_DIR)/screen/anim.c
 endif
 
 ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))
