@@ -10,11 +10,13 @@ I2C_HandleTypeDef hi2c1;
 DMA_HandleTypeDef hdma_i2c1_rx;
 DMA_HandleTypeDef hdma_i2c1_tx;
 
-I2S_HandleTypeDef hi2s2;
-
 SPI_HandleTypeDef hspi1;
 DMA_HandleTypeDef hdma_spi1_rx;
 DMA_HandleTypeDef hdma_spi1_tx;
+
+SPI_HandleTypeDef hspi2;
+DMA_HandleTypeDef hdma_spi2_rx;
+DMA_HandleTypeDef hdma_spi2_tx;
 
 #ifdef TINYUSB_ENABLE
 void OTG_FS_IRQHandler(void)
@@ -133,22 +135,6 @@ static void MX_I2C1_Init(void)
     }
 }
 
-static void MX_I2S2_Init(void)
-{
-
-    hi2s2.Instance = SPI2;
-    hi2s2.Init.Mode = I2S_MODE_MASTER_TX;
-    hi2s2.Init.Standard = I2S_STANDARD_PHILIPS;
-    hi2s2.Init.DataFormat = I2S_DATAFORMAT_16B;
-    hi2s2.Init.MCLKOutput = I2S_MCLKOUTPUT_DISABLE;
-    hi2s2.Init.AudioFreq = I2S_AUDIOFREQ_8K;
-    hi2s2.Init.CPOL = I2S_CPOL_LOW;
-    hi2s2.Init.ClockSource = I2S_CLOCK_PLL;
-    if (HAL_I2S_Init(&hi2s2) != HAL_OK) {
-        Error_Handler();
-    }
-}
-
 static void MX_SPI1_Init(void)
 {
     hspi1.Instance = SPI1;
@@ -170,6 +156,28 @@ static void MX_SPI1_Init(void)
     }
 }
 
+static void MX_SPI2_Init(void)
+{
+    hspi2.Instance = SPI2;
+    hspi2.Init.Mode = SPI_MODE_MASTER;
+    hspi2.Init.Direction = SPI_DIRECTION_2LINES;
+    hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
+    hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
+    hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
+    hspi2.Init.NSS = SPI_NSS_SOFT;
+    hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
+    hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
+    hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
+    hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+    hspi2.Init.CRCPolynomial = 7;
+    hspi2.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
+    hspi2.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
+
+    if (HAL_SPI_Init(&hspi2) != HAL_OK) {
+        Error_Handler();
+    }
+}
+
 static void MX_DMA_Init(void)
 {
     __HAL_RCC_DMA2_CLK_ENABLE();
@@ -179,6 +187,12 @@ static void MX_DMA_Init(void)
     /* DMA1_Stream0_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+    /* DMA1_Stream3_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+    /* DMA1_Stream4_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
     /* DMA1_Stream6_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
@@ -242,8 +256,8 @@ void custom_board_init(void)
     MX_USB_DEVICE_Init();
 #endif
     MX_I2C1_Init();
-    MX_I2S2_Init();
     MX_SPI1_Init();
+    MX_SPI2_Init();
 }
 
 void custom_board_task(void)

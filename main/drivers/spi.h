@@ -8,9 +8,14 @@
 #include <stdbool.h>
 #include "amk_error.h"
 
+typedef enum {
+    SPI_INSTANCE_1,
+    SPI_INSTANCE_2,
+} spi_instance_t;
+
 typedef void *spi_handle_t;
 
-spi_handle_t spi_init(void);
+spi_handle_t spi_init(spi_instance_t inst);
 bool spi_ready(spi_handle_t spi);
 amk_error_t spi_send(spi_handle_t spi, const void *data, size_t length);
 amk_error_t spi_recv(spi_handle_t spi, void* data, size_t length);

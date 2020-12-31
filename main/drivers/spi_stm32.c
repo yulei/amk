@@ -8,11 +8,20 @@
 
 #define TIMEOUT_DEFAULT 100
 
+#ifdef SPI_USE_INSTANCE_1
 extern SPI_HandleTypeDef hspi1;
+#endif
+#ifdef SPI_USE_INSTANCE_2
+extern SPI_HandleTypeDef hspi2;
+#endif
 
-spi_handle_t spi_init(void)
+spi_handle_t spi_init(spi_instance_t inst)
 {
-    return &hspi1;
+    if (inst == SPI_INSTANCE_1) return &hspi1;
+
+    if (inst == SPI_INSTANCE_2) return &hspi2;
+
+    return NULL;
 }
 
 bool spi_ready(spi_handle_t spi)

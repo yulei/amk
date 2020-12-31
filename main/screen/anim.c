@@ -58,14 +58,13 @@ static anim_t anims[ANIM_FILE_MAX] = {
 };
 
 static FATFS flashfs;
-static char flashfs_path[4];
 
 static void anim_reset(anim_t* anim);
 static bool anim_init(anim_t* anim, FIL* file);
 
 void anim_mount(void)
 {
-    f_mount(&flashfs, flashfs_path, 1);
+    f_mount(&flashfs, "", 1);
 }
 
 anim_t *anim_open(const char *name)

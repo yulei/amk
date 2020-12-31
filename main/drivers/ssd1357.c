@@ -304,9 +304,14 @@ static void flush_screen(ssd1357_t *driver, const void *data, size_t size)
     write_data_buffer(driver, data, size);
 }*/
 
+#ifndef SSD1357_SPI_ID
+#define SSD1357_SPI_ID  SPI_INSTANCE_1
+#endif
+
 void ssd1357_init(ssd1357_t *driver)
 {
-    spi = spi_init();
+    spi = spi_init(SSD1357_SPI_ID);
+
     gpio_write_pin(driver->reset, 0);
     wait_ms(5);
     gpio_write_pin(driver->reset, 1);

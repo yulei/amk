@@ -40,7 +40,6 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/gifdec.c
 	SRCS += $(MAIN_DIR)/screen/image.c
 	SRCS += $(MAIN_DIR)/screen/upng.c
-	SRCS += $(MAIN_DIR)/screen/anim.c
 endif
 
 ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))
@@ -88,6 +87,7 @@ ifeq (yes, $(strip $(WEBUSB_ENABLE)))
 endif
 
 ifeq (yes, $(strip $(MSC_ENABLE)))
+	SRCS += $(MAIN_DIR)/screen/anim.c
 	SRCS += $(MAIN_DIR)/drivers/w25qxx.c
 	SRCS += $(MAIN_DIR)/drivers/spi.c
 	SRCS += $(MAIN_DIR)/usb/mscusb.c

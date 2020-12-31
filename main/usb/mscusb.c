@@ -152,10 +152,14 @@ int32_t tud_msc_scsi_cb (uint8_t lun, uint8_t const scsi_cmd[16], void* buffer, 
 __attribute__((weak))
 void msc_init_kb(void) {}
 
+#ifndef W25QXX_SPI_ID
+#define W25QXX_SPI_ID SPI_INSTANCE_ID_1
+#endif
+
 void msc_init(void)
 {
     w25qxx_config.cs = FLASH_CS;
-    w25qxx_config.spi = spi_init();
+    w25qxx_config.spi = spi_init(W25QXX_SPI_ID);
     w25qxx = w25qxx_init(&w25qxx_config);
 
     msc_init_kb();

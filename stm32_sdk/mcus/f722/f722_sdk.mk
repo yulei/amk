@@ -10,7 +10,9 @@ SRCS += \
 	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_spi_ex.c \
 
 APP_DEFS += \
-	-DSTM32F722xx\
+	-DSPI_USE_INSTANCE_1 \
+	-DSPI_USE_INSTANCE_2 \
+	-DSTM32F722xx \
     -DCFG_TUSB_MCU=OPT_MCU_STM32F7 \
 
 SDK_DEFS += -mcpu=cortex-m7 -mthumb -mfpu=fpv5-sp-d16 -mfloat-abi=hard
