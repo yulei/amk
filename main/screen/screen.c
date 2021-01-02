@@ -5,7 +5,7 @@
 #include "screen.h"
 #include "gpio_pin.h"
 #include "ssd1357.h"
-#include "lvgl.h"
+//#include "lvgl.h"
 
 static ssd1357_t ssd1357_drivers[SCREEN_NUM] = {
     {SCREEN_0_RESET, SCREEN_0_CS, SCREEN_0_DC},
@@ -14,12 +14,12 @@ static ssd1357_t ssd1357_drivers[SCREEN_NUM] = {
 #endif
 };
 
-static lv_disp_drv_t screen_driver;
-static void disp_flush(struct _disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p);
+//static lv_disp_drv_t screen_driver;
+//static void disp_flush(struct _disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p);
 
 void screen_init(void)
 {
-    lv_init();
+    //lv_init();
 
     for (int i = 0; i < SCREEN_NUM; i++) {
         gpio_write_pin(ssd1357_drivers[i].reset, 0);
@@ -32,7 +32,7 @@ void screen_init(void)
     }
 
     // create two buffer on screen size
-    static lv_disp_buf_t disp_buf;
+    /*static lv_disp_buf_t disp_buf;
     static lv_color_t buf_1[LV_HOR_RES_MAX * LV_VER_RES_MAX];
     static lv_color_t buf_2[LV_HOR_RES_MAX * LV_VER_RES_MAX];
     lv_disp_buf_init(&disp_buf, buf_1, buf_2, LV_HOR_RES_MAX * LV_VER_RES_MAX);
@@ -50,6 +50,7 @@ void screen_init(void)
 
     // test
     //screen_test();
+    */
 }
 
 __attribute__((weak))
@@ -57,7 +58,7 @@ void screen_task_kb(void) {}
 
 void screen_task(void)
 {
-    lv_task_handler();
+    //lv_task_handler();
     screen_task_kb();
 }
 
@@ -66,12 +67,12 @@ void screen_uninit(void)
 
 void screen_ticks(uint32_t ticks)
 {
-    lv_tick_inc(ticks);
+    //lv_tick_inc(ticks);
 }
 
-void disp_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
+/*void disp_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
-    /*uint32_t width  = area->x2-area->x1+1;
+    uint32_t width  = area->x2-area->x1+1;
     uint32_t height = area->y2-area->y1+1;
     ssd1357_fill_rect(&ssd1357_drivers[0],
                           area->x1,
@@ -81,10 +82,10 @@ void disp_flush(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_
                           color_p,
                           sizeof(lv_color_t) * (width*height));
                           
-                          */
+                          
 
     lv_disp_flush_ready(disp_drv);
-}
+}*/
 
 void screen_fill(const void* data)
 {
@@ -93,18 +94,13 @@ void screen_fill(const void* data)
 
 void screen_test(void)
 {
-    lv_obj_t * label1 =  lv_label_create(lv_scr_act(), NULL);
+/*    lv_obj_t * label1 =  lv_label_create(lv_scr_act(), NULL);
     lv_label_set_text(label1, "Hello \nbabyfish!");
     lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
+*/
 }
 
-void screen_fill_rect(void* data)
+void screen_fill_rect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, const void *data, uint32_t data_size)
 {
-    ssd1357_fill_rect(&ssd1357_drivers[0],
-                        0,
-                        0,
-                        64,
-                        64,
-                        data,
-                        sizeof(lv_color_t) * (64*64));
+    ssd1357_fill_rect(&ssd1357_drivers[0], x, y, width, height, data, data_size);
 }

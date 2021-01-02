@@ -59,7 +59,7 @@ endif
 endif
 
 ifeq (yes,$(SCREEN_ENABLE))
-include $(LIB_DIR)/lvgl.mk
+#include $(LIB_DIR)/lvgl.mk
 endif
 
 ifeq (yes,$(MSC_ENABLE))
