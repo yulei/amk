@@ -26,6 +26,7 @@
 //  +---------------------------------------------------------------+
 //
 
+#define ANIM_SIG    "ANIM"
 #define FRAME_MAX 128
 typedef struct __attribute__((packed)) {
     char signature[4];  //"ANIM"
@@ -42,51 +43,55 @@ typedef struct __attribute__((packed)) {
 typedef struct {
     anim_header_t header;   // anim file header
     uint16_t frame;         // current frame
-    uint16_t delay;         // current delay 
     FIL file;               // anim file object
-    //const void *data;       // current frame data 
+    bool opened;
 } anim_file_t;
 
+#define ANIM_FILE_NAME_MAX  13
+#define ANIM_FILE_MAX       32
+#define ANIM_ROOT_DIR       "/"
 struct anim_t {
     anim_file_t obj;
-    bool used;
+    uint16_t total;
+    uint16_t current;
+    char path[ANIM_FILE_NAME_MAX];
+    char files[ANIM_FILE_MAX][ANIM_FILE_NAME_MAX];
 };
 
-#define ANIM_FILE_MAX 1
-static anim_t anims[ANIM_FILE_MAX] = {
-    {.used = false},
-};
-
+static anim_t anim_inst;
 static FATFS flashfs;
 
-static void anim_reset(anim_t* anim);
-static bool anim_init(anim_t* anim, FIL* file);
+static bool anim_init(anim_t *anim, FIL *file);
+static void anim_scan(anim_t *anim);
+static bool anim_open_current(anim_t *anim);
 
-void anim_mount(void)
+void anim_mount(bool mount)
 {
-    f_mount(&flashfs, "", 1);
+    if (mount) {
+        f_mount(&flashfs, "", 1);
+    } else {
+        f_unmount("");
+    }
 }
 
-anim_t *anim_open(const char *name)
+anim_t *anim_open(const char *path)
 {
-    anim_t *cur = NULL;
-    for (int i = 0; i < ANIM_FILE_MAX; i++) {
-        if ( !anims[i].used) {
-            cur = &anims[i];
-            break;
-        }
+    if (!path || (strlen(path)==0)) {
+        memcpy(&anim_inst.path[0], ANIM_ROOT_DIR, ANIM_FILE_NAME_MAX);
+    } else {
+        memcpy(&anim_inst.path[0], path, ANIM_FILE_NAME_MAX);
     }
-    if (!cur) return NULL;
-    FIL file;
-    FRESULT ret = f_open(&file, name, FA_READ);
-    if (ret == FR_OK) {
-        if (anim_init(cur, &file)) {
-            cur->used = true;
-            return cur;
-        } else {
-            f_close(&file);
-        }
-    } 
+
+    anim_scan(&anim_inst);
+
+    if (anim_inst.total == 0) {
+        return NULL;
+    }
+
+    if (anim_open_current(&anim_inst)) {
+        return &anim_inst;
+
+    }
     
     return NULL;
 }
@@ -108,6 +113,12 @@ uint32_t anim_get_bitformat(anim_t* anim)
 
 uint32_t anim_step(anim_t *anim, uint32_t *delay, void *buf, uint32_t size)
 {
+    if (anim->obj.frame >= anim->obj.header.frames) {
+        f_close(&anim->obj.file);
+        return 0; // at the file end
+    } 
+
+    *delay = anim->obj.header.delays[anim->obj.frame];
     uint32_t frame_size = anim->obj.header.width*anim->obj.header.height*anim->obj.header.format;
     if (size < frame_size) {
         amk_printf("ANIM buffer size too small, size=%d, frame=%d\n", size, frame_size);
@@ -118,40 +129,87 @@ uint32_t anim_step(anim_t *anim, uint32_t *delay, void *buf, uint32_t size)
 
     UINT readed = 0;
     f_read(&anim->obj.file, buf, size, &readed);
-
-    *delay = anim->obj.delay;
-    anim->obj.frame = (anim->obj.frame+1) % anim->obj.header.frames;
-    anim->obj.delay = anim->obj.header.delays[anim->obj.frame];
+    anim->obj.frame++;
     return readed;
 }
 
-/*void anim_rewind(anim_t *anim)
+bool anim_next(anim_t *anim)
 {
-    anim->obj.frame = 0;
-    anim->obj.delay = 0;
-} */
+    anim->current++;
+    if (anim->current >= anim->total) {
+        f_close(&anim->obj.file);
+        //re-scan
+        anim_scan(anim);
+        if (anim->total == 0) {
+            return false;
+        }
+    }
+    return anim_open_current(anim);
+}
+
+void anim_rewind(anim_t *anim)
+{
+    anim_open_current(anim);
+}
 
 void anim_close(anim_t *anim)
 {
-    if (anim->used) {
-        f_close(&anim->obj.file);
-        anim_reset(anim);
-    }
-}
-
-static void anim_reset(anim_t *anim)
-{
+    f_close(&anim->obj.file);
     memset(anim, 0, sizeof(anim_t));
 }
 
 static bool anim_init(anim_t *anim, FIL *file)
 {
-    anim_reset(anim);
+    memset(&anim->obj.header, 0, sizeof(anim_header_t));
+    anim->obj.frame = 0;
     memcpy(&anim->obj.file, file, sizeof(FIL));
     UINT readed = 0;
     if (FR_OK != f_read(&anim->obj.file, &anim->obj.header, sizeof(anim_header_t), &readed)) {
+        f_close(&anim->obj.file);
         return false;
+    } else {
+        if (memcmp(ANIM_SIG, anim->obj.header.signature, 4) != 0) {
+            f_close(&anim->obj.file);
+            return false;
+        }
     }
 
     return true;
+}
+
+
+static void anim_scan(anim_t *anim)
+{
+    anim->total = 0;
+    anim->current = 0;
+
+    DIR dir;
+    FRESULT res = f_opendir(&dir, anim->path);
+    if (res == FR_OK) {
+        for (;;) {
+            FILINFO fno;
+            res = f_readdir(&dir, &fno);
+            if (res != FR_OK || fno.fname[0] == 0) break;
+            if ( (fno.fattrib & AM_DIR) == 0) {
+                memcpy(&anim->files[anim->total][0], fno.fname, ANIM_FILE_NAME_MAX);
+                anim->total++;
+            }
+        }
+        f_closedir(&dir);
+    }
+}
+
+static bool anim_open_current(anim_t *anim)
+{
+    FIL file;
+    FRESULT ret = f_open(&file, anim->files[anim->current], FA_READ);
+    if (ret == FR_OK) {
+        if (anim_init(&anim_inst, &file)) {
+            return true;
+        } else {
+            f_close(&file);
+        }
+    } 
+
+    return false;
 }
