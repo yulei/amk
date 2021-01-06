@@ -37,3 +37,6 @@
 [submodule "stm32_sdk/devices/f7"]
 	path = stm32_sdk/devices/f7
 	url = https://github.com/STMicroelectronics/cmsis_device_f7.git
+[submodule "libs/nofrendo"]
+	path = libs/nofrendo
+	url = https://github.com/yulei/nofrendo_arcada.git

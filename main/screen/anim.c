@@ -27,7 +27,7 @@
 //
 
 #define ANIM_SIG    "ANIM"
-#define FRAME_MAX 128
+#define FRAME_MAX   256
 typedef struct __attribute__((packed)) {
     char signature[4];  //"ANIM"
     uint16_t size;      // size of the header
@@ -64,6 +64,7 @@ static FATFS flashfs;
 static bool anim_init(anim_t *anim, FIL *file);
 static void anim_scan(anim_t *anim);
 static bool anim_open_current(anim_t *anim);
+static bool anim_check_file(const char *path);
 
 void anim_mount(bool mount)
 {
@@ -113,7 +114,7 @@ uint32_t anim_get_bitformat(anim_t* anim)
 
 uint32_t anim_step(anim_t *anim, uint32_t *delay, void *buf, uint32_t size)
 {
-    if (anim->obj.frame >= anim->obj.header.frames) {
+    if (anim->obj.frame >= anim->obj.header.frames || anim->obj.frame >= FRAME_MAX) {
         f_close(&anim->obj.file);
         return 0; // at the file end
     } 
@@ -191,8 +192,10 @@ static void anim_scan(anim_t *anim)
             res = f_readdir(&dir, &fno);
             if (res != FR_OK || fno.fname[0] == 0) break;
             if ( (fno.fattrib & AM_DIR) == 0) {
-                memcpy(&anim->files[anim->total][0], fno.fname, ANIM_FILE_NAME_MAX);
-                anim->total++;
+                if (anim_check_file(fno.fname)) {
+                    memcpy(&anim->files[anim->total][0], fno.fname, ANIM_FILE_NAME_MAX);
+                    anim->total++;
+                }
             }
         }
         f_closedir(&dir);
@@ -212,4 +215,36 @@ static bool anim_open_current(anim_t *anim)
     } 
 
     return false;
+}
+
+static bool anim_check_file(const char *path)
+{
+    FIL file;
+    if (FR_OK != f_open(&file, path, FA_READ)) {
+        amk_printf("ANIM check: failed to open file: %s\n", path);
+        return false;
+    }
+
+    anim_header_t header;
+    UINT readed = 0;
+    bool result = false;
+    if (FR_OK != f_read(&file, &header, sizeof(anim_header_t), &readed)) {
+        amk_printf("ANIM check: failed to read file header: %s\n", path);
+        goto exit;
+    }
+    
+    if (memcmp(ANIM_SIG, header.signature, 4) != 0) {
+        amk_printf("ANIM check: signature invalid: %c%c%c%c\n", header.signature[0], header.signature[1], header.signature[2], header.signature[3]);
+        goto exit;
+    }
+
+    if (f_size(&file) != header.total) {
+        amk_printf("ANIM check: file size invalid: should:%d, actually:%d\n", header.total, f_size(&file));
+        goto exit;
+    }
+
+    result = true;
+exit:
+    f_close(&file);
+    return result;  
 }
