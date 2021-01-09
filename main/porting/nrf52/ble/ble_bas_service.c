@@ -10,7 +10,9 @@
 #include "nrf_saadc.h"
 #include "nrf_drv_saadc.h"
 
-#define SAADC_SAMPLES 5
+#define SAADC_SAMPLES           5
+#define BAT_UPDATE_THRESHHOLD   5
+#define BAT_UPDATE_WEIGHT       70
 static nrf_saadc_value_t m_saadc_buffers[2][SAADC_SAMPLES];
 
 APP_TIMER_DEF(m_battery_sample_timer_id)                             /**< battery voltage sampling timer. */
@@ -168,8 +170,14 @@ static void battery_process_saadc_result(uint32_t result)
         }
     }
 
-    NRF_LOG_INFO("battery sampling finished: value=%d, mV=%d, percent=%d.", result, mv, percent);
-    rf_driver.battery_power = percent;
+    uint32_t change = rf_driver.battery_power > percent ? rf_driver.battery_power - percent : percent - rf_driver.battery_power;
+    NRF_LOG_INFO("battery sampling finished: value=%d, mV=%d, percent=%d, current=%d, change=%d.", result, mv, percent, rf_driver.battery_power, change);
+    if ( change > BAT_UPDATE_THRESHHOLD) {
+        rf_driver.battery_power = ((100-BAT_UPDATE_WEIGHT)*rf_driver.battery_power + BAT_UPDATE_WEIGHT*percent)/100;
+    } else {
+        rf_driver.battery_power = percent;
+    }
+
     battery_level_update(percent);
 }
 

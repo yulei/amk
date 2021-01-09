@@ -12,7 +12,10 @@
 
 #include "rgb_led.h"
 
-#if !defined(NRF52) && !defined(NRF52840_XXAA)
+#if defined(NRF52) || defined(NRF52840_XXAA)
+#include "nrf_gpio.h"
+#endif
+
 static bool scan_key(uint16_t code)
 {
     for (uint8_t r = 0; r < MATRIX_ROWS; r++) {
@@ -43,7 +46,6 @@ static bool boot_scan_key(uint16_t code)
 
     return scan_key(code);
 }
-#endif
 
 __attribute__((weak))
 void pre_boot_init(void) {}
@@ -60,25 +62,32 @@ void boot_init(void)
         eeconfig_init();
     }
 
-#if !defined(NRF52) && !defined(NRF52840_XXAA)
-    /* do scans in case of bounce */
-    amk_printf("boot scan: ... ");
-    uint8_t scan = 100;
-    while (scan--) { matrix_scan(); wait_ms(10); }
-    amk_printf("done.\n");
+    bool skip_scan = false;
 
-    /* jump to bootloader */
-    if (matrix_get_row(0) & 0x01) {
-        // matrix(0,0)
-        amk_printf("boot: jump to bootloader \n");
-        bootloader_jump();
-    }
-
-    /* eeconfig clear */
-    if (boot_scan_key(BM_KEY_EEPROM_CLEAR)) {
-        eeconfig_init();
-    }
-
+#if defined(NRF52) || defined(NRF52840_XXAA)
+    skip_scan = nrf_gpio_pin_read(VBUS_DETECT_PIN) ? false : true;
 #endif
+
+    if (!skip_scan) {
+        amk_printf("boot scan: ... ");
+        uint8_t scan = 100;
+        while (scan--) { matrix_scan(); wait_ms(10); }
+        amk_printf("done.\n");
+
+        /* jump to bootloader */
+        if (matrix_get_row(0) & 0x01) {
+            // matrix(0,0)
+            amk_printf("boot: jump to bootloader \n");
+            bootloader_jump();
+        }
+
+        /* eeconfig clear */
+        if (boot_scan_key(BM_KEY_EEPROM_CLEAR)) {
+            eeconfig_init();
+        }
+    } else {
+        amk_printf("boot scan skipped \n");
+    }
+
     post_boot_init();
 }
