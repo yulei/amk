@@ -11,6 +11,7 @@
 
 static rgb_led_t ws2812_leds[RGB_LED_NUM];
 static bool ws2812_ready = false;
+static bool ws2812_dirty = false;
 static pin_t ws2812_pin;
 
 #ifndef NOP_FUDGE
@@ -81,6 +82,7 @@ void ws2812_init(pin_t pin)
     gpio_write_pin(pin, 0);
     
     ws2812_ready = true;
+    ws2812_dirty = true;
 }
 
 void ws2812_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
@@ -90,6 +92,7 @@ void ws2812_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
         ws2812_leds[index].g = green;
         ws2812_leds[index].b = blue;
     }
+    ws2812_dirty = true;
 }
 
 void ws2812_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
@@ -99,12 +102,17 @@ void ws2812_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
         ws2812_leds[i].g = green;
         ws2812_leds[i].b = blue;
     }
+    ws2812_dirty = true;
 }
 
 void ws2812_update_buffers(pin_t pin)
 {
     if (!ws2812_ready) {
         ws2812_init(pin);
+    }
+
+    if (!ws2812_dirty) {
+        return;
     }
 
     __disable_irq();
@@ -116,6 +124,8 @@ void ws2812_update_buffers(pin_t pin)
     }
     wait_ns(RES);
     __enable_irq();
+
+    ws2812_dirty = false;
 }
 
 void ws2812_uninit(pin_t pin)
@@ -123,4 +133,5 @@ void ws2812_uninit(pin_t pin)
     if (!ws2812_ready) return;
 
     ws2812_ready = false;
+    ws2812_dirty = false;
 }

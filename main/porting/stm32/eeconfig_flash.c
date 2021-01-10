@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "eeconfig.h"
+#include "amk_printf.h"
 
 #if defined(STM32F103xB)
 #define FLASH_BASE_ADDRESS      0x801FC00
@@ -16,11 +17,11 @@
 #define FLASH_INVALID_ADDRESS   0xFFFFFFFF
 #define FLASH_PAGE_NUM          1
 #elif defined(STM32F411xE) || defined(STM32F722xx) || defined(STM32F405xx)
-#define FLASH_BASE_ADDRESS      0x8060000
-#define FLASH_TOTAL_SIZE        0x20000
+#define FLASH_BASE_ADDRESS      0x8010000
+#define FLASH_TOTAL_SIZE        0x10000
 #define FLASH_INVALID_DATA      0xFFFFFFFF
 #define FLASH_INVALID_ADDRESS   0xFFFFFFFF
-#define FLASH_SECTOR_ID         FLASH_SECTOR_7
+#define FLASH_SECTOR_ID         FLASH_SECTOR_4
 #define FLASH_SECTOR_NUM        1
 #else
 #error "eeconfig: unsupported mcu"
@@ -42,6 +43,7 @@ static bool fee_write(uintptr_t address, uint8_t data);
 static uint8_t fee_read(uintptr_t address);
 
 static void flash_unlock(void);
+static void flash_lock(void);
 static bool flash_write(uint32_t address, uint16_t offset, uint16_t data);
 static void flash_read(uint32_t address, uint16_t *offset, uint16_t *data);
 static void flash_erase_pages(void);
@@ -182,9 +184,6 @@ void eeconfig_write_keymap(uint8_t val) { eeprom_write_byte(EECONFIG_KEYMAP, val
 //==============================================
 void fee_init(void)
 {
-    // unlock flash
-    flash_unlock();
-
     // initialize DataBuf
     fee_backup();
 }
@@ -291,6 +290,11 @@ void flash_unlock(void)
     HAL_FLASH_Unlock();
 }
 
+void flash_lock(void)
+{
+    HAL_FLASH_Lock();
+}
+
 void flash_read(uint32_t address, uint16_t* offset, uint16_t* data)
 {
     uint32_t value = *((__IO uint32_t*)(address));
@@ -301,43 +305,42 @@ void flash_read(uint32_t address, uint16_t* offset, uint16_t* data)
 bool flash_write(uint32_t address, uint16_t offset, uint16_t data)
 {
     uint32_t value = (offset << 16) | data;
+    flash_unlock();
     HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, address, value);
+    flash_lock();
     return false;
 }
 
 void flash_erase_pages(void)
 {
-#if defined(STM32F103xB)
+    uint32_t error = 0;
     FLASH_EraseInitTypeDef erase;
     memset(&erase, 0, sizeof(erase));
+    flash_unlock();
+#if defined(STM32F103xB)
     erase.TypeErase = FLASH_TYPEERASE_PAGES;
     erase.Banks = FLASH_BANK_1;
     erase.PageAddress = FLASH_BASE_ADDRESS;
     erase.NbPages = FLASH_PAGE_NUM;
-    uint32_t error = 0;
     HAL_FLASHEx_Erase(&erase, &error);
 #elif defined(STM32F411xE) || defined(STM32F405xx)
-    FLASH_EraseInitTypeDef erase;
-    memset(&erase, 0, sizeof(erase));
     erase.TypeErase = FLASH_TYPEERASE_SECTORS;
     erase.Banks = FLASH_BANK_1;
     erase.Sector = FLASH_SECTOR_ID;
     erase.NbSectors = FLASH_SECTOR_NUM;
     erase.VoltageRange = FLASH_VOLTAGE_RANGE_3;
-    uint32_t error = 0;
     HAL_FLASHEx_Erase(&erase, &error);
 #elif defined(STM32F722xx)
-    FLASH_EraseInitTypeDef erase;
-    memset(&erase, 0, sizeof(erase));
     erase.TypeErase = FLASH_TYPEERASE_SECTORS;
     erase.Sector = FLASH_SECTOR_ID;
     erase.NbSectors = FLASH_SECTOR_NUM;
     erase.VoltageRange = FLASH_VOLTAGE_RANGE_3;
-    uint32_t error = 0;
     HAL_FLASHEx_Erase(&erase, &error);
 #else
 #error "Flash Erase: unsupported mcu"
 #endif
+    flash_lock();
+    amk_printf("Flash erase page, error=%d\n", error);
 }
 
 //==================================================
