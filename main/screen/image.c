@@ -7,9 +7,9 @@
 
 int img_read(image_t *image, void *buf, size_t size)
 {
-    uint8_t* p = (uint8_t*)image->data;
+    uint8_t* p = ((uint8_t*)image->data)+image->pos;
     size_t to_read = image->pos+size >= image->total ? image->total - image->pos : size;
-    memcpy(buf, p + image->pos, to_read);
+    memcpy(buf, p, to_read);
     image->pos += to_read;
     return to_read;
 }
@@ -31,8 +31,9 @@ int img_seek(image_t *image, int offset, img_seek_t pos)
         break;
     case IMG_END:
         if (offset < 0) {
-            image->total += offset;
+            image->pos = image->total + offset;
         } else {
+            image->pos = image->total;
         }
         break;
     default:

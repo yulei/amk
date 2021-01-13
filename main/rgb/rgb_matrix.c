@@ -329,7 +329,11 @@ void rgb_matrix_init(rgb_driver_t *driver)
     if (!eeconfig_is_enabled()) {
         eeconfig_init();
     }
+
     eeconfig_read_rgb_matrix(&matrix_state.config);
+    if (matrix_state.config.mode == 0xFF) {
+        rgb_matrix_update_default();
+    }
 
     matrix_state.driver = driver;
     if (matrix_state.config.enable)

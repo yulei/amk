@@ -59,8 +59,11 @@ endif
 endif
 
 ifeq (yes,$(SCREEN_ENABLE))
-include $(LIB_DIR)/lvgl.mk
-include $(LIB_DIR)/imgdec.mk
+#include $(LIB_DIR)/lvgl.mk
+endif
+
+ifeq (yes,$(MSC_ENABLE))
+include $(LIB_DIR)/fatfs.mk
 endif
 
 .PHONY: default list clean flash erase

@@ -6,6 +6,10 @@
 #include "usb_descriptors.h"
 #include "amk_printf.h"
 
+UART_HandleTypeDef huart1;
+DMA_HandleTypeDef hdma_usart1_rx;
+DMA_HandleTypeDef hdma_usart1_tx;
+
 void USB_HP_IRQHandler(void)
 {
     tud_int_handler(0);
@@ -20,10 +24,6 @@ void USBWakeUp_IRQHandler(void)
 {
     tud_int_handler(0);
 }
-
-UART_HandleTypeDef huart1;
-DMA_HandleTypeDef hdma_usart1_rx;
-DMA_HandleTypeDef hdma_usart1_tx;
 
 void Error_Handler(void)
 {

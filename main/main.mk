@@ -7,12 +7,12 @@ SRCS += \
 	$(MAIN_DIR)/main.c  \
 	$(MAIN_DIR)/custom_action.c \
 	$(MAIN_DIR)/amk_keymap.c \
-	$(MAIN_DIR)/usb_descriptors.c \
 	$(MAIN_DIR)/amk_printf.c \
 	$(MAIN_DIR)/eeprom_manager.c \
 	$(MAIN_DIR)/amk_boot.c \
 	$(MAIN_DIR)/report_queue.c \
 	$(MAIN_DIR)/rgb/rgb_led.c \
+	$(MAIN_DIR)/usb/usb_descriptors.c \
 
 INCS += \
 	$(MAIN_DIR) \
@@ -20,6 +20,7 @@ INCS += \
 	$(MAIN_DIR)/drivers \
 	$(MAIN_DIR)/rgb \
 	$(MAIN_DIR)/screen \
+	$(MAIN_DIR)/usb \
 	$(MAIN_DIR)/rtt \
 	$(LIB_DIR)/tinyusb/src \
 
@@ -36,6 +37,10 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/spi.c
 	SRCS += $(MAIN_DIR)/drivers/ssd1357.c
 	SRCS += $(MAIN_DIR)/screen/screen.c
+	SRCS += $(MAIN_DIR)/screen/gifdec.c
+	SRCS += $(MAIN_DIR)/screen/image.c
+	SRCS += $(MAIN_DIR)/screen/upng.c
+	SRCS += $(MAIN_DIR)/screen/fractal.c
 endif
 
 ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))
@@ -78,8 +83,16 @@ ifeq (is31fl3733, $(strip $(RGB_MATRIX_ENABLE)))
 endif
 
 ifeq (yes, $(strip $(WEBUSB_ENABLE)))
-	SRCS += $(MAIN_DIR)/webusb.c
+	SRCS += $(MAIN_DIR)/usb/webusb.c
 	APP_DEFS += -DWEBUSB_ENABLE
+endif
+
+ifeq (yes, $(strip $(MSC_ENABLE)))
+	SRCS += $(MAIN_DIR)/screen/anim.c
+	SRCS += $(MAIN_DIR)/drivers/w25qxx.c
+	SRCS += $(MAIN_DIR)/drivers/spi.c
+	SRCS += $(MAIN_DIR)/usb/mscusb.c
+	APP_DEFS += -DMSC_ENABLE
 endif
 
 ifneq (yes, $(strip $(CUSTOM_MATRIX)))

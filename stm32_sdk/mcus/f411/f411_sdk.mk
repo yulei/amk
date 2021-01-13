@@ -9,6 +9,7 @@ SRCS += \
 	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_spi.c \
 
 APP_DEFS += \
+	-DSPI_USE_INSTANCE_1 \
 	-DSTM32F411xE \
     -DCFG_TUSB_MCU=OPT_MCU_STM32F4 \
 

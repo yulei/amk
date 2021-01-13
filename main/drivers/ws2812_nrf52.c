@@ -23,6 +23,7 @@
 static rgb_led_t ws2812_leds[RGB_LED_NUM];
 static uint16_t ws2812_data[WS2812_BUF_SIZE];
 static bool ws2812_ready = false;
+static bool ws2812_dirty = false;
 static pin_t ws2812_pin;
 
 nrfx_pwm_t ws2812_pwm = NRFX_PWM_INSTANCE(0);
@@ -86,6 +87,7 @@ void ws2812_init(pin_t pin)
     //wait_ms(2);
 
     ws2812_ready = true;
+    ws2812_dirty = true;
 }
 
 void ws2812_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
@@ -95,6 +97,7 @@ void ws2812_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
         ws2812_leds[index].g = green;
         ws2812_leds[index].b = blue;
     }
+    ws2812_dirty = true;
 }
 
 void ws2812_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
@@ -104,12 +107,17 @@ void ws2812_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
         ws2812_leds[i].g = green;
         ws2812_leds[i].b = blue;
     }
+    ws2812_dirty = true;
 }
 
 void ws2812_update_buffers(pin_t pin)
 {
     if (!ws2812_ready) {
         ws2812_init(pin);
+    }
+
+    if (!ws2812_dirty) {
+        return;
     }
 
     for (int i = 0; i < RGB_LED_NUM; i++) {
@@ -122,7 +130,7 @@ void ws2812_update_buffers(pin_t pin)
     ws2812_pwm_seq.length = WS2812_BUF_SIZE; 
     nrfx_pwm_simple_playback(&ws2812_pwm, &ws2812_pwm_seq, 1, NRFX_PWM_FLAG_STOP);
     wait_ms(2);
-        //NRF_LOG_INFO("ws2812 setleds playback: number: %d", number);
+    ws2812_dirty = false;
 }
 
 void ws2812_uninit(pin_t pin)
@@ -131,4 +139,5 @@ void ws2812_uninit(pin_t pin)
 
     nrfx_pwm_uninit(&ws2812_pwm);
     ws2812_ready = false;
+    ws2812_dirty = false;
 }

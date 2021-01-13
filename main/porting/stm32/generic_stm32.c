@@ -24,6 +24,10 @@
 #include "webusb.h"
 #endif
 
+#ifdef MSC_ENABLE
+#include "mscusb.h"
+#endif
+
 #include "rgb_led.h"
 
 extern void Error_Handler(void); 
@@ -84,11 +88,16 @@ void board_task(void)
     screen_task();
 #endif
 
+#ifdef MSC_ENABLE
+    msc_task();
+#endif
+
 #ifdef WEBUSB_ENABLE
     webusb_task();
 #endif
 
     rgb_led_task();
+
     custom_board_task();
 }
 
@@ -102,6 +111,10 @@ static void amk_init(void)
     host_set_driver(&amk_driver);
 #ifdef SCREEN_ENABLE
     screen_init();
+#endif
+
+#ifdef MSC_ENABLE
+    msc_init();
 #endif
     amk_keymap_init();
 }

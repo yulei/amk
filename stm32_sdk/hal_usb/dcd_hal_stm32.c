@@ -13,6 +13,10 @@
     #define DCD_MAX_EP_NUM      4
     #define DCD_USB_INSTANCE    USB_OTG_FS
     #define DCD_USB_IRQn        OTG_FS_IRQn
+#elif defined(STM32F722xx)
+    #define DCD_MAX_EP_NUM      6
+    #define DCD_USB_INSTANCE    USB_OTG_FS
+    #define DCD_USB_IRQn        OTG_FS_IRQn
 #else
     #error "HAL USB unsupported mcu"
 #endif
@@ -47,11 +51,14 @@ void dcd_init(uint8_t rhport)
 
 #if defined(STM32F103xB)
     dcd_usb.Init.ep0_mps = CFG_TUD_ENDPOINT0_SIZE;
-    dcd_usb.Init.battery_charging_enable = DISABLE;
 #else
     dcd_usb.Init.dma_enable = DISABLE;
     dcd_usb.Init.vbus_sensing_enable = DISABLE;
     dcd_usb.Init.use_dedicated_ep1 = DISABLE;
+#endif
+
+#if defined(STM32F103xB) || defined(STM32F722xx)
+    dcd_usb.Init.battery_charging_enable = DISABLE;
 #endif
     if (HAL_PCD_Init(&dcd_usb) != HAL_OK) {
         amk_printf("Failed to initialize HAL PCD\n");
@@ -161,21 +168,21 @@ void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr)
 void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef *usb, uint8_t epnum)
 {
     //amk_printf("PCD DataOut\n");
-    if (last_out_size==0) {
-        dcd_event_xfer_complete(0, epnum, 0, XFER_RESULT_SUCCESS, true); 
-    } else {
+    //if (last_out_size==0) {
+    //    dcd_event_xfer_complete(0, epnum, 0, XFER_RESULT_SUCCESS, true); 
+    //} else {
         dcd_event_xfer_complete(0, epnum, HAL_PCD_EP_GetRxCount(usb, epnum), XFER_RESULT_SUCCESS, true); 
-    }
+    //}
 }
 
 void HAL_PCD_DataInStageCallback(PCD_HandleTypeDef *usb, uint8_t epnum)
 {
-    //amk_printf("PCD DataIn\n");
-    if (last_in_size==0) {
-        dcd_event_xfer_complete(0, 0x80|epnum, 0, XFER_RESULT_SUCCESS, true); 
-    } else {
-        dcd_event_xfer_complete(0, 0x80|epnum, usb->OUT_ep[epnum & EP_ADDR_MSK].xfer_len, XFER_RESULT_SUCCESS, true); 
-    }
+    //amk_printf("PCD DataIn, last in size: %d\n", last_in_size);
+    //if (last_in_size==0) {
+    //    dcd_event_xfer_complete(0, 0x80|epnum, 0, XFER_RESULT_SUCCESS, true); 
+    //} else {
+        dcd_event_xfer_complete(0, 0x80|epnum, usb->IN_ep[epnum & EP_ADDR_MSK].xfer_count, XFER_RESULT_SUCCESS, true); 
+    //}
 }
 
 void HAL_PCD_SetupStageCallback(PCD_HandleTypeDef *usb)

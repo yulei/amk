@@ -304,9 +304,14 @@ static void flush_screen(ssd1357_t *driver, const void *data, size_t size)
     write_data_buffer(driver, data, size);
 }*/
 
+#ifndef SSD1357_SPI_ID
+#define SSD1357_SPI_ID  SPI_INSTANCE_1
+#endif
+
 void ssd1357_init(ssd1357_t *driver)
 {
-    spi = spi_init();
+    spi = spi_init(SSD1357_SPI_ID);
+
     gpio_write_pin(driver->reset, 0);
     wait_ms(5);
     gpio_write_pin(driver->reset, 1);
@@ -338,7 +343,7 @@ void ssd1357_init(ssd1357_t *driver)
     fill_screen(driver, 0x0000);                    // Clear Screen
     set_display_on_off(driver, 0xAF);               // Display On (0xAE/0xAF)
     // need to power up screen here
-    // wait_ms(200);
+     wait_ms(200);
 }
 
 void ssd1357_fill_rect(ssd1357_t* driver, uint32_t x, uint32_t y, uint32_t width, uint32_t height, const void *data, size_t size)
@@ -346,16 +351,30 @@ void ssd1357_fill_rect(ssd1357_t* driver, uint32_t x, uint32_t y, uint32_t width
     set_column_address(driver, COL_BEGIN+y, COL_BEGIN+y+height-1);
     set_row_address(driver, ROW_BEGIN+x, ROW_BEGIN+x+width-1);
     set_write_ram(driver);
-    //write_data_buffer(driver, data, size);
-    uint16_t* color = (uint16_t*)data;
+    write_data_buffer(driver, data, size);
+    /*uint16_t* color = (uint16_t*)data;
     for (int i = 0; i < 64; i++) {
         for (int j = 0; j < 64; j++) {
             write_data_buffer(driver, color, sizeof(*color));
             ++color;
         }
-    }
+    }*/
 }
 
+void ssd1357_fill(ssd1357_t* driver, const void* data)
+{
+    uint16_t *color = (uint16_t*)data;
+    set_column_address(driver, COL_BEGIN, COL_END);
+    set_row_address(driver, ROW_BEGIN, ROW_END);
+    set_write_ram(driver);
+
+    for (int i = 0; i < 64; i++) {
+        for (int j = 0; j < 64; j++) {
+            write_data_buffer(driver, color, sizeof(*color));
+            color++;
+        }
+    }
+}
 void ssd1331_uninit(void)
 {
 }
