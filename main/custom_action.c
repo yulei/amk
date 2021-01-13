@@ -140,7 +140,7 @@ static uint8_t current_layer(keypos_t key)
     return 0;
 }
 
-bool hook_process_action_no(keyrecord_t *record)
+bool hook_process_action(keyrecord_t *record)
 {
     keyevent_t event = record->event;
     uint8_t tap_count = record->tap.count;
