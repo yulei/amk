@@ -97,12 +97,22 @@ void ee_keymap_set_valid(bool valid)
     }
 }
 
-void ee_keymap_write(uint8_t layer, const void* keymaps, size_t size)
+void ee_keymap_write_layer(uint8_t layer, const void* keymaps, size_t size)
 {
     flash_store_write(layer, keymaps, size);
 }
 
-void ee_keymap_read(uint8_t layer, void* keymaps, size_t size)
+void ee_keymap_read_layer(uint8_t layer, void* keymaps, size_t size)
 {
     flash_store_read(layer, keymaps, size);
+}
+
+void ee_keymap_write_key(uint8_t layer, uint8_t row, uint8_t col, uint16_t key)
+{
+    flash_store_write_key(layer, row, col, key);
+}
+
+uint16_t ee_keymap_read_key(uint8_t layer, uint8_t row, uint8_t col)
+{
+    return flash_store_read_key(layer, row, col);
 }

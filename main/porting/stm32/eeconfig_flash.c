@@ -366,3 +366,21 @@ size_t flash_store_read(uint8_t key, void* data, size_t size)
 
     return size;
 }
+
+void flash_store_write_key(uint8_t layer, uint8_t row, uint8_t col, uint16_t key)
+{
+    uint32_t addr = EEPROM_KEYMAP_START + layer*MATRIX_ROWS*MATRIX_COLS*2 + (row*MATRIX_COLS + col)*2;
+    uint8_t* p = (uint8_t*)&key;
+    fee_write(addr, p[0]);
+    fee_write(addr+1, p[1]);
+}
+
+uint16_t flash_store_read_key(uint8_t layer, uint8_t row, uint8_t col)
+{
+    uint16_t key = 0;
+    uint32_t addr = EEPROM_KEYMAP_START + layer*MATRIX_ROWS*MATRIX_COLS*2 + (row*MATRIX_COLS + col)*2;
+    uint8_t* p = (uint8_t*)&key;
+    p[0] = fee_read(addr);
+    p[1] = fee_read(addr+1);
+    return key;
+}

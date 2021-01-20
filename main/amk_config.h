@@ -9,6 +9,7 @@
 #include "action.h"
 #include "action_macro.h"
 #include "action_code.h"
+#include "actionmap.h"
 #include "custom_action.h"
 #include "keymap.h"
 #include "gpio_pin.h"

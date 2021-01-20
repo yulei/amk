@@ -150,7 +150,11 @@ bool hook_process_action(keyrecord_t *record)
     action_t action = layer_switch_get_action(event);
     if (action.code == 0) {
         uint8_t layer = current_layer(event.key);
+        #ifdef ACTIONMAP_ENABLE
+        uint8_t keycode = action_for_key(layer, event.key).key.code;
+        #else
         uint8_t keycode = keymap_key_to_keycode(layer, event.key);
+        #endif
         if (keycode < KC_CTMB || keycode > KC_CTME) {
             return false;
         } else {

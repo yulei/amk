@@ -46,5 +46,7 @@ void eeprom_update_block(const void *buf, void *addr, size_t len);
 
 bool ee_keymap_is_valid(void);
 void ee_keymap_set_valid(bool valid);
-void ee_keymap_write(uint8_t layer, const void* keymaps, size_t size);
-void ee_keymap_read(uint8_t layer, void* keymaps, size_t size);
+void ee_keymap_write_layer(uint8_t layer, const void* keymaps, size_t size);
+void ee_keymap_read_layer(uint8_t layer, void* keymaps, size_t size);
+void ee_keymap_write_key(uint8_t layer, uint8_t row, uint8_t col, uint16_t key);
+uint16_t ee_keymap_read_key(uint8_t layer, uint8_t row, uint8_t col);
