@@ -18,6 +18,10 @@
 #define PWM_TIM_CHANNEL TIM_CHANNEL_3
 #endif
 
+#ifndef PWM_TIM_PERIOD
+#error "pwm time period must been defined"
+#endif
+
 extern TIM_HandleTypeDef PWM_TIM;
 
 #define LED_DATA_SIZE           (RGB_LED_NUM * 24)
@@ -25,8 +29,8 @@ extern TIM_HandleTypeDef PWM_TIM;
 #define RESET_SLOTS_END         (50)
 #define WS2812_LAST_SLOT        (1)
 #define LED_BUFFER_SIZE         (RESET_SLOTS_BEGIN + LED_DATA_SIZE + WS2812_LAST_SLOT + RESET_SLOTS_END)
-#define WS2812_1                (71)
-#define WS2812_0                (34)
+#define WS2812_1                ((PWM_TIM_PERIOD*2)/3)
+#define WS2812_0                (PWM_TIM_PERIOD/3)
 #define WS2812_RESET            (0)
 
 //static rgb_led_t ws2812_leds[RGB_LED_NUM];

@@ -18,6 +18,9 @@ SPI_HandleTypeDef hspi2;
 DMA_HandleTypeDef hdma_spi2_rx;
 DMA_HandleTypeDef hdma_spi2_tx;
 
+TIM_HandleTypeDef htim2;
+DMA_HandleTypeDef hdma_tim2_ch1;
+
 #ifdef TINYUSB_ENABLE
 void OTG_FS_IRQHandler(void)
 {
@@ -178,6 +181,42 @@ static void MX_SPI2_Init(void)
     }
 }
 
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim);
+/**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
+    TIM_OC_InitTypeDef sConfigOC = {0};
+
+    htim2.Instance = TIM2;
+    htim2.Init.Prescaler = 0;
+    htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim2.Init.Period = (PWM_TIM_PERIOD-1);
+    htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    if (HAL_TIM_PWM_Init(&htim2) != HAL_OK) {
+        Error_Handler();
+    }
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK) {
+        Error_Handler();
+    }
+    sConfigOC.OCMode = TIM_OCMODE_PWM1;
+    sConfigOC.Pulse = 0;
+    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+    if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK) {
+        Error_Handler();
+    }
+
+    HAL_TIM_MspPostInit(&htim2);
+}
+
 static void MX_DMA_Init(void)
 {
     __HAL_RCC_DMA2_CLK_ENABLE();
@@ -193,6 +232,9 @@ static void MX_DMA_Init(void)
     /* DMA1_Stream4_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
+    /* DMA1_Stream5_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
     /* DMA1_Stream6_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
@@ -258,6 +300,7 @@ void custom_board_init(void)
     MX_I2C1_Init();
     MX_SPI1_Init();
     MX_SPI2_Init();
+    MX_TIM2_Init();
 }
 
 void custom_board_task(void)
