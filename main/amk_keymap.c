@@ -9,6 +9,7 @@
 
 #include "action.h"
 #include "keymap.h"
+#include "amk_printf.h"
 
 #ifdef WEBUSB_ENABLE
 
@@ -51,11 +52,15 @@ void amk_keymap_init(void)
 {
     memset(amk_keymaps, 0, sizeof(amk_keymaps));
     if (ee_keymap_is_valid()) {
-        for(int layer = 0; layer < (keymaps_size/(MATRIX_ROWS*MATRIX_COLS)); layer++) {
-            ee_keymap_read(layer, &(amk_keymaps[layer][0][0]), MATRIX_ROWS*MATRIX_COLS*2);
+        for(int layer = 0; layer < (keymaps_size/(MATRIX_ROWS*MATRIX_COLS*2)); layer++) {
+            for (int row = 0; row < MATRIX_ROWS; row++) {
+                for (int col = 0; col < MATRIX_COLS; col++) {
+                    amk_keymaps[layer][row][col] = ee_keymap_read_key(layer, row, col);
+                }
+            }
         }
     } else {
-        for(int layer = 0; layer < (keymaps_size/(MATRIX_ROWS*MATRIX_COLS)); layer++) {
+        for(int layer = 0; layer < (keymaps_size/(MATRIX_ROWS*MATRIX_COLS*2)); layer++) {
             for (int row = 0; row < MATRIX_ROWS; row++) {
                 for (int col = 0; col < MATRIX_COLS; col++) {
 #ifdef ACTIONMAP_ENABLE
@@ -63,9 +68,10 @@ void amk_keymap_init(void)
 #else
                     amk_keymaps[layer][row][col] = keymaps[layer][row][col];
 #endif
+                    ee_keymap_write_key(layer, row, col, amk_keymaps[layer][row][col]);
                 }
             }
-            ee_keymap_write(layer, &(amk_keymaps[layer][0][0]), MATRIX_ROWS*MATRIX_COLS*2);
+            //ee_keymap_write(layer, &(amk_keymaps[layer][0][0]), MATRIX_ROWS*MATRIX_COLS*2);
         }
         ee_keymap_set_valid(true);
     }
@@ -73,12 +79,17 @@ void amk_keymap_init(void)
 
 void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
 {
+    if (amk_keymaps[layer][row][col] == keycode) return;
+
+    amk_printf("amk_keymap_set: layer=%d, row=%d, col=%d, key=0x%x\n", layer, row, col, keycode);
     amk_keymaps[layer][row][col] = keycode;
-    ee_keymap_write(layer, &(amk_keymaps[layer][0][0]), MATRIX_ROWS*MATRIX_COLS*2);
+    ee_keymap_write_key(layer, row, col, amk_keymaps[layer][row][col]);
+    //ee_keymap_write(layer, &(amk_keymaps[layer][0][0]), MATRIX_ROWS*MATRIX_COLS*2);
 }
 
 uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
 {
+    amk_printf("amk_keymap_get: layer=%d, row=%d, col=%d, key=0x%x\n", layer, row, col, amk_keymaps[layer][row][col]);
     return amk_keymaps[layer][row][col];
 }
 

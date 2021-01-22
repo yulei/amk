@@ -23,6 +23,8 @@ static matrix_row_t matrix_debouncing[MATRIX_ROWS];
 #ifndef MATRIX_DIRECT_PINS
 static pin_t col_pins[] = MATRIX_COL_PINS;
 static pin_t row_pins[] = MATRIX_ROW_PINS;
+#else
+static pin_t direct_pins[] = MATRIX_DIRECT_PINS;
 #endif
 
 static bool debouncing = false;
@@ -48,6 +50,10 @@ void matrix_init_custom(void)
     }
     for (int row = 0; row < MATRIX_ROWS; row++) {
         gpio_set_input_pulldown(row_pins[row]);
+    }
+#else
+    for (int pin = 0; pin < sizeof(direct_pins)/sizeof(pin_t); pin++) {
+        gpio_set_input_pullup(direct_pins[pin]);
     }
 #endif
 }
@@ -89,6 +95,24 @@ bool matrix_scan_custom(matrix_row_t* raw)
             }
         }
         gpio_write_pin(col_pins[col], 0);
+    }
+#else
+    for (int col = 0; col < MATRIX_COLS; col++) {
+        for(uint8_t row = 0; row < MATRIX_ROWS; row++) {
+            matrix_row_t last_row_value    = matrix_debouncing[row];
+            matrix_row_t current_row_value = last_row_value;
+
+            if ( gpio_read_pin(direct_pins[MATRIX_COLS*row+col])) {
+                current_row_value &= ~(1 << col);
+            } else {
+                current_row_value |= (1 << col);
+            }
+
+            if (last_row_value != current_row_value) {
+                matrix_debouncing[row] = current_row_value;
+                changed = true;
+            }
+        }
     }
 #endif
     /*if (changed) {
