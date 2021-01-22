@@ -101,6 +101,27 @@ static uint32_t update_delay(void)
     return DELAY_DEFAULT;
 }
 
+static bool rgb_matrix_config_valid(rgb_matrix_config_t *config)
+{
+    if (config->mode > RM_EFFECT_MAX) {
+        return false;
+    }
+
+    if (config->speed > SPEED_MAX) {
+        return false;
+    }
+
+    if (config->sat == SAT_MIN) {
+        return false;
+    }
+
+    if (config->val == SAT_MIN) {
+        return false;
+    }
+
+    return true;
+}
+
 static bool rgb_matrix_need_update(void)
 {
     return timer_elapsed32(matrix_state.last_ticks)*matrix_state.config.speed >= update_delay();
@@ -316,7 +337,7 @@ static void rgb_matrix_mode_keyhit(void)
 void rgb_matrix_update_default(void)
 {
     matrix_state.config.enable  = 1;
-    matrix_state.config.mode    = RM_EFFECT_GRADIENT;
+    matrix_state.config.mode    = RM_EFFECT_RAINBOW_V;
     matrix_state.config.speed   = SPEED_DEFAULT;
     matrix_state.config.hue     = HUE_DEFAULT;
     matrix_state.config.sat     = SAT_DEFAULT;
@@ -331,7 +352,7 @@ void rgb_matrix_init(rgb_driver_t *driver)
     }
 
     eeconfig_read_rgb_matrix(&matrix_state.config);
-    if (matrix_state.config.mode == 0xFF) {
+    if (!rgb_matrix_config_valid(&matrix_state.config)) {
         rgb_matrix_update_default();
     }
 

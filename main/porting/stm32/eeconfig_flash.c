@@ -304,11 +304,16 @@ void flash_read(uint32_t address, uint16_t* offset, uint16_t* data)
 
 bool flash_write(uint32_t address, uint16_t offset, uint16_t data)
 {
+    bool ret = true;
     uint32_t value = (offset << 16) | data;
     flash_unlock();
-    HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, address, value);
+    HAL_StatusTypeDef status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, address, value);
+    if (status != HAL_OK) {
+        amk_printf("Failed to programe word: addr=%x, data=%x, error=%d\n", address, value, HAL_FLASH_GetError());
+        ret = false;
+    }
     flash_lock();
-    return false;
+    return ret;
 }
 
 void flash_erase_pages(void)
@@ -322,23 +327,21 @@ void flash_erase_pages(void)
     erase.Banks = FLASH_BANK_1;
     erase.PageAddress = FLASH_BASE_ADDRESS;
     erase.NbPages = FLASH_PAGE_NUM;
-    HAL_FLASHEx_Erase(&erase, &error);
 #elif defined(STM32F411xE) || defined(STM32F405xx)
     erase.TypeErase = FLASH_TYPEERASE_SECTORS;
     erase.Banks = FLASH_BANK_1;
     erase.Sector = FLASH_SECTOR_ID;
     erase.NbSectors = FLASH_SECTOR_NUM;
     erase.VoltageRange = FLASH_VOLTAGE_RANGE_3;
-    HAL_FLASHEx_Erase(&erase, &error);
 #elif defined(STM32F722xx)
     erase.TypeErase = FLASH_TYPEERASE_SECTORS;
     erase.Sector = FLASH_SECTOR_ID;
     erase.NbSectors = FLASH_SECTOR_NUM;
     erase.VoltageRange = FLASH_VOLTAGE_RANGE_3;
-    HAL_FLASHEx_Erase(&erase, &error);
 #else
-#error "Flash Erase: unsupported mcu"
+    #error "Flash Erase: unsupported mcu"
 #endif
+    HAL_FLASHEx_Erase(&erase, &error);
     flash_lock();
     amk_printf("Flash erase page, error=%d\n", error);
 }

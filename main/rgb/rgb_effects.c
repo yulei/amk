@@ -67,6 +67,26 @@ static rgb_effects_state_t effects_state;
 #define RANDOM_DISTANCE 17
 static uint8_t get_random_hue(uint8_t hue) { return (rand() % HUE_MAX) + RANDOM_DISTANCE; }
 
+static bool effects_config_valid(rgb_effects_config_t *config)
+{
+    if (config->mode >= RGB_EFFECT_MAX) {
+        return false;
+    }
+
+    if (config->speed > SPEED_MAX) {
+        return false;
+    }
+
+    if (config->sat == SAT_MIN) {
+        return false;
+    }
+
+    if (config->val == VAL_MIN) {
+        return false;
+    }
+    return true;
+}
+
 static void effects_mode_init(void)
 {
     switch(effects_state.config.mode) {
@@ -268,7 +288,7 @@ void rgb_effects_init(rgb_driver_t* driver)
     }
 
     eeconfig_read_rgb(&effects_state.config);
-    if (effects_state.config.mode == 0xFF){
+    if ( !effects_config_valid(&effects_state.config)){
         effects_update_default();
     }
 
