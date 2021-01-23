@@ -589,7 +589,7 @@ static uint8_t webusb_dataout(USBD_HandleTypeDef *pdev, uint8_t epnum, void* use
             USBD_LL_GetRxDataSize(pdev, epnum));
 
     switch (hwusb->recv_buffer[0]) {
-        case WEBUSB_KEYMAP_SET:
+        case WEBUSB_KEYMAP_SET: {
             amk_keymap_set(hwusb->recv_buffer[1], hwusb->recv_buffer[2], hwusb->recv_buffer[3], (hwusb->recv_buffer[5]<<8) | hwusb->recv_buffer[4]);
             amk_printf("cmd=%d, layer=%d, row=%d, col=%d, keycode=%d\n",
                         hwusb->recv_buffer[0], 
@@ -597,7 +597,9 @@ static uint8_t webusb_dataout(USBD_HandleTypeDef *pdev, uint8_t epnum, void* use
                         hwusb->recv_buffer[2],
                         hwusb->recv_buffer[3],
                         (hwusb->recv_buffer[5]<<8) | hwusb->recv_buffer[4]);
-            break;
+            USBD_StatusTypeDef status = USBD_LL_Transmit(pdev, epnum | 0x80, hwusb->send_buffer, 32);
+            amk_printf("WEBUSB keymap SET writeback: status=%d\n", status);
+            } break;
             
         case WEBUSB_KEYMAP_GET: {
             uint16_t keycode = amk_keymap_get(hwusb->recv_buffer[1], hwusb->recv_buffer[2], hwusb->recv_buffer[3]);
@@ -609,8 +611,8 @@ static uint8_t webusb_dataout(USBD_HandleTypeDef *pdev, uint8_t epnum, void* use
             hwusb->recv_buffer[4] = keycode&0xFF;
             hwusb->recv_buffer[5] = (keycode>>8)&0xFF;
             memcpy(hwusb->send_buffer, hwusb->recv_buffer, 32);
-            USBD_StatusTypeDef status = USBD_LL_Transmit(pdev, 0x83, hwusb->send_buffer, 32);
-            amk_printf("WEBUSB transmit: status=%d\n", status);
+            USBD_StatusTypeDef status = USBD_LL_Transmit(pdev, epnum | 0x80, hwusb->send_buffer, 32);
+            amk_printf("WEBUSB keymap GET writeback: status=%d\n", status);
             } break;
         default:
             amk_printf("WEBUSB unknown command: %d\n",hwusb->recv_buffer[0]);

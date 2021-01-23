@@ -95,13 +95,15 @@ bool usb_suspended(void)
 
 void usb_remote_wakeup(void)
 {
-#if defined(OPT_MCU_STM32F1)
+#if defined(STM32F103xB)
     tud_remote_wakeup();
-#elif defined(OPT_MCU_STM32F4)
+#elif defined(STM32F405xx) || defined(STM32F411xE) || defined(STM32F722xx)
 #define USB_DEVICE     ((USB_OTG_DeviceTypeDef *)(USB_OTG_FS_PERIPH_BASE + USB_OTG_DEVICE_BASE))
-    USB_DEVICE->DCTL |= USB_OTG_DCTL_RWUSIG;
-    HAL_Delay(5);
-    USB_DEVICE->DCTL &= ~USB_OTG_DCTL_RWUSIG;
+    if ((USB_DEVICE->DSTS & USB_OTG_DSTS_SUSPSTS) == USB_OTG_DSTS_SUSPSTS) {
+        USB_DEVICE->DCTL |= USB_OTG_DCTL_RWUSIG;
+        HAL_Delay(5);
+        USB_DEVICE->DCTL &= ~USB_OTG_DCTL_RWUSIG;
+    }
 #else
 #error "Unsupport MCU on remote wakeup"
 #endif
