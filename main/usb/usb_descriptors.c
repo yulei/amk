@@ -42,10 +42,19 @@ uint32_t tud_descriptor_device_size(void)
 }
 
 // HID Keyboard Report Descriptor
+#ifdef SHARED_HID_EP
+static uint8_t desc_hid_report_kbd[] =
+{
+    TUD_HID_REPORT_DESC_KEYBOARD( HID_REPORT_ID(HID_REPORT_ID_KEYBOARD) ),
+    TUD_HID_REPORT_DESC_MOUSE( HID_REPORT_ID(HID_REPORT_ID_MOUSE) ),
+    TUD_HID_REPORT_DESC_EXTRA( HID_REPORT_ID_SYSTEM, HID_REPORT_ID_CONSUMER ),
+};
+#else
 static uint8_t desc_hid_report_kbd[] =
 {
     TUD_HID_REPORT_DESC_KEYBOARD(),
 };
+#endif
 
 // HID other report
 static uint8_t desc_hid_report_other[] =
@@ -90,14 +99,22 @@ uint32_t tud_descriptor_hid_report_other_size(void)
 #define MSCUSB_DESC_LEN 0 
 #endif
 
+#ifdef SHARED_HID_EP
+#define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + WEBUSB_DESC_LEN + MSCUSB_DESC_LEN)
+#else
 #define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + WEBUSB_DESC_LEN + MSCUSB_DESC_LEN)
+#endif
 
 static uint8_t desc_configuration[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
     TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
     // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
+#ifdef SHARED_HID_EP
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#else
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#endif
 
 #ifdef WEBUSB_ENABLE
     // Interface number, string index, EP Out & IN address, EP size
@@ -123,6 +140,11 @@ uint32_t tud_descriptor_configuration_size(uint8_t index)
 }
 
 // Invoked when received GET HID REPORT DESCRIPTOR
+#ifdef SHARED_HID_EP
+uint8_t const* tud_hid_descriptor_report_cb(void) {
+    return tud_descriptor_hid_report_kbd_cb();
+}
+#else
 uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf)
 {
     if (itf == ITF_NUM_HID_KBD) {
@@ -132,13 +154,14 @@ uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf)
     }
     return NULL;
 }
+#endif
 
 static uint8_t desc_hid_kbd[] = {
+#ifdef SHARED_HID_EP
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#else
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
-};
-
-static uint8_t desc_hid_other[] = {
-    TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#endif
 };
 
 // Invoded when received GET HID DESCRIPTOR
@@ -152,6 +175,11 @@ uint32_t tud_descriptor_hid_interface_kbd_size(void)
     return sizeof(desc_hid_kbd);
 }
 
+#ifndef SHARED_HID_EP
+static uint8_t desc_hid_other[] = {
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+};
+
 // Invoded when received GET HID DESCRIPTOR
 uint8_t const* tud_descriptor_hid_interface_other_cb(void)
 {
@@ -162,6 +190,7 @@ uint32_t tud_descriptor_hid_interface_other_size(void)
 {
     return sizeof(desc_hid_other);
 }
+#endif
 
 #ifdef WEBUSB_ENABLE
 // BOS Descriptor

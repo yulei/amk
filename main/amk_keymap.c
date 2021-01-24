@@ -22,8 +22,6 @@ extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
 extern const action_t fn_actions[];
 #endif
 
-extern const uint32_t keymaps_size;
-
 #ifdef ACTIONMAP_ENABLE
 action_t action_for_key(uint8_t layer, keypos_t key)
 {
@@ -52,7 +50,7 @@ void amk_keymap_init(void)
 {
     memset(amk_keymaps, 0, sizeof(amk_keymaps));
     if (ee_keymap_is_valid()) {
-        for(int layer = 0; layer < (keymaps_size/(MATRIX_ROWS*MATRIX_COLS*2)); layer++) {
+        for(int layer = 0; layer < AMK_KEYMAP_MAX_LAYER; layer++) {
             for (int row = 0; row < MATRIX_ROWS; row++) {
                 for (int col = 0; col < MATRIX_COLS; col++) {
                     amk_keymaps[layer][row][col] = ee_keymap_read_key(layer, row, col);
@@ -60,7 +58,7 @@ void amk_keymap_init(void)
             }
         }
     } else {
-        for(int layer = 0; layer < (keymaps_size/(MATRIX_ROWS*MATRIX_COLS*2)); layer++) {
+        for(int layer = 0; layer < AMK_KEYMAP_MAX_LAYER; layer++) {
             for (int row = 0; row < MATRIX_ROWS; row++) {
                 for (int col = 0; col < MATRIX_COLS; col++) {
 #ifdef ACTIONMAP_ENABLE

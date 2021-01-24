@@ -76,17 +76,43 @@
 // Interface number
 enum {
     ITF_NUM_HID_KBD,
+#ifdef SHARED_HID_EP
+    #define ITF_NUM_HID_OTHER ITF_NUM_HID_KBD
+#else
     ITF_NUM_HID_OTHER,
-#ifdef MSC_ENABLE
-    ITF_NUM_MSC,
 #endif
 #ifdef WEBUSB_ENABLE
     ITF_NUM_VENDOR,
 #endif
+#ifdef MSC_ENABLE
+    ITF_NUM_MSC,
+#endif
     ITF_NUM_TOTAL
 };
 
+#ifdef SHARED_HID_EP
 // Endpoint number
+enum {
+    EPNUM_HID_KBD       = 0x01,
+#ifdef WEBUSB_ENABLE
+    EPNUM_VENDOR_OUT    = 0x02,
+    #if defined(STM32F103xB) || defined(NRF52840_XXAA)
+    EPNUM_VENDOR_IN     = 0x03,
+    #else
+        #define EPNUM_VENDOR_IN EPNUM_VENDOR_OUT
+    #endif
+#endif
+#ifdef MSC_ENABLE
+    EPNUM_MSC_OUT       = 0x03,
+    #if defined(STM32F103xB) || defined(NRF52840_XXAA)
+    EPNUM_MSC_IN        = 0x04,
+    #else
+        #define EPNUM_MSC_IN    EPNUM_MSC_OUT
+    #endif
+#endif
+    EPNUM_MAX
+};
+#else
 enum {
     EPNUM_HID_KBD       = 0x01,
     EPNUM_HID_OTHER     = 0x02,
@@ -108,10 +134,15 @@ enum {
 #endif
     EPNUM_MAX
 };
+#endif
 
 // Report id
 enum {
-    HID_REPORT_ID_KEYBOARD,
+#ifdef SHARED_HID_EP
+    HID_REPORT_ID_KEYBOARD = 1,
+#else
+    HID_REPORT_ID_KEYBOARD = 0,
+#endif
     HID_REPORT_ID_MOUSE,
     HID_REPORT_ID_SYSTEM,
     HID_REPORT_ID_CONSUMER,
@@ -132,7 +163,11 @@ uint32_t tud_descriptor_device_size(void);
 uint8_t const* tud_descriptor_configuration_cb(uint8_t index);
 uint32_t tud_descriptor_configuration_size(uint8_t index);
 
+#ifdef SHARED_HID_EP
+uint8_t const* tud_hid_descriptor_report_cb(void);
+#else
 uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf);
+#endif
 
 uint8_t const* tud_descriptor_hid_report_kbd_cb(void);
 uint32_t tud_descriptor_hid_report_kbd_size(void);
@@ -147,6 +182,10 @@ uint8_t const* tud_descriptor_hid_interface_other_cb(void);
 uint32_t tud_descriptor_hid_interface_other_size(void);
 
 #ifdef WEBUSB_ENABLE
+enum {
+    WEBUSB_KEYMAP_SET = 1,
+    WEBUSB_KEYMAP_GET,
+};
 uint8_t const* tud_descriptor_bos_cb(void);
 uint32_t tud_descriptor_bos_size(void);
 

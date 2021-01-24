@@ -82,11 +82,6 @@ static uint8_t  webusb_datain(USBD_HandleTypeDef *pdev, uint8_t epnum, void* use
 static uint8_t  webusb_dataout(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user);
 static uint8_t  webusb_write(USBD_HandleTypeDef *pdev, uint8_t epnum, uint8_t* data, uint16_t size, void* user);
 
-typedef enum {
-    WEBUSB_KEYMAP_SET = 1,
-    WEBUSB_KEYMAP_GET,
-} webusb_command_t;
-
 usbd_class_interface_t USBD_WEBUSB = {
     webusb_setup,
     webusb_datain,

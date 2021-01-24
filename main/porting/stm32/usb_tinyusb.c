@@ -140,6 +140,30 @@ void tud_resume_cb(void)
 {
 }
 
+#ifdef SHARED_HID_EP
+uint16_t tud_hid_get_report_cb(uint8_t report_id, hid_report_type_t report_type, uint8_t* buffer, uint16_t reqlen)
+{
+    // TODO not Implemented
+    (void) report_id;
+    (void) report_type;
+    (void) buffer;
+    (void) reqlen;
+
+    return 0;
+}
+
+extern uint8_t amk_led_state;
+void tud_hid_set_report_cb(uint8_t report_id, hid_report_type_t report_type, uint8_t const *buffer, uint16_t bufsize)
+{
+    (void) report_id;
+    if (report_type == HID_REPORT_TYPE_OUTPUT) {
+        if (bufsize) {
+            amk_led_state = buffer[0];
+            amk_printf("Set Report Data: size=%d, state=%x\n", bufsize, buffer[0]);
+        }
+    }
+}
+#else
 // Invoked when received GET_REPORT control request
 // Application must fill buffer report's content and return its length.
 // Return zero will cause the stack to STALL request
@@ -169,3 +193,4 @@ void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t rep
         }
     }
 }
+#endif
