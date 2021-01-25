@@ -309,8 +309,18 @@ uint8_t usbd_comp_send(USBD_HandleTypeDef *pdev, uint8_t type, uint8_t *report, 
         return USBD_FAIL;
     }
     usbd_interface_t* interface = find_interface_by_type(type);
+    static uint8_t send_buf[16];
+    uint16_t send_len = len;
+    if (type != 0) {
+        send_len++;
+        send_buf[0] = type;
+        memcpy(&send_buf[1], report, len);
+    } else {
+        memcpy(&send_buf[0], report, len);
+    }
     if (interface && interface->instance->write) {
-        return interface->instance->write(pdev, interface->epin, report, len, interface->data);
+        //return interface->instance->write(pdev, interface->epin, report, len, interface->data);
+        return interface->instance->write(pdev, interface->epin, send_buf, send_len, interface->data);
     }
 
     return USBD_FAIL;
