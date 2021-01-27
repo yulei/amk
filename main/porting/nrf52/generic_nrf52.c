@@ -54,6 +54,19 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
     app_error_handler(DEAD_BEEF, line_num, p_file_name);
 }
 
+#ifdef RESET_ON_ERROR
+void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t info)
+{
+    __disable_irq();
+    NRF_LOG_FINAL_FLUSH();
+
+    NRF_LOG_ERROR("Fatal error");
+    NRF_BREAKPOINT_COND;
+    // On assert, the system can only recover with a reset.
+    NRF_LOG_WARNING("System reset");
+    NVIC_SystemReset();
+}
+#endif
 
 /**@brief Function for the Event Scheduler initialization.
  */

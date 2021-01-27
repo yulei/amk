@@ -42,7 +42,7 @@
 
 #define OUTPUT_REPORT_INDEX                 0                                          /**< Index of Output Report. */
 #define OUTPUT_REPORT_MAX_LEN               1                                          /**< Maximum length of Output Report. */
-#define OUTPUT_REP_REF_ID                   0                                          /**< Id of reference to Keyboard Output Report. */
+#define OUTPUT_REP_REF_ID                   1                                          /**< Id of reference to Keyboard Output Report. */
 
 #define FEATURE_REPORT_INDEX                0                                          /**< Index of Feature Report. */
 #define FEATURE_REPORT_MAX_LEN              2                                          /**< Maximum length of Feature Report. */
