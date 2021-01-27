@@ -5,8 +5,10 @@
 
 #include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
 #include "anim.h"
 #include "ff.h"
+#include "timer.h"
 #include "amk_printf.h"
 
 // anim file format
@@ -90,6 +92,7 @@ anim_t *anim_open(const char *path)
     }
 
     if (anim_open_current(&anim_inst)) {
+        srand(timer_read32());
         return &anim_inst;
 
     }
@@ -148,9 +151,20 @@ bool anim_next(anim_t *anim)
     return anim_open_current(anim);
 }
 
-void anim_rewind(anim_t *anim)
+bool anim_rewind(anim_t *anim)
 {
-    anim_open_current(anim);
+    return anim_open_current(anim);
+}
+
+bool anim_random(anim_t *anim)
+{
+    f_close(&anim->obj.file);
+    anim_scan(anim);
+    if (anim->total == 0) {
+        return false;
+    }
+    anim->current = rand() % anim->total;
+    return anim_open_current(anim);
 }
 
 void anim_close(anim_t *anim)
