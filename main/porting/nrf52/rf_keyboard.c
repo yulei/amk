@@ -87,10 +87,10 @@ void rf_keyboard_init(rf_send_report_t send_report, rf_prepare_sleep_t prepare_s
 
     keyboard_setup();
     keyboard_init();
+    nrf_usb_init(&usb_handler);
     boot_init();
     host_set_driver(&kbd_driver);
     keyboard_timer_init();
-    nrf_usb_init(&usb_handler);
     amk_keymap_init();
 #if WDT_ENABLE
     rf_wdt_init();

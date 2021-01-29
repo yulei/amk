@@ -5,17 +5,21 @@
 #pragma once
 
 /* USB Device descriptor parameter */
-#define VENDOR_ID  0x4D58   // MX
-#define PRODUCT_ID 0xBE60   // hhkb ble
-#define DEVICE_VER 0x0001
-#define MANUFACTURER astro
-#define PRODUCT Matrix Falcon
+#define VENDOR_ID       0x4D58   // MX
+#define PRODUCT_ID      0xBE60   // hhkb ble
+#define DEVICE_VER      0x0001
+#define MANUFACTURER    astro
+#define PRODUCT         Matrix Falcon
 
 /* key matrix size */
 #define MATRIX_ROWS 5
 #define MATRIX_COLS 14
 #define MATRIX_ROW_PINS { 2, 31, 30,  3, 29}
 #define MATRIX_COL_PINS { 9,  8,  7,  6,  5,  4, 10, 24, 23, 17, 16, 15, 14, 13}
+
+#define BOOT_ROW_PIN    2
+#define BOOT_COL_PIN    9
+
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
 #define DEBOUNCE                    5
 
@@ -33,17 +37,14 @@
 #define RGBLIGHT_EN_HIGH
 
 #define RGB_LED_NUM                 4
-//#define WS2812_LED_PIN              18
+#define WS2812_LED_PIN              12
 
 #define AW9523B_ADDR                0xB6
 
 #define CAPS_LED_PIN                18
-
 #define INDICATOR_PIN               25
 
 //#define GZLL_IS_CLIENT              1
-
-#define WS2812_LED_PIN              12
 //#define DISABLE_USB
 //#define SLEEP_COUNT_MAX             2
 //#define RESET_ON_ERROR

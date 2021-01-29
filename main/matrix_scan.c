@@ -199,6 +199,15 @@ void matrix_prepare_sleep(void)
     }
 }
 
+bool matrix_check_boot(void)
+{
+    nrf_gpio_cfg_input(row_pins[0], NRF_GPIO_PIN_PULLDOWN);
+    nrf_gpio_cfg_output(col_pins[0]);
+    wait_ms(1);
+    nrf_gpio_pin_write(col_pins[0], 1);
+    wait_ms(1);
+    return nrf_gpio_pin_read(row_pins[0]) ? true : false;
+}
 #else
 
 void matrix_prepare_sleep(void) {}

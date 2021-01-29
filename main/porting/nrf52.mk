@@ -19,6 +19,12 @@ INCS += \
 	$(NRF52_PORTING_DIR) \
 	$(NRF52_PORTING_DIR)/ble \
 
+ifeq (yes, $(strip JLINK_MMD))
+	SRCS += $(NRF52_PORTING_DIR)/mmd/JLINK_MONITOR_ISR_SES.c $(NRF52_PORTING_DIR)/mmd/JLINK_MONITOR.c
+	INCS += $(NRF52_PORTING_DIR)/mmd
+	APP_DEFS += -DCONFIG_JLINK_MONITOR_ENABLED=1
+endif
+
 ifeq (NRF52832, $(strip $(MCU)))
 	SRCS += $(NRF52_PORTING_DIR)/usb_backend_uart.c
 endif

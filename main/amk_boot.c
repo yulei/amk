@@ -63,6 +63,7 @@ void boot_init(void)
     }
 
     bool skip_scan = false;
+    bool jump_to_boot = false;
 
 #if defined(NRF52) || defined(NRF52840_XXAA)
     skip_scan = nrf_gpio_pin_read(VBUS_DETECT_PIN) ? false : true;
@@ -70,13 +71,20 @@ void boot_init(void)
 
     if (!skip_scan) {
         amk_printf("boot scan: ... ");
+#if defined(NRF52) || defined(NRF52840_XXAA)
+        extern bool matrix_check_boot(void);
+        jump_to_boot = matrix_check_boot();
+#else
         uint8_t scan = 100;
         while (scan--) { matrix_scan(); wait_ms(10); }
+        if (matrix_get_row(0) & 0x01) {
+            jump_to_boot = true;
+        }
+#endif
         amk_printf("done.\n");
 
         /* jump to bootloader */
-        if (matrix_get_row(0) & 0x01) {
-            // matrix(0,0)
+        if (jump_to_boot) {
             amk_printf("boot: jump to bootloader \n");
             bootloader_jump();
         }
