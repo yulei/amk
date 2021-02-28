@@ -9,7 +9,6 @@
 #include <stdint.h>
 #include "gpio_pin.h"
 
-
 typedef struct {
 #ifdef SCREEN_POWER_PIN
     pin_t power;

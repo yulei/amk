@@ -253,6 +253,13 @@ void st7735_init(st7735_t *driver)
     execute_commands(driver, init_cmds1);
     execute_commands(driver, init_cmds2);
     execute_commands(driver, init_cmds3);
+    set_address_window(driver, 0, 0, ST7735_WIDTH-1, ST7735_HEIGHT-1);
+    uint16_t color = 0;
+    for (int x = 0; x < ST7735_WIDTH; x++) {
+        for (int y = 0; y < ST7735_HEIGHT; y++) {
+            write_data(driver, (uint8_t*)&color, sizeof(color));
+        }
+    }
     st7735_unselect(driver);
 }
 
