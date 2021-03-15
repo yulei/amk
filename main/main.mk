@@ -35,7 +35,8 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 	LVGL_ENABLE = yes
 	APP_DEFS += -DSCREEN_ENABLE
 	SRCS += $(MAIN_DIR)/drivers/spi.c
-	SRCS += $(MAIN_DIR)/drivers/ssd1357.c
+#	SRCS += $(MAIN_DIR)/drivers/ssd1357.c
+	SRCS += $(MAIN_DIR)/drivers/st7735.c
 	SRCS += $(MAIN_DIR)/screen/screen.c
 	SRCS += $(MAIN_DIR)/screen/gifdec.c
 	SRCS += $(MAIN_DIR)/screen/image.c
