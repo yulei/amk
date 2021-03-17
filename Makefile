@@ -22,6 +22,7 @@ MAIN_DIR := main
 LIB_DIR := libs
 NRF5_DIR := nrf5_sdk
 STM32_DIR := stm32_sdk
+ATSAMD_DIR := atsamd_sdk 
 
 ifneq (, $(GOALS))
 GOAL_LIST := $(subst /, ,$(GOALS))
