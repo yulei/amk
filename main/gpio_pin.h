@@ -161,6 +161,23 @@
     #define D13 MAKE_PIN(GPIOD, 13)
     #define D14 MAKE_PIN(GPIOD, 14)
     #define D15 MAKE_PIN(GPIOD, 15)
+#elif defined(__SAMD21G18A__)
+    #include "generic_hal.h"
+    typedef uint8_t pin_t;
+
+    #define GPIO_PIN_FUNCTION_A 0
+    #define GPIO_PIN_FUNCTION_B 1
+    #define GPIO_PIN_FUNCTION_C 2
+    #define GPIO_PIN_FUNCTION_D 3
+    #define GPIO_PIN_FUNCTION_E 4
+    #define GPIO_PIN_FUNCTION_F 5
+    #define GPIO_PIN_FUNCTION_G 6
+    #define GPIO_PIN_FUNCTION_H 7
+
+    #define PA04 GPIO(GPIO_PORTA, 4)
+    #define PA05 GPIO(GPIO_PORTA, 5)
+    #define PA24 GPIO(GPIO_PORTA, 24)
+    #define PA25 GPIO(GPIO_PORTA, 25)
 #else
     #error "MCU_TYPE not defined"
 #endif

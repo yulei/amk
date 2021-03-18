@@ -2,7 +2,30 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-MK_DIR = mkdir -p
+ifdef SystemRoot
+	SHELL = cmd.exe
+	MK_DIR = mkdir
+else
+	ifeq ($(shell uname), Linux)
+		MK_DIR = mkdir -p
+	endif
+
+	ifeq ($(shell uname | cut -d _ -f 1), CYGWIN)
+		MK_DIR = mkdir -p
+	endif
+
+	ifeq ($(shell uname | cut -d _ -f 1), MINGW32)
+		MK_DIR = mkdir -p
+	endif
+
+	ifeq ($(shell uname | cut -d _ -f 1), MINGW64)
+		MK_DIR = mkdir -p
+	endif
+
+	ifeq ($(shell uname | cut -d _ -f 1), DARWIN)
+		MK_DIR = mkdir -p
+	endif
+endif
 
 # List the subdirectories for creating object files
 SUB_DIRS +=  \
@@ -22,6 +45,7 @@ hpl/sercom \
 examples \
 hpl/gclk \
 usb \
+hpl/nvmctrl \
 hpl/core \
 usb/device
 
@@ -29,9 +53,11 @@ usb/device
 OBJS +=  \
 hal/src/hal_io.o \
 samd21a/gcc/gcc/startup_samd21.o \
+usb/usb_protocol.o \
 usb/class/hid/device/hiddf_generic.o \
 usb/class/cdc/device/cdcdf_acm.o \
 hal/utils/src/utils_syscalls.o \
+hpl/nvmctrl/hpl_nvmctrl.o \
 usb/class/msc/device/mscdf.o \
 hpl/usb/hpl_usb.o \
 hal/src/hal_delay.o \
@@ -45,7 +71,7 @@ hpl/sysctrl/hpl_sysctrl.o \
 usb/class/hid/device/hiddf_keyboard.o \
 hal/src/hal_usart_sync.o \
 hpl/gclk/hpl_gclk.o \
-usb/usb_protocol.o \
+hal/src/hal_flash.o \
 hal/src/hal_init.o \
 hal/src/hal_usb_device.o \
 main.o \
@@ -53,9 +79,9 @@ samd21a/gcc/system_samd21.o \
 examples/driver_examples.o \
 driver_init.o \
 hpl/sercom/hpl_sercom.o \
-hal/utils/src/utils_event.o \
-usb/class/hid/device/hiddf_mouse.o \
 hal/src/hal_gpio.o \
+usb/class/hid/device/hiddf_mouse.o \
+hal/utils/src/utils_event.o \
 hal/src/hal_sleep.o \
 hpl/dmac/hpl_dmac.o \
 atmel_start.o \
@@ -65,9 +91,11 @@ hal/src/hal_atomic.o
 OBJS_AS_ARGS +=  \
 "hal/src/hal_io.o" \
 "samd21a/gcc/gcc/startup_samd21.o" \
+"usb/usb_protocol.o" \
 "usb/class/hid/device/hiddf_generic.o" \
 "usb/class/cdc/device/cdcdf_acm.o" \
 "hal/utils/src/utils_syscalls.o" \
+"hpl/nvmctrl/hpl_nvmctrl.o" \
 "usb/class/msc/device/mscdf.o" \
 "hpl/usb/hpl_usb.o" \
 "hal/src/hal_delay.o" \
@@ -81,7 +109,7 @@ OBJS_AS_ARGS +=  \
 "usb/class/hid/device/hiddf_keyboard.o" \
 "hal/src/hal_usart_sync.o" \
 "hpl/gclk/hpl_gclk.o" \
-"usb/usb_protocol.o" \
+"hal/src/hal_flash.o" \
 "hal/src/hal_init.o" \
 "hal/src/hal_usb_device.o" \
 "main.o" \
@@ -89,9 +117,9 @@ OBJS_AS_ARGS +=  \
 "examples/driver_examples.o" \
 "driver_init.o" \
 "hpl/sercom/hpl_sercom.o" \
-"hal/utils/src/utils_event.o" \
-"usb/class/hid/device/hiddf_mouse.o" \
 "hal/src/hal_gpio.o" \
+"usb/class/hid/device/hiddf_mouse.o" \
+"hal/utils/src/utils_event.o" \
 "hal/src/hal_sleep.o" \
 "hpl/dmac/hpl_dmac.o" \
 "atmel_start.o" \
@@ -108,6 +136,7 @@ DIR_INCLUDES +=  \
 -I"../hpl/core" \
 -I"../hpl/dmac" \
 -I"../hpl/gclk" \
+-I"../hpl/nvmctrl" \
 -I"../hpl/pm" \
 -I"../hpl/port" \
 -I"../hpl/sercom" \
@@ -135,14 +164,16 @@ DIR_INCLUDES +=  \
 DEPS := $(OBJS:%.o=%.d)
 
 DEPS_AS_ARGS +=  \
+"usb/usb_protocol.d" \
 "samd21a/gcc/gcc/startup_samd21.d" \
-"hal/src/hal_gpio.d" \
+"hal/utils/src/utils_event.d" \
 "hal/src/hal_io.d" \
 "usb/class/hid/device/hiddf_generic.d" \
 "hal/utils/src/utils_syscalls.d" \
 "usb/class/cdc/device/cdcdf_acm.d" \
 "hpl/usb/hpl_usb.d" \
 "usb/class/msc/device/mscdf.d" \
+"hpl/nvmctrl/hpl_nvmctrl.d" \
 "usb/class/hid/device/hiddf_mouse.d" \
 "hpl/core/hpl_core_m0plus_base.d" \
 "hal/utils/src/utils_list.d" \
@@ -151,7 +182,7 @@ DEPS_AS_ARGS +=  \
 "hal/src/hal_delay.d" \
 "hpl/core/hpl_init.d" \
 "hpl/sysctrl/hpl_sysctrl.d" \
-"usb/usb_protocol.d" \
+"hal/src/hal_flash.d" \
 "hpl/gclk/hpl_gclk.d" \
 "hal/src/hal_usb_device.d" \
 "hpl/dmac/hpl_dmac.d" \
@@ -164,7 +195,7 @@ DEPS_AS_ARGS +=  \
 "examples/driver_examples.d" \
 "hal/src/hal_sleep.d" \
 "hpl/sercom/hpl_sercom.d" \
-"hal/utils/src/utils_event.d" \
+"hal/src/hal_gpio.d" \
 "hal/src/hal_atomic.d" \
 "usb/device/usbdc.d" \
 "hpl/pm/hpl_pm.d" \

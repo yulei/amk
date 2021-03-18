@@ -243,7 +243,7 @@
 // <i> Indicates whether Run in Standby is enabled or not
 // <id> gclk_arch_gen_3_RUNSTDBY
 #ifndef CONF_GCLK_GEN_3_RUNSTDBY
-#define CONF_GCLK_GEN_3_RUNSTDBY 0
+#define CONF_GCLK_GEN_3_RUNSTDBY 1
 #endif
 
 // <q> Divide Selection
@@ -294,7 +294,7 @@
 // <i> This defines the clock source for generic clock generator 3
 // <id> gclk_gen_3_oscillator
 #ifndef CONF_GCLK_GEN_3_SRC
-#define CONF_GCLK_GEN_3_SRC GCLK_GENCTRL_SRC_XOSC
+#define CONF_GCLK_GEN_3_SRC GCLK_GENCTRL_SRC_XOSC32K
 #endif
 // </h>
 

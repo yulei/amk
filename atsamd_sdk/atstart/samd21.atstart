@@ -158,14 +158,14 @@ drivers:
     functionality: System
     api: HAL:HPL:GCLK
     configuration:
-      $input: 48000000
-      $input_id: Digital Frequency Locked Loop (DFLL48M)
-      RESERVED_InputFreq: 48000000
-      RESERVED_InputFreq_id: Digital Frequency Locked Loop (DFLL48M)
+      $input: 8000000
+      $input_id: 8MHz Internal Oscillator (OSC8M)
+      RESERVED_InputFreq: 8000000
+      RESERVED_InputFreq_id: 8MHz Internal Oscillator (OSC8M)
       _$freq_output_Generic clock generator 0: 8000000
       _$freq_output_Generic clock generator 1: 400000
       _$freq_output_Generic clock generator 2: 400000
-      _$freq_output_Generic clock generator 3: 400000
+      _$freq_output_Generic clock generator 3: 32768
       _$freq_output_Generic clock generator 4: 400000
       _$freq_output_Generic clock generator 5: 400000
       _$freq_output_Generic clock generator 6: 400000
@@ -201,7 +201,7 @@ drivers:
       gclk_arch_gen_2_idc: false
       gclk_arch_gen_2_oe: false
       gclk_arch_gen_2_oov: false
-      gclk_arch_gen_3_RUNSTDBY: false
+      gclk_arch_gen_3_RUNSTDBY: true
       gclk_arch_gen_3_enable: false
       gclk_arch_gen_3_idc: false
       gclk_arch_gen_3_oe: false
@@ -237,7 +237,7 @@ drivers:
       gclk_gen_2_oscillator: External Crystal Oscillator 0.4-32MHz (XOSC)
       gclk_gen_3_div: 1
       gclk_gen_3_div_sel: false
-      gclk_gen_3_oscillator: External Crystal Oscillator 0.4-32MHz (XOSC)
+      gclk_gen_3_oscillator: 32kHz External Crystal Oscillator (XOSC32K)
       gclk_gen_4_div: 1
       gclk_gen_4_div_sel: false
       gclk_gen_4_oscillator: External Crystal Oscillator 0.4-32MHz (XOSC)
@@ -250,6 +250,19 @@ drivers:
       gclk_gen_7_div: 1
       gclk_gen_7_div_sel: false
       gclk_gen_7_oscillator: Digital Frequency Locked Loop (DFLL48M)
+    optional_signals: []
+    variant: null
+    clocks:
+      domain_group: null
+  FLASH_0:
+    user_label: FLASH_0
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::NVMCTRL::driver_config_definition::Flash::HAL:Driver:FLASH
+    functionality: Flash
+    api: HAL:Driver:FLASH
+    configuration:
+      nvm_arch_cache: false
+      nvm_arch_read_mode: No Miss Penalty
+      nvm_arch_sleepprm: Wake On Access
     optional_signals: []
     variant: null
     clocks:
@@ -617,14 +630,14 @@ drivers:
     functionality: System
     api: HAL:HPL:SYSCTRL
     configuration:
-      $input: 400000
+      $input: 32768
       $input_id: Generic clock generator 3
-      RESERVED_InputFreq: 400000
+      RESERVED_InputFreq: 32768
       RESERVED_InputFreq_id: Generic clock generator 3
       _$freq_output_8MHz Internal Oscillator (OSC8M): 8000000
       _$freq_output_Digital Frequency Locked Loop (DFLL48M): 48000000
-      _$freq_output_External Crystal Oscillator 0.4-32MHz (XOSC): '400000'
-      _$freq_output_Fractional Digital Phase Locked Loop (FDPLL96M): 585925000
+      _$freq_output_External Crystal Oscillator 0.4-32MHz (XOSC): 400000
+      _$freq_output_Fractional Digital Phase Locked Loop (FDPLL96M): 47998976
       dfll48m_arch_bplckc: true
       dfll48m_arch_calibration: false
       dfll48m_arch_ccdis: true
@@ -681,7 +694,7 @@ drivers:
       xosc32k_arch_en32k: false
       xosc32k_arch_enable: false
       xosc32k_arch_ondemand: true
-      xosc32k_arch_runstdby: false
+      xosc32k_arch_runstdby: true
       xosc32k_arch_startup: 122 us
       xosc32k_arch_wrtlock: false
       xosc32k_arch_xtalen: false

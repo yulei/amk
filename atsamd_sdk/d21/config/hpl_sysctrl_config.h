@@ -223,7 +223,7 @@
 // <i> If this bit is 1: The oscillator is not stopped in standby sleep mode.
 // <id> xosc32k_arch_runstdby
 #ifndef CONF_XOSC32K_RUNSTDBY
-#define CONF_XOSC32K_RUNSTDBY 0
+#define CONF_XOSC32K_RUNSTDBY 1
 #endif
 
 // <q> Enable 1K

@@ -13,7 +13,21 @@
 #include <hpl_gclk_base.h>
 #include <hpl_pm_base.h>
 
+struct flash_descriptor FLASH_0;
+
 struct usart_sync_descriptor USART_0;
+
+void FLASH_0_CLOCK_init(void)
+{
+
+	_pm_enable_bus_clock(PM_BUS_APBB, NVMCTRL);
+}
+
+void FLASH_0_init(void)
+{
+	FLASH_0_CLOCK_init();
+	flash_init(&FLASH_0, NVMCTRL);
+}
 
 void USART_0_PORT_init(void)
 {
@@ -142,6 +156,8 @@ void USB_DEVICE_INSTANCE_init(void)
 void system_init(void)
 {
 	init_mcu();
+
+	FLASH_0_init();
 
 	USART_0_init();
 

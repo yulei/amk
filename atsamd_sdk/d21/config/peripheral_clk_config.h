@@ -73,7 +73,7 @@
  * \brief SERCOM0's Slow Clock frequency
  */
 #ifndef CONF_GCLK_SERCOM0_SLOW_FREQUENCY
-#define CONF_GCLK_SERCOM0_SLOW_FREQUENCY 400000
+#define CONF_GCLK_SERCOM0_SLOW_FREQUENCY 32768
 #endif
 
 // <y> USB Clock Source

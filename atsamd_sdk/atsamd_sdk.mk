@@ -7,8 +7,6 @@ MCU_TYPE := samd21a
 endif
 
 SRCS += \
-	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/atmel_start.c \
-	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/driver_init.c \
 	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/$(MCU_TYPE)/gcc/gcc/startup_samd21.c \
 	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/$(MCU_TYPE)/gcc/system_samd21.c \
 	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/hal/src/hal_atomic.c \
