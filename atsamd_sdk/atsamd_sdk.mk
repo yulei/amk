@@ -11,6 +11,7 @@ SRCS += \
 	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/$(MCU_TYPE)/gcc/system_samd21.c \
 	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/hal/src/hal_atomic.c \
 	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/hal/src/hal_delay.c \
+	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/hal/src/hal_flash.c \
 	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/hal/src/hal_gpio.c \
 	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/hal/src/hal_init.c \
 	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/hal/src/hal_io.c \
@@ -24,6 +25,7 @@ SRCS += \
 	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/hpl/core/hpl_core_m0plus_base.c \
 	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/hpl/dmac/hpl_dmac.c \
 	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/hpl/gclk/hpl_gclk.c \
+	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/hpl/nvmctrl/hpl_nvmctrl.c \
 	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/hpl/pm/hpl_pm.c \
 	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/hpl/sercom/hpl_sercom.c \
 	$(ATSAMDSDK_DIR)/$(MCU_FAMILY)/hpl/sysctrl/hpl_sysctrl.c \
@@ -48,9 +50,10 @@ APP_DEFS += \
 
 include $(ATSAMDSDK_DIR)/$(MCU_SERIES)$(MCU_FAMILY).mk
 
-#always use tinyusb
-include $(LIB_DIR)/tinyusb.mk
-APP_DEFS += -DTINYUSB_ENABLE
+ifeq (yes, $(strip $(TINYUSB_ENABLE)))
+	include $(LIB_DIR)/tinyusb.mk
+	APP_DEFS += -DTINYUSB_ENABLE
+endif
 
 LINKER_PATH	?= $(ATSAMDSDK_DIR)/$(MCU_FAMILY)/$(MCU_TYPE)/gcc/gcc
 LINKER_SCRIPT := $(LINKER_PATH)/$(MCU_LD)_flash.ld

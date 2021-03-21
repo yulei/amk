@@ -7,7 +7,7 @@
 
 // USB Device descriptor parameter
 #define VENDOR_ID  0x4D58   // MX
-#define PRODUCT_ID 0x0101   // one key
+#define PRODUCT_ID 0x0111   // one key
 #define DEVICE_VER 0x0001
 #define MANUFACTURER astro
 #define PRODUCT One Key

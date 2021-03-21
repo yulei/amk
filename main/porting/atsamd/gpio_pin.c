@@ -19,10 +19,13 @@ void gpio_write_pin(pin_t pin, int value)
 void gpio_set_output_pushpull(pin_t pin)
 {
     gpio_set_pin_direction(pin, GPIO_DIRECTION_OUT);
+    gpio_set_pin_pull_mode(pin, GPIO_PULL_OFF);
 }
 
 void gpio_set_output_opendrain(pin_t pin)
 {
+    gpio_set_pin_direction(pin, GPIO_DIRECTION_OUT);
+    gpio_set_pin_pull_mode(pin, GPIO_PULL_DOWN);
 }
 
 void gpio_set_input_floating(pin_t pin)

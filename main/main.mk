@@ -105,14 +105,9 @@ ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
 endif
 
 ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
-	SRCS += $(MAIN_DIR)/suspend.c
-	SRCS += $(MAIN_DIR)/rtt/SEGGER_RTT.c
 	include $(MAIN_DIR)/porting/stm32.mk
 endif
 
 ifneq (,$(filter $(strip $(MCU)),$(ATSAMD_MCUS)))
-	SRCS += $(MAIN_DIR)/suspend.c
-	SRCS += $(MAIN_DIR)/eeconfig_mem.c
-	SRCS += $(MAIN_DIR)/rtt/SEGGER_RTT.c
 	include $(MAIN_DIR)/porting/atsamd.mk
 endif
