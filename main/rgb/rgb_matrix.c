@@ -357,8 +357,8 @@ void rgb_matrix_init(rgb_driver_t *driver)
     }
 
     matrix_state.driver = driver;
-    if (matrix_state.config.enable)
-        matrix_state.driver->init();
+    //if (matrix_state.config.enable)
+    matrix_state.driver->init();
 
     matrix_state.last_ticks = timer_read32();
     srand(matrix_state.last_ticks);

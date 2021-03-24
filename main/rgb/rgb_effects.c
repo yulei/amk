@@ -293,8 +293,8 @@ void rgb_effects_init(rgb_driver_t* driver)
     }
 
     effects_state.driver        = driver;
-    if (effects_state.config.enable)
-        effects_state.driver->init();
+    //if (effects_state.config.enable)
+    effects_state.driver->init();
 
     effects_state.counter       = 0;
     effects_state.wipe_on       = true;
