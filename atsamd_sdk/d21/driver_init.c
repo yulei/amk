@@ -157,6 +157,90 @@ void system_init(void)
 {
 	init_mcu();
 
+	// GPIO on PA06
+
+	gpio_set_pin_level(PA06,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   false);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(PA06, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(PA06, GPIO_PIN_FUNCTION_OFF);
+
+	// GPIO on PA07
+
+	gpio_set_pin_level(PA07,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   false);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(PA07, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(PA07, GPIO_PIN_FUNCTION_OFF);
+
+	// GPIO on PA08
+
+	gpio_set_pin_level(PA08,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   false);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(PA08, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(PA08, GPIO_PIN_FUNCTION_OFF);
+
+	// GPIO on PA09
+
+	gpio_set_pin_level(PA09,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   false);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(PA09, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(PA09, GPIO_PIN_FUNCTION_OFF);
+
+	// GPIO on PA10
+
+	gpio_set_pin_level(PA10,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   false);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(PA10, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(PA10, GPIO_PIN_FUNCTION_OFF);
+
+	// GPIO on PA11
+
+	gpio_set_pin_level(PA11,
+	                   // <y> Initial level
+	                   // <id> pad_initial_level
+	                   // <false"> Low
+	                   // <true"> High
+	                   false);
+
+	// Set pin direction to output
+	gpio_set_pin_direction(PA11, GPIO_DIRECTION_OUT);
+
+	gpio_set_pin_function(PA11, GPIO_PIN_FUNCTION_OFF);
+
 	FLASH_0_init();
 
 	USART_0_init();

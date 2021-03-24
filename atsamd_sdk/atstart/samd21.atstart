@@ -158,10 +158,10 @@ drivers:
     functionality: System
     api: HAL:HPL:GCLK
     configuration:
-      $input: 8000000
-      $input_id: 8MHz Internal Oscillator (OSC8M)
-      RESERVED_InputFreq: 8000000
-      RESERVED_InputFreq_id: 8MHz Internal Oscillator (OSC8M)
+      $input: 48000000
+      $input_id: Digital Frequency Locked Loop (DFLL48M)
+      RESERVED_InputFreq: 48000000
+      RESERVED_InputFreq_id: Digital Frequency Locked Loop (DFLL48M)
       _$freq_output_Generic clock generator 0: 8000000
       _$freq_output_Generic clock generator 1: 400000
       _$freq_output_Generic clock generator 2: 400000
@@ -765,6 +765,42 @@ pads:
     definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::pad::PA05
     mode: Peripheral IO
     user_label: PA05
+    configuration: null
+  PA06:
+    name: PA06
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::pad::PA06
+    mode: Digital output
+    user_label: PA06
+    configuration: null
+  PA07:
+    name: PA07
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::pad::PA07
+    mode: Digital output
+    user_label: PA07
+    configuration: null
+  PA08:
+    name: PA08
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::pad::PA08
+    mode: Digital output
+    user_label: PA08
+    configuration: null
+  PA09:
+    name: PA09
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::pad::PA09
+    mode: Digital output
+    user_label: PA09
+    configuration: null
+  PA10:
+    name: PA10
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::pad::PA10
+    mode: Digital output
+    user_label: PA10
+    configuration: null
+  PA11:
+    name: PA11
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::pad::PA11
+    mode: Digital output
+    user_label: PA11
     configuration: null
   PA24:
     name: PA24
