@@ -21,6 +21,8 @@ DMA_HandleTypeDef hdma_spi2_tx;
 TIM_HandleTypeDef htim2;
 DMA_HandleTypeDef hdma_tim2_ch1;
 
+RTC_HandleTypeDef hrtc;
+
 #ifdef TINYUSB_ENABLE
 void OTG_FS_IRQHandler(void)
 {
@@ -84,17 +86,19 @@ void SystemClock_Config(void)
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7) != HAL_OK) {
         Error_Handler();
     }
-    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_I2C1|RCC_PERIPHCLK_I2S |RCC_PERIPHCLK_CLK48;
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC | RCC_PERIPHCLK_I2C1|RCC_PERIPHCLK_I2S |RCC_PERIPHCLK_CLK48;
     PeriphClkInitStruct.PLLI2S.PLLI2SN = 192;
     PeriphClkInitStruct.PLLI2S.PLLI2SR = 2;
     PeriphClkInitStruct.PLLI2S.PLLI2SQ = 2;
     PeriphClkInitStruct.PLLI2SDivQ = 1;
+    PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
     PeriphClkInitStruct.I2sClockSelection = RCC_I2SCLKSOURCE_PLLI2S;
     PeriphClkInitStruct.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
     PeriphClkInitStruct.Clk48ClockSelection = RCC_CLK48SOURCE_PLL;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
         Error_Handler();
     }
+
 }
 
 /**
@@ -246,6 +250,21 @@ static void MX_DMA_Init(void)
     HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 }
 
+static void MX_RTC_Init(void)
+{
+    hrtc.Instance = RTC;
+    hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+    hrtc.Init.AsynchPrediv = 127;
+    hrtc.Init.SynchPrediv = 255;
+    hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+    hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+    hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+    if (HAL_RTC_Init(&hrtc) != HAL_OK)
+    {
+        Error_Handler();
+    }
+}
+
 #if defined(TINYUSB_ENABLE)
 void usb_port_init(void)
 {
@@ -301,6 +320,7 @@ void custom_board_init(void)
     MX_SPI1_Init();
     MX_SPI2_Init();
     MX_TIM2_Init();
+    MX_RTC_Init();
 }
 
 void custom_board_task(void)

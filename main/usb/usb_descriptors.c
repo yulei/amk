@@ -140,21 +140,19 @@ uint32_t tud_descriptor_configuration_size(uint8_t index)
 }
 
 // Invoked when received GET HID REPORT DESCRIPTOR
-#ifdef SHARED_HID_EP
-uint8_t const* tud_hid_descriptor_report_cb(void) {
-    return tud_descriptor_hid_report_kbd_cb();
-}
-#else
 uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf)
 {
+#ifdef SHARED_HID_EP
+    return tud_descriptor_hid_report_kbd_cb();
+#else
     if (itf == ITF_NUM_HID_KBD) {
         return tud_descriptor_hid_report_kbd_cb();
     } else if (itf == ITF_NUM_HID_OTHER) {
         return tud_descriptor_hid_report_other_cb();
     }
     return NULL;
-}
 #endif
+}
 
 static uint8_t desc_hid_kbd[] = {
 #ifdef SHARED_HID_EP

@@ -14,6 +14,8 @@ SPI_HandleTypeDef hspi1;
 DMA_HandleTypeDef hdma_spi1_rx;
 DMA_HandleTypeDef hdma_spi1_tx;
 
+RTC_HandleTypeDef hrtc;
+
 #ifdef TINYUSB_ENABLE
 void OTG_FS_IRQHandler(void)
 {
@@ -38,6 +40,7 @@ void SystemClock_Config(void)
 {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
     /** Configure the main internal regulator output voltage
      */
@@ -70,6 +73,13 @@ void SystemClock_Config(void)
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
     {
         amk_printf("Failed to config Clock\n");
+        Error_Handler();
+    }
+
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+    PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+    {
         Error_Handler();
     }
 }
@@ -144,6 +154,20 @@ static void MX_DMA_Init(void)
     HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
 }
 
+static void MX_RTC_Init(void)
+{
+    hrtc.Instance = RTC;
+    hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+    hrtc.Init.AsynchPrediv = 127;
+    hrtc.Init.SynchPrediv = 255;
+    hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+    hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+    hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+    if (HAL_RTC_Init(&hrtc) != HAL_OK)
+    {
+        Error_Handler();
+    }
+}
 
 #if defined(TINYUSB_ENABLE)
 void usb_port_init(void)
@@ -189,6 +213,7 @@ void custom_board_init(void)
 #endif
     MX_I2C1_Init();
     MX_SPI1_Init();
+    MX_RTC_Init();
 }
 
 void custom_board_task(void)

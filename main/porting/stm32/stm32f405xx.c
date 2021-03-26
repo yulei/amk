@@ -12,6 +12,8 @@ DMA_HandleTypeDef hdma_i2c2_tx;
 TIM_HandleTypeDef htim1;
 DMA_HandleTypeDef hdma_tim1_ch3;
 
+RTC_HandleTypeDef hrtc;
+
 void Error_Handler(void)
 {
     __asm__("BKPT");
@@ -21,6 +23,7 @@ void SystemClock_Config(void)
 {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
     /** Configure the main internal regulator output voltage
      */
@@ -51,6 +54,13 @@ void SystemClock_Config(void)
     RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV4;
 
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
+    {
+        Error_Handler();
+    }
+
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+    PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
     {
         Error_Handler();
     }
@@ -136,6 +146,21 @@ static void MX_TIM1_Init(void)
     HAL_TIM_MspPostInit(&htim1);
 }
 
+static void MX_RTC_Init(void)
+{
+    hrtc.Instance = RTC;
+    hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+    hrtc.Init.AsynchPrediv = 127;
+    hrtc.Init.SynchPrediv = 255;
+    hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+    hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+    hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+    if (HAL_RTC_Init(&hrtc) != HAL_OK)
+    {
+        Error_Handler();
+    }
+}
+
 void custom_board_init(void)
 {
     SystemClock_Config();
@@ -143,6 +168,7 @@ void custom_board_init(void)
     MX_GPIO_Init();
     MX_DMA_Init();
     MX_TIM1_Init();
+    MX_RTC_Init();
 }
 
 void custom_board_task(void)

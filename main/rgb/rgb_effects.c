@@ -267,6 +267,8 @@ static void effects_set_enable(uint8_t enable)
 {
     effects_state.config.enable = enable;
     eeconfig_update_rgb(&effects_state.config);
+    if (effects_state.config.enable)
+        effects_state.driver->init();
 }
 
 void effects_update_default(void)
@@ -293,8 +295,8 @@ void rgb_effects_init(rgb_driver_t* driver)
     }
 
     effects_state.driver        = driver;
-    //if (effects_state.config.enable)
-    effects_state.driver->init();
+    if (effects_state.config.enable)
+        effects_state.driver->init();
 
     effects_state.counter       = 0;
     effects_state.wipe_on       = true;

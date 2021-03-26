@@ -41,6 +41,8 @@ static pin_t ws2812_pin;
 
 void ws2812_init(pin_t pin)
 {
+    if (ws2812_ready) return;
+
     ws2812_pin = pin;
 
     ws2812_ready = true;
