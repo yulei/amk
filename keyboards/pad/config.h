@@ -36,4 +36,3 @@
 #define PWM_TIM_PERIOD      105
 
 #define VECT_TAB_OFFSET         0x20000
-#define cfg_tusb_config_file    "tusb_def.h"

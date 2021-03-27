@@ -6,7 +6,11 @@
 #include "usbd_ctlreq.h"
 #include "usbd_composite.h"
 #include "usb_descriptors.h"
+#include "usb_led.h"
 #include "amk_printf.h"
+
+bool usb_led_event = false;
+uint8_t usb_led_state = 0;
 
 typedef enum {
     ITF_IDLE = 0,
@@ -224,7 +228,7 @@ static uint8_t  comp_deinit(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
 static uint8_t comp_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
 {
     USBD_StatusTypeDef ret = USBD_FAIL;
-    amk_printf("bmRequst=%d, request=%d, index=%d\n", req->bmRequest, req->bRequest, req->wIndex);
+    amk_printf("bmRequst=%d, request=%d, index=%d, value=%d\n", req->bmRequest, req->bRequest, req->wIndex, req->wValue);
     if ((req->bmRequest&USB_REQ_TYPE_MASK) == USB_REQ_TYPE_VENDOR) {
         usbd_interface_t* interface = &usbd_composite.interfaces[2];
         ret = interface->instance->setup(pdev, req, interface->data);
@@ -260,6 +264,8 @@ static uint8_t comp_ep0_tx_sent(struct _USBD_HandleTypeDef *pdev)
 
 static uint8_t comp_ep0_rx_ready(struct _USBD_HandleTypeDef *pdev)
 {
+    amk_printf("ep0 rx ready: led =0x%x\n", usb_led_state);
+    usb_led_event = true;
     return USBD_OK;
 }
 
@@ -435,6 +441,10 @@ static uint8_t  hid_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, v
 
                 case HID_REQ_CONTROL_GET_IDLE:
                 USBD_CtlSendData(pdev, (uint8_t *)(void *)&hhid->idle, 1U);
+                break;
+                case HID_REQ_CONTROL_SET_REPORT:
+                amk_printf("HID SET REPORT: \n");
+                USBD_CtlPrepareRx(pdev, &usb_led_state, 1U);
                 break;
 
                 default:

@@ -24,6 +24,7 @@
 #include "usb_host.h"
 #include "usbh_core.h"
 #include "usbh_hid_multi.h"
+#include "usb_led.h"
 #include "amk_printf.h"
 
 /* USER CODE BEGIN Includes */
@@ -98,6 +99,13 @@ void MX_USB_HOST_Process(void)
 {
   /* USB Host Background task */
   USBH_Process(&hUsbHostHS);
+
+  if (Appli_state == APPLICATION_READY) {
+      if (usb_led_event) {
+        USBH_HID_SetReport(&hUsbHostHS, 0x02, 0, &usb_led_state, 1u, 0);
+        usb_led_event = false;
+      }
+  }
 }
 /*
  * user callback definition
