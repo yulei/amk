@@ -330,6 +330,7 @@ void custom_board_init(void)
     } else {
         usb_setting |= USB_WEBUSB_BIT;
     }
+    HAL_PWR_EnableBkUpAccess();
     HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0);
 #endif
 }

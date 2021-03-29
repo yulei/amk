@@ -37,18 +37,14 @@ tusb_desc_device_t const desc_device_dyn =
 {
     .bLength            = sizeof(tusb_desc_device_t),
     .bDescriptorType    = TUSB_DESC_DEVICE,
-#ifdef WEBUSB_ENABLE
-    .bcdUSB             = 0x0210, // at least 2.1 or 3.x for BOS & webUSB
-#else
     .bcdUSB             = 0x0200,
-#endif
     .bDeviceClass       = 0x00,
     .bDeviceSubClass    = 0x00,
     .bDeviceProtocol    = 0x00,
     .bMaxPacketSize0    = CFG_TUD_ENDPOINT0_SIZE,
 
     .idVendor           = VENDOR_ID,
-    .idProduct          = PRODUCT_ID+0x11,
+    .idProduct          = ~PRODUCT_ID,
     .bcdDevice          = DEVICE_VER,
 
     .iManufacturer      = DESC_STR_MANUFACTURE,
