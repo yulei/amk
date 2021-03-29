@@ -126,3 +126,17 @@ void screen_fill_rect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, c
     ssd1357_fill_rect(&screen_drivers[0], x, y, width, height, data, data_size);
 #endif
 }
+
+void screen_fill_rect_async(uint32_t x, uint32_t y, uint32_t width, uint32_t height, const void *data, uint32_t data_size)
+{
+    st7735_fill_rect_async(&screen_drivers[0], x, y, width, height, data, data_size);
+}
+
+bool screen_fill_ready(void)
+{
+    if (st7735_fill_ready(&screen_drivers[0])) {
+        st7735_release(&screen_drivers[0]);
+        return true;
+    }
+    return false;
+}

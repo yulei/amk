@@ -7,11 +7,17 @@
 
 #include <stdint.h>
 
+typedef enum {
+    ANIM_TYPE_MAIN,
+    ANIM_TYPE_AUX,
+    ANIM_TYPE_MAX,
+} anim_type_t;
+
 typedef struct anim_t anim_t;
 
 void anim_mount(bool mount);
 
-anim_t *anim_open(const char *path);
+anim_t *anim_open(const char *path, anim_type_t type);
 uint32_t anim_get_width(anim_t* anim);
 uint32_t anim_get_height(anim_t* anim);
 uint32_t anim_get_bitformat(anim_t* anim);

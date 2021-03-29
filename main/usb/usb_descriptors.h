@@ -6,6 +6,11 @@
 
 #include "tusb.h"
 
+#define USB_MSC_BIT         (1u << 1)
+#define USB_WEBUSB_BIT      (1u << 2)
+
+extern uint32_t usb_setting;
+
 #define NKRO_KEYCODE_SIZE   32
 
 // Extra key report
@@ -73,6 +78,29 @@
         HID_OUTPUT       ( HID_CONSTANT                            ) ,\
     HID_COLLECTION_END \
 
+#ifdef DYNAMIC_CONFIGURATION
+// Interface number
+enum {
+    ITF_NUM_HID_KBD,
+    ITF_NUM_HID_OTHER,
+    ITF_NUM_DUMMY,
+    #define ITF_NUM_VENDOR ITF_NUM_DUMMY
+    #define ITF_NUM_MSC ITF_NUM_DUMMY
+    ITF_NUM_TOTAL
+};
+
+// Endpoint number
+enum {
+    EPNUM_HID_KBD       = 0x01,
+    EPNUM_HID_OTHER,
+    EPNUM_DUMMY,
+    #define EPNUM_VENDOR_OUT    EPNUM_DUMMY
+    #define EPNUM_VENDOR_IN     EPNUM_DUMMY
+    #define EPNUM_MSC_OUT       EPNUM_DUMMY
+    #define EPNUM_MSC_IN        EPNUM_DUMMY
+    EPNUM_MAX
+};
+#else
 // Interface number
 enum {
     ITF_NUM_HID_KBD,
@@ -134,8 +162,8 @@ enum {
 #endif
     EPNUM_MAX
 };
-#endif
-
+#endif //SHARED_HID_EP
+#endif// DYNAMIC_CONFIGURATION
 // Report id
 enum {
 #ifdef SHARED_HID_EP

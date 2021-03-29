@@ -4,6 +4,8 @@
 
 #include "usb_descriptors.h"
 
+uint32_t usb_setting = 0;
+
 // Device Descriptors
 tusb_desc_device_t const desc_device =
 {
@@ -30,14 +32,50 @@ tusb_desc_device_t const desc_device =
     .bNumConfigurations = 0x01
 };
 
+// Device Descriptors
+tusb_desc_device_t const desc_device_dyn =
+{
+    .bLength            = sizeof(tusb_desc_device_t),
+    .bDescriptorType    = TUSB_DESC_DEVICE,
+#ifdef WEBUSB_ENABLE
+    .bcdUSB             = 0x0210, // at least 2.1 or 3.x for BOS & webUSB
+#else
+    .bcdUSB             = 0x0200,
+#endif
+    .bDeviceClass       = 0x00,
+    .bDeviceSubClass    = 0x00,
+    .bDeviceProtocol    = 0x00,
+    .bMaxPacketSize0    = CFG_TUD_ENDPOINT0_SIZE,
+
+    .idVendor           = VENDOR_ID,
+    .idProduct          = PRODUCT_ID+0x11,
+    .bcdDevice          = DEVICE_VER,
+
+    .iManufacturer      = DESC_STR_MANUFACTURE,
+    .iProduct           = DESC_STR_PRODUCT,
+    .iSerialNumber      = DESC_STR_SERIAL,
+
+    .bNumConfigurations = 0x01
+};
+
 // Invoked when received GET DEVICE DESCRIPTOR
 uint8_t const* tud_descriptor_device_cb(void)
 {
+#ifdef DYNAMIC_CONFIGURATION
+    if (usb_setting & USB_MSC_BIT) {
+        return (uint8_t*) &desc_device_dyn;
+    }
+#endif
     return (uint8_t *) &desc_device;
 }
 
 uint32_t tud_descriptor_device_size(void)
 {
+#ifdef DYNAMIC_CONFIGURATION
+    if (usb_setting & USB_MSC_BIT) {
+        return sizeof(desc_device_dyn);
+    }
+#endif
     return sizeof(desc_device);
 }
 
@@ -105,6 +143,9 @@ uint32_t tud_descriptor_hid_report_other_size(void)
 #define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + WEBUSB_DESC_LEN + MSCUSB_DESC_LEN)
 #endif
 
+#define CONFIG_LEN_MSC (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + MSCUSB_DESC_LEN)
+#define CONFIG_LEN_WEBUSB (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + WEBUSB_DESC_LEN)
+
 static uint8_t desc_configuration[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
     TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
@@ -127,15 +168,61 @@ static uint8_t desc_configuration[] = {
 #endif
 };
 
+#ifdef DYNAMIC_CONFIGURATION
+static uint8_t desc_with_msc[] = {
+    // Config number, interface count, string index, total length, attribute, power in mA
+    TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_LEN_MSC, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
+    // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
+#ifdef SHARED_HID_EP
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#else
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#endif
+    // Interface number, string index, EP Out & EP In address, EP size
+#ifdef MSC_ENABLE
+    TUD_MSC_DESCRIPTOR(ITF_NUM_MSC, 0, EPNUM_MSC_OUT, 0x80|EPNUM_MSC_IN, CFG_TUD_MSC_EPSIZE),
+#endif
+};
+
+static uint8_t desc_with_webusb[] = {
+    // Config number, interface count, string index, total length, attribute, power in mA
+    TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_LEN_WEBUSB, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
+    // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
+#ifdef SHARED_HID_EP
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#else
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#endif
+    // Interface number, string index, EP Out & IN address, EP size
+#ifdef WEBUSB_ENABLE
+    TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, 0, EPNUM_VENDOR_OUT, 0x80|EPNUM_VENDOR_IN, CFG_TUD_VENDOR_EPSIZE),
+#endif
+};
+#endif
 
 // Invoked when received GET CONFIGURATION DESCRIPTOR
 uint8_t const* tud_descriptor_configuration_cb(uint8_t index)
 {
+#ifdef DYNAMIC_CONFIGURATION
+    if (usb_setting & USB_MSC_BIT) {
+        return desc_with_msc;
+    }
+    return desc_with_webusb;
+#endif
+
     return desc_configuration;
 }
 
 uint32_t tud_descriptor_configuration_size(uint8_t index)
 {
+#ifdef DYNAMIC_CONFIGURATION
+    if (usb_setting & USB_MSC_BIT) {
+        return sizeof(desc_with_msc);
+    }
+    return sizeof(desc_with_webusb);
+#endif
     return sizeof(desc_configuration);
 }
 

@@ -3,7 +3,7 @@
  */
 
 #include "generic_hal.h"
-#include "tusb.h"
+#include "usb_descriptors.h"
 
 
 I2C_HandleTypeDef hi2c1;
@@ -153,7 +153,7 @@ static void MX_SPI1_Init(void)
     hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
     hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
     hspi1.Init.NSS = SPI_NSS_SOFT;
-    hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
+    hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
     hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
     hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
     hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -174,7 +174,7 @@ static void MX_SPI2_Init(void)
     hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
     hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
     hspi2.Init.NSS = SPI_NSS_SOFT;
-    hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
+    hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
     hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
     hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
     hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -323,6 +323,15 @@ void custom_board_init(void)
     MX_SPI2_Init();
     MX_RTC_Init();
     MX_TIM2_Init();
+#ifdef DYNAMIC_CONFIGURATION
+    uint32_t magic = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1);
+    if (magic > 0) {
+        usb_setting |= USB_MSC_BIT;
+    } else {
+        usb_setting |= USB_WEBUSB_BIT;
+    }
+    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0);
+#endif
 }
 
 void custom_board_task(void)

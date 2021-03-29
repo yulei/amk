@@ -197,6 +197,12 @@ static void write_data(st7735_t *driver, const uint8_t* buff, size_t buff_size)
     spi_send(spi, buff, buff_size);
 }
 
+static void write_data_async(st7735_t *driver, const uint8_t* buff, size_t buff_size)
+{
+    gpio_write_pin(driver->dc, 1);
+    spi_send_async(spi, buff, buff_size);
+}
+
 static void execute_commands(st7735_t *driver, const uint8_t *addr)
 {
     uint8_t commands, args;
@@ -268,6 +274,24 @@ void st7735_fill_rect(st7735_t *driver, uint32_t x, uint32_t y, uint32_t w, uint
     st7735_select(driver);
     set_address_window(driver, x, y, x+w-1, y+h-1);
     write_data(driver, data, size);
+    st7735_unselect(driver);
+}
+
+void st7735_fill_rect_async(st7735_t *driver, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const void *data, size_t size)
+{
+    st7735_select(driver);
+    set_address_window(driver, x, y, x+w-1, y+h-1);
+    write_data_async(driver, data, size);
+    //st7735_unselect(driver);
+}
+
+bool st7735_fill_ready(st7735_t *driver)
+{
+    return spi_ready(spi);
+}
+
+void st7735_release(st7735_t *driver)
+{
     st7735_unselect(driver);
 }
 
