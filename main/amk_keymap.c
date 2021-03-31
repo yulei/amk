@@ -11,7 +11,7 @@
 #include "keymap.h"
 #include "amk_printf.h"
 
-#ifdef WEBUSB_ENABLE
+#ifdef WEBCONFIG_ENABLE
 
 static uint16_t amk_keymaps[AMK_KEYMAP_MAX_LAYER][MATRIX_ROWS][MATRIX_COLS];
 

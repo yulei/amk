@@ -88,6 +88,10 @@ ifeq (yes, $(strip $(WEBUSB_ENABLE)))
 	APP_DEFS += -DWEBUSB_ENABLE
 endif
 
+ifeq (yes, $(strip $(WEBCONFIG_ENABLE)))
+	APP_DEFS += -DWEBCONFIG_ENABLE
+endif
+
 ifeq (yes, $(strip $(MSC_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/anim.c
 	SRCS += $(MAIN_DIR)/drivers/w25qxx.c
