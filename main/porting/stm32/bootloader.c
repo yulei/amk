@@ -5,6 +5,7 @@
 
 #include "generic_hal.h"
 #include "bootloader.h"
+#include "tusb.h"
 
 extern RTC_HandleTypeDef hrtc;
 
@@ -26,5 +27,8 @@ static void magic_write(uint32_t magic)
 void bootloader_jump(void)
 {
     magic_write(Bootloader_Magic);
+
+    tud_disconnect();
+    HAL_Delay(10);
     HAL_NVIC_SystemReset();
 }

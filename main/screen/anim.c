@@ -70,13 +70,15 @@ static void anim_scan(anim_t *anim);
 static bool anim_open_current(anim_t *anim);
 static bool anim_check_file(const char *path, const char *sig);
 
-void anim_mount(bool mount)
+bool anim_mount(bool mount)
 {
+    FRESULT res = FR_OK;
     if (mount) {
-        f_mount(&flashfs, "", 1);
+        res = f_mount(&flashfs, "", 1);
     } else {
-        f_unmount("");
+        res = f_unmount("");
     }
+    return (res == FR_OK);
 }
 
 anim_t *anim_open(const char *path, anim_type_t type)

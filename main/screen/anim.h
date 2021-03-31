@@ -15,7 +15,7 @@ typedef enum {
 
 typedef struct anim_t anim_t;
 
-void anim_mount(bool mount);
+bool anim_mount(bool mount);
 
 anim_t *anim_open(const char *path, anim_type_t type);
 uint32_t anim_get_width(anim_t* anim);
