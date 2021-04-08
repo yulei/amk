@@ -2,6 +2,7 @@
 PROJECT_NAME := amk
 NRF_MCUS := NRF52832 NRF52840
 STM32_MCUS := STM32F103 STM32F411 STM32F405 STM32F722
+ATSAMD_MCUS := ATSAMD21
 
 # Source files
 SRCS += \
@@ -22,6 +23,7 @@ MAIN_DIR := main
 LIB_DIR := libs
 NRF5_DIR := nrf5_sdk
 STM32_DIR := stm32_sdk
+ATSAMD_DIR := atsamd_sdk
 
 ifneq (, $(GOALS))
 GOAL_LIST := $(subst /, ,$(GOALS))
@@ -53,6 +55,8 @@ ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
 include $(NRF5_DIR)/nrf5_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
 include $(STM32_DIR)/stm32_sdk.mk
+else ifneq (,$(filter $(strip $(MCU)),$(ATSAMD_MCUS)))
+include $(ATSAMD_DIR)/atsamd_sdk.mk
 else
 $(error Unsupported MCU: $(MCU))
 endif

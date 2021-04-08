@@ -8,6 +8,7 @@ SRCS += \
 	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_i2s.c \
 	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_spi.c \
 	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_spi_ex.c \
+	$(STM32SDK_DIR)/drivers/$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_iwdg.c \
 
 APP_DEFS += \
 	-DSPI_USE_INSTANCE_1 \

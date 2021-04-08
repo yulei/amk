@@ -22,6 +22,7 @@ TIM_HandleTypeDef htim2;
 DMA_HandleTypeDef hdma_tim2_ch1;
 
 RTC_HandleTypeDef hrtc;
+IWDG_HandleTypeDef hiwdg;
 
 #ifdef TINYUSB_ENABLE
 void OTG_FS_IRQHandler(void)
@@ -261,8 +262,18 @@ static void MX_RTC_Init(void)
     hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
     hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
     hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
-    if (HAL_RTC_Init(&hrtc) != HAL_OK)
-    {
+    if (HAL_RTC_Init(&hrtc) != HAL_OK) {
+        Error_Handler();
+    }
+}
+
+static void MX_IWDG_Init(void)
+{
+    hiwdg.Instance = IWDG;
+    hiwdg.Init.Prescaler = IWDG_PRESCALER_32;
+    hiwdg.Init.Window = 999;
+    hiwdg.Init.Reload = 999;
+    if (HAL_IWDG_Init(&hiwdg) != HAL_OK) {
         Error_Handler();
     }
 }
@@ -323,6 +334,7 @@ void custom_board_init(void)
     MX_SPI2_Init();
     MX_RTC_Init();
     MX_TIM2_Init();
+    MX_IWDG_Init();
 #ifdef DYNAMIC_CONFIGURATION
     uint32_t magic = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1);
     if (magic > 0) {
