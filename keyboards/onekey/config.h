@@ -16,11 +16,11 @@
 #define MATRIX_ROWS 1
 #define MATRIX_COLS 1
 
-//#define MATRIX_ROW_PINS { B15}
-//#define MATRIX_COL_PINS { C15}
+#define MATRIX_ROW_PINS { B15}
+#define MATRIX_COL_PINS { C15}
 
-#define MATRIX_ROW_PINS { PA04}
-#define MATRIX_COL_PINS { PA05}
+//#define MATRIX_ROW_PINS { PA04}
+//#define MATRIX_COL_PINS { PA05}
 
 #define SCREEN_NUM      2
 
