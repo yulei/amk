@@ -8,13 +8,13 @@
 #include "tusb.h"
 #include "wait.h"
 
+static uint32_t Bootloader_Magic=0x41544B42;
+
 #if defined (NUC126)
 static void magic_write(uint32_t magic)
 {}
 #else
 extern RTC_HandleTypeDef hrtc;
-
-static uint32_t Bootloader_Magic=0x41544B42;
 
 static void magic_write(uint32_t magic)
 {
