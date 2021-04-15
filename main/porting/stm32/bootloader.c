@@ -5,7 +5,10 @@
 
 #include "generic_hal.h"
 #include "bootloader.h"
+
+#ifndef USB_HOST_ENABLE
 #include "tusb.h"
+#endif
 
 extern RTC_HandleTypeDef hrtc;
 
@@ -28,7 +31,9 @@ void bootloader_jump(void)
 {
     magic_write(Bootloader_Magic);
 
+#ifndef USB_HOST_ENABLE
     tud_disconnect();
     HAL_Delay(10);
+#endif
     HAL_NVIC_SystemReset();
 }

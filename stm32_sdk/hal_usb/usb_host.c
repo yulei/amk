@@ -49,7 +49,7 @@ ApplicationTypeDef Appli_state = APPLICATION_IDLE;
  * -- Insert your variables declaration here --
  */
 /* USER CODE BEGIN 0 */
-
+static void USBH_UpdateLedState(USBH_HandleTypeDef *phost);
 /* USER CODE END 0 */
 
 /*
@@ -92,20 +92,24 @@ void MX_USB_HOST_Init(void)
   /* USER CODE END USB_HOST_Init_PostTreatment */
 }
 
+void USBH_UpdateLedState(USBH_HandleTypeDef *phost)
+{
+    if (Appli_state == APPLICATION_READY) {
+        if (usb_led_event) {
+            if (USBH_OK == USBH_HID_SetReport(&hUsbHostHS, 0x02, 0, &usb_led_state, 1u, 0)) {
+                usb_led_event = false;
+            }
+        }
+    }
+}
 /*
  * Background task
  */
 void MX_USB_HOST_Process(void)
 {
-  /* USB Host Background task */
-  USBH_Process(&hUsbHostHS);
-
-  if (Appli_state == APPLICATION_READY) {
-      if (usb_led_event) {
-        USBH_HID_SetReport(&hUsbHostHS, 0x02, 0, &usb_led_state, 1u, 0);
-        usb_led_event = false;
-      }
-  }
+    /* USB Host Background task */
+    USBH_Process(&hUsbHostHS);
+    USBH_UpdateLedState(&hUsbHostHS);
 }
 /*
  * user callback definition
