@@ -1,19 +1,17 @@
+include $(MAIN_DIR)/porting/common_porting.mk
+
 STM32_PORTING_DIR := $(MAIN_DIR)/porting/stm32
 
 SRCS += \
-	$(STM32_PORTING_DIR)/timer.c \
-	$(STM32_PORTING_DIR)/bootloader.c \
-	$(STM32_PORTING_DIR)/wait.c \
-	$(STM32_PORTING_DIR)/generic_stm32.c \
-	$(STM32_PORTING_DIR)/gpio_pin.c \
 	$(STM32_PORTING_DIR)/eeconfig_flash.c \
+	$(STM32_PORTING_DIR)/gpio_pin.c \
+	$(STM32_PORTING_DIR)/stm32.c \
+	$(STM32_PORTING_DIR)/wait.c \
 
 INCS += \
 	$(STM32_PORTING_DIR) \
 
-ifeq (yes, $(TINYUSB_ENABLE))
-	SRCS += $(STM32_PORTING_DIR)/usb_tinyusb.c
-else
+ifneq (yes, $(TINYUSB_ENABLE))
 	SRCS += $(STM32_PORTING_DIR)/usb_hal.c
 endif
 

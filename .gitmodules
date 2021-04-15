@@ -40,3 +40,6 @@
 [submodule "libs/nofrendo"]
 	path = libs/nofrendo
 	url = https://github.com/yulei/nofrendo_arcada.git
+[submodule "nuvoton_sdk/nuc126"]
+	path = nuvoton_sdk/nuc126
+	url = https://github.com/OpenNuvoton/NUC126BSP.git

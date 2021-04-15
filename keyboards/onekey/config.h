@@ -7,7 +7,7 @@
 
 // USB Device descriptor parameter
 #define VENDOR_ID  0x4D58   // MX
-#define PRODUCT_ID 0x0101   // one key
+#define PRODUCT_ID 0x0111   // one key
 #define DEVICE_VER 0x0001
 #define MANUFACTURER astro
 #define PRODUCT One Key
@@ -18,6 +18,9 @@
 
 #define MATRIX_ROW_PINS { B15}
 #define MATRIX_COL_PINS { C15}
+
+//#define MATRIX_ROW_PINS { PA04}
+//#define MATRIX_COL_PINS { PA05}
 
 #define SCREEN_NUM      2
 

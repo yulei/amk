@@ -25,6 +25,14 @@ else
 	ifeq (STM32F722, $(strip $(MCU)))
 	SRCS += $(TINYUSB_DIR)/portable/st/synopsys/dcd_synopsys.c
 	endif
+
+	ifeq (ATSAMD21, $(strip $(MCU)))
+	SRCS += $(TINYUSB_DIR)/portable/microchip/samd/dcd_samd.c
+	endif
+
+	ifeq (NUC126, $(strip $(MCU)))
+	SRCS += $(TINYUSB_DIR)/portable/nuvoton/nuc121/dcd_nuc121.c
+	endif
 endif #TINYUSB_USE_HAL
 
 ifeq (NRF52840, $(strip $(MCU)))

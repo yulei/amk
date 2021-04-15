@@ -74,6 +74,8 @@ void boot_init(void)
 #if defined(NRF52) || defined(NRF52840_XXAA)
         extern bool matrix_check_boot(void);
         jump_to_boot = matrix_check_boot();
+#elif defined(NUC126)
+
 #else
         uint8_t scan = 100;
         while (scan--) { matrix_scan(); wait_ms(10); }
