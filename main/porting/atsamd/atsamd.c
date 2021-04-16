@@ -21,8 +21,8 @@ static void FLASH_0_init(void)
 
 static void USART_0_PORT_init(void)
 {
-    gpio_set_pin_function(PA04, PINMUX_PA04D_SERCOM0_PAD0);
-    gpio_set_pin_function(PA05, PINMUX_PA05D_SERCOM0_PAD1);
+    gpio_set_pin_function(A4, PINMUX_PA04D_SERCOM0_PAD0);
+    gpio_set_pin_function(A5, PINMUX_PA05D_SERCOM0_PAD1);
 }
 
 static void USART_0_CLOCK_init(void)
@@ -40,15 +40,15 @@ static void USART_0_init(void)
 
 static void USB_DEVICE_0_PORT_init(void)
 {
-    gpio_set_pin_direction(PA24, GPIO_DIRECTION_OUT);
-    gpio_set_pin_level(PA24, false);
-    gpio_set_pin_pull_mode(PA24, GPIO_PULL_OFF); 
-    gpio_set_pin_function(PA24, PINMUX_PA24G_USB_DM);
+    gpio_set_pin_direction(A24, GPIO_DIRECTION_OUT);
+    gpio_set_pin_level(A24, false);
+    gpio_set_pin_pull_mode(A24, GPIO_PULL_OFF); 
+    gpio_set_pin_function(A24, PINMUX_PA24G_USB_DM);
 
-    gpio_set_pin_direction(PA25, GPIO_DIRECTION_OUT);
-    gpio_set_pin_level(PA25, false);
-    gpio_set_pin_pull_mode(PA25, GPIO_PULL_OFF);
-    gpio_set_pin_function(PA25, PINMUX_PA25G_USB_DP);
+    gpio_set_pin_direction(A25, GPIO_DIRECTION_OUT);
+    gpio_set_pin_level(A25, false);
+    gpio_set_pin_pull_mode(A25, GPIO_PULL_OFF);
+    gpio_set_pin_function(A25, PINMUX_PA25G_USB_DP);
 }
 
 /* The USB module requires a GCLK_USB of 48 MHz ~ 0.25% clock

@@ -13,7 +13,6 @@ SRCS += \
 	$(NRF52_PORTING_DIR)/ble_keyboard.c \
 	$(NRF52_PORTING_DIR)/gzll_keyboard.c \
 	$(NRF52_PORTING_DIR)/rf_keyboard.c \
-	$(NRF52_PORTING_DIR)/eeconfig_fds.c \
 
 INCS += \
 	$(NRF52_PORTING_DIR) \
@@ -31,4 +30,12 @@ endif
 
 ifeq (NRF52840, $(strip $(MCU)))
 	SRCS += $(NRF52_PORTING_DIR)/usb_backend_tinyusb.c
+endif
+
+ifeq (yes, $(strip $(EECONFIG_FRAM)))
+	SRCS += $(MAIN_DIR)/eeconfig_fram.c
+	SRCS += $(MAIN_DIR)/drivers/mb85rcxx.c
+	APP_DEFS += -DEECONFIG_FRAM
+else
+	SRCS += $(NRF52_PORTING_DIR)/eeconfig_fds.c
 endif

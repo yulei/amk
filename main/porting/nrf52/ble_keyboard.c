@@ -114,7 +114,9 @@ static void ble_stack_init(void)
 void ble_keyboard_init(void)
 {
     ble_stack_init();
+#ifndef EECONFIG_FRAM
     fds_eeprom_init();
+#endif
     ble_services_init();
 
     rf_keyboard_init(ble_send_report, ble_prepare_sleep);
