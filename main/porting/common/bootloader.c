@@ -13,7 +13,7 @@
 
 static uint32_t Bootloader_Magic=0x41544B42;
 
-#if defined (NUC126) || defined(__SAMD21G18A__)
+#if defined (NUC126) || defined(__SAMD21G18A__) || defined(STM32L432xx)
 static void magic_write(uint32_t magic)
 {}
 #else

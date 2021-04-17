@@ -74,7 +74,7 @@
     #define P1_30 NRF_GPIO_PIN_MAP(1,30)
     #define P1_31 NRF_GPIO_PIN_MAP(1,31)
 
-#elif defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F722xx) || defined(STM32F103xB)
+#elif defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F722xx) || defined(STM32F103xB) || defined(STM32L432xx) 
     #include "generic_hal.h"
 
     typedef uint32_t pin_t;

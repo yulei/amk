@@ -131,3 +131,4 @@ void eeconfig_write_backlight(uint8_t val) { eeprom_write_byte(EECONFIG_BACKLIGH
 #endif
 
 void fds_eeprom_init(void) {}
+void fee_init(void) {}
