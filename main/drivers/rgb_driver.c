@@ -8,10 +8,21 @@
 #include "rgb_color.h"
 #include "gpio_pin.h"
 #include "wait.h"
+#include "amk_printf.h"
 
 #include "drivers/ws2812.h"
 #include "drivers/aw9523b.h"
 #include "drivers/is31fl3731.h"
+
+#ifndef RGB_DRIVER_DEBUG
+#define RGB_DRIVER_DEBUG 1
+#endif
+
+#if RGB_DRIVER_DEBUG
+#define rgb_driver_debug  amk_printf
+#else
+#define rgb_driver_debug(...)
+#endif
 
 #if defined(RGB_WITH_WS2812) || defined(RGB_DRIVER_AW9523B)
     #ifndef RGB_LED_NUM
@@ -98,6 +109,7 @@ void rd_aw9523b_init(void)
     wait_ms(1);
 #endif
     aw9523b_init(AW9523B_ADDR);
+    rgb_driver_debug("AW9523B init\n");
 }
 
 void rd_aw9523b_uninit(void)
@@ -106,6 +118,7 @@ void rd_aw9523b_uninit(void)
 #ifdef RGBLIGHT_EN_PIN
     gpio_write_pin(RGBLIGHT_EN_PIN, 0);
 #endif
+    rgb_driver_debug("AW9523B uninit\n");
 }
 
 void rd_aw9523b_set_color(uint32_t index, uint8_t hue, uint8_t sat, uint8_t val)

@@ -42,8 +42,7 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
     switch (id) {
 #ifdef RGB_EFFECTS_ENABLE
         case AF_RGB_TOG:
-            rgb_effects_toggle();
-            keyboard_set_rgb(rgb_effects_enabled());
+            keyboard_set_rgb(!rgb_effects_enabled());
             amk_printf("Toggle rgb: %d\n", rgb_effects_enabled());
             break;
         case AF_RGB_MOD:

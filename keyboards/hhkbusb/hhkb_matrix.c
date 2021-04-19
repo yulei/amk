@@ -11,6 +11,7 @@
 #include "host.h"
 #include "gpio_pin.h"
 #include "usb_descriptors.h"
+#include "amk_keymap.h"
 #include "amk_printf.h"
 
 extern UART_HandleTypeDef huart1;
@@ -98,6 +99,27 @@ typedef enum
 } command_t;
 
 static uint8_t command_buf[CMD_MAX_LEN];
+#define BLE_ROWS 5
+#define BLE_COLS 14
+typedef enum {
+    BS_IDLE,
+    BS_SEND,
+} ble_state_t;
+
+static uint16_t ble_keymaps[AMK_KEYMAP_MAX_LAYER][BLE_ROWS][BLE_COLS];
+typedef struct {
+    uint8_t     layer;
+    uint8_t     row;
+    uint8_t     col;
+    uint8_t     finished;
+    ble_state_t state;
+} ble_sync_state_t;
+
+static ble_sync_state_t ble_sync;
+static void ble_sync_init(void);
+static void ble_sync_process(void);
+static void ble_sync_update(uint8_t layer, uint8_t row, uint8_t col, uint16_t key);
+
 
 typedef enum
 {
@@ -211,10 +233,10 @@ static void process_command(report_item_t *item)
         reset_to_bootloader(USER_RESET);
         break;
     case CMD_KEYMAP_SET_ACK:
-        //USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 6);
+        // do nothing
         break;
     case CMD_KEYMAP_GET_ACK:
-        //USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 6);
+        ble_sync_update(item->data[0], item->data[1], item->data[2], (item->data[3]<<8) | item->data[4]);
         break;
 
     default:
@@ -275,11 +297,14 @@ static void send_set_leds(uint8_t led)
 static matrix_row_t matrix[MATRIX_ROWS];
 static uint8_t recv_char;
 
+
+
 void matrix_init(void)
 {
     report_queue_init(&report_queue);
     HAL_UART_Receive_IT(&huart1, &recv_char, 1);
     gpio_set_input_pullup(reset_pin);
+    ble_sync_init();
 }
 
 uint8_t matrix_scan(void)
@@ -287,6 +312,8 @@ uint8_t matrix_scan(void)
     if (gpio_read_pin(reset_pin) == 0) {
         reset_to_bootloader(PIN_RESET);
     }
+
+    ble_sync_process();
 
     report_item_t item;
     while (report_queue_get(&report_queue, &item)) {
@@ -344,4 +371,75 @@ void uart_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
     get_cmd[3] = CMD_KEYMAP_GET+layer+row+col; // checksum
 
     HAL_UART_Transmit_DMA(&huart1, &get_cmd[0], 8);
+}
+
+void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
+{
+    if (!((layer < AMK_KEYMAP_MAX_LAYER) && (row < BLE_ROWS) && (col < BLE_COLS))) return;
+
+    ble_keymaps[layer][row][col] = keycode;
+    uart_keymap_set(layer, row, col, keycode);
+}
+
+uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
+{
+    return ble_keymaps[layer][row][col];
+}
+
+static void ble_sync_init(void)
+{
+    for (uint8_t layer = 0; layer < AMK_KEYMAP_MAX_LAYER; layer++) {
+        for (uint8_t row = 0; row < BLE_ROWS; row++) {
+            for (uint8_t col = 0; col < BLE_COLS; col++) {
+                ble_keymaps[layer][row][col] = 0;
+            }
+        }
+    }
+    ble_sync.layer      = 0;
+    ble_sync.row        = 0;
+    ble_sync.col        = 0;
+    ble_sync.finished   = 0;
+    ble_sync.state      = BS_IDLE;
+}
+
+static void ble_sync_process(void)
+{
+    if (ble_sync.finished) return;
+
+    // waiting for last command back
+    if (ble_sync.state == BS_SEND) return;
+
+    // get current keymap
+    uart_keymap_get(ble_sync.layer, ble_sync.row, ble_sync.col);
+    ble_sync.state = BS_SEND;
+}
+
+static void ble_sync_update(uint8_t layer, uint8_t row, uint8_t col, uint16_t key)
+{
+    if ((ble_sync.layer != layer) || (ble_sync.row != row) || (ble_sync.col != col)) {
+        amk_printf("MISMATCH: layer:[%d]-[%d], row:[%d]-[%d], col:[%d]-[%d]\n", 
+            ble_sync.layer, layer, ble_sync.row, row, ble_sync.col, col);
+        ble_sync.state = BS_IDLE;
+        return;
+    }
+
+    ble_keymaps[layer][row][col] = key;
+    if (col == (BLE_COLS-1)) {
+        if (row < (BLE_ROWS-1)) {
+            col = 0;
+            ble_sync.row++;
+        } else {
+            if (layer < (AMK_KEYMAP_MAX_LAYER-1)) {
+                col = 0;
+                row = 0;
+                ble_sync.layer++;
+            } else {
+                // all done
+                ble_sync.finished = 1;
+            }
+        }
+    } else {
+        ble_sync.col++;
+    }
+    ble_sync.state = BS_IDLE;
 }

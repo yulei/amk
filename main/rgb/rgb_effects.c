@@ -11,6 +11,16 @@
 #include "eeprom_manager.h"
 #include "amk_printf.h"
 
+#ifndef RGB_EFFECTS_DEBUG
+#define RGB_EFFECTS_DEBUG 1
+#endif
+
+#if RGB_EFFECTS_DEBUG
+#define rgb_effects_debug  amk_printf
+#else
+#define rgb_effects_debug(...)
+#endif
+
 #define DELAY_MIN   0
 #define DELAY_DEFAULT 1500
 
@@ -378,12 +388,15 @@ void rgb_effects_dec_mode(void)
 void rgb_effects_toggle(void)
 {
     effects_state.config.enable = !effects_state.config.enable;
+    effects_set_enable(effects_state.config.enable);
+
     if (effects_state.config.enable) {
         effects_state.driver->init();
+        rgb_effects_debug("effects: driver init\n");
     } else {
         effects_state.driver->uninit();
+        rgb_effects_debug("effects: driver uninit\n");
     }
-    effects_set_enable(effects_state.config.enable);
 }
 
 void rgb_effects_task(void)

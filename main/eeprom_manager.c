@@ -7,6 +7,17 @@
 #include "flash_store.h"
 #include "rgb_effects.h"
 #include "rgb_matrix.h"
+#include "amk_printf.h"
+
+#ifndef EEPROM_MANAGER_DEBUG
+#define EEPROM_MANAGER_DEBUG 1
+#endif
+
+#if EEPROM_MANAGER_DEBUG
+#define ee_mgr_debug  amk_printf
+#else
+#define ee_mgr_debug(...)
+#endif
 
 uint32_t eeconfig_read_kb(void)
 {
@@ -32,6 +43,7 @@ void eeconfig_read_rgb(void* rgb)
     config->hue     = eeprom_read_byte(EECONFIG_RGB+3);
     config->sat     = eeprom_read_byte(EECONFIG_RGB+4);
     config->val     = eeprom_read_byte(EECONFIG_RGB+5);
+    ee_mgr_debug("EE MGR: read rgb, enable: %d\n", config->enable);
 }
 
 void eeconfig_write_rgb(const void* rgb)
@@ -43,6 +55,7 @@ void eeconfig_write_rgb(const void* rgb)
     eeprom_write_byte(EECONFIG_RGB+3, config->hue);
     eeprom_write_byte(EECONFIG_RGB+4, config->sat);
     eeprom_write_byte(EECONFIG_RGB+5, config->val);
+    ee_mgr_debug("EE MGR: write rgb, enable: %d\n", config->enable);
 }
 
 void eeconfig_update_rgb(const void* rgb)

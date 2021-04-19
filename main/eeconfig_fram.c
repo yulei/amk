@@ -6,7 +6,17 @@
 #include <stdint.h>
 #include "eeconfig.h"
 #include "mb85rcxx.h"
+#include "amk_printf.h"
 
+#ifndef EECONFIG_FRAM_DEBUG
+#define EECONFIG_FRAM_DEBUG 1
+#endif
+
+#if EECONFIG_FRAM_DEBUG
+#define ee_fram_debug  amk_printf
+#else
+#define ee_fram_debug(...)
+#endif
 uint8_t eeprom_read_byte(const uint8_t *addr) {
     uint16_t offset = (uint16_t)((uintptr_t)addr);
     return mb85rcxx_read_byte(offset);
@@ -87,6 +97,8 @@ void eeprom_update_block(const void *buf, void *addr, size_t len) {
 
 void eeconfig_init(void)
 {
+    ee_fram_debug("eeconfig_init\n");
+
     eeprom_write_word(EECONFIG_MAGIC,          EECONFIG_MAGIC_NUMBER);
     eeprom_write_byte(EECONFIG_DEBUG,          0);
     eeprom_write_byte(EECONFIG_DEFAULT_LAYER,  0);
@@ -103,11 +115,13 @@ void eeconfig_init(void)
 
 void eeconfig_enable(void)
 {
+    ee_fram_debug("eeconfig_enable\n");
     eeprom_write_word(EECONFIG_MAGIC, EECONFIG_MAGIC_NUMBER);
 }
 
 void eeconfig_disable(void)
 {
+    ee_fram_debug("eeconfig_disable\n");
     eeprom_write_word(EECONFIG_MAGIC, 0xFFFF);
 }
 
@@ -132,3 +146,50 @@ void eeconfig_write_backlight(uint8_t val) { eeprom_write_byte(EECONFIG_BACKLIGH
 
 void fds_eeprom_init(void) {}
 void fee_init(void) {}
+
+
+//==================================================
+// flash store for keymaps
+//==================================================
+
+#define EEPROM_KEYMAP_START 64
+
+void flash_store_write(uint8_t key, const void* data, size_t size)
+{
+    uint32_t start = EEPROM_KEYMAP_START+key*MATRIX_ROWS*MATRIX_COLS*2;
+    const uint8_t* p = (const uint8_t*)data;
+    for(int i = 0; i < size; i++) {
+        mb85rcxx_write_byte(start+i, p[i]);
+    }
+}
+
+size_t flash_store_read(uint8_t key, void* data, size_t size)
+{
+    uint32_t start = EEPROM_KEYMAP_START+key*MATRIX_ROWS*MATRIX_COLS*2;
+    uint8_t* p = (uint8_t*)data;
+    for(int i = 0; i < size; i++) {
+        p[i] = mb85rcxx_read_byte(start+i);
+    }
+
+    return size;
+}
+
+void flash_store_write_key(uint8_t layer, uint8_t row, uint8_t col, uint16_t key)
+{
+    ee_fram_debug("flash_store_write_key: layer:%d, row:%d, col:%d, key:%d\n", layer, row, col, key);
+    uint32_t addr = EEPROM_KEYMAP_START + layer*MATRIX_ROWS*MATRIX_COLS*2 + (row*MATRIX_COLS + col)*2;
+    uint8_t* p = (uint8_t*)&key;
+    mb85rcxx_write_byte(addr, p[0]);
+    mb85rcxx_write_byte(addr+1, p[1]);
+}
+
+uint16_t flash_store_read_key(uint8_t layer, uint8_t row, uint8_t col)
+{
+    ee_fram_debug("flash_store_read_key: layer:%d, row:%d, col:%d\n", layer, row, col);
+    uint16_t key = 0;
+    uint32_t addr = EEPROM_KEYMAP_START + layer*MATRIX_ROWS*MATRIX_COLS*2 + (row*MATRIX_COLS + col)*2;
+    uint8_t* p = (uint8_t*)&key;
+    p[0] = mb85rcxx_read_byte(addr);
+    p[1] = mb85rcxx_read_byte(addr+1);
+    return key;
+}

@@ -75,6 +75,7 @@ void amk_keymap_init(void)
     }
 }
 
+__attribute__((weak))
 void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
 {
     if (amk_keymaps[layer][row][col] == keycode) return;
@@ -82,9 +83,9 @@ void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
     amk_printf("amk_keymap_set: layer=%d, row=%d, col=%d, key=0x%x\n", layer, row, col, keycode);
     amk_keymaps[layer][row][col] = keycode;
     ee_keymap_write_key(layer, row, col, amk_keymaps[layer][row][col]);
-    //ee_keymap_write(layer, &(amk_keymaps[layer][0][0]), MATRIX_ROWS*MATRIX_COLS*2);
 }
 
+__attribute__((weak))
 uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
 {
     amk_printf("amk_keymap_get: layer=%d, row=%d, col=%d, key=0x%x\n", layer, row, col, amk_keymaps[layer][row][col]);
@@ -93,7 +94,11 @@ uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
 
 #else
 void amk_keymap_init(void){}
+
+__attribute__((weak))
 void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode) {}
+
+__attribute__((weak))
 uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col) {return 0;}
 
 #endif

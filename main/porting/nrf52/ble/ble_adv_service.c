@@ -55,7 +55,7 @@ void ble_adv_service_init(void)
 
     ble_advertising_conn_cfg_tag_set(&m_advertising, APP_BLE_CONN_CFG_TAG);
     
-     err_code = sd_ble_gap_tx_power_set(BLE_GAP_TX_POWER_ROLE_ADV, m_advertising.adv_handle, DEFAULT_TX_POWER_LEVEL);
+    err_code = sd_ble_gap_tx_power_set(BLE_GAP_TX_POWER_ROLE_ADV, m_advertising.adv_handle, DEFAULT_TX_POWER_LEVEL);
     APP_ERROR_CHECK(err_code);
 }
 
