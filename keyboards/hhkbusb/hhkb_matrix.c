@@ -414,7 +414,7 @@ static void ble_sync_init(void)
 #ifdef WEBCONFIG_ENABLE
     ble_sync.finished   = 0;
 #else
-    ble_sync.finished   = 1;
+    ble_sync.finished   = 1;    // no need to sync keymap
 #endif
 
     ble_sync.state      = BS_IDLE;
