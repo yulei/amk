@@ -45,6 +45,7 @@ void i2c_init(void)
     APP_ERROR_CHECK(err_code);
     twi_ready = true;
     nrfx_twi_enable(&m_twi);
+    NRF_LOG_INFO("twi enabled");
 }
 
 amk_error_t i2c_send(uint8_t addr, const void* data, size_t length, size_t timeout)
@@ -91,12 +92,14 @@ void i2c_uninit(void)
 {
     if (!i2c_ready()) return;
 
-    nrfx_twi_disable(&m_twi);
+    //nrfx_twi_disable(&m_twi);
+
+    nrfx_twi_uninit(&m_twi);
     // anomaly [89] work around
     *(volatile uint32_t *)0x40003FFC = 0;
     *(volatile uint32_t *)0x40003FFC;
     *(volatile uint32_t *)0x40003FFC = 1;
-    nrfx_twi_uninit(&m_twi);
+
     NRF_LOG_INFO("twi disabled");
     twi_ready = false;
 }

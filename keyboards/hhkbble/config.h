@@ -9,7 +9,7 @@
 #define PRODUCT_ID      0xBE60   // hhkb ble
 #define DEVICE_VER      0x0001
 #define MANUFACTURER    astro
-#define PRODUCT         Falcon Test
+#define PRODUCT         Matrix Falcon
 
 /* key matrix size */
 #define MATRIX_ROWS 5

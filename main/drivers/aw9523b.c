@@ -7,6 +7,7 @@
 #include "aw9523b.h"
 #include "wait.h"
 #include "i2c.h"
+#include "gpio_pin.h"
 #include "amk_printf.h"
 
 #ifndef AW9523B_DEBUG
@@ -45,10 +46,26 @@ static bool    aw9523b_ready     = false;
 
 bool aw9523b_available(uint8_t addr)
 {
-    i2c_init();
+    bool uninit = false;
+    if (!i2c_ready()) {
+        i2c_init();
+        uninit = true;
+    }
+#ifdef RGBLIGHT_EN_PIN
+    gpio_set_output_pushpull(RGBLIGHT_EN_PIN);
+    gpio_write_pin(RGBLIGHT_EN_PIN, 1);
+    wait_ms(1);
+#endif
     uint8_t data = 0;
     amk_error_t ec = i2c_write_reg(addr, AW9523B_RESET, &data, 1, TIMEOUT);
-    i2c_uninit();
+    if (uninit) {
+        i2c_uninit();
+        wait_ms(1);
+    }
+
+#ifdef RGBLIGHT_EN_PIN
+    gpio_set_input_floating(RGBLIGHT_EN_PIN);
+#endif
 
     return ec == AMK_SUCCESS ? true : false;
 }
