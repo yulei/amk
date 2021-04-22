@@ -6,6 +6,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "rgb_color.h"
 
 #ifndef AW9523B_ADDR
@@ -34,6 +35,8 @@
 #define AW9523B_PWM_SIZE    16
 
 extern const rgb_led_t g_aw9523b_leds[];
+
+bool aw9523b_available(uint8_t addr);
 
 void aw9523b_init(uint8_t addr);
 

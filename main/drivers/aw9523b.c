@@ -9,6 +9,16 @@
 #include "i2c.h"
 #include "amk_printf.h"
 
+#ifndef AW9523B_DEBUG
+#define AW9523B_DEBUG 1
+#endif
+
+#if AW9523B_DEBUG
+#define aw9523b_debug  amk_printf
+#else
+#define aw9523b_debug(...)
+#endif
+
 #define AW9523B_P0_INPUT    0x00
 #define AW9523B_P1_INPUT    0x01
 #define AW9523B_P0_OUTPUT   0x02
@@ -33,6 +43,16 @@ static uint8_t aw9523b_pwm_buf[AW9523B_PWM_SIZE];
 static bool    aw9523b_pwm_dirty = false;
 static bool    aw9523b_ready     = false;
 
+bool aw9523b_available(uint8_t addr)
+{
+    i2c_init();
+    uint8_t data = 0;
+    amk_error_t ec = i2c_write_reg(addr, AW9523B_RESET, &data, 1, TIMEOUT);
+    i2c_uninit();
+
+    return ec == AMK_SUCCESS ? true : false;
+}
+
 void aw9523b_init(uint8_t addr)
 {
     if (aw9523b_ready) return;
@@ -40,7 +60,9 @@ void aw9523b_init(uint8_t addr)
     i2c_init();
     // reset chip
     uint8_t data = 0;
-    i2c_write_reg(addr, AW9523B_RESET, &data, 1, TIMEOUT);
+    amk_error_t ec = i2c_write_reg(addr, AW9523B_RESET, &data, 1, TIMEOUT);
+    aw9523b_debug("aw9523b write reset result: %d\n", ec);
+
     wait_ms(1);
     // set max led current
     data = 0x03; // 37mA/4

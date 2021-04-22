@@ -2,8 +2,7 @@
 SRCS += $(KEYBOARD_DIR)/hhkbble.c
 
 MCU = NRF52832
-RGB_EFFECTS_ENABLE = yes
-EECONFIG_FRAM = yes
+RGB_EFFECTS_ENABLE = all
 
 ifeq (yes,$(strip $(ACTIONMAP_ENABLE)))
 	SRCS += $(KEYBOARD_DIR)/hhkbble_action.c

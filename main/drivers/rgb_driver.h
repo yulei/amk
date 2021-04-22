@@ -6,6 +6,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef void (*rgb_driver_init)(void);
 typedef void (*rgb_driver_uninit)(void);
@@ -28,5 +29,6 @@ typedef enum {
     RGB_DRIVER_IS31FL3733,
 } RGB_DRIVER_TYPE;
 
+bool rgb_driver_available(RGB_DRIVER_TYPE type);
 rgb_driver_t* rgb_driver_create(RGB_DRIVER_TYPE type);
 void rgb_driver_destroy(rgb_driver_t* driver);

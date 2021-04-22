@@ -24,7 +24,7 @@
 #define rgb_driver_debug(...)
 #endif
 
-#if defined(RGB_WITH_WS2812) || defined(RGB_DRIVER_AW9523B)
+#if defined(RGB_WITH_WS2812) || defined(RGB_WITH_AW9523B) || defined(GB_WITH_ALL)
     #ifndef RGB_LED_NUM
         #error "RGB_LED_NUM must be defined"
     #endif
@@ -100,6 +100,7 @@ static rgb_driver_t aw9523b_driver = {
     .set_color_all = rd_aw9523b_set_color_all,
     .flush = rd_aw9523b_flush,
 };
+
 
 void rd_aw9523b_init(void)
 {
@@ -279,6 +280,31 @@ static void rd_3733_flush(void)
 }
 
 #endif
+
+bool rgb_driver_available(RGB_DRIVER_TYPE type)
+{
+    switch(type) {
+#ifdef RGB_WITH_WS2812
+        case RGB_DRIVER_WS2812:
+            return true;    // always available
+#endif
+#ifdef RGB_WITH_AW9523B
+        case RGB_DRIVER_AW9523B:
+            return aw9523b_available(AW9523B_ADDR);
+#endif
+#ifdef RGB_WITH_IS31FL3731
+        case RGB_DRIVER_IS31FL3731:
+            return true;    // TODO
+#endif
+#ifdef RGB_WITH_IS31FL3733
+        case RGB_DRIVER_IS31FL3733:
+            return true;    // TODO
+#endif
+        default:
+            break;
+    }
+    return true;
+}
 
 rgb_driver_t* rgb_driver_create(RGB_DRIVER_TYPE type)
 {

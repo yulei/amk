@@ -11,6 +11,9 @@
 #include "nrf_uart.h"
 #include "nrf_delay.h"
 
+#ifndef PRINT_AMK_KEYMAP_SETGET
+#define PRINT_AMK_KEYMAP_SETGET 0
+#endif
 typedef struct {
     nrf_usb_event_handler_t event;
     bool vbus_enabled;
@@ -269,13 +272,17 @@ static void uart_process_cmd(const uint8_t* cmd, uint32_t size)
         } break;
         case CMD_KEYMAP_SET: {
             uint16_t key = (cmd[4] << 8) | (cmd[5]);
+            #if PRINT_AMK_KEYMAP_SETGET
             NRF_LOG_INFO("Keymap Set: layer=%d, row=%d, col=%d, key=%d", cmd[1], cmd[2], cmd[3], key);
+            #endif
             amk_keymap_set(cmd[1], cmd[2], cmd[3], key);
             uart_send_cmd(CMD_KEYMAP_SET_ACK, &cmd[1], 5);
         } break;
         case CMD_KEYMAP_GET: {
             uint16_t keycode = amk_keymap_get(cmd[1], cmd[2], cmd[3]);
+            #if PRINT_AMK_KEYMAP_SETGET
             NRF_LOG_INFO("Keymap Get: layer=%d, row=%d, col=%d, key=%d", cmd[1], cmd[2], cmd[3], keycode);
+            #endif
             uint8_t buf[5];
             buf[0] = cmd[1];
             buf[1] = cmd[2];

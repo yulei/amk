@@ -45,6 +45,7 @@
 
 #define RAINBOW_STEP_DEFAULT    32
 #define BREATH_STEP_DEFAULT     32
+#define CIRCLE_STEP_DEFAULT     2
 
 enum rgb_effects_type {
     RGB_EFFECT_STATIC,
@@ -70,6 +71,7 @@ typedef struct {
     uint32_t                counter;
     uint32_t                rainbow_step;
     uint32_t                breath_step;
+    uint32_t                circle_step;
     bool                    wipe_on;
     RGB_EFFECT_FUN          effects[RGB_EFFECT_MAX];
 } rgb_effects_state_t;
@@ -253,7 +255,7 @@ static void effects_mode_circle(void)
 {
     effects_state.driver->set_color_all(effects_state.config.hue, effects_state.config.sat, effects_state.config.val);
 
-    effects_state.config.hue += HUE_STEP;
+    effects_state.config.hue += effects_state.circle_step;
 }
 
 static void effects_set_hue(uint8_t hue)
@@ -326,6 +328,7 @@ void rgb_effects_init(rgb_driver_t* driver)
     effects_state.wipe_on       = true;
     effects_state.rainbow_step  = RAINBOW_STEP_DEFAULT;
     effects_state.breath_step   = BREATH_STEP_DEFAULT;
+    effects_state.circle_step   = CIRCLE_STEP_DEFAULT;
     effects_state.last_ticks    = timer_read32();
     srand(effects_state.last_ticks);
     effects_state.effects[RGB_EFFECT_STATIC]    = effects_mode_static;

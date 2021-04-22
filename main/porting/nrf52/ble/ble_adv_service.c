@@ -65,6 +65,7 @@ void ble_adv_service_start(bool erase_bonds)
         ble_pm_delete_bonds();
         // Advertising is started by PM_EVT_PEERS_DELETE_SUCCEEDED event.
     } else {
+        NRF_LOG_INFO("Current available peer count: %d", pm_peer_count());
         ble_pm_whitelist_set(PM_PEER_ID_LIST_SKIP_NO_ID_ADDR);
 
         ret_code_t ret = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
