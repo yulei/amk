@@ -114,7 +114,7 @@ static void ble_stack_init(void)
 void ble_keyboard_init(void)
 {
     ble_stack_init();
-#ifndef EECONFIG_FRAM
+#ifdef EECONFIG_FDS
     fds_eeprom_init();
 #endif
     ble_services_init();

@@ -32,21 +32,21 @@ void FLASH_0_init(void)
 void USART_0_PORT_init(void)
 {
 
-	gpio_set_pin_function(PA04, PINMUX_PA04D_SERCOM0_PAD0);
+	gpio_set_pin_function(PA12, PINMUX_PA12C_SERCOM2_PAD0);
 
-	gpio_set_pin_function(PA05, PINMUX_PA05D_SERCOM0_PAD1);
+	gpio_set_pin_function(PA13, PINMUX_PA13C_SERCOM2_PAD1);
 }
 
 void USART_0_CLOCK_init(void)
 {
-	_pm_enable_bus_clock(PM_BUS_APBC, SERCOM0);
-	_gclk_enable_channel(SERCOM0_GCLK_ID_CORE, CONF_GCLK_SERCOM0_CORE_SRC);
+	_pm_enable_bus_clock(PM_BUS_APBC, SERCOM2);
+	_gclk_enable_channel(SERCOM2_GCLK_ID_CORE, CONF_GCLK_SERCOM2_CORE_SRC);
 }
 
 void USART_0_init(void)
 {
 	USART_0_CLOCK_init();
-	usart_sync_init(&USART_0, SERCOM0, (void *)NULL);
+	usart_sync_init(&USART_0, SERCOM2, (void *)NULL);
 	USART_0_PORT_init();
 }
 
@@ -240,6 +240,36 @@ void system_init(void)
 	gpio_set_pin_direction(PA11, GPIO_DIRECTION_OUT);
 
 	gpio_set_pin_function(PA11, GPIO_PIN_FUNCTION_OFF);
+
+	// GPIO on PA14
+
+	// Set pin direction to input
+	gpio_set_pin_direction(S2, GPIO_DIRECTION_IN);
+
+	gpio_set_pin_pull_mode(S2,
+	                       // <y> Pull configuration
+	                       // <id> pad_pull_config
+	                       // <GPIO_PULL_OFF"> Off
+	                       // <GPIO_PULL_UP"> Pull-up
+	                       // <GPIO_PULL_DOWN"> Pull-down
+	                       GPIO_PULL_UP);
+
+	gpio_set_pin_function(S2, GPIO_PIN_FUNCTION_OFF);
+
+	// GPIO on PA15
+
+	// Set pin direction to input
+	gpio_set_pin_direction(S1, GPIO_DIRECTION_IN);
+
+	gpio_set_pin_pull_mode(S1,
+	                       // <y> Pull configuration
+	                       // <id> pad_pull_config
+	                       // <GPIO_PULL_OFF"> Off
+	                       // <GPIO_PULL_UP"> Pull-up
+	                       // <GPIO_PULL_DOWN"> Pull-down
+	                       GPIO_PULL_UP);
+
+	gpio_set_pin_function(S1, GPIO_PIN_FUNCTION_OFF);
 
 	FLASH_0_init();
 

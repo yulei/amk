@@ -2,16 +2,16 @@ format_version: '2'
 name: My Project
 versions:
   api: '1.0'
-  backend: 1.8.491
-  commit: 605bd5a7663644fb84783aa2b00942b79b0d8955
+  backend: 1.8.543
+  commit: 931b2422bde1a793dea853de68547f48bf245b0f
   content: unknown
   content_pack_name: unknown
   format: '2'
-  frontend: 1.8.491
-  packs_version_avr8: 1.0.1446
+  frontend: 1.8.543
+  packs_version_avr8: 1.0.1457
   packs_version_qtouch: unknown
   packs_version_sam: 1.0.1726
-  version_backend: 1.8.491
+  version_backend: 1.8.543
   version_frontend: ''
 board:
   identifier: CustomBoard
@@ -297,7 +297,7 @@ drivers:
         configuration: {}
   USART_0:
     user_label: USART_0
-    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::SERCOM0::driver_config_definition::UART::HAL:Driver:USART.Sync
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::SERCOM2::driver_config_definition::UART::HAL:Driver:USART.Sync
     functionality: USART
     api: HAL:Driver:USART_Sync
     configuration:
@@ -324,11 +324,11 @@ drivers:
     variant:
       specification: TXPO=0, RXPO=1, CMODE=0
       required_signals:
-      - name: SERCOM0/PAD/0
-        pad: PA04
+      - name: SERCOM2/PAD/0
+        pad: PA12
         label: TX
-      - name: SERCOM0/PAD/1
-        pad: PA05
+      - name: SERCOM2/PAD/1
+        pad: PA13
         label: RX
     clocks:
       domain_group:
@@ -754,18 +754,6 @@ drivers:
         configuration:
           usb_gclk_selection: Generic clock generator 7
 pads:
-  PA04:
-    name: PA04
-    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::pad::PA04
-    mode: Peripheral IO
-    user_label: PA04
-    configuration: null
-  PA05:
-    name: PA05
-    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::pad::PA05
-    mode: Peripheral IO
-    user_label: PA05
-    configuration: null
   PA06:
     name: PA06
     definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::pad::PA06
@@ -802,6 +790,32 @@ pads:
     mode: Digital output
     user_label: PA11
     configuration: null
+  PA12:
+    name: PA12
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::pad::PA12
+    mode: Peripheral IO
+    user_label: PA12
+    configuration: null
+  PA13:
+    name: PA13
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::pad::PA13
+    mode: Peripheral IO
+    user_label: PA13
+    configuration: null
+  S2:
+    name: PA14
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::pad::PA14
+    mode: Digital input
+    user_label: S2
+    configuration:
+      pad_pull_config: Pull-up
+  S1:
+    name: PA15
+    definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::pad::PA15
+    mode: Digital input
+    user_label: S1
+    configuration:
+      pad_pull_config: Pull-up
   PA24:
     name: PA24
     definition: Atmel:SAMD21_Drivers:0.0.1::SAMD21G18A-MF::pad::PA24

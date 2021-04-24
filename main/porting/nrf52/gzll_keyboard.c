@@ -47,7 +47,7 @@ void gzll_keyboard_init(bool host)
     nrf_gzll_set_base_address_0(GZLL_BASE_ADDRESS_0);
     nrf_gzll_set_base_address_1(GZLL_BASE_ADDRESS_1);
 
-#ifndef EECONFIG_FRAM
+#ifdef EECONFIG_FDS
     fds_eeprom_init();
 #endif
 

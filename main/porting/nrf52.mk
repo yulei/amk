@@ -37,5 +37,10 @@ ifeq (yes, $(strip $(EECONFIG_FRAM)))
 	SRCS += $(MAIN_DIR)/drivers/mb85rcxx.c
 	APP_DEFS += -DEECONFIG_FRAM
 else
+	ifeq (yes, $(strip $(EECONFIG_FDS)))
 	SRCS += $(NRF52_PORTING_DIR)/eeconfig_fds.c
+	APP_DEFS += -DEECONFIG_FDS
+	else
+	SRCS += $(MAIN_DIR)/eeconfig_mem.c
+	endif
 endif
