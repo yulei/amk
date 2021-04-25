@@ -6,7 +6,6 @@
 #include "common_config.h"
 #include "nrf_gpio.h"
 #include "nrf_pwr_mgmt.h"
-#include "nrfx_gpiote.h"
 #include "nrfx_wdt.h"
 #include "nrf_drv_timer.h"
 #include "nrf_drv_clock.h"
@@ -40,7 +39,6 @@ static bool keyboard_pwr_mgmt_shutdown_handler(nrf_pwr_mgmt_evt_t event);
 NRF_PWR_MGMT_HANDLER_REGISTER(keyboard_pwr_mgmt_shutdown_handler, NRF_PWR_MGMT_CONFIG_HANDLER_PRIORITY_COUNT - 1);
 
 static void keyboard_timer_init(void);
-static void keyboard_timer_uninit(void);
 static void keyboard_timer_start(void);
 static void keyboard_timer_stop(void);
 static void keyboard_timer_handler(void *p_context);
@@ -84,8 +82,6 @@ void rf_keyboard_init(rf_send_report_t send_report, rf_prepare_sleep_t prepare_s
     rf_send_report = send_report;
     rf_prepare_sleep = prepare_sleep;
 
-    nrfx_gpiote_init();
-
     keyboard_setup();
     keyboard_init();
     nrf_usb_init(&usb_handler);
@@ -109,13 +105,10 @@ void rf_keyboard_prepare_sleep(void)
     NRF_LOG_INFO("power down sleep preparing");
     // stop keyboard timer
     keyboard_timer_stop();
-    keyboard_timer_uninit();
     // stop all timer
     app_timer_stop_all();
     // rf stack sleep
     rf_prepare_sleep();
-    // uninit gpiote
-    nrfx_gpiote_uninit();
     // keyboard sleep
     keyboard_prepare_sleep();
     // turn matrix to sense mode
@@ -150,10 +143,6 @@ static void keyboard_timer_stop(void)
     ret_code_t err_code;
     err_code = app_timer_stop(m_keyboard_timer_id);
     APP_ERROR_CHECK(err_code);
-}
-
-static void keyboard_timer_uninit(void)
-{
 }
 
 static bool keyboard_rgblight_on(void)

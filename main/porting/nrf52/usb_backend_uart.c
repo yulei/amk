@@ -7,13 +7,15 @@
 #include "amk_keymap.h"
 #include "app_uart.h"
 #include "nrf_gpio.h"
-#include "nrfx_gpiote.h"
 #include "nrf_uart.h"
 #include "nrf_delay.h"
+
+APP_TIMER_DEF(m_vbus_timer_id); /**< vbus check delay */
 
 #ifndef PRINT_AMK_KEYMAP_SETGET
 #define PRINT_AMK_KEYMAP_SETGET 0
 #endif
+
 typedef struct {
     nrf_usb_event_handler_t event;
     bool vbus_enabled;
@@ -29,7 +31,6 @@ typedef struct {
 static nrf_usb_config_t usb_config;
 static nrf_usb_buf_t usb_buffer;
 
-static void vbus_event_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
 static void usb_update_state();
 static void uart_init(void);
 static void uart_uninit(void);
@@ -39,9 +40,20 @@ static void uart_process_data(uint8_t data);
 static void uart_process_cmd(const uint8_t* cmd, uint32_t size);
 static uint8_t compute_checksum(const uint8_t* data, uint32_t size);
 
+static void vbus_timer_handler(void * p_context);
+
 void nrf_usb_preinit(void) {}
 void nrf_usb_postinit(void) {}
-void nrf_usb_task(void) {}
+
+void nrf_usb_task(void) 
+{
+    bool on = nrf_gpio_pin_read(VBUS_DETECT_PIN) ? true : false;
+
+    if (usb_config.vbus_enabled != on) {
+        app_timer_start(m_vbus_timer_id, VBUS_DETECT_DELAY_INTERVAL, NULL);
+    }
+}
+
 void nrf_usb_init(nrf_usb_event_handler_t *eh)
 {
     usb_config.event.enable_cb  = eh->enable_cb;
@@ -55,13 +67,12 @@ void nrf_usb_init(nrf_usb_event_handler_t *eh)
     }
     usb_buffer.count = 0;
 
-    ret_code_t err_code;
-    nrfx_gpiote_in_config_t in_config = NRFX_GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
-    err_code = nrfx_gpiote_in_init(VBUS_DETECT_PIN, &in_config, vbus_event_handler);
-    APP_ERROR_CHECK(err_code);
-    nrfx_gpiote_in_event_enable(VBUS_DETECT_PIN, true);
-
+    nrf_gpio_cfg_input(VBUS_DETECT_PIN, NRF_GPIO_PIN_NOPULL);
     usb_update_state();
+
+    ret_code_t err_code;
+    err_code = app_timer_create(&m_vbus_timer_id, APP_TIMER_MODE_SINGLE_SHOT, vbus_timer_handler);
+    APP_ERROR_CHECK(err_code);
 }
 
 void nrf_usb_send_report(nrf_report_id report, const void *data, size_t size)
@@ -118,7 +129,7 @@ void nrf_usb_reboot(void)
 
 static void usb_update_state()
 {
-    usb_config.vbus_enabled = nrfx_gpiote_in_is_set(VBUS_DETECT_PIN) ? true : false;
+    usb_config.vbus_enabled = nrf_gpio_pin_read(VBUS_DETECT_PIN) ? true : false;
 
     if (usb_config.vbus_enabled) {
         uart_init();
@@ -128,14 +139,6 @@ static void usb_update_state()
         usb_config.event.disable_cb();
         uart_uninit();
         NRF_LOG_INFO("VBUS off, turn off uart");
-    }
-}
-
-static void vbus_event_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
-{
-    NRF_LOG_INFO("PIN EVENT: pin=%d, action=%d", pin, action);
-    if (pin == VBUS_DETECT_PIN) {
-        usb_update_state();
     }
 }
 
@@ -305,4 +308,13 @@ static uint8_t compute_checksum(const uint8_t* data, uint32_t size)
         checksum += data[i];
     }
     return checksum;
+}
+
+static void vbus_timer_handler(void * p_context)
+{
+    bool on = nrf_gpio_pin_read(VBUS_DETECT_PIN) ? true : false;
+
+    if (usb_config.vbus_enabled != on) {
+        usb_update_state();
+    }
 }

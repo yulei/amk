@@ -64,6 +64,7 @@
 #define BATTERY_LEVEL_MEAS_SAMPLE           APP_TIMER_TICKS(2)                         /**< Battery level measurement sampling (ticks). */
 #define BATTERY_LEVEL_MEAS_INTERVAL         APP_TIMER_TICKS(60*1000)                   /**< Battery level measurement interval (ticks). */
 
+#define VBUS_DETECT_DELAY_INTERVAL          APP_TIMER_TICKS(10)                          /**< VBUS debounce time (ticks). */
 
 #define DEAD_BEEF                           0xDEADBEEF                                 /**< Value used */
 
