@@ -44,6 +44,8 @@
 #define CAPS_LED_PIN                18
 #define INDICATOR_PIN               25
 
+#define WDT_ENABLE                  1        
+
 //#define GZLL_IS_CLIENT              1
 //#define DISABLE_USB
 //#define SLEEP_COUNT_MAX             2
