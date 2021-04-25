@@ -10,6 +10,7 @@
 #include "gzll_keyboard.h"
 #include "eeconfig_fds.h"
 #include "usb_interface.h"
+#include "rf_power.h"
 
 #if defined(DISABLE_SLEEP)
     #if defined(DISABLE_USB)
@@ -131,6 +132,7 @@ void board_init(void)
 #endif
 
     // Initialize.
+    rf_power_init();
     log_init();
     timers_init();
     power_management_init();

@@ -74,7 +74,7 @@ void is31fl3731_uninit(is31_t *driver)
             return;
     }
     // all drivers uninited, release the i2c interface
-    if (i2c_ready()) i2c_uninit();
+    //if (i2c_ready()) i2c_uninit();
 }
 
 void is31fl3731_set_color(is31_t *driver, uint8_t index, uint8_t red, uint8_t green, uint8_t blue)

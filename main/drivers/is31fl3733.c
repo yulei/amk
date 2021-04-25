@@ -114,7 +114,7 @@ void is31fl3733_uninit(is31_t *driver)
             return;
     }
     // all drivers uninited, release the i2c interface
-    if (i2c_ready()) i2c_uninit();
+    //if (i2c_ready()) i2c_uninit();
 }
 
 static void init_driver(is31fl3733_driver_t *driver)

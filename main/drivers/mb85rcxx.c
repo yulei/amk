@@ -14,10 +14,8 @@
 
 void mb85rcxx_write_byte(uint16_t addr, uint8_t data)
 {
-    bool uninit = false;
     if (!i2c_ready()) {
         i2c_init();
-        uninit = true;
     }
 
     uint8_t dev_addr = MB85RC_ADDR(addr);
@@ -25,18 +23,12 @@ void mb85rcxx_write_byte(uint16_t addr, uint8_t data)
     cmd[0] = MB85RC_OFFSET(addr);
     cmd[1] = data;
     i2c_send(dev_addr, cmd, 2, TIMEOUT);
-
-    if (uninit) {
-        i2c_uninit();
-    }
 }
 
 uint8_t mb85rcxx_read_byte(uint16_t addr)
 {
-    bool uninit = false;
     if (!i2c_ready()) {
         i2c_init();
-        uninit = true;
     }
 
     uint8_t dev_addr = MB85RC_ADDR(addr);
@@ -45,8 +37,5 @@ uint8_t mb85rcxx_read_byte(uint16_t addr)
     uint8_t data = 0;
     i2c_recv(dev_addr, &data, 1, TIMEOUT);
 
-    if (uninit) {
-        i2c_uninit();
-    }
     return data;
 }

@@ -13,6 +13,7 @@ SRCS += \
 	$(NRF52_PORTING_DIR)/ble_keyboard.c \
 	$(NRF52_PORTING_DIR)/gzll_keyboard.c \
 	$(NRF52_PORTING_DIR)/rf_keyboard.c \
+	$(NRF52_PORTING_DIR)/rf_power.c \
 
 INCS += \
 	$(NRF52_PORTING_DIR) \

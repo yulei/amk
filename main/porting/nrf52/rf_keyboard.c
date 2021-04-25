@@ -21,6 +21,7 @@
 #include "amk_boot.h"
 
 #include "rgb_led.h"
+#include "rf_power.h"
 #include "amk_keymap.h"
 
 static rf_send_report_t rf_send_report = NULL;
@@ -121,6 +122,8 @@ void rf_keyboard_prepare_sleep(void)
     matrix_prepare_sleep();
     // usb backend to sleep
     nrf_usb_prepare_sleep();
+    // release all active peripherals
+    rf_power_prepare_sleep();
 }
 
 void rf_keyboard_jump_bootloader(void)

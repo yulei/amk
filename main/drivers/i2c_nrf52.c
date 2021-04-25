@@ -10,6 +10,7 @@
 #include "app_error.h"
 #include "nrfx_twi.h"
 #include "nrf_log.h"
+#include "rf_power.h"
 
 #ifndef I2C_INSTANCE_ID
     #define I2C_INSTANCE_ID     0
@@ -29,6 +30,12 @@ static bool twi_ready = false;
 
 #define TWI_ADDR(addr) ((addr)>>1)
 
+static void i2c_prepare_sleep(void* context)
+{
+    (void)(context);
+    i2c_uninit();
+}
+
 bool i2c_ready(void) { return twi_ready; }
 
 void i2c_init(void)
@@ -46,6 +53,7 @@ void i2c_init(void)
     twi_ready = true;
     nrfx_twi_enable(&m_twi);
     NRF_LOG_INFO("twi enabled");
+    rf_power_register(i2c_prepare_sleep, NULL);
 }
 
 amk_error_t i2c_send(uint8_t addr, const void* data, size_t length, size_t timeout)
@@ -95,10 +103,6 @@ void i2c_uninit(void)
     //nrfx_twi_disable(&m_twi);
 
     nrfx_twi_uninit(&m_twi);
-    // anomaly [89] work around
-    *(volatile uint32_t *)0x40003FFC = 0;
-    *(volatile uint32_t *)0x40003FFC;
-    *(volatile uint32_t *)0x40003FFC = 1;
 
     NRF_LOG_INFO("twi disabled");
     twi_ready = false;
