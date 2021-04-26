@@ -59,6 +59,7 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
         } break;
 
         case BLE_GATTS_EVT_HVN_TX_COMPLETE:
+            NRF_LOG_INFO("GAP Event: hvn tx complete.");
             // Send next key event
             ble_hids_service_flush(true);
             break;
