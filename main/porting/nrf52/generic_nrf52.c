@@ -5,6 +5,7 @@
 
 #include "common_config.h"
 #include "nrf_pwr_mgmt.h"
+#include "nrf_delay.h"
 #include "app_scheduler.h"
 #include "ble_keyboard.h"
 #include "gzll_keyboard.h"
@@ -39,6 +40,34 @@ rf_driver_t rf_driver = {
 
 bool rf_is_ble = true;
 
+static void on_error(void)
+{
+    NRF_LOG_FINAL_FLUSH();
+
+#if NRF_MODULE_ENABLED(NRF_LOG_BACKEND_RTT)
+    // To allow the buffer to be flushed by the host.
+    nrf_delay_ms(100);
+#endif
+#ifdef AMK_DEBUG_MODE
+    NRF_BREAKPOINT_COND;
+#endif
+    NVIC_SystemReset();
+}
+
+
+void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p_file_name)
+{
+    NRF_LOG_ERROR("app_error_handler err_code:%d %s:%d", error_code, p_file_name, line_num);
+    on_error();
+}
+
+
+void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t info)
+{
+    NRF_LOG_ERROR("Received a fault! id: 0x%08x, pc: 0x%08x, info: 0x%08x", id, pc, info);
+    on_error();
+}
+
 /**@brief Callback function for asserts in the SoftDevice.
  *
  * @details This function will be called in case of an assert in the SoftDevice.
@@ -54,20 +83,6 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
 {
     app_error_handler(DEAD_BEEF, line_num, p_file_name);
 }
-
-#ifdef RESET_ON_ERROR
-void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t info)
-{
-    __disable_irq();
-    NRF_LOG_FINAL_FLUSH();
-
-    NRF_LOG_ERROR("Fatal error");
-    NRF_BREAKPOINT_COND;
-    // On assert, the system can only recover with a reset.
-    NRF_LOG_WARNING("System reset");
-    NVIC_SystemReset();
-}
-#endif
 
 /**@brief Function for the Event Scheduler initialization.
  */

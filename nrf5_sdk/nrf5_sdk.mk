@@ -54,7 +54,6 @@ SRCS += \
 	$(NRF5SDK_DIR)/components/libraries/timer/drv_rtc.c \
 	$(NRF5SDK_DIR)/components/libraries/uart/app_uart_fifo.c \
 	$(NRF5SDK_DIR)/components/libraries/util/app_error.c \
-	$(NRF5SDK_DIR)/components/libraries/util/app_error_handler_gcc.c \
 	$(NRF5SDK_DIR)/components/libraries/util/app_error_weak.c \
 	$(NRF5SDK_DIR)/components/libraries/util/app_util_platform.c \
 	$(NRF5SDK_DIR)/components/libraries/util/nrf_assert.c \
