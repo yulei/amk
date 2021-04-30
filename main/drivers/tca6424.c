@@ -4,6 +4,17 @@
 
 #include "tca6424.h"
 #include "i2c.h"
+#include "amk_printf.h"
+
+#ifndef TCA6424_DEBUG
+#define TCA6424_DEBUG 1
+#endif
+
+#if TCA6424_DEBUG
+#define tca6424_debug  amk_printf
+#else
+#define tca6424_debug(...)
+#endif
 
 #define TCA6424_INPUT_PORT0     0x0
 #define TCA6424_INPUT_PORT1     0x01

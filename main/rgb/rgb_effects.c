@@ -412,8 +412,10 @@ void rgb_effects_toggle(void)
         effects_state.driver->init();
         rgb_effects_debug("effects: driver init\n");
     } else {
+        #ifdef RGBLIGHT_EN_PIN
         effects_state.driver->uninit();
         rgb_effects_debug("effects: driver uninit\n");
+        #endif
     }
 }
 
@@ -426,6 +428,11 @@ void rgb_effects_task(void)
             //amk_printf("effects last ticks: %d\n", effects_state.last_ticks);
         }
         effects_state.driver->flush();
+    } else {
+        #ifndef RGBLIGHT_EN_PIN
+        effects_state.driver->set_color_all(0,0,0);
+        effects_state.driver->flush();
+        #endif
     }
 }
 
