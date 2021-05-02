@@ -159,11 +159,14 @@ void nrf_usb_power_event_handler(nrfx_power_usb_evt_t event)
 {
     switch(event) {
     case NRFX_POWER_USB_EVT_DETECTED:
+        NRF_LOG_INFO("USB detected");
         break;
     case NRFX_POWER_USB_EVT_REMOVED:
+        NRF_LOG_INFO("USB removed");
         nrf_usb_event.disable_cb();
         break;
     case NRFX_POWER_USB_EVT_READY:
+        NRF_LOG_INFO("USB ready");
         nrf_usb_event.enable_cb();
         break;
     default:

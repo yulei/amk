@@ -31,6 +31,7 @@ endif
 
 ifeq (NRF52840, $(strip $(MCU)))
 	SRCS += $(NRF52_PORTING_DIR)/usb_backend_tinyusb.c
+#SRCS += $(NRF52_PORTING_DIR)/usb_backend_usb.c
 endif
 
 ifeq (yes, $(strip $(EECONFIG_FRAM)))

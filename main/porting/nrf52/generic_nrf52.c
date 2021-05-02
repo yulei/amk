@@ -170,6 +170,10 @@ void board_init(void)
 
     if (GZLL_IS_HOST || GZLL_IS_CLIENT || (reason&RST_USE_GZLL)) {
         NRF_LOG_INFO("use GAZELL protocol");
+        //if (reason&RST_USE_GZLL) {
+        //    NRF_LOG_INFO("reset use GAZELL");
+        //    NRF_POWER->GPREGRET |= RST_USE_GZLL;
+        //}
 
         rf_is_ble = false;
         gzll_keyboard_init(GZLL_IS_HOST);

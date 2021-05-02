@@ -365,6 +365,7 @@ bool hook_process_action_main(keyrecord_t *record) {
                 sd_nvic_SystemReset();
             } else {
                 NRF_LOG_INFO("switch to ble");
+                NRF_POWER->GPREGRET = 0;
                 NVIC_SystemReset();
             } return true;
         default:

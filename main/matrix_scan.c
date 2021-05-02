@@ -12,6 +12,16 @@
 #include "wait.h"
 #include "amk_printf.h"
 
+#ifndef MATRIX_SCAN_DEBUG
+#define MATRIX_SCAN_DEBUG 1
+#endif
+
+#if MATRIX_SCAN_DEBUG
+#define matrix_scan_debug  amk_printf
+#else
+#define matrix_scan_debug(...)
+#endif
+
 #ifndef DEBOUNCE
 #   define DEBOUNCE 5
 #endif
@@ -150,11 +160,11 @@ bool matrix_scan_custom(matrix_row_t* raw)
         }
     #endif
 #endif
-    /*if (changed) {
+    if (changed) {
         for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-            amk_printf("row:%d-%x\n", row, matrix_get_row(row));
+            matrix_scan_debug("row:%d-%x\n", row, matrix_get_row(row));
         }
-    }*/
+    }
     return changed;
 }
 

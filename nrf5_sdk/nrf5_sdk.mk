@@ -181,6 +181,16 @@ ifeq (NRF52840, $(strip $(MCU)))
 	INCS += $(NRF5SDK_DIR)/components/softdevice/s140/headers
 	INCS += $(NRF5SDK_DIR)/components/softdevice/s140/headers/nrf52
 	INCS += $(NRF5SDK_DIR)/modules/nrfx/drivers/src
+#	SRCS += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/generic/app_usbd_hid_generic.c
+#	SRCS += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/app_usbd_hid.c
+#	SRCS += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd.c
+#	SRCS += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd_core.c
+#	SRCS += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd_serial_num.c
+#	SRCS += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd_string_desc.c
+#	SRCS += $(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_usbd.c
+#	INCS += $(NRF5SDK_DIR)/components/libraries/usbd
+#	INCS += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid
+#	INCS += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/generic
 	APP_DEFS += -DNRF52840_XXAA
 	APP_DEFS += -DS140
 	LINKER_SCRIPT := $(NRF5_DIR)/nrf52840.ld
