@@ -149,8 +149,8 @@ void board_init(void)
     // Initialize.
     rf_power_init();
     log_init();
-    timers_init();
     power_management_init();
+    timers_init();
     scheduler_init();
 
     nrf_usb_preinit();

@@ -13,7 +13,7 @@
 #include "amk_printf.h"
 
 #ifndef MATRIX_SCAN_DEBUG
-#define MATRIX_SCAN_DEBUG 1
+#define MATRIX_SCAN_DEBUG 0
 #endif
 
 #if MATRIX_SCAN_DEBUG
@@ -170,6 +170,7 @@ bool matrix_scan_custom(matrix_row_t* raw)
 
 uint8_t matrix_scan(void)
 {
+    matrix_scan_debug("matrix scan start\n");
     bool changed = matrix_scan_custom(&matrix_debouncing[0]);
 
     if (changed && !debouncing) {

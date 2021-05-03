@@ -35,12 +35,10 @@ void gzll_keyboard_init(bool host)
     
     if (m_gzll_host) {
         NRF_LOG_INFO("GZLL init to host");
-        bool result = nrf_gzll_init(NRF_GZLL_MODE_HOST);
-        GAZELLE_ERROR_CODE_CHECK(result);
+        GAZELLE_ERROR_CODE_CHECK(nrf_gzll_init(NRF_GZLL_MODE_HOST));
     } else {
         NRF_LOG_INFO("GZLL init to device");
-        bool result = nrf_gzll_init(NRF_GZLL_MODE_DEVICE);
-        GAZELLE_ERROR_CODE_CHECK(result);
+        GAZELLE_ERROR_CODE_CHECK(nrf_gzll_init(NRF_GZLL_MODE_DEVICE));
     }
 
     nrf_gzll_set_max_tx_attempts(GZLL_MAX_TX_ATTEMPTS);
@@ -90,9 +88,9 @@ void gzll_keyboard_keepalive(void)
 
     if (nrf_gzll_ok_to_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST)) {
         m_gzll_keepalive[1] = GZLL_KEEPALIVE;
-        GAZELLE_ERROR_CODE_CHECK(nrf_gzll_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST,
-                                                                m_gzll_keepalive,
-                                                                GZLL_PAYLOAD_SIZE));
+        if (!nrf_gzll_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST, m_gzll_keepalive, GZLL_PAYLOAD_SIZE)) {
+            NRF_LOG_ERROR("GZLL failed add to tx fifo, code:%d", nrf_gzll_get_error_code());
+        }
     }
     NRF_LOG_INFO("GZLL keep alive packet sent");
 }
@@ -114,11 +112,12 @@ void nrf_gzll_device_tx_success(uint32_t pipe, nrf_gzll_device_tx_info_t tx_info
     if (tx_info.payload_received_in_ack) {
         // if ack was sent with payload, pop them from rx fifo.
         if (!nrf_gzll_fetch_packet_from_rx_fifo(pipe, dummy, &dummy_length)) {
-            NRF_LOG_ERROR("GZLL failed to rx fifo");
+            NRF_LOG_ERROR("GZLL failed fetch from rx fifo, error:%d", nrf_gzll_get_error_code());
         } else {
             // update led status from host ack
             rf_driver.rf_led = dummy[1];
             NRF_LOG_INFO("GZLL rf led: %d", dummy[1]);
+            //gzll_keyboard_keepalive();
         }
     }
 }
@@ -135,12 +134,14 @@ void nrf_gzll_device_tx_failed(uint32_t pipe, nrf_gzll_device_tx_info_t tx_info)
     if (tx_info.payload_received_in_ack) {
         // if ack was sent with payload, pop them from rx fifo.
         if (!nrf_gzll_fetch_packet_from_rx_fifo(pipe, dummy, &dummy_length)) {
-            NRF_LOG_ERROR("GZLL failed to rx fifo, error:%d", nrf_gzll_get_error_code());
+            NRF_LOG_ERROR("GZLL failed fetch from rx fifo, error:%d", nrf_gzll_get_error_code());
         }
     }
 
     // If the transmission failed, re-send current packet.
-    //GAZELLE_ERROR_CODE_CHECK(nrf_gzll_add_packet_to_tx_fifo(pipe, m_gzll_packet, GZLL_PAYLOAD_SIZE));
+    if (!nrf_gzll_add_packet_to_tx_fifo(pipe, m_gzll_packet, GZLL_PAYLOAD_SIZE)) {
+        NRF_LOG_ERROR("GZLL failed to readded packet to tx fifo, error:%d", nrf_gzll_get_error_code());
+    }
 }
 
 

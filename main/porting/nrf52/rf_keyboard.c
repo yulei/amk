@@ -18,6 +18,7 @@
 #include "keyboard.h"
 #include "matrix_scan.h"
 #include "amk_boot.h"
+#include "wait.h"
 
 #include "rgb_led.h"
 #include "rf_power.h"
@@ -35,6 +36,11 @@ static void rf_wdt_init(void);
 static void rf_wdt_feed(void);
 #endif
 
+//#define USE_DEDICATE_TIMER
+#ifdef USE_DEDICATE_TIMER
+const nrf_drv_rtc_t keyboard_rtc = NRF_DRV_RTC_INSTANCE(2); /**< Declaring an instance of nrf_drv_rtc for RTC2. */
+#endif
+
 static bool keyboard_pwr_mgmt_shutdown_handler(nrf_pwr_mgmt_evt_t event);
 NRF_PWR_MGMT_HANDLER_REGISTER(keyboard_pwr_mgmt_shutdown_handler, NRF_PWR_MGMT_CONFIG_HANDLER_PRIORITY_COUNT - 1);
 
@@ -42,6 +48,9 @@ static void keyboard_timer_init(void);
 static void keyboard_timer_start(void);
 static void keyboard_timer_stop(void);
 static void keyboard_timer_handler(void *p_context);
+#ifdef USE_DEDICATE_TIMER
+static void keyboard_timer_handler_tmp(void *p_context);
+#endif
 
 /** the fllowing function can be overrided by the keyboard codes */
 extern void keyboard_set_rgb(bool on);
@@ -87,11 +96,11 @@ void rf_keyboard_init(rf_send_report_t send_report, rf_prepare_sleep_t prepare_s
     nrf_usb_init(&usb_handler);
     boot_init();
     host_set_driver(&kbd_driver);
-    keyboard_timer_init();
-    amk_keymap_init();
 #if WDT_ENABLE
     rf_wdt_init();
 #endif
+    keyboard_timer_init();
+    amk_keymap_init();
 }
 
 void rf_keyboard_start()
@@ -124,11 +133,39 @@ void rf_keyboard_jump_bootloader(void)
     nrf_usb_reboot();
 }
 
+#ifdef USE_DEDICATE_TIMER
+static void keyboard_rtc_handler(nrf_drv_rtc_int_type_t int_type)
+{
+    NRF_LOG_INFO("keyboard rtc fired");
+    if (int_type == NRF_DRV_RTC_INT_COMPARE0)
+    {
+        keyboard_timer_handler(NULL);
+    }
+}
+#endif
+
 static void keyboard_timer_init(void)
 {
     ret_code_t err_code;
+#ifdef USE_DEDICATE_TIMER
+    err_code = app_timer_create(&m_keyboard_timer_id, APP_TIMER_MODE_REPEATED, keyboard_timer_handler_tmp);
+#else
     err_code = app_timer_create(&m_keyboard_timer_id, APP_TIMER_MODE_REPEATED, keyboard_timer_handler);
+#endif
     APP_ERROR_CHECK(err_code);
+
+
+#ifdef USE_DEDICATE_TIMER
+    //Initialize RTC instance
+    nrf_drv_rtc_config_t config = NRF_DRV_RTC_DEFAULT_CONFIG;
+    config.prescaler = 32;
+    err_code = nrf_drv_rtc_init(&keyboard_rtc, &config, keyboard_rtc_handler);
+    APP_ERROR_CHECK(err_code);
+
+    //Set compare channel to trigger interrupt after COMPARE_COUNTERTIME seconds
+    err_code = nrf_drv_rtc_cc_set(&keyboard_rtc, 0, 10, true);
+    APP_ERROR_CHECK(err_code);
+#endif
 }
 
 static void keyboard_timer_start(void)
@@ -136,6 +173,12 @@ static void keyboard_timer_start(void)
     ret_code_t err_code;
     err_code = app_timer_start(m_keyboard_timer_id, KEYBOARD_SCAN_INTERVAL, NULL);
     APP_ERROR_CHECK(err_code);
+
+#ifdef USE_DEDICATE_TIMER
+    //Power on RTC instance
+    nrf_drv_rtc_enable(&keyboard_rtc);
+#endif
+    NRF_LOG_INFO("keyboard timer started");
 }
 
 static void keyboard_timer_stop(void)
@@ -143,6 +186,12 @@ static void keyboard_timer_stop(void)
     ret_code_t err_code;
     err_code = app_timer_stop(m_keyboard_timer_id);
     APP_ERROR_CHECK(err_code);
+
+#ifdef USE_DEDICATE_TIMER
+    //Power off RTC instance
+    nrf_drv_rtc_disable(&keyboard_rtc);
+#endif
+    NRF_LOG_INFO("keyboard timer stopped");
 }
 
 static bool keyboard_rgblight_on(void)
@@ -161,8 +210,16 @@ static bool keyboard_rgbmatrix_on(void)
 
 static bool keyboard_rgb_on(void) { return keyboard_rgblight_on() || keyboard_rgbmatrix_on(); }
 
+#ifdef USE_DEDICATE_TIMER
+static void keyboard_timer_handler_tmp(void *p_context)
+{
+    //NRF_LOG_INFO("keyboard timer tmp handler");
+}
+#endif
+
 static void keyboard_timer_handler(void *p_context)
 {
+    //NRF_LOG_INFO("keyboard timer handler");
 #if WDT_ENABLE
     rf_wdt_feed();
 #endif
@@ -380,11 +437,12 @@ bool hook_process_action_main(keyrecord_t *record) {
 void rf_wdt_init(void)
 {
     ret_code_t err_code;
-    /*if (!nrf_drv_clock_init_check()) {
+    if (!nrf_drv_clock_init_check()) {
         err_code = nrf_drv_clock_init();
         APP_ERROR_CHECK(err_code);
         nrf_drv_clock_lfclk_request(NULL);
-    }*/
+        while( !nrf_drv_clock_lfclk_is_running()) ;
+    }
 
     nrfx_wdt_config_t config = NRFX_WDT_DEAFULT_CONFIG;
     err_code = nrfx_wdt_init(&config, rf_wdt_event_handler);
@@ -392,6 +450,7 @@ void rf_wdt_init(void)
     err_code = nrfx_wdt_channel_alloc(&rf_wdt_channgel);
     APP_ERROR_CHECK(err_code);
     nrfx_wdt_enable();
+    NRF_LOG_INFO("WDT enabled");
 }
 
 void rf_wdt_feed(void)
