@@ -440,8 +440,9 @@ void rf_wdt_init(void)
     if (!nrf_drv_clock_init_check()) {
         err_code = nrf_drv_clock_init();
         APP_ERROR_CHECK(err_code);
-        nrf_drv_clock_lfclk_request(NULL);
-        while( !nrf_drv_clock_lfclk_is_running()) ;
+        if (!nrf_drv_clock_lfclk_is_running()) {
+            nrf_drv_clock_lfclk_request(NULL);
+        }
     }
 
     nrfx_wdt_config_t config = NRFX_WDT_DEAFULT_CONFIG;
