@@ -201,3 +201,9 @@ ifeq (NRF52840, $(strip $(MCU)))
 endif
 
 LINKER_PATH := $(NRF5SDK_DIR)/modules/nrfx/mdk
+
+ifeq (yes, $(strip $(NRF_AMK_DEBUG)))
+	APP_DEFS += -DNRF_AMK_DEBUG
+	APP_DEFS += -DdEBUG
+	SRCS += $(NRF5SDK_DIR)/components/libraries/util/app_error_handler_gcc.c
+endif

@@ -12,6 +12,7 @@ void rgb_led_init(void)
 
 #ifdef RGB_EFFECTS_ENABLE
 #ifdef RGB_WITH_ALL
+
     if (rgb_driver_available(RGB_DRIVER_AW9523B)) {
         driver = rgb_driver_create(RGB_DRIVER_AW9523B);
     } else {

@@ -78,6 +78,45 @@ extern uint32_t usb_setting;
         HID_OUTPUT       ( HID_CONSTANT                            ) ,\
     HID_COLLECTION_END \
 
+// code from qmk
+/////////////////////
+// RAW Usage page and ID configuration
+
+#ifndef RAW_USAGE_PAGE
+#    define RAW_USAGE_PAGE 0xFF60
+#endif
+
+#ifndef RAW_USAGE_ID
+#    define RAW_USAGE_ID 0x61
+#endif
+
+#define RAW_EPSIZE 32
+
+#define RAW_USAGE_PAGE_HI ((uint8_t)(RAW_USAGE_PAGE >> 8))
+#define RAW_USAGE_PAGE_LO ((uint8_t)(RAW_USAGE_PAGE & 0xFF))
+
+#define TUD_HID_REPORT_DESC_VIAL(report_size, ...) \
+    HID_USAGE_PAGE_N ( RAW_USAGE_PAGE, 2                                            ),\
+    HID_USAGE        ( RAW_USAGE_ID                                                 ),\
+    HID_COLLECTION   ( HID_COLLECTION_APPLICATION                                   ),\
+      /* Report ID if any */\
+      __VA_ARGS__ \
+      /* Input */ \
+      HID_USAGE       ( 0x62                                                        ),\
+      HID_LOGICAL_MIN ( 0x00                                                        ),\
+      HID_LOGICAL_MAX ( 0xff                                                        ),\
+      HID_REPORT_SIZE ( 8                                                           ),\
+      HID_REPORT_COUNT( report_size                                                 ),\
+      HID_INPUT       ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE                      ),\
+      /* Output */ \
+      HID_USAGE       ( 0x63                                                        ),\
+      HID_LOGICAL_MIN ( 0x00                                                        ),\
+      HID_LOGICAL_MAX ( 0xff                                                        ),\
+      HID_REPORT_SIZE ( 8                                                           ),\
+      HID_REPORT_COUNT( report_size                                                 ),\
+      HID_OUTPUT      ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE | HID_NON_VOLATILE   ),\
+    HID_COLLECTION_END \
+
 #ifdef DYNAMIC_CONFIGURATION
 // Interface number
 enum {
@@ -108,6 +147,9 @@ enum {
     #define ITF_NUM_HID_OTHER ITF_NUM_HID_KBD
 #else
     ITF_NUM_HID_OTHER,
+#endif
+#ifdef VIAL_ENABLE
+    ITF_NUM_VIAL,
 #endif
 #ifdef WEBUSB_ENABLE
     ITF_NUM_VENDOR,
@@ -144,6 +186,14 @@ enum {
 enum {
     EPNUM_HID_KBD       = 0x01,
     EPNUM_HID_OTHER     = 0x02,
+#ifdef VIAL_ENABLE
+    EPNUM_VIAL_OUT      = 0x03,
+    #if defined(STM32F103xB) || defined(NRF52840_XXAA)
+    EPNUM_VIAL_IN       = 0x04,
+    #else
+        #define EPNUM_VIAL_IN EPNUM_VIAL_OUT
+    #endif
+#endif
 #ifdef WEBUSB_ENABLE
     EPNUM_VENDOR_OUT    = 0x03,
     #if defined(STM32F103xB) || defined(NRF52840_XXAA)
@@ -176,6 +226,7 @@ enum {
     HID_REPORT_ID_CONSUMER,
     HID_REPORT_ID_NKRO,
     HID_REPORT_ID_WEBUSB,
+    HID_REPORT_ID_VIAL,
     HID_REPORT_ID_UNKNOWN,
 };
 
@@ -204,6 +255,14 @@ uint32_t tud_descriptor_hid_interface_kbd_size(void);
 
 uint8_t const* tud_descriptor_hid_interface_other_cb(void);
 uint32_t tud_descriptor_hid_interface_other_size(void);
+
+#ifdef VIAL_ENABLE
+uint8_t const* tud_descriptor_hid_report_vial_cb(void);
+uint32_t tud_descriptor_hid_report_vial_size(void);
+
+uint8_t const* tud_descriptor_hid_interface_vial_cb(void);
+uint32_t tud_descriptor_hid_interface_vial_size(void);
+#endif
 
 #ifdef WEBUSB_ENABLE
 enum {

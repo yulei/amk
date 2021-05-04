@@ -85,7 +85,7 @@
 #define KEYBOARD_SLOW_SCAN_INTERVAL         APP_TIMER_TICKS(100)                       /**< Slow keyboard scan interval */
 #define SLEEP_SCAN_OVERFLOW                 (60*100)                                   /**< increase sleep count while scan overlow */
 #ifndef SLEEP_COUNT_MAX
-#define SLEEP_COUNT_MAX                     2                                        /**< In minutes */
+#define SLEEP_COUNT_MAX                     10                                         /**< In minutes */
 #endif
 
 #define LEDS_NUMBER 0

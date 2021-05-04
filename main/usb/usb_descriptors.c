@@ -120,6 +120,22 @@ uint32_t tud_descriptor_hid_report_other_size(void)
     return sizeof(desc_hid_report_other);
 }
 
+#ifdef VIAL_ENABLE
+static uint8_t desc_hid_report_vial[] =
+{
+    TUD_HID_REPORT_DESC_VIAL(RAW_EPSIZE),
+};
+
+uint8_t const* tud_descriptor_hid_report_vial_cb(void)
+{
+    return desc_hid_report_vial;
+}
+
+uint32_t tud_descriptor_hid_report_vial_size(void)
+{
+    return sizeof(desc_hid_report_vial);
+}
+#endif
 // Configuration Descriptor
 #ifdef WEBUSB_ENABLE
 #define WEBUSB_DESC_LEN TUD_VENDOR_DESC_LEN

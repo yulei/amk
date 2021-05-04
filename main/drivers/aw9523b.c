@@ -61,8 +61,12 @@ bool aw9523b_available(uint8_t addr)
 #ifdef RGBLIGHT_EN_PIN
     gpio_set_input_floating(RGBLIGHT_EN_PIN);
 #endif
+    bool available = (ec == AMK_SUCCESS) ? true : false;
+    if (!available) {
+        i2c_uninit();
+    }
 
-    return ec == AMK_SUCCESS ? true : false;
+    return available;
 }
 
 void aw9523b_init(uint8_t addr)

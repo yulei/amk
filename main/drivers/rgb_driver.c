@@ -24,7 +24,7 @@
 #define rgb_driver_debug(...)
 #endif
 
-#if defined(RGB_WITH_WS2812) || defined(RGB_WITH_AW9523B) || defined(GB_WITH_ALL)
+#if defined(RGB_WITH_WS2812) || defined(RGB_WITH_AW9523B) || defined(RGB_WITH_ALL)
     #ifndef RGB_LED_NUM
         #error "RGB_LED_NUM must be defined"
     #endif
