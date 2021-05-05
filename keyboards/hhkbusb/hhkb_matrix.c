@@ -16,7 +16,7 @@
 #include "amk_printf.h"
 
 #ifndef HHKB_MATRIX_DEBUG
-#define HHKB_MATRIX_DEBUG 0
+#define HHKB_MATRIX_DEBUG 1
 #endif
 
 #if HHKB_MATRIX_DEBUG
@@ -396,7 +396,8 @@ void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
 
 uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
 {
-    return ble_keymaps[layer][row][col];
+    hhkb_matrix_debug("get keymap \n");
+    return 0;//ble_keymaps[layer][row][col];
 }
 
 static void ble_sync_init(void)

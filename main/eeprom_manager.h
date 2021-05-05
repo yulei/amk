@@ -15,6 +15,10 @@
 #define EECONFIG_RGB                (uint8_t*)24        // 6 bytes
 #define EECONFIG_RGB_MATRIX         (uint8_t*)30        // 6 bytes
 
+#define EECONFIG_SIZE               64
+#define EEPROM_SIZE                 2048
+#define DYNAMIC_KEYMAP_EEPROM_MAX_ADDR (EEPROM_SIZE-1)
+
 uint32_t eeconfig_read_kb(void);
 void eeconfig_write_kb(uint32_t data);
 void eeconfig_update_kb(uint32_t data);

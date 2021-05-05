@@ -30,7 +30,7 @@ ifeq (STM32F722, $(strip $(MCU)))
 endif
 
 ifeq (STM32F103, $(strip $(MCU)))
-	SRCS += $(STM32_PORTING_DIR)/eeconfig_flash.c
+	SRCS += $(MAIN_DIR)/eeconfig_mem.c
 	SRCS += $(STM32_PORTING_DIR)/stm32f103xb.c
 endif
 

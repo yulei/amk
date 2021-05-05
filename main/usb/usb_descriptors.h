@@ -9,6 +9,7 @@
 #define USB_MSC_BIT         (1u << 1)
 #define USB_WEBUSB_BIT      (1u << 2)
 
+
 extern uint32_t usb_setting;
 
 #define NKRO_KEYCODE_SIZE   32
@@ -78,43 +79,30 @@ extern uint32_t usb_setting;
         HID_OUTPUT       ( HID_CONSTANT                            ) ,\
     HID_COLLECTION_END \
 
-// code from qmk
-/////////////////////
-// RAW Usage page and ID configuration
-
-#ifndef RAW_USAGE_PAGE
-#    define RAW_USAGE_PAGE 0xFF60
-#endif
-
-#ifndef RAW_USAGE_ID
-#    define RAW_USAGE_ID 0x61
-#endif
-
-#define RAW_EPSIZE 32
-
-#define RAW_USAGE_PAGE_HI ((uint8_t)(RAW_USAGE_PAGE >> 8))
-#define RAW_USAGE_PAGE_LO ((uint8_t)(RAW_USAGE_PAGE & 0xFF))
+#define VIAL_USAGE_PAGE     0xFF60
+#define VIAL_USAGE_ID       0x61
+#define VIAL_EPSIZE         CFG_TUD_HID_EP_BUFSIZE
 
 #define TUD_HID_REPORT_DESC_VIAL(report_size, ...) \
-    HID_USAGE_PAGE_N ( RAW_USAGE_PAGE, 2                                            ),\
-    HID_USAGE        ( RAW_USAGE_ID                                                 ),\
+    HID_USAGE_PAGE_N ( VIAL_USAGE_PAGE, 2                                           ),\
+    HID_USAGE        ( VIAL_USAGE_ID                                                ),\
     HID_COLLECTION   ( HID_COLLECTION_APPLICATION                                   ),\
-      /* Report ID if any */\
-      __VA_ARGS__ \
-      /* Input */ \
-      HID_USAGE       ( 0x62                                                        ),\
-      HID_LOGICAL_MIN ( 0x00                                                        ),\
-      HID_LOGICAL_MAX ( 0xff                                                        ),\
-      HID_REPORT_SIZE ( 8                                                           ),\
-      HID_REPORT_COUNT( report_size                                                 ),\
-      HID_INPUT       ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE                      ),\
-      /* Output */ \
-      HID_USAGE       ( 0x63                                                        ),\
-      HID_LOGICAL_MIN ( 0x00                                                        ),\
-      HID_LOGICAL_MAX ( 0xff                                                        ),\
-      HID_REPORT_SIZE ( 8                                                           ),\
-      HID_REPORT_COUNT( report_size                                                 ),\
-      HID_OUTPUT      ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE | HID_NON_VOLATILE   ),\
+        /* Report ID if any */\
+        __VA_ARGS__ \
+        /* Input */ \
+        HID_USAGE       ( 0x62                                                      ),\
+        HID_LOGICAL_MIN ( 0x00                                                      ),\
+        HID_LOGICAL_MAX ( 0xff                                                      ),\
+        HID_REPORT_SIZE ( 8                                                         ),\
+        HID_REPORT_COUNT( report_size                                               ),\
+        HID_INPUT       ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE                    ),\
+        /* Output */ \
+        HID_USAGE       ( 0x63                                                      ),\
+        HID_LOGICAL_MIN ( 0x00                                                      ),\
+        HID_LOGICAL_MAX ( 0xff                                                      ),\
+        HID_REPORT_SIZE ( 8                                                         ),\
+        HID_REPORT_COUNT( report_size                                               ),\
+        HID_OUTPUT      ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE | HID_NON_VOLATILE ),\
     HID_COLLECTION_END \
 
 #ifdef DYNAMIC_CONFIGURATION

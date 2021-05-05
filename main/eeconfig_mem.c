@@ -5,8 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "eeconfig.h"
-
-#define EEPROM_SIZE 64
+#include "eeprom_manager.h"
 
 static uint8_t buffer[EEPROM_SIZE];
 

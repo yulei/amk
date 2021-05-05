@@ -8,6 +8,10 @@
 #include "amk_printf.h"
 #include "report_queue.h"
 
+#ifdef VIAL_ENABLE
+#include "vial_porting.h"
+#endif
+
 static hid_report_queue_t report_queue;
 
 static bool usb_itf_ready(uint32_t type);
@@ -31,6 +35,9 @@ void usb_task(void)
         }
     }
 
+#ifdef VIAL_ENABLE
+    vial_task();
+#endif
     tud_task();
 }
 
@@ -141,6 +148,12 @@ uint16_t tud_hid_get_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t
     (void) buffer;
     (void) reqlen;
 
+#ifdef VIAL_ENABLE
+    if (itf == ITF_NUM_VIAL) {
+        //amk_printf("Vial GetReport Data: size=%d\n", reqlen);
+        return 0;
+    }
+#endif
     return 0;
 }
 
@@ -149,12 +162,19 @@ uint16_t tud_hid_get_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t
 extern uint8_t amk_led_state;
 void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t report_type, uint8_t const *buffer, uint16_t bufsize)
 {
-    //amk_printf("Set Report:\n")
+    //amk_printf("Set Report: itf=%d, id=%d, type=%d\n", itf, report_id, report_type);
     (void) report_id;
     if (itf == ITF_NUM_HID_KBD && report_type == HID_REPORT_TYPE_OUTPUT) {
         if (bufsize) {
             amk_led_state = buffer[0];
-            amk_printf("Set Report Data: size=%d, state=%x\n", bufsize, buffer[0]);
+            //amk_printf("Set Report Data: size=%d, state=%x\n", bufsize, buffer[0]);
         }
     }
+
+#ifdef VIAL_ENABLE
+    if (itf == ITF_NUM_VIAL) {
+        //amk_printf("VIAL process data: size=%d\n", bufsize);
+        vial_process((uint8_t*)buffer, (uint8_t)bufsize);
+    }
+#endif
 }

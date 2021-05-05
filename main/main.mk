@@ -116,6 +116,13 @@ ifeq (yes, $(strip $(MSC_ENABLE)))
 	APP_DEFS += -DMSC_ENABLE
 endif
 
+ifeq (yes, $(strip $(VIAL_ENABLE)))
+	INCS += $(MAIN_DIR)/vial
+	SRCS += $(MAIN_DIR)/vial/vial_porting.c
+	SRCS += $(MAIN_DIR)/vial/keycode_convert.c
+	APP_DEFS += -DVIAL_ENABLE
+endif
+
 ifneq (yes, $(strip $(CUSTOM_MATRIX)))
 	SRCS += $(MAIN_DIR)/matrix_scan.c
 endif
@@ -135,3 +142,4 @@ endif
 ifneq (,$(filter $(strip $(MCU)),$(NUVOTON_MCUS)))
 	include $(MAIN_DIR)/porting/nuvoton.mk
 endif
+
