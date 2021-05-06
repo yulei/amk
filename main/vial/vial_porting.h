@@ -14,42 +14,7 @@
 #include "amk_keymap.h"
 #include "matrix.h"
 #include "usb_descriptors.h"
-
-// Keyboard level code can change where VIA stores the magic.
-// The magic is the build date YYMMDD encoded as BCD in 3 bytes,
-// thus installing firmware built on a different date to the one
-// already installed can be detected and the EEPROM data is reset.
-// The only reason this is important is in case EEPROM usage changes
-// and the EEPROM was not explicitly reset by bootmagic lite.
-#ifndef VIA_EEPROM_MAGIC_ADDR
-#    define VIA_EEPROM_MAGIC_ADDR (EECONFIG_SIZE)
-#endif
-
-#define VIA_EEPROM_LAYOUT_OPTIONS_ADDR (VIA_EEPROM_MAGIC_ADDR + 3)
-
-// Changing the layout options size after release will invalidate EEPROM,
-// but this is something that should be set correctly on initial implementation.
-// 1 byte is enough for most uses (i.e. 8 binary states, or 6 binary + 1 ternary/quaternary )
-#ifndef VIA_EEPROM_LAYOUT_OPTIONS_SIZE
-#    define VIA_EEPROM_LAYOUT_OPTIONS_SIZE 1
-#endif
-
-// Allow override of the layout options default value.
-// This requires advanced knowledge of how VIA stores layout options
-// and is only really useful for setting a boolean layout option
-// state to true by default.
-#ifndef VIA_EEPROM_LAYOUT_OPTIONS_DEFAULT
-#    define VIA_EEPROM_LAYOUT_OPTIONS_DEFAULT 0x00000000
-#endif
-
-// The end of the EEPROM memory used by VIA
-// By default, dynamic keymaps will start at this if there is no
-// custom config
-#define VIA_EEPROM_CUSTOM_CONFIG_ADDR (VIA_EEPROM_LAYOUT_OPTIONS_ADDR + VIA_EEPROM_LAYOUT_OPTIONS_SIZE)
-
-#ifndef VIA_EEPROM_CUSTOM_CONFIG_SIZE
-#    define VIA_EEPROM_CUSTOM_CONFIG_SIZE 0
-#endif
+#include "keycode_convert.h"
 
 // This is changed only when the command IDs change,
 // so VIA Configurator can detect compatible firmware.

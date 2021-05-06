@@ -104,10 +104,6 @@ ifeq (yes, $(strip $(WEBUSB_ENABLE)))
 	APP_DEFS += -DWEBUSB_ENABLE
 endif
 
-ifeq (yes, $(strip $(WEBCONFIG_ENABLE)))
-	APP_DEFS += -DWEBCONFIG_ENABLE
-endif
-
 ifeq (yes, $(strip $(MSC_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/anim.c
 	SRCS += $(MAIN_DIR)/drivers/w25qxx.c
@@ -116,11 +112,18 @@ ifeq (yes, $(strip $(MSC_ENABLE)))
 	APP_DEFS += -DMSC_ENABLE
 endif
 
+ifeq (yes, $(strip $(KEYMAP_CONFIG_ENABLE)))
+	APP_DEFS += -DKEYMAP_CONFIG_ENABLE	
+endif
+
 ifeq (yes, $(strip $(VIAL_ENABLE)))
 	INCS += $(MAIN_DIR)/vial
 	SRCS += $(MAIN_DIR)/vial/vial_porting.c
 	SRCS += $(MAIN_DIR)/vial/keycode_convert.c
 	APP_DEFS += -DVIAL_ENABLE
+	ifneq (yes, $(strip $(VIAL_ENABLE)))
+		APP_DEFS += -DKEYMAP_CONFIG_ENABLE	
+	endif
 endif
 
 ifneq (yes, $(strip $(CUSTOM_MATRIX)))

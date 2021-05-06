@@ -5,12 +5,15 @@
 [submodule "libs/tmk"]
 	path = libs/tmk
 	url = https://github.com/yulei/tmk_keyboard.git
+	ignore = dirty
 [submodule "libs/tinyusb"]
 	path = libs/tinyusb
 	url = https://github.com/yulei/tinyusb.git
+	ignore = dirty
 [submodule "libs/printf"]
 	path = libs/printf
 	url = https://github.com/yulei/printf.git
+	ignore = dirty
 [submodule "stm32_sdk/cmsis"]
 	path = stm32_sdk/cmsis
 	url = https://github.com/STMicroelectronics/cmsis_core.git

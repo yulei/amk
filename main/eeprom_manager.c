@@ -4,7 +4,6 @@
 
 #include "eeprom_manager.h"
 #include "eeconfig.h"
-#include "flash_store.h"
 #include "rgb_effects.h"
 #include "rgb_matrix.h"
 #include "amk_printf.h"
@@ -90,10 +89,35 @@ void eeconfig_update_rgb_matrix(const void* rgb)
     eeconfig_write_rgb_matrix(rgb);
 }
 
+uint8_t eeconfig_read_layout_options(void)
+{
+    return eeprom_read_byte(EECONFIG_LAYOUT_OPTIONS);
+}
+
+void eeconfig_write_layout_options(uint8_t options)
+{
+    eeprom_write_byte(EECONFIG_LAYOUT_OPTIONS, options);
+}
+
+void eeconfig_update_layout_options(uint8_t options)
+{
+    eeconfig_write_layout_options(options);
+}
+
 #define KEYMAP_MAGIC_VALUE      0x4D585438
 #define KEYMAP_MAGIC_DEFAULT    0xFFFFFFFF
 #define KEYMAP_MAX_LAYER        4
+#define KEYMAP_LAYER_SIZE      (MATRIX_ROWS*MATRIX_COLS*2)
 
+static uint16_t* ee_keymap_get_addr(uint8_t layer, uint8_t row, uint8_t col)
+{
+    return (uint16_t*)(EEKEYMAP_START_ADDR + ((layer*KEYMAP_LAYER_SIZE)+(MATRIX_ROWS*row+col)*2));
+}
+
+static uint8_t *ee_keymap_get_addr_by_offset(uint16_t offset)
+{
+    return (uint8_t*)(EEKEYMAP_START_ADDR + offset);
+}
 
 bool ee_keymap_is_valid(void)
 {
@@ -110,22 +134,33 @@ void ee_keymap_set_valid(bool valid)
     }
 }
 
-void ee_keymap_write_layer(uint8_t layer, const void* keymaps, size_t size)
-{
-    flash_store_write(layer, keymaps, size);
-}
-
-void ee_keymap_read_layer(uint8_t layer, void* keymaps, size_t size)
-{
-    flash_store_read(layer, keymaps, size);
-}
-
 void ee_keymap_write_key(uint8_t layer, uint8_t row, uint8_t col, uint16_t key)
 {
-    flash_store_write_key(layer, row, col, key);
+    uint16_t *addr = ee_keymap_get_addr(layer, row, col);
+    eeprom_write_word(addr, key);
 }
 
 uint16_t ee_keymap_read_key(uint8_t layer, uint8_t row, uint8_t col)
 {
-    return flash_store_read_key(layer, row, col);
+    uint16_t *addr = ee_keymap_get_addr(layer, row, col);
+    return eeprom_read_word(addr);
+}
+
+void ee_keymap_write_buffer(uint16_t offset, uint16_t size, uint8_t *data)
+{
+    uint8_t *addr = ee_keymap_get_addr_by_offset(offset);
+    for (int i = 0; i < size; i++) {
+        *data = eeprom_read_byte(addr);
+        data++;
+        addr++;
+    }
+}
+void ee_keymap_read_buffer(uint16_t offset, uint16_t size, uint8_t *data)
+{
+    uint8_t *addr = ee_keymap_get_addr_by_offset(offset);
+    for (int i = 0; i < size; i++) {
+        eeprom_write_byte(addr, *data);
+        data++;
+        addr++;
+    }
 }

@@ -51,10 +51,16 @@ enum user_keycodes {
 
 uint16_t amk_to_vial(uint16_t keycode)
 {
-    return keycode;
+    if (keycode <= 0xFF)
+        return keycode;
+    else
+        return 0;
 }
 
 uint16_t vial_to_amk(uint16_t keycode)
 {
-    return keycode;
+    if (keycode < 0xFF)
+        return keycode;
+    else
+        return 0;
 }

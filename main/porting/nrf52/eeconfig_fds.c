@@ -293,14 +293,13 @@ void eeconfig_init(void)
     eeprom_write_byte(EECONFIG_DEFAULT_LAYER,  0);
     eeprom_write_byte(EECONFIG_KEYMAP,         0);
     eeprom_write_byte(EECONFIG_MOUSEKEY_ACCEL, 0);
-#ifdef BACKLIGHT_ENABLE
-    eeprom_write_byte(EECONFIG_BACKLIGHT,      0);
-#endif
 
 #ifdef RGB_EFFECTS_ENABLE
     extern void effects_update_default(void);
     effects_update_default();
 #endif
+
+    eeprom_write_byte(EECONFIG_LAYOUT_OPTIONS, 0);
 }
 
 void eeconfig_enable(void)
@@ -326,91 +325,3 @@ void eeconfig_write_default_layer(uint8_t val) { eeprom_write_byte(EECONFIG_DEFA
 
 uint8_t eeconfig_read_keymap(void)      { return eeprom_read_byte(EECONFIG_KEYMAP); }
 void eeconfig_write_keymap(uint8_t val) { eeprom_write_byte(EECONFIG_KEYMAP, val); }
-
-#ifdef BACKLIGHT_ENABLE
-uint8_t eeconfig_read_backlight(void)      { return eeprom_read_byte(EECONFIG_BACKLIGHT); }
-void eeconfig_write_backlight(uint8_t val) { eeprom_write_byte(EECONFIG_BACKLIGHT, val); }
-#endif
-
-//==================================================
-// flash store for keymaps
-//==================================================
-#define KEYMAP_SIZE     ((MATRIX_ROWS*MATRIX_COLS*2+3)&3)
-
-__ALIGN(4) static uint8_t keymap_buf_0[KEYMAP_SIZE]; 
-__ALIGN(4) static uint8_t keymap_buf_1[KEYMAP_SIZE]; 
-__ALIGN(4) static uint8_t keymap_buf_2[KEYMAP_SIZE]; 
-__ALIGN(4) static uint8_t keymap_buf_3[KEYMAP_SIZE]; 
-
-static uint8_t* keymap_bufs[] = {keymap_buf_0,keymap_buf_1, keymap_buf_2, keymap_buf_3}; 
-
-static fds_record_t keymap_record = {
-    .file_id = EE_FILEID,
-    .key = EE_KEYMAP_KEY,
-    .data.p_data = keymap_buf_0,
-    .data.length_words = KEYMAP_SIZE/sizeof(uint32_t),
-};
-
-static void flash_store_update(void)
-{
-    fds_record_desc_t desc = {0};
-    fds_find_token_t token = {0};
-    ret_code_t err_code = fds_record_find_by_key(keymap_record.key, &desc, &token);
-    if (err_code == NRF_SUCCESS) {
-        err_code  = fds_record_update(&desc, &keymap_record);
-        APP_ERROR_CHECK(err_code);
-        // no gc again
-    } else {
-        err_code = fds_record_write(&desc, &keymap_record);
-        APP_ERROR_CHECK(err_code);
-        // no gc again
-    }
-    if (err_code == NRF_SUCCESS) {
-        keymap_dirty = false;
-    }
-}
-
-void flash_store_write(uint8_t key, const void* data, size_t size)
-{
-    fds_record_desc_t desc = {0};
-    fds_find_token_t token = {0};
-
-    keymap_record.key = EE_KEYMAP_KEY+key;
-    memcpy(keymap_bufs[key], data, size);
-    keymap_record.data.p_data = keymap_bufs[key];
-    keymap_dirty = true;
-
-    ret_code_t err_code = fds_record_find_by_key(keymap_record.key, &desc, &token);
-    if (err_code == NRF_SUCCESS) {
-        err_code = fds_record_update(&desc, &keymap_record);
-        if (err_code == FDS_ERR_NO_SPACE_IN_FLASH) {
-            fds_gc();
-        } else {
-            APP_ERROR_CHECK(err_code);
-        }
-    } else {
-        err_code = fds_record_write(&desc, &keymap_record);
-        if (err_code == FDS_ERR_NO_SPACE_IN_FLASH) {
-            fds_gc();
-        } else {
-            APP_ERROR_CHECK(err_code);
-        }
-    }
-}
-
-size_t flash_store_read(uint8_t key, void* data, size_t size)
-{
-    fds_record_desc_t desc = {0};
-    fds_find_token_t token = {0};
-    ret_code_t err_code = fds_record_find_by_key(EE_KEYMAP_KEY+key, &desc, &token);
-    if (err_code == NRF_SUCCESS) {
-        fds_flash_record_t record;
-        err_code = fds_record_open(&desc, &record);
-        APP_ERROR_CHECK(err_code);
-        memcpy(data, record.p_data, size);
-        fds_record_close(&desc);
-        return size;
-    } else {
-        return 0;
-    }
-}

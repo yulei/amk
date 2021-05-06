@@ -5,13 +5,15 @@
 #include "generic_hal.h"
 
 static void DWT_Delay_Init(void);
-extern void fee_init(void);
 
 void system_init(void)
 {
     HAL_Init();
     DWT_Delay_Init();
+#ifdef EECONFIG_FLASH 
+extern void fee_init(void);
     fee_init();
+#endif
 }
 
 static void DWT_Delay_Init(void)

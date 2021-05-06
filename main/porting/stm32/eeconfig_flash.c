@@ -148,10 +148,14 @@ void eeconfig_init(void)
     extern void effects_update_default(void);
     effects_update_default();
 #endif
+
 #ifdef RGB_MATRIX_ENABLE
     extern void rgb_matrix_update_default(void);
     rgb_matrix_update_default();
 #endif
+
+    eeprom_write_byte(EECONFIG_LAYOUT_OPTIONS, 0);
+
     hook_eeconfig_init();
 }
 
@@ -344,46 +348,4 @@ void flash_erase_pages(void)
     HAL_FLASHEx_Erase(&erase, &error);
     flash_lock();
     amk_printf("Flash erase page, error=%d\n", error);
-}
-
-//==================================================
-// flash store for keymaps
-//==================================================
-
-void flash_store_write(uint8_t key, const void* data, size_t size)
-{
-    uint32_t start = EEPROM_KEYMAP_START+key*MATRIX_ROWS*MATRIX_COLS*2;
-    const uint8_t* p = (const uint8_t*)data;
-    for(int i = 0; i < size; i++) {
-        fee_write(start+i, p[i]);
-    }
-}
-
-size_t flash_store_read(uint8_t key, void* data, size_t size)
-{
-    uint32_t start = EEPROM_KEYMAP_START+key*MATRIX_ROWS*MATRIX_COLS*2;
-    uint8_t* p = (uint8_t*)data;
-    for(int i = 0; i < size; i++) {
-        p[i] = fee_read(start+i);
-    }
-
-    return size;
-}
-
-void flash_store_write_key(uint8_t layer, uint8_t row, uint8_t col, uint16_t key)
-{
-    uint32_t addr = EEPROM_KEYMAP_START + layer*MATRIX_ROWS*MATRIX_COLS*2 + (row*MATRIX_COLS + col)*2;
-    uint8_t* p = (uint8_t*)&key;
-    fee_write(addr, p[0]);
-    fee_write(addr+1, p[1]);
-}
-
-uint16_t flash_store_read_key(uint8_t layer, uint8_t row, uint8_t col)
-{
-    uint16_t key = 0;
-    uint32_t addr = EEPROM_KEYMAP_START + layer*MATRIX_ROWS*MATRIX_COLS*2 + (row*MATRIX_COLS + col)*2;
-    uint8_t* p = (uint8_t*)&key;
-    p[0] = fee_read(addr);
-    p[1] = fee_read(addr+1);
-    return key;
 }

@@ -37,6 +37,7 @@ endif
 ifeq (yes, $(strip $(EECONFIG_FRAM)))
 	SRCS += $(MAIN_DIR)/eeconfig_fram.c
 	SRCS += $(MAIN_DIR)/drivers/mb85rcxx.c
+	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	APP_DEFS += -DEECONFIG_FRAM
 else
 	ifeq (yes, $(strip $(EECONFIG_FDS)))

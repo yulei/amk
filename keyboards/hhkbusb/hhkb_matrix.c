@@ -110,15 +110,13 @@ typedef enum
 } command_t;
 
 static uint8_t command_buf[CMD_MAX_LEN];
-#define BLE_ROWS 5
-#define BLE_COLS 14
 typedef enum {
     BS_IDLE,
     BS_SEND,
 } ble_state_t;
 
 #define BLE_SYNC_TIMEOUT    1000
-static uint16_t ble_keymaps[AMK_KEYMAP_MAX_LAYER][BLE_ROWS][BLE_COLS];
+static uint16_t ble_keymaps[AMK_KEYMAP_MAX_LAYER][MATRIX_ROWS][MATRIX_COLS];
 typedef struct {
     uint8_t     layer;
     uint8_t     row;
@@ -386,9 +384,12 @@ void uart_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
     HAL_UART_Transmit_DMA(&huart1, &get_cmd[0], 8);
 }
 
+void amk_keymap_init(void)
+{}
+
 void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
 {
-    if (!((layer < AMK_KEYMAP_MAX_LAYER) && (row < BLE_ROWS) && (col < BLE_COLS))) return;
+    if (!((layer < AMK_KEYMAP_MAX_LAYER) && (row < MATRIX_ROWS) && (col < MATRIX_COLS))) return;
 
     ble_keymaps[layer][row][col] = keycode;
     uart_keymap_set(layer, row, col, keycode);
@@ -396,15 +397,36 @@ void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
 
 uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
 {
-    hhkb_matrix_debug("get keymap \n");
-    return 0;//ble_keymaps[layer][row][col];
+    return ble_keymaps[layer][row][col];
+}
+
+uint8_t amk_keymap_get_layer_count(void) { return 4; }
+
+void amk_keymap_get_buffer(uint16_t offset, uint16_t size, uint8_t *data)
+{
+    hhkb_matrix_debug("get_buffer: offset=%d, size=%d\n", offset, size);
+    uint8_t *addr = (uint8_t*)(ble_keymaps)+offset;
+    for (int i = 0; i < size/2; i++) {
+        data[1] = addr[0];
+        data[0] = addr[1];
+        data += 2; 
+        addr += 2;
+    }
+}
+
+void amk_keymap_set_buffer(uint16_t offset, uint16_t size, uint8_t *data)
+{
+    hhkb_matrix_debug("set_buffer: offset=%d, size=%d\n", offset, size);
+    //uint8_t *addr = (uint8_t*)(ble_keymaps)+offset;
+    
+    //memcpy(addr, data, size);
 }
 
 static void ble_sync_init(void)
 {
     for (uint8_t layer = 0; layer < AMK_KEYMAP_MAX_LAYER; layer++) {
-        for (uint8_t row = 0; row < BLE_ROWS; row++) {
-            for (uint8_t col = 0; col < BLE_COLS; col++) {
+        for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
+            for (uint8_t col = 0; col < MATRIX_COLS; col++) {
                 ble_keymaps[layer][row][col] = 0;
             }
         }
@@ -412,7 +434,7 @@ static void ble_sync_init(void)
     ble_sync.layer      = 0;
     ble_sync.row        = 0;
     ble_sync.col        = 0;
-#ifdef WEBCONFIG_ENABLE
+#ifdef VIAL_ENABLE 
     ble_sync.finished   = 0;
 #else
     ble_sync.finished   = 1;    // no need to sync keymap
@@ -454,14 +476,14 @@ static void ble_sync_update(uint8_t layer, uint8_t row, uint8_t col, uint16_t ke
     }
 
     ble_keymaps[layer][row][col] = key;
-    if (col == (BLE_COLS-1)) {
-        if (row < (BLE_ROWS-1)) {
-            col = 0;
+    if (col == (MATRIX_COLS-1)) {
+        if (row < (MATRIX_ROWS-1)) {
+            ble_sync.col = 0;
             ble_sync.row++;
         } else {
             if (layer < (AMK_KEYMAP_MAX_LAYER-1)) {
-                col = 0;
-                row = 0;
+                ble_sync.col = 0;
+                ble_sync.row = 0;
                 ble_sync.layer++;
             } else {
                 // all done
@@ -476,3 +498,6 @@ static void ble_sync_update(uint8_t layer, uint8_t row, uint8_t col, uint16_t ke
     hhkb_matrix_debug("BLESYNC: next key: layer:%d, row:%d, col:%d\n", ble_sync.layer, ble_sync.row, ble_sync.col);
     ble_sync.state = BS_IDLE;
 }
+
+#include "action.h"
+const action_t PROGMEM actionmaps[4][MATRIX_ROWS][MATRIX_COLS];

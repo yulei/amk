@@ -155,28 +155,14 @@ void vial_handle_cmd(uint8_t *msg, uint8_t length) {
     }
 }
 
-// This is generalized so the layout options EEPROM usage can be
-// variable, between 1 and 4 bytes.
-uint32_t via_get_layout_options(void) {
-    uint32_t value = 0;
-    // Start at the most significant byte
-    void *source = (void *)(VIA_EEPROM_LAYOUT_OPTIONS_ADDR);
-    for (uint8_t i = 0; i < VIA_EEPROM_LAYOUT_OPTIONS_SIZE; i++) {
-        value = value << 8;
-        value |= eeprom_read_byte(source);
-        source++;
-    }
-    return value;
+static uint32_t via_get_layout_options(void)
+{
+    return eeconfig_read_layout_options();
 }
 
-void via_set_layout_options(uint32_t value) {
-    // Start at the least significant byte
-    void *target = (void *)(VIA_EEPROM_LAYOUT_OPTIONS_ADDR + VIA_EEPROM_LAYOUT_OPTIONS_SIZE - 1);
-    for (uint8_t i = 0; i < VIA_EEPROM_LAYOUT_OPTIONS_SIZE; i++) {
-        eeprom_update_byte(target, value & 0xFF);
-        value = value >> 8;
-        target--;
-    }
+static void via_set_layout_options(uint32_t value)
+{
+    eeconfig_write_layout_options((uint8_t) value);
 }
 
 void vial_process(uint8_t *data, uint8_t length) 
@@ -276,14 +262,16 @@ void vial_process(uint8_t *data, uint8_t length)
         }
         case id_dynamic_keymap_get_keycode: {
             uint16_t keycode = amk_keymap_get(command_data[0], command_data[1], command_data[2]);//dynamic_keymap_get_keycode(command_data[0], command_data[1], command_data[2]);
+            keycode = amk_to_vial(keycode);
             command_data[3]  = keycode >> 8;
             command_data[4]  = keycode & 0xFF;
             vial_debug("via: id_dynamic_keymap_get_keycode: %d\n", keycode);
             break;
         }
         case id_dynamic_keymap_set_keycode: {
-            //dynamic_keymap_set_keycode(command_data[0], command_data[1], command_data[2], (command_data[3] << 8) | command_data[4]);
-            amk_keymap_set(command_data[0], command_data[1], command_data[2], (command_data[3] << 8) | command_data[4]);
+            uint16_t keycode = (command_data[3] << 8) | command_data[4];
+            keycode = vial_to_amk(keycode);
+            amk_keymap_set(command_data[0], command_data[1], command_data[2], keycode);
             vial_debug("via: id_dynamic_keymap_set_keycode: %d\n",(command_data[3] << 8) | command_data[4]);
             break;
         }
@@ -357,28 +345,24 @@ void vial_process(uint8_t *data, uint8_t length)
             break;
         }
         case id_dynamic_keymap_get_layer_count: {
-            //command_data[0] = dynamic_keymap_get_layer_count();
-            //*command_id = id_unhandled;
-            command_data[0] = 4;//dynamic_keymap_get_layer_count();
-            vial_debug("unhandled command: id_dynamic_keymap_get_layer_count\n");
+            command_data[0] = amk_keymap_get_layer_count();
+            vial_debug("via: id_dynamic_keymap_get_layer_count: %d\n", command_data[0]);
             break;
         }
         case id_dynamic_keymap_get_buffer: {
-            //uint16_t offset = (command_data[0] << 8) | command_data[1];
-            //uint16_t size   = command_data[2];  // size <= 28
-            //if (size <= 28)
-            //    dynamic_keymap_get_buffer(offset, size, &command_data[3]);
-            *command_id = id_unhandled;
-            vial_debug("unhandled command: id_dynamic_keymap_get_buffer\n");
+            uint16_t offset = (command_data[0] << 8) | command_data[1];
+            uint16_t size   = command_data[2];  // size <= 28
+            if (size <= 28)
+                amk_keymap_get_buffer(offset, size, &command_data[3]);
+            vial_debug("vial: id_dynamic_keymap_get_buffer\n");
             break;
         }
         case id_dynamic_keymap_set_buffer: {
-            //uint16_t offset = (command_data[0] << 8) | command_data[1];
-            //uint16_t size   = command_data[2];  // size <= 28
-            //if (size <= 28)
-            //    dynamic_keymap_set_buffer(offset, size, &command_data[3]);
-            *command_id = id_unhandled;
-            vial_debug("unhandled command: id_dynamic_keymap_set_buffer\n");
+            uint16_t offset = (command_data[0] << 8) | command_data[1];
+            uint16_t size   = command_data[2];  // size <= 28
+            if (size <= 28)
+                amk_keymap_set_buffer(offset, size, &command_data[3]);
+            vial_debug("via: id_dynamic_keymap_set_buffer\n");
             break;
         }
 #if defined(VIAL_ENABLE) && !defined(VIAL_INSECURE)
@@ -424,7 +408,6 @@ static void vial_send(uint8_t *data, uint8_t length)
 {
     if (tud_hid_n_ready(ITF_NUM_VIAL)) {
         tud_hid_n_report(ITF_NUM_VIAL, 0, data, length);
-        vial_debug("vial send success\n");
     } else {
         // save to queue
         vial_debug("vial send busy\n");

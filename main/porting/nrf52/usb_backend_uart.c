@@ -13,7 +13,7 @@
 APP_TIMER_DEF(m_vbus_timer_id); /**< vbus check delay */
 
 #ifndef PRINT_AMK_KEYMAP_SETGET
-#define PRINT_AMK_KEYMAP_SETGET 0
+#define PRINT_AMK_KEYMAP_SETGET 1
 #endif
 
 typedef struct {
