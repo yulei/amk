@@ -255,12 +255,13 @@ void USART1_IRQHandler(void)
   {// received one char
     uint8_t d = huart1.Instance->DR & 0x000000FF;
     uart_recv_char(d);
+    __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
     return;
   }
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
   /* USER CODE BEGIN USART1_IRQn 1 */
-
+  __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
   /* USER CODE END USART1_IRQn 1 */
 }
 

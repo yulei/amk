@@ -230,13 +230,14 @@ static void uart_send_cmd(command_t cmd, const uint8_t* data, uint32_t size)
 
 static void uart_process_data(uint8_t data)
 {
+    NRF_LOG_INFO("uart received: %d", data);
     switch(usb_buffer.count) {
     case 0:
     // first byte
         if (data == SYNC_BYTE_1) {
             usb_buffer.data[usb_buffer.count++] = data;
         } else {
-            NRF_LOG_WARNING("Invalid sync 1 received");
+            NRF_LOG_WARNING("Invalid sync 1 received: %d\n", data);
         }
         break;
     case 1:
@@ -244,23 +245,39 @@ static void uart_process_data(uint8_t data)
         if (data == SYNC_BYTE_2) {
             usb_buffer.data[usb_buffer.count++] = data;
         } else {
-            NRF_LOG_WARNING("Invalid sync 2 received");
+            NRF_LOG_WARNING("Invalid sync 2 received: %d\n", data);
             usb_buffer.count = 0;
         }
         break;
     default:
-        usb_buffer.data[usb_buffer.count++] = data;
-        if ((usb_buffer.count > 2) && (usb_buffer.count == (usb_buffer.data[2] + 2))) {
-            // full packet received
-            uint8_t* cmd = &usb_buffer.data[2];
-            uint8_t checksum = compute_checksum(cmd + 2, cmd[0] - 2);
-            if (checksum != cmd[1]) {
-                // invalid checksum
-                NRF_LOG_WARNING("Checksum mismatch: SRC:%x, CUR:%x", cmd[1], checksum);
-            } else {
-                uart_process_cmd(&cmd[2], cmd[0]-2);
-            }
+        if (usb_buffer.count >= NRF_RECV_BUF_SIZE) {
+            NRF_LOG_WARNING("UART receving queue OVERSIZE\n");
             usb_buffer.count = 0;
+        } else if ((usb_buffer.count==2) && (data==SYNC_PING)) {
+            uint8_t cmd[4];
+            cmd[0] = SYNC_BYTE_1;
+            cmd[1] = SYNC_BYTE_2;
+            cmd[2] = SYNC_PONG;
+            usb_buffer.count = 0;
+            // uart sould valid at this moment
+            for (uint32_t i = 0; i < 3; i++) {
+                app_uart_put(cmd[i]);
+            }
+            NRF_LOG_INFO("UART PONG");
+        } else {
+            usb_buffer.data[usb_buffer.count++] = data;
+            if ((usb_buffer.count > 2) && (usb_buffer.count == (usb_buffer.data[2] + 2)) {
+                // full packet received
+                uint8_t* cmd = &usb_buffer.data[2];
+                uint8_t checksum = compute_checksum(cmd + 2, cmd[0] - 2);
+                if (checksum != cmd[1]) {
+                    // invalid checksum
+                    NRF_LOG_WARNING("Checksum mismatch: SRC:%x, CUR:%x", cmd[1], checksum);
+                } else {
+                    uart_process_cmd(&cmd[2], cmd[0]-2);
+                }
+                usb_buffer.count = 0;
+            }
         }
         break;
     }

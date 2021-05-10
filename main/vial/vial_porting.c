@@ -352,16 +352,20 @@ void vial_process(uint8_t *data, uint8_t length)
         case id_dynamic_keymap_get_buffer: {
             uint16_t offset = (command_data[0] << 8) | command_data[1];
             uint16_t size   = command_data[2];  // size <= 28
-            if (size <= 28)
+            if (size <= 28) {
                 amk_keymap_get_buffer(offset, size, &command_data[3]);
+                convert_keycode_buffer(&command_data[3], size, true);
+            }
             vial_debug("vial: id_dynamic_keymap_get_buffer\n");
             break;
         }
         case id_dynamic_keymap_set_buffer: {
             uint16_t offset = (command_data[0] << 8) | command_data[1];
             uint16_t size   = command_data[2];  // size <= 28
-            if (size <= 28)
+            if (size <= 28) {
+                convert_keycode_buffer(&command_data[3], size, false);
                 amk_keymap_set_buffer(offset, size, &command_data[3]);
+            }
             vial_debug("via: id_dynamic_keymap_set_buffer\n");
             break;
         }

@@ -86,7 +86,8 @@ static bool report_queue_get(report_queue_t* queue, report_item_t* item)
 #define CMD_MAX_LEN 64
 #define SYNC_BYTE_1 0xAA
 #define SYNC_BYTE_2 0x55
-#define RECV_DELAY 100
+#define SYNC_PING   0xA5
+#define SYNC_PONG   0x5A
 
 static void process_data(uint8_t d);
 static void enqueue_command(uint8_t *cmd);
@@ -110,6 +111,8 @@ typedef enum
 } command_t;
 
 static uint8_t command_buf[CMD_MAX_LEN];
+static uint32_t command_buf_count = 0;
+
 typedef enum {
     BS_IDLE,
     BS_SEND,
@@ -123,6 +126,7 @@ typedef struct {
     uint8_t     col;
     uint8_t     finished;
     ble_state_t state;
+    uint8_t     pong;
     uint32_t    last;
 } ble_sync_state_t;
 
@@ -157,23 +161,49 @@ static void reset_to_bootloader(reset_reason_t reason)
 
 static void process_data(uint8_t d)
 {
-    hhkb_matrix_debug("uart received: %d\n", d);
-    static uint32_t count = 0;
-    if (count == 0 && d != SYNC_BYTE_1) {
+    hhkb_matrix_debug("uart received: %d, current count=%d\n", d, command_buf_count);
+    if (command_buf_count == 0 && d != SYNC_BYTE_1) {
         hhkb_matrix_debug("SYNC BYTE 1: %x\n", d);
         return;
-    } else if (count == 1 && d != SYNC_BYTE_2) {
-        count = 0;
+    } else if (command_buf_count == 1 && d != SYNC_BYTE_2) {
+        command_buf_count = 0;
+        memset(command_buf, 0, sizeof(command_buf));
         hhkb_matrix_debug("SYNC BYTE 2: %x\n", d);
         return;
     }
 
-    command_buf[count] = d;
-    count++;
-    if ((count > 2) && (count == (command_buf[2] + 2))) {
-        // full packet received
-        enqueue_command(&command_buf[2]);
-        count = 0;
+    if (command_buf_count >= CMD_MAX_LEN) {
+        hhkb_matrix_debug("UART command oversize\n");
+        memset(command_buf, 0, sizeof(command_buf));
+        command_buf_count = 0;
+        return;
+    }
+
+    command_buf[command_buf_count] = d;
+
+    if ((command_buf_count==2) && (d==SYNC_PONG)) {
+        hhkb_matrix_debug("SYNC PONG received: %x\n", d);
+        ble_sync.pong = 1;
+        memset(command_buf, 0, sizeof(command_buf));
+        command_buf_count= 0;
+        return;
+    }
+
+    if (command_buf[2]+2 > CMD_MAX_LEN) {
+        hhkb_matrix_debug("UART invalid command size: %d\n", command_buf[2]);
+        memset(command_buf, 0, sizeof(command_buf));
+        command_buf_count= 0;
+        return;
+    }
+
+    command_buf_count++;
+    if (command_buf_count > 2) {
+        if (command_buf_count == (command_buf[2] + 2)) {
+            // full packet received
+            enqueue_command(&command_buf[2]);
+            memset(command_buf, 0, sizeof(command_buf));
+            command_buf_count = 0;
+        }
     }
 }
 
@@ -308,11 +338,12 @@ static void send_set_leds(uint8_t led)
 static matrix_row_t matrix[MATRIX_ROWS];
 static uint8_t recv_char;
 
-
-
 void matrix_init(void)
 {
     report_queue_init(&report_queue);
+    memset(command_buf, 0, sizeof(command_buf));
+    command_buf_count = 0;
+
     HAL_UART_Receive_IT(&huart1, &recv_char, 1);
     gpio_set_input_pullup(reset_pin);
     ble_sync_init();
@@ -441,6 +472,7 @@ static void ble_sync_init(void)
 #endif
 
     ble_sync.state      = BS_IDLE;
+    ble_sync.pong       = 0;
     ble_sync.last       = timer_read32();
 }
 
@@ -458,9 +490,19 @@ static void ble_sync_process(void)
         }
     }
 
-    // get current keymap
-    hhkb_matrix_debug("BLE SYNC: uart keymap get: layer:%d, row:%d, col:%d\n", ble_sync.layer, ble_sync.row, ble_sync.col);
-    uart_keymap_get(ble_sync.layer, ble_sync.row, ble_sync.col);
+    if (ble_sync.pong == 0) {
+        hhkb_matrix_debug("BLE SYNC: send ping\n");
+        static uint8_t ping_cmd[4];
+        ping_cmd[0] = SYNC_BYTE_1;
+        ping_cmd[1] = SYNC_BYTE_2;
+        ping_cmd[2] = SYNC_PING;
+        HAL_UART_Transmit_DMA(&huart1, &ping_cmd[0], 3);
+    } else {
+        // get current keymap
+        hhkb_matrix_debug("BLE SYNC: uart keymap get: layer:%d, row:%d, col:%d\n", ble_sync.layer, ble_sync.row, ble_sync.col);
+        uart_keymap_get(ble_sync.layer, ble_sync.row, ble_sync.col);
+    }
+
     ble_sync.last = timer_read32();
     ble_sync.state = BS_SEND;
 }

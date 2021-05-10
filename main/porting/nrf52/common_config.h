@@ -94,6 +94,8 @@
 // UART communication
 #define SYNC_BYTE_1 0xAA
 #define SYNC_BYTE_2 0x55
+#define SYNC_PING   0xA5
+#define SYNC_PONG   0x5A
 
 typedef enum {
     CMD_KEY_REPORT,
