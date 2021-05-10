@@ -266,7 +266,7 @@ static void uart_process_data(uint8_t data)
             NRF_LOG_INFO("UART PONG");
         } else {
             usb_buffer.data[usb_buffer.count++] = data;
-            if ((usb_buffer.count > 2) && (usb_buffer.count == (usb_buffer.data[2] + 2)) {
+            if ((usb_buffer.count > 2) && (usb_buffer.count == (usb_buffer.data[2] + 2))) {
                 // full packet received
                 uint8_t* cmd = &usb_buffer.data[2];
                 uint8_t checksum = compute_checksum(cmd + 2, cmd[0] - 2);
