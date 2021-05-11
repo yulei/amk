@@ -46,8 +46,10 @@ static bool    aw9523b_ready     = false;
 
 bool aw9523b_available(uint8_t addr)
 {
+    bool need_release = false;
     if (!i2c_ready()) {
         i2c_init();
+        need_release = true;
     }
 
 #ifdef RGBLIGHT_EN_PIN
@@ -63,7 +65,10 @@ bool aw9523b_available(uint8_t addr)
 #endif
     bool available = (ec == AMK_SUCCESS) ? true : false;
     if (!available) {
-        i2c_uninit();
+        aw9523b_debug("aw9523b not available: %d, release?=%d\n", ec, need_release);
+        if (need_release) {
+            i2c_uninit();
+        }
     }
 
     return available;

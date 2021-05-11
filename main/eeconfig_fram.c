@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "eeconfig.h"
+#include "eeprom_manager.h"
 #include "mb85rcxx.h"
 #include "amk_printf.h"
 

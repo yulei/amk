@@ -78,8 +78,73 @@ static uint16_t map_keycode(uint16_t keycode, bool amk)
     for (int i = 0; i < sizeof(keycode_map)/sizeof(keycode_map_t); i++) {
         bool matched = amk ? keycode_map[i].amk_keycode.code == keycode : keycode_map[i].vial_keycode == keycode;
         if (matched) {
-            return amk ? keycode_map[i].amk_keycode.code : keycode_map[i].vial_keycode;
+            return amk ? keycode_map[i].vial_keycode : keycode_map[i].amk_keycode.code;
         }
+    }
+
+    return 0;
+}
+
+/* keycode to system usage */
+static uint8_t usage_to_keycode(uint16_t usage) 
+{
+    switch(usage) {
+        // system usage
+        case SYSTEM_POWER_DOWN:
+            return KC_SYSTEM_POWER;
+        case SYSTEM_SLEEP:
+            return KC_SYSTEM_SLEEP;
+        case SYSTEM_WAKE_UP:
+            return KC_SYSTEM_WAKE;
+        // consumer usage
+        case AUDIO_MUTE:
+            return KC_AUDIO_MUTE;
+        case AUDIO_VOL_UP:
+            return KC_AUDIO_VOL_UP;
+        case AUDIO_VOL_DOWN:
+            return KC_AUDIO_VOL_DOWN;
+        case TRANSPORT_NEXT_TRACK:
+            return KC_MEDIA_NEXT_TRACK;
+        case TRANSPORT_PREV_TRACK:
+            return KC_MEDIA_PREV_TRACK;
+        case TRANSPORT_FAST_FORWARD:
+            return KC_MEDIA_FAST_FORWARD;
+        case TRANSPORT_REWIND:
+            return KC_MEDIA_REWIND;
+        case TRANSPORT_STOP:
+            return KC_MEDIA_STOP;
+        case TRANSPORT_STOP_EJECT:
+            return KC_MEDIA_EJECT;
+        case TRANSPORT_PLAY_PAUSE:
+            return KC_MEDIA_PLAY_PAUSE;
+        case APPLAUNCH_CC_CONFIG:
+            return KC_MEDIA_SELECT;
+        case APPLAUNCH_EMAIL:
+            return KC_MAIL;
+        case APPLAUNCH_CALCULATOR:
+            return KC_CALCULATOR;
+        case APPLAUNCH_LOCAL_BROWSER:
+            return KC_MY_COMPUTER;
+        case APPCONTROL_SEARCH:
+            return KC_WWW_SEARCH;
+        case APPCONTROL_HOME:
+            return KC_WWW_HOME;
+        case APPCONTROL_BACK:
+            return KC_WWW_BACK;
+        case APPCONTROL_FORWARD:
+            return KC_WWW_FORWARD;
+        case APPCONTROL_STOP:
+            return KC_WWW_STOP;
+        case APPCONTROL_REFRESH:
+            return KC_WWW_REFRESH;
+        case APPCONTROL_BOOKMARKS:
+            return KC_WWW_FAVORITES;
+        case BRIGHTNESS_INCREMENT:
+            return KC_BRIGHTNESS_INC;
+        case BRIGHTNESS_DECREMENT:
+            return KC_BRIGHTNESS_DEC;
+        default:
+            break;
     }
 
     return 0;
@@ -119,6 +184,12 @@ uint16_t amk_to_vial(uint16_t keycode)
                         break;
                 }
             }
+            break;
+        case ACT_USAGE:
+            vial_kc = usage_to_keycode(action.usage.code);
+            break;
+        case ACT_MOUSEKEY:
+            vial_kc = action.key.code;
             break;
         case ACT_LAYER:
             {
@@ -182,12 +253,42 @@ uint16_t amk_to_vial(uint16_t keycode)
     return vial_kc;
 }
 
+static action_t convert_basic(uint16_t keycode)
+{
+    action_t ac = ACTION_NO;
+    switch (keycode) {
+        case KC_A ... KC_EXSEL:
+        case KC_LCTRL ... KC_RGUI:
+            ac = (action_t)ACTION_KEY(keycode);
+            break;
+        case KC_SYSTEM_POWER ... KC_SYSTEM_WAKE:
+            ac = (action_t)ACTION_USAGE_SYSTEM(KEYCODE2SYSTEM(keycode));
+            break;
+        case KC_AUDIO_MUTE ... KC_BRIGHTNESS_DEC:
+            ac = (action_t)ACTION_USAGE_CONSUMER(KEYCODE2CONSUMER(keycode));
+            break;
+        case KC_MS_UP ... KC_MS_ACCEL2:
+            ac = (action_t)ACTION_MOUSEKEY(keycode);
+            break;
+        case KC_TRNS:
+            ac = (action_t)ACTION_TRANSPARENT;
+            break;
+        case KC_BOOTLOADER:
+            ac = (action_t)ACTION_COMMAND(COMMAND_BOOTLOADER, 0);
+            break;
+        default:
+            break;
+    }
+
+    return ac;
+}
+
 uint16_t vial_to_amk(uint16_t keycode)
 {
     action_t amk_kc = AC_NO;
     switch( keycode) {
         case QK_BASIC ... QK_BASIC_MAX:
-            amk_kc.code = keycode;
+            amk_kc = convert_basic(keycode);
         break;
         case QK_MODS  ...  QK_MODS_MAX: {
             amk_kc = (action_t)ACTION_MODS_KEY(keycode >> 8, keycode & 0xFF);
