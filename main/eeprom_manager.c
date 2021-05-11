@@ -195,6 +195,9 @@ void eeconfig_init(void)
 #endif
 
     eeprom_write_byte(EECONFIG_LAYOUT_OPTIONS, 0);
+
+    // reset keymap to original state
+    amk_keymap_reset();
 }
 
 void eeconfig_enable(void)
