@@ -382,6 +382,9 @@ bool hook_process_action_main(keyrecord_t *record) {
     }
 
     switch(action.key.code) {
+        case KC_F19:
+            // reset keymap
+            amk_keymap_reset();
         case KC_F20: // disable sleep mode
             rf_driver.output_target &= ~SLEEP_ENABLED;
             break;

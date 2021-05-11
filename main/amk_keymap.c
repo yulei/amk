@@ -59,6 +59,22 @@ void amk_keymap_init(void)
 }
 
 __attribute__((weak))
+void amk_keymap_reset(void)
+{
+    memset(amk_keymaps, 0, sizeof(amk_keymaps));
+    for(int layer = 0; layer < AMK_KEYMAP_MAX_LAYER; layer++) {
+        for (int row = 0; row < MATRIX_ROWS; row++) {
+            for (int col = 0; col < MATRIX_COLS; col++) {
+                amk_keymaps[layer][row][col] = actionmaps[layer][row][col].code;
+                ee_keymap_write_key(layer, row, col, amk_keymaps[layer][row][col]);
+            }
+        }
+    }
+    ee_keymap_set_valid(true);
+    amk_printf("amk_keymap_reset finished\n");
+}
+
+__attribute__((weak))
 uint8_t amk_keymap_get_layer_count(void)
 {
     return AMK_KEYMAP_MAX_LAYER;
@@ -98,6 +114,12 @@ __attribute__((weak))
 void amk_keymap_init(void)
 {
     amk_printf("amk_keymap_init in disabled mode\n");
+}
+
+__attribute__((weak))
+void amk_keymap_reset(void)
+{
+    amk_printf("amk_keymap_reset in disabled mode\n");
 }
 
 __attribute__((weak))

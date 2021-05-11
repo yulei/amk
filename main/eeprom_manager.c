@@ -6,6 +6,7 @@
 #include "eeconfig.h"
 #include "rgb_effects.h"
 #include "rgb_matrix.h"
+#include "amk_keymap.h"
 #include "amk_printf.h"
 
 #ifndef EEPROM_MANAGER_DEBUG
@@ -111,7 +112,7 @@ void eeconfig_update_layout_options(uint8_t options)
 
 static uint16_t* ee_keymap_get_addr(uint8_t layer, uint8_t row, uint8_t col)
 {
-    return (uint16_t*)(EEKEYMAP_START_ADDR + ((layer*KEYMAP_LAYER_SIZE)+(MATRIX_ROWS*row+col)*2));
+    return (uint16_t*)(EEKEYMAP_START_ADDR + ((layer*KEYMAP_LAYER_SIZE)+(MATRIX_COLS*row+col)*2));
 }
 
 static uint8_t *ee_keymap_get_addr_by_offset(uint16_t offset)
@@ -164,3 +165,58 @@ void ee_keymap_read_buffer(uint16_t offset, uint16_t size, uint8_t *data)
         addr++;
     }
 }
+
+/*****************/
+/* TMK functions */
+/*****************/
+
+// platform dependent preparation
+__attribute__((weak))
+void eeconfig_init_prepare(void) {}
+
+void eeconfig_init(void)
+{
+    eeconfig_init_prepare();
+
+    eeprom_write_word(EECONFIG_MAGIC,          EECONFIG_MAGIC_NUMBER);
+    eeprom_write_byte(EECONFIG_DEBUG,          0);
+    eeprom_write_byte(EECONFIG_DEFAULT_LAYER,  0);
+    eeprom_write_byte(EECONFIG_KEYMAP,         0);
+    eeprom_write_byte(EECONFIG_MOUSEKEY_ACCEL, 0);
+
+#ifdef RGB_EFFECTS_ENABLE
+    extern void effects_update_default(void);
+    effects_update_default();
+#endif
+
+#ifdef RGB_MATRIX_ENABLE
+    extern void rgb_matrix_update_default(void);
+    rgb_matrix_update_default();
+#endif
+
+    eeprom_write_byte(EECONFIG_LAYOUT_OPTIONS, 0);
+}
+
+void eeconfig_enable(void)
+{
+    eeprom_write_word(EECONFIG_MAGIC, EECONFIG_MAGIC_NUMBER);
+}
+
+void eeconfig_disable(void)
+{
+    eeprom_write_word(EECONFIG_MAGIC, 0xFFFF);
+}
+
+bool eeconfig_is_enabled(void)
+{
+    return (eeprom_read_word(EECONFIG_MAGIC) == EECONFIG_MAGIC_NUMBER);
+}
+
+uint8_t eeconfig_read_debug(void)      { return eeprom_read_byte(EECONFIG_DEBUG); }
+void eeconfig_write_debug(uint8_t val) { eeprom_write_byte(EECONFIG_DEBUG, val); }
+
+uint8_t eeconfig_read_default_layer(void)      { return eeprom_read_byte(EECONFIG_DEFAULT_LAYER); }
+void eeconfig_write_default_layer(uint8_t val) { eeprom_write_byte(EECONFIG_DEFAULT_LAYER, val); }
+
+uint8_t eeconfig_read_keymap(void)      { return eeprom_read_byte(EECONFIG_KEYMAP); }
+void eeconfig_write_keymap(uint8_t val) { eeprom_write_byte(EECONFIG_KEYMAP, val); }

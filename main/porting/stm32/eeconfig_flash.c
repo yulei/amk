@@ -129,59 +129,11 @@ void eeprom_update_block(const void *buf, void *addr, size_t len)
     eeprom_write_block(buf, addr, len);
 }
 
-//=======================================================
-// TMK functions
-//=======================================================
-__attribute__((weak))
-void hook_eeconfig_init(void) {}
-
-void eeconfig_init(void)
+// cleanup eeconfig before initialization
+void eeconfig_prepare(void)
 {
     fee_erase();
-    eeprom_write_word(EECONFIG_MAGIC,           EECONFIG_MAGIC_NUMBER);
-    eeprom_write_byte(EECONFIG_DEBUG,           0);
-    eeprom_write_byte(EECONFIG_DEFAULT_LAYER,   0);
-    eeprom_write_byte(EECONFIG_KEYMAP,          0);
-    eeprom_write_byte(EECONFIG_MOUSEKEY_ACCEL,  0);
-
-#ifdef RGB_EFFECTS_ENABLE
-    extern void effects_update_default(void);
-    effects_update_default();
-#endif
-
-#ifdef RGB_MATRIX_ENABLE
-    extern void rgb_matrix_update_default(void);
-    rgb_matrix_update_default();
-#endif
-
-    eeprom_write_byte(EECONFIG_LAYOUT_OPTIONS, 0);
-
-    hook_eeconfig_init();
 }
-
-void eeconfig_enable(void)
-{
-    eeprom_write_word(EECONFIG_MAGIC, EECONFIG_MAGIC_NUMBER);
-}
-
-void eeconfig_disable(void)
-{
-    eeprom_write_word(EECONFIG_MAGIC, 0xFFFF);
-}
-
-bool eeconfig_is_enabled(void)
-{
-    return (eeprom_read_word(EECONFIG_MAGIC) == EECONFIG_MAGIC_NUMBER);
-}
-
-uint8_t eeconfig_read_debug(void)      { return eeprom_read_byte(EECONFIG_DEBUG); }
-void eeconfig_write_debug(uint8_t val) { eeprom_write_byte(EECONFIG_DEBUG, val); }
-
-uint8_t eeconfig_read_default_layer(void)      { return eeprom_read_byte(EECONFIG_DEFAULT_LAYER); }
-void eeconfig_write_default_layer(uint8_t val) { eeprom_write_byte(EECONFIG_DEFAULT_LAYER, val); }
-
-uint8_t eeconfig_read_keymap(void)      { return eeprom_read_byte(EECONFIG_KEYMAP); }
-void eeconfig_write_keymap(uint8_t val) { eeprom_write_byte(EECONFIG_KEYMAP, val); }
 
 //==============================================
 // flash eeprom operation
