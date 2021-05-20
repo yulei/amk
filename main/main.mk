@@ -38,9 +38,9 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 #	SRCS += $(MAIN_DIR)/drivers/ssd1357.c
 	SRCS += $(MAIN_DIR)/drivers/st7735.c
 	SRCS += $(MAIN_DIR)/screen/screen.c
-	SRCS += $(MAIN_DIR)/screen/gifdec.c
-	SRCS += $(MAIN_DIR)/screen/image.c
-	SRCS += $(MAIN_DIR)/screen/upng.c
+#	SRCS += $(MAIN_DIR)/screen/gifdec.c
+#	SRCS += $(MAIN_DIR)/screen/image.c
+#	SRCS += $(MAIN_DIR)/screen/upng.c
 	SRCS += $(MAIN_DIR)/screen/fractal.c
 endif
 
