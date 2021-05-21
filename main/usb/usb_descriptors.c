@@ -268,6 +268,25 @@ uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf)
 #endif
 }
 
+uint32_t tud_hid_descriptor_report_size(uint8_t itf)
+{
+#ifdef SHARED_HID_EP
+    return tud_descriptor_hid_report_kbd_size();
+#else
+    if (itf == ITF_NUM_HID_KBD) {
+        return tud_descriptor_hid_report_kbd_size();
+    } else if (itf == ITF_NUM_HID_OTHER) {
+        return tud_descriptor_hid_report_other_size();
+    }
+    #ifdef VIAL_ENABLE
+    else if (itf == ITF_NUM_VIAL) {
+        return tud_descriptor_hid_report_vial_size();
+    }
+    #endif
+    return 0;
+#endif
+}
+
 static uint8_t desc_hid_kbd[] = {
 #ifdef SHARED_HID_EP
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
@@ -275,6 +294,44 @@ static uint8_t desc_hid_kbd[] = {
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
 #endif
 };
+
+
+uint8_t const* tud_hid_descriptor_interface_cb(uint8_t itf)
+{
+    #ifdef SHARED_HID_EP
+    return tud_descriptor_hid_interface_kbd_cb();
+#else
+    if (itf == ITF_NUM_HID_KBD) {
+        return tud_descriptor_hid_interface_kbd_cb();
+    } else if (itf == ITF_NUM_HID_OTHER) {
+        return tud_descriptor_hid_interface_other_cb();
+    }
+    #ifdef VIAL_ENABLE
+    else if (itf == ITF_NUM_VIAL) {
+        return tud_descriptor_hid_interface_vial_cb();
+    }
+    #endif
+    return NULL;
+#endif
+}
+uint32_t tud_hid_descriptor_interface_size(uint8_t itf)
+{
+#ifdef SHARED_HID_EP
+    return tud_descriptor_hid_interface_kbd_size();
+#else
+    if (itf == ITF_NUM_HID_KBD) {
+        return tud_descriptor_hid_interface_kbd_size();
+    } else if (itf == ITF_NUM_HID_OTHER) {
+        return tud_descriptor_hid_interface_other_size();
+    }
+    #ifdef VIAL_ENABLE
+    else if (itf == ITF_NUM_VIAL) {
+        return tud_descriptor_hid_interface_vial_size();
+    }
+    #endif
+    return 0;
+#endif
+}
 
 // Invoded when received GET HID DESCRIPTOR
 uint8_t const* tud_descriptor_hid_interface_kbd_cb(void)
@@ -417,7 +474,7 @@ char const* string_desc_arr [] =
     (const char[]) { 0x09, 0x04 },  // 0: is supported language is English (0x0409)
     TU_XSTRING(MANUFACTURER),       // 1: Manufacturer
     TU_XSTRING(PRODUCT),            // 2: Product
-    "vial:f64c2b3c",                       // 3: Serials, should use chip ID
+    "vial:f64c2b3c",                // 3: Serials, should use chip ID
     "Configuration",                // 4: Device configuration 
     "HID Keyboard",                 // 5: Hid keyboard
     "HID Extra",                    // 6: Hid extra key

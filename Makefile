@@ -4,6 +4,7 @@ NRF_MCUS := NRF52832 NRF52840
 STM32_MCUS := STM32F103 STM32F411 STM32F405 STM32F722 STM32L432
 ATSAMD_MCUS := ATSAMD21
 NUVOTON_MCUS := NUC126
+GD32_MCUS := GD32E103
 
 # Source files
 SRCS += \
@@ -26,6 +27,7 @@ NRF5_DIR := nrf5_sdk
 STM32_DIR := stm32_sdk
 ATSAMD_DIR := atsamd_sdk
 NUVOTON_DIR := nuvoton_sdk
+GD32_DIR := gd32_sdk
 
 ifneq (, $(GOALS))
 GOAL_LIST := $(subst /, ,$(GOALS))
@@ -50,6 +52,8 @@ else
 $(error Unsupported Target: $(GOALS))
 endif
 
+$(info $(MCU))
+
 include $(MAIN_DIR)/main.mk
 include $(LIB_DIR)/tmk.mk
 include $(LIB_DIR)/printf.mk
@@ -61,6 +65,8 @@ else ifneq (,$(filter $(strip $(MCU)),$(ATSAMD_MCUS)))
 include $(ATSAMD_DIR)/atsamd_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(NUVOTON_MCUS)))
 include $(NUVOTON_DIR)/nuvoton_sdk.mk
+else ifneq (,$(filter $(strip $(MCU)),$(GD32_MCUS)))
+include $(GD32_DIR)/gd32_sdk.mk
 else
 $(error Unsupported MCU: $(MCU))
 endif

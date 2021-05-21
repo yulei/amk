@@ -7,13 +7,13 @@
 #include "bootloader.h"
 #include "wait.h"
 
-#ifndef USB_HOST_ENABLE
+#if !defined(USB_HOST_ENABLE) && !defined(GD32E10X)
 #include "tusb.h"
 #endif
 
 static uint32_t Bootloader_Magic=0x41544B42;
 
-#if defined (NUC126) || defined(__SAMD21G18A__) || defined(STM32L432xx)
+#if defined (NUC126) || defined(__SAMD21G18A__) || defined(STM32L432xx) || defined(GD32E10X)
 static void magic_write(uint32_t magic)
 {}
 #else
@@ -37,7 +37,7 @@ void bootloader_jump(void)
 {
     magic_write(Bootloader_Magic);
 
-#ifndef USB_HOST_ENABLE
+#if !defined(USB_HOST_ENABLE) && !defined(GD32E10X)
     tud_disconnect();
 #endif
     wait_ms(10);
