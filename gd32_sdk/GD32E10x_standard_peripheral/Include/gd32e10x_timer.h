@@ -590,7 +590,7 @@ void timer_deinit(uint32_t timer_periph);
 /* initialize TIMER init parameter struct */
 void timer_struct_para_init(timer_parameter_struct* initpara);
 /* initialize TIMER counter */
-void timer_init(uint32_t timer_periph, timer_parameter_struct* initpara);
+void gdtimer_init(uint32_t timer_periph, timer_parameter_struct* initpara);
 /* enable a timer */
 void timer_enable(uint32_t timer_periph);
 /* disable a timer */

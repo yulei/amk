@@ -3,6 +3,7 @@ include $(MAIN_DIR)/porting/common_porting.mk
 GD32_PORTING_DIR := $(MAIN_DIR)/porting/gd32
 
 SRCS += \
+	$(GD32_PORTING_DIR)/gd32e10x_hw.c \
 	$(GD32_PORTING_DIR)/gpio_pin.c \
 	$(GD32_PORTING_DIR)/gd32.c \
 	$(GD32_PORTING_DIR)/wait.c \

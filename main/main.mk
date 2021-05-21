@@ -146,3 +146,6 @@ ifneq (,$(filter $(strip $(MCU)),$(NUVOTON_MCUS)))
 	include $(MAIN_DIR)/porting/nuvoton.mk
 endif
 
+ifneq (,$(filter $(strip $(MCU)),$(GD32_MCUS)))
+	include $(MAIN_DIR)/porting/gd32.mk
+endif

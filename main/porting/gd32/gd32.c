@@ -5,9 +5,11 @@
 #include "gpio_pin.h"
 #include "usb_descriptors.h"
 #include "usb_comp.h"
+#include "drv_usb_hw.h"
+#include "drv_usbd_int.h"
 
 volatile static uint32_t systick_count;
-usb_core_driver amk_comp;
+extern usb_core_driver amk_comp;
 
 extern void usb_timer_irq(void);
 
@@ -31,11 +33,11 @@ void system_init(void)
 {
     systick_init();
 
-	usb_rcu_config();
-    usb_timer_init();
-    usbd_init(&amk_comp, USB_CORE_ENUM_FS, &comp_desc, &usbd_comp_cb);
+	//usb_rcu_config();
+    //usb_timer_init();
+    //usbd_init(&amk_comp, USB_CORE_ENUM_FS, &comp_desc, &usbd_comp_cb);
     //usb_dev_disconnect(&msc_udisk);
-    usb_intr_config();
+    //usb_intr_config();
 }
 
 void custom_board_init(void)
@@ -58,7 +60,7 @@ void sdk_init()
 
 uint32_t sdk_ticks(void)
 {
-    return systick_get();
+    return systick_get_tick();
 }
 
 // system irq handler
@@ -74,5 +76,5 @@ void TIMER2_IRQHandler(void)
 
 void  USBFS_IRQHandler (void)
 {
-    usbd_isr(&msc_udisk);
+    usbd_isr(&amk_comp);
 }

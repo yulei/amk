@@ -10,11 +10,12 @@
 #include "report_queue.h"
 #include "wait.h"
 #include "amk_printf.h"
-#include "usb_descriptor.h"
+#include "usb_descriptors.h"
+#include "usb_comp.h"
 
-static usb_core_driver hid_comp;
-static usb_desc hid_comp_desc;
-static usb_class_core hid_comp_core;
+usb_core_driver amk_comp;
+usb_desc comp_desc;
+usb_class_core comp_core;
 
 static hid_report_queue_t report_queue;
 
@@ -26,7 +27,7 @@ void usb_init(void)
     hid_report_queue_init(&report_queue);
     usb_rcu_config();
     usb_timer_init();
-    usbd_init(&hid_comp, USB_CORE_ENUM_FS, &hid_comp_desc, &hid_comp_class);
+    usbd_init(&amk_comp, USB_CORE_ENUM_FS, &comp_desc, &comp_core);
     usb_intr_config();
 }
 
@@ -47,11 +48,11 @@ static bool usb_itf_ready(uint32_t type)
 {
     switch(type) {
     case HID_REPORT_ID_KEYBOARD:
-        return usbd_comp_itf_ready(&hUsbDeviceFS, ITF_NUM_HID_KBD);
+        return usbd_comp_itf_ready(&amk_comp, ITF_NUM_HID_KBD);
     case HID_REPORT_ID_MOUSE:
     case HID_REPORT_ID_SYSTEM:
     case HID_REPORT_ID_CONSUMER:
-        return usbd_comp_itf_ready(&hUsbDeviceFS, ITF_NUM_HID_OTHER);
+        return usbd_comp_itf_ready(&amk_comp, ITF_NUM_HID_OTHER);
     default:
         break;
     }
@@ -62,16 +63,16 @@ static bool usb_itf_send_report(uint32_t report_type, const void* data, uint32_t
 {
     switch(report_type) {
     case HID_REPORT_ID_KEYBOARD:
-        usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_KEYBOARD, (uint8_t*)data, size);
+        usbd_comp_send(&amk_comp, HID_REPORT_ID_KEYBOARD, (uint8_t*)data, size);
         break;
     case HID_REPORT_ID_MOUSE:
-        usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_MOUSE, (uint8_t*)data, size);
+        usbd_comp_send(&amk_comp, HID_REPORT_ID_MOUSE, (uint8_t*)data, size);
         break;
     case HID_REPORT_ID_SYSTEM:
-        usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_SYSTEM, (uint8_t*)data, size);
+        usbd_comp_send(&amk_comp, HID_REPORT_ID_SYSTEM, (uint8_t*)data, size);
         break;
     case HID_REPORT_ID_CONSUMER:
-        usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_CONSUMER, (uint8_t*)data, size);
+        usbd_comp_send(&amk_comp, HID_REPORT_ID_CONSUMER, (uint8_t*)data, size);
         break;
     }
     return true;
@@ -79,19 +80,19 @@ static bool usb_itf_send_report(uint32_t report_type, const void* data, uint32_t
 
 bool usb_ready(void)
 {
-    return (hid_comp.dev.cur_status == USBD_CONFIGURED);
+    return (amk_comp.dev.cur_status == USBD_CONFIGURED);
 }
 
 bool usb_suspended(void)
 {
-    return (hid_comp.dev.cur_status == USBD_SUSPENDED);
+    return (amk_comp.dev.cur_status == USBD_SUSPENDED);
 }
 
 void usb_remote_wakeup(void)
 {
-    usb_rwkup_set(&hid_comp);
+    usb_rwkup_set(&amk_comp);
     wait_ms(5);
-    usb_rwkup_reset(&hid_comp);
+    usb_rwkup_reset(&amk_comp);
 }
 
 void usb_send_report(uint8_t report_type, const void* data, size_t size)

@@ -4,7 +4,7 @@ NRF_MCUS := NRF52832 NRF52840
 STM32_MCUS := STM32F103 STM32F411 STM32F405 STM32F722 STM32L432
 ATSAMD_MCUS := ATSAMD21
 NUVOTON_MCUS := NUC126
-GD32_MCUS := GD32E103
+GD32_MCUS := GD32_E103 
 
 # Source files
 SRCS += \
@@ -51,8 +51,6 @@ include $(wildcard $(KEYBOARD_DIR)/*.mk)
 else
 $(error Unsupported Target: $(GOALS))
 endif
-
-$(info $(MCU))
 
 include $(MAIN_DIR)/main.mk
 include $(LIB_DIR)/tmk.mk

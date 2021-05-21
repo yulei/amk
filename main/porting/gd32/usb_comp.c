@@ -12,7 +12,7 @@ static uint8_t comp_data_in(usb_dev *udev, uint8_t ep_num);
 static uint8_t comp_data_out(usb_dev *udev, uint8_t ep_num);
 
 usb_class_core usbd_comp_cb = {
-    .command        = NO_CMD,
+    .command        = 0xFFU,//NO_CMD,
     .alter_set      = 0U,
 
     .init           = comp_init,
@@ -93,20 +93,20 @@ bool usbd_comp_itf_ready(usb_core_driver *udev, uint32_t itf_num)
 {
     if (itf_num >= ITF_NUM_TOTAL) return false;
 
-    comp_itf_t *itf = (comp_itf_t*)(&udev->dev.class_data[itf_num])
-    return itf->busy;
+    comp_itf_t *itf = (comp_itf_t*)(&udev->dev.class_data[itf_num]);
+    return itf->busy ? true : false;
 }
 
 static comp_itf_t *find_itf(usb_core_driver *udev, uint8_t type)
 {
     if (type == HID_REPORT_ID_KEYBOARD) {
-        return &udev->dev.class_data[ITF_NUM_HID_KBD];
+        return (comp_itf_t*)udev->dev.class_data[ITF_NUM_HID_KBD];
 #ifdef VIAL_ENABLE 
     } else if (type == HID_REPORT_ID_VIAL) {
-        return &udev->dev.class_data[ITF_NUM_VIAL];
+        return (comp_itf_t*)udev->dev.class_data[ITF_NUM_VIAL];
 #endif
     } else {
-        return &udev->dev.class_data[ITF_NUM_OTHER];
+        return (comp_itf_t*)udev->dev.class_data[ITF_NUM_HID_OTHER];
     }
 }
 
@@ -129,13 +129,14 @@ uint8_t usbd_comp_send(usb_core_driver *udev, uint8_t type, uint8_t *report, uin
 
 uint8_t comp_init(usb_dev *udev, uint8_t config_index)
 {
-    comp_desc.dev_desc = tud_descriptor_device_cb();
-    comp_desc.config_desc = tud_descriptor_configuration_cb(); 
+    comp_desc.dev_desc = (uint8_t*)tud_descriptor_device_cb();
+    comp_desc.config_desc = (uint8_t*)tud_descriptor_configuration_cb(0); 
 
     usb_hid_desc_config_set* hid_config_desc = (usb_hid_desc_config_set*)comp_desc.config_desc;
 
     for (int i = 0; i < ITF_NUM_TOTAL; i++) {
         memset(&comp_itfs[i], 0, sizeof(comp_itf_t));
+        udev->dev.class_data[i] = &comp_itfs[i];
         if (i == ITF_NUM_HID_KBD) {
             comp_itfs[i].ep_in = 0x80 | EPNUM_HID_KBD;
             comp_itfs[i].ep_out = 0xFF;
@@ -155,23 +156,26 @@ uint8_t comp_init(usb_dev *udev, uint8_t config_index)
             usbd_ep_setup (udev, &(hid_config_desc->hid_epin));
         }
     }
+
+    return USB_OK;
 }
 
 static uint8_t comp_deinit(usb_dev *udev, uint8_t config_index)
 {
-    usb_hid_desc_config_set* hid_config_desc = (usb_hid_desc_config_set*)comp_desc.config_desc;
     for (int i = 0; i < ITF_NUM_TOTAL; i++) {
         if (i == ITF_NUM_HID_KBD) {
-            usbd_ep_clear(udev, &(hid_config_desc->hid_epin));
+            usbd_ep_clear(udev, EPNUM_HID_KBD);
 #ifdef VIAL_ENABLE 
         } else if (type == HID_REPORT_ID_VIAL) {
-            usbd_ep_clear(udev, &(hid_config_desc->hid_epin));
-            usbd_ep_clear(udev, &(hid_config_desc->hid_epout));
+            usbd_ep_clear(udev, EPNUM_VIAL_IN);
+            usbd_ep_clear(udev, EPNUM_VIAL_IN);
 #endif
         } else {
-            usbd_ep_setup (udev, &(hid_config_desc->hid_epin));
+            usbd_ep_clear(udev, EPNUM_HID_OTHER);
         }
     }
+
+    return USB_OK;
 }
 
 extern uint8_t amk_led_state;
@@ -181,7 +185,7 @@ static uint8_t comp_req_proc(usb_dev *udev, usb_req *req)
 
     if (req->wIndex >= ITF_NUM_TOTAL) return USBD_FAIL;
 
-    comp_itf_t* itf = comp_itfs[req->wIndex];
+    comp_itf_t* itf = &comp_itfs[req->wIndex];
 
     switch (req->bRequest) {
     case GET_REPORT:
@@ -201,7 +205,7 @@ static uint8_t comp_req_proc(usb_dev *udev, usb_req *req)
     case SET_REPORT:
         // process led state .etc
         if (req->wIndex == ITF_NUM_HID_KBD) {
-            amk_led_state = udev->dev.control.xfer_buf[0];
+            amk_led_state = udev->dev.transc_out[0].xfer_buf[0];
         } 
 #ifdef VIAL_ENABLE
         if (req->wIndex== ITF_NUM_VIAL) {

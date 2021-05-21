@@ -217,7 +217,7 @@ static void hw_time_set(uint8_t unit)
     timer_basestructure.clockdivision     = TIMER_CKDIV_DIV1;
     timer_basestructure.repetitioncounter = 0U;
 
-    timer_init(TIMER2, &timer_basestructure);
+    gdtimer_init(TIMER2, &timer_basestructure);
 
     timer_interrupt_flag_clear(TIMER2, TIMER_INT_UP);
 

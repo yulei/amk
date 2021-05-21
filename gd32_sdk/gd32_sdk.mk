@@ -1,4 +1,4 @@
-GD32_SDK_DIR := $(GD32_DIR)
+GD32SDK_DIR := $(GD32_DIR)
 GD32SDK_PERI_DIR := $(GD32_DIR)/GD32E10x_standard_peripheral
 GD32SDK_USB_DIR := $(GD32_DIR)/GD32E10x_usbfs_library
 
@@ -9,8 +9,8 @@ MCU_TYPE := e103
 endif
 
 SRCS += \
-	$(GD32SDK_DIR)/gcc/startup_gd32$(MCU_TYPE).s \
-	$(GD32SDK_DIR)/CMSIS/GD/GD32E10x/Source/system_$(MCU_FAMILY).c \
+	$(GD32SDK_DIR)/gcc/startup_gd32e103.s \
+	$(GD32SDK_DIR)/CMSIS/GD/GD32E10x/Source/system_gd32e10x.c \
 	$(GD32SDK_PERI_DIR)/Source/gd32e10x_fmc.c \
 	$(GD32SDK_PERI_DIR)/Source/gd32e10x_gpio.c \
 	$(GD32SDK_PERI_DIR)/Source/gd32e10x_misc.c \
@@ -23,12 +23,10 @@ SRCS += \
 	$(GD32SDK_USB_DIR)/device/core/Source/usbd_core.c \
 	$(GD32SDK_USB_DIR)/device/core/Source/usbd_enum.c \
 	$(GD32SDK_USB_DIR)/device/core/Source/usbd_transc.c \
-	$(GD32SDK_USB_DIR)/device/class/hid/Source/custom_hid_core.c \
-	$(GD32SDK_USB_DIR)/device/class/hid/Source/standard_hid_core.c \
-	$(GD32SDK_USB_DIR)/device/class/hid/Source/standard_hid_core.c \
 
 INCS += \
-	$(GD32SDK_DIR)/CMSIS/GD/GD32E10x/Include.c \
+	$(GD32SDK_DIR)/CMSIS \
+	$(GD32SDK_DIR)/CMSIS/GD/GD32E10x/Include \
 	$(GD32SDK_PERI_DIR)/Include \
 	$(GD32SDK_USB_DIR)/driver/Include \
 	$(GD32SDK_USB_DIR)/device/core/Include \
@@ -37,10 +35,13 @@ INCS += \
 	$(GD32SDK_USB_DIR)/ustd/common \
 
 APP_DEFS += \
+	-DCFG_TUSB_MCU=GD32E10X \
 	-DUSE_STDPERIPH_DRIVER \
 	-DGD32E10X \
 	-DHXTAL_VALUE=25000000 \
 	-DHXTAL_VALUE_25M=HXTAL_VALUE \
+
+SDK_DEFS += -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
 LINKER_PATH	?= $(GD32SDK_DIR)/gcc
 LINKER_SCRIPT := $(LINKER_PATH)/gd32e103xb_flash.ld

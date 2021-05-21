@@ -335,9 +335,10 @@
     #include "generic_hal.h"
 
     typedef uint32_t pin_t;
+    #define PIN_P(x) (1<<(x))
     #define MAKE_PIN(port, pin) (((uint32_t)(port))|((pin)&0x0F))
     #define GET_PIN(port_pin) PIN_P(((port_pin)&0x0F))
-    #define GET_PORT(port_pin) ((GPIO_TypeDef*)((port_pin)&~0x0F))
+    #define GET_PORT(port_pin) ((port_pin)&~0x0F)
 
     #define A0 MAKE_PIN(GPIOA, 0)
     #define A1 MAKE_PIN(GPIOA, 1)

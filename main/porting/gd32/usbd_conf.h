@@ -37,12 +37,13 @@ OF SUCH DAMAGE.
 #define __USBD_CONF_H
 
 #include "usb_conf.h"
+#include "usb_descriptors.h"
 
 #define USBD_CFG_MAX_NUM                1
 #define USBD_ITF_MAX_NUM                ITF_NUM_TOTAL
 #define USB_STR_DESC_MAX_SIZE           64
 #define USB_STRING_COUNT                4
 
-#define                  32
+#define HID_EP_BUF_SIZE                 32
 
 #endif /* __USBD_CONF_H */

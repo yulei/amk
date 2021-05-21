@@ -3,7 +3,7 @@
  */
 
 #include "wait.h"
-#incldue "drv_usb_hw.h"
+#include "drv_usb_hw.h"
 
 void wait_ms(int ms)
 {
