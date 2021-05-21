@@ -205,10 +205,12 @@ void HAL_PCD_DataInStageCallback(PCD_HandleTypeDef *usb, uint8_t epnum)
         if (epnum == 0) {
             dcd_event_xfer_complete(0, 0x80|epnum, usb->IN_ep[epnum & EP_ADDR_MSK].xfer_count, XFER_RESULT_SUCCESS, true); 
         } else
-#endif
         {
             dcd_event_xfer_complete(0, 0x80|epnum, last_in_size, XFER_RESULT_SUCCESS, true); 
         }
+#else
+        dcd_event_xfer_complete(0, 0x80|epnum, usb->IN_ep[epnum & EP_ADDR_MSK].xfer_count, XFER_RESULT_SUCCESS, true); 
+#endif
     //}
 }
 
