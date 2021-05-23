@@ -147,11 +147,8 @@ bool anim_next(anim_t *anim)
     anim->current++;
     if (anim->current >= anim->total) {
         f_close(&anim->obj.file);
-        //re-scan
-        anim_scan(anim);
-        if (anim->total == 0) {
-            return false;
-        }
+        //reset to start
+        anim->current = 0;
     }
     return anim_open_current(anim);
 }
@@ -164,10 +161,6 @@ bool anim_rewind(anim_t *anim)
 bool anim_random(anim_t *anim)
 {
     f_close(&anim->obj.file);
-    anim_scan(anim);
-    if (anim->total == 0) {
-        return false;
-    }
     anim->current = rand() % anim->total;
     return anim_open_current(anim);
 }

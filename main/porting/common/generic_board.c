@@ -100,9 +100,6 @@ void board_task(void)
 
 static void amk_init(void)
 {
-    keyboard_init();
-    boot_init();
-    host_set_driver(&amk_driver);
 #ifdef SCREEN_ENABLE
     screen_init();
 #endif
@@ -110,6 +107,10 @@ static void amk_init(void)
 #ifdef MSC_ENABLE
     msc_init();
 #endif
+
+    keyboard_init();
+    boot_init();
+    host_set_driver(&amk_driver);
     amk_keymap_init();
 }
 
