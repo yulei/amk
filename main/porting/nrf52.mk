@@ -5,6 +5,7 @@ SRCS += \
 	$(NRF52_PORTING_DIR)/timer.c \
 	$(NRF52_PORTING_DIR)/bootloader.c \
 	$(NRF52_PORTING_DIR)/gpio_pin.c \
+	$(NRF52_PORTING_DIR)/suspend.c \
 	$(NRF52_PORTING_DIR)/wait.c \
 	$(NRF52_PORTING_DIR)/ble/ble_adv_service.c \
 	$(NRF52_PORTING_DIR)/ble/ble_bas_service.c \

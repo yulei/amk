@@ -2,6 +2,7 @@
 MK := mkdir -p
 RM := rm -rf
 CP := cp
+UF2 := python util/uf2conv.py
 
 # Build type
 NO_DEBUG ?= 1
@@ -131,8 +132,12 @@ $(BUILD_DIR)/%.o : %.S
 	@$(PROGRESS) Assembling: $(notdir $<)
 	$(ASSEMBLING)
 
-$(TARGET): $(addprefix $(OUTPUT_DIR)/$(TARGET), .elf .bin .hex)
 
+ifeq (NRF52840, $(strip $(MCU)))
+$(TARGET): $(addprefix $(OUTPUT_DIR)/$(TARGET), .elf .bin .hex .uf2)
+else
+$(TARGET): $(addprefix $(OUTPUT_DIR)/$(TARGET), .elf .bin .hex)
+endif
 # Create elf files 
 %.elf: $(OBJS)
 	$(info Linking: $(notdir $@))
@@ -148,6 +153,11 @@ $(TARGET): $(addprefix $(OUTPUT_DIR)/$(TARGET), .elf .bin .hex)
 %.hex: %.elf
 	$(info Creating: $(notdir $@))
 	$(NO_ECHO)$(OBJCOPY) -O ihex $< $@
+
+# Create uf2 file from the .hex file
+%.uf2: %.hex
+	$(info Creating: $(notdir $@))
+	$(NO_ECHO)$(UF2) $< -c -f 0xADA52840 -o $@
 
 # Include the dependency files
 -include $(OBJS:%.o=%.d)

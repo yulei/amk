@@ -47,7 +47,11 @@
     #define BATTERY_SAADC_PIN               NRF_SAADC_INPUT_AIN4                        /**< Default pin for saadc */
 #endif
 
+#ifdef BLE_PRODUCT
+#define DEVICE_NAME                         NRF_NAME(BLE_PRODUCT)                       /**< Name of device. Will be included in the advertising data. */
+#else
 #define DEVICE_NAME                         NRF_NAME(PRODUCT)                           /**< Name of device. Will be included in the advertising data. */
+#endif
 #define MANUFACTURER_NAME                   NRF_NAME(MANUFACTURER)                      /**< Manufacturer. Will be passed to Device Information Service. */
 
 #define VENDOR_ID_SOURCE                    0x02                                       /**< Vendor ID Source. */

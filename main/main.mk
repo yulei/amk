@@ -45,7 +45,7 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 endif
 
 ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))
-	SRCS += $(MAIN_DIR)/drivers/ws2812.c
+#	SRCS += $(MAIN_DIR)/drivers/ws2812.c
 	SRCS += $(MAIN_DIR)/drivers/aw9523b.c
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
@@ -57,8 +57,8 @@ endif
 
 ifeq (ws2812, $(strip $(RGB_EFFECTS_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/ws2812.c
-	SRCS += $(MAIN_DIR)/drivers/aw9523b.c
-	SRCS += $(MAIN_DIR)/drivers/i2c.c
+#	SRCS += $(MAIN_DIR)/drivers/aw9523b.c
+#	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_effects.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_color.c

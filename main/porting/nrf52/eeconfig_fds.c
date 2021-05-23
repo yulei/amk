@@ -6,7 +6,6 @@
 
 #include <string.h>
 #include "eeprom_manager.h"
-#include "flash_store.h"
 #include "fds.h"
 #include "app_timer.h"
 #include "app_scheduler.h"
@@ -24,12 +23,9 @@ APP_TIMER_DEF(m_eeprom_update_timer_id);        // timer for update the eeprom
 
 #define EE_FILEID 0x6565                        //"ee"
 #define EE_EEPROM_KEY 0x00AB                    // should in rage 0x0001-0xBFFF
-#define EE_KEYMAP_KEY 0xAB00
 
 static volatile bool ee_fds_initialized = false;
 static volatile bool eeprom_dirty = false;
-static volatile bool keymap_dirty = false;
-#define KEYMAP_LAYER_SIZE   4
 
 extern void idle_state_handle(void);
 static void wait_for_fds_ready(void)
@@ -51,7 +47,6 @@ static fds_record_t ee_record = {
 static void fds_eeprom_restore(void);
 static void fds_eeprom_update(void);
 static void eeprom_update_timeout_handler(void *p_context);
-static void flash_store_update(void);
 
 static void ee_evt_handler(fds_evt_t const *p_evt)
 {
@@ -69,17 +64,6 @@ static void ee_evt_handler(fds_evt_t const *p_evt)
                 eeprom_dirty = false;
             }
         }
-        if (p_evt->write.file_id == EE_FILEID && ((p_evt->write.record_key < EE_KEYMAP_KEY+KEYMAP_LAYER_SIZE)&&(p_evt->write.record_key>=EE_KEYMAP_KEY))) {
-            if (p_evt->result != NRF_SUCCESS) {
-                NRF_LOG_INFO("KEYMAP write/update failed: %d, restart again", p_evt->result);
-                ret_code_t err_code;
-                err_code = app_timer_start(m_eeprom_update_timer_id, EEPROM_UPDATE_DELAY, NULL);
-                APP_ERROR_CHECK(err_code);
-            } else {
-                NRF_LOG_INFO("KEYMAP[%d] write/update success", p_evt->write.record_key);
-                keymap_dirty = false;
-            }
-        }
         break;
     case FDS_EVT_DEL_RECORD:
     case FDS_EVT_DEL_FILE:
@@ -89,9 +73,6 @@ static void ee_evt_handler(fds_evt_t const *p_evt)
             ret_code_t err_code;
             err_code = app_timer_start(m_eeprom_update_timer_id, EEPROM_UPDATE_DELAY, NULL);
             APP_ERROR_CHECK(err_code);
-        }
-        if (keymap_dirty) {
-            flash_store_update();
         }
         break;
     case FDS_EVT_INIT:
@@ -132,13 +113,10 @@ void fds_eeprom_init(void)
 
 static void eeprom_update_timeout_handler(void* p_context)
 {
-    NRF_LOG_INFO("eeprom update time out, eeprom_dirty=%d, keymap_dirty=%d", eeprom_dirty, keymap_dirty);
+    NRF_LOG_INFO("eeprom update time out, eeprom_dirty=%d", eeprom_dirty);
 
     if (eeprom_dirty) {
         fds_eeprom_update();
-    }
-    if (keymap_dirty) {
-        flash_store_update();
     }
 }
 
