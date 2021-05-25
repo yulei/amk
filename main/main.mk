@@ -38,13 +38,14 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 #	SRCS += $(MAIN_DIR)/drivers/ssd1357.c
 	SRCS += $(MAIN_DIR)/drivers/st7735.c
 	SRCS += $(MAIN_DIR)/screen/screen.c
-	SRCS += $(MAIN_DIR)/screen/gifdec.c
-	SRCS += $(MAIN_DIR)/screen/image.c
-	SRCS += $(MAIN_DIR)/screen/upng.c
+#	SRCS += $(MAIN_DIR)/screen/gifdec.c
+#	SRCS += $(MAIN_DIR)/screen/image.c
+#	SRCS += $(MAIN_DIR)/screen/upng.c
 	SRCS += $(MAIN_DIR)/screen/fractal.c
 endif
 
 ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))
+#	SRCS += $(MAIN_DIR)/drivers/ws2812.c
 	SRCS += $(MAIN_DIR)/drivers/aw9523b.c
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
@@ -56,11 +57,26 @@ endif
 
 ifeq (ws2812, $(strip $(RGB_EFFECTS_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/ws2812.c
+#	SRCS += $(MAIN_DIR)/drivers/aw9523b.c
+#	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_effects.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_color.c
 	APP_DEFS += -DRGB_EFFECTS_ENABLE
 	APP_DEFS += -DRGB_WITH_WS2812
+endif
+
+ifeq (all, $(strip $(RGB_EFFECTS_ENABLE)))
+	SRCS += $(MAIN_DIR)/drivers/ws2812.c
+	SRCS += $(MAIN_DIR)/drivers/aw9523b.c
+	SRCS += $(MAIN_DIR)/drivers/i2c.c
+	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_effects.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_color.c
+	APP_DEFS += -DRGB_EFFECTS_ENABLE
+	APP_DEFS += -DRGB_WITH_ALL
+	APP_DEFS += -DRGB_WITH_WS2812
+	APP_DEFS += -DRGB_WITH_AW9523B
 endif
 
 ifeq (yes, $(strip $(RGB_MATRIX_ENABLE)))
@@ -88,16 +104,26 @@ ifeq (yes, $(strip $(WEBUSB_ENABLE)))
 	APP_DEFS += -DWEBUSB_ENABLE
 endif
 
-ifeq (yes, $(strip $(WEBCONFIG_ENABLE)))
-	APP_DEFS += -DWEBCONFIG_ENABLE
-endif
-
 ifeq (yes, $(strip $(MSC_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/anim.c
 	SRCS += $(MAIN_DIR)/drivers/w25qxx.c
 	SRCS += $(MAIN_DIR)/drivers/spi.c
 	SRCS += $(MAIN_DIR)/usb/mscusb.c
 	APP_DEFS += -DMSC_ENABLE
+endif
+
+ifeq (yes, $(strip $(KEYMAP_CONFIG_ENABLE)))
+	APP_DEFS += -DKEYMAP_CONFIG_ENABLE	
+endif
+
+ifeq (yes, $(strip $(VIAL_ENABLE)))
+	INCS += $(MAIN_DIR)/vial
+	SRCS += $(MAIN_DIR)/vial/vial_porting.c
+	SRCS += $(MAIN_DIR)/vial/keycode_convert.c
+	APP_DEFS += -DVIAL_ENABLE
+	ifneq (yes, $(strip $(VIAL_ENABLE)))
+		APP_DEFS += -DKEYMAP_CONFIG_ENABLE	
+	endif
 endif
 
 ifneq (yes, $(strip $(CUSTOM_MATRIX)))
@@ -118,4 +144,8 @@ endif
 
 ifneq (,$(filter $(strip $(MCU)),$(NUVOTON_MCUS)))
 	include $(MAIN_DIR)/porting/nuvoton.mk
+endif
+
+ifneq (,$(filter $(strip $(MCU)),$(GD32_MCUS)))
+	include $(MAIN_DIR)/porting/gd32.mk
 endif

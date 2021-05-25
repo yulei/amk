@@ -54,7 +54,6 @@ SRCS += \
 	$(NRF5SDK_DIR)/components/libraries/timer/drv_rtc.c \
 	$(NRF5SDK_DIR)/components/libraries/uart/app_uart_fifo.c \
 	$(NRF5SDK_DIR)/components/libraries/util/app_error.c \
-	$(NRF5SDK_DIR)/components/libraries/util/app_error_handler_gcc.c \
 	$(NRF5SDK_DIR)/components/libraries/util/app_error_weak.c \
 	$(NRF5SDK_DIR)/components/libraries/util/app_util_platform.c \
 	$(NRF5SDK_DIR)/components/libraries/util/nrf_assert.c \
@@ -71,6 +70,7 @@ SRCS += \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_power.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_twi.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_wdt.c \
+	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_rtc.c \
 	$(NRF5SDK_DIR)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
 	$(NRF5SDK_DIR)/integration/nrfx/legacy/nrf_drv_clock.c \
 	$(NRF5SDK_DIR)/integration/nrfx/legacy/nrf_drv_power.c \
@@ -174,6 +174,7 @@ ifeq (NRF52832, $(strip $(MCU)))
 	APP_DEFS += -DNRF52_PAN_74
 	APP_DEFS += -DS132
 	LINKER_SCRIPT := $(NRF5_DIR)/nrf52832.ld
+	LIBS += $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52_gcc.a
 endif
 
 ifeq (NRF52840, $(strip $(MCU)))
@@ -182,11 +183,27 @@ ifeq (NRF52840, $(strip $(MCU)))
 	INCS += $(NRF5SDK_DIR)/components/softdevice/s140/headers
 	INCS += $(NRF5SDK_DIR)/components/softdevice/s140/headers/nrf52
 	INCS += $(NRF5SDK_DIR)/modules/nrfx/drivers/src
+#	SRCS += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/generic/app_usbd_hid_generic.c
+#	SRCS += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/app_usbd_hid.c
+#	SRCS += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd.c
+#	SRCS += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd_core.c
+#	SRCS += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd_serial_num.c
+#	SRCS += $(NRF5SDK_DIR)/components/libraries/usbd/app_usbd_string_desc.c
+#	SRCS += $(NRF5SDK_DIR)/modules/nrfx/drivers/src/nrfx_usbd.c
+#	INCS += $(NRF5SDK_DIR)/components/libraries/usbd
+#	INCS += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid
+#	INCS += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/generic
 	APP_DEFS += -DNRF52840_XXAA
 	APP_DEFS += -DS140
 	LINKER_SCRIPT := $(NRF5_DIR)/nrf52840.ld
+	LIBS += $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52840_gcc.a
 	include $(LIB_DIR)/tinyusb.mk
 endif
 
-LIBS += $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52_gcc.a
 LINKER_PATH := $(NRF5SDK_DIR)/modules/nrfx/mdk
+
+ifeq (yes, $(strip $(NRF_AMK_DEBUG)))
+	APP_DEFS += -DNRF_AMK_DEBUG
+	APP_DEFS += -DDEBUG
+	SRCS += $(NRF5SDK_DIR)/components/libraries/util/app_error_handler_gcc.c
+endif

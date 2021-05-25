@@ -96,18 +96,30 @@ void matrix_init_kb(void)
 
     fractal_init();
     last_ticks = timer_read32();
+    // initialize renders
+#ifdef MSC_ENABLE
+    for (int i = 0; i < sizeof(renders)/sizeof(render_t); i++) {
+        renders[i].anim = anim_open(NULL, renders[i].type);
+        if (renders[i].anim) {
+            amk_printf("ANIM: faield to open root path\n");
+        }
+    }
+#endif
 }
 
 #ifdef MSC_ENABLE
 void render_task(render_t* render)
 {
-    if (!render->anim) {
+    if (!render->anim)
+        return;
+
+    /*if (!render->anim) {
         render->anim = anim_open(NULL, render->type);
         if (!render->anim) {
             amk_printf("ANIM: faield to open root path\n");
             return;
         }
-    } 
+    }*/
 
     if (filling) {
         if (screen_fill_ready()) {

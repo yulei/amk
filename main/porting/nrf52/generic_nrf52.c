@@ -5,11 +5,14 @@
 
 #include "common_config.h"
 #include "nrf_pwr_mgmt.h"
+#include "nrf_delay.h"
+#include "nrf_drv_clock.h"
 #include "app_scheduler.h"
 #include "ble_keyboard.h"
 #include "gzll_keyboard.h"
 #include "eeconfig_fds.h"
 #include "usb_interface.h"
+#include "rf_power.h"
 
 #if defined(DISABLE_SLEEP)
     #if defined(DISABLE_USB)
@@ -28,6 +31,7 @@
 rf_driver_t rf_driver = {
     .rf_led         = 0,
     .usb_led        = 0,
+    .is_ble         = 1,
     .vbus_enabled   = 0,
     .output_target  = OUTPUT_RF | OUTPUT_MASK,
     .matrix_changed = 0,
@@ -36,7 +40,33 @@ rf_driver_t rf_driver = {
     .scan_count     = 0,
 };
 
-bool rf_is_ble = true;
+#ifndef NRF_AMK_DEBUG
+static void on_error(void)
+{
+    NRF_LOG_FINAL_FLUSH();
+
+#if NRF_MODULE_ENABLED(NRF_LOG_BACKEND_RTT)
+    // To allow the buffer to be flushed by the host.
+    nrf_delay_ms(100);
+#endif
+
+    NVIC_SystemReset();
+}
+
+void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p_file_name)
+{
+    NRF_LOG_ERROR("app_error_handler err_code:%d %s:%d", error_code, p_file_name, line_num);
+    on_error();
+}
+
+
+void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t info)
+{
+    NRF_LOG_ERROR("Received a fault! id: 0x%08x, pc: 0x%08x, info: 0x%08x", id, pc, info);
+    on_error();
+}
+
+#endif
 
 /**@brief Callback function for asserts in the SoftDevice.
  *
@@ -53,20 +83,6 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
 {
     app_error_handler(DEAD_BEEF, line_num, p_file_name);
 }
-
-#ifdef RESET_ON_ERROR
-void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t info)
-{
-    __disable_irq();
-    NRF_LOG_FINAL_FLUSH();
-
-    NRF_LOG_ERROR("Fatal error");
-    NRF_BREAKPOINT_COND;
-    // On assert, the system can only recover with a reset.
-    NRF_LOG_WARNING("System reset");
-    NVIC_SystemReset();
-}
-#endif
 
 /**@brief Function for the Event Scheduler initialization.
  */
@@ -131,9 +147,10 @@ void board_init(void)
 #endif
 
     // Initialize.
+    rf_power_init();
     log_init();
-    timers_init();
     power_management_init();
+    timers_init();
     scheduler_init();
 
     nrf_usb_preinit();
@@ -153,8 +170,12 @@ void board_init(void)
 
     if (GZLL_IS_HOST || GZLL_IS_CLIENT || (reason&RST_USE_GZLL)) {
         NRF_LOG_INFO("use GAZELL protocol");
+        if (reason&RST_USE_GZLL) {
+            NRF_POWER->GPREGRET |= RST_USE_GZLL;
+        }
 
-        rf_is_ble = false;
+        nrf_drv_clock_lfclk_request(NULL);
+        rf_driver.is_ble = 0;
         gzll_keyboard_init(GZLL_IS_HOST);
 
         nrf_usb_postinit();
@@ -162,7 +183,7 @@ void board_init(void)
     } else {
         NRF_LOG_INFO("use BLE protocol");
 
-        rf_is_ble = true;
+        rf_driver.is_ble = 1;
         ble_keyboard_init();
 
         nrf_usb_postinit();

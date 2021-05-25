@@ -47,7 +47,11 @@
     #define BATTERY_SAADC_PIN               NRF_SAADC_INPUT_AIN4                        /**< Default pin for saadc */
 #endif
 
+#ifdef BLE_PRODUCT
+#define DEVICE_NAME                         NRF_NAME(BLE_PRODUCT)                       /**< Name of device. Will be included in the advertising data. */
+#else
 #define DEVICE_NAME                         NRF_NAME(PRODUCT)                           /**< Name of device. Will be included in the advertising data. */
+#endif
 #define MANUFACTURER_NAME                   NRF_NAME(MANUFACTURER)                      /**< Manufacturer. Will be passed to Device Information Service. */
 
 #define VENDOR_ID_SOURCE                    0x02                                       /**< Vendor ID Source. */
@@ -64,6 +68,7 @@
 #define BATTERY_LEVEL_MEAS_SAMPLE           APP_TIMER_TICKS(2)                         /**< Battery level measurement sampling (ticks). */
 #define BATTERY_LEVEL_MEAS_INTERVAL         APP_TIMER_TICKS(60*1000)                   /**< Battery level measurement interval (ticks). */
 
+#define VBUS_DETECT_DELAY_INTERVAL          APP_TIMER_TICKS(10)                          /**< VBUS debounce time (ticks). */
 
 #define DEAD_BEEF                           0xDEADBEEF                                 /**< Value used */
 
@@ -93,6 +98,8 @@
 // UART communication
 #define SYNC_BYTE_1 0xAA
 #define SYNC_BYTE_2 0x55
+#define SYNC_PING   0xA5
+#define SYNC_PONG   0x5A
 
 typedef enum {
     CMD_KEY_REPORT,
@@ -132,7 +139,10 @@ typedef enum {
 #define NRF_INPUT_REPORT_SYSTEM_MAX_LEN     2
 #define NRF_INPUT_REPORT_CONSUMER_MAX_LEN   2
 
+#ifndef WDT_ENABLE
 #define WDT_ENABLE      1
+#endif
+
 #define OUTPUT_RF       0x01
 #define OUTPUT_USB      0x02
 #define USB_ENABLED     0x80
@@ -141,7 +151,7 @@ typedef enum {
 typedef struct {
     uint8_t         rf_led;         /**< keyboard led status from ble */
     uint8_t         usb_led;        /**< keyboard led status from usb */
-    //uint8_t         is_ble;         /**< current is ble stack */
+    uint8_t         is_ble;         /**< current is ble stack */
     uint8_t         vbus_enabled;   /**< vbus status */
     uint8_t         output_target;  /**< target of output */
     uint8_t         matrix_changed; /**< matrix has changed */
@@ -151,6 +161,5 @@ typedef struct {
 } rf_driver_t;
 
 extern rf_driver_t rf_driver;
-extern bool rf_is_ble;
 typedef void (*rf_send_report_t)(uint8_t type, uint8_t *data, uint8_t size);
 typedef void (*rf_prepare_sleep_t)(void);

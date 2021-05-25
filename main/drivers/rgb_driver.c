@@ -8,12 +8,23 @@
 #include "rgb_color.h"
 #include "gpio_pin.h"
 #include "wait.h"
+#include "amk_printf.h"
 
 #include "drivers/ws2812.h"
 #include "drivers/aw9523b.h"
 #include "drivers/is31fl3731.h"
 
-#if defined(RGB_WITH_WS2812) || defined(RGB_DRIVER_AW9523B)
+#ifndef RGB_DRIVER_DEBUG
+#define RGB_DRIVER_DEBUG 1
+#endif
+
+#if RGB_DRIVER_DEBUG
+#define rgb_driver_debug  amk_printf
+#else
+#define rgb_driver_debug(...)
+#endif
+
+#if defined(RGB_WITH_WS2812) || defined(RGB_WITH_AW9523B) || defined(RGB_WITH_ALL)
     #ifndef RGB_LED_NUM
         #error "RGB_LED_NUM must be defined"
     #endif
@@ -90,6 +101,7 @@ static rgb_driver_t aw9523b_driver = {
     .flush = rd_aw9523b_flush,
 };
 
+
 void rd_aw9523b_init(void)
 {
 #ifdef RGBLIGHT_EN_PIN
@@ -98,6 +110,7 @@ void rd_aw9523b_init(void)
     wait_ms(1);
 #endif
     aw9523b_init(AW9523B_ADDR);
+    rgb_driver_debug("AW9523B init\n");
 }
 
 void rd_aw9523b_uninit(void)
@@ -106,6 +119,7 @@ void rd_aw9523b_uninit(void)
 #ifdef RGBLIGHT_EN_PIN
     gpio_write_pin(RGBLIGHT_EN_PIN, 0);
 #endif
+    rgb_driver_debug("AW9523B uninit\n");
 }
 
 void rd_aw9523b_set_color(uint32_t index, uint8_t hue, uint8_t sat, uint8_t val)
@@ -266,6 +280,31 @@ static void rd_3733_flush(void)
 }
 
 #endif
+
+bool rgb_driver_available(RGB_DRIVER_TYPE type)
+{
+    switch(type) {
+#ifdef RGB_WITH_WS2812
+        case RGB_DRIVER_WS2812:
+            return true;    // always available
+#endif
+#ifdef RGB_WITH_AW9523B
+        case RGB_DRIVER_AW9523B:
+            return aw9523b_available(AW9523B_ADDR);
+#endif
+#ifdef RGB_WITH_IS31FL3731
+        case RGB_DRIVER_IS31FL3731:
+            return true;    // TODO
+#endif
+#ifdef RGB_WITH_IS31FL3733
+        case RGB_DRIVER_IS31FL3733:
+            return true;    // TODO
+#endif
+        default:
+            break;
+    }
+    return true;
+}
 
 rgb_driver_t* rgb_driver_create(RGB_DRIVER_TYPE type)
 {

@@ -11,11 +11,21 @@ void rgb_led_init(void)
 #endif
 
 #ifdef RGB_EFFECTS_ENABLE
-#ifdef RGB_WITH_WS2812
-    driver = rgb_driver_create(RGB_DRIVER_WS2812);
-#endif
-#ifdef RGB_WITH_AW9523B
-    driver = rgb_driver_create(RGB_DRIVER_AW9523B);
+#ifdef RGB_WITH_ALL
+
+    if (rgb_driver_available(RGB_DRIVER_AW9523B)) {
+        driver = rgb_driver_create(RGB_DRIVER_AW9523B);
+    } else {
+        driver = rgb_driver_create(RGB_DRIVER_WS2812);
+    }
+
+#else
+    #ifdef RGB_WITH_WS2812
+        driver = rgb_driver_create(RGB_DRIVER_WS2812);
+    #endif
+    #ifdef RGB_WITH_AW9523B
+        driver = rgb_driver_create(RGB_DRIVER_AW9523B);
+    #endif
 #endif
     rgb_effects_init(driver);
 #endif

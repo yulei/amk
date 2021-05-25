@@ -44,7 +44,7 @@ tusb_desc_device_t const desc_device_dyn =
     .bMaxPacketSize0    = CFG_TUD_ENDPOINT0_SIZE,
 
     .idVendor           = VENDOR_ID,
-    .idProduct          = ~PRODUCT_ID,
+    .idProduct          = (uint16_t)(~PRODUCT_ID),
     .bcdDevice          = DEVICE_VER,
 
     .iManufacturer      = DESC_STR_MANUFACTURE,
@@ -120,7 +120,29 @@ uint32_t tud_descriptor_hid_report_other_size(void)
     return sizeof(desc_hid_report_other);
 }
 
+#ifdef VIAL_ENABLE
+static uint8_t desc_hid_report_vial[] =
+{
+    TUD_HID_REPORT_DESC_VIAL(VIAL_EPSIZE),
+};
+
+uint8_t const* tud_descriptor_hid_report_vial_cb(void)
+{
+    return desc_hid_report_vial;
+}
+
+uint32_t tud_descriptor_hid_report_vial_size(void)
+{
+    return sizeof(desc_hid_report_vial);
+}
+#endif
+
 // Configuration Descriptor
+#ifdef VIAL_ENABLE
+#define VIAL_DESC_LEN TUD_HID_INOUT_DESC_LEN 
+#else
+#define VIAL_DESC_LEN 0 
+#endif
 #ifdef WEBUSB_ENABLE
 #define WEBUSB_DESC_LEN TUD_VENDOR_DESC_LEN
 #else 
@@ -136,7 +158,7 @@ uint32_t tud_descriptor_hid_report_other_size(void)
 #ifdef SHARED_HID_EP
 #define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + WEBUSB_DESC_LEN + MSCUSB_DESC_LEN)
 #else
-#define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + WEBUSB_DESC_LEN + MSCUSB_DESC_LEN)
+#define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + VIAL_DESC_LEN + WEBUSB_DESC_LEN + MSCUSB_DESC_LEN)
 #endif
 
 #define CONFIG_LEN_MSC (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + MSCUSB_DESC_LEN)
@@ -151,6 +173,10 @@ static uint8_t desc_configuration[] = {
 #else
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#endif
+
+#ifdef VIAL_ENABLE
+    TUD_HID_INOUT_DESCRIPTOR(ITF_NUM_VIAL, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_vial), EPNUM_VIAL_OUT, 0x80 | EPNUM_VIAL_IN, VIAL_EPSIZE, CFG_TUD_HID_POLL_INTERVAL),
 #endif
 
 #ifdef WEBUSB_ENABLE
@@ -233,7 +259,31 @@ uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf)
     } else if (itf == ITF_NUM_HID_OTHER) {
         return tud_descriptor_hid_report_other_cb();
     }
+    #ifdef VIAL_ENABLE
+    else if (itf == ITF_NUM_VIAL) {
+        return tud_descriptor_hid_report_vial_cb();
+    }
+    #endif
     return NULL;
+#endif
+}
+
+uint32_t tud_hid_descriptor_report_size(uint8_t itf)
+{
+#ifdef SHARED_HID_EP
+    return tud_descriptor_hid_report_kbd_size();
+#else
+    if (itf == ITF_NUM_HID_KBD) {
+        return tud_descriptor_hid_report_kbd_size();
+    } else if (itf == ITF_NUM_HID_OTHER) {
+        return tud_descriptor_hid_report_other_size();
+    }
+    #ifdef VIAL_ENABLE
+    else if (itf == ITF_NUM_VIAL) {
+        return tud_descriptor_hid_report_vial_size();
+    }
+    #endif
+    return 0;
 #endif
 }
 
@@ -244,6 +294,44 @@ static uint8_t desc_hid_kbd[] = {
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
 #endif
 };
+
+
+uint8_t const* tud_hid_descriptor_interface_cb(uint8_t itf)
+{
+    #ifdef SHARED_HID_EP
+    return tud_descriptor_hid_interface_kbd_cb();
+#else
+    if (itf == ITF_NUM_HID_KBD) {
+        return tud_descriptor_hid_interface_kbd_cb();
+    } else if (itf == ITF_NUM_HID_OTHER) {
+        return tud_descriptor_hid_interface_other_cb();
+    }
+    #ifdef VIAL_ENABLE
+    else if (itf == ITF_NUM_VIAL) {
+        return tud_descriptor_hid_interface_vial_cb();
+    }
+    #endif
+    return NULL;
+#endif
+}
+uint32_t tud_hid_descriptor_interface_size(uint8_t itf)
+{
+#ifdef SHARED_HID_EP
+    return tud_descriptor_hid_interface_kbd_size();
+#else
+    if (itf == ITF_NUM_HID_KBD) {
+        return tud_descriptor_hid_interface_kbd_size();
+    } else if (itf == ITF_NUM_HID_OTHER) {
+        return tud_descriptor_hid_interface_other_size();
+    }
+    #ifdef VIAL_ENABLE
+    else if (itf == ITF_NUM_VIAL) {
+        return tud_descriptor_hid_interface_vial_size();
+    }
+    #endif
+    return 0;
+#endif
+}
 
 // Invoded when received GET HID DESCRIPTOR
 uint8_t const* tud_descriptor_hid_interface_kbd_cb(void)
@@ -271,6 +359,23 @@ uint32_t tud_descriptor_hid_interface_other_size(void)
 {
     return sizeof(desc_hid_other);
 }
+#endif
+
+#ifdef VIAL_ENABLE
+static uint8_t desc_hid_vial[] = {
+    TUD_HID_INOUT_DESCRIPTOR(ITF_NUM_VIAL, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_vial), EPNUM_VIAL_OUT, 0x80 | EPNUM_VIAL_IN, VIAL_EPSIZE, CFG_TUD_HID_POLL_INTERVAL),
+};
+
+uint8_t const* tud_descriptor_hid_interface_vial_cb(void)
+{
+    return desc_hid_vial;
+}
+
+uint32_t tud_descriptor_hid_interface_vial_size(void)
+{
+    return sizeof(desc_hid_vial);
+}
+
 #endif
 
 #ifdef WEBUSB_ENABLE
@@ -369,7 +474,7 @@ char const* string_desc_arr [] =
     (const char[]) { 0x09, 0x04 },  // 0: is supported language is English (0x0409)
     TU_XSTRING(MANUFACTURER),       // 1: Manufacturer
     TU_XSTRING(PRODUCT),            // 2: Product
-    "123456",                       // 3: Serials, should use chip ID
+    "vial:f64c2b3c",                // 3: Serials, should use chip ID
     "Configuration",                // 4: Device configuration 
     "HID Keyboard",                 // 5: Hid keyboard
     "HID Extra",                    // 6: Hid extra key

@@ -8,6 +8,7 @@
 #include "nrf_drv_clock.h"
 #include "nrf_drv_power.h"
 #include "usb_descriptors.h"
+#include "suspend.h"
 #include "report_queue.h"
 
 static nrf_usb_event_handler_t nrf_usb_event;
@@ -128,13 +129,13 @@ void nrf_usb_task(void)
 
     tud_task();
 
-/*    if (tud_suspended()) {
+    if (tud_suspended()) {
         if (suspend_wakeup_condition()) {
             // wake up remote
-            remote_wakeup();
+            nrf_usb_wakeup();
         }
     }
-*/
+
 }
 
 void nrf_usb_send_report(nrf_report_id report, const void *data, size_t size)
@@ -153,17 +154,25 @@ void nrf_usb_wakeup(void)
 
 void nrf_usb_prepare_sleep(void) { }
 
-void nrf_usb_reboot(void) { }
+#define UF2_BOOT_MAGIC 0x57
+void nrf_usb_reboot(void)
+{
+    sd_power_gpregret_set(RST_REGISTER, UF2_BOOT_MAGIC);
+    sd_nvic_SystemReset();
+}
 
 void nrf_usb_power_event_handler(nrfx_power_usb_evt_t event)
 {
     switch(event) {
     case NRFX_POWER_USB_EVT_DETECTED:
+        NRF_LOG_INFO("USB detected");
         break;
     case NRFX_POWER_USB_EVT_REMOVED:
+        NRF_LOG_INFO("USB removed");
         nrf_usb_event.disable_cb();
         break;
     case NRFX_POWER_USB_EVT_READY:
+        NRF_LOG_INFO("USB ready");
         nrf_usb_event.enable_cb();
         break;
     default:

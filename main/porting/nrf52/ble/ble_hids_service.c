@@ -6,11 +6,12 @@
 #include "ble_hids.h"
 #include "ble_hids_service.h"
 #include "usb_descriptors.h"
+#include "report_queue.h"
 
 const static uint8_t hid_report_descriptor [] = {
     TUD_HID_REPORT_DESC_KEYBOARD( HID_REPORT_ID(NRF_REPORT_ID_KEYBOARD) ),
     TUD_HID_REPORT_DESC_MOUSE   ( HID_REPORT_ID(NRF_REPORT_ID_MOUSE) ),
-    TUD_HID_REPORT_DESC_EXTRA( NRF_REPORT_ID_SYSTEM, NRF_REPORT_ID_CONSUMER),
+    TUD_HID_REPORT_DESC_EXTRA   ( NRF_REPORT_ID_SYSTEM, NRF_REPORT_ID_CONSUMER),
 };
 
 typedef struct {
@@ -27,53 +28,8 @@ static report_entry_t report_entries[NRF_REPORT_ID_MAX] = {
 
 #define REPORT_ID_TO_INDEX(x) ((x)-1)
 
-/**Buffer queue access macros
- *
- * @{ */
-/** Initialization of buffer list */
-#define BUFFER_LIST_INIT()     \
-    do {                       \
-        buffer_list.rp    = 0; \
-        buffer_list.wp    = 0; \
-        buffer_list.count = 0; \
-    } while (0)
-
-/** Provide status of data list is full or not */
-#define BUFFER_LIST_FULL() ((MAX_BUFFER_ENTRIES == buffer_list.count - 1) ? true : false)
-
-/** Provides status of buffer list is empty or not */
-#define BUFFER_LIST_EMPTY() ((0 == buffer_list.count) ? true : false)
-
-#define BUFFER_ELEMENT_INIT(i)                                  \
-    do {                                                        \
-        memset(&(buffer_list.buffer[(i)].report_data[0]), 0,    \
-                sizeof(buffer_list.buffer[(i)].report_data));   \
-    } while (0)
-
-/** @} */
-
-/** Abstracts buffer element */
-typedef struct hid_key_buffer {
-    uint8_t report_index;                                   /**< report index*/
-    uint8_t report_len;                                     /**< report size*/
-    uint8_t report_data[NRF_INPUT_REPORT_KEYBOARD_MAX_LEN]; /**< report body*/
-    ble_hids_t * p_instance;                                /**< Identifies peer and service instance */
-} buffer_entry_t;
-
-STATIC_ASSERT(sizeof(buffer_entry_t) % 4 == 0);
-
-/** Circular buffer list */
-typedef struct {
-    buffer_entry_t buffer[MAX_BUFFER_ENTRIES]; /**< Maximum number of entries that can enqueued in the list */
-    uint8_t        rp;                         /**< Index to the read location */
-    uint8_t        wp;                         /**< Index to write location */
-    uint8_t        count;                      /**< Number of elements in the list */
-} buffer_list_t;
-
-STATIC_ASSERT(sizeof(buffer_list_t) % 4 == 0);
-
-static buffer_list_t     buffer_list;                               /**< List to enqueue not just data to be sent, but also related information like the handle, connection handle etc */
-static bool              m_in_boot_mode = false;                    /**< Current protocol mode. */
+static hid_report_queue_t   ble_hid_report_queue;                   /**< queue to holding the report data */
+static bool                 m_in_boot_mode = false;                 /**< Current protocol mode. */
 
 BLE_HIDS_DEF(m_hids,                                                /**< Structure used to identify the HID service. */
              NRF_SDH_BLE_TOTAL_LINK_COUNT,
@@ -253,25 +209,9 @@ static uint32_t send_report(ble_hids_t * p_hids, uint8_t report_index, uint8_t* 
 }
 
 
-/**@brief   Function for initializing the buffer queue used to key events that could not be
- *          transmitted
- *
- * @warning This handler is an example only. You need to analyze how you wish to buffer or buffer at
- *          all.
- *
- * @note    In case of HID keyboard, a temporary buffering could be employed to handle scenarios
- *          where encryption is not yet enabled or there was a momentary link loss or there were no
- *          Transmit buffers.
- */
 static void buffer_init(void)
 {
-    uint32_t buffer_count;
-
-    BUFFER_LIST_INIT();
-
-    for (buffer_count = 0; buffer_count < MAX_BUFFER_ENTRIES; buffer_count++) {
-        BUFFER_ELEMENT_INIT(buffer_count);
-    }
+    hid_report_queue_init(&ble_hid_report_queue);
 }
 
 
@@ -290,26 +230,16 @@ static void buffer_init(void)
  */
 static uint32_t buffer_enqueue(ble_hids_t * p_hids, uint8_t report_index, uint8_t* report_data, uint8_t report_len)
 {
-    buffer_entry_t * element;
-    uint32_t         err_code = NRF_SUCCESS;
+    uint32_t err_code = NRF_SUCCESS;
 
-    if (BUFFER_LIST_FULL()) {
-        // Element cannot be buffered.
+    if (hid_report_queue_full(&ble_hid_report_queue)) {
         err_code = NRF_ERROR_NO_MEM;
     } else {
-        // Make entry of buffer element and copy data.
-        element                 = &buffer_list.buffer[(buffer_list.wp)];
-        element->p_instance     = p_hids;
-        element->report_index   = report_index;
-        element->report_len     = report_len;
-        memcpy(&element->report_data[0], report_data, report_len);
-
-        buffer_list.count++;
-        buffer_list.wp++;
-
-        if (buffer_list.wp == MAX_BUFFER_ENTRIES) {
-            buffer_list.wp = 0;
-        }
+        hid_report_t item;
+        memcpy(item.data, report_data, report_len);
+        item.type = report_index;
+        item.size = report_len;
+        hid_report_queue_put(&ble_hid_report_queue, &item);
     }
 
     return err_code;
@@ -330,34 +260,19 @@ static uint32_t buffer_enqueue(ble_hids_t * p_hids, uint8_t report_index, uint8_
  */
 static uint32_t buffer_dequeue(bool tx_flag)
 {
-    buffer_entry_t * p_element;
-    uint32_t         err_code = NRF_SUCCESS;
+    uint32_t err_code = NRF_SUCCESS;
 
-    if (BUFFER_LIST_EMPTY()) {
+    if (hid_report_queue_empty(&ble_hid_report_queue)) {
         err_code = NRF_ERROR_NOT_FOUND;
     } else {
-        bool remove_element = true;
-
-        p_element = &buffer_list.buffer[(buffer_list.rp)];
-
-        if (tx_flag) {
-            err_code = send_report(p_element->p_instance, p_element->report_index, p_element->report_data, p_element->report_len);
-
-            if (err_code == NRF_ERROR_RESOURCES) {
-                // Transmission could not be completed, do not remove the entry, adjust next data to
-                // be transmitted
-                remove_element         = false;
-            }
-        }
-
-        if (remove_element) {
-            BUFFER_ELEMENT_INIT(buffer_list.rp);
-
-            buffer_list.rp++;
-            buffer_list.count--;
-
-            if (buffer_list.rp == MAX_BUFFER_ENTRIES) {
-                buffer_list.rp = 0;
+        if (!tx_flag) {
+            // cleanup the current queue
+            hid_report_queue_init(&ble_hid_report_queue);
+        } else {
+            hid_report_t* item = hid_report_queue_peek(&ble_hid_report_queue);
+            err_code = send_report(&m_hids, item->type, item->data, item->size);
+            if (err_code == NRF_SUCCESS) {
+                hid_report_queue_pop(&ble_hid_report_queue);
             }
         }
     }

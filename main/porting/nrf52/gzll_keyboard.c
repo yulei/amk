@@ -35,19 +35,19 @@ void gzll_keyboard_init(bool host)
     
     if (m_gzll_host) {
         NRF_LOG_INFO("GZLL init to host");
-        bool result = nrf_gzll_init(NRF_GZLL_MODE_HOST);
-        GAZELLE_ERROR_CODE_CHECK(result);
+        GAZELLE_ERROR_CODE_CHECK(nrf_gzll_init(NRF_GZLL_MODE_HOST));
     } else {
         NRF_LOG_INFO("GZLL init to device");
-        bool result = nrf_gzll_init(NRF_GZLL_MODE_DEVICE);
-        GAZELLE_ERROR_CODE_CHECK(result);
+        GAZELLE_ERROR_CODE_CHECK(nrf_gzll_init(NRF_GZLL_MODE_DEVICE));
     }
 
     nrf_gzll_set_max_tx_attempts(GZLL_MAX_TX_ATTEMPTS);
     nrf_gzll_set_base_address_0(GZLL_BASE_ADDRESS_0);
     nrf_gzll_set_base_address_1(GZLL_BASE_ADDRESS_1);
 
+#ifdef EECONFIG_FDS
     fds_eeprom_init();
+#endif
 
     NRF_LOG_INFO("Start to init rf keyboard");
     rf_keyboard_init(gzll_send_report, gzll_prepare_sleep);
@@ -88,9 +88,9 @@ void gzll_keyboard_keepalive(void)
 
     if (nrf_gzll_ok_to_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST)) {
         m_gzll_keepalive[1] = GZLL_KEEPALIVE;
-        GAZELLE_ERROR_CODE_CHECK(nrf_gzll_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST,
-                                                                m_gzll_keepalive,
-                                                                GZLL_PAYLOAD_SIZE));
+        if (!nrf_gzll_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST, m_gzll_keepalive, GZLL_PAYLOAD_SIZE)) {
+            NRF_LOG_ERROR("GZLL failed add to tx fifo, code:%d", nrf_gzll_get_error_code());
+        }
     }
     NRF_LOG_INFO("GZLL keep alive packet sent");
 }
@@ -111,10 +111,14 @@ void nrf_gzll_device_tx_success(uint32_t pipe, nrf_gzll_device_tx_info_t tx_info
     NRF_LOG_INFO("GZLL tx success");
     if (tx_info.payload_received_in_ack) {
         // if ack was sent with payload, pop them from rx fifo.
-        GAZELLE_ERROR_CODE_CHECK(nrf_gzll_fetch_packet_from_rx_fifo(pipe, dummy, &dummy_length));
-        // update led status from host ack
-        rf_driver.rf_led = dummy[1];
-        NRF_LOG_INFO("GZLL rf led: %d", dummy[1]);
+        if (!nrf_gzll_fetch_packet_from_rx_fifo(pipe, dummy, &dummy_length)) {
+            NRF_LOG_ERROR("GZLL failed fetch from rx fifo, error:%d", nrf_gzll_get_error_code());
+        } else {
+            // update led status from host ack
+            rf_driver.rf_led = dummy[1];
+            NRF_LOG_INFO("GZLL rf led: %d", dummy[1]);
+            //gzll_keyboard_keepalive();
+        }
     }
 }
 
@@ -126,14 +130,18 @@ void nrf_gzll_device_tx_failed(uint32_t pipe, nrf_gzll_device_tx_info_t tx_info)
     uint8_t  dummy[NRF_GZLL_CONST_MAX_PAYLOAD_LENGTH];
     uint32_t dummy_length = NRF_GZLL_CONST_MAX_PAYLOAD_LENGTH;
 
-    NRF_LOG_INFO("GZLL tx failed");
+    NRF_LOG_INFO("GZLL tx failed on pipe:%d", pipe);
     if (tx_info.payload_received_in_ack) {
         // if ack was sent with payload, pop them from rx fifo.
-        GAZELLE_ERROR_CODE_CHECK(nrf_gzll_fetch_packet_from_rx_fifo(pipe, dummy, &dummy_length));
+        if (!nrf_gzll_fetch_packet_from_rx_fifo(pipe, dummy, &dummy_length)) {
+            NRF_LOG_ERROR("GZLL failed fetch from rx fifo, error:%d", nrf_gzll_get_error_code());
+        }
     }
 
     // If the transmission failed, re-send current packet.
-    GAZELLE_ERROR_CODE_CHECK(nrf_gzll_add_packet_to_tx_fifo(pipe, m_gzll_packet, GZLL_PAYLOAD_SIZE));
+    if (!nrf_gzll_add_packet_to_tx_fifo(pipe, m_gzll_packet, GZLL_PAYLOAD_SIZE)) {
+        NRF_LOG_ERROR("GZLL failed to readded packet to tx fifo, error:%d", nrf_gzll_get_error_code());
+    }
 }
 
 
@@ -145,6 +153,7 @@ void nrf_gzll_host_rx_data_ready(uint32_t pipe, nrf_gzll_host_rx_info_t rx_info)
         return;
     }
 
+    NRF_LOG_INFO("GZLL HOST data received");
     uint8_t  dummy[NRF_GZLL_CONST_MAX_PAYLOAD_LENGTH];
     uint32_t dummy_length = NRF_GZLL_CONST_MAX_PAYLOAD_LENGTH;
 
@@ -152,7 +161,7 @@ void nrf_gzll_host_rx_data_ready(uint32_t pipe, nrf_gzll_host_rx_info_t rx_info)
     bool result_value = nrf_gzll_fetch_packet_from_rx_fifo(pipe, dummy, &dummy_length);
 
     if (!result_value) {
-        NRF_LOG_ERROR("HOST RX fifo error ");
+        NRF_LOG_ERROR("HOST RX fifo error: %d", nrf_gzll_get_error_code());
     }
 
     if (dummy_length > 1) {
@@ -178,6 +187,9 @@ void nrf_gzll_host_rx_data_ready(uint32_t pipe, nrf_gzll_host_rx_info_t rx_info)
             memcpy(&report, &dummy[2], sizeof(report));
             nrf_usb_send_report(NRF_REPORT_ID_CONSUMER, &report, sizeof(report));
         } break;
+        case GZLL_KEEPALIVE:
+            // keep alive packet
+            break;
         default:
             NRF_LOG_INFO("GZLL HOST: unknown report type: %d", dummy[1]);
             break;
@@ -188,7 +200,7 @@ void nrf_gzll_host_rx_data_ready(uint32_t pipe, nrf_gzll_host_rx_info_t rx_info)
 
     result_value = nrf_gzll_add_packet_to_tx_fifo(pipe, dummy, dummy_length);
     if (!result_value) {
-        NRF_LOG_ERROR("HOST TX fifo error ");
+        NRF_LOG_ERROR("HOST TX fifo error:%d", nrf_gzll_get_error_code());
     }
 }
 
@@ -223,5 +235,7 @@ static void gzll_send_report(uint8_t type, uint8_t* data, uint8_t size)
         NRF_LOG_INFO("GZLL: unknown report type: %d", type);
         return;
     }
-    GAZELLE_ERROR_CODE_CHECK(nrf_gzll_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST, m_gzll_packet, GZLL_PAYLOAD_SIZE));
+    if (!nrf_gzll_add_packet_to_tx_fifo(GZLL_PIPE_TO_HOST, m_gzll_packet, GZLL_PAYLOAD_SIZE)) {
+        NRF_LOG_ERROR("GZLL: failed to add packet to tx fifo, code:%d", nrf_gzll_get_error_code());
+    }
 }

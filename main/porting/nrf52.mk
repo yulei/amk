@@ -5,6 +5,7 @@ SRCS += \
 	$(NRF52_PORTING_DIR)/timer.c \
 	$(NRF52_PORTING_DIR)/bootloader.c \
 	$(NRF52_PORTING_DIR)/gpio_pin.c \
+	$(NRF52_PORTING_DIR)/suspend.c \
 	$(NRF52_PORTING_DIR)/wait.c \
 	$(NRF52_PORTING_DIR)/ble/ble_adv_service.c \
 	$(NRF52_PORTING_DIR)/ble/ble_bas_service.c \
@@ -13,7 +14,7 @@ SRCS += \
 	$(NRF52_PORTING_DIR)/ble_keyboard.c \
 	$(NRF52_PORTING_DIR)/gzll_keyboard.c \
 	$(NRF52_PORTING_DIR)/rf_keyboard.c \
-	$(NRF52_PORTING_DIR)/eeconfig_fds.c \
+	$(NRF52_PORTING_DIR)/rf_power.c \
 
 INCS += \
 	$(NRF52_PORTING_DIR) \
@@ -31,4 +32,19 @@ endif
 
 ifeq (NRF52840, $(strip $(MCU)))
 	SRCS += $(NRF52_PORTING_DIR)/usb_backend_tinyusb.c
+#SRCS += $(NRF52_PORTING_DIR)/usb_backend_usb.c
+endif
+
+ifeq (yes, $(strip $(EECONFIG_FRAM)))
+	SRCS += $(MAIN_DIR)/eeconfig_fram.c
+	SRCS += $(MAIN_DIR)/drivers/mb85rcxx.c
+	SRCS += $(MAIN_DIR)/drivers/i2c.c
+	APP_DEFS += -DEECONFIG_FRAM
+else
+	ifeq (yes, $(strip $(EECONFIG_FDS)))
+	SRCS += $(NRF52_PORTING_DIR)/eeconfig_fds.c
+	APP_DEFS += -DEECONFIG_FDS
+	else
+	SRCS += $(MAIN_DIR)/eeconfig_mem.c
+	endif
 endif

@@ -9,9 +9,21 @@
 #include "report.h"
 #include "matrix.h"
 #include "host.h"
+#include "timer.h"
 #include "gpio_pin.h"
 #include "usb_descriptors.h"
+#include "amk_keymap.h"
 #include "amk_printf.h"
+
+#ifndef HHKB_MATRIX_DEBUG
+#define HHKB_MATRIX_DEBUG 1
+#endif
+
+#if HHKB_MATRIX_DEBUG
+#define hhkb_matrix_debug  amk_printf
+#else
+#define hhkb_matrix_debug(...)
+#endif
 
 extern UART_HandleTypeDef huart1;
 pin_t reset_pin = RESET_PIN;
@@ -74,7 +86,8 @@ static bool report_queue_get(report_queue_t* queue, report_item_t* item)
 #define CMD_MAX_LEN 64
 #define SYNC_BYTE_1 0xAA
 #define SYNC_BYTE_2 0x55
-#define RECV_DELAY 100
+#define SYNC_PING   0xA5
+#define SYNC_PONG   0x5A
 
 static void process_data(uint8_t d);
 static void enqueue_command(uint8_t *cmd);
@@ -98,6 +111,30 @@ typedef enum
 } command_t;
 
 static uint8_t command_buf[CMD_MAX_LEN];
+static uint32_t command_buf_count = 0;
+
+typedef enum {
+    BS_IDLE,
+    BS_SEND,
+} ble_state_t;
+
+#define BLE_SYNC_TIMEOUT    1000
+static uint16_t ble_keymaps[AMK_KEYMAP_MAX_LAYER][MATRIX_ROWS][MATRIX_COLS];
+typedef struct {
+    uint8_t     layer;
+    uint8_t     row;
+    uint8_t     col;
+    uint8_t     finished;
+    ble_state_t state;
+    uint8_t     pong;
+    uint32_t    last;
+} ble_sync_state_t;
+
+static ble_sync_state_t ble_sync;
+static void ble_sync_init(void);
+static void ble_sync_process(void);
+static void ble_sync_update(uint8_t layer, uint8_t row, uint8_t col, uint16_t key);
+
 
 typedef enum
 {
@@ -108,9 +145,9 @@ typedef enum
 static void reset_to_bootloader(reset_reason_t reason)
 {
     if ( reason == USER_RESET) {
-        amk_printf("USER reset to bootloader\n");
+        hhkb_matrix_debug("USER reset to bootloader\n");
     } else {
-        amk_printf("PIN reset to bootloader\n");
+        hhkb_matrix_debug("PIN reset to bootloader\n");
     }
     clear_jump_to_app();
 
@@ -124,33 +161,59 @@ static void reset_to_bootloader(reset_reason_t reason)
 
 static void process_data(uint8_t d)
 {
-    //amk_printf("uart received: %d\n", d);
-    static uint32_t count = 0;
-    if (count == 0 && d != SYNC_BYTE_1) {
-        //amk_printf("SYNC BYTE 1: %x\n", d);
+    hhkb_matrix_debug("uart received: %d, current count=%d\n", d, command_buf_count);
+    if (command_buf_count == 0 && d != SYNC_BYTE_1) {
+        hhkb_matrix_debug("SYNC BYTE 1: %x\n", d);
         return;
-    } else if (count == 1 && d != SYNC_BYTE_2) {
-        count = 0;
-        //amk_printf("SYNC BYTE 2: %x\n", d);
+    } else if (command_buf_count == 1 && d != SYNC_BYTE_2) {
+        command_buf_count = 0;
+        memset(command_buf, 0, sizeof(command_buf));
+        hhkb_matrix_debug("SYNC BYTE 2: %x\n", d);
         return;
     }
 
-    command_buf[count] = d;
-    count++;
-    if ((count > 2) && (count == (command_buf[2] + 2))) {
-        // full packet received
-        enqueue_command(&command_buf[2]);
-        count = 0;
+    if (command_buf_count >= CMD_MAX_LEN) {
+        hhkb_matrix_debug("UART command oversize\n");
+        memset(command_buf, 0, sizeof(command_buf));
+        command_buf_count = 0;
+        return;
+    }
+
+    command_buf[command_buf_count] = d;
+
+    if ((command_buf_count==2) && (d==SYNC_PONG)) {
+        hhkb_matrix_debug("SYNC PONG received: %x\n", d);
+        ble_sync.pong = 1;
+        memset(command_buf, 0, sizeof(command_buf));
+        command_buf_count= 0;
+        return;
+    }
+
+    if (command_buf[2]+2 > CMD_MAX_LEN) {
+        hhkb_matrix_debug("UART invalid command size: %d\n", command_buf[2]);
+        memset(command_buf, 0, sizeof(command_buf));
+        command_buf_count= 0;
+        return;
+    }
+
+    command_buf_count++;
+    if (command_buf_count > 2) {
+        if (command_buf_count == (command_buf[2] + 2)) {
+            // full packet received
+            enqueue_command(&command_buf[2]);
+            memset(command_buf, 0, sizeof(command_buf));
+            command_buf_count = 0;
+        }
     }
 }
 
 static void enqueue_command(uint8_t *cmd)
 {
-    amk_printf("Enqueue Command: %d\n", cmd[2]);
+    hhkb_matrix_debug("Enqueue Command: %d\n", cmd[2]);
     uint8_t checksum = compute_checksum(cmd + 2, cmd[0] - 2);
     if (checksum != cmd[1]) {
         // invalid checksum
-        amk_printf("Checksum: LEN:%x, SRC:%x, CUR:%x\n", cmd[0], cmd[1], checksum);
+        hhkb_matrix_debug("Checksum: LEN:%x, SRC:%x, CUR:%x\n", cmd[0], cmd[1], checksum);
         return;
     }
 
@@ -165,11 +228,11 @@ static void process_command(report_item_t *item)
     switch (item->type) {
     case CMD_KEY_REPORT: {
         static report_keyboard_t report;
-        amk_printf("Send key report\n");
+        hhkb_matrix_debug("Send key report\n");
         for (uint32_t i = 0; i < sizeof(report); i++) {
-            amk_printf(" 0x%x", item->data[i]);
+            hhkb_matrix_debug(" 0x%x", item->data[i]);
         }
-        amk_printf("\n");
+        hhkb_matrix_debug("\n");
 
         memcpy(&report.raw[0], &item->data[0], sizeof(report));
         host_keyboard_send(&report);
@@ -177,9 +240,9 @@ static void process_command(report_item_t *item)
 #ifdef MOUSE_ENABLE
     case CMD_MOUSE_REPORT: {
         static report_mouse_t report;
-        amk_printf("Send mouse report\n");
+        hhkb_matrix_debug("Send mouse report\n");
         for (uint32_t i = 0; i < sizeof(report); i++) {
-            amk_printf(" 0x%x", item->data[i]);
+            hhkb_matrix_debug(" 0x%x", item->data[i]);
         }
 
         memcpy(&report, &item->data[0], sizeof(report));
@@ -189,9 +252,9 @@ static void process_command(report_item_t *item)
 #ifdef EXTRAKEY_ENABLE
     case CMD_SYSTEM_REPORT: {
         static uint16_t report;
-        amk_printf("Send system report\n");
+        hhkb_matrix_debug("Send system report\n");
         for (uint32_t i = 0; i < sizeof(report); i++) {
-            amk_printf(" 0x%x", item->data[i]);
+            hhkb_matrix_debug(" 0x%x", item->data[i]);
         }
         memcpy(&report, &item->data[0], sizeof(report));
         host_system_send(report);
@@ -199,9 +262,9 @@ static void process_command(report_item_t *item)
     } break;
     case CMD_CONSUMER_REPORT: {
         static uint16_t report;
-        amk_printf("Send consumer report\n");
+        hhkb_matrix_debug("Send consumer report\n");
         for (uint32_t i = 0; i < sizeof(report); i++) {
-            amk_printf(" 0x%x", item->data[i]);
+            hhkb_matrix_debug(" 0x%x", item->data[i]);
         }
         memcpy(&report, &item->data[0], sizeof(report));
         host_consumer_send(report);
@@ -211,10 +274,10 @@ static void process_command(report_item_t *item)
         reset_to_bootloader(USER_RESET);
         break;
     case CMD_KEYMAP_SET_ACK:
-        //USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 6);
+        // do nothing
         break;
     case CMD_KEYMAP_GET_ACK:
-        //USBD_COMP_Send(&hUsbDeviceFS, HID_REPORT_ID_WEBUSB, &item->data[0], 6);
+        ble_sync_update(item->data[0], item->data[1], item->data[2], (item->data[3]<<8) | item->data[4]);
         break;
 
     default:
@@ -278,8 +341,12 @@ static uint8_t recv_char;
 void matrix_init(void)
 {
     report_queue_init(&report_queue);
+    memset(command_buf, 0, sizeof(command_buf));
+    command_buf_count = 0;
+
     HAL_UART_Receive_IT(&huart1, &recv_char, 1);
     gpio_set_input_pullup(reset_pin);
+    ble_sync_init();
 }
 
 uint8_t matrix_scan(void)
@@ -287,6 +354,8 @@ uint8_t matrix_scan(void)
     if (gpio_read_pin(reset_pin) == 0) {
         reset_to_bootloader(PIN_RESET);
     }
+
+    ble_sync_process();
 
     report_item_t item;
     while (report_queue_get(&report_queue, &item)) {
@@ -299,7 +368,7 @@ matrix_row_t matrix_get_row(uint8_t row) { return matrix[row]; }
 
 void matrix_print(void)
 {
-    amk_printf("matrix_print\n");
+    hhkb_matrix_debug("matrix_print\n");
 }
 
 void led_set(uint8_t usb_led)
@@ -335,7 +404,7 @@ void uart_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
     static uint8_t get_cmd[16];
     get_cmd[0] = SYNC_BYTE_1;
     get_cmd[1] = SYNC_BYTE_2;
-    get_cmd[2] = 8;                 // size
+    get_cmd[2] = 6;                 // size
     get_cmd[4] = CMD_KEYMAP_GET;    // command type
     get_cmd[5] = layer;             
     get_cmd[6] = row;
@@ -345,3 +414,132 @@ void uart_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
 
     HAL_UART_Transmit_DMA(&huart1, &get_cmd[0], 8);
 }
+
+void amk_keymap_init(void)
+{}
+
+void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
+{
+    if (!((layer < AMK_KEYMAP_MAX_LAYER) && (row < MATRIX_ROWS) && (col < MATRIX_COLS))) return;
+
+    ble_keymaps[layer][row][col] = keycode;
+    uart_keymap_set(layer, row, col, keycode);
+}
+
+uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
+{
+    return ble_keymaps[layer][row][col];
+}
+
+uint8_t amk_keymap_get_layer_count(void) { return 4; }
+
+void amk_keymap_get_buffer(uint16_t offset, uint16_t size, uint8_t *data)
+{
+    hhkb_matrix_debug("get_buffer: offset=%d, size=%d\n", offset, size);
+    uint8_t *addr = (uint8_t*)(ble_keymaps)+offset;
+    for (int i = 0; i < size/2; i++) {
+        data[1] = addr[0];
+        data[0] = addr[1];
+        data += 2; 
+        addr += 2;
+    }
+}
+
+void amk_keymap_set_buffer(uint16_t offset, uint16_t size, uint8_t *data)
+{
+    hhkb_matrix_debug("set_buffer: offset=%d, size=%d\n", offset, size);
+    //uint8_t *addr = (uint8_t*)(ble_keymaps)+offset;
+    
+    //memcpy(addr, data, size);
+}
+
+static void ble_sync_init(void)
+{
+    for (uint8_t layer = 0; layer < AMK_KEYMAP_MAX_LAYER; layer++) {
+        for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
+            for (uint8_t col = 0; col < MATRIX_COLS; col++) {
+                ble_keymaps[layer][row][col] = 0;
+            }
+        }
+    }
+    ble_sync.layer      = 0;
+    ble_sync.row        = 0;
+    ble_sync.col        = 0;
+#ifdef VIAL_ENABLE 
+    ble_sync.finished   = 0;
+#else
+    ble_sync.finished   = 1;    // no need to sync keymap
+#endif
+
+    ble_sync.state      = BS_IDLE;
+    ble_sync.pong       = 0;
+    ble_sync.last       = timer_read32();
+}
+
+static void ble_sync_process(void)
+{
+    if (ble_sync.finished) return;
+
+    // waiting for last command back
+    if (ble_sync.state == BS_SEND) {
+        if (timer_elapsed32(ble_sync.last) > BLE_SYNC_TIMEOUT) {
+            hhkb_matrix_debug("BLESYNC: timer out, resent\n");
+            ble_sync.state = BS_IDLE;
+        } else {
+            return;
+        }
+    }
+
+    if (ble_sync.pong == 0) {
+        hhkb_matrix_debug("BLE SYNC: send ping\n");
+        static uint8_t ping_cmd[4];
+        ping_cmd[0] = SYNC_BYTE_1;
+        ping_cmd[1] = SYNC_BYTE_2;
+        ping_cmd[2] = SYNC_PING;
+        HAL_UART_Transmit_DMA(&huart1, &ping_cmd[0], 3);
+    } else {
+        // get current keymap
+        hhkb_matrix_debug("BLE SYNC: uart keymap get: layer:%d, row:%d, col:%d\n", ble_sync.layer, ble_sync.row, ble_sync.col);
+        uart_keymap_get(ble_sync.layer, ble_sync.row, ble_sync.col);
+    }
+
+    ble_sync.last = timer_read32();
+    ble_sync.state = BS_SEND;
+}
+
+static void ble_sync_update(uint8_t layer, uint8_t row, uint8_t col, uint16_t key)
+{
+    hhkb_matrix_debug("BLESYNC: get keymap acked\n");
+    if ((ble_sync.layer != layer) || (ble_sync.row != row) || (ble_sync.col != col)) {
+        hhkb_matrix_debug("MISMATCH: layer:[%d]-[%d], row:[%d]-[%d], col:[%d]-[%d]\n", 
+            ble_sync.layer, layer, ble_sync.row, row, ble_sync.col, col);
+        ble_sync.state = BS_IDLE;
+        return;
+    }
+
+    ble_keymaps[layer][row][col] = key;
+    if (col == (MATRIX_COLS-1)) {
+        if (row < (MATRIX_ROWS-1)) {
+            ble_sync.col = 0;
+            ble_sync.row++;
+        } else {
+            if (layer < (AMK_KEYMAP_MAX_LAYER-1)) {
+                ble_sync.col = 0;
+                ble_sync.row = 0;
+                ble_sync.layer++;
+            } else {
+                // all done
+                amk_printf("BLESYNC: finished\n");
+                ble_sync.finished = 1;
+            }
+        }
+    } else {
+        ble_sync.col++;
+    }
+
+    hhkb_matrix_debug("BLESYNC: next key: layer:%d, row:%d, col:%d\n", ble_sync.layer, ble_sync.row, ble_sync.col);
+    ble_sync.state = BS_IDLE;
+}
+
+#include "action.h"
+const action_t PROGMEM actionmaps[4][MATRIX_ROWS][MATRIX_COLS];

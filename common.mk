@@ -2,9 +2,10 @@
 MK := mkdir -p
 RM := rm -rf
 CP := cp
+UF2 := python util/uf2conv.py
 
 # Build type
-NO_DEBUG ?= 0
+NO_DEBUG ?= 1
 LTO_ENABLE ?= 0
 
 # Echo suspend
@@ -50,9 +51,9 @@ $(OBJ_DIRS):
 #$(info $(OBJS))
 
 ifeq (1,$(NO_DEBUG))
-OPT = -Os -g3
+OPT = -Os -ggdb
 else
-OPT = -Og -gdwarf-2 -DDEBUG
+OPT = -Og -ggdb -DDEBUG
 endif
 
 ifeq (1,$(LTO_ENABLE))
@@ -84,6 +85,8 @@ LDFLAGS += -L$(LINKER_PATH) -T$(LINKER_SCRIPT)
 LDFLAGS += -Wl,--gc-sections
 # use newlib in nano version
 LDFLAGS += --specs=nano.specs
+# let linker print memory usage
+LDFLAGS += -Wl,--print-memory-usage 
 
 # Add standard libraries at the very end of the linker input, after all objects
 # that may need symbols provided by these libraries.
@@ -129,8 +132,12 @@ $(BUILD_DIR)/%.o : %.S
 	@$(PROGRESS) Assembling: $(notdir $<)
 	$(ASSEMBLING)
 
-$(TARGET): $(addprefix $(OUTPUT_DIR)/$(TARGET), .elf .bin .hex)
 
+ifeq (NRF52840, $(strip $(MCU)))
+$(TARGET): $(addprefix $(OUTPUT_DIR)/$(TARGET), .elf .bin .hex .uf2)
+else
+$(TARGET): $(addprefix $(OUTPUT_DIR)/$(TARGET), .elf .bin .hex)
+endif
 # Create elf files 
 %.elf: $(OBJS)
 	$(info Linking: $(notdir $@))
@@ -146,6 +153,11 @@ $(TARGET): $(addprefix $(OUTPUT_DIR)/$(TARGET), .elf .bin .hex)
 %.hex: %.elf
 	$(info Creating: $(notdir $@))
 	$(NO_ECHO)$(OBJCOPY) -O ihex $< $@
+
+# Create uf2 file from the .hex file
+%.uf2: %.hex
+	$(info Creating: $(notdir $@))
+	$(NO_ECHO)$(UF2) $< -c -f 0xADA52840 -o $@
 
 # Include the dependency files
 -include $(OBJS:%.o=%.d)

@@ -129,55 +129,11 @@ void eeprom_update_block(const void *buf, void *addr, size_t len)
     eeprom_write_block(buf, addr, len);
 }
 
-//=======================================================
-// TMK functions
-//=======================================================
-__attribute__((weak))
-void hook_eeconfig_init(void) {}
-
-void eeconfig_init(void)
+// cleanup eeconfig before initialization
+void eeconfig_prepare(void)
 {
     fee_erase();
-    eeprom_write_word(EECONFIG_MAGIC,           EECONFIG_MAGIC_NUMBER);
-    eeprom_write_byte(EECONFIG_DEBUG,           0);
-    eeprom_write_byte(EECONFIG_DEFAULT_LAYER,   0);
-    eeprom_write_byte(EECONFIG_KEYMAP,          0);
-    eeprom_write_byte(EECONFIG_MOUSEKEY_ACCEL,  0);
-
-#ifdef RGB_EFFECTS_ENABLE
-    extern void effects_update_default(void);
-    effects_update_default();
-#endif
-#ifdef RGB_MATRIX_ENABLE
-    extern void rgb_matrix_update_default(void);
-    rgb_matrix_update_default();
-#endif
-    hook_eeconfig_init();
 }
-
-void eeconfig_enable(void)
-{
-    eeprom_write_word(EECONFIG_MAGIC, EECONFIG_MAGIC_NUMBER);
-}
-
-void eeconfig_disable(void)
-{
-    eeprom_write_word(EECONFIG_MAGIC, 0xFFFF);
-}
-
-bool eeconfig_is_enabled(void)
-{
-    return (eeprom_read_word(EECONFIG_MAGIC) == EECONFIG_MAGIC_NUMBER);
-}
-
-uint8_t eeconfig_read_debug(void)      { return eeprom_read_byte(EECONFIG_DEBUG); }
-void eeconfig_write_debug(uint8_t val) { eeprom_write_byte(EECONFIG_DEBUG, val); }
-
-uint8_t eeconfig_read_default_layer(void)      { return eeprom_read_byte(EECONFIG_DEFAULT_LAYER); }
-void eeconfig_write_default_layer(uint8_t val) { eeprom_write_byte(EECONFIG_DEFAULT_LAYER, val); }
-
-uint8_t eeconfig_read_keymap(void)      { return eeprom_read_byte(EECONFIG_KEYMAP); }
-void eeconfig_write_keymap(uint8_t val) { eeprom_write_byte(EECONFIG_KEYMAP, val); }
 
 //==============================================
 // flash eeprom operation
@@ -344,46 +300,4 @@ void flash_erase_pages(void)
     HAL_FLASHEx_Erase(&erase, &error);
     flash_lock();
     amk_printf("Flash erase page, error=%d\n", error);
-}
-
-//==================================================
-// flash store for keymaps
-//==================================================
-
-void flash_store_write(uint8_t key, const void* data, size_t size)
-{
-    uint32_t start = EEPROM_KEYMAP_START+key*MATRIX_ROWS*MATRIX_COLS*2;
-    const uint8_t* p = (const uint8_t*)data;
-    for(int i = 0; i < size; i++) {
-        fee_write(start+i, p[i]);
-    }
-}
-
-size_t flash_store_read(uint8_t key, void* data, size_t size)
-{
-    uint32_t start = EEPROM_KEYMAP_START+key*MATRIX_ROWS*MATRIX_COLS*2;
-    uint8_t* p = (uint8_t*)data;
-    for(int i = 0; i < size; i++) {
-        p[i] = fee_read(start+i);
-    }
-
-    return size;
-}
-
-void flash_store_write_key(uint8_t layer, uint8_t row, uint8_t col, uint16_t key)
-{
-    uint32_t addr = EEPROM_KEYMAP_START + layer*MATRIX_ROWS*MATRIX_COLS*2 + (row*MATRIX_COLS + col)*2;
-    uint8_t* p = (uint8_t*)&key;
-    fee_write(addr, p[0]);
-    fee_write(addr+1, p[1]);
-}
-
-uint16_t flash_store_read_key(uint8_t layer, uint8_t row, uint8_t col)
-{
-    uint16_t key = 0;
-    uint32_t addr = EEPROM_KEYMAP_START + layer*MATRIX_ROWS*MATRIX_COLS*2 + (row*MATRIX_COLS + col)*2;
-    uint8_t* p = (uint8_t*)&key;
-    p[0] = fee_read(addr);
-    p[1] = fee_read(addr+1);
-    return key;
 }

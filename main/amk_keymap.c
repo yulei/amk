@@ -11,18 +11,15 @@
 #include "keymap.h"
 #include "amk_printf.h"
 
-#ifdef WEBCONFIG_ENABLE
+#ifdef KEYMAP_CONFIG_ENABLE 
 
-static uint16_t amk_keymaps[AMK_KEYMAP_MAX_LAYER][MATRIX_ROWS][MATRIX_COLS];
-
-#ifdef ACTIONMAP_ENABLE
-extern const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS];
-#else
-extern const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
-extern const action_t fn_actions[];
+#ifndef ACTIONMAP_ENABLE
+#error ACTIONMAP must be enabled with webconfig
 #endif
 
-#ifdef ACTIONMAP_ENABLE
+static uint16_t amk_keymaps[AMK_KEYMAP_MAX_LAYER][MATRIX_ROWS][MATRIX_COLS];
+extern const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS];
+
 action_t action_for_key(uint8_t layer, keypos_t key)
 {
     return (action_t)amk_keymap_get(layer, key.row, key.col);
@@ -33,19 +30,8 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
     return MACRO_NONE;
 }
-#else
-uint8_t keymap_key_to_keycode(uint8_t layer, keypos_t key)
-{
-    return amk_keymap_get(layer, key.row, key.col);
-}
 
-action_t keymap_fn_to_action(uint8_t keycode)
-{
-    return fn_actions[FN_INDEX(keycode)];
-}
-#endif
-
-
+__attribute__((weak))
 void amk_keymap_init(void)
 {
     memset(amk_keymaps, 0, sizeof(amk_keymaps));
@@ -61,20 +47,40 @@ void amk_keymap_init(void)
         for(int layer = 0; layer < AMK_KEYMAP_MAX_LAYER; layer++) {
             for (int row = 0; row < MATRIX_ROWS; row++) {
                 for (int col = 0; col < MATRIX_COLS; col++) {
-#ifdef ACTIONMAP_ENABLE
                     amk_keymaps[layer][row][col] = actionmaps[layer][row][col].code;
-#else
-                    amk_keymaps[layer][row][col] = keymaps[layer][row][col];
-#endif
                     ee_keymap_write_key(layer, row, col, amk_keymaps[layer][row][col]);
                 }
             }
-            //ee_keymap_write(layer, &(amk_keymaps[layer][0][0]), MATRIX_ROWS*MATRIX_COLS*2);
         }
         ee_keymap_set_valid(true);
     }
+
+    amk_printf("amk_keymap_init finished\n");
 }
 
+__attribute__((weak))
+void amk_keymap_reset(void)
+{
+    memset(amk_keymaps, 0, sizeof(amk_keymaps));
+    for(int layer = 0; layer < AMK_KEYMAP_MAX_LAYER; layer++) {
+        for (int row = 0; row < MATRIX_ROWS; row++) {
+            for (int col = 0; col < MATRIX_COLS; col++) {
+                amk_keymaps[layer][row][col] = actionmaps[layer][row][col].code;
+                ee_keymap_write_key(layer, row, col, amk_keymaps[layer][row][col]);
+            }
+        }
+    }
+    ee_keymap_set_valid(true);
+    amk_printf("amk_keymap_reset finished\n");
+}
+
+__attribute__((weak))
+uint8_t amk_keymap_get_layer_count(void)
+{
+    return AMK_KEYMAP_MAX_LAYER;
+}
+
+__attribute__((weak))
 void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
 {
     if (amk_keymaps[layer][row][col] == keycode) return;
@@ -82,18 +88,55 @@ void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
     amk_printf("amk_keymap_set: layer=%d, row=%d, col=%d, key=0x%x\n", layer, row, col, keycode);
     amk_keymaps[layer][row][col] = keycode;
     ee_keymap_write_key(layer, row, col, amk_keymaps[layer][row][col]);
-    //ee_keymap_write(layer, &(amk_keymaps[layer][0][0]), MATRIX_ROWS*MATRIX_COLS*2);
 }
 
+__attribute__((weak))
 uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
 {
     amk_printf("amk_keymap_get: layer=%d, row=%d, col=%d, key=0x%x\n", layer, row, col, amk_keymaps[layer][row][col]);
     return amk_keymaps[layer][row][col];
 }
 
+__attribute__((weak))
+void amk_keymap_get_buffer(uint16_t offset, uint16_t size, uint8_t *data)
+{
+    ee_keymap_read_buffer(offset, size, data);
+}
+
+__attribute__((weak))
+void amk_keymap_set_buffer(uint16_t offset, uint16_t size, uint8_t *data)
+{
+    ee_keymap_write_buffer(offset, size, data);
+}
+
 #else
-void amk_keymap_init(void){}
+__attribute__((weak))
+void amk_keymap_init(void)
+{
+    amk_printf("amk_keymap_init in disabled mode\n");
+}
+
+__attribute__((weak))
+void amk_keymap_reset(void)
+{
+    amk_printf("amk_keymap_reset in disabled mode\n");
+}
+
+__attribute__((weak))
+uint8_t amk_keymap_get_layer_count(void) { return 0; }
+
+__attribute__((weak))
 void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode) {}
-uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col) {return 0;}
+
+__attribute__((weak))
+uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col) { return 0; }
+
+__attribute__((weak))
+void amk_keymap_get_buffer(uint16_t offset, uint16_t size, uint8_t *data)
+{}
+
+__attribute__((weak))
+void amk_keymap_set_buffer(uint16_t offset, uint16_t size, uint8_t *data)
+{}
 
 #endif

@@ -54,3 +54,10 @@ hid_report_t *hid_report_queue_peek(hid_report_queue_t* queue)
     if (hid_report_queue_empty(queue)) return NULL;
     return &(queue->items[queue->head]);
 }
+
+void hid_report_queue_pop(hid_report_queue_t* queue)
+{
+    if (hid_report_queue_empty(queue)) return;
+
+    queue->head = (queue->head + 1) % HID_REPORT_QUEUE_SIZE;
+}

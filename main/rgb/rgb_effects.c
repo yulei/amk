@@ -11,6 +11,16 @@
 #include "eeprom_manager.h"
 #include "amk_printf.h"
 
+#ifndef RGB_EFFECTS_DEBUG
+#define RGB_EFFECTS_DEBUG 1
+#endif
+
+#if RGB_EFFECTS_DEBUG
+#define rgb_effects_debug  amk_printf
+#else
+#define rgb_effects_debug(...)
+#endif
+
 #define DELAY_MIN   0
 #define DELAY_DEFAULT 1500
 
@@ -35,6 +45,7 @@
 
 #define RAINBOW_STEP_DEFAULT    32
 #define BREATH_STEP_DEFAULT     32
+#define CIRCLE_STEP_DEFAULT     2
 
 enum rgb_effects_type {
     RGB_EFFECT_STATIC,
@@ -45,8 +56,11 @@ enum rgb_effects_type {
     RGB_EFFECT_BREATH,
     RGB_EFFECT_WIPE,
     RGB_EFFECT_SCAN,
+    RGB_EFFECT_CIRCLE,
     RGB_EFFECT_MAX
 };
+
+#define RGB_EFFECT_DEFAULT RGB_EFFECT_CIRCLE
 
 typedef void (*RGB_EFFECT_FUN)(void);
 
@@ -57,6 +71,7 @@ typedef struct {
     uint32_t                counter;
     uint32_t                rainbow_step;
     uint32_t                breath_step;
+    uint32_t                circle_step;
     bool                    wipe_on;
     RGB_EFFECT_FUN          effects[RGB_EFFECT_MAX];
 } rgb_effects_state_t;
@@ -111,6 +126,8 @@ static void effects_mode_init(void)
             effects_state.counter = 0;
             effects_state.driver->set_color_all(0, 0, 0);
             break;
+        case RGB_EFFECT_CIRCLE:
+            break; 
         default:
             break;
     }
@@ -130,6 +147,8 @@ static uint32_t effects_delay(void)
         case RGB_EFFECT_RANDOM:
             break;
         case RGB_EFFECT_BREATH:
+            break;
+        case RGB_EFFECT_CIRCLE:
             break;
         default:
             break;
@@ -232,6 +251,13 @@ static void effects_mode_scan(void)
     }
 }
 
+static void effects_mode_circle(void)
+{
+    effects_state.driver->set_color_all(effects_state.config.hue, effects_state.config.sat, effects_state.config.val);
+
+    effects_state.config.hue += effects_state.circle_step;
+}
+
 static void effects_set_hue(uint8_t hue)
 {
     effects_state.config.hue = hue;
@@ -274,7 +300,7 @@ static void effects_set_enable(uint8_t enable)
 void effects_update_default(void)
 {
     effects_state.config.enable = 1;
-    effects_state.config.mode = RGB_EFFECT_SCAN;
+    effects_state.config.mode = RGB_EFFECT_DEFAULT;
     effects_state.config.speed = SPEED_DEFAULT;
     effects_state.config.hue = HUE_DEFAULT;
     effects_state.config.sat = SAT_DEFAULT;
@@ -302,6 +328,7 @@ void rgb_effects_init(rgb_driver_t* driver)
     effects_state.wipe_on       = true;
     effects_state.rainbow_step  = RAINBOW_STEP_DEFAULT;
     effects_state.breath_step   = BREATH_STEP_DEFAULT;
+    effects_state.circle_step   = CIRCLE_STEP_DEFAULT;
     effects_state.last_ticks    = timer_read32();
     srand(effects_state.last_ticks);
     effects_state.effects[RGB_EFFECT_STATIC]    = effects_mode_static;
@@ -312,6 +339,7 @@ void rgb_effects_init(rgb_driver_t* driver)
     effects_state.effects[RGB_EFFECT_BREATH]    = effects_mode_breath;
     effects_state.effects[RGB_EFFECT_WIPE]      = effects_mode_wipe;
     effects_state.effects[RGB_EFFECT_SCAN]      = effects_mode_scan;
+    effects_state.effects[RGB_EFFECT_CIRCLE]    = effects_mode_circle;
     effects_mode_init();
 }
 
@@ -378,12 +406,17 @@ void rgb_effects_dec_mode(void)
 void rgb_effects_toggle(void)
 {
     effects_state.config.enable = !effects_state.config.enable;
+    effects_set_enable(effects_state.config.enable);
+
     if (effects_state.config.enable) {
         effects_state.driver->init();
+        rgb_effects_debug("effects: driver init\n");
     } else {
+        #ifdef RGBLIGHT_EN_PIN
         effects_state.driver->uninit();
+        rgb_effects_debug("effects: driver uninit\n");
+        #endif
     }
-    effects_set_enable(effects_state.config.enable);
 }
 
 void rgb_effects_task(void)
@@ -395,6 +428,11 @@ void rgb_effects_task(void)
             //amk_printf("effects last ticks: %d\n", effects_state.last_ticks);
         }
         effects_state.driver->flush();
+    } else {
+        #ifndef RGBLIGHT_EN_PIN
+        effects_state.driver->set_color_all(0,0,0);
+        effects_state.driver->flush();
+        #endif
     }
 }
 

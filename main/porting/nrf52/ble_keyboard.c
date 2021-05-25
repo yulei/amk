@@ -6,6 +6,7 @@
 #include "ble_config.h"
 
 #include "ble_keyboard.h"
+#include "ble_adv_service.h"
 #include "ble_hids_service.h"
 #include "ble_services.h"
 #include "eeconfig_fds.h"
@@ -14,6 +15,8 @@
 ble_driver_t ble_driver = {
     .peer_id = PM_PEER_ID_INVALID,
     .conn_handle = BLE_CONN_HANDLE_INVALID,
+    .current_peer = BLE_PEER_DEVICE_0,
+    .restart_advertise = false,
 };
 
 static void ble_send_report(uint8_t type, uint8_t *data, uint8_t size);
@@ -43,6 +46,11 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             ble_hids_service_flush(false);
 
             ble_driver.conn_handle = BLE_CONN_HANDLE_INVALID;
+            if (ble_driver.restart_advertise) {
+                ble_driver.restart_advertise = false;
+                ble_adv_service_restart();
+                NRF_LOG_INFO("Restart connection");
+            }
 
             break; // BLE_GAP_EVT_DISCONNECTED
 
@@ -59,6 +67,7 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
         } break;
 
         case BLE_GATTS_EVT_HVN_TX_COMPLETE:
+            //NRF_LOG_INFO("GAP Event: hvn tx complete.");
             // Send next key event
             ble_hids_service_flush(true);
             break;
@@ -114,7 +123,9 @@ static void ble_stack_init(void)
 void ble_keyboard_init(void)
 {
     ble_stack_init();
+#ifdef EECONFIG_FDS
     fds_eeprom_init();
+#endif
     ble_services_init();
 
     rf_keyboard_init(ble_send_report, ble_prepare_sleep);

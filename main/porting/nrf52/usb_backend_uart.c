@@ -7,9 +7,14 @@
 #include "amk_keymap.h"
 #include "app_uart.h"
 #include "nrf_gpio.h"
-#include "nrfx_gpiote.h"
 #include "nrf_uart.h"
 #include "nrf_delay.h"
+
+APP_TIMER_DEF(m_vbus_timer_id); /**< vbus check delay */
+
+#ifndef PRINT_AMK_KEYMAP_SETGET
+#define PRINT_AMK_KEYMAP_SETGET 1
+#endif
 
 typedef struct {
     nrf_usb_event_handler_t event;
@@ -26,7 +31,6 @@ typedef struct {
 static nrf_usb_config_t usb_config;
 static nrf_usb_buf_t usb_buffer;
 
-static void vbus_event_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
 static void usb_update_state();
 static void uart_init(void);
 static void uart_uninit(void);
@@ -36,9 +40,20 @@ static void uart_process_data(uint8_t data);
 static void uart_process_cmd(const uint8_t* cmd, uint32_t size);
 static uint8_t compute_checksum(const uint8_t* data, uint32_t size);
 
+static void vbus_timer_handler(void * p_context);
+
 void nrf_usb_preinit(void) {}
 void nrf_usb_postinit(void) {}
-void nrf_usb_task(void) {}
+
+void nrf_usb_task(void) 
+{
+    bool on = nrf_gpio_pin_read(VBUS_DETECT_PIN) ? true : false;
+
+    if (usb_config.vbus_enabled != on) {
+        app_timer_start(m_vbus_timer_id, VBUS_DETECT_DELAY_INTERVAL, NULL);
+    }
+}
+
 void nrf_usb_init(nrf_usb_event_handler_t *eh)
 {
     usb_config.event.enable_cb  = eh->enable_cb;
@@ -52,13 +67,12 @@ void nrf_usb_init(nrf_usb_event_handler_t *eh)
     }
     usb_buffer.count = 0;
 
-    ret_code_t err_code;
-    nrfx_gpiote_in_config_t in_config = NRFX_GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
-    err_code = nrfx_gpiote_in_init(VBUS_DETECT_PIN, &in_config, vbus_event_handler);
-    APP_ERROR_CHECK(err_code);
-    nrfx_gpiote_in_event_enable(VBUS_DETECT_PIN, true);
-
+    nrf_gpio_cfg_input(VBUS_DETECT_PIN, NRF_GPIO_PIN_NOPULL);
     usb_update_state();
+
+    ret_code_t err_code;
+    err_code = app_timer_create(&m_vbus_timer_id, APP_TIMER_MODE_SINGLE_SHOT, vbus_timer_handler);
+    APP_ERROR_CHECK(err_code);
 }
 
 void nrf_usb_send_report(nrf_report_id report, const void *data, size_t size)
@@ -115,7 +129,7 @@ void nrf_usb_reboot(void)
 
 static void usb_update_state()
 {
-    usb_config.vbus_enabled = nrfx_gpiote_in_is_set(VBUS_DETECT_PIN) ? true : false;
+    usb_config.vbus_enabled = nrf_gpio_pin_read(VBUS_DETECT_PIN) ? true : false;
 
     if (usb_config.vbus_enabled) {
         uart_init();
@@ -125,14 +139,6 @@ static void usb_update_state()
         usb_config.event.disable_cb();
         uart_uninit();
         NRF_LOG_INFO("VBUS off, turn off uart");
-    }
-}
-
-static void vbus_event_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
-{
-    NRF_LOG_INFO("PIN EVENT: pin=%d, action=%d", pin, action);
-    if (pin == VBUS_DETECT_PIN) {
-        usb_update_state();
     }
 }
 
@@ -224,13 +230,14 @@ static void uart_send_cmd(command_t cmd, const uint8_t* data, uint32_t size)
 
 static void uart_process_data(uint8_t data)
 {
+    NRF_LOG_INFO("uart received: %d", data);
     switch(usb_buffer.count) {
     case 0:
     // first byte
         if (data == SYNC_BYTE_1) {
             usb_buffer.data[usb_buffer.count++] = data;
         } else {
-            NRF_LOG_WARNING("Invalid sync 1 received");
+            NRF_LOG_WARNING("Invalid sync 1 received: %d\n", data);
         }
         break;
     case 1:
@@ -238,23 +245,39 @@ static void uart_process_data(uint8_t data)
         if (data == SYNC_BYTE_2) {
             usb_buffer.data[usb_buffer.count++] = data;
         } else {
-            NRF_LOG_WARNING("Invalid sync 2 received");
+            NRF_LOG_WARNING("Invalid sync 2 received: %d\n", data);
             usb_buffer.count = 0;
         }
         break;
     default:
-        usb_buffer.data[usb_buffer.count++] = data;
-        if ((usb_buffer.count > 2) && (usb_buffer.count == (usb_buffer.data[2] + 2))) {
-            // full packet received
-            uint8_t* cmd = &usb_buffer.data[2];
-            uint8_t checksum = compute_checksum(cmd + 2, cmd[0] - 2);
-            if (checksum != cmd[1]) {
-                // invalid checksum
-                NRF_LOG_WARNING("Checksum mismatch: SRC:%x, CUR:%x", cmd[1], checksum);
-            } else {
-                uart_process_cmd(&cmd[2], cmd[0]-2);
-            }
+        if (usb_buffer.count >= NRF_RECV_BUF_SIZE) {
+            NRF_LOG_WARNING("UART receving queue OVERSIZE\n");
             usb_buffer.count = 0;
+        } else if ((usb_buffer.count==2) && (data==SYNC_PING)) {
+            uint8_t cmd[4];
+            cmd[0] = SYNC_BYTE_1;
+            cmd[1] = SYNC_BYTE_2;
+            cmd[2] = SYNC_PONG;
+            usb_buffer.count = 0;
+            // uart sould valid at this moment
+            for (uint32_t i = 0; i < 3; i++) {
+                app_uart_put(cmd[i]);
+            }
+            NRF_LOG_INFO("UART PONG");
+        } else {
+            usb_buffer.data[usb_buffer.count++] = data;
+            if ((usb_buffer.count > 2) && (usb_buffer.count == (usb_buffer.data[2] + 2))) {
+                // full packet received
+                uint8_t* cmd = &usb_buffer.data[2];
+                uint8_t checksum = compute_checksum(cmd + 2, cmd[0] - 2);
+                if (checksum != cmd[1]) {
+                    // invalid checksum
+                    NRF_LOG_WARNING("Checksum mismatch: SRC:%x, CUR:%x", cmd[1], checksum);
+                } else {
+                    uart_process_cmd(&cmd[2], cmd[0]-2);
+                }
+                usb_buffer.count = 0;
+            }
         }
         break;
     }
@@ -269,13 +292,17 @@ static void uart_process_cmd(const uint8_t* cmd, uint32_t size)
         } break;
         case CMD_KEYMAP_SET: {
             uint16_t key = (cmd[4] << 8) | (cmd[5]);
+            #if PRINT_AMK_KEYMAP_SETGET
             NRF_LOG_INFO("Keymap Set: layer=%d, row=%d, col=%d, key=%d", cmd[1], cmd[2], cmd[3], key);
+            #endif
             amk_keymap_set(cmd[1], cmd[2], cmd[3], key);
             uart_send_cmd(CMD_KEYMAP_SET_ACK, &cmd[1], 5);
         } break;
         case CMD_KEYMAP_GET: {
             uint16_t keycode = amk_keymap_get(cmd[1], cmd[2], cmd[3]);
+            #if PRINT_AMK_KEYMAP_SETGET
             NRF_LOG_INFO("Keymap Get: layer=%d, row=%d, col=%d, key=%d", cmd[1], cmd[2], cmd[3], keycode);
+            #endif
             uint8_t buf[5];
             buf[0] = cmd[1];
             buf[1] = cmd[2];
@@ -298,4 +325,13 @@ static uint8_t compute_checksum(const uint8_t* data, uint32_t size)
         checksum += data[i];
     }
     return checksum;
+}
+
+static void vbus_timer_handler(void * p_context)
+{
+    bool on = nrf_gpio_pin_read(VBUS_DETECT_PIN) ? true : false;
+
+    if (usb_config.vbus_enabled != on) {
+        usb_update_state();
+    }
 }

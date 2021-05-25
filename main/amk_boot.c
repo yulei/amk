@@ -65,13 +65,17 @@ void boot_init(void)
     bool skip_scan = false;
     bool jump_to_boot = false;
 
-#if defined(NRF52) || defined(NRF52840_XXAA)
+#if defined(NRF52)
     skip_scan = nrf_gpio_pin_read(VBUS_DETECT_PIN) ? false : true;
+#endif
+
+#if defined(NRF52840_XXAA)
+    skip_scan = true;
 #endif
 
     if (!skip_scan) {
         amk_printf("boot scan: ... ");
-#if defined(NRF52) || defined(NRF52840_XXAA)
+#if defined(NRF52)
         extern bool matrix_check_boot(void);
         jump_to_boot = matrix_check_boot();
 #elif defined(NUC126)

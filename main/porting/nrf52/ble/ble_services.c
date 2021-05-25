@@ -70,11 +70,16 @@ void ble_pm_whitelist_set(pm_peer_id_list_skip_t skip)
     ret_code_t err_code = pm_peer_id_list(peer_ids, &peer_id_count, PM_PEER_ID_INVALID, skip);
     APP_ERROR_CHECK(err_code);
 
-    NRF_LOG_INFO("\tm_whitelist_peer_cnt %d, MAX_PEERS_WLIST %d",
-                   peer_id_count + 1,
-                   BLE_GAP_WHITELIST_ADDR_MAX_COUNT);
+    NRF_LOG_INFO("\tm_whitelist_peer_cnt %d, MAX_PEERS_WLIST %d", peer_id_count, BLE_GAP_WHITELIST_ADDR_MAX_COUNT);
 
-    err_code = pm_whitelist_set(peer_ids, peer_id_count);
+    if (ble_driver.current_peer >= peer_id_count) {
+        err_code = pm_whitelist_set(NULL, 0);
+    } else {
+        // only set the current device
+        pm_peer_id_t cur = peer_ids[ble_driver.current_peer];
+        err_code = pm_whitelist_set(&cur, 1);
+    } 
+
     APP_ERROR_CHECK(err_code);
 }
 
@@ -91,7 +96,13 @@ void ble_pm_identities_set(pm_peer_id_list_skip_t skip)
     ret_code_t err_code = pm_peer_id_list(peer_ids, &peer_id_count, PM_PEER_ID_INVALID, skip);
     APP_ERROR_CHECK(err_code);
 
-    err_code = pm_device_identities_list_set(peer_ids, peer_id_count);
+    if (ble_driver.current_peer >= peer_id_count) {
+        err_code = pm_device_identities_list_set(NULL, 0);
+    } else {
+        // only set the current device
+        pm_peer_id_t cur = peer_ids[ble_driver.current_peer];
+        err_code = pm_device_identities_list_set(&cur, 1);
+    } 
     APP_ERROR_CHECK(err_code);
 }
 
@@ -155,9 +166,9 @@ static void pm_evt_handler(pm_evt_t const * p_evt)
     }
         break;*/
     case PM_EVT_CONN_SEC_CONFIG_REQ: {
-        // allow pairing request from an already bonded peer.
-        pm_conn_sec_config_t conn_sec_config = { .allow_repairing = true };
-        pm_conn_sec_config_reply(p_evt->conn_handle, &conn_sec_config);
+            // allow pairing request from an already bonded peer.
+            pm_conn_sec_config_t conn_sec_config = { .allow_repairing = true };
+            pm_conn_sec_config_reply(p_evt->conn_handle, &conn_sec_config);
         }
         break;
 

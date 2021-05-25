@@ -10,5 +10,3 @@
 #include "action_macro.h"
 #include "action_code.h"
 #include "keymap.h"
-
-#define LAYOUT_default(k00) { {k00} }

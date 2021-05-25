@@ -6,21 +6,23 @@
 #include "common_config.h"
 #include "nrf_gpio.h"
 #include "nrf_pwr_mgmt.h"
-#include "nrfx_gpiote.h"
 #include "nrfx_wdt.h"
 #include "nrf_drv_timer.h"
 #include "nrf_drv_clock.h"
 #include "nrf_drv_rtc.h"
 #include "usb_interface.h"
 #include "app_scheduler.h"
+#include "ble_adv_service.h"
 
 #include "report.h"
 #include "host.h"
 #include "keyboard.h"
 #include "matrix_scan.h"
 #include "amk_boot.h"
+#include "wait.h"
 
 #include "rgb_led.h"
+#include "rf_power.h"
 #include "amk_keymap.h"
 
 static rf_send_report_t rf_send_report = NULL;
@@ -35,14 +37,21 @@ static void rf_wdt_init(void);
 static void rf_wdt_feed(void);
 #endif
 
+//#define USE_DEDICATE_TIMER
+#ifdef USE_DEDICATE_TIMER
+const nrf_drv_rtc_t keyboard_rtc = NRF_DRV_RTC_INSTANCE(2); /**< Declaring an instance of nrf_drv_rtc for RTC2. */
+#endif
+
 static bool keyboard_pwr_mgmt_shutdown_handler(nrf_pwr_mgmt_evt_t event);
 NRF_PWR_MGMT_HANDLER_REGISTER(keyboard_pwr_mgmt_shutdown_handler, NRF_PWR_MGMT_CONFIG_HANDLER_PRIORITY_COUNT - 1);
 
 static void keyboard_timer_init(void);
-static void keyboard_timer_uninit(void);
 static void keyboard_timer_start(void);
 static void keyboard_timer_stop(void);
 static void keyboard_timer_handler(void *p_context);
+#ifdef USE_DEDICATE_TIMER
+static void keyboard_timer_handler_tmp(void *p_context);
+#endif
 
 /** the fllowing function can be overrided by the keyboard codes */
 extern void keyboard_set_rgb(bool on);
@@ -83,18 +92,16 @@ void rf_keyboard_init(rf_send_report_t send_report, rf_prepare_sleep_t prepare_s
     rf_send_report = send_report;
     rf_prepare_sleep = prepare_sleep;
 
-    nrfx_gpiote_init();
-
     keyboard_setup();
     keyboard_init();
     nrf_usb_init(&usb_handler);
     boot_init();
     host_set_driver(&kbd_driver);
-    keyboard_timer_init();
-    amk_keymap_init();
 #if WDT_ENABLE
     rf_wdt_init();
 #endif
+    keyboard_timer_init();
+    amk_keymap_init();
 }
 
 void rf_keyboard_start()
@@ -108,19 +115,18 @@ void rf_keyboard_prepare_sleep(void)
     NRF_LOG_INFO("power down sleep preparing");
     // stop keyboard timer
     keyboard_timer_stop();
-    keyboard_timer_uninit();
     // stop all timer
     app_timer_stop_all();
     // rf stack sleep
     rf_prepare_sleep();
-    // uninit gpiote
-    nrfx_gpiote_uninit();
     // keyboard sleep
     keyboard_prepare_sleep();
     // turn matrix to sense mode
     matrix_prepare_sleep();
     // usb backend to sleep
     nrf_usb_prepare_sleep();
+    // release all active peripherals
+    rf_power_prepare_sleep();
 }
 
 void rf_keyboard_jump_bootloader(void)
@@ -128,11 +134,39 @@ void rf_keyboard_jump_bootloader(void)
     nrf_usb_reboot();
 }
 
+#ifdef USE_DEDICATE_TIMER
+static void keyboard_rtc_handler(nrf_drv_rtc_int_type_t int_type)
+{
+    NRF_LOG_INFO("keyboard rtc fired");
+    if (int_type == NRF_DRV_RTC_INT_COMPARE0)
+    {
+        keyboard_timer_handler(NULL);
+    }
+}
+#endif
+
 static void keyboard_timer_init(void)
 {
     ret_code_t err_code;
+#ifdef USE_DEDICATE_TIMER
+    err_code = app_timer_create(&m_keyboard_timer_id, APP_TIMER_MODE_REPEATED, keyboard_timer_handler_tmp);
+#else
     err_code = app_timer_create(&m_keyboard_timer_id, APP_TIMER_MODE_REPEATED, keyboard_timer_handler);
+#endif
     APP_ERROR_CHECK(err_code);
+
+
+#ifdef USE_DEDICATE_TIMER
+    //Initialize RTC instance
+    nrf_drv_rtc_config_t config = NRF_DRV_RTC_DEFAULT_CONFIG;
+    config.prescaler = 32;
+    err_code = nrf_drv_rtc_init(&keyboard_rtc, &config, keyboard_rtc_handler);
+    APP_ERROR_CHECK(err_code);
+
+    //Set compare channel to trigger interrupt after COMPARE_COUNTERTIME seconds
+    err_code = nrf_drv_rtc_cc_set(&keyboard_rtc, 0, 10, true);
+    APP_ERROR_CHECK(err_code);
+#endif
 }
 
 static void keyboard_timer_start(void)
@@ -140,6 +174,12 @@ static void keyboard_timer_start(void)
     ret_code_t err_code;
     err_code = app_timer_start(m_keyboard_timer_id, KEYBOARD_SCAN_INTERVAL, NULL);
     APP_ERROR_CHECK(err_code);
+
+#ifdef USE_DEDICATE_TIMER
+    //Power on RTC instance
+    nrf_drv_rtc_enable(&keyboard_rtc);
+#endif
+    NRF_LOG_INFO("keyboard timer started");
 }
 
 static void keyboard_timer_stop(void)
@@ -147,10 +187,12 @@ static void keyboard_timer_stop(void)
     ret_code_t err_code;
     err_code = app_timer_stop(m_keyboard_timer_id);
     APP_ERROR_CHECK(err_code);
-}
 
-static void keyboard_timer_uninit(void)
-{
+#ifdef USE_DEDICATE_TIMER
+    //Power off RTC instance
+    nrf_drv_rtc_disable(&keyboard_rtc);
+#endif
+    NRF_LOG_INFO("keyboard timer stopped");
 }
 
 static bool keyboard_rgblight_on(void)
@@ -169,8 +211,16 @@ static bool keyboard_rgbmatrix_on(void)
 
 static bool keyboard_rgb_on(void) { return keyboard_rgblight_on() || keyboard_rgbmatrix_on(); }
 
+#ifdef USE_DEDICATE_TIMER
+static void keyboard_timer_handler_tmp(void *p_context)
+{
+    //NRF_LOG_INFO("keyboard timer tmp handler");
+}
+#endif
+
 static void keyboard_timer_handler(void *p_context)
 {
+    //NRF_LOG_INFO("keyboard timer handler");
 #if WDT_ENABLE
     rf_wdt_feed();
 #endif
@@ -314,7 +364,23 @@ static void usb_leds(uint8_t leds)
     rf_driver.usb_led = leds;
 }
 
+static void connect_target(uint8_t device)
+{
+    if (rf_driver.is_ble) {
+        if ((device!=ble_driver.current_peer) && (device<=pm_peer_count())) {
+            NRF_LOG_INFO("restart advertising for device:%d, current=%d", device, ble_driver.current_peer);
+            ble_driver.current_peer = device;
+            ble_adv_service_restart();
+        }
+    }
+}
+
 // bluetooth control command
+// F15 : set device 0
+// F16 : set device 1
+// F17 : set device 2
+// F18 : set device 3
+// F19 : reset keymap
 // F20 : disable sleep mode
 // F21 : select usb/rf output
 // F22 : erase bond
@@ -333,6 +399,21 @@ bool hook_process_action_main(keyrecord_t *record) {
     }
 
     switch(action.key.code) {
+        case KC_F15:
+            connect_target(BLE_PEER_DEVICE_0);
+            break;
+        case KC_F16:
+            connect_target(BLE_PEER_DEVICE_1);
+            break;
+        case KC_F17:
+            connect_target(BLE_PEER_DEVICE_2);
+            break;
+        case KC_F18:
+            connect_target(BLE_PEER_DEVICE_3);
+            break;
+        case KC_F19:
+            // reset keymap
+            amk_keymap_reset();
         case KC_F20: // disable sleep mode
             rf_driver.output_target &= ~SLEEP_ENABLED;
             break;
@@ -363,8 +444,7 @@ bool hook_process_action_main(keyrecord_t *record) {
             return true;
 
         case KC_F24: // toggle BLE or GAZELL
-            //if (rf_driver.is_ble) {
-            if (rf_is_ble) {
+            if (rf_driver.is_ble) {
                 NRF_LOG_INFO("switch to gzll");
                 sd_power_gpregret_set(RST_REGISTER, RST_USE_GZLL);
                 ret_code_t err_code;
@@ -373,6 +453,7 @@ bool hook_process_action_main(keyrecord_t *record) {
                 sd_nvic_SystemReset();
             } else {
                 NRF_LOG_INFO("switch to ble");
+                NRF_POWER->GPREGRET &= ~RST_USE_GZLL;
                 NVIC_SystemReset();
             } return true;
         default:
@@ -387,11 +468,13 @@ bool hook_process_action_main(keyrecord_t *record) {
 void rf_wdt_init(void)
 {
     ret_code_t err_code;
-    /*if (!nrf_drv_clock_init_check()) {
+    if (!nrf_drv_clock_init_check()) {
         err_code = nrf_drv_clock_init();
         APP_ERROR_CHECK(err_code);
-        nrf_drv_clock_lfclk_request(NULL);
-    }*/
+        if (!nrf_drv_clock_lfclk_is_running()) {
+            nrf_drv_clock_lfclk_request(NULL);
+        }
+    }
 
     nrfx_wdt_config_t config = NRFX_WDT_DEAFULT_CONFIG;
     err_code = nrfx_wdt_init(&config, rf_wdt_event_handler);
@@ -399,6 +482,7 @@ void rf_wdt_init(void)
     err_code = nrfx_wdt_channel_alloc(&rf_wdt_channgel);
     APP_ERROR_CHECK(err_code);
     nrfx_wdt_enable();
+    NRF_LOG_INFO("WDT enabled");
 }
 
 void rf_wdt_feed(void)
