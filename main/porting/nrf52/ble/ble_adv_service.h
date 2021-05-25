@@ -9,4 +9,5 @@
 
 void ble_adv_service_init(void);
 void ble_adv_service_start(bool erase_bonds);
+void ble_adv_service_restart(void);
 void ble_adv_service_prepare_sleep(void);

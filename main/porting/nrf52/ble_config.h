@@ -55,6 +55,15 @@
 typedef struct {
     pm_peer_id_t    peer_id;                        /**< Device reference handle to the current bonded central. */
     uint16_t        conn_handle;                    /**< Handle of the current connection. */
+    uint16_t        current_peer;                   /**< Current connected peer */
+    bool            restart_advertise;              /**< Restart advertising after disconnected */
 } ble_driver_t;
+
+typedef enum {
+    BLE_PEER_DEVICE_0,
+    BLE_PEER_DEVICE_1,
+    BLE_PEER_DEVICE_2,
+    BLE_PEER_DEVICE_3,
+} ble_peer_device_t;
 
 extern ble_driver_t ble_driver;

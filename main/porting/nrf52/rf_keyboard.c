@@ -12,6 +12,7 @@
 #include "nrf_drv_rtc.h"
 #include "usb_interface.h"
 #include "app_scheduler.h"
+#include "ble_adv_service.h"
 
 #include "report.h"
 #include "host.h"
@@ -363,7 +364,23 @@ static void usb_leds(uint8_t leds)
     rf_driver.usb_led = leds;
 }
 
+static void connect_target(uint8_t device)
+{
+    if (rf_driver.is_ble) {
+        if ((device!=ble_driver.current_peer) && (device<=pm_peer_count())) {
+            NRF_LOG_INFO("restart advertising for device:%d, current=%d", device, ble_driver.current_peer);
+            ble_driver.current_peer = device;
+            ble_adv_service_restart();
+        }
+    }
+}
+
 // bluetooth control command
+// F15 : set device 0
+// F16 : set device 1
+// F17 : set device 2
+// F18 : set device 3
+// F19 : reset keymap
 // F20 : disable sleep mode
 // F21 : select usb/rf output
 // F22 : erase bond
@@ -382,6 +399,18 @@ bool hook_process_action_main(keyrecord_t *record) {
     }
 
     switch(action.key.code) {
+        case KC_F15:
+            connect_target(BLE_PEER_DEVICE_0);
+            break;
+        case KC_F16:
+            connect_target(BLE_PEER_DEVICE_1);
+            break;
+        case KC_F17:
+            connect_target(BLE_PEER_DEVICE_2);
+            break;
+        case KC_F18:
+            connect_target(BLE_PEER_DEVICE_3);
+            break;
         case KC_F19:
             // reset keymap
             amk_keymap_reset();
@@ -415,8 +444,7 @@ bool hook_process_action_main(keyrecord_t *record) {
             return true;
 
         case KC_F24: // toggle BLE or GAZELL
-            //if (rf_driver.is_ble) {
-            if (rf_is_ble) {
+            if (rf_driver.is_ble) {
                 NRF_LOG_INFO("switch to gzll");
                 sd_power_gpregret_set(RST_REGISTER, RST_USE_GZLL);
                 ret_code_t err_code;

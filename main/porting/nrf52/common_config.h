@@ -140,7 +140,7 @@ typedef enum {
 #define NRF_INPUT_REPORT_CONSUMER_MAX_LEN   2
 
 #ifndef WDT_ENABLE
-#define WDT_ENABLE      0
+#define WDT_ENABLE      1
 #endif
 
 #define OUTPUT_RF       0x01
@@ -151,7 +151,7 @@ typedef enum {
 typedef struct {
     uint8_t         rf_led;         /**< keyboard led status from ble */
     uint8_t         usb_led;        /**< keyboard led status from usb */
-    //uint8_t         is_ble;         /**< current is ble stack */
+    uint8_t         is_ble;         /**< current is ble stack */
     uint8_t         vbus_enabled;   /**< vbus status */
     uint8_t         output_target;  /**< target of output */
     uint8_t         matrix_changed; /**< matrix has changed */
@@ -161,6 +161,5 @@ typedef struct {
 } rf_driver_t;
 
 extern rf_driver_t rf_driver;
-extern bool rf_is_ble;
 typedef void (*rf_send_report_t)(uint8_t type, uint8_t *data, uint8_t size);
 typedef void (*rf_prepare_sleep_t)(void);

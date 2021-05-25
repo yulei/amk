@@ -31,6 +31,7 @@
 rf_driver_t rf_driver = {
     .rf_led         = 0,
     .usb_led        = 0,
+    .is_ble         = 1,
     .vbus_enabled   = 0,
     .output_target  = OUTPUT_RF | OUTPUT_MASK,
     .matrix_changed = 0,
@@ -38,8 +39,6 @@ rf_driver_t rf_driver = {
     .sleep_count    = 0,
     .scan_count     = 0,
 };
-
-bool rf_is_ble = true;
 
 #ifndef NRF_AMK_DEBUG
 static void on_error(void)
@@ -176,7 +175,7 @@ void board_init(void)
         }
 
         nrf_drv_clock_lfclk_request(NULL);
-        rf_is_ble = false;
+        rf_driver.is_ble = 0;
         gzll_keyboard_init(GZLL_IS_HOST);
 
         nrf_usb_postinit();
@@ -184,7 +183,7 @@ void board_init(void)
     } else {
         NRF_LOG_INFO("use BLE protocol");
 
-        rf_is_ble = true;
+        rf_driver.is_ble = 1;
         ble_keyboard_init();
 
         nrf_usb_postinit();

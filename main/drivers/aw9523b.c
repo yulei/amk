@@ -65,7 +65,7 @@ bool aw9523b_available(uint8_t addr)
 #endif
     bool available = (ec == AMK_SUCCESS) ? true : false;
     if (!available) {
-        aw9523b_debug("aw9523b not available: %d, release?=%d\n", ec, need_release);
+        aw9523b_debug("aw9523b not available: %d, release=%d\n", ec, need_release);
         if (need_release) {
             i2c_uninit();
         }
