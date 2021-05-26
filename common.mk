@@ -49,6 +49,7 @@ $(OBJ_DIRS):
 #$(info $(INCS))
 #$(info $(LIBS))
 #$(info $(OBJS))
+#$(info $(APP_DEFS))
 
 ifeq (1,$(NO_DEBUG))
 OPT = -Os -ggdb

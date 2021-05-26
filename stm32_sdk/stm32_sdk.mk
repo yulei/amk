@@ -31,6 +31,12 @@ MCU_FAMILY := stm32l4xx
 MCU_TYPE := l432
 endif
 
+ifeq (STM32L072, $(strip $(MCU)))
+MCU_SERIES := l0
+MCU_FAMILY := stm32l0xx
+MCU_TYPE := l072
+endif
+
 SRCS += \
 	$(STM32SDK_DIR)/mcus/$(MCU_TYPE)/system_$(MCU_FAMILY).c \
 	$(STM32SDK_DIR)/mcus/$(MCU_TYPE)/$(MCU_FAMILY)_hal_msp.c \

@@ -21,6 +21,10 @@
     #define DCD_MAX_EP_NUM      8
     #define DCD_USB_INSTANCE    USB
     #define DCD_USB_IRQn        USB_FS_IRQn
+#elif defined(STM32L072xx)
+    #define DCD_MAX_EP_NUM      8
+    #define DCD_USB_INSTANCE    USB
+    #define DCD_USB_IRQn        USB_IRQn
 #else
     #error "HAL USB unsupported mcu"
 #endif
@@ -61,14 +65,14 @@ void dcd_init(uint8_t rhport)
 #if defined(STM32F103xB)
     dcd_usb.Init.ep0_mps = CFG_TUD_ENDPOINT0_SIZE;
 #else
-    #if !defined(STM32L432xx)
+    #if !defined(STM32L432xx) && !defined(STM32L072xx)
     dcd_usb.Init.dma_enable = DISABLE;
     dcd_usb.Init.vbus_sensing_enable = DISABLE;
     dcd_usb.Init.use_dedicated_ep1 = DISABLE;
     #endif
 #endif
 
-#if defined(STM32F103xB) || defined(STM32F722xx) || defined(STM32L432xx)
+#if defined(STM32F103xB) || defined(STM32F722xx) || defined(STM32L432xx) || defined(STM32L072xx)
     dcd_usb.Init.battery_charging_enable = DISABLE;
 #endif
     if (HAL_PCD_Init(&dcd_usb) != HAL_OK) {

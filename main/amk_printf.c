@@ -31,11 +31,15 @@ void _putchar(char character)
 #endif
 
 #if AMK_PRINT_TIMESTAMP
+
 #include "generic_hal.h"
 int amk_printf_ts(const char* format, ...)
 {
+    int size = 0;
+#ifndef STM32L072xx
     uint32_t ticks = DWT->CYCCNT / (SystemCoreClock/1000000);
-    int size = printf_("[TS-%8d]: ", ticks);
+    size += printf_("[TS-%8d]: ", ticks);
+#endif
     va_list va;
     va_start(va, format);
     size += printf_(format, va);
