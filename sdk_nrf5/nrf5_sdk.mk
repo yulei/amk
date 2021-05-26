@@ -1,5 +1,6 @@
+
 NRF5SDK_VERSION := nRF5_SDK_17.0.2_d674dde
-NRF5SDK_DIR := $(NRF5_DIR)/$(NRF5SDK_VERSION)
+NRF5SDK_DIR := $(VENDOR_DIR)/$(NRF5SDK_VERSION)
 
 SRCS += \
 	$(NRF5SDK_DIR)/components/boards/boards.c \
@@ -144,7 +145,7 @@ INCS += \
 	$(NRF5SDK_DIR)/external/fprintf \
 	$(NRF5SDK_DIR)/external/segger_rtt \
 	$(NRF5SDK_DIR)/external/utf_converter \
-	$(NRF5SDK_DIR)/.. \
+	sdk_nrf5 \
 
 APP_DEFS += \
 	-DAPP_UART \
@@ -173,7 +174,7 @@ ifeq (NRF52832, $(strip $(MCU)))
 	APP_DEFS += -DNRF52832_XXAA
 	APP_DEFS += -DNRF52_PAN_74
 	APP_DEFS += -DS132
-	LINKER_SCRIPT := $(NRF5_DIR)/nrf52832.ld
+	LINKER_SCRIPT := sdk_nrf5/nrf52832.ld
 	LIBS += $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52_gcc.a
 endif
 
@@ -195,7 +196,7 @@ ifeq (NRF52840, $(strip $(MCU)))
 #	INCS += $(NRF5SDK_DIR)/components/libraries/usbd/class/hid/generic
 	APP_DEFS += -DNRF52840_XXAA
 	APP_DEFS += -DS140
-	LINKER_SCRIPT := $(NRF5_DIR)/nrf52840.ld
+	LINKER_SCRIPT := sdk_nrf5/nrf52840.ld
 	LIBS += $(NRF5SDK_DIR)/components/proprietary_rf/gzll/gcc/gzll_nrf52840_gcc.a
 	include $(LIB_DIR)/tinyusb.mk
 endif

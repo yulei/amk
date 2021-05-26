@@ -37,8 +37,8 @@ int amk_printf_ts(const char* format, ...)
 {
     int size = 0;
 #ifndef STM32L072xx
-    uint32_t ticks = DWT->CYCCNT / (SystemCoreClock/1000000);
-    size += printf_("[TS-%8d]: ", ticks);
+    unsigned int ticks = DWT->CYCCNT / (SystemCoreClock/1000000);
+    size += printf_("[TS-%8u]: ", ticks);
 #endif
     va_list va;
     va_start(va, format);

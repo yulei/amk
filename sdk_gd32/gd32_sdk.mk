@@ -1,12 +1,14 @@
-GD32SDK_DIR := $(GD32_DIR)
-GD32SDK_PERI_DIR := $(GD32_DIR)/GD32E10x_standard_peripheral
-GD32SDK_USB_DIR := $(GD32_DIR)/GD32E10x_usbfs_library
+
+GD32SDK_DIR := $(VENDOR_DIR)/gd32e10x
+GD32SDK_PERI_DIR := $(VENDOR_DIR)/gd32e10x/GD32E10x_standard_peripheral
+GD32SDK_USB_DIR := $(VENDOR_DIR)/gd32e10x/GD32E10x_usbfs_library
 
 ifeq (GD32E103, $(strip $(MCU)))
 MCU_SERIES := f4
 MCU_FAMILY := gd32e10x 
 MCU_TYPE := e103
 endif
+
 
 SRCS += \
 	$(GD32SDK_DIR)/gcc/startup_gd32e103.s \

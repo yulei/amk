@@ -12,7 +12,7 @@ INCS += \
 	$(TINYUSB_DIR) \
 
 ifeq (yes, $(strip $(TINYUSB_USE_HAL)))
-	SRCS += $(STM32_DIR)/hal_usb/dcd_hal_stm32.c
+	SRCS += $(STM32SDK_DIR)/hal_usb/dcd_hal_stm32.c
 else
 	ifeq (STM32F103, $(strip $(MCU)))
 	SRCS += $(TINYUSB_DIR)/portable/st/stm32_fsdev/dcd_stm32_fsdev.c
