@@ -62,7 +62,7 @@ void boot_init(void)
         eeconfig_init();
     }
 
-    bool skip_scan = false;
+    bool skip_scan = true;
     bool jump_to_boot = false;
 
 #if defined(NRF52)

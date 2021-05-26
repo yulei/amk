@@ -59,10 +59,15 @@ static void amk_init(void);
 
 void board_init(void)
 {
+    amk_printf("system_init\n");
     system_init();
+    amk_printf("custom_board_init\n");
     custom_board_init();
+    amk_printf("usb_init\n");
     usb_init();
+    amk_printf("amk_init\n");
     amk_init();
+    amk_printf("board_init end\n");
 }
 
 
@@ -101,13 +106,16 @@ void board_task(void)
 static void amk_init(void)
 {
 #ifdef SCREEN_ENABLE
+    amk_printf("screen_init\n");
     screen_init();
 #endif
 
 #ifdef MSC_ENABLE
+    amk_printf("msc_init\n");
     msc_init();
 #endif
 
+    amk_printf("keyboard_init\n");
     keyboard_init();
     boot_init();
     host_set_driver(&amk_driver);
