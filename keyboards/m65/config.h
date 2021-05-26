@@ -10,7 +10,7 @@
 #define PRODUCT_ID 0x6500   // M65 with screen
 #define DEVICE_VER 0x0001
 #define MANUFACTURER Matrix Lab
-#define PRODUCT Matrix 65 with Screen
+#define PRODUCT Matrix VITA
 
 // key matrix
 #define MATRIX_ROWS     5

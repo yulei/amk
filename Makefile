@@ -23,11 +23,11 @@ GOALS := $(filter-out default list clean flash erase flash_softdevice sdk_config
 OUTPUT_DIR := build
 MAIN_DIR := main
 LIB_DIR := libs
-NRF5_DIR := nrf5_sdk
-STM32_DIR := stm32_sdk
-ATSAMD_DIR := atsamd_sdk
-NUVOTON_DIR := nuvoton_sdk
-GD32_DIR := gd32_sdk
+NRF5_DIR := sdk_nrf5
+STM32_DIR := sdk_stm32
+ATSAMD_DIR := sdk_samd
+NUVOTON_DIR := sdk_nuvoton
+GD32_DIR := sdk_gd32
 
 ifneq (, $(GOALS))
 GOAL_LIST := $(subst /, ,$(GOALS))
