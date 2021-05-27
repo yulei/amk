@@ -6,7 +6,7 @@ RGB_EFFECTS_ENABLE = all
 EECONFIG_FDS = yes
 
 ifeq (yes,$(strip $(ACTIONMAP_ENABLE)))
-	SRCS += $(KEYBOARD_DIR)/hhkbble_action.c
+	SRCS += $(wildcard $(KEYBOARD_DIR)/*_action.c)
 else
-	SRCS += $(KEYBOARD_DIR)/hhkbble_keymap.c
+	SRCS += $(wildcard $(KEYBOARD_DIR)/*_keymap.c)
 endif
