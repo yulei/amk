@@ -21,6 +21,7 @@
 #include "amk_boot.h"
 #include "wait.h"
 
+#include "eeprom_manager.h"
 #include "rgb_led.h"
 #include "rf_power.h"
 #include "amk_keymap.h"
@@ -370,6 +371,7 @@ static void connect_target(uint8_t device)
         if ((device!=ble_driver.current_peer) && (device<=pm_peer_count())) {
             NRF_LOG_INFO("restart advertising for device:%d, current=%d", device, ble_driver.current_peer);
             ble_driver.current_peer = device;
+            eeconfig_update_device(ble_driver.current_peer);
             ble_adv_service_restart();
         }
     }
