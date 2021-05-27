@@ -105,6 +105,21 @@ void eeconfig_update_layout_options(uint8_t options)
     eeconfig_write_layout_options(options);
 }
 
+uint8_t eeconfig_read_device(void)
+{
+    return eeprom_read_byte(EECONFIG_DEVICE);
+}
+
+void eeconfig_write_device(uint8_t device)
+{
+    eeprom_write_byte(EECONFIG_DEVICE, device);
+}
+
+void eeconfig_update_device(uint8_t device)
+{
+    eeconfig_write_device(device);
+}
+
 #define KEYMAP_MAGIC_VALUE      0x4D585438
 #define KEYMAP_MAGIC_DEFAULT    0xFFFFFFFF
 #define KEYMAP_MAX_LAYER        4
@@ -195,6 +210,7 @@ void eeconfig_init(void)
 #endif
 
     eeprom_write_byte(EECONFIG_LAYOUT_OPTIONS, 0);
+    eeprom_write_byte(EECONFIG_DEVICE, 0);
 
     // reset keymap to original state
     amk_keymap_reset();

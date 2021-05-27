@@ -9,6 +9,7 @@
 #include "ble_adv_service.h"
 #include "ble_hids_service.h"
 #include "ble_services.h"
+#include "eeprom_manager.h"
 #include "eeconfig_fds.h"
 #include "rf_keyboard.h"
 
@@ -129,6 +130,12 @@ void ble_keyboard_init(void)
     ble_services_init();
 
     rf_keyboard_init(ble_send_report, ble_prepare_sleep);
+
+    ble_driver.current_peer = eeconfig_read_device();
+    if (ble_driver.current_peer >= BLE_PEER_DEVICE_MAX) {
+        ble_driver.current_peer = BLE_PEER_DEVICE_0;
+        eeconfig_update_device(ble_driver.current_peer);
+    } 
 }
 
 void ble_keyboard_start(bool erase_bonds)

@@ -15,6 +15,7 @@
 #define EECONFIG_RGB                (uint8_t*)24        // 6 bytes
 #define EECONFIG_RGB_MATRIX         (uint8_t*)30        // 6 bytes
 #define EECONFIG_LAYOUT_OPTIONS     (uint8_t*)36        // 1 bytes
+#define EECONFIG_DEVICE             (uint8_t*)37        // 1 bytes
 
 #define EECONFIG_SIZE               64
 #define EEPROM_SIZE                 2048
@@ -34,6 +35,10 @@ void eeconfig_update_rgb_matrix(const void* rgb);
 uint8_t eeconfig_read_layout_options(void);
 void eeconfig_write_layout_options(uint8_t);
 void eeconfig_update_layout_options(uint8_t);
+
+uint8_t eeconfig_read_device(void);
+void eeconfig_write_device(uint8_t);
+void eeconfig_update_device(uint8_t);
 
 // wrapper functions
 uint8_t eeprom_read_byte(const uint8_t *Address);

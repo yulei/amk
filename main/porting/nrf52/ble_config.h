@@ -64,6 +64,7 @@ typedef enum {
     BLE_PEER_DEVICE_1,
     BLE_PEER_DEVICE_2,
     BLE_PEER_DEVICE_3,
+    BLE_PEER_DEVICE_MAX,
 } ble_peer_device_t;
 
 extern ble_driver_t ble_driver;
