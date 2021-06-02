@@ -8,3 +8,4 @@ sdk_samd/d21/gcc/*
 !sdk_samd/d21/gcc/Makefile
 *.DS_Store
 *.bin
+*.hex
