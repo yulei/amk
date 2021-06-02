@@ -6,7 +6,7 @@
 #include "printf.h"
 
 #define AMK_DEBUG 1
-#define AMK_PRINT_TIMESTAMP 1
+#define AMK_PRINT_TIMESTAMP 0
 
 #if AMK_DEBUG
 #if AMK_PRINT_TIMESTAMP

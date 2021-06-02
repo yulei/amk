@@ -258,6 +258,7 @@ static void uart_process_data(uint8_t data)
             cmd[0] = SYNC_BYTE_1;
             cmd[1] = SYNC_BYTE_2;
             cmd[2] = SYNC_PONG;
+            //cmd[3] = SYNC_PONG;
             usb_buffer.count = 0;
             // uart sould valid at this moment
             for (uint32_t i = 0; i < 3; i++) {

@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "generic_hal.h"
 #include "stm32f1xx_it.h"
+#include "amk_printf.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -57,8 +58,6 @@
 
 /* External variables --------------------------------------------------------*/
 //extern PCD_HandleTypeDef hpcd_USB_FS;
-extern DMA_HandleTypeDef hdma_usart1_rx;
-extern DMA_HandleTypeDef hdma_usart1_tx;
 extern UART_HandleTypeDef huart1;
 /* USER CODE BEGIN EV */
 
@@ -129,34 +128,6 @@ void PendSV_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles DMA1 channel4 global interrupt.
-  */
-void DMA1_Channel4_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA1_Channel4_IRQn 0 */
-
-  /* USER CODE END DMA1_Channel4_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_usart1_tx);
-  /* USER CODE BEGIN DMA1_Channel4_IRQn 1 */
-
-  /* USER CODE END DMA1_Channel4_IRQn 1 */
-}
-
-/**
-  * @brief This function handles DMA1 channel5 global interrupt.
-  */
-void DMA1_Channel5_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA1_Channel5_IRQn 0 */
-
-  /* USER CODE END DMA1_Channel5_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_usart1_rx);
-  /* USER CODE BEGIN DMA1_Channel5_IRQn 1 */
-
-  /* USER CODE END DMA1_Channel5_IRQn 1 */
-}
-
-/**
   * @brief This function handles USB low priority or CAN RX0 interrupts.
   */
 //void USB_LP_CAN1_RX0_IRQHandler(void)
@@ -171,6 +142,43 @@ void DMA1_Channel5_IRQHandler(void)
 //}
 
 __attribute__((weak)) void uart_recv_char(uint8_t c){}
+void uart_error_process(UART_HandleTypeDef * huart, uint32_t isr)
+{
+    amk_printf("UART ERROR: 0x%x\n", isr);
+    #if 0
+    /* UART frame error interrupt occurred --------------------------------------*/
+    if ((isr & USART_SR_FE) != 0U) {
+        __HAL_UART_CLEAR_FLAG(huart, UART_CLEAR_FEF);
+    }
+
+    /* UART noise error interrupt occurred --------------------------------------*/
+    if ((isr & USART_SR_NE) != 0U) {
+        __HAL_UART_CLEAR_FLAG(huart, UART_CLEAR_NEF);
+    }
+
+    /* UART Over-Run interrupt occurred -----------------------------------------*/
+    if ((isr & USART_SR_ORE) != 0U) {
+        __HAL_UART_CLEAR_FLAG(huart, UART_CLEAR_OREF);
+    }
+    #endif
+}
+
+void USART1_IRQHandler(void)
+{
+  uint32_t isr = huart1.Instance->SR;
+  uint32_t cr1 = huart1.Instance->CR1;
+  if (((isr & USART_SR_RXNE) != 0) && ((cr1 & USART_CR1_RXNEIE) != 0))
+  {// received one char
+    uint8_t d = huart1.Instance->DR & 0x000000FF;
+    uart_recv_char(d);
+  }
+
+  if (isr & (uint32_t)( USART_SR_FE | USART_SR_ORE | USART_SR_NE )) {
+    uart_error_process(&huart1, isr);
+  }
+ // HAL_UART_IRQHandler(&huart1);
+}
+#if 0
 /**
   * @brief This function handles USART1 global interrupt.
   */
@@ -192,6 +200,7 @@ void USART1_IRQHandler(void)
   __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
   /* USER CODE END USART1_IRQn 1 */
 }
+#endif
 
 /* USER CODE BEGIN 1 */
 

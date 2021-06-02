@@ -8,8 +8,6 @@
 
 RTC_HandleTypeDef hrtc;
 UART_HandleTypeDef huart1;
-DMA_HandleTypeDef hdma_usart1_rx;
-DMA_HandleTypeDef hdma_usart1_tx;
 
 void USB_HP_IRQHandler(void)
 {
@@ -100,20 +98,6 @@ static void MX_USART1_UART_Init(void)
     __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
 }
 
-static void MX_DMA_Init(void)
-{
-    /* DMA controller clock enable */
-    __HAL_RCC_DMA1_CLK_ENABLE();
-
-    /* DMA interrupt init */
-    /* DMA1_Channel4_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
-    /* DMA1_Channel5_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
-}
-
 static void MX_USB_DEVICE_Init(void)
 {
     GPIO_InitTypeDef  GPIO_InitStruct;
@@ -150,7 +134,6 @@ void custom_board_init(void)
 {
     SystemClock_Config();
 
-    MX_DMA_Init();
     MX_USART1_UART_Init();
     MX_GPIO_Init();
     MX_RTC_Init();

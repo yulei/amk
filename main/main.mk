@@ -26,8 +26,14 @@ INCS += \
 
 
 ifeq (yes, $(strip $(MATRIX_USE_TCA6424)))
-	APP_DEFS += -DMATRIX_USE_TCA6424
+	APP_DEFS += -DMATRIX_I2C_PINS
 	SRCS += $(MAIN_DIR)/drivers/tca6424.c
+	SRCS += $(MAIN_DIR)/drivers/i2c.c
+endif
+
+ifeq (yes, $(strip $(MATRIX_USE_PCA9535)))
+	APP_DEFS += -DMATRIX_I2C_PINS
+	SRCS += $(MAIN_DIR)/drivers/pca9535.c
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
 endif
 

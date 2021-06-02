@@ -5,11 +5,10 @@
 #include "generic_hal.h"
 #include "usb_descriptors.h"
 
+
 RTC_HandleTypeDef hrtc;
 
 UART_HandleTypeDef huart1;
-DMA_HandleTypeDef hdma_usart1_rx;
-DMA_HandleTypeDef hdma_usart1_tx;
 
 void USB_IRQHandler(void)
 {
@@ -122,20 +121,13 @@ static void MX_USART1_UART_Init(void)
     huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
     huart1.Init.OverSampling = UART_OVERSAMPLING_16;
     huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-    huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+    huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_RXOVERRUNDISABLE_INIT|UART_ADVFEATURE_DMADISABLEONERROR_INIT;
+    huart1.AdvancedInit.OverrunDisable = UART_ADVFEATURE_OVERRUN_DISABLE;
+    huart1.AdvancedInit.DMADisableonRxError = UART_ADVFEATURE_DMA_DISABLEONRXERROR;
+
     if (HAL_UART_Init(&huart1) != HAL_OK) {
         Error_Handler();
     }
-}
-
-static void MX_DMA_Init(void)
-{
-    __HAL_RCC_DMA1_CLK_ENABLE();
-
-    /* DMA interrupt init */
-    /* DMA1_Channel2_3_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Channel2_3_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Channel2_3_IRQn);
 }
 
 static void MX_USB_DEVICE_Init(void)
@@ -149,7 +141,6 @@ void custom_board_init(void)
 {
     SystemClock_Config();
     MX_GPIO_Init();
-    MX_DMA_Init();
     MX_RTC_Init();
     MX_USB_DEVICE_Init();
     MX_USART1_UART_Init();

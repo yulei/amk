@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "generic_hal.h"
 #include "stm32l0xx_it.h"
+#include "amk_printf.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -59,6 +60,7 @@
 extern PCD_HandleTypeDef hpcd_USB_FS;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern DMA_HandleTypeDef hdma_usart1_tx;
+extern UART_HandleTypeDef huart1;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -114,20 +116,43 @@ void PendSV_Handler(void)
 /* please refer to the startup file (startup_stm32l0xx.s).                    */
 /******************************************************************************/
 
-/**
-  * @brief This function handles DMA1 channel 2 and channel 3 interrupts.
-  */
-void DMA1_Channel2_3_IRQHandler(void)
+__attribute__((weak)) void uart_recv_char(uint8_t c){}
+
+void uart_error_process(UART_HandleTypeDef * huart, uint32_t isr)
 {
-  /* USER CODE BEGIN DMA1_Channel2_3_IRQn 0 */
+    amk_printf("UART ERROR: 0x%x\n", isr);
+    /* UART frame error interrupt occurred --------------------------------------*/
+    if ((isr & USART_ISR_FE) != 0U) {
+        __HAL_UART_CLEAR_FLAG(huart, UART_CLEAR_FEF);
+    }
 
-  /* USER CODE END DMA1_Channel2_3_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_usart1_tx);
-  HAL_DMA_IRQHandler(&hdma_usart1_rx);
-  /* USER CODE BEGIN DMA1_Channel2_3_IRQn 1 */
+    /* UART noise error interrupt occurred --------------------------------------*/
+    if ((isr & USART_ISR_NE) != 0U) {
+        __HAL_UART_CLEAR_FLAG(huart, UART_CLEAR_NEF);
+    }
 
-  /* USER CODE END DMA1_Channel2_3_IRQn 1 */
+    /* UART Over-Run interrupt occurred -----------------------------------------*/
+    if ((isr & USART_ISR_ORE) != 0U) {
+        __HAL_UART_CLEAR_FLAG(huart, UART_CLEAR_OREF);
+    }
 }
+
+void USART1_IRQHandler(void)
+{
+  uint32_t isr = huart1.Instance->ISR;
+  uint32_t cr1 = huart1.Instance->CR1;
+  if (((isr & USART_ISR_RXNE) != 0) && ((cr1 & USART_CR1_RXNEIE) != 0))
+  {// received one char
+    uint8_t d = huart1.Instance->RDR & 0x000000FF;
+    uart_recv_char(d);
+  }
+
+  if (isr & (uint32_t)( USART_ISR_FE | USART_ISR_ORE | USART_ISR_NE )) {
+    uart_error_process(&huart1, isr);
+  }
+ // HAL_UART_IRQHandler(&huart1);
+}
+
 
 /**
   * @brief This function handles USB event interrupt / USB wake-up interrupt through EXTI line 18.
