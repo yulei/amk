@@ -46,7 +46,7 @@ static void uninit_driver(is31_t *driver);
 
 static void map_led(uint8_t index, uint8_t *red_reg, uint8_t* green_reg, uint8_t *blue_reg)
 {
-    is31_led_t *led = &g_rgb_matrix.leds[index];
+    is31_led_t *led = &g_is31_leds[index];
     *red_reg    = led->red;
     *green_reg  = led->green;
     *blue_reg   = led->blue;

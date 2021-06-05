@@ -36,6 +36,10 @@
 
 #define WDT_ENABLE                  1        
 
+#define AW9106B_SHDN_PIN            16
+#define AW9106B_ADDR1               0xB6
+#define AW9106B_ADDR2               0xB2
+
 //#define GZLL_IS_CLIENT              1
 //#define DISABLE_USB
 //#define SLEEP_COUNT_MAX             2

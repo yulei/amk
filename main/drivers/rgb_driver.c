@@ -184,7 +184,7 @@ static void rd_3731_set_color(uint32_t index, uint8_t hue, uint8_t sat, uint8_t 
 {
     hsv_t hsv = {hue, sat, val};
     rgb_t rgb = hsv_to_rgb(hsv);
-    is31_led_t *led = &g_rgb_matrix.leds[index];
+    is31_led_t *led = &g_is31_leds[index];
     is31fl3731_set_color(is31_drivers[led->driver], index, rgb.r, rgb.g, rgb.b);
 }
 
@@ -253,7 +253,7 @@ static void rd_3733_set_color(uint32_t index, uint8_t hue, uint8_t sat, uint8_t 
 {
     hsv_t hsv = {hue, sat, val};
     rgb_t rgb = hsv_to_rgb(hsv);
-    is31_led_t *led = &g_rgb_matrix.leds[index];
+    is31_led_t *led = &g_is31_leds[index];
     is31fl3733_set_color(is31_drivers[led->driver], index, rgb.r, rgb.g, rgb.b);
 }
 

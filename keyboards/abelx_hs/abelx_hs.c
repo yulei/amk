@@ -10,6 +10,10 @@
 #include "rgb_effects.h"
 #include "amk_printf.h"
 #include "led.h"
+#include "aw9106b.h"
+#include "rgb_indicator.h"
+#include "rgb_ring.h"
+#include "wait.h"
 
 #ifndef HS_DEBUG
 #define HS_DEBUG 0
@@ -20,6 +24,17 @@
 #else
 #define hs_debug(...)
 #endif
+
+rgb_led_t g_aw9106b_leds[] = {
+    {0, AW9106B_DIM1, AW9106B_DIM2, AW9106B_DIM0},  // CAPS
+    {0, AW9106B_DIM4, AW9106B_DIM5, AW9106B_DIM3},  // ESC
+    {1, AW9106B_DIM4, AW9106B_DIM5, AW9106B_DIM3},  // SCROLL
+    {1, AW9106B_DIM1, AW9106B_DIM2, AW9106B_DIM0},  // NUM
+};
+
+#define CAPS_LED    0
+#define SCROLL_LED  2
+#define NUM_LED     3
 
 static const pin_t row_pins[MATRIX_ROWS] = { 8, 11,12,13,14,29};
 static uint8_t col_pins[MATRIX_COLS] = {
@@ -69,6 +84,13 @@ void matrix_i2c_init(void)
         gpio_set_input_pulldown(row_pins[row]);
     }
 
+    gpio_set_output_pushpull(RGBLIGHT_EN_PIN);
+    gpio_write_pin(RGBLIGHT_EN_PIN, 1);
+    wait_ms(1);
+
+    rgb_indicator_init();
+    rgb_ring_init();
+
     hs_debug("matrix i2c init finished\n");
 }
 
@@ -100,6 +122,8 @@ bool matrix_i2c_scan(matrix_row_t* raw)
         set_port(PCA9535_PORT(col_pins[col]), 0);
     }
 
+    rgb_indicator_task();
+    rgb_ring_task();
     return changed;
 }
 
@@ -114,6 +138,7 @@ void matrix_i2c_prepare_sleep(void)
         nrf_gpio_cfg_sense_input(row_pins[row], NRF_GPIO_PIN_PULLDOWN, NRF_GPIO_PIN_SENSE_HIGH);
     }
 
+    rgb_indicator_uninit();
     hs_debug("matrix i2c sleep prepared\n");
 }
 
@@ -128,8 +153,20 @@ bool matrix_i2c_check_boot(void)
 void led_set(uint8_t led)
 {
     if (led & (1 << USB_LED_CAPS_LOCK)) {
+        rgb_indicator_set(CAPS_LED, 0xFF, 0xFF, 0xFF);
+    } else {
+        rgb_indicator_set(CAPS_LED, 0, 0, 0);
     }
 
     if (led & (1 << USB_LED_SCROLL_LOCK)) {
+        rgb_indicator_set(SCROLL_LED, 0xFF, 0xFF, 0xFF);
+    } else {
+        rgb_indicator_set(SCROLL_LED, 0, 0, 0);
     }
+    
+    //if (led & (1 << USB_LED_NUM_LOCK)) {
+    //    rgb_indicator_set(NUM_LED, 0xFF, 0xFF, 0xFF);
+    //} else {
+    //    rgb_indicator_set(NUM_LED, 0, 0, 0);
+    //}
 }

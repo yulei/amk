@@ -38,10 +38,10 @@ static void uninit_driver(is31_t *driver);
 
 static void map_led(uint8_t index, uint8_t *red_reg, uint8_t* green_reg, uint8_t *blue_reg)
 {
-    is31_led_t *led = &g_rgb_matrix.leds[index];
-    *red_reg    = led->red - PWM_REG;
-    *green_reg  = led->green - PWM_REG;
-    *blue_reg   = led->blue - PWM_REG;
+    rgb_led_t *led = &g_is31_leds[index];
+    *red_reg    = led->r - PWM_REG;
+    *green_reg  = led->g - PWM_REG;
+    *blue_reg   = led->b - PWM_REG;
 }
 
 is31_t *is31fl3731_init(uint8_t addr, uint8_t led_num)

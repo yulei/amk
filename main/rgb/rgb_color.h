@@ -19,7 +19,12 @@ typedef struct {
     uint8_t v;
 } hsv_t;
 
-typedef rgb_t rgb_led_t;
+typedef struct {
+    uint8_t driver;
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+} rgb_led_t;
 
 rgb_t hsv_to_rgb(hsv_t hsv);
 

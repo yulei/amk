@@ -50,8 +50,22 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/fractal.c
 endif
 
+ifeq (yes, $(strip $(INDICATOR_ENABLE)))
+	SRCS += $(MAIN_DIR)/rgb/rgb_indicator.c
+	SRCS += $(MAIN_DIR)/drivers/aw9106b.c
+	SRCS += $(MAIN_DIR)/drivers/i2c.c
+	APP_DEFS += -DINDICATOR_ENABLE
+endif
+
+ifeq (yes, $(strip $(RGB_RING_ENABLE)))
+	SRCS += $(MAIN_DIR)/rgb/rgb_ring.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_color.c
+	SRCS += $(MAIN_DIR)/drivers/is31fl3731.c
+	SRCS += $(MAIN_DIR)/drivers/i2c.c
+	APP_DEFS += -DRGB_RING_ENABLE
+endif
+
 ifeq (yes, $(strip $(RGB_EFFECTS_ENABLE)))
-#	SRCS += $(MAIN_DIR)/drivers/ws2812.c
 	SRCS += $(MAIN_DIR)/drivers/aw9523b.c
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
@@ -63,8 +77,6 @@ endif
 
 ifeq (ws2812, $(strip $(RGB_EFFECTS_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/ws2812.c
-#	SRCS += $(MAIN_DIR)/drivers/aw9523b.c
-#	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_effects.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_color.c

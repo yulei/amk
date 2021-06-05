@@ -1,15 +1,20 @@
 /**
  * @file aw9106.h
- * @brief driver for aw9106
+ * @brief driver for aw9106, current support 2 drivers
  */
 
 #pragma once
 
 #include <stdint.h>
+#include "rgb_color.h"
 
-#ifndef AW9106B_ADDR
-    #define AW9106B_ADDR    0xB6
-#endif
+//#ifndef AW9106B_ADDR1
+//    #define AW9106B_ADDR1   0xB6
+//#endif
+
+//#ifndef AW9106B_ADDR2
+//    #define AW9106B_ADDR2   0xB2
+//#endif
 
 #define AW9106B_CTL         0x11
 #define AW9106B_CPMD_A      0x12
@@ -27,18 +32,12 @@
 #define AW9106B_RESET       0x7F
 #define AW9106B_PWM_SIZE    6
 
-typedef struct {
-    uint8_t     r;
-    uint8_t     g;
-    uint8_t     b;
-} aw9106b_led_t;
+extern rgb_led_t g_aw9106b_leds[];
 
-extern aw9106b_led_t g_aw9106b_leds[];
-
-void aw9106b_init(uint8_t addr);
+void aw9106b_init(uint8_t addr, uint8_t index);
 
 void aw9106b_set_color(int index, uint8_t red, uint8_t green, uint8_t blue);
 void aw9106b_set_color_all(uint8_t red, uint8_t green, uint8_t blue);
-void aw9106b_update_buffers(uint8_t addr);
+void aw9106b_update_buffers(uint8_t addr, uint8_t index);
 
-void aw9106b_uninit(uint8_t addr);
+void aw9106b_uninit(uint8_t addr, uint8_t index);

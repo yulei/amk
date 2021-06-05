@@ -1,6 +1,6 @@
 
-USB_DEVICE_PATH := $(STM32SDK_DIR)/usb_device
-USB_HOST_PATH := $(STM32SDK_DIR)/usb_host
+USB_DEVICE_PATH := $(VENDOR_DIR)/usb_device
+USB_HOST_PATH := $(VENDOR_DIR)/usb_host
 HAL_USB_PATH :=$(STM32SDK_DIR)/hal_usb
 
 SRCS += \
@@ -22,8 +22,8 @@ SRCS += \
 	$(USB_HOST_PATH)/Core/Src/usbh_ctlreq.c \
 	$(USB_HOST_PATH)/Core/Src/usbh_ioreq.c \
 	$(USB_HOST_PATH)/Core/Src/usbh_pipes.c \
-	$(STM32SDK_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_hcd.c \
-	$(STM32SDK_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_ll_usb.c
+	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_hcd.c \
+	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_ll_usb.c
 
 APP_DEFS += -DUSB_HOST_ENABLE -DHAL_HCD_MODULE_ENABLED
 endif

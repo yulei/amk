@@ -6,6 +6,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "rgb_led.h"
 
 typedef struct {
     uint8_t     addr;
@@ -20,19 +21,14 @@ typedef struct {
 #define IS31_TIMEOUT        100
 
 typedef struct {
-    uint8_t driver;
-    uint8_t red;
-    uint8_t green;
-    uint8_t blue;
-} is31_led_t;
-
-typedef struct {
     uint8_t x;  // postion x
     uint8_t y;  // position y
     uint8_t a;  // attribute
     uint8_t r;  // mapped key matrix row
     uint8_t c;  // mapped key matrix col
 } is31_led_attribute_t;
+
+extern rgb_led_t g_is31_leds[];
 
 #ifdef RGB_MATRIX_ENABLE
 #ifndef RGB_MATRIX_LED_NUM
@@ -41,7 +37,6 @@ typedef struct {
 
 typedef struct
 {
-    is31_led_t leds[RGB_MATRIX_LED_NUM];                  // led definition depends on the specific driver
     is31_led_attribute_t attributes[RGB_MATRIX_LED_NUM];  // led common attribute
 } rgb_matrix_t;
 
