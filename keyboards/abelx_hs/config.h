@@ -24,9 +24,9 @@
 #define BATTERY_SAADC_ENABLE_PIN    9
 #define BATTERY_SAADC_PIN           NRF_SAADC_INPUT_AIN3
 
-#define I2C_INSTANCE_ID             0
-#define I2C_SCL_PIN                 17
-#define I2C_SDA_PIN                 18
+#define I2C_USE_INSTANCE_1
+#define I2C1_SCL_PIN                17
+#define I2C1_SDA_PIN                18
 
 #define RGBLIGHT_EN_PIN             24
 #define RGBLIGHT_EN_HIGH

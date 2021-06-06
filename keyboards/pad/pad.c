@@ -5,7 +5,7 @@
 #include "pad.h"
 #include "is31fl3731.h"
 
-is31_led_t g_is31_leds[] ={
+rgb_led_t g_is31_leds[] ={
     {0, C1_9, C3_10, C4_10},
     {0, C1_10, C2_10, C4_11},
     {0, C1_11, C2_11, C3_11},

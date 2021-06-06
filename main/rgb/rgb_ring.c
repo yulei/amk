@@ -361,7 +361,6 @@ static void rgb_ring_config_init(rgb_ring_config_t *config)
 
 void rgb_ring_init(void)
 {
-    i2c_init();
     rgb_ring_config_init(&rgb_ring.config);
     rgb_ring.driver = is31fl3731_init(IS31_ADDR1, RING_LED_TOTAL);
 

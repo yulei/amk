@@ -18,24 +18,32 @@ static uint8_t aw9106b_pwm_buf[AW9106B_NUM][AW9106B_PWM_SIZE];
 static bool    aw9106b_pwm_dirty[AW9106B_NUM] = {false, false};
 static bool    aw9106b_ready[AW9106B_NUM] = {false, false};
 
+#ifndef AW9106B_I2C_ID
+#define AW9106B_I2C_ID     I2C_INSTANCE_1
+#endif
+static i2c_handle_t i2c_inst;
+
 void aw9106b_init(uint8_t addr, uint8_t index)
 {
-    i2c_init();
+    if (!i2c_inst) {
+        i2c_inst = i2c_init(AW9106B_I2C_ID);
+    }
+
     uint8_t data = 0;
     amk_error_t status = AMK_SUCCESS;
-    status = i2c_write_reg(addr, AW9106B_RESET, &data, 1, TIMEOUT);
+    status = i2c_write_reg(i2c_inst, addr, AW9106B_RESET, &data, 1, TIMEOUT);
     if (status) amk_printf("failed to reset aw9106b, status:%d\n", status);
 
     wait_ms(1);
     // set max led current
     data = 0x03; // 37mA/4
-    i2c_write_reg(addr, AW9106B_CTL, &data, 1, TIMEOUT);
+    i2c_write_reg(i2c_inst, addr, AW9106B_CTL, &data, 1, TIMEOUT);
     if (status) amk_printf("failed to set aw9106b current, status:%d\n", status);
     // set port to led mode
     data = 0;
-    i2c_write_reg(addr, AW9106B_CPMD_A, &data, 1, TIMEOUT);
+    i2c_write_reg(i2c_inst, addr, AW9106B_CPMD_A, &data, 1, TIMEOUT);
     if (status) amk_printf("failed to set aw9106b pin A mode, status:%d\n", status);
-    i2c_write_reg(addr, AW9106B_CPMD_B, &data, 1, TIMEOUT);
+    i2c_write_reg(i2c_inst, addr, AW9106B_CPMD_B, &data, 1, TIMEOUT);
     if (status) amk_printf("failed to set aw9106b pin B mode, status:%d\n", status);
     // clear pwm buff
     for (uint8_t i = 0; i < AW9106B_PWM_SIZE; i++) {
@@ -78,17 +86,17 @@ void aw9106b_update_buffers(uint8_t addr, uint8_t index)
     amk_error_t status = 0;
 
     if (aw9106b_ready[index] && aw9106b_pwm_dirty[index]) {
-        status = i2c_write_reg(addr, AW9106B_DIM0, &aw9106b_pwm_buf[index][PWM2BUF(AW9106B_DIM0)], 1, TIMEOUT);
+        status = i2c_write_reg(i2c_inst, addr, AW9106B_DIM0, &aw9106b_pwm_buf[index][PWM2BUF(AW9106B_DIM0)], 1, TIMEOUT);
         if (status) amk_printf("failed to set DIM0 color status:%d\n", status);
-        status = i2c_write_reg(addr, AW9106B_DIM1, &aw9106b_pwm_buf[index][PWM2BUF(AW9106B_DIM1)], 1, TIMEOUT);
+        status = i2c_write_reg(i2c_inst, addr, AW9106B_DIM1, &aw9106b_pwm_buf[index][PWM2BUF(AW9106B_DIM1)], 1, TIMEOUT);
         if (status) amk_printf("failed to set DIM0 color status:%d\n", status);
-        status = i2c_write_reg(addr, AW9106B_DIM2, &aw9106b_pwm_buf[index][PWM2BUF(AW9106B_DIM2)], 1, TIMEOUT);
+        status = i2c_write_reg(i2c_inst, addr, AW9106B_DIM2, &aw9106b_pwm_buf[index][PWM2BUF(AW9106B_DIM2)], 1, TIMEOUT);
         if (status) amk_printf("failed to set DIM0 color status:%d\n", status);
-        status = i2c_write_reg(addr, AW9106B_DIM3, &aw9106b_pwm_buf[index][PWM2BUF(AW9106B_DIM3)], 1, TIMEOUT);
+        status = i2c_write_reg(i2c_inst, addr, AW9106B_DIM3, &aw9106b_pwm_buf[index][PWM2BUF(AW9106B_DIM3)], 1, TIMEOUT);
         if (status) amk_printf("failed to set DIM0 color status:%d\n", status);
-        status = i2c_write_reg(addr, AW9106B_DIM4, &aw9106b_pwm_buf[index][PWM2BUF(AW9106B_DIM4)], 1, TIMEOUT);
+        status = i2c_write_reg(i2c_inst, addr, AW9106B_DIM4, &aw9106b_pwm_buf[index][PWM2BUF(AW9106B_DIM4)], 1, TIMEOUT);
         if (status) amk_printf("failed to set DIM0 color status:%d\n", status);
-        status = i2c_write_reg(addr, AW9106B_DIM5, &aw9106b_pwm_buf[index][PWM2BUF(AW9106B_DIM5)], 1, TIMEOUT);
+        status = i2c_write_reg(i2c_inst, addr, AW9106B_DIM5, &aw9106b_pwm_buf[index][PWM2BUF(AW9106B_DIM5)], 1, TIMEOUT);
         if (status) amk_printf("failed to set DIM0 color status:%d\n", status);
 
         aw9106b_pwm_dirty[index] = false;

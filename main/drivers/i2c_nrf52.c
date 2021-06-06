@@ -13,142 +13,196 @@
 #include "nrf_gpio.h"
 #include "rf_power.h"
 
-#ifndef I2C_INSTANCE_ID
-    #define I2C_INSTANCE_ID     0
+typedef struct {
+    nrfx_twi_t  twi;
+    uint32_t    scl;
+    uint32_t    sda;
+    uint32_t    id;
+    uint32_t    error;
+    bool        ready;
+} i2c_instance_t;
+
+#ifdef I2C_USE_INSTANCE_1
+    #define I2C1_ID     0
+    #define I2C1_SCL    I2C1_SCL_PIN
+    #define I2C1_SDA    I2C1_SDA_PIN
+    static volatile bool done1 = false;
+    static i2c_instance_t m_i2c1 = {
+        .twi = NRFX_TWI_INSTANCE(I2C1_ID),
+        .scl = I2C1_SCL,
+        .sda = I2C1_SDA,
+        .id = I2C_INSTANCE_1,
+        .error = AMK_SUCCESS,
+        .ready = false,
+    };
 #endif
 
-#ifndef I2C_SCL_PIN
-    #define I2C_SCL_PIN         18
-#endif
-
-#ifndef I2C_SDA_PIN
-    #define I2C_SDA_PIN         19
-#endif
-
-/* TWI instance. */
-static const nrfx_twi_t m_twi = NRFX_TWI_INSTANCE(I2C_INSTANCE_ID);
-static bool twi_ready = false;
-static volatile bool twi_done = false;
-static volatile uint32_t twi_error = AMK_SUCCESS;
 
 #define TWI_ADDR(addr) ((addr)>>1)
 
+static void set_done(i2c_instance_t *inst, bool state)
+{
+    if (inst->id == I2C_INSTANCE_1) {
+        done1 = state;
+    }
+}
+
+static void wait_done(i2c_instance_t *inst)
+{
+    if (inst->id == I2C_INSTANCE_1) {
+        while( !done1) {
+        };
+    }
+}
+
 static void i2c_event_handler(nrfx_twi_evt_t const *p_event, void *p_context);
 
-static void i2c_prepare_sleep(void* context)
+static void i2c_prepare_sleep(void *context)
 {
-    (void)(context);
-    i2c_uninit();
+    i2c_instance_t *inst = (i2c_instance_t*)context;
+    i2c_uninit(inst);
 }
 
-bool i2c_ready(void) { return twi_ready; }
-
-void i2c_init(void)
+static void i2c_inst_init(i2c_instance_t *inst)
 {
-    if (i2c_ready())
+    if (i2c_ready(inst))
         return;
+
     ret_code_t err_code = NRFX_SUCCESS;
 
-    nrfx_twi_config_t twi_config = NRFX_TWI_DEFAULT_CONFIG;
-    twi_config.scl = I2C_SCL_PIN;
-    twi_config.sda = I2C_SDA_PIN;
+    nrfx_twi_config_t config = NRFX_TWI_DEFAULT_CONFIG;
+    config.scl = inst->scl;
+    config.sda = inst->sda;
 
-    err_code = nrfx_twi_init(&m_twi, &twi_config, i2c_event_handler, NULL);
+    err_code = nrfx_twi_init(&inst->twi, &config, i2c_event_handler, inst);
     APP_ERROR_CHECK(err_code);
-    twi_ready = true;
-    nrfx_twi_enable(&m_twi);
+    inst->ready = true;
+    nrfx_twi_enable(&inst->twi);
     NRF_LOG_INFO("twi enabled");
-    rf_power_register(i2c_prepare_sleep, NULL);
+    rf_power_register(i2c_prepare_sleep, inst);
 }
 
-amk_error_t i2c_send(uint8_t addr, const void* data, size_t length, size_t timeout)
+static void i2c_event_handler(nrfx_twi_evt_t const *p_event, void *p_context)
 {
+    i2c_instance_t *inst = (i2c_instance_t*)p_context;
+    switch( p_event->type) {
+    case NRFX_TWI_EVT_DONE:
+        //NRF_LOG_INFO("i2c event done");
+        inst->error = AMK_SUCCESS;
+        //error1 = AMK_SUCCESS;
+        break;
+    case NRFX_TWI_EVT_ADDRESS_NACK:
+        NRF_LOG_INFO("i2c address nack");
+        inst->error = AMK_I2C_ERROR;
+        //error1 = AMK_I2C_ERROR;
+        break;
+    case NRFX_TWI_EVT_DATA_NACK:
+        NRF_LOG_INFO("i2c data nack");
+        inst->error = AMK_I2C_ERROR;
+        //error1 = AMK_I2C_ERROR;
+        break;
+    case NRFX_TWI_EVT_OVERRUN:
+        NRF_LOG_INFO("i2c overrun");
+        inst->error = AMK_I2C_ERROR;
+        //error1 = AMK_I2C_ERROR;
+        break;
+    case NRFX_TWI_EVT_BUS_ERROR:
+        NRF_LOG_INFO("i2c bus error");
+        inst->error = AMK_I2C_ERROR;
+        //error1 = AMK_I2C_ERROR;
+        break;
+    }
+    set_done(inst, true);
+}
+
+i2c_handle_t i2c_init(I2C_ID id)
+{
+    if (id == I2C_INSTANCE_1) {
+        i2c_inst_init(&m_i2c1);
+        return &m_i2c1;
+    }
+
+    return NULL;
+}
+
+bool i2c_ready(i2c_handle_t i2c)
+{
+    i2c_instance_t *inst = (i2c_instance_t*)i2c;
+    return inst->ready;
+}
+
+amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void *data, size_t length, size_t timeout)
+{
+    i2c_instance_t *inst = (i2c_instance_t*)i2c;
     (void)timeout;
-    twi_done = false;
-    twi_error = AMK_SUCCESS;
-    ret_code_t err_code = nrfx_twi_tx(&m_twi, TWI_ADDR(addr), data, length, false);
+    inst->error = AMK_SUCCESS;
+    set_done(inst, false);
+    ret_code_t err_code = nrfx_twi_tx(&inst->twi, TWI_ADDR(addr), data, length, false);
+
     if (err_code != NRFX_SUCCESS) {
         NRF_LOG_INFO("twi TX error: %d\n", err_code);
         return AMK_I2C_ERROR;
     }
 
-    while( !twi_done) ;
+    wait_done(inst);
 
-    return twi_error;
+    return inst->error;
 }
 
-amk_error_t i2c_recv(uint8_t addr, void* data, size_t length, size_t timeout)
+amk_error_t i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, size_t timeout)
 {
+    i2c_instance_t *inst = (i2c_instance_t*)i2c;
     (void)timeout;
-    twi_done = false;
-    twi_error = AMK_SUCCESS;
-    ret_code_t err_code = nrfx_twi_rx(&m_twi, TWI_ADDR(addr), data, length);
+    inst->error = AMK_SUCCESS;
+    set_done(inst, false);
+    ret_code_t err_code = nrfx_twi_rx(&inst->twi, TWI_ADDR(addr), data, length);
     if (err_code != NRFX_SUCCESS) {
         NRF_LOG_INFO("twi RX error: %d\n", err_code);
         return AMK_I2C_ERROR;
     }
-    while( !twi_done) ;
-    return twi_error;
+
+    wait_done(inst);
+
+    return inst->error;
 }
 
-amk_error_t i2c_write_reg(uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
+amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
 {
     (void)timeout;
     uint8_t packet[length + 1];
     memcpy(&packet[1], data, length);
     packet[0] = reg;
-    return i2c_send(addr, packet, length + 1, 0);
+    return i2c_send(i2c, addr, packet, length + 1, 0);
 }
 
-amk_error_t i2c_read_reg(uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
+amk_error_t i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
 {
+    i2c_instance_t *inst = (i2c_instance_t*)i2c;
     (void)timeout;
-    twi_done = false;
-    twi_error = AMK_SUCCESS;
+    set_done(inst, false);
+    inst->error = AMK_SUCCESS;
     nrfx_twi_xfer_desc_t txrx = NRFX_TWI_XFER_DESC_TXRX(TWI_ADDR(addr), &reg, 1, data, length);
-    ret_code_t err_code = nrfx_twi_xfer(&m_twi, &txrx, 0);
+    ret_code_t err_code = nrfx_twi_xfer(&inst->twi, &txrx, 0);
     if (err_code != NRFX_SUCCESS) {
         NRF_LOG_INFO("twi XFER error: %d\n", err_code);
         return AMK_I2C_ERROR;
     }
-    while (!twi_done) ;
-    return twi_error;
+
+    wait_done(inst);
+
+    return inst->error;
 }
 
-void i2c_uninit(void)
+void i2c_uninit(i2c_handle_t i2c)
 {
-    if (!i2c_ready()) return;
+    if (!i2c_ready(i2c)) return;
 
-    //nrfx_twi_disable(&m_twi);
+    i2c_instance_t *inst = (i2c_instance_t*)i2c;
 
-    nrfx_twi_uninit(&m_twi);
+    //nrfx_twi_disable(&inst->twi);
+
+    nrfx_twi_uninit(&inst->twi);
 
     NRF_LOG_INFO("twi disabled");
-    twi_ready = false;
-}
-
-static void i2c_event_handler(nrfx_twi_evt_t const *p_event, void *p_context)
-{
-    switch( p_event->type) {
-    case NRFX_TWI_EVT_DONE:
-        //NRF_LOG_INFO("i2c event done");
-        break;
-    case NRFX_TWI_EVT_ADDRESS_NACK:
-        NRF_LOG_INFO("i2c address nack");
-        twi_error = AMK_I2C_ERROR;
-        break;
-    case NRFX_TWI_EVT_DATA_NACK:
-        NRF_LOG_INFO("i2c data nack");
-        twi_error = AMK_I2C_ERROR;
-        break;
-    case NRFX_TWI_EVT_OVERRUN:
-        NRF_LOG_INFO("i2c overrun");
-        twi_error = AMK_I2C_ERROR;
-        break;
-    case NRFX_TWI_EVT_BUS_ERROR:
-        NRF_LOG_INFO("i2c bus error");
-        twi_error = AMK_I2C_ERROR;
-        break;
-    }
-    twi_done = true;
+    inst->ready = false;
 }

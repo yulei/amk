@@ -27,9 +27,10 @@
 #define IS31_DRIVER_NUM     1
 #define IS31_ADDR1          0xE8
 #define IS31_LED_NUM1       26
-#define I2C_INSTANCE_ID     I2C2
-#define I2C_SCL_PIN         B9
-#define I2C_SDA_PIN         B10
+
+#define I2C_USE_INSTANCE_1
+#define I2C1_SCL_PIN        B9
+#define I2C1_SDA_PIN        B10
 
 #define RGB_LED_NUM         4
 #define WS2812_LED_PIN      A10

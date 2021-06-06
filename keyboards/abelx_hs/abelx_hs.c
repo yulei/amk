@@ -87,9 +87,13 @@ void matrix_i2c_init(void)
     gpio_set_output_pushpull(RGBLIGHT_EN_PIN);
     gpio_write_pin(RGBLIGHT_EN_PIN, 1);
     wait_ms(1);
-
+#ifdef INDICATOR_ENABLE
     rgb_indicator_init();
+#endif
+
+#ifdef RGB_RING_ENABLE
     rgb_ring_init();
+#endif
 
     hs_debug("matrix i2c init finished\n");
 }
@@ -122,8 +126,13 @@ bool matrix_i2c_scan(matrix_row_t* raw)
         set_port(PCA9535_PORT(col_pins[col]), 0);
     }
 
+#ifdef INDICATOR_ENABLE
     rgb_indicator_task();
+#endif
+
+#ifdef RGB_RING_ENABLE
     rgb_ring_task();
+#endif
     return changed;
 }
 
@@ -138,7 +147,9 @@ void matrix_i2c_prepare_sleep(void)
         nrf_gpio_cfg_sense_input(row_pins[row], NRF_GPIO_PIN_PULLDOWN, NRF_GPIO_PIN_SENSE_HIGH);
     }
 
+#ifdef INDICATOR_ENABLE
     rgb_indicator_uninit();
+#endif
     hs_debug("matrix i2c sleep prepared\n");
 }
 
@@ -152,6 +163,7 @@ bool matrix_i2c_check_boot(void)
 
 void led_set(uint8_t led)
 {
+#ifdef INDICATOR_ENABLE
     if (led & (1 << USB_LED_CAPS_LOCK)) {
         rgb_indicator_set(CAPS_LED, 0xFF, 0xFF, 0xFF);
     } else {
@@ -169,4 +181,5 @@ void led_set(uint8_t led)
     //} else {
     //    rgb_indicator_set(NUM_LED, 0, 0, 0);
     //}
+#endif
 }
