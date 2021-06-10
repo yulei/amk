@@ -36,6 +36,7 @@ static void i2c_inst_init(i2c_instance_t *inst, I2C_TypeDef *i2c)
     if (i2c_ready(inst))
         return;
 
+#ifndef STM32F722xx
     inst->handle.Instance = i2c;
     inst->handle.Init.ClockSpeed = 400000;
     inst->handle.Init.DutyCycle = I2C_DUTYCYCLE_2;
@@ -50,6 +51,8 @@ static void i2c_inst_init(i2c_instance_t *inst, I2C_TypeDef *i2c)
     } else {
         //Error_Handler();
     }
+#endif
+    inst->ready = true;
 }
 
 i2c_handle_t i2c_init(I2C_ID id)
@@ -123,8 +126,9 @@ void i2c_uninit(i2c_handle_t i2c)
     if(!i2c_ready(i2c)) {
         return;
     }
-
     i2c_instance_t *inst = (i2c_instance_t*)i2c;
+#ifndef STM32F722xx
     HAL_I2C_DeInit(&inst->handle);
+#endif
     inst->ready = false;
 }

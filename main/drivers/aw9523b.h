@@ -5,9 +5,8 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <stdbool.h>
-#include "rgb_color.h"
+#include "awinic.h"
 
 #ifndef AW9523B_ADDR
     #define AW9523B_ADDR 0xB6
@@ -34,14 +33,12 @@
 
 #define AW9523B_PWM_SIZE    16
 
-extern const rgb_led_t g_aw9523b_leds[];
-
 bool aw9523b_available(uint8_t addr);
 
-void aw9523b_init(uint8_t addr);
+awinic_t *aw9523b_init(uint8_t addr, uint8_t index, uint8_t led_num);
 
-void aw9523b_set_color(int index, uint8_t red, uint8_t green, uint8_t blue);
-void aw9523b_set_color_all(uint8_t red, uint8_t green, uint8_t blue);
-void aw9523b_update_buffers(uint8_t addr);
+void aw9523b_set_color(awinic_t *driver, int index, uint8_t red, uint8_t green, uint8_t blue);
+void aw9523b_set_color_all(awinic_t *driver, uint8_t red, uint8_t green, uint8_t blue);
+void aw9523b_update_buffers(awinic_t *driver);
 
-void aw9523b_uninit(uint8_t addr);
+void aw9523b_uninit(awinic_t *driver);

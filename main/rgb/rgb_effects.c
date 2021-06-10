@@ -7,9 +7,14 @@
 #include <stdbool.h>
 
 #include "rgb_effects.h"
+#include "rgb_led.h"
 #include "timer.h"
 #include "eeprom_manager.h"
 #include "amk_printf.h"
+
+#ifndef RGB_EFFECTS_NUM
+    #define RGB_EFFECTS_NUM 1
+#endif
 
 #ifndef RGB_EFFECTS_DEBUG
 #define RGB_EFFECTS_DEBUG 1
@@ -24,7 +29,7 @@
 #define DELAY_MIN   0
 #define DELAY_DEFAULT 1500
 
-#define SPEED_MIN 0
+#define SPEED_MIN 1
 #define SPEED_MAX 15
 #define SPEED_DEFAULT 7
 
@@ -62,11 +67,14 @@ enum rgb_effects_type {
 
 #define RGB_EFFECT_DEFAULT RGB_EFFECT_CIRCLE
 
-typedef void (*RGB_EFFECT_FUN)(void);
+typedef struct s_rgb_effects_state rgb_effects_state_t;
+typedef void (*RGB_EFFECT_FUN)(rgb_effects_state_t*);
 
-typedef struct {
+struct s_rgb_effects_state {
     rgb_effects_config_t    config;
-    rgb_driver_t*           driver;
+    uint8_t                 index;
+    uint8_t                 led_start;
+    uint8_t                 led_count;
     uint32_t                last_ticks;
     uint32_t                counter;
     uint32_t                rainbow_step;
@@ -74,9 +82,9 @@ typedef struct {
     uint32_t                circle_step;
     bool                    wipe_on;
     RGB_EFFECT_FUN          effects[RGB_EFFECT_MAX];
-} rgb_effects_state_t;
+};
 
-static rgb_effects_state_t effects_state;
+static rgb_effects_state_t effects_state[RGB_EFFECTS_NUM];
 
 // utilities
 #define RANDOM_DISTANCE 17
@@ -88,7 +96,7 @@ static bool effects_config_valid(rgb_effects_config_t *config)
         return false;
     }
 
-    if (config->speed > SPEED_MAX) {
+    if (config->speed > SPEED_MAX || config->speed < SPEED_MIN) {
         return false;
     }
 
@@ -102,9 +110,25 @@ static bool effects_config_valid(rgb_effects_config_t *config)
     return true;
 }
 
-static void effects_mode_init(void)
+static void effects_set_color(rgb_effects_state_t *state, uint8_t index, uint8_t red, uint8_t green, uint8_t blue)
 {
-    switch(effects_state.config.mode) {
+    uint8_t g_index = index + state->led_start;
+    rgb_driver_t *driver = rgb_led_map(g_index);
+    if (driver) {
+        driver->set_color(driver, g_index, red, green, blue);
+    }
+}
+
+static void effects_set_color_all(rgb_effects_state_t *state, uint8_t red, uint8_t green, uint8_t blue)
+{
+    for (uint8_t i = 0; i < state->led_count; i++) {
+        effects_set_color(state, i, red, green, blue);
+    }
+}
+
+static void effects_mode_init(rgb_effects_state_t *state)
+{
+    switch(state->config.mode) {
         case RGB_EFFECT_STATIC:
             break;
         case RGB_EFFECT_BLINK:
@@ -118,13 +142,13 @@ static void effects_mode_init(void)
         case RGB_EFFECT_BREATH:
             break;
         case RGB_EFFECT_WIPE:
-            effects_state.wipe_on = true;
-            effects_state.counter = 0;
-            effects_state.driver->set_color_all(0, 0, 0);
+            state->wipe_on = true;
+            state->counter = 0;
+            effects_set_color_all(state, 0, 0, 0);
             break;
         case RGB_EFFECT_SCAN:
-            effects_state.counter = 0;
-            effects_state.driver->set_color_all(0, 0, 0);
+            state->counter = 0;
+            effects_set_color_all(state, 0, 0, 0);
             break;
         case RGB_EFFECT_CIRCLE:
             break; 
@@ -133,9 +157,9 @@ static void effects_mode_init(void)
     }
 }
 
-static uint32_t effects_delay(void)
+static uint32_t effects_delay(rgb_effects_state_t *state)
 {
-    switch(effects_state.config.mode) {
+    switch(state->config.mode) {
         case RGB_EFFECT_STATIC:
             return DELAY_MIN;
         case RGB_EFFECT_BLINK:
@@ -157,286 +181,313 @@ static uint32_t effects_delay(void)
     return DELAY_DEFAULT;
 }
 
-static bool effects_need_update(void)
+static bool effects_need_update(rgb_effects_state_t *state)
 {
-    /*uint32_t elapsed = timer_elapsed32(effects_state.last_ticks);
-    uint32_t interval = elapsed * effects_state.config.speed;
-    if (interval >= effects_delay()){
-        amk_printf("elapsed:%d, interval:%d, delay:%d\n", elapsed, interval, effects_delay());
-    }*/
-
-    return timer_elapsed32(effects_state.last_ticks)*effects_state.config.speed >= effects_delay();
+    //return timer_elapsed32(state->last_ticks)*state->config.speed >= effects_delay(state);
+    return timer_elapsed32(state->last_ticks)*SPEED_DEFAULT>= effects_delay(state);
 }
 
-static void effects_update_timer(void) { effects_state.last_ticks = timer_read32(); }
+static void effects_update_timer(rgb_effects_state_t *state)
+{
+    state->last_ticks = timer_read32();
+}
 
 //effects
-static void effects_mode_static(void)
+static void effects_mode_static(rgb_effects_state_t *state)
 {
-    effects_state.driver->set_color_all(effects_state.config.hue, effects_state.config.sat, effects_state.config.val);
+    effects_set_color_all(state, state->config.hue, state->config.sat, state->config.val);
 }
 
-static void effects_mode_blink(void)
+static void effects_mode_blink(rgb_effects_state_t *state)
 {
-    if(effects_state.counter % 2 == 1) {
+    if(state->counter % 2 == 1) {
         // on
-        effects_state.driver->set_color_all(effects_state.config.hue, effects_state.config.sat, effects_state.config.val);
+        effects_set_color_all(state, state->config.hue, state->config.sat, state->config.val);
     }
     else {
         // off
-        effects_state.driver->set_color_all(0, 0, 0);
+        effects_set_color_all(state, 0, 0, 0);
     }
-    effects_state.counter++;
+    state->counter++;
 }
 
-static void effects_mode_random(void)
+static void effects_mode_random(rgb_effects_state_t *state)
 {
-    uint8_t hue = effects_state.config.hue;
-    for (int i = 0; i < EFFECTS_LED_NUM; i++) {
+    uint8_t hue = state->config.hue;
+    for (int i = 0; i < state->led_count; i++) {
         hue = get_random_hue(hue);
-        effects_state.driver->set_color_all(hue, effects_state.config.sat, effects_state.config.val);
+        effects_set_color_all(state, hue, state->config.sat, state->config.val);
     }
 }
 
-static void effects_mode_gradient(void)
+static void effects_mode_gradient(rgb_effects_state_t *state)
 {
-    uint8_t step = HUE_MAX / EFFECTS_LED_NUM;
+    uint8_t step = HUE_MAX / state->led_count;
 
-    for (int i = 0; i < EFFECTS_LED_NUM; i++) {
-        effects_state.driver->set_color(i, effects_state.config.hue + i*step, effects_state.config.sat, effects_state.config.val);
+    for (int i = 0; i < state->led_count; i++) {
+        effects_set_color(state, i, state->config.hue + i*step, state->config.sat, state->config.val);
     }
     //effects_state.config.hue += step;
 }
 
-static void effects_mode_rainbow(void)
+static void effects_mode_rainbow(rgb_effects_state_t *state)
 {
-    uint8_t step = HUE_MAX / EFFECTS_LED_NUM;
-    for (int i = 0; i < EFFECTS_LED_NUM; i++) {
-        effects_state.driver->set_color(i, effects_state.config.hue + i*step, effects_state.config.sat, effects_state.config.val);
+    uint8_t step = HUE_MAX / state->led_count;
+    for (int i = 0; i < state->led_count; i++) {
+        effects_set_color(state, i, state->config.hue + i*step, state->config.sat, state->config.val);
     }
-    effects_state.config.hue += effects_state.rainbow_step;
+    state->config.hue += state->rainbow_step;
 }
 
-static void effects_mode_breath(void)
+static void effects_mode_breath(rgb_effects_state_t *state)
 {
-    uint8_t breath = VAL_MAX / effects_state.breath_step;
+    uint8_t breath = VAL_MAX / state->breath_step;
 
-    effects_state.driver->set_color_all(effects_state.config.hue, effects_state.config.sat, effects_state.config.val);
-    effects_state.config.val += breath;
+    effects_set_color_all(state, state->config.hue, state->config.sat, state->config.val);
+    state->config.val += breath;
 }
 
-static void effects_mode_wipe(void)
+static void effects_mode_wipe(rgb_effects_state_t *state)
 {
-    if (effects_state.wipe_on) {
-        effects_state.driver->set_color(effects_state.counter, effects_state.config.hue, effects_state.config.sat, effects_state.config.val);
+    if (state->wipe_on) {
+        effects_set_color(state, state->counter, state->config.hue, state->config.sat, state->config.val);
     } else {
-        effects_state.driver->set_color(effects_state.counter, 0, 0, 0);
+        effects_set_color(state, state->counter, 0, 0, 0);
     }
-    effects_state.counter++;
-    if (effects_state.counter == EFFECTS_LED_NUM) {
-        effects_state.counter = 0;
-        effects_state.wipe_on = !effects_state.wipe_on;
-        effects_state.config.hue += HUE_MAX/EFFECTS_LED_NUM;
-    }
-}
-
-static void effects_mode_scan(void)
-{
-    uint8_t prev = (effects_state.counter == 0) ? EFFECTS_LED_NUM - 1 : effects_state.counter - 1;
-    effects_state.driver->set_color(prev, 0, 0, 0);
-    effects_state.driver->set_color(effects_state.counter, effects_state.config.hue, effects_state.config.sat, effects_state.config.val);
-    effects_state.counter = (effects_state.counter + 1) % EFFECTS_LED_NUM;
-    if (effects_state.counter == 0) {
-        effects_state.config.hue += HUE_MAX/EFFECTS_LED_NUM;
+    state->counter++;
+    if (state->counter == state->led_count) {
+        state->counter = 0;
+        state->wipe_on = !state->wipe_on;
+        state->config.hue += HUE_MAX/state->led_count;
     }
 }
 
-static void effects_mode_circle(void)
+static void effects_mode_scan(rgb_effects_state_t *state)
 {
-    effects_state.driver->set_color_all(effects_state.config.hue, effects_state.config.sat, effects_state.config.val);
-
-    effects_state.config.hue += effects_state.circle_step;
+    uint8_t prev = (state->counter == 0) ? state->led_count - 1 : state->counter - 1;
+    effects_set_color(state, prev, 0, 0, 0);
+    effects_set_color(state, state->counter, state->config.hue, state->config.sat, state->config.val);
+    state->counter = (state->counter + 1) % state->led_count;
+    if (state->counter == 0) {
+        state->config.hue += HUE_MAX/state->led_count;
+    }
 }
 
-static void effects_set_hue(uint8_t hue)
+static void effects_mode_circle(rgb_effects_state_t *state)
 {
-    effects_state.config.hue = hue;
-    eeconfig_update_rgb(&effects_state.config);
+    effects_set_color_all(state, state->config.hue, state->config.sat, state->config.val);
+
+    state->config.hue += state->circle_step;
 }
 
-static void effects_set_sat(uint8_t sat)
+static void effects_set_hue(rgb_effects_state_t *state, uint8_t hue)
 {
-    effects_state.config.sat = sat;
-    eeconfig_update_rgb(&effects_state.config);
+    state->config.hue = hue;
+    eeconfig_update_rgb(&state->config, state->index);
 }
 
-static void effects_set_val(uint8_t val)
+static void effects_set_sat(rgb_effects_state_t *state, uint8_t sat)
 {
-    effects_state.config.val = val;
-    eeconfig_update_rgb(&effects_state.config);
+    state->config.sat = sat;
+    eeconfig_update_rgb(&state->config, state->index);
 }
 
-static void effects_set_speed(uint8_t speed)
+static void effects_set_val(rgb_effects_state_t *state, uint8_t val)
 {
-    effects_state.config.speed = !speed ? 1 : speed;
-    eeconfig_update_rgb(&effects_state.config);
+    state->config.val = val;
+    eeconfig_update_rgb(&state->config, state->index);
 }
 
-static void effects_set_mode(uint8_t mode)
+static void effects_set_speed(rgb_effects_state_t *state, uint8_t speed)
 {
-    effects_state.config.mode = mode;
-    effects_mode_init();
-    eeconfig_update_rgb(&effects_state.config);
+    state->config.speed = !speed ? 1 : speed;
+    eeconfig_update_rgb(&state->config, state->index);
 }
 
-static void effects_set_enable(uint8_t enable)
+static void effects_set_mode(rgb_effects_state_t *state, uint8_t mode)
 {
-    effects_state.config.enable = enable;
-    eeconfig_update_rgb(&effects_state.config);
-    if (effects_state.config.enable)
-        effects_state.driver->init();
+    state->config.mode = mode;
+    effects_mode_init(state);
+    eeconfig_update_rgb(&state->config, state->index);
 }
 
-void effects_update_default(void)
+static void effects_set_enable(rgb_effects_state_t *state, uint8_t enable)
 {
-    effects_state.config.enable = 1;
-    effects_state.config.mode = RGB_EFFECT_DEFAULT;
-    effects_state.config.speed = SPEED_DEFAULT;
-    effects_state.config.hue = HUE_DEFAULT;
-    effects_state.config.sat = SAT_DEFAULT;
-    effects_state.config.val = VAL_DEFAULT;
-    eeconfig_update_rgb(&effects_state.config);
+    state->config.enable = enable;
+    eeconfig_update_rgb(&state->config, state->index);
+    //if (state->config.enable)
+    //    state->driver->init();
+}
+
+static void effects_update_default(rgb_effects_state_t *state)
+{
+    state->config.enable = 1;
+    state->config.mode = RGB_EFFECT_DEFAULT;
+    state->config.speed = SPEED_DEFAULT;
+    state->config.hue = HUE_DEFAULT;
+    state->config.sat = SAT_DEFAULT;
+    state->config.val = VAL_DEFAULT;
+    eeconfig_update_rgb(&state->config, state->index);
+}
+
+static void effects_state_init(rgb_effects_state_t * state)
+{
+    state->counter       = 0;
+    state->wipe_on       = true;
+    state->rainbow_step  = RAINBOW_STEP_DEFAULT;
+    state->breath_step   = BREATH_STEP_DEFAULT;
+    state->circle_step   = CIRCLE_STEP_DEFAULT;
+    state->last_ticks    = timer_read32();
+    srand(state->last_ticks);
+    state->effects[RGB_EFFECT_STATIC]    = effects_mode_static;
+    state->effects[RGB_EFFECT_BLINK]     = effects_mode_blink;
+    state->effects[RGB_EFFECT_GRADIENT]  = effects_mode_gradient;
+    state->effects[RGB_EFFECT_RAINBOW]   = effects_mode_rainbow;
+    state->effects[RGB_EFFECT_RANDOM]    = effects_mode_random;
+    state->effects[RGB_EFFECT_BREATH]    = effects_mode_breath;
+    state->effects[RGB_EFFECT_WIPE]      = effects_mode_wipe;
+    state->effects[RGB_EFFECT_SCAN]      = effects_mode_scan;
+    state->effects[RGB_EFFECT_CIRCLE]    = effects_mode_circle;
+    effects_mode_init(state);
 }
 
 // interface
-void rgb_effects_init(rgb_driver_t* driver)
+rgb_effects_t rgb_effects_init(rgb_driver_t* driver, uint8_t index, uint8_t led_start, uint8_t led_count)
 {
+    rgb_effects_state_t *state = &effects_state[index];
+    state->index = index;
+    state->led_start = led_start;
+    state->led_count = led_count;
     if (!eeconfig_is_enabled()) {
         eeconfig_init();
     }
 
-    eeconfig_read_rgb(&effects_state.config);
-    if ( !effects_config_valid(&effects_state.config)){
-        effects_update_default();
+    eeconfig_read_rgb(&state->config, index);
+    if ( !effects_config_valid(&state->config)){
+        effects_update_default(state);
     }
 
-    effects_state.driver        = driver;
-    if (effects_state.config.enable)
-        effects_state.driver->init();
+    //state->driver = driver;
+    //if (state->config.enable)
+    //    state->driver->init();
+    
+    effects_state_init(state);
 
-    effects_state.counter       = 0;
-    effects_state.wipe_on       = true;
-    effects_state.rainbow_step  = RAINBOW_STEP_DEFAULT;
-    effects_state.breath_step   = BREATH_STEP_DEFAULT;
-    effects_state.circle_step   = CIRCLE_STEP_DEFAULT;
-    effects_state.last_ticks    = timer_read32();
-    srand(effects_state.last_ticks);
-    effects_state.effects[RGB_EFFECT_STATIC]    = effects_mode_static;
-    effects_state.effects[RGB_EFFECT_BLINK]     = effects_mode_blink;
-    effects_state.effects[RGB_EFFECT_GRADIENT]  = effects_mode_gradient;
-    effects_state.effects[RGB_EFFECT_RAINBOW]   = effects_mode_rainbow;
-    effects_state.effects[RGB_EFFECT_RANDOM]    = effects_mode_random;
-    effects_state.effects[RGB_EFFECT_BREATH]    = effects_mode_breath;
-    effects_state.effects[RGB_EFFECT_WIPE]      = effects_mode_wipe;
-    effects_state.effects[RGB_EFFECT_SCAN]      = effects_mode_scan;
-    effects_state.effects[RGB_EFFECT_CIRCLE]    = effects_mode_circle;
-    effects_mode_init();
+    return state;
 }
 
-void rgb_effects_inc_hue(void)
+void rgb_effects_uninit(rgb_effects_t effects)
+{}
+
+void rgb_effects_inc_hue(rgb_effects_t effects)
 {
-    effects_set_hue(effects_state.config.hue + HUE_STEP);
+    rgb_effects_state_t *state = (rgb_effects_state_t*)effects;
+    effects_set_hue(state, state->config.hue + HUE_STEP);
 }
 
-void rgb_effects_dec_hue(void)
+void rgb_effects_dec_hue(rgb_effects_t effects)
 {
-    effects_set_hue(effects_state.config.hue - HUE_STEP);
+    rgb_effects_state_t *state = (rgb_effects_state_t*)effects;
+    effects_set_hue(state, state->config.hue - HUE_STEP);
 }
 
-void rgb_effects_inc_sat(void)
+void rgb_effects_inc_sat(rgb_effects_t effects)
 {
-    effects_set_sat(effects_state.config.sat + SAT_STEP);
+    rgb_effects_state_t *state = (rgb_effects_state_t*)effects;
+    effects_set_sat(state, state->config.sat + SAT_STEP);
 }
 
-void rgb_effects_dec_sat(void)
+void rgb_effects_dec_sat(rgb_effects_t effects)
 {
-    effects_set_sat(effects_state.config.sat - SAT_STEP);
+    rgb_effects_state_t *state = (rgb_effects_state_t*)effects;
+    effects_set_sat(state, state->config.sat - SAT_STEP);
 }
 
-void rgb_effects_inc_val(void)
+void rgb_effects_inc_val(rgb_effects_t effects)
 {
-    effects_set_val(effects_state.config.val + VAL_STEP);
+    rgb_effects_state_t *state = (rgb_effects_state_t*)effects;
+    effects_set_val(state, state->config.val + VAL_STEP);
 }
 
-void rgb_effects_dec_val(void)
+void rgb_effects_dec_val(rgb_effects_t effects)
 {
-    effects_set_val(effects_state.config.val - VAL_STEP);
+    rgb_effects_state_t *state = (rgb_effects_state_t*)effects;
+    effects_set_val(state, state->config.val - VAL_STEP);
 }
 
-void rgb_effects_inc_speed(void)
+void rgb_effects_inc_speed(rgb_effects_t effects)
 {
-    effects_set_speed(++effects_state.config.speed);
+    rgb_effects_state_t *state = (rgb_effects_state_t*)effects;
+    effects_set_speed(state, ++state->config.speed);
 }
 
-void rgb_effects_dec_speed(void)
+void rgb_effects_dec_speed(rgb_effects_t effects)
 {
-    effects_set_speed(--effects_state.config.speed);
+    rgb_effects_state_t *state = (rgb_effects_state_t*)effects;
+    effects_set_speed(state, --state->config.speed);
 }
 
-void rgb_effects_inc_mode(void)
+void rgb_effects_inc_mode(rgb_effects_t effects)
 {
-    effects_state.config.mode++;
-    if (effects_state.config.mode >= RGB_EFFECT_MAX) {
-        effects_state.config.mode = RGB_EFFECT_STATIC;
+    rgb_effects_state_t *state = (rgb_effects_state_t*)effects;
+    state->config.mode++;
+    if (state->config.mode >= RGB_EFFECT_MAX) {
+        state->config.mode = RGB_EFFECT_STATIC;
     }
-    effects_set_mode(effects_state.config.mode);
+    effects_set_mode(state, state->config.mode);
 }
 
-void rgb_effects_dec_mode(void)
+void rgb_effects_dec_mode(rgb_effects_t effects)
 {
-    if (effects_state.config.mode == 0) {
-        effects_state.config.mode = RGB_EFFECT_MAX - 1;
+    rgb_effects_state_t *state = (rgb_effects_state_t*)effects;
+    if (state->config.mode == 0) {
+        state->config.mode = RGB_EFFECT_MAX - 1;
     } else {
-        effects_state.config.mode--;
+        state->config.mode--;
     }
 
-    effects_set_mode(effects_state.config.mode);
+    effects_set_mode(state, state->config.mode);
 }
 
-void rgb_effects_toggle(void)
+void rgb_effects_toggle(rgb_effects_t effects)
 {
-    effects_state.config.enable = !effects_state.config.enable;
-    effects_set_enable(effects_state.config.enable);
+    rgb_effects_state_t *state = (rgb_effects_state_t*)effects;
+    state->config.enable = !state->config.enable;
+    effects_set_enable(state, state->config.enable);
 
-    if (effects_state.config.enable) {
-        effects_state.driver->init();
+/*
+    if (state->config.enable) {
+        state->driver->init();
         rgb_effects_debug("effects: driver init\n");
     } else {
         #ifdef RGBLIGHT_EN_PIN
-        effects_state.driver->uninit();
+        state->driver->uninit();
         rgb_effects_debug("effects: driver uninit\n");
         #endif
     }
+*/
 }
 
-void rgb_effects_task(void)
+void rgb_effects_task(rgb_effects_t effects)
 {
-    if (effects_state.config.enable) {
-        if (effects_need_update() ) {
-            effects_state.effects[effects_state.config.mode]();
-            effects_update_timer();
+    rgb_effects_state_t *state = (rgb_effects_state_t*)effects;
+    if (state->config.enable) {
+        if (effects_need_update(state) ) {
+            state->effects[state->config.mode](state);
+            effects_update_timer(state);
             //amk_printf("effects last ticks: %d\n", effects_state.last_ticks);
         }
-        effects_state.driver->flush();
+        //state->driver->flush();
     } else {
         #ifndef RGBLIGHT_EN_PIN
-        effects_state.driver->set_color_all(0,0,0);
-        effects_state.driver->flush();
+        effects_set_color_all(state, 0, 0, 0);
+        //state->driver->flush();
         #endif
     }
 }
 
-bool rgb_effects_enabled(void)
+bool rgb_effects_enabled(rgb_effects_t effects)
 {
-    return effects_state.config.enable ? true :false;
+    rgb_effects_state_t *state = (rgb_effects_state_t*)effects;
+    return state->config.enable ? true :false;
 }

@@ -3,45 +3,59 @@
  */
 
 #include "rgb_led.h"
+#include "rgb_driver.h"
+#include "rgb_bar.h"
+#include "rgb_indicator.h"
+#include "rgb_ring.h"
+#include "rgb_matrix.h"
 
 void rgb_led_init(void)
 { 
-#if defined(RGB_EFFECTS_ENABLE) || defined(RGB_MATRIX_ENABLE)
-    rgb_driver_t *driver = 0;
+    rgb_driver_init();
+
+#ifdef RGB_BAR_ENABLE
+    rgb_bar_init();
 #endif
 
-#ifdef RGB_EFFECTS_ENABLE
-#ifdef RGB_WITH_ALL
-
-    if (rgb_driver_available(RGB_DRIVER_AW9523B)) {
-        driver = rgb_driver_create(RGB_DRIVER_AW9523B);
-    } else {
-        driver = rgb_driver_create(RGB_DRIVER_WS2812);
-    }
-
-#else
-    #ifdef RGB_WITH_WS2812
-        driver = rgb_driver_create(RGB_DRIVER_WS2812);
-    #endif
-    #ifdef RGB_WITH_AW9523B
-        driver = rgb_driver_create(RGB_DRIVER_AW9523B);
-    #endif
+#ifdef RGB_INDICATOR_ENABLE
+    rgb_indicator_init();
 #endif
-    rgb_effects_init(driver);
+
+#ifdef RGB_RING_ENABLE
+    rgb_ring_init();
 #endif
 
 #ifdef RGB_MATRIX_ENABLE
-    driver = rgb_driver_create(RGB_DRIVER_IS31FL3731);
-    rgb_matrix_init(driver);
+    rgb_matrix_init();
 #endif
 }
 
 void rgb_led_task(void)
 {
-#ifdef RGB_EFFECTS_ENABLE
-    rgb_effects_task();
+#ifdef RGB_BAR_ENABLE
+    rgb_bar_task();
 #endif
+
+#ifdef RGB_INDICATOR_ENABLE
+    rgb_indicator_task();
+#endif
+
+#ifdef RGB_RING_ENABLE
+    rgb_ring_task();
+#endif
+
 #ifdef RGB_MATRIX_ENABLE
     rgb_matrix_task();
 #endif
+    for (int i = 0; i < RGB_DEVICE_NUM; i++) {
+        rgb_driver_t *driver = rgb_driver_get(i);
+        driver->flush(driver);
+    }
+}
+
+rgb_driver_t *rgb_led_map(uint8_t led_index)
+{
+    uint8_t driver = g_rgb_leds[led_index].driver;
+
+    return rgb_driver_get(driver);
 }

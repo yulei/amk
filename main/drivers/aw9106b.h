@@ -5,8 +5,7 @@
 
 #pragma once
 
-#include <stdint.h>
-#include "rgb_color.h"
+#include "awinic.h"
 
 //#ifndef AW9106B_ADDR1
 //    #define AW9106B_ADDR1   0xB6
@@ -32,12 +31,10 @@
 #define AW9106B_RESET       0x7F
 #define AW9106B_PWM_SIZE    6
 
-extern rgb_led_t g_aw9106b_leds[];
+awinic_t *aw9106b_init(uint8_t addr, uint8_t index, uint8_t led_num);
 
-void aw9106b_init(uint8_t addr, uint8_t index);
+void aw9106b_set_color(awinic_t *driver, int index, uint8_t red, uint8_t green, uint8_t blue);
+void aw9106b_set_color_all(awinic_t *driver, uint8_t red, uint8_t green, uint8_t blue);
+void aw9106b_update_buffers(awinic_t *driver);
 
-void aw9106b_set_color(int index, uint8_t red, uint8_t green, uint8_t blue);
-void aw9106b_set_color_all(uint8_t red, uint8_t green, uint8_t blue);
-void aw9106b_update_buffers(uint8_t addr, uint8_t index);
-
-void aw9106b_uninit(uint8_t addr, uint8_t index);
+void aw9106b_uninit(awinic_t *driver);

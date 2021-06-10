@@ -1,19 +1,3 @@
-/* Copyright 2018 Jason Williams (Wilba)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * @file is31fl3236.h
  * @brief driver for is31fl3236
@@ -21,29 +5,13 @@
 
 #pragma once
 
-#include <stdint.h>
+#include "is31.h"
 
-typedef struct is31_led {
-    uint8_t driver : 2;
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-} __attribute__((packed)) is31_led;
-
-extern const is31_led g_is31_leds[DRIVER_LED_TOTAL];
-
-void IS31FL3236_init(uint8_t addr);
-void IS31FL3236_write_register(uint8_t addr, uint8_t reg, uint8_t data);
-void IS31FL3236_write_pwm_buffer(uint8_t addr, uint8_t *pwm_buffer);
-
-void IS31FL3236_set_color(int index, uint8_t red, uint8_t green, uint8_t blue);
-void IS31FL3236_set_color_all(uint8_t red, uint8_t green, uint8_t blue);
-
-// This should not be called from an interrupt
-// (eg. from a timer interrupt).
-// Call this while idle (in between matrix scans).
-// If the buffer is dirty, it will update the driver with the buffer.
-void IS31FL3236_update_pwm_buffers(uint8_t addr);
+is31_t *is31fl3236_init(uint8_t addr, uint8_t index, uint8_t led_num);
+void is31fl3236_set_color(is31_t *driver, uint8_t index, uint8_t red, uint8_t green, uint8_t blue);
+void is31fl3236_set_color_all(is31_t *driver, uint8_t red, uint8_t green, uint8_t blue);
+void is31fl3236_update_buffers(is31_t *driver);
+void is31fl3236_uninit(is31_t *driver);
 
 #define OUT_1 0x01
 #define OUT_2 0x02

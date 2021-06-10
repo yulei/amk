@@ -9,9 +9,10 @@
 #include "rgb_led.h"
 
 typedef struct {
+    uint8_t     index;
     uint8_t     addr;
     uint8_t     led_num;
-    void        *user;       
+    void        *data;       
 } is31_t;
 
 #ifndef IS31_DRIVER_NUM
@@ -27,8 +28,6 @@ typedef struct {
     uint8_t r;  // mapped key matrix row
     uint8_t c;  // mapped key matrix col
 } is31_led_attribute_t;
-
-extern rgb_led_t g_is31_leds[];
 
 #ifdef RGB_MATRIX_ENABLE
 #ifndef RGB_MATRIX_LED_NUM

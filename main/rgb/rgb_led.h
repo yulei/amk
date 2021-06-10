@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include "rgb_color.h"
 #include "rgb_driver.h"
-#include "rgb_effects.h"
-#include "rgb_matrix.h"
 
 void rgb_led_init(void);
 void rgb_led_task(void);
+
+rgb_driver_t *rgb_led_map(uint8_t led_index);

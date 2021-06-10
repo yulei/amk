@@ -1,122 +1,158 @@
-/* Copyright 2017 Jason Williams
- * Copyright 2018 Jack Humbert
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * @file is31fl3236.c
  * @brief driver implementation for is31fl3236
  */
 
+#include <string.h>
 #include "is31fl3236.h"
-#include "i2c_master.h"
+#include "i2c.h"
 #include "wait.h"
 
-// This is a 7-bit address, that gets left-shifted and bit 0
-// set to 0 for write, 1 for read (as per I2C protocol)
-// The address will vary depending on your wiring:
-// 0b0111100 AD <-> GND
-// 0b0111111 AD <-> VCC
-// 0b0111101 AD <-> SCL
-// 0b0111110 AD <-> SDA
+#define PWM_BUFFER_SIZE     36
+#define CONTROL_BUFFER_SIZE 36
 
-// This is the full 8-bit address
-#define ISSI_ADDR_DEFAULT 0b01111000
+#define SHUTDOWN_REG        0x00
+#define PWM_REG             0x01
+#define UPDATE_REG          0x25
+#define CONTROL_REG         0x26
+#define GLOBAL_CONTROL_REG  0x4A
+#define OUT_FREQUENCY_REG   0x4B
+#define RESET_REG           0x4F
 
-// These are the register addresses
-#define ISSI_REG_SHUTDOWN       0x00
-#define ISSI_REG_PWM            0x01
-#define ISSI_REG_UPDATE         0x25
-#define ISSI_REG_CONTROL        0x26
-#define ISSI_REG_GLOBAL_CONTROL 0x4A
-#define ISSI_REG_FREQUENCY      0x4B
-#define ISSI_REG_RESET          0x4F
-
-
-#ifndef ISSI_TIMEOUT
-#    define ISSI_TIMEOUT 100
+#ifndef IS31FL3236_NUM
+    #define IS31FL3236_NUM  1
 #endif
 
-// Transfer buffer for TWITransmitData()
-uint8_t g_twi_transfer_buffer[40] = {0};
+#define TIMEOUT             100
+#ifndef IS31FL3236_I2C_ID
+#define IS31FL3236_I2C_ID     I2C_INSTANCE_1
+#endif
 
-uint8_t g_pwm_buffer[36] = {0};
-bool    g_pwm_buffer_update_required = false;
+static i2c_handle_t i2c_inst;
 
-uint8_t g_led_control_registers[36] = {0};
-bool    g_led_control_registers_update_required = false;
+typedef struct {
+    is31_t          is31;
+    uint8_t         pwm_buffer[PWM_BUFFER_SIZE + 1];
+    bool            pwm_dirty;
+    uint8_t         control_buffer[CONTROL_BUFFER_SIZE + 1];
+    bool            control_dirty;
+    bool            ready;
+} is31fl3236_driver_t;
 
-void IS31FL3236_write_pwm_buffer(uint8_t addr, uint8_t *pwm_buffer)
+static is31fl3236_driver_t is31_drivers[IS31FL3236_NUM] = {0};
+
+static void init_driver(is31fl3236_driver_t *driver);
+static void uninit_driver(is31_t *driver);
+
+static void map_led(uint8_t index, uint8_t *red_reg, uint8_t* green_reg, uint8_t *blue_reg)
 {
-    i2c_writeReg(addr, ISSI_REG_PWM, pwm_buffer, 36, ISSI_TIMEOUT);
-
-    // update the pwm buffer
-    uint8_t data = 0;
-    i2c_writeReg(addr, ISSI_REG_UPDATE, &data, 1, ISSI_TIMEOUT);
+    rgb_led_t *led = &g_rgb_leds[index];
+    *red_reg    = led->r - PWM_REG;
+    *green_reg  = led->g - PWM_REG;
+    *blue_reg   = led->b - PWM_REG;
 }
 
-void IS31FL3236_init(uint8_t addr)
+is31_t *is31fl3236_init(uint8_t addr, uint8_t index, uint8_t led_num)
 {
-    i2c_init();
+    is31fl3236_driver_t *driver = &is31_drivers[index];
+    driver->is31.addr = addr;
+    driver->is31.index = index;
+    driver->is31.led_num = led_num;
+    driver->is31.data = driver;
+
+    init_driver(driver);
+
+    driver->ready = true;
+    return &driver->is31;
+}
+
+void is31fl3236_uninit(is31_t *driver)
+{   
+    // turn chip off
+    uninit_driver(driver);
+
+    // reset driver data
+    is31fl3236_driver_t *is31 = (is31fl3236_driver_t*)(driver->data);
+    
+    memset(is31, 0, sizeof(is31fl3236_driver_t));
+}
+
+void is31fl3236_set_color(is31_t *driver, uint8_t index, uint8_t red, uint8_t green, uint8_t blue)
+{
+    uint8_t r, g, b;
+    map_led(index, &r, &g, &b);
+    is31fl3236_driver_t *is31 = (is31fl3236_driver_t*)(driver->data);
+    is31->pwm_buffer[r + 1] = red;
+    is31->pwm_buffer[g + 1] = green;
+    is31->pwm_buffer[b + 1] = blue;
+    is31->pwm_dirty = true;
+}
+
+void is31fl3236_set_color_all(is31_t *driver, uint8_t red, uint8_t green, uint8_t blue)
+{
+    for (int i = 0; i < driver->led_num; i++) {
+        is31fl3236_set_color(driver, i, red, green, blue);
+    }
+}
+
+void is31fl3236_update_buffers(is31_t *driver)
+{
+    is31fl3236_driver_t *is31 = (is31fl3236_driver_t*)(driver->data);
+    bool need_update = is31->pwm_dirty || is31->control_dirty;
+    if (is31->pwm_dirty) {
+        i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1, TIMEOUT);
+        is31->pwm_dirty = false;
+    }
+
+    if (is31->control_dirty) {
+        i2c_send(i2c_inst, driver->addr, is31->control_buffer, CONTROL_BUFFER_SIZE + 1, TIMEOUT);
+        is31->pwm_dirty = false;
+    }
+
+    if (need_update) {
+        uint8_t data = 0;
+        i2c_write_reg(i2c_inst, driver->addr, CONTROL_REG, &data, 1, TIMEOUT);
+    }
+}
+
+
+void init_driver(is31fl3236_driver_t *driver)
+{
+    if (!i2c_inst) {
+        i2c_inst = i2c_init(IS31FL3236_I2C_ID);
+    }
+
+    memset(driver->pwm_buffer, 0, PWM_BUFFER_SIZE + 1);
+    driver->pwm_buffer[0]       = PWM_REG;
+    driver->pwm_dirty           = false;
+    memset(driver->control_buffer, 1, CONTROL_BUFFER_SIZE + 1);
+    driver->control_buffer[0]   = CONTROL_REG;
+    driver->control_dirty       = false;
+
     // Reset 3236 to default state
     uint8_t data = 0;
-    i2c_writeReg(addr, ISSI_REG_RESET, &data, 1, ISSI_TIMEOUT);
+    i2c_write_reg(i2c_inst, driver->is31.addr, RESET_REG, &data, 1, TIMEOUT);
 
     wait_ms(10);
 
     // Turn off software shutdown
     data = 1;
-    i2c_writeReg(addr, ISSI_REG_SHUTDOWN, &data, 1, ISSI_TIMEOUT);
+    i2c_write_reg(i2c_inst, driver->is31.addr, SHUTDOWN_REG, &data, 1, TIMEOUT);
 
-    // turn on all LEDs in the LED control register
-    for (int i = 0; i < 36; i++) {
-        g_led_control_registers[i] = 0x01;
-    }
-    i2c_writeReg(addr, ISSI_REG_CONTROL, &g_led_control_registers[0], 36, ISSI_TIMEOUT);
+    // Turn on all leds
+    i2c_send(i2c_inst, driver->is31.addr, driver->control_buffer, CONTROL_BUFFER_SIZE+1, TIMEOUT);
 
-    // set PWM on all LEDs
-    for (int i = 0; i < 36; i++) {
-        g_pwm_buffer[i] = 0;
-    }
-    i2c_writeReg(addr, ISSI_REG_PWM, &g_pwm_buffer[0], 36, ISSI_TIMEOUT);
+    // Clear pwm
+    i2c_send(i2c_inst, driver->is31.addr, driver->pwm_buffer, PWM_BUFFER_SIZE+1, TIMEOUT);
 
     // update PWM and control values
     data = 0;
-    i2c_writeReg(addr, ISSI_REG_UPDATE, &data, 1, ISSI_TIMEOUT);
+    i2c_write_reg(i2c_inst, driver->is31.addr, UPDATE_REG, &data, 1, TIMEOUT);
 }
 
-void IS31FL3236_set_color(int index, uint8_t red, uint8_t green, uint8_t blue) {
-    if (index >= 0 && index < DRIVER_LED_TOTAL) {
-        is31_led led = g_is31_leds[index];
-
-        g_pwm_buffer[led.r - ISSI_REG_PWM]   = red;
-        g_pwm_buffer[led.g - ISSI_REG_PWM]   = green;
-        g_pwm_buffer[led.b - ISSI_REG_PWM]   = blue;
-        g_pwm_buffer_update_required = true;
-    }
-}
-
-void IS31FL3236_set_color_all(uint8_t red, uint8_t green, uint8_t blue) {
-    for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
-        IS31FL3236_set_color(i, red, green, blue);
-    }
-}
-
-void IS31FL3236_update_pwm_buffers(uint8_t addr) {
-    if (g_pwm_buffer_update_required) {
-        IS31FL3236_write_pwm_buffer(addr, &g_pwm_buffer[0]);
-    }
-    g_pwm_buffer_update_required = false;
+void uninit_driver(is31_t *driver)
+{
+    // shutdonw driver
+    uint8_t data = 0;
+    i2c_write_reg(i2c_inst, driver->addr, RESET_REG, &data, 1, TIMEOUT);
 }

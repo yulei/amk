@@ -6,9 +6,8 @@
  */
 
 #include <stdbool.h>
-#include "gpio_pin.h"
+#include "rgb_common.h"
 #include "ws2812.h"
-#include "rgb_color.h"
 
 #ifndef PWM_TIM
 #define PWM_TIM htim1

@@ -23,7 +23,6 @@ void rgb_indicator_init(void)
     aw9106b_init(AW9106B_ADDR2, 1);
 #endif
     aw9106b_set_color_all(0, 0, 0);
-
 }
 
 void rgb_indicator_set(uint8_t index, uint8_t red, uint8_t green, uint8_t blue)

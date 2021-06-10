@@ -1,10 +1,9 @@
 /**
- * rgb_color.c
- *  rgb color implementation
+ * rgb_common.c
+ *  rgb common implementation
  */
 
-#include "rgb_color.h"
-
+#include "rgb_common.h"
 
 static const uint8_t CIE1931_CURVE[256] = {
     0,   1,   1,   1,   1,   1,   1,   1,   1,   1,   2,   2,   2,   2,   2,   2,

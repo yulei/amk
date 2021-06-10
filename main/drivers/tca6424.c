@@ -34,20 +34,28 @@
 
 #define TIMEOUT         100
 
+#ifndef TCA6424_I2C_ID
+#define TCA6424_I2C_ID     I2C_INSTANCE_1
+#endif
+
+static i2c_handle_t i2c_inst;
+
 void tca6424_init(void)
 {
-    i2c_init();
+    if (!i2c_inst) {
+        i2c_inst = i2c_init(TCA6424_I2C_ID);
+    }
 }
 
 static void write_port(uint8_t p, uint8_t d)
 {
-    i2c_write_reg(TCA6424_ADDR, p, &d, 1, TIMEOUT);
+    i2c_write_reg(i2c_inst, TCA6424_ADDR, p, &d, 1, TIMEOUT);
 }
 
 static uint8_t read_port(uint8_t port)
 {
     uint8_t data = 0;
-    i2c_read_reg(TCA6424_ADDR, port, &data, 1, TIMEOUT);
+    i2c_read_reg(i2c_inst, TCA6424_ADDR, port, &data, 1, TIMEOUT);
     return data;
 }
 

@@ -9,10 +9,6 @@
 #include <stdint.h>
 #include "rgb_driver.h"
 
-#ifndef EFFECTS_LED_NUM
-#define EFFECTS_LED_NUM     4
-#endif
-
 #ifndef EFFECTS_HUE_STEP
 #define EFFECTS_HUE_STEP    8
 #endif
@@ -34,17 +30,22 @@ typedef struct {
     uint8_t val;
 } rgb_effects_config_t;
 
-void rgb_effects_init(rgb_driver_t* driver);
-bool rgb_effects_enabled(void);
-void rgb_effects_inc_hue(void);
-void rgb_effects_dec_hue(void);
-void rgb_effects_inc_sat(void);
-void rgb_effects_dec_sat(void);
-void rgb_effects_inc_val(void);
-void rgb_effects_dec_val(void);
-void rgb_effects_inc_speed(void);
-void rgb_effects_dec_speed(void);
-void rgb_effects_inc_mode(void);
-void rgb_effects_dec_mode(void);
-void rgb_effects_toggle(void);
-void rgb_effects_task(void);
+typedef void* rgb_effects_t;
+
+rgb_effects_t rgb_effects_init(rgb_driver_t* driver, uint8_t index, uint8_t led_start, uint8_t led_count);
+void rgb_effects_uninit(rgb_effects_t effects);
+void rgb_effects_task(rgb_effects_t effects);
+
+bool rgb_effects_enabled(rgb_effects_t effects);
+void rgb_effects_toggle(rgb_effects_t effects);
+
+void rgb_effects_inc_hue(rgb_effects_t effects);
+void rgb_effects_dec_hue(rgb_effects_t effects);
+void rgb_effects_inc_sat(rgb_effects_t effects);
+void rgb_effects_dec_sat(rgb_effects_t effects);
+void rgb_effects_inc_val(rgb_effects_t effects);
+void rgb_effects_dec_val(rgb_effects_t effects);
+void rgb_effects_inc_speed(rgb_effects_t effects);
+void rgb_effects_dec_speed(rgb_effects_t effects);
+void rgb_effects_inc_mode(rgb_effects_t effects);
+void rgb_effects_dec_mode(rgb_effects_t effects);

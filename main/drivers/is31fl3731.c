@@ -34,6 +34,7 @@ typedef struct {
     bool            pwm_dirty;
     uint8_t         control_buffer[CONTROL_BUFFER_SIZE + 1];
     bool            control_dirty;
+    bool            ready;
 } is31fl3731_driver_t;
 
 static is31fl3731_driver_t is31_drivers[IS31_DRIVER_NUM] = {0};
@@ -43,26 +44,24 @@ static void uninit_driver(is31_t *driver);
 
 static void map_led(uint8_t index, uint8_t *red_reg, uint8_t* green_reg, uint8_t *blue_reg)
 {
-    rgb_led_t *led = &g_is31_leds[index];
+    rgb_led_t *led = &g_rgb_leds[index];
     *red_reg    = led->r - PWM_REG;
     *green_reg  = led->g - PWM_REG;
     *blue_reg   = led->b - PWM_REG;
 }
 
-is31_t *is31fl3731_init(uint8_t addr, uint8_t led_num)
+is31_t *is31fl3731_init(uint8_t addr, uint8_t index, uint8_t led_num)
 {
-    is31_t *driver = NULL;
-    for (int i = 0; i < IS31_DRIVER_NUM; i++) {
-        if (is31_drivers[i].is31.addr == 0) {
-            driver          = &(is31_drivers[i].is31);
-            driver->addr    = addr;
-            driver->led_num = led_num;
-            driver->user    = &(is31_drivers[i]);
-            init_driver(&is31_drivers[i]);
-            break;
-        }
-    }
-    return driver;
+    is31fl3731_driver_t *driver = &is31_drivers[index];
+    driver->is31.addr = addr;
+    driver->is31.index = index;
+    driver->is31.led_num = led_num;
+    driver->is31.data = driver;
+
+    init_driver(driver);
+
+    driver->ready = true;
+    return &driver->is31;
 }
 
 void is31fl3731_uninit(is31_t *driver)
@@ -71,22 +70,15 @@ void is31fl3731_uninit(is31_t *driver)
     uninit_driver(driver);
 
     // reset driver data
-    is31fl3731_driver_t *is31 = (is31fl3731_driver_t*)(driver->user);
+    is31fl3731_driver_t *is31 = (is31fl3731_driver_t*)(driver->data);
     memset(is31, 0, sizeof(is31fl3731_driver_t));
-
-    for (int i = 0; i < IS31_DRIVER_NUM; i++) {
-        if (is31_drivers[i].is31.addr != 0)
-            return;
-    }
-    // all drivers uninited, release the i2c interface
-    //if (i2c_ready()) i2c_uninit();
 }
 
 void is31fl3731_set_color(is31_t *driver, uint8_t index, uint8_t red, uint8_t green, uint8_t blue)
 {
     uint8_t r, g, b;
     map_led(index, &r, &g, &b);
-    is31fl3731_driver_t *is31 = (is31fl3731_driver_t*)(driver->user);
+    is31fl3731_driver_t *is31 = (is31fl3731_driver_t*)(driver->data);
     is31->pwm_buffer[r + 1] = red;
     is31->pwm_buffer[g + 1] = green;
     is31->pwm_buffer[b + 1] = blue;
@@ -102,7 +94,7 @@ void is31fl3731_set_color_all(is31_t *driver, uint8_t red, uint8_t green, uint8_
 
 void is31fl3731_update_buffers(is31_t *driver)
 {
-    is31fl3731_driver_t *is31 = (is31fl3731_driver_t*)(driver->user);
+    is31fl3731_driver_t *is31 = (is31fl3731_driver_t*)(driver->data);
     if (is31->pwm_dirty) {
         i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1, IS31_TIMEOUT);
         is31->pwm_dirty = false;
@@ -164,7 +156,7 @@ void init_driver(is31fl3731_driver_t *driver)
         driver->control_buffer[reg_g+1] |= (1 << bit_g);
         driver->control_buffer[reg_b+1] |= (1 << bit_b);
     }
-    i2c_send(i2c_inst, driver->is31.addr, driver->control_buffer, CONTROL_BUFFER_SIZE+1, IS31_TIMEOUT);
+    i2c_send(i2c_inst, driver->is31.addr, driver->control_buffer, CONTROL_BUFFER_SIZE+1, TIMEOUT);
 }
 
 void uninit_driver(is31_t *driver)

@@ -37,12 +37,25 @@
 
 #define AW9523B_RESET       0x7F
 
+#ifndef AW9523B_NUM
+    #define AW9523B_NUM     1
+#endif
+
 #define TIMEOUT             100
 
 #define PWM2BUF(x) ((x) - AW9523B_PWM_BASE)
-static uint8_t aw9523b_pwm_buf[AW9523B_PWM_SIZE];
-static bool    aw9523b_pwm_dirty = false;
-static bool    aw9523b_ready     = false;
+
+typedef struct {
+    awinic_t awinic;
+    uint8_t pwm_buffer[AW9523B_PWM_SIZE];
+    bool pwm_dirty;
+    bool ready;
+} aw9523b_t;
+
+static aw9523b_t aw9523b_drivers[AW9523B_NUM];
+//static uint8_t aw9523b_pwm_buf[AW9523B_PWM_SIZE];
+//static bool    aw9523b_pwm_dirty = false;
+//static bool    aw9523b_ready     = false;
 
 #ifndef AW9523B_I2C_ID
 #define AW9523B_I2C_ID     I2C_INSTANCE_1
@@ -62,7 +75,7 @@ bool aw9523b_available(uint8_t addr)
     wait_ms(1);
 #endif
     uint8_t data = 0;
-    amk_error_t ec = i2c_write_reg(addr, AW9523B_RESET, &data, 1, TIMEOUT);
+    amk_error_t ec = i2c_write_reg(i2c_inst, addr, AW9523B_RESET, &data, 1, TIMEOUT);
 
 #ifdef RGBLIGHT_EN_PIN
     gpio_set_input_floating(RGBLIGHT_EN_PIN);
@@ -79,13 +92,18 @@ bool aw9523b_available(uint8_t addr)
     return available;
 }
 
-void aw9523b_init(uint8_t addr)
+awinic_t *aw9523b_init(uint8_t addr, uint8_t index, uint8_t led_num)
 {
-    if (aw9523b_ready) return;
-
     if (!i2c_inst) {
         i2c_inst = i2c_init(AW9523B_I2C_ID);
     }
+
+    aw9523b_t *aw9523b = &aw9523b_drivers[index];
+    aw9523b->awinic.addr = addr;
+    aw9523b->awinic.index = index;
+    aw9523b->awinic.led_num = led_num;
+    aw9523b->awinic.data = aw9523b;
+
     // reset chip
     uint8_t data = 0;
     amk_error_t ec = i2c_write_reg(i2c_inst, addr, AW9523B_RESET, &data, 1, TIMEOUT);
@@ -100,56 +118,60 @@ void aw9523b_init(uint8_t addr)
     i2c_write_reg(i2c_inst, addr, AW9523B_P0_LED, &data, 1, TIMEOUT);
     i2c_write_reg(i2c_inst, addr, AW9523B_P1_LED, &data, 1, TIMEOUT);
     // clear pwm buff
-    for (uint8_t i = 0; i < 16; i++) {
-        aw9523b_pwm_buf[i] = 0;
+    for (uint8_t i = 0; i < AW9523B_PWM_SIZE; i++) {
+        aw9523b->pwm_buffer[i] = 0;
     }
-    aw9523b_pwm_dirty = false;
-    aw9523b_ready = true;
+    aw9523b->pwm_dirty = false;
+    aw9523b->ready = true;
+
+    return &aw9523b->awinic;
 }
 
-void aw9523b_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
+void aw9523b_set_color(awinic_t *driver, int index, uint8_t red, uint8_t green, uint8_t blue)
 {
-    if (index >= RGB_LED_NUM) return;
+    if (index >= driver->led_num) return;
 
-    rgb_led_t led = g_aw9523b_leds[index];
-    if (aw9523b_pwm_buf[PWM2BUF(led.r)] != red) {
-        aw9523b_pwm_buf[PWM2BUF(led.r)] = red;
-        aw9523b_pwm_dirty = true;
+    aw9523b_t *aw9523b = (aw9523b_t *)driver->data;
+    rgb_led_t led = g_rgb_leds[index];
+    if (aw9523b->pwm_buffer[PWM2BUF(led.r)] != red) {
+        aw9523b->pwm_buffer[PWM2BUF(led.r)] = red;
+        aw9523b->pwm_dirty = true;
     }
-     if (aw9523b_pwm_buf[PWM2BUF(led.g)] != green) {
-        aw9523b_pwm_buf[PWM2BUF(led.g)] = green;
-        aw9523b_pwm_dirty = true;
+     if (aw9523b->pwm_buffer[PWM2BUF(led.g)] != green) {
+        aw9523b->pwm_buffer[PWM2BUF(led.g)] = green;
+        aw9523b->pwm_dirty = true;
     }
-     if (aw9523b_pwm_buf[PWM2BUF(led.b)] != blue) {
-        aw9523b_pwm_buf[PWM2BUF(led.b)] = blue;
-        aw9523b_pwm_dirty = true;
+     if (aw9523b->pwm_buffer[PWM2BUF(led.b)] != blue) {
+        aw9523b->pwm_buffer[PWM2BUF(led.b)] = blue;
+        aw9523b->pwm_dirty = true;
     }
 }
 
-void aw9523b_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
+void aw9523b_set_color_all(awinic_t *driver, uint8_t red, uint8_t green, uint8_t blue)
 {
-    for (uint8_t i = 0; i < RGB_LED_NUM; i++) {
-        aw9523b_set_color(i, red, green, blue);
+    for (uint8_t i = 0; i < driver->led_num; i++) {
+        aw9523b_set_color(driver, i, red, green, blue);
     }
-    aw9523b_pwm_dirty = true;
 }
 
-void aw9523b_update_buffers(uint8_t addr)
+void aw9523b_update_buffers(awinic_t *driver)
 {
-    if (aw9523b_ready&&aw9523b_pwm_dirty) {
-        for (uint8_t i = 0; i < RGB_LED_NUM; i++){
-            rgb_led_t led = g_aw9523b_leds[i];
-            i2c_write_reg(i2c_inst, addr, led.r, &aw9523b_pwm_buf[PWM2BUF(led.r)], 1, TIMEOUT);
-            i2c_write_reg(i2c_inst, addr, led.g, &aw9523b_pwm_buf[PWM2BUF(led.g)], 1, TIMEOUT);
-            i2c_write_reg(i2c_inst, addr, led.b, &aw9523b_pwm_buf[PWM2BUF(led.b)], 1, TIMEOUT);
+    aw9523b_t *aw9523b = (aw9523b_t *)driver->data;
+    if (aw9523b->ready && aw9523b->pwm_dirty) {
+        for (uint8_t i = 0; i < aw9523b->awinic.led_num; i++){
+            rgb_led_t led = g_rgb_leds[i];
+            i2c_write_reg(i2c_inst, aw9523b->awinic.addr, led.r, &aw9523b->pwm_buffer[PWM2BUF(led.r)], 1, TIMEOUT);
+            i2c_write_reg(i2c_inst, aw9523b->awinic.addr, led.g, &aw9523b->pwm_buffer[PWM2BUF(led.g)], 1, TIMEOUT);
+            i2c_write_reg(i2c_inst, aw9523b->awinic.addr, led.b, &aw9523b->pwm_buffer[PWM2BUF(led.b)], 1, TIMEOUT);
         }
-        aw9523b_pwm_dirty = false;
+        aw9523b->pwm_dirty = false;
     }
 }
 
-void aw9523b_uninit(uint8_t addr)
+void aw9523b_uninit(awinic_t *driver)
 {
-    if (!aw9523b_ready) return;
+    aw9523b_t *aw9523b = (aw9523b_t *)driver->data;
+    if (!aw9523b->ready) return;
 
-    aw9523b_ready = false;
+    aw9523b->ready = false;
 }

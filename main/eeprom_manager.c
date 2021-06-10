@@ -34,33 +34,35 @@ void eeconfig_update_kb(uint32_t data)
     eeprom_update_dword(EECONFIG_KEYBOARD, data);
 }
 
-void eeconfig_read_rgb(void* rgb)
+void eeconfig_read_rgb(void* rgb, uint8_t index)
 {
     rgb_effects_config_t *config = (rgb_effects_config_t*)rgb;
-    config->enable  = eeprom_read_byte(EECONFIG_RGB);
-    config->mode    = eeprom_read_byte(EECONFIG_RGB+1);
-    config->speed   = eeprom_read_byte(EECONFIG_RGB+2);
-    config->hue     = eeprom_read_byte(EECONFIG_RGB+3);
-    config->sat     = eeprom_read_byte(EECONFIG_RGB+4);
-    config->val     = eeprom_read_byte(EECONFIG_RGB+5);
+    uint8_t *addr = ((uint8_t*)EECONFIG_RGB) + index*6;
+    config->enable  = eeprom_read_byte(addr);
+    config->mode    = eeprom_read_byte(addr+1);
+    config->speed   = eeprom_read_byte(addr+2);
+    config->hue     = eeprom_read_byte(addr+3);
+    config->sat     = eeprom_read_byte(addr+4);
+    config->val     = eeprom_read_byte(addr+5);
     ee_mgr_debug("EE MGR: read rgb, enable: %d\n", config->enable);
 }
 
-void eeconfig_write_rgb(const void* rgb)
+void eeconfig_write_rgb(const void* rgb, uint8_t index)
 {
     rgb_effects_config_t *config = (rgb_effects_config_t*)rgb;
-    eeprom_write_byte(EECONFIG_RGB, config->enable);
-    eeprom_write_byte(EECONFIG_RGB+1, config->mode);
-    eeprom_write_byte(EECONFIG_RGB+2, config->speed);
-    eeprom_write_byte(EECONFIG_RGB+3, config->hue);
-    eeprom_write_byte(EECONFIG_RGB+4, config->sat);
-    eeprom_write_byte(EECONFIG_RGB+5, config->val);
+    uint8_t *addr = ((uint8_t*)EECONFIG_RGB) + index*6;
+    eeprom_write_byte(addr,   config->enable);
+    eeprom_write_byte(addr+1, config->mode);
+    eeprom_write_byte(addr+2, config->speed);
+    eeprom_write_byte(addr+3, config->hue);
+    eeprom_write_byte(addr+4, config->sat);
+    eeprom_write_byte(addr+5, config->val);
     ee_mgr_debug("EE MGR: write rgb, enable: %d\n", config->enable);
 }
 
-void eeconfig_update_rgb(const void* rgb)
+void eeconfig_update_rgb(const void* rgb, uint8_t index)
 {
-    eeconfig_write_rgb(rgb);
+    eeconfig_write_rgb(rgb, index);
 }
 
 void eeconfig_read_rgb_matrix(void* rgb)
