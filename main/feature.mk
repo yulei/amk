@@ -89,5 +89,19 @@ ifeq (yes, $(strip $(VIAL_ENABLE)))
 endif
 
 ifneq (yes, $(strip $(CUSTOM_MATRIX)))
-	SRCS += $(MAIN_DIR)/matrix_scan.c
+	SRCS += $(MAIN_DIR)/common/matrix_scan.c
+endif
+
+ifeq (yes, $(EECONFIG_FRAM)) 
+	SRCS += $(MAIN_DIR)/common/eeconfig_fram.c
+	SRCS += $(MAIN_DIR)/drivers/mb85rcxx.c
+	SRCS += $(MAIN_DIR)/drivers/i2c.c
+	APP_DEFS += -DEECONFIG_FRAM
+else
+	ifeq (yes, $(EECONFIG_FLASH))
+		SRCS += $(PLATFORM_PORTING_DIR)/eeconfig_flash.c
+		APP_DEFS += -DEECONFIG_FLASH
+	else
+		SRCS += $(MAIN_DIR)/common/eeconfig_mem.c
+	endif
 endif

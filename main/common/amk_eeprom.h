@@ -1,5 +1,5 @@
 /**
- * eeprom_manager.h
+ * amk_eeprom.h
  */
 
 #pragma once

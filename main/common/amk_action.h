@@ -1,6 +1,6 @@
 /**
- * custom_action.h
- *      action function defintion for custom behavior
+ * @file amk_action.h
+ * @brief action function defintion for custom behavior
  */
 
 #pragma once

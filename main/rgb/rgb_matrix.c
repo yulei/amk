@@ -7,7 +7,7 @@
 
 #include "rgb_color.h"
 #include "rgb_matrix.h"
-#include "eeprom_manager.h"
+#include "amk_eeprom.h"
 #include "timer.h"
 #include "is31.h"
 #include "keyboard.h"

@@ -1,9 +1,8 @@
 /**
- * eeprom_manager.c
+ * @file amk_eeprom.c
  */
 
-#include "eeprom_manager.h"
-#include "eeconfig.h"
+#include "amk_eeprom.h"
 #include "rgb_effects.h"
 #include "rgb_matrix.h"
 #include "amk_keymap.h"

@@ -5,7 +5,7 @@
 #include <string.h>
 
 #include "amk_keymap.h"
-#include "eeprom_manager.h"
+#include "amk_eeprom.h"
 
 #include "action.h"
 #include "keymap.h"

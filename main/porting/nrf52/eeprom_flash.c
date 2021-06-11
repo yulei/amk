@@ -1,11 +1,11 @@
 /**
- * @file eeprom_fds.c
+ * @file eeprom_flash.c
  * @brief fds base eeprom emulation
  *
  */
 
 #include <string.h>
-#include "eeprom_manager.h"
+#include "amk_eeprom.h"
 #include "fds.h"
 #include "app_timer.h"
 #include "app_scheduler.h"

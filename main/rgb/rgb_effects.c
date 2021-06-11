@@ -9,7 +9,7 @@
 #include "rgb_effects.h"
 #include "rgb_led.h"
 #include "timer.h"
-#include "eeprom_manager.h"
+#include "amk_eeprom.h"
 #include "amk_printf.h"
 
 #ifndef RGB_EFFECTS_NUM

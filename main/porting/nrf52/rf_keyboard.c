@@ -18,12 +18,12 @@
 #include "host.h"
 #include "keyboard.h"
 #include "matrix_scan.h"
-#include "amk_boot.h"
 #include "wait.h"
 
-#include "eeprom_manager.h"
 #include "rgb_led.h"
 #include "rf_power.h"
+#include "amk_boot.h"
+#include "amk_eeprom.h"
 #include "amk_keymap.h"
 
 static rf_send_report_t rf_send_report = NULL;

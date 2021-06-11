@@ -4,7 +4,7 @@
 
 #include "keycode_convert.h"
 #include "actionmap.h"
-#include "custom_action.h"
+#include "amk_action.h"
 
 // Can't use SAFE_RANGE here, it might change if someone adds
 // new values to enum quantum_keycodes.

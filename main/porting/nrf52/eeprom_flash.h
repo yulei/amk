@@ -1,5 +1,5 @@
 /**
- * @file eeprom_fds.h
+ * @file eeprom_flash.h
  *
  */
 

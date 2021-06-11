@@ -1,8 +1,8 @@
 /**
- * custom_action.c
- *      action function defintion for custom behavior
+ * @file amk_action.c
+ * @brief action function defintion for custom behavior
  */
-#include "custom_action.h"
+#include "amk_action.h"
 #include "eeconfig.h"
 #include "rgb_effects.h"
 #include "rgb_matrix.h"

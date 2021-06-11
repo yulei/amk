@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 #include <string.h>
-#include "eeprom_manager.h"
+#include "amk_eeprom.h"
 #include "timer.h"
 #include "amk_keymap.h"
 #include "matrix.h"

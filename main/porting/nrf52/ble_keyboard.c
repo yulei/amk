@@ -9,8 +9,8 @@
 #include "ble_adv_service.h"
 #include "ble_hids_service.h"
 #include "ble_services.h"
-#include "eeprom_manager.h"
-#include "eeconfig_fds.h"
+#include "amk_eeprom.h"
+#include "eeprom_flash.h"
 #include "rf_keyboard.h"
 
 ble_driver_t ble_driver = {
@@ -124,7 +124,7 @@ static void ble_stack_init(void)
 void ble_keyboard_init(void)
 {
     ble_stack_init();
-#ifdef EECONFIG_FDS
+#ifdef EECONFIG_FLASH
     fds_eeprom_init();
 #endif
     ble_services_init();

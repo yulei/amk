@@ -1,31 +1,21 @@
 /**
- * @file eeconfig_fram.c
+ * @file eeconfig_mem.c
  *
  */
 #include <stddef.h>
 #include <stdint.h>
-#include "eeconfig.h"
-#include "eeprom_manager.h"
-#include "mb85rcxx.h"
-#include "amk_printf.h"
+#include "amk_eeprom.h"
 
-#ifndef EECONFIG_FRAM_DEBUG
-#define EECONFIG_FRAM_DEBUG 1
-#endif
+static uint8_t buffer[EEPROM_SIZE];
 
-#if EECONFIG_FRAM_DEBUG
-#define ee_fram_debug  amk_printf
-#else
-#define ee_fram_debug(...)
-#endif
 uint8_t eeprom_read_byte(const uint8_t *addr) {
-    uint16_t offset = (uint16_t)((uintptr_t)addr);
-    return mb85rcxx_read_byte(offset);
+    uintptr_t offset = (uintptr_t)addr;
+    return buffer[offset];
 }
 
 void eeprom_write_byte(uint8_t *addr, uint8_t value) {
-    uint16_t offset = (uint16_t)((uintptr_t)addr);
-    mb85rcxx_write_byte(offset, value);
+    uintptr_t offset = (uintptr_t)addr;
+    buffer[offset]   = value;
 }
 
 uint16_t eeprom_read_word(const uint16_t *addr) {
