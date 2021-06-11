@@ -13,7 +13,7 @@
 #include "amk_printf.h"
 
 #ifndef RGB_EFFECTS_NUM
-    #define RGB_EFFECTS_NUM 1
+    #define RGB_EFFECTS_NUM RGB_SEGMENT_NUM
 #endif
 
 #ifndef RGB_EFFECTS_DEBUG
@@ -72,16 +72,16 @@ typedef void (*RGB_EFFECT_FUN)(rgb_effects_state_t*);
 
 struct s_rgb_effects_state {
     rgb_effects_config_t    config;
-    uint8_t                 index;
-    uint8_t                 led_start;
-    uint8_t                 led_count;
+    RGB_EFFECT_FUN          effects[RGB_EFFECT_MAX];
     uint32_t                last_ticks;
     uint32_t                counter;
     uint32_t                rainbow_step;
     uint32_t                breath_step;
     uint32_t                circle_step;
     bool                    wipe_on;
-    RGB_EFFECT_FUN          effects[RGB_EFFECT_MAX];
+    uint8_t                 index;
+    uint8_t                 led_start;
+    uint8_t                 led_count;
 };
 
 static rgb_effects_state_t effects_state[RGB_EFFECTS_NUM];
@@ -481,6 +481,7 @@ void rgb_effects_task(rgb_effects_t effects)
     } else {
         #ifndef RGBLIGHT_EN_PIN
         effects_set_color_all(state, 0, 0, 0);
+        //effects_set_color_all(state, 0xFF, 0xFF, 0xFF);
         //state->driver->flush();
         #endif
     }

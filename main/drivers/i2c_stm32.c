@@ -8,6 +8,7 @@
 #include "generic_hal.h"
 #include "i2c.h"
 #include "gpio_pin.h"
+#include "amk_printf.h"
 
 typedef struct {
     I2C_HandleTypeDef handle;
@@ -36,7 +37,30 @@ static void i2c_inst_init(i2c_instance_t *inst, I2C_TypeDef *i2c)
     if (i2c_ready(inst))
         return;
 
-#ifndef STM32F722xx
+#ifdef STM32F722xx
+    inst->handle.Instance = I2C1;
+    inst->handle.Init.Timing = 0x6000030D;
+    inst->handle.Init.OwnAddress1 = 0;
+    inst->handle.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+    inst->handle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+    inst->handle.Init.OwnAddress2 = 0;
+    inst->handle.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+    inst->handle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+    inst->handle.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+    if (HAL_I2C_Init(&inst->handle) != HAL_OK) {
+        amk_printf("HAL_I2C_Init() failed\n");
+    }
+    /** Configure Analogue filter
+    */
+    if (HAL_I2CEx_ConfigAnalogFilter(&inst->handle, I2C_ANALOGFILTER_ENABLE) != HAL_OK) {
+        amk_printf("HAL_I2CEx_ConfigAnalogFilter() failed\n");
+    }
+    /** Configure Digital filter
+    */
+    if (HAL_I2CEx_ConfigDigitalFilter(&inst->handle, 0) != HAL_OK) {
+        amk_printf("HAL_I2CEx_ConfigDigitalFilter() failed\n");
+    }
+#else
     inst->handle.Instance = i2c;
     inst->handle.Init.ClockSpeed = 400000;
     inst->handle.Init.DutyCycle = I2C_DUTYCYCLE_2;
@@ -127,8 +151,6 @@ void i2c_uninit(i2c_handle_t i2c)
         return;
     }
     i2c_instance_t *inst = (i2c_instance_t*)i2c;
-#ifndef STM32F722xx
     HAL_I2C_DeInit(&inst->handle);
-#endif
     inst->ready = false;
 }

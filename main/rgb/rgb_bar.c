@@ -10,7 +10,7 @@ typedef struct {
     rgb_effects_t   effects[RGB_SEGMENT_NUM];
 } rgb_bar_t;
 
-static rgb_bar_t rgb_bar;
+rgb_bar_t rgb_bar;
 
 void rgb_bar_init(void)
 {

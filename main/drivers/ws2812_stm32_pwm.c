@@ -23,7 +23,7 @@
 
 extern TIM_HandleTypeDef PWM_TIM;
 
-#define LED_DATA_SIZE           (RGB_LED_NUM * 24)
+#define LED_DATA_SIZE           (WS2812_LED_NUM * 24)
 #define RESET_SLOTS_BEGIN       (50)
 #define RESET_SLOTS_END         (50)
 #define WS2812_LAST_SLOT        (1)
@@ -32,7 +32,6 @@ extern TIM_HandleTypeDef PWM_TIM;
 #define WS2812_0                (PWM_TIM_PERIOD/3)
 #define WS2812_RESET            (0)
 
-//static rgb_led_t ws2812_leds[RGB_LED_NUM];
 static uint32_t ws2812_leds[LED_BUFFER_SIZE];
 static bool ws2812_ready = false;
 static bool ws2812_dirty = false;
@@ -61,7 +60,7 @@ void ws2812_init(pin_t pin)
 
 void ws2812_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
 {
-    if (index < RGB_LED_NUM) {
+    if (index < WS2812_LED_NUM) {
         uint32_t i = 0;
         // green
         uint32_t cur = RESET_SLOTS_BEGIN+index*24;
@@ -84,7 +83,7 @@ void ws2812_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
 
 void ws2812_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
 {
-    for (int i = 0; i < RGB_LED_NUM; i++) {
+    for (int i = 0; i < WS2812_LED_NUM; i++) {
         ws2812_set_color(i, red, green, blue);
     }
     ws2812_dirty = true;

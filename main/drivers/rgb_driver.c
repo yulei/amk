@@ -275,9 +275,9 @@ bool rgb_driver_available(rgb_driver_type_t type)
     return true;
 }
 
-rgb_driver_t* rgb_driver_create(rgb_device_t *device)
+rgb_driver_t* rgb_driver_create(rgb_device_t *device, uint8_t index)
 {
-    rgb_driver_t *driver = &rgb_drivers[device->index];
+    rgb_driver_t *driver = &rgb_drivers[index];
     driver->device = device;
     driver->data = NULL;
     switch(device->type) {
@@ -338,9 +338,9 @@ void rgb_driver_destroy(rgb_driver_t* driver)
 void rgb_driver_init(void)
 {
 	for (int i = 0; i < RGB_DEVICE_NUM; i++) {
-        rgb_driver_t *driver = rgb_driver_create(&g_rgb_devices[i]);
+        rgb_driver_t *driver = rgb_driver_create(&g_rgb_devices[i], i);
         driver->init(driver);
-        rgb_drivers[i].data = driver;
+        //rgb_drivers[i].data = driver;
 	}
 } 
 

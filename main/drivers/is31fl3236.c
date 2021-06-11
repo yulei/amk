@@ -7,6 +7,17 @@
 #include "is31fl3236.h"
 #include "i2c.h"
 #include "wait.h"
+#include "amk_printf.h"
+
+#ifndef FL3236_DEBUG
+#define FL3236_DEBUG 1
+#endif
+
+#if FL3236_DEBUG
+#define fl3236_debug  amk_printf
+#else
+#define fl3236_debug(...)
+#endif
 
 #define PWM_BUFFER_SIZE     36
 #define CONTROL_BUFFER_SIZE 36
@@ -63,6 +74,7 @@ is31_t *is31fl3236_init(uint8_t addr, uint8_t index, uint8_t led_num)
     init_driver(driver);
 
     driver->ready = true;
+    fl3236_debug("IS31FL3236: initialized\n");
     return &driver->is31;
 }
 
@@ -97,27 +109,38 @@ void is31fl3236_set_color_all(is31_t *driver, uint8_t red, uint8_t green, uint8_
 
 void is31fl3236_update_buffers(is31_t *driver)
 {
+    uint32_t status = AMK_SUCCESS;
     is31fl3236_driver_t *is31 = (is31fl3236_driver_t*)(driver->data);
     bool need_update = is31->pwm_dirty || is31->control_dirty;
     if (is31->pwm_dirty) {
-        i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1, TIMEOUT);
+        status = i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1, TIMEOUT);
+        if (status != AMK_SUCCESS) {
+            fl3236_debug("IS31FL3236: failed to update pwm buffer: addr=%d, status=%d\n", driver->addr, status);
+        }
         is31->pwm_dirty = false;
     }
 
     if (is31->control_dirty) {
-        i2c_send(i2c_inst, driver->addr, is31->control_buffer, CONTROL_BUFFER_SIZE + 1, TIMEOUT);
+        status = i2c_send(i2c_inst, driver->addr, is31->control_buffer, CONTROL_BUFFER_SIZE + 1, TIMEOUT);
+        if (status != AMK_SUCCESS) {
+            fl3236_debug("IS31FL3236: failed to update control buffer: %d\n", status);
+        }
         is31->pwm_dirty = false;
     }
 
     if (need_update) {
         uint8_t data = 0;
-        i2c_write_reg(i2c_inst, driver->addr, CONTROL_REG, &data, 1, TIMEOUT);
+        status = i2c_write_reg(i2c_inst, driver->addr, UPDATE_REG, &data, 1, TIMEOUT);
+        if (status != AMK_SUCCESS) {
+            fl3236_debug("IS31FL3236: failed to update UPDATE register: %d\n", status);
+        }
     }
 }
 
 
 void init_driver(is31fl3236_driver_t *driver)
 {
+    uint32_t status = AMK_SUCCESS;
     if (!i2c_inst) {
         i2c_inst = i2c_init(IS31FL3236_I2C_ID);
     }
@@ -131,23 +154,38 @@ void init_driver(is31fl3236_driver_t *driver)
 
     // Reset 3236 to default state
     uint8_t data = 0;
-    i2c_write_reg(i2c_inst, driver->is31.addr, RESET_REG, &data, 1, TIMEOUT);
+    status = i2c_write_reg(i2c_inst, driver->is31.addr, RESET_REG, &data, 1, TIMEOUT);
+    if (status != AMK_SUCCESS) {
+        fl3236_debug("IS31FL3236: failed to reset: %d\n", status);
+    }
 
     wait_ms(10);
 
-    // Turn off software shutdown
+    // Turn on chip
     data = 1;
-    i2c_write_reg(i2c_inst, driver->is31.addr, SHUTDOWN_REG, &data, 1, TIMEOUT);
+    status = i2c_write_reg(i2c_inst, driver->is31.addr, SHUTDOWN_REG, &data, 1, TIMEOUT);
+    if (status != AMK_SUCCESS) {
+        fl3236_debug("IS31FL3236: failed to turn on chip: %d\n", status);
+    }
 
     // Turn on all leds
-    i2c_send(i2c_inst, driver->is31.addr, driver->control_buffer, CONTROL_BUFFER_SIZE+1, TIMEOUT);
+    status = i2c_send(i2c_inst, driver->is31.addr, driver->control_buffer, CONTROL_BUFFER_SIZE+1, TIMEOUT);
+    if (status != AMK_SUCCESS) {
+        fl3236_debug("IS31FL3236: failed to turn on leds: %d\n", status);
+    }
 
     // Clear pwm
-    i2c_send(i2c_inst, driver->is31.addr, driver->pwm_buffer, PWM_BUFFER_SIZE+1, TIMEOUT);
+    status = i2c_send(i2c_inst, driver->is31.addr, driver->pwm_buffer, PWM_BUFFER_SIZE+1, TIMEOUT);
+    if (status != AMK_SUCCESS) {
+        fl3236_debug("IS31FL3236: failed to clear pwm: %d\n", status);
+    }
 
     // update PWM and control values
     data = 0;
-    i2c_write_reg(i2c_inst, driver->is31.addr, UPDATE_REG, &data, 1, TIMEOUT);
+    status = i2c_write_reg(i2c_inst, driver->is31.addr, UPDATE_REG, &data, 1, TIMEOUT);
+    if (status != AMK_SUCCESS) {
+        fl3236_debug("IS31FL3236: failed to update pwm&control: %d\n", status);
+    }
 }
 
 void uninit_driver(is31_t *driver)

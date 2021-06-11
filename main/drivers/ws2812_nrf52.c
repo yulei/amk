@@ -16,11 +16,11 @@
 #define WS2812_VAL_RESET    (0x8000)
 #define WS2812_RESET_PERIOD 256
 
-#define WS2812_COLOR_SIZE   (RGB_LED_NUM*24)
+#define WS2812_COLOR_SIZE   (WS2812_LED_NUM*24)
 #define WS2812_RESET_SIZE   1
 #define WS2812_BUF_SIZE     (WS2812_COLOR_SIZE + WS2812_RESET_SIZE)
 
-static rgb_led_t ws2812_leds[RGB_LED_NUM];
+static rgb_led_t ws2812_leds[WS2812_LED_NUM];
 static uint16_t ws2812_data[WS2812_BUF_SIZE];
 static bool ws2812_ready = false;
 static bool ws2812_dirty = false;
@@ -92,7 +92,7 @@ void ws2812_init(pin_t pin)
 
 void ws2812_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
 {
-    if (index < RGB_LED_NUM) {
+    if (index < WS2812_LED_NUM) {
         ws2812_leds[index].r = red;
         ws2812_leds[index].g = green;
         ws2812_leds[index].b = blue;
@@ -102,7 +102,7 @@ void ws2812_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
 
 void ws2812_set_color_all(uint8_t red, uint8_t green, uint8_t blue)
 {
-    for (int i = 0; i < RGB_LED_NUM; i++) {
+    for (int i = 0; i < WS2812_LED_NUM; i++) {
         ws2812_leds[i].r = red;
         ws2812_leds[i].g = green;
         ws2812_leds[i].b = blue;
@@ -120,7 +120,7 @@ void ws2812_update_buffers(pin_t pin)
         return;
     }
 
-    for (int i = 0; i < RGB_LED_NUM; i++) {
+    for (int i = 0; i < WS2812_LED_NUM; i++) {
         ws2812_write_led(i, ws2812_leds[i].r, ws2812_leds[i].g, ws2812_leds[i].b);
     }
 
