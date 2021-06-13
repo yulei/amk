@@ -39,5 +39,4 @@ typedef enum {
 bool rgb_driver_available(rgb_driver_type_t type);
 void rgb_driver_init(void);
 rgb_driver_t *rgb_driver_get(uint8_t index);
-//rgb_driver_t* rgb_driver_create(rgb_device_t *device);
 void rgb_driver_destroy(rgb_driver_t* driver);

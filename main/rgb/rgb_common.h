@@ -27,11 +27,19 @@ typedef struct {
 } rgb_led_t;
 
 typedef struct {
+    uint8_t x;  // postion x
+    uint8_t y;  // position y
+    uint8_t a;  // attribute
+    uint8_t r;  // mapped key matrix row
+    uint8_t c;  // mapped key matrix col
+} rgb_led_attr_t;
+
+typedef struct {
     uint8_t type;
     uint8_t addr;
     uint8_t index;
     uint8_t led_start;
-    uint8_t led_count;
+    uint8_t led_num;
 } rgb_device_t;
 
 typedef struct {

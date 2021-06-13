@@ -12,6 +12,7 @@
 #include "is31fl3236.h"
 #include "is31fl3731.h"
 //#include "aw9106b.h"
+#include "rgb_driver.h"
 #include "rgb_indicator.h"
 #include "rgb_linear.h"
 

@@ -5,36 +5,18 @@
 
 #pragma once
 
-#include "awinic.h"
+#include "i2c_led.h"
 
-//#ifndef AW9106B_ADDR1
-//    #define AW9106B_ADDR1   0xB6
-//#endif
+i2c_led_t *aw9106b_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t led_num);
+void aw9106b_uninit(i2c_led_t *driver);
 
-//#ifndef AW9106B_ADDR2
-//    #define AW9106B_ADDR2   0xB2
-//#endif
+void aw9106b_set_color(i2c_led_t *driver, int index, uint8_t red, uint8_t green, uint8_t blue);
+void aw9106b_set_color_all(i2c_led_t *driver, uint8_t red, uint8_t green, uint8_t blue);
+void aw9106b_update_buffers(i2c_led_t *driver);
 
-#define AW9106B_CTL         0x11
-#define AW9106B_CPMD_A      0x12
-#define AW9106B_CPMD_B      0x13
-#define AW9106B_EN_BRE      0x14
-
-#define AW9106B_PWM_BASE    0x20
-#define AW9106B_DIM0        0x20
-#define AW9106B_DIM1        0x21
-#define AW9106B_DIM2        0x22
-#define AW9106B_DIM3        0x23
-#define AW9106B_DIM4        0x24
-#define AW9106B_DIM5        0x25
-
-#define AW9106B_RESET       0x7F
-#define AW9106B_PWM_SIZE    6
-
-awinic_t *aw9106b_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t led_num);
-
-void aw9106b_set_color(awinic_t *driver, int index, uint8_t red, uint8_t green, uint8_t blue);
-void aw9106b_set_color_all(awinic_t *driver, uint8_t red, uint8_t green, uint8_t blue);
-void aw9106b_update_buffers(awinic_t *driver);
-
-void aw9106b_uninit(awinic_t *driver);
+#define AW_DIM0         0x0
+#define AW_DIM1         0x1
+#define AW_DIM2         0x2
+#define AW_DIM3         0x3
+#define AW_DIM4         0x4
+#define AW_DIM5         0x5

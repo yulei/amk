@@ -81,7 +81,7 @@ struct s_rgb_linear_state {
     bool                    wipe_on;
     uint8_t                 index;
     uint8_t                 led_start;
-    uint8_t                 led_count;
+    uint8_t                 led_num;
 };
 
 static rgb_linear_state_t effects_state[RGB_EFFECT_LINEAR_NUM];
@@ -121,7 +121,7 @@ static void effects_set_color(rgb_linear_state_t *state, uint8_t index, uint8_t 
 
 static void effects_set_color_all(rgb_linear_state_t *state, uint8_t hue, uint8_t sat, uint8_t val)
 {
-    for (uint8_t i = 0; i < state->led_count; i++) {
+    for (uint8_t i = 0; i < state->led_num; i++) {
         effects_set_color(state, i, hue, sat, val);
     }
 }
@@ -214,7 +214,7 @@ static void effects_mode_blink(rgb_linear_state_t *state)
 static void effects_mode_random(rgb_linear_state_t *state)
 {
     uint8_t hue = state->config->hue;
-    for (int i = 0; i < state->led_count; i++) {
+    for (int i = 0; i < state->led_num; i++) {
         hue = get_random_hue(hue);
         effects_set_color_all(state, hue, state->config->sat, state->config->val);
     }
@@ -222,9 +222,9 @@ static void effects_mode_random(rgb_linear_state_t *state)
 
 static void effects_mode_gradient(rgb_linear_state_t *state)
 {
-    uint8_t step = HUE_MAX / state->led_count;
+    uint8_t step = HUE_MAX / state->led_num;
 
-    for (int i = 0; i < state->led_count; i++) {
+    for (int i = 0; i < state->led_num; i++) {
         effects_set_color(state, i, state->config->hue + i*step, state->config->sat, state->config->val);
     }
     //effects_state.config->hue += step;
@@ -232,8 +232,8 @@ static void effects_mode_gradient(rgb_linear_state_t *state)
 
 static void effects_mode_rainbow(rgb_linear_state_t *state)
 {
-    uint8_t step = HUE_MAX / state->led_count;
-    for (int i = 0; i < state->led_count; i++) {
+    uint8_t step = HUE_MAX / state->led_num;
+    for (int i = 0; i < state->led_num; i++) {
         effects_set_color(state, i, state->config->hue + i*step, state->config->sat, state->config->val);
     }
     state->config->hue += state->rainbow_step;
@@ -255,21 +255,21 @@ static void effects_mode_wipe(rgb_linear_state_t *state)
         effects_set_color(state, state->counter, 0, 0, 0);
     }
     state->counter++;
-    if (state->counter == state->led_count) {
+    if (state->counter == state->led_num) {
         state->counter = 0;
         state->wipe_on = !state->wipe_on;
-        state->config->hue += HUE_MAX/state->led_count;
+        state->config->hue += HUE_MAX/state->led_num;
     }
 }
 
 static void effects_mode_scan(rgb_linear_state_t *state)
 {
-    uint8_t prev = (state->counter == 0) ? state->led_count - 1 : state->counter - 1;
+    uint8_t prev = (state->counter == 0) ? state->led_num - 1 : state->counter - 1;
     effects_set_color(state, prev, 0, 0, 0);
     effects_set_color(state, state->counter, state->config->hue, state->config->sat, state->config->val);
-    state->counter = (state->counter + 1) % state->led_count;
+    state->counter = (state->counter + 1) % state->led_num;
     if (state->counter == 0) {
-        state->config->hue += HUE_MAX/state->led_count;
+        state->config->hue += HUE_MAX/state->led_num;
     }
 }
 
@@ -350,13 +350,13 @@ static void effects_state_init(rgb_linear_state_t *state)
 }
 
 // interface
-rgb_effect_t rgb_effect_linear_init(rgb_config_t *config, uint8_t index, uint8_t led_start, uint8_t led_count)
+rgb_effect_t rgb_effect_linear_init(rgb_config_t *config, uint8_t index, uint8_t led_start, uint8_t led_num)
 {
     rgb_linear_state_t *state = &effects_state[index];
     state->config = config;
     state->index = index;
     state->led_start = led_start;
-    state->led_count = led_count;
+    state->led_num = led_num;
     if (!eeconfig_is_enabled()) {
         eeconfig_init();
     }

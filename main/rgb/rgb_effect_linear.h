@@ -7,7 +7,7 @@
 
 #include "rgb_driver.h"
 
-rgb_effect_t rgb_effect_linear_init(rgb_config_t* config, uint8_t index, uint8_t led_start, uint8_t led_count);
+rgb_effect_t rgb_effect_linear_init(rgb_config_t* config, uint8_t index, uint8_t led_start, uint8_t led_num);
 void rgb_effect_linear_uninit(rgb_effect_t effect);
 void rgb_effect_linear_task(rgb_effect_t effect);
 

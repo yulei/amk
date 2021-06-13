@@ -1,19 +1,18 @@
 /**
- * is31fl3733.h
- *  driver interace for is31fl3733
+ * @file is31fl3733.h
+ * @brief driver interace for is31fl3733
  */
 
 #pragma once
 
-#include "is31.h"
+#include "i2c_led.h"
 
-is31_t *is31fl3733_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t led_num);
-void is31fl3733_set_color(is31_t* driver, uint8_t index, uint8_t red, uint8_t green, uint8_t blue);
-void is31fl3733_set_color_all(is31_t* driver, uint8_t red, uint8_t green, uint8_t blue);
-void is31fl3733_update_buffers(is31_t* driver);
-void is31fl3733_uninit(is31_t *driver);
+i2c_led_t *is31fl3733_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t led_num);
+void is31fl3733_uninit(i2c_led_t *driver);
 
-// pwm register address
+void is31fl3733_set_color(i2c_led_t * driver, uint8_t index, uint8_t red, uint8_t green, uint8_t blue);
+void is31fl3733_set_color_all(i2c_led_t * driver, uint8_t red, uint8_t green, uint8_t blue);
+void is31fl3733_update_buffers(i2c_led_t * driver);
 
 #define  A_1    0x00
 #define  A_2    0x01
