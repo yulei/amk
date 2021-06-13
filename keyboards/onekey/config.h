@@ -30,7 +30,6 @@
 #define SCREEN_1_DC     B2
 
 #define WS2812_LED_NUM  4
-#define RGB_LED_NUM     11
 #define WS2812_LED_PIN  A0
 #define PWM_TIM_PERIOD  134
 #define PWM_TIM htim2
@@ -41,6 +40,9 @@
 #define I2C1_SCL_PIN    B8
 #define I2C1_SDA_PIN    B9
 
-#define RGB_SEGMENT_NUM 2
+//#define RGB_SEGMENT_NUM 2
+//#define RGB_LED_NUM     11
+#define RGB_SEGMENT_NUM 3
+#define RGB_LED_NUM     24
 
 #define VECT_TAB_OFFSET 0x20000

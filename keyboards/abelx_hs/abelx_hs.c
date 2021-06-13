@@ -5,15 +5,18 @@
 #include <stdbool.h>
 
 #include "abelx_hs.h"
-#include "gpio_pin.h"
-#include "pca9535.h"
-#include "rgb_effects.h"
-#include "amk_printf.h"
 #include "led.h"
-#include "aw9106b.h"
-#include "rgb_indicator.h"
-#include "rgb_ring.h"
 #include "wait.h"
+
+#include "pca9535.h"
+#include "is31fl3236.h"
+#include "is31fl3731.h"
+//#include "aw9106b.h"
+#include "rgb_indicator.h"
+#include "rgb_linear.h"
+
+#include "amk_gpio.h"
+#include "amk_printf.h"
 
 #ifndef HS_DEBUG
 #define HS_DEBUG 0
@@ -25,11 +28,59 @@
 #define hs_debug(...)
 #endif
 
-rgb_led_t g_aw9106b_leds[] = {
-    {0, AW9106B_DIM1, AW9106B_DIM2, AW9106B_DIM0},  // CAPS
-    {0, AW9106B_DIM4, AW9106B_DIM5, AW9106B_DIM3},  // ESC
-    {1, AW9106B_DIM4, AW9106B_DIM5, AW9106B_DIM3},  // SCROLL
-    {1, AW9106B_DIM1, AW9106B_DIM2, AW9106B_DIM0},  // NUM
+rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
+    // ws2812 leds
+    {0,0,0,0},
+    {0,0,0,0},
+    {0,0,0,0},
+    {0,0,0,0},
+
+    // front leds
+//    {1, OUT_34, OUT_35, OUT_36},
+//    {1, OUT_31, OUT_32, OUT_33},
+//    {1, OUT_28, OUT_29, OUT_30},
+//    {1, OUT_25, OUT_26, OUT_27},
+
+    // indicator leds
+//    {2, AW9106B_DIM1, AW9106B_DIM2, AW9106B_DIM0},  // CAPS
+//    {2, AW9106B_DIM4, AW9106B_DIM5, AW9106B_DIM3},  // ESC
+//    {3, AW9106B_DIM4, AW9106B_DIM5, AW9106B_DIM3},  // SCROLL
+//    {3, AW9106B_DIM1, AW9106B_DIM2, AW9106B_DIM0},  // NUM
+
+    {1, C1_1,   C3_2,   C4_2},
+    {1, C1_2,   C2_2,   C4_3},
+    {1, C1_3,   C2_3,   C3_3},
+    {1, C1_4,   C2_4,   C3_4},
+    {1, C1_5,   C2_5,   C3_5},
+    {1, C1_6,   C2_6,   C3_6},
+    {1, C1_7,   C2_7,   C3_7},
+    {1, C1_8,   C2_8,   C3_8},
+
+    {1, C9_1,   C8_1,   C7_1},
+    {1, C9_2,   C8_2,   C7_2},
+    {1, C9_3,   C8_3,   C7_3},
+    {1, C9_4,   C8_4,   C7_4},
+    {1, C9_5,   C8_5,   C7_5},
+    {1, C9_6,   C8_6,   C7_6},
+    {1, C9_7,   C8_7,   C6_6},
+    {1, C9_8,   C7_7,   C6_7},
+
+    {1, C1_9,   C3_10,  C4_10},
+    {1, C1_10,  C2_10,  C4_11},
+    {1, C1_11,  C2_11,  C3_11},
+    {1, C1_12,  C2_12,  C3_12},
+};
+
+rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
+    { RGB_DRIVER_WS2812, 0, 0, 0, 4},
+    { RGB_DRIVER_IS31FL3731, 0xE8, 0, 4, 20},
+    //{ RGB_DRIVER_IS31FL3236, 0x78, 0, 4, 4},
+};
+
+rgb_linear_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
+    {0, 0, 0, 4},
+    {1, 1, 4, 16},
+    {1, 2, 20, 4},
 };
 
 #define CAPS_LED    0
@@ -84,17 +135,6 @@ void matrix_i2c_init(void)
         gpio_set_input_pulldown(row_pins[row]);
     }
 
-    gpio_set_output_pushpull(RGBLIGHT_EN_PIN);
-    gpio_write_pin(RGBLIGHT_EN_PIN, 1);
-    wait_ms(1);
-#ifdef INDICATOR_ENABLE
-    rgb_indicator_init();
-#endif
-
-#ifdef RGB_RING_ENABLE
-    rgb_ring_init();
-#endif
-
     hs_debug("matrix i2c init finished\n");
 }
 
@@ -126,13 +166,6 @@ bool matrix_i2c_scan(matrix_row_t* raw)
         set_port(PCA9535_PORT(col_pins[col]), 0);
     }
 
-#ifdef INDICATOR_ENABLE
-    rgb_indicator_task();
-#endif
-
-#ifdef RGB_RING_ENABLE
-    rgb_ring_task();
-#endif
     return changed;
 }
 
@@ -147,9 +180,6 @@ void matrix_i2c_prepare_sleep(void)
         nrf_gpio_cfg_sense_input(row_pins[row], NRF_GPIO_PIN_PULLDOWN, NRF_GPIO_PIN_SENSE_HIGH);
     }
 
-#ifdef INDICATOR_ENABLE
-    rgb_indicator_uninit();
-#endif
     hs_debug("matrix i2c sleep prepared\n");
 }
 
@@ -163,7 +193,7 @@ bool matrix_i2c_check_boot(void)
 
 void led_set(uint8_t led)
 {
-#ifdef INDICATOR_ENABLE
+#ifdef RGB_INDICATOR_ENABLE
     if (led & (1 << USB_LED_CAPS_LOCK)) {
         rgb_indicator_set(CAPS_LED, 0xFF, 0xFF, 0xFF);
     } else {

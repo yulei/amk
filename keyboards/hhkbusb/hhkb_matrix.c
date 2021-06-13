@@ -10,11 +10,11 @@
 #include "matrix.h"
 #include "host.h"
 #include "timer.h"
-#include "gpio_pin.h"
 #include "usb_descriptors.h"
+#include "ring_buffer.h"
+#include "amk_gpio.h"
 #include "amk_keymap.h"
 #include "amk_printf.h"
-#include "ring_buffer.h"
 
 #ifndef HHKB_MATRIX_DEBUG
 #define HHKB_MATRIX_DEBUG 1
