@@ -11,6 +11,7 @@
 typedef struct {
     uint8_t     index;
     uint8_t     addr;
+    uint8_t     led_start;
     uint8_t     led_num;
     void        *data;       
 } is31_t;

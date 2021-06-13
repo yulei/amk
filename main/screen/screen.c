@@ -1,9 +1,9 @@
 /**
- * screen.c
+ * @file screen.c
  */
 
 #include "screen.h"
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 
 #ifndef SCREEN_DRIVER
 #define SCREEN_DRIVER_ST7735

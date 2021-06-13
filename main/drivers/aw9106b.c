@@ -45,7 +45,7 @@ static aw9106b_t aw9106b_drivers[AW9106B_NUM];
 #endif
 static i2c_handle_t i2c_inst;
 
-awinic_t *aw9106b_init(uint8_t addr, uint8_t index, uint8_t led_num)
+awinic_t *aw9106b_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t led_num)
 {
     if (!i2c_inst) {
         i2c_inst = i2c_init(AW9106B_I2C_ID);
@@ -54,6 +54,7 @@ awinic_t *aw9106b_init(uint8_t addr, uint8_t index, uint8_t led_num)
     aw9106b_t *driver = &aw9106b_drivers[index];
     driver->awinic.addr = addr;
     driver->awinic.index = index;
+    driver->awinic.led_start = led_start;
     driver->awinic.led_num = led_num;
     driver->awinic.data = driver;
 

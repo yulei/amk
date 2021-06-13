@@ -31,7 +31,7 @@
 #define AW9106B_RESET       0x7F
 #define AW9106B_PWM_SIZE    6
 
-awinic_t *aw9106b_init(uint8_t addr, uint8_t index, uint8_t led_num);
+awinic_t *aw9106b_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t led_num);
 
 void aw9106b_set_color(awinic_t *driver, int index, uint8_t red, uint8_t green, uint8_t blue);
 void aw9106b_set_color_all(awinic_t *driver, uint8_t red, uint8_t green, uint8_t blue);

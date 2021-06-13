@@ -63,11 +63,12 @@ static void map_led(uint8_t index, uint8_t *red_reg, uint8_t* green_reg, uint8_t
     *blue_reg   = led->b - PWM_REG;
 }
 
-is31_t *is31fl3236_init(uint8_t addr, uint8_t index, uint8_t led_num)
+is31_t *is31fl3236_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t led_num)
 {
     is31fl3236_driver_t *driver = &is31_drivers[index];
     driver->is31.addr = addr;
     driver->is31.index = index;
+    driver->is31.led_start = led_start;
     driver->is31.led_num = led_num;
     driver->is31.data = driver;
 

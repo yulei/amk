@@ -24,9 +24,9 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/fractal.c
 endif
 
-ifeq (yes, $(strip $(RGB_BAR_ENABLE)))
-	SRCS += $(MAIN_DIR)/rgb/rgb_bar.c
-	APP_DEFS += -DRGB_BAR_ENABLE
+ifeq (yes, $(strip $(RGB_LINEAR_ENABLE)))
+	SRCS += $(MAIN_DIR)/rgb/rgb_linear.c
+	APP_DEFS += -DRGB_LINEAR_ENABLE
 	RGB_ENABLE = yes
 endif
 
@@ -34,11 +34,6 @@ ifeq (yes, $(strip $(RGB_INDICATOR_ENABLE)))
 	SRCS += $(MAIN_DIR)/rgb/rgb_indicator.c
 	APP_DEFS += -DRGB_INDICATOR_ENABLE
 	RGB_ENABLE = yes
-endif
-
-ifeq (yes, $(strip $(RGB_RING_ENABLE)))
-	SRCS += $(MAIN_DIR)/rgb/rgb_ring.c
-	APP_DEFS += -DRGB_RING_ENABLE
 endif
 
 ifeq (yes, $(strip $(RGB_MATRIX_ENABLE)))
@@ -57,7 +52,8 @@ ifeq (yes, $(strip $(RGB_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_common.c
-	SRCS += $(MAIN_DIR)/rgb/rgb_effects.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_effect_linear.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_led.c
 	APP_DEFS += -DRGB_ENABLE
 endif
 
@@ -89,11 +85,11 @@ ifeq (yes, $(strip $(VIAL_ENABLE)))
 endif
 
 ifneq (yes, $(strip $(CUSTOM_MATRIX)))
-	SRCS += $(MAIN_DIR)/common/matrix_scan.c
+	SRCS += $(MAIN_DIR)/amk/matrix_scan.c
 endif
 
 ifeq (yes, $(EECONFIG_FRAM)) 
-	SRCS += $(MAIN_DIR)/common/eeconfig_fram.c
+	SRCS += $(MAIN_DIR)/amk/eeconfig_fram.c
 	SRCS += $(MAIN_DIR)/drivers/mb85rcxx.c
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	APP_DEFS += -DEECONFIG_FRAM
@@ -102,6 +98,6 @@ else
 		SRCS += $(PLATFORM_PORTING_DIR)/eeconfig_flash.c
 		APP_DEFS += -DEECONFIG_FLASH
 	else
-		SRCS += $(MAIN_DIR)/common/eeconfig_mem.c
+		SRCS += $(MAIN_DIR)/amk/eeconfig_mem.c
 	endif
 endif

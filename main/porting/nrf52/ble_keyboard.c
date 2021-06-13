@@ -10,7 +10,7 @@
 #include "ble_hids_service.h"
 #include "ble_services.h"
 #include "amk_eeprom.h"
-#include "eeprom_flash.h"
+#include "eeconfig_flash.h"
 #include "rf_keyboard.h"
 
 ble_driver_t ble_driver = {

@@ -4,8 +4,6 @@
  */
 #include "amk_action.h"
 #include "eeconfig.h"
-#include "rgb_effects.h"
-#include "rgb_matrix.h"
 
 #include "action.h"
 #include "action_layer.h"
@@ -15,6 +13,14 @@
 #include "amk_printf.h"
 #include "wait.h"
 
+#ifdef RGB_ENABLE
+//#include "rgb_effects.h"
+#endif
+
+#ifdef RGB_MATRIX_ENABLE
+#include "rgb_matrix.h"
+#endif
+
 #if defined(NRF52) || defined(NRF52840_XXAA)
 #include "common_config.h"
 #endif
@@ -22,16 +28,16 @@
 __attribute__((weak))
 void keyboard_set_rgb(bool on)
 {
-#ifdef RGB_EFFECTS_ENABLE
+#ifdef RGB_ENABLE
     amk_printf("keyboard_set_rgb: %d\n", on);
     if (on) {
-        if (!rgb_effects_enabled()) {
-            rgb_effects_toggle();
-        }
+        //if (!rgb_effects_enabled()) {
+        //    rgb_effects_toggle();
+        //}
     } else {
-        if (rgb_effects_enabled()) {
-            rgb_effects_toggle();
-        }
+        //if (rgb_effects_enabled()) {
+        //    rgb_effects_toggle();
+        //}
     }
 #endif
 }
@@ -41,37 +47,37 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
     if (!record->event.pressed) return; // do not press key released event
 
     switch (id) {
-#ifdef RGB_EFFECTS_ENABLE
+#ifdef RGB_ENABLE
         case AF_RGB_TOG:
-            keyboard_set_rgb(!rgb_effects_enabled());
-            amk_printf("Toggle rgb: %d\n", rgb_effects_enabled());
+            //keyboard_set_rgb(!rgb_effects_enabled());
+            //amk_printf("Toggle rgb: %d\n", rgb_effects_enabled());
             break;
         case AF_RGB_MOD:
-            rgb_effects_inc_mode();
+            //rgb_effects_inc_mode();
             break;
         case AF_RGB_HUEI:
-            rgb_effects_inc_hue();
+            //rgb_effects_inc_hue();
             break;
         case AF_RGB_HUED:
-            rgb_effects_dec_hue();
+            //rgb_effects_dec_hue();
             break;
         case AF_RGB_SATI:
-            rgb_effects_inc_sat();
+            //rgb_effects_inc_sat();
             break;
         case AF_RGB_SATD:
-            rgb_effects_dec_sat();
+            //rgb_effects_dec_sat();
             break;
         case AF_RGB_VALI:
-            rgb_effects_inc_val();
+            //rgb_effects_inc_val();
             break;
         case AF_RGB_VALD:
-            rgb_effects_dec_val();
+            //rgb_effects_dec_val();
             break;
         case AF_RGB_SPDI:
-            rgb_effects_inc_speed();
+            //rgb_effects_inc_speed();
             break;
         case AF_RGB_SPDD:
-            rgb_effects_dec_speed();
+            //rgb_effects_dec_speed();
             break;
 #endif
 #ifdef RGB_MATRIX_ENABLE

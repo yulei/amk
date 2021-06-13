@@ -4,12 +4,12 @@
  */
 
 #include <string.h>
-#include "gpio_pin.h"
 #include "matrix_scan.h"
 #include "keyboard.h"
 #include "print.h"
 #include "timer.h"
 #include "wait.h"
+#include "amk_gpio.h"
 #include "amk_printf.h"
 
 #ifndef MATRIX_SCAN_DEBUG

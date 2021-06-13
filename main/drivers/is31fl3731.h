@@ -7,7 +7,7 @@
 
 #include "is31.h"
 
-is31_t *is31fl3731_init(uint8_t addr, uint8_t index, uint8_t led_num);
+is31_t *is31fl3731_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t led_num);
 void is31fl3731_set_color(is31_t *driver, uint8_t index, uint8_t red, uint8_t green, uint8_t blue);
 void is31fl3731_set_color_all(is31_t *driver, uint8_t red, uint8_t green, uint8_t blue);
 void is31fl3731_update_buffers(is31_t *driver);

@@ -11,11 +11,11 @@
 #include "action_code.h"
 #include "actionmap.h"
 #include "keymap.h"
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 #include "amk_action.h"
 #include "amk_printf.h"
 
-#ifdef RGB_EFFECTS_ENABLE
+#ifdef RGB_ENABLE
 #include "rgb_effects.h"
 #endif
 

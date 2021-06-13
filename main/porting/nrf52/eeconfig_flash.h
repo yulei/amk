@@ -1,5 +1,5 @@
 /**
- * @file eeprom_flash.h
+ * @file eeconfig_flash.h
  *
  */
 

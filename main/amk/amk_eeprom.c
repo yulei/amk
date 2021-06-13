@@ -3,10 +3,15 @@
  */
 
 #include "amk_eeprom.h"
-#include "rgb_effects.h"
-#include "rgb_matrix.h"
 #include "amk_keymap.h"
 #include "amk_printf.h"
+
+#ifdef RGB_ENABLE
+#include "rgb_common.h"
+#endif
+#ifdef RGB_MATRIX_ENABLE
+#include "rgb_matrix.h"
+#endif
 
 #ifndef EEPROM_MANAGER_DEBUG
 #define EEPROM_MANAGER_DEBUG 1
@@ -33,9 +38,10 @@ void eeconfig_update_kb(uint32_t data)
     eeprom_update_dword(EECONFIG_KEYBOARD, data);
 }
 
+#ifdef RGB_ENABLE
 void eeconfig_read_rgb(void* rgb, uint8_t index)
 {
-    rgb_effects_config_t *config = (rgb_effects_config_t*)rgb;
+    rgb_config_t *config = (rgb_config_t*)rgb;
     uint8_t *addr = ((uint8_t*)EECONFIG_RGB) + index*6;
     config->enable  = eeprom_read_byte(addr);
     config->mode    = eeprom_read_byte(addr+1);
@@ -44,11 +50,12 @@ void eeconfig_read_rgb(void* rgb, uint8_t index)
     config->sat     = eeprom_read_byte(addr+4);
     config->val     = eeprom_read_byte(addr+5);
     ee_mgr_debug("EE MGR: read rgb, enable: %d\n", config->enable);
+
 }
 
 void eeconfig_write_rgb(const void* rgb, uint8_t index)
 {
-    rgb_effects_config_t *config = (rgb_effects_config_t*)rgb;
+    rgb_config_t *config = (rgb_config_t*)rgb;
     uint8_t *addr = ((uint8_t*)EECONFIG_RGB) + index*6;
     eeprom_write_byte(addr,   config->enable);
     eeprom_write_byte(addr+1, config->mode);
@@ -63,7 +70,9 @@ void eeconfig_update_rgb(const void* rgb, uint8_t index)
 {
     eeconfig_write_rgb(rgb, index);
 }
+#endif
 
+#ifdef RGB_MATRIX_ENABLE
 void eeconfig_read_rgb_matrix(void* rgb)
 {
     rgb_matrix_config_t *config = (rgb_matrix_config_t*)rgb;
@@ -90,6 +99,7 @@ void eeconfig_update_rgb_matrix(const void* rgb)
 {
     eeconfig_write_rgb_matrix(rgb);
 }
+#endif
 
 uint8_t eeconfig_read_layout_options(void)
 {
@@ -200,14 +210,14 @@ void eeconfig_init(void)
     eeprom_write_byte(EECONFIG_KEYMAP,         0);
     eeprom_write_byte(EECONFIG_MOUSEKEY_ACCEL, 0);
 
-#ifdef RGB_EFFECTS_ENABLE
-    extern void effects_update_default(void);
-    effects_update_default();
+#ifdef RGB_ENABLE
+    //extern void effects_update_default(void);
+    //effects_update_default();
 #endif
 
 #ifdef RGB_MATRIX_ENABLE
-    extern void rgb_matrix_update_default(void);
-    rgb_matrix_update_default();
+    //extern void rgb_matrix_update_default(void);
+    //rgb_matrix_update_default();
 #endif
 
     eeprom_write_byte(EECONFIG_LAYOUT_OPTIONS, 0);

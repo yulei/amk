@@ -5,8 +5,8 @@
 
 #include <stddef.h>
 #include "rgb_driver.h"
-#include "gpio_pin.h"
 #include "wait.h"
+#include "amk_gpio.h"
 #include "amk_printf.h"
 
 #include "drivers/ws2812.h"
@@ -76,7 +76,7 @@ static void rd_aw9523b_init(rgb_driver_t *driver)
     gpio_write_pin(RGBLIGHT_EN_PIN, 1);
     wait_ms(1);
 #endif
-    driver->data = aw9523b_init(driver->device->addr, driver->device->index, driver->device->led_count);
+    driver->data = aw9523b_init(driver->device->addr, driver->device->index, driver->device->led_start, driver->device->led_count);
     rgb_driver_debug("AW9523B init\n");
 }
 
@@ -119,7 +119,7 @@ static void rd_aw9106b_init(rgb_driver_t *driver)
     gpio_write_pin(RGBLIGHT_EN_PIN, 1);
     wait_ms(1);
 #endif
-    driver->data = aw9106b_init(driver->device->addr, driver->device->index, driver->device->led_count);
+    driver->data = aw9106b_init(driver->device->addr, driver->device->index, driver->device->led_start, driver->device->led_count);
     rgb_driver_debug("AW9106B init\n");
 }
 
@@ -157,7 +157,7 @@ static void rd_aw9106b_flush(rgb_driver_t *driver)
 
 static void rd_3731_init(rgb_driver_t *driver)
 {
-    driver->data = is31fl3731_init(driver->device->addr, driver->device->index, driver->device->led_count);
+    driver->data = is31fl3731_init(driver->device->addr, driver->device->index, driver->device->led_start, driver->device->led_count);
 }
 
 static void rd_3731_uninit(rgb_driver_t *driver)
@@ -190,7 +190,7 @@ static void rd_3731_flush(rgb_driver_t *driver)
 
 static void rd_3733_init(rgb_driver_t *driver)
 {
-    driver->data = is31fl3733_init(driver->device->addr, driver->device->index, driver->device->led_count);
+    driver->data = is31fl3733_init(driver->device->addr, driver->device->index, driver->device->led_start, driver->device->led_count);
 }
 
 static void rd_3733_uninit(rgb_driver_t *driver)
@@ -223,7 +223,7 @@ static void rd_3733_flush(rgb_driver_t *driver)
 
 static void rd_3236_init(rgb_driver_t *driver)
 {
-    driver->data = is31fl3236_init(driver->device->addr, driver->device->index, driver->device->led_count);
+    driver->data = is31fl3236_init(driver->device->addr, driver->device->index, driver->device->led_start, driver->device->led_count);
 }
 
 static void rd_3236_uninit(rgb_driver_t *driver)

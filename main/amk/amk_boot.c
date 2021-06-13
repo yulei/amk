@@ -10,7 +10,9 @@
 #include "amk_boot.h"
 #include "amk_printf.h"
 
+#ifdef RGB_ENABLE
 #include "rgb_led.h"
+#endif
 
 #if defined(NRF52) || defined(NRF52840_XXAA)
 #include "nrf_gpio.h"
@@ -52,7 +54,9 @@ void pre_boot_init(void) {}
 
 void post_boot_init(void)
 { 
+#ifdef RGB_ENABLE
     rgb_led_init();
+#endif
 }
 
 void boot_init(void)

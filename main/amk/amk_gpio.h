@@ -1,6 +1,6 @@
 /**
- * gpio_pin.h
- * generic pin implementation
+ * @file amk_gpio.h
+ * @brief generic pin implementation
  */
 
 #pragma once

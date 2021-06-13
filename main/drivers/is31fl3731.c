@@ -50,11 +50,12 @@ static void map_led(uint8_t index, uint8_t *red_reg, uint8_t* green_reg, uint8_t
     *blue_reg   = led->b - PWM_REG;
 }
 
-is31_t *is31fl3731_init(uint8_t addr, uint8_t index, uint8_t led_num)
+is31_t *is31fl3731_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t led_num)
 {
     is31fl3731_driver_t *driver = &is31_drivers[index];
     driver->is31.addr = addr;
     driver->is31.index = index;
+    driver->is31.led_start = led_start;
     driver->is31.led_num = led_num;
     driver->is31.data = driver;
 
@@ -144,7 +145,7 @@ void init_driver(is31fl3731_driver_t *driver)
     // turn on used leds
     for (int i = 0; i < driver->is31.led_num; i++) {
         uint8_t r, g, b;
-        map_led(i, &r, &g, &b);
+        map_led(i+driver->is31.led_start, &r, &g, &b);
 
         uint8_t reg_r = r / 8;
         uint8_t reg_g = g / 8;

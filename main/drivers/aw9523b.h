@@ -35,7 +35,7 @@
 
 bool aw9523b_available(uint8_t addr);
 
-awinic_t *aw9523b_init(uint8_t addr, uint8_t index, uint8_t led_num);
+awinic_t *aw9523b_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t led_num);
 
 void aw9523b_set_color(awinic_t *driver, int index, uint8_t red, uint8_t green, uint8_t blue);
 void aw9523b_set_color_all(awinic_t *driver, uint8_t red, uint8_t green, uint8_t blue);

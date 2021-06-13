@@ -9,7 +9,7 @@
 #include "nrf_gzll.h"
 #include "nrf_gzll_error.h"
 #include "nrf_drv_clock.h"
-#include "eeprom_flash.h"
+#include "eeconfig_flash.h"
 #include "rf_keyboard.h"
 #include "usb_interface.h"
 #include "report.h"

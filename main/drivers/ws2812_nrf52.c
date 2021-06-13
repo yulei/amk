@@ -6,7 +6,7 @@
 #include "nrf_gpio.h"
 #include "ws2812.h"
 #include "nrf_log.h"
-#include "rgb_color.h"
+#include "rgb_common.h"
 #include "wait.h"
 
 // data copied from the Adafruit NeoPixel lib

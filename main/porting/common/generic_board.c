@@ -28,7 +28,9 @@
 #include "mscusb.h"
 #endif
 
+#ifdef RGB_ENABLE
 #include "rgb_led.h"
+#endif
 
 extern void system_init(void);
 extern void custom_board_init(void);
@@ -98,7 +100,9 @@ void board_task(void)
     webusb_task();
 #endif
 
+#ifdef RGB_ENABLE
     rgb_led_task();
+#endif
 
     custom_board_task();
 }

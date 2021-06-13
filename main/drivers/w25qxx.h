@@ -1,12 +1,12 @@
 /**
  * @file w25qxx.h
- *  for accessing w25q serials flash chip
+ * @brief for accessing w25q serials flash chip
  */
 
 #pragma once
 
 #include "amk_error.h"
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 #include "spi.h"
 
 typedef enum {

@@ -10,7 +10,7 @@
 #include "app_scheduler.h"
 #include "ble_keyboard.h"
 #include "gzll_keyboard.h"
-#include "eeprom_flash.h"
+#include "eeconfig_flash.h"
 #include "usb_interface.h"
 #include "rf_power.h"
 

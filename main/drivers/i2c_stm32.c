@@ -7,7 +7,7 @@
 
 #include "generic_hal.h"
 #include "i2c.h"
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 #include "amk_printf.h"
 
 typedef struct {

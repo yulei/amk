@@ -1,8 +1,8 @@
 /**
- * gpio_pin.c
- *  nrf52 gpio wrapper
+ * @file gpio_pin.c
+ * @brief nrf52 gpio wrapper
  */
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 #include "nrf_gpio.h"
 
 int gpio_read_pin(pin_t pin)

@@ -1,5 +1,5 @@
 /**
- * ssd1357.h
+ * @file ssd1357.h
  */
 
 #pragma once
@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 
 typedef struct {
 #ifdef SCREEN_POWER_PIN

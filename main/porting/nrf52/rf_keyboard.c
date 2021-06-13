@@ -198,8 +198,8 @@ static void keyboard_timer_stop(void)
 
 static bool keyboard_rgblight_on(void)
 {
-#ifdef RGB_EFFECTS_ENABLE
-    return rgb_effects_enabled();
+#ifdef RGB_ENABLE
+    return true;//rgb_effects_enabled();
 #else
     return false;
 #endif
@@ -226,7 +226,10 @@ static void keyboard_timer_handler(void *p_context)
     rf_wdt_feed();
 #endif
     keyboard_task();
+
+#ifdef RGB_ENABLE
     rgb_led_task();
+#endif
 
     if (rf_driver.vbus_enabled && (rf_driver.output_target&USB_ENABLED)) {
         // do not run the power related stuff while have usb supply

@@ -7,7 +7,7 @@
 #include "aw9523b.h"
 #include "wait.h"
 #include "i2c.h"
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 #include "amk_printf.h"
 
 #ifndef AW9523B_DEBUG
@@ -92,7 +92,7 @@ bool aw9523b_available(uint8_t addr)
     return available;
 }
 
-awinic_t *aw9523b_init(uint8_t addr, uint8_t index, uint8_t led_num)
+awinic_t *aw9523b_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t led_num)
 {
     if (!i2c_inst) {
         i2c_inst = i2c_init(AW9523B_I2C_ID);
@@ -101,6 +101,7 @@ awinic_t *aw9523b_init(uint8_t addr, uint8_t index, uint8_t led_num)
     aw9523b_t *aw9523b = &aw9523b_drivers[index];
     aw9523b->awinic.addr = addr;
     aw9523b->awinic.index = index;
+    aw9523b->awinic.led_start = led_start;
     aw9523b->awinic.led_num = led_num;
     aw9523b->awinic.data = aw9523b;
 

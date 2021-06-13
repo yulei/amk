@@ -4,7 +4,7 @@
 
 #include <stdint.h>
 #include "aw9106b.h"
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 #include "wait.h"
 
 void rgb_indicator_init(void)
