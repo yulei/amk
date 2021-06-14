@@ -229,16 +229,6 @@ void matrix_prepare_sleep(void)
         nrf_gpio_cfg_default(i);
     }
 
-#ifdef CAPS_LED_PIN
-    nrf_gpio_cfg_output(CAPS_LED_PIN);
-    nrf_gpio_pin_clear(CAPS_LED_PIN);
-#endif
-    
-#ifdef RGBLIGHT_EN_PIN
-    nrf_gpio_cfg_output(RGBLIGHT_EN_PIN);
-    nrf_gpio_pin_clear(RGBLIGHT_EN_PIN);
-#endif
-
     for (uint32_t i = 0; i < MATRIX_COLS; i++) {
         nrf_gpio_cfg_output(col_pins[i]);
         nrf_gpio_pin_set(col_pins[i]);

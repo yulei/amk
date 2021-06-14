@@ -331,9 +331,12 @@ rgb_driver_t* rgb_driver_create(rgb_device_t *device, uint8_t index)
     return driver;
 }
 
-void rgb_driver_destroy(rgb_driver_t* driver)
+void rgb_driver_uninit(void)
 {
-    //driver->uninit();
+	for (int i = 0; i < RGB_DEVICE_NUM; i++) {
+        rgb_driver_t *driver = &rgb_drivers[i];
+        driver->uninit(driver);
+	}
 }
 
 void rgb_driver_init(void)
@@ -341,7 +344,6 @@ void rgb_driver_init(void)
 	for (int i = 0; i < RGB_DEVICE_NUM; i++) {
         rgb_driver_t *driver = rgb_driver_create(&g_rgb_devices[i], i);
         driver->init(driver);
-        //rgb_drivers[i].data = driver;
 	}
 } 
 

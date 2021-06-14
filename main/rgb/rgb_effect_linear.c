@@ -29,13 +29,9 @@
 #define DELAY_MIN   0
 #define DELAY_DEFAULT 1500
 
-
 #define RAINBOW_STEP_DEFAULT    32
 #define BREATH_STEP_DEFAULT     32
 #define CIRCLE_STEP_DEFAULT     2
-
-
-#define RGB_EFFECT_DEFAULT RL_EFFECT_CIRCLE
 
 typedef struct s_rgb_linear_state rgb_linear_state_t;
 typedef void (*RGB_EFFECT_FUN)(rgb_linear_state_t*);
@@ -258,12 +254,12 @@ static void effects_set_enable(rgb_linear_state_t *state, uint8_t enable)
 
 static void effects_update_default(rgb_linear_state_t *state)
 {
-    state->config->enable = 1;
-    state->config->mode = RGB_EFFECT_DEFAULT;
-    state->config->speed = SPEED_DEFAULT;
-    state->config->hue = HUE_DEFAULT;
-    state->config->sat = SAT_DEFAULT;
-    state->config->val = VAL_DEFAULT;
+    state->config->enable   = ENABLE_DEFAULT;
+    state->config->mode     = MODE_DEFAULT;
+    state->config->speed    = SPEED_DEFAULT;
+    state->config->hue      = HUE_DEFAULT;
+    state->config->sat      = SAT_DEFAULT;
+    state->config->val      = VAL_DEFAULT;
     eeconfig_update_rgb(state->config, state->index);
 }
 

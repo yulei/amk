@@ -33,14 +33,14 @@
 
 #define WS2812_LED_NUM              4
 #define WS2812_LED_PIN              23
-#define RGB_LED_NUM                 28
+#define RGB_LED_NUM                 12
 
 #define WDT_ENABLE                  1        
 
-#define AW9106B_SHDN_PIN            16
+#define INDICATOR_SHDN_PIN          16
 
-#define RGB_DEVICE_NUM				4
-#define RGB_SEGMENT_NUM             3
+#define RGB_DEVICE_NUM              4
+#define RGB_SEGMENT_NUM             2
 #define RGB_INDICATOR_LED_NUM       4
 
 //#define GZLL_IS_CLIENT              1

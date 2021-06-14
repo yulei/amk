@@ -35,15 +35,32 @@
 rgb_config_t g_rgb_configs[RGB_LED_CONFIG_NUM];
 static uint8_t rgb_config_cur;
 
+static void rgb_led_set_power(bool on)
+{
+    if (on) {
+#ifdef INDICATOR_SHDN_PIN 
+        gpio_set_output_pushpull(INDICATOR_SHDN_PIN);
+        gpio_write_pin(INDICATOR_SHDN_PIN, 1);
+        wait_ms(1);
+#endif
+
+#ifdef RGBLIGHT_EN_PIN
+        gpio_set_output_pushpull(RGBLIGHT_EN_PIN);
+        gpio_write_pin(RGBLIGHT_EN_PIN, 1);
+#endif
+
+    } else {
+#ifdef RGBLIGHT_EN_PIN
+        gpio_set_output_pushpull(RGBLIGHT_EN_PIN);
+        gpio_write_pin(RGBLIGHT_EN_PIN, 0);
+#endif
+    }
+}
+
 void rgb_led_init(void)
 { 
     rgb_config_cur = 0;
-
-#ifdef AW9106B_SHDN_PIN
-    gpio_set_output_pushpull(AW9106B_SHDN_PIN);
-    gpio_write_pin(AW9106B_SHDN_PIN, 1);
-    wait_ms(1);
-#endif
+    rgb_led_set_power(true);
 
     rgb_driver_init();
 
@@ -73,9 +90,13 @@ void rgb_led_task(void)
 #ifdef RGB_MATRIX_ENABLE
     rgb_matrix_task();
 #endif
-    for (int i = 0; i < RGB_DEVICE_NUM; i++) {
-        rgb_driver_t *driver = rgb_driver_get(i);
-        driver->flush(driver);
+    if (rgb_led_is_on()) {
+        for (int i = 0; i < RGB_DEVICE_NUM; i++) {
+            rgb_driver_t *driver = rgb_driver_get(i);
+            driver->flush(driver);
+        }
+    } else {
+        rgb_led_set_power(false);
     }
 }
 
@@ -111,7 +132,22 @@ bool rgb_led_config_enabled(void)
 
 void rgb_led_config_toggle(void)
 {
+    bool all_off = !rgb_led_is_on();
+
     g_rgb_configs[rgb_config_cur].enable = !g_rgb_configs[rgb_config_cur].enable;
+    eeconfig_update_rgb(&g_rgb_configs[rgb_config_cur], rgb_config_cur);
+
+    if (all_off) {
+        // all off to on, need re-init driver and turn led power
+        rgb_led_set_power(true);
+        rgb_driver_init();
+    }
+
+    if (!rgb_led_is_on()) {
+        // turn off all leds
+        rgb_driver_uninit();
+        rgb_led_set_power(false);
+    }
 }
 
 static void rgb_led_effect_init_mode(rgb_config_t *config)
@@ -197,6 +233,7 @@ static void rgb_led_config_set_param(uint8_t param, uint8_t value)
     }
 
     if (update) {
+        eeconfig_update_rgb(&g_rgb_configs[rgb_config_cur], rgb_config_cur);
     }
 }
 
@@ -256,4 +293,46 @@ void rgb_led_config_dec_param(uint8_t param)
         default:
             break;
     }
+}
+
+bool rgb_led_is_on(void)
+{
+    uint8_t on = 0;
+    for (uint8_t i = 0; i < RGB_LED_CONFIG_NUM; i++) {
+        on |= g_rgb_configs[i].enable;
+    }
+
+    return on ? true : false;
+}
+
+void rgb_led_set_all(bool on)
+{
+    for (uint8_t i = 0; i < RGB_LED_CONFIG_NUM; i++) {
+        g_rgb_configs[i].enable = on ? 1 : 0;
+    }
+
+    if (!on) {
+        // shutdown led
+#ifdef RGBLIGHT_EN_PIN
+        gpio_set_output_pushpull(RGBLIGHT_EN_PIN);
+        gpio_write_pin(RGBLIGHT_EN_PIN, 0);
+#endif
+    }
+}
+
+void rgb_led_prepare_sleep(void)
+{
+#ifdef RGB_LINEAR_ENABLE
+    rgb_linear_prepare_sleep();
+#endif
+#ifdef RGB_INDICATOR_ENABLE
+    rgb_indicator_prepare_sleep();
+#endif
+#ifdef RGB_MATRIX_ENABLE
+#endif
+
+    // shutdown drivers
+    rgb_driver_prepare_sleep();
+    // led power off
+    rgb_led_set_power(false);
 }

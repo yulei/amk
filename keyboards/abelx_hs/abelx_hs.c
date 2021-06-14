@@ -30,18 +30,19 @@
 #endif
 
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
-    // ws2812 leds
+    // back leds
     {0,0,0,0},
     {0,0,0,0},
     {0,0,0,0},
     {0,0,0,0},
 
     // front leds
-//    {1, OUT_34, OUT_35, OUT_36},
-//    {1, OUT_31, OUT_32, OUT_33},
-//    {1, OUT_28, OUT_29, OUT_30},
-//    {1, OUT_25, OUT_26, OUT_27},
+    {1, OUT_34, OUT_35, OUT_36},
+    {1, OUT_31, OUT_32, OUT_33},
+    {1, OUT_28, OUT_29, OUT_30},
+    {1, OUT_25, OUT_26, OUT_27},
 
+#if 0
     {1, C1_1,   C3_2,   C4_2},
     {1, C1_2,   C2_2,   C4_3},
     {1, C1_3,   C2_3,   C3_3},
@@ -64,6 +65,7 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {1, C1_10,  C2_10,  C4_11},
     {1, C1_11,  C2_11,  C3_11},
     {1, C1_12,  C2_12,  C3_12},
+#endif
 
     // indicator leds
     {2, AW_DIM1, AW_DIM2, AW_DIM0},  // CAPS
@@ -74,21 +76,18 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
 
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
     { RGB_DRIVER_WS2812, 0, 0, 0, 4},
-    { RGB_DRIVER_IS31FL3731, 0xE8, 0, 4, 20},
-    //{ RGB_DRIVER_IS31FL3236, 0x78, 0, 4, 4},
-    { RGB_DRIVER_AW9106B, 0xB6, 0, 24, 2},
-    { RGB_DRIVER_AW9106B, 0xB2, 1, 26, 2},
+    { RGB_DRIVER_IS31FL3236, 0x78, 0, 4, 4},
+    //{ RGB_DRIVER_IS31FL3731, 0xE8, 0, 4, 20},
+    { RGB_DRIVER_AW9106B, 0xB6, 0, 8, 2},
+    { RGB_DRIVER_AW9106B, 0xB2, 1, 10, 2},
 };
 
 rgb_linear_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
     {0, 0, 0, 4},
-    {1, 1, 4, 16},
-    {1, 2, 20, 4},
+    {1, 1, 4, 4},
 };
 
-uint8_t g_rgb_indicator_index[RGB_INDICATOR_LED_NUM] = {
-    24,25,26,27,
-};
+uint8_t g_rgb_indicator_index[RGB_INDICATOR_LED_NUM] = { 24,25,26,27 };
 
 #define CAPS_LED    0
 #define SCROLL_LED  2

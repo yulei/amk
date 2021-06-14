@@ -12,7 +12,7 @@
 #include "amk_printf.h"
 
 #ifndef AW9523B_DEBUG
-#define AW9523B_DEBUG 1
+#define AW9523B_DEBUG 0
 #endif
 
 #if AW9523B_DEBUG
@@ -114,6 +114,8 @@ i2c_led_t *aw9523b_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t 
     }
 
     aw9523b_t *driver = &aw9523b_drivers[index];
+    if (driver->ready) return &driver->i2c_led;
+
     driver->i2c_led.addr = addr;
     driver->i2c_led.index = index;
     driver->i2c_led.led_start = led_start;
@@ -123,7 +125,7 @@ i2c_led_t *aw9523b_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t 
     // reset chip
     uint8_t data = 0;
     amk_error_t ec = i2c_write_reg(i2c_inst, addr, AW9523B_RESET, &data, 1, TIMEOUT);
-    aw9523b_debug("aw9523b write reset result: %d\n", ec);
+    if (ec != AMK_SUCCESS) aw9523b_debug("aw9523b write reset result: %d\n", ec);
 
     wait_ms(1);
     // set max led current

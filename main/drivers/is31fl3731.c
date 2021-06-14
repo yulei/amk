@@ -50,6 +50,8 @@ static void uninit_driver(i2c_led_t *driver);
 i2c_led_t *is31fl3731_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t led_num)
 {
     is31fl3731_driver_t *driver = &is31_drivers[index];
+    if (driver->ready) return &driver->i2c_led;
+
     driver->i2c_led.addr        = addr;
     driver->i2c_led.index       = index;
     driver->i2c_led.led_start   = led_start;

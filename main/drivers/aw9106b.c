@@ -12,7 +12,7 @@
 #include "amk_printf.h"
 
 #ifndef AW9106B_DEBUG
-#define AW9106B_DEBUG 1
+#define AW9106B_DEBUG 0
 #endif
 
 #if AW9106B_DEBUG
@@ -63,6 +63,8 @@ i2c_led_t *aw9106b_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t 
     }
 
     aw9106b_t *driver = &aw9106b_drivers[index];
+    if (driver->ready) return &driver->i2c_led;
+
     driver->i2c_led.addr = addr;
     driver->i2c_led.index = index;
     driver->i2c_led.led_start = led_start;
@@ -153,8 +155,11 @@ void aw9106b_update_buffers(i2c_led_t *driver)
 
 void aw9106b_uninit(i2c_led_t *driver)
 {
-    aw9106b_t * aw9106b = (aw9106b_t*)driver->data;
+    // never uninit
+
+    /*aw9106b_t * aw9106b = (aw9106b_t*)driver->data;
     if (!aw9106b->ready) return;
 
     aw9106b->ready = false;
+    */
 }

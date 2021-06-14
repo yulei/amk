@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 #include "gpio_pin.h"
-#include "rgb_effects.h"
+#include "rgb_led.h"
 #include "aw9523b.h"
 #include "amk_printf.h"
 #include "led.h"
@@ -20,11 +20,12 @@ void matrix_init_kb(void)
 
 void keyboard_prepare_sleep(void)
 {
-    // turn off rgb
-    keyboard_set_rgb(false);
     // turn off caps
+    gpio_set_output_pushpull(CAPS_LED_PIN);
     gpio_write_pin(CAPS_LED_PIN, 0);
-    gpio_set_input_floating(CAPS_LED_PIN);
+
+    // turn off rgb
+    rgb_led_prepare_sleep();
 }
 
 const rgb_led_t g_aw9523b_leds[RGB_LED_NUM] = {

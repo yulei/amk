@@ -30,8 +30,13 @@ void rgb_indicator_task(void)
 
 void rgb_indicator_uninit(void)
 {
-#ifdef AW9106B_SHDN_PIN
-    gpio_set_output_pushpull(AW9106B_SHDN_PIN);
-    gpio_write_pin(AW9106B_SHDN_PIN, 0);
-#endif
+}
+
+void rgb_indicator_prepare_sleep(void)
+{
+    #ifdef INDICATOR_SHDN_PIN
+        gpio_set_output_pushpull(INDICATOR_SHDN_PIN);
+        gpio_write_pin(INDICATOR_SHDN_PIN, 0);
+        wait_ms(1);
+    #endif
 }

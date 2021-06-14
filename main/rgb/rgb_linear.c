@@ -33,3 +33,6 @@ void rgb_linear_uninit(void)
         rgb_effect_linear_uninit(rgb_linear.effects[i]);
     }
 }
+
+void rgb_linear_prepare_sleep(void)
+{}
