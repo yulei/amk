@@ -12,10 +12,9 @@
 
 #define EECONFIG_KEYBOARD           (uint32_t*)8
 #define EECONFIG_KEYMAP_MAGIC       (uint32_t*)12
-#define EECONFIG_RGB                (uint8_t*)16        // 6 * 4 bytes
-#define EECONFIG_RGB_MATRIX         (uint8_t*)40        // 6 bytes
-#define EECONFIG_LAYOUT_OPTIONS     (uint8_t*)46        // 1 bytes
-#define EECONFIG_DEVICE             (uint8_t*)47        // 1 bytes
+#define EECONFIG_RGB                (uint8_t*)16        // 6 * 8 bytes
+#define EECONFIG_LAYOUT_OPTIONS     (uint8_t*)62        // 1 bytes
+#define EECONFIG_DEVICE             (uint8_t*)63        // 1 bytes
 
 #define EECONFIG_SIZE               64
 #define EEPROM_SIZE                 2048
@@ -27,10 +26,6 @@ void eeconfig_update_kb(uint32_t data);
 void eeconfig_read_rgb(void* rgb, uint8_t index);
 void eeconfig_write_rgb(const void* rgb, uint8_t index);
 void eeconfig_update_rgb(const void* rgb, uint8_t index);
-
-void eeconfig_read_rgb_matrix(void* rgb);
-void eeconfig_write_rgb_matrix(const void* rgb);
-void eeconfig_update_rgb_matrix(const void* rgb);
 
 uint8_t eeconfig_read_layout_options(void);
 void eeconfig_write_layout_options(uint8_t);

@@ -12,7 +12,7 @@
 #include "amk_printf.h"
 
 #ifndef AW9106B_DEBUG
-#define AW9106B_DEBUG 0
+#define AW9106B_DEBUG 1
 #endif
 
 #if AW9106B_DEBUG
@@ -100,7 +100,7 @@ void aw9106b_set_color(i2c_led_t *driver, int index, uint8_t red, uint8_t green,
 {
     aw9106b_t * aw9106b = (aw9106b_t*)driver->data;
 
-    if (index >= aw9106b->i2c_led.led_num) 
+    if ((index < aw9106b->i2c_led.led_start) || (index >= aw9106b->i2c_led.led_start + aw9106b->i2c_led.led_num))
     {
         aw9106b_debug("AW9106B: set_color out of range: index=%d, max=%d\n", index, aw9106b->i2c_led.led_num);
         return;

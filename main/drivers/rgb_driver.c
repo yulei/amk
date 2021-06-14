@@ -138,7 +138,8 @@ static void rd_aw9106b_set_color(rgb_driver_t *driver, uint32_t index, uint8_t h
     hsv_t hsv = {hue, sat, val};
     rgb_t rgb = hsv_to_rgb(hsv);
     i2c_led_t *awinic = (i2c_led_t *)driver->data;
-    aw9523b_set_color(awinic, index, rgb.r, rgb.g, rgb.b);
+
+    aw9106b_set_color(awinic, index, rgb.r, rgb.g, rgb.b);
 }
 
 static void rd_aw9106b_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t sat, uint8_t val)
@@ -146,13 +147,13 @@ static void rd_aw9106b_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t 
     hsv_t hsv = {hue, sat, val};
     rgb_t rgb = hsv_to_rgb(hsv);
     i2c_led_t *awinic = (i2c_led_t *)driver->data;
-    aw9523b_set_color_all(awinic, rgb.r, rgb.g, rgb.b);
+    aw9106b_set_color_all(awinic, rgb.r, rgb.g, rgb.b);
 }
 
 static void rd_aw9106b_flush(rgb_driver_t *driver)
 {
     i2c_led_t *awinic = (i2c_led_t *)driver->data;
-    aw9523b_update_buffers(awinic);
+    aw9106b_update_buffers(awinic);
 }
 
 static void rd_3731_init(rgb_driver_t *driver)

@@ -11,7 +11,7 @@
 #include "pca9535.h"
 #include "is31fl3236.h"
 #include "is31fl3731.h"
-//#include "aw9106b.h"
+#include "aw9106b.h"
 #include "rgb_driver.h"
 #include "rgb_indicator.h"
 #include "rgb_linear.h"
@@ -42,12 +42,6 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
 //    {1, OUT_28, OUT_29, OUT_30},
 //    {1, OUT_25, OUT_26, OUT_27},
 
-    // indicator leds
-//    {2, AW9106B_DIM1, AW9106B_DIM2, AW9106B_DIM0},  // CAPS
-//    {2, AW9106B_DIM4, AW9106B_DIM5, AW9106B_DIM3},  // ESC
-//    {3, AW9106B_DIM4, AW9106B_DIM5, AW9106B_DIM3},  // SCROLL
-//    {3, AW9106B_DIM1, AW9106B_DIM2, AW9106B_DIM0},  // NUM
-
     {1, C1_1,   C3_2,   C4_2},
     {1, C1_2,   C2_2,   C4_3},
     {1, C1_3,   C2_3,   C3_3},
@@ -70,18 +64,30 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {1, C1_10,  C2_10,  C4_11},
     {1, C1_11,  C2_11,  C3_11},
     {1, C1_12,  C2_12,  C3_12},
+
+    // indicator leds
+    {2, AW_DIM1, AW_DIM2, AW_DIM0},  // CAPS
+    {2, AW_DIM4, AW_DIM5, AW_DIM3},  // ESC
+    {3, AW_DIM4, AW_DIM5, AW_DIM3},  // SCROLL
+    {3, AW_DIM1, AW_DIM2, AW_DIM0},  // NUM
 };
 
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
     { RGB_DRIVER_WS2812, 0, 0, 0, 4},
     { RGB_DRIVER_IS31FL3731, 0xE8, 0, 4, 20},
     //{ RGB_DRIVER_IS31FL3236, 0x78, 0, 4, 4},
+    { RGB_DRIVER_AW9106B, 0xB6, 0, 24, 2},
+    { RGB_DRIVER_AW9106B, 0xB2, 1, 26, 2},
 };
 
 rgb_linear_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
     {0, 0, 0, 4},
     {1, 1, 4, 16},
     {1, 2, 20, 4},
+};
+
+uint8_t g_rgb_indicator_index[RGB_INDICATOR_LED_NUM] = {
+    24,25,26,27,
 };
 
 #define CAPS_LED    0
