@@ -14,11 +14,7 @@
 #include "wait.h"
 
 #ifdef RGB_ENABLE
-//#include "rgb_effects.h"
-#endif
-
-#ifdef RGB_MATRIX_ENABLE
-#include "rgb_matrix.h"
+#include "rgb_led.h"
 #endif
 
 #if defined(NRF52) || defined(NRF52840_XXAA)
@@ -31,87 +27,53 @@ void keyboard_set_rgb(bool on)
 #ifdef RGB_ENABLE
     amk_printf("keyboard_set_rgb: %d\n", on);
     if (on) {
-        //if (!rgb_effects_enabled()) {
-        //    rgb_effects_toggle();
-        //}
+        if (!rgb_led_config_enabled()) {
+            rgb_led_config_toggle();
+        }
     } else {
-        //if (rgb_effects_enabled()) {
-        //    rgb_effects_toggle();
-        //}
+        if (rgb_led_config_enabled()) {
+            rgb_led_config_toggle();
+        }
     }
 #endif
 }
 
 void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
-    if (!record->event.pressed) return; // do not press key released event
+    if (!record->event.pressed) return; // do not process key released event
 
     switch (id) {
 #ifdef RGB_ENABLE
         case AF_RGB_TOG:
-            //keyboard_set_rgb(!rgb_effects_enabled());
-            //amk_printf("Toggle rgb: %d\n", rgb_effects_enabled());
+            keyboard_set_rgb(!rgb_led_config_enabled());
+            amk_printf("Toggle rgb: %d\n", rgb_led_config_enabled());
             break;
         case AF_RGB_MOD:
-            //rgb_effects_inc_mode();
+            rgb_led_config_inc_param(RGB_EFFECT_MODE);
             break;
         case AF_RGB_HUEI:
-            //rgb_effects_inc_hue();
+            rgb_led_config_inc_param(RGB_EFFECT_HUE);
             break;
         case AF_RGB_HUED:
-            //rgb_effects_dec_hue();
+            rgb_led_config_dec_param(RGB_EFFECT_HUE);
             break;
         case AF_RGB_SATI:
-            //rgb_effects_inc_sat();
+            rgb_led_config_inc_param(RGB_EFFECT_SAT);
             break;
         case AF_RGB_SATD:
-            //rgb_effects_dec_sat();
+            rgb_led_config_dec_param(RGB_EFFECT_SAT);
             break;
         case AF_RGB_VALI:
-            //rgb_effects_inc_val();
+            rgb_led_config_inc_param(RGB_EFFECT_VAL);
             break;
         case AF_RGB_VALD:
-            //rgb_effects_dec_val();
+            rgb_led_config_dec_param(RGB_EFFECT_VAL);
             break;
         case AF_RGB_SPDI:
-            //rgb_effects_inc_speed();
+            rgb_led_config_inc_param(RGB_EFFECT_SPEED);
             break;
         case AF_RGB_SPDD:
-            //rgb_effects_dec_speed();
-            break;
-#endif
-#ifdef RGB_MATRIX_ENABLE
-        case AF_RGB_MATRIX_TOG:
-            rgb_matrix_toggle();
-            //keyboard_set_rgb(rgb_effects_enabled());
-            amk_printf("Toggle rgb matrix: %d\n", rgb_matrix_enabled());
-            break;
-        case AF_RGB_MATRIX_MOD:
-            rgb_matrix_inc_mode();
-            break;
-        case AF_RGB_MATRIX_HUEI:
-            rgb_matrix_inc_hue();
-            break;
-        case AF_RGB_MATRIX_HUED:
-            rgb_matrix_dec_hue();
-            break;
-        case AF_RGB_MATRIX_SATI:
-            rgb_matrix_inc_sat();
-            break;
-        case AF_RGB_MATRIX_SATD:
-            rgb_matrix_dec_sat();
-            break;
-        case AF_RGB_MATRIX_VALI:
-            rgb_matrix_inc_val();
-            break;
-        case AF_RGB_MATRIX_VALD:
-            rgb_matrix_dec_val();
-            break;
-        case AF_RGB_MATRIX_SPDI:
-            rgb_matrix_inc_speed();
-            break;
-        case AF_RGB_MATRIX_SPDD:
-            rgb_matrix_dec_speed();
+            rgb_led_config_dec_param(RGB_EFFECT_SPEED);
             break;
 #endif
         case AF_EEPROM_RESET:

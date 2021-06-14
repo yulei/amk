@@ -381,6 +381,7 @@ static void connect_target(uint8_t device)
 }
 
 // bluetooth control command
+// F13 : next rgb config
 // F15 : set device 0
 // F16 : set device 1
 // F17 : set device 2
@@ -404,24 +405,30 @@ bool hook_process_action_main(keyrecord_t *record) {
     }
 
     switch(action.key.code) {
+    #ifdef RGB_ENABLE
+        case KC_F13:
+            rgb_led_config_next();
+            return true;
+    #endif
         case KC_F15:
             connect_target(BLE_PEER_DEVICE_0);
-            break;
+            return true;
         case KC_F16:
             connect_target(BLE_PEER_DEVICE_1);
-            break;
+            return true;
         case KC_F17:
             connect_target(BLE_PEER_DEVICE_2);
-            break;
+            return true;
         case KC_F18:
             connect_target(BLE_PEER_DEVICE_3);
-            break;
+            return true;
         case KC_F19:
             // reset keymap
             amk_keymap_reset();
+            return true;
         case KC_F20: // disable sleep mode
             rf_driver.output_target &= ~SLEEP_ENABLED;
-            break;
+            return true;
         case KC_F21: // toggle usb/ble output
             if (rf_driver.output_target & OUTPUT_RF) {
                 if (rf_driver.vbus_enabled) {

@@ -49,16 +49,47 @@ typedef struct {
     uint8_t hue;
     uint8_t sat;
     uint8_t val;
+    uint8_t type;
+    void*   data;
 } rgb_config_t;
 
-typedef enum {
+enum {
     RGB_EFFECT_ENABLE,
     RGB_EFFECT_MODE,
     RGB_EFFECT_SPEED,
     RGB_EFFECT_HUE,
     RGB_EFFECT_SAT,
     RGB_EFFECT_VAL,
-} rgb_config_param_t;
+};
+
+enum {
+    RGB_EFFECT_LINEAR,
+    RGB_EFFECT_INDICATOR,
+    RGB_EFFECT_MATRIX,
+};
+
+#define ENABLE_DEFAULT  1
+#define MODE_DEFAULT    0
+
+#define SPEED_MIN 1
+#define SPEED_MAX 15
+#define SPEED_DEFAULT 7
+#define SPEED_STEP  1
+
+#define HUE_MIN 0
+#define HUE_MAX 255
+#define HUE_DEFAULT HUE_MIN
+#define HUE_STEP 8
+
+#define SAT_MIN 0
+#define SAT_MAX 255
+#define SAT_DEFAULT SAT_MAX
+#define SAT_STEP 8
+
+#define VAL_MIN 0
+#define VAL_MAX 255
+#define VAL_DEFAULT VAL_MAX
+#define VAL_STEP 8
 
 typedef void* rgb_effect_t;
 typedef void (*rgb_effect_fun_t)(rgb_effect_t*);

@@ -44,20 +44,6 @@
 #define BREATH_STEP_DEFAULT     32
 #define INVALID_LED             0xFF
 
-typedef enum {
-    RM_EFFECT_STATIC,
-    RM_EFFECT_BREATH,
-    RM_EFFECT_GRADIENT,
-    RM_EFFECT_RAINBOW,
-    RM_EFFECT_GRADIENT_V,
-    RM_EFFECT_RAINBOW_V,
-    RM_EFFECT_ROTATE,
-    RM_EFFECT_SNAKE,
-    RM_EFFECT_KEYHIT,
-    RM_EFFECT_RANDOM,
-    RM_EFFECT_TEST,
-#define RM_EFFECT_MAX RM_EFFECT_TEST
-} rgb_matrix_effect_type_t;
 
 typedef void (*RM_EFFECT_FUN)(void);
 
@@ -501,4 +487,12 @@ static uint8_t key_to_led(uint8_t row, uint8_t col)
     }
 
     return INVALID_LED;
+}
+
+void rgb_effect_matrix_init_mode(rgb_effect_t effect)
+{}
+
+uint8_t rgb_effect_matrix_max(rgb_effect_t effect)
+{
+    return 
 }
