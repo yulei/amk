@@ -19,6 +19,5 @@ void rgb_led_config_init(void);
 void rgb_led_config_next(void);
 bool rgb_led_config_enabled(void);
 void rgb_led_config_toggle(void);
-
 void rgb_led_config_inc_param(uint8_t param);
 void rgb_led_config_dec_param(uint8_t param);

@@ -12,7 +12,7 @@
 #include "amk_printf.h"
 
 #ifndef AW9523B_DEBUG
-#define AW9523B_DEBUG 0
+#define AW9523B_DEBUG 1
 #endif
 
 #if AW9523B_DEBUG
@@ -82,6 +82,7 @@ bool aw9523b_available(uint8_t addr)
     bool need_release = false;
     if (!i2c_inst) {
         i2c_inst = i2c_init(AW9523B_I2C_ID);
+        need_release = true;
     }
 
 #ifdef RGBLIGHT_EN_PIN

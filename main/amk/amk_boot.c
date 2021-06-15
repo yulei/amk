@@ -63,6 +63,7 @@ void boot_init(void)
 {
     /* check signature */
     if (!eeconfig_is_enabled()) {
+        amk_printf("boot init: eeconfig\n");
         eeconfig_init();
     }
 

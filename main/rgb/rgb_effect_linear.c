@@ -17,7 +17,7 @@
 #endif
 
 #ifndef RGB_EFFECTS_DEBUG
-#define RGB_EFFECTS_DEBUG 1
+#define RGB_EFFECTS_DEBUG 0
 #endif
 
 #if RGB_EFFECTS_DEBUG
@@ -299,11 +299,13 @@ rgb_effect_t rgb_effect_linear_init(rgb_config_t *config, uint8_t index, uint8_t
     }
 
     eeconfig_read_rgb(state->config, index);
+    rgb_effects_debug("RGB config: index:%d, enable:%d, mode:%d, speed:%d, hue:%d, sat:%d, val:%d\n", 
+    index, state->config->enable, state->config->mode, state->config->speed, state->config->hue, state->config->sat, state->config->val);
+
     if ( !effects_config_valid(state->config)){
         effects_update_default(state);
     }
 
-    //effects_update_default(state);
     effects_state_init(state);
 
     return state;

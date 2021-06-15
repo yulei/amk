@@ -4,13 +4,53 @@
 
 #include <stdbool.h>
 
-#include "gpio_pin.h"
-#include "rgb_effects.h"
-#include "aw9523b.h"
-#include "amk_printf.h"
 #include "led.h"
+#include "rgb_led.h"
+#include "rgb_linear.h"
+#include "aw9523b.h"
+#include "amk_gpio.h"
+#include "amk_printf.h"
 
-extern void keyboard_set_rgb(bool on);
+static rgb_led_t ws2812_leds[RGB_LED_NUM] = {
+    {0, 0, 0, 0},
+    {0, 0, 0, 0},
+    {0, 0, 0, 0},
+    {0, 0, 0, 0},
+};
+
+rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
+    {0, AW_P12, AW_P11, AW_P10},
+    {0, AW_P01, AW_P00, AW_P13},
+    {0, AW_P04, AW_P03, AW_P02},
+    {0, AW_P07, AW_P06, AW_P05},
+};
+
+static rgb_device_t ws2812_device = {RGB_DRIVER_WS2812, 0, 0, 0, 4};
+
+rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
+    {RGB_DRIVER_AW9523B, 0xB6, 0, 0, 4},
+};
+
+rgb_linear_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
+    {0, 0, 0, 4},
+};
+
+void rgb_led_init_pre(void)
+{
+    if (!aw9523b_available(0xB6)) {
+        for (int i = 0; i < RGB_LED_NUM; i++) {
+            g_rgb_leds[i].driver = ws2812_leds[i].driver;
+            g_rgb_leds[i].r = ws2812_leds[i].r;
+            g_rgb_leds[i].g = ws2812_leds[i].g;
+            g_rgb_leds[i].b = ws2812_leds[i].b;
+        }
+        g_rgb_devices[0].type = ws2812_device.type;
+        g_rgb_devices[0].addr = ws2812_device.addr;
+        g_rgb_devices[0].index = ws2812_device.index;
+        g_rgb_devices[0].led_start = ws2812_device.led_start;
+        g_rgb_devices[0].led_num = ws2812_device.led_num;
+    } 
+}
 
 void matrix_init_kb(void)
 {
@@ -21,17 +61,13 @@ void matrix_init_kb(void)
 void keyboard_prepare_sleep(void)
 {
     // turn off rgb
-    keyboard_set_rgb(false);
+    rgb_led_set_all(false);
     // turn off caps
     gpio_write_pin(CAPS_LED_PIN, 0);
     gpio_set_input_floating(CAPS_LED_PIN);
 }
 
 const rgb_led_t g_aw9523b_leds[RGB_LED_NUM] = {
-    {AW9523B_P12_PWM, AW9523B_P11_PWM, AW9523B_P10_PWM},
-    {AW9523B_P01_PWM, AW9523B_P00_PWM, AW9523B_P13_PWM},
-    {AW9523B_P04_PWM, AW9523B_P03_PWM, AW9523B_P02_PWM},
-    {AW9523B_P07_PWM, AW9523B_P06_PWM, AW9523B_P05_PWM},
 };
 
 void led_set(uint8_t led)

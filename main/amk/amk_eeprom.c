@@ -7,10 +7,7 @@
 #include "amk_printf.h"
 
 #ifdef RGB_ENABLE
-#include "rgb_common.h"
-#endif
-#ifdef RGB_MATRIX_ENABLE
-#include "rgb_matrix.h"
+#include "rgb_led.h"
 #endif
 
 #ifndef EEPROM_MANAGER_DEBUG
@@ -182,14 +179,9 @@ void eeconfig_init(void)
     eeprom_write_byte(EECONFIG_MOUSEKEY_ACCEL, 0);
 
 #ifdef RGB_ENABLE
-    //extern void effects_update_default(void);
-    //effects_update_default();
+    rgb_led_config_init();
 #endif
 
-#ifdef RGB_MATRIX_ENABLE
-    //extern void rgb_matrix_update_default(void);
-    //rgb_matrix_update_default();
-#endif
 
     eeprom_write_byte(EECONFIG_LAYOUT_OPTIONS, 0);
     eeprom_write_byte(EECONFIG_DEVICE, 0);

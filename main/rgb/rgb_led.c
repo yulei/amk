@@ -4,13 +4,30 @@
 
 #include "rgb_led.h"
 #include "rgb_driver.h"
+#ifdef RGB_LINEAR_ENABLE
 #include "rgb_linear.h"
-#include "rgb_indicator.h"
-#include "rgb_matrix.h"
 #include "rgb_effect_linear.h"
+#endif
+#ifdef RGB_INDICATOR_ENABLE
+#include "rgb_indicator.h"
+#endif
+#ifdef RGB_MATRIX_ENABLE
+#include "rgb_matrix.h"
+#endif
 #include "wait.h"
 #include "amk_eeprom.h"
 #include "amk_gpio.h"
+#include "amk_printf.h"
+
+#ifndef RGB_LED_DEBUG
+#define RGB_LED_DEBUG 0
+#endif
+
+#if RGB_LED_DEBUG
+#define rgb_led_debug  amk_printf
+#else
+#define rgb_led_debug(...)
+#endif
 
 #ifdef RGB_LINEAR_ENABLE
     #define RGB_LINEAR_CONFIG_NUM       RGB_SEGMENT_NUM 
@@ -57,8 +74,14 @@ static void rgb_led_set_power(bool on)
     }
 }
 
+__attribute__((weak))
+void rgb_led_init_pre(void)
+{}
+
 void rgb_led_init(void)
 { 
+    rgb_led_init_pre();
+
     rgb_config_cur = 0;
     rgb_led_set_power(true);
 
@@ -109,6 +132,7 @@ rgb_driver_t *rgb_led_map(uint8_t led_index)
 
 void rgb_led_config_init(void)
 {
+    rgb_led_debug("rgb_led_config_init()\n");
     for (uint8_t i = 0; i < RGB_LED_CONFIG_NUM; i++) {
         g_rgb_configs[i].enable = ENABLE_DEFAULT;
         g_rgb_configs[i].mode = MODE_DEFAULT;
