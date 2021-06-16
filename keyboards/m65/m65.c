@@ -7,15 +7,23 @@
 #include "m65.h"
 #include "timer.h"
 #include "led.h"
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 #include "usb_descriptors.h"
+
+
+#ifdef DYNAMIC_CONFIGURATION
+extern RTC_HandleTypeDef hrtc;
+static void reset_to_msc(bool msc);
+#endif
 
 #ifdef SCREEN_ENABLE
 #include "screen.h"
 #include "fractal.h"
 #endif
 
+
 #ifdef MSC_ENABLE
+#include "mscusb.h"
 #include "anim.h"
 #include "amk_printf.h"
 enum {
@@ -83,9 +91,29 @@ static render_t renders[] = {
 
 #endif
 
-static uint32_t last_ticks = 0;
-static void reset_to_msc(bool msc);
+#ifdef RGB_ENABLE
+#include "rgb_driver.h"
+#include "rgb_linear.h"
+rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
+    {0, 0, 0, 0},
+    {0, 0, 0, 0},
+    {0, 0, 0, 0},
+    {0, 0, 0, 0},
+};
 
+
+rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
+    {RGB_DRIVER_WS2812, 0, 0, 0, 4},
+};
+
+rgb_linear_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
+    {0, 0, 0, 4},
+};
+#endif
+
+static uint32_t last_ticks = 0;
+
+//#if defined(DYNAMIC_CONFIGURATION) || defined(MSC_ENABLE)
 void matrix_init_kb(void)
 {
     gpio_set_output_pushpull(SCREEN_0_PWR);
@@ -94,7 +122,9 @@ void matrix_init_kb(void)
     gpio_set_output_pushpull(FLASH_CS);
     gpio_write_pin(FLASH_CS, 1);
 
+#ifdef SCREEN_ENABLE
     fractal_init();
+#endif
     last_ticks = timer_read32();
     // initialize renders
 #ifdef MSC_ENABLE
@@ -167,6 +197,8 @@ void render_task(render_t* render)
 
 void msc_init_kb(void)
 {
+    if (usb_setting & USB_MSC_BIT) return;
+
     if (!anim_mount(true) ) reset_to_msc(true);
 
     memset(anim_buf, 0, sizeof(anim_buf));
@@ -204,7 +236,6 @@ void led_set(uint8_t led)
 #include "action.h"
 #include "action_layer.h"
 #include "tusb.h"
-extern RTC_HandleTypeDef hrtc;
 bool hook_process_action_main(keyrecord_t *record)
 {
     if (IS_NOEVENT(record->event) || !record->event.pressed) { 
@@ -216,9 +247,13 @@ bool hook_process_action_main(keyrecord_t *record)
     }
 
     switch(action.key.code) {
+        case KC_F23:
+            msc_erase();
+            reset_to_msc(true);
+            return true;
         case KC_F24: 
             reset_to_msc((usb_setting & USB_MSC_BIT) ? false : true);
-        return true;
+            return true;
         default:
             break;
     }
@@ -226,7 +261,11 @@ bool hook_process_action_main(keyrecord_t *record)
     return false;
 }
 
-void reset_to_msc(bool msc)
+
+#endif
+
+#ifdef DYNAMIC_CONFIGURATION
+static void reset_to_msc(bool msc)
 {
     HAL_PWR_EnableBkUpAccess();
     HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, msc ? 1 : 0);
@@ -234,5 +273,4 @@ void reset_to_msc(bool msc)
     HAL_Delay(10);
     HAL_NVIC_SystemReset();
 }
-
 #endif

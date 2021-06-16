@@ -10,7 +10,7 @@
 #define PRODUCT_ID 0x6500   // M65 with screen
 #define DEVICE_VER 0x0001
 #define MANUFACTURER Matrix Lab
-#define PRODUCT Matrix VITA
+#define PRODUCT Matrix Vita
 
 // key matrix
 #define MATRIX_ROWS     5
@@ -38,11 +38,19 @@
 
 #define VECT_TAB_OFFSET 0x20000
 
-#define RGB_LED_NUM     4
+#define I2C_USE_INSTANCE_1
+#define I2C1_SCL_PIN    B8
+#define I2C1_SDA_PIN    B9
+
+#define WS2812_LED_NUM  4
 #define WS2812_LED_PIN  A0
 #define PWM_TIM_PERIOD  134
 #define PWM_TIM htim2
 #define PWM_TIM_CHANNEL TIM_CHANNEL_1
+
+#define RGB_LED_NUM     4
+#define RGB_DEVICE_NUM  1
+#define RGB_SEGMENT_NUM 1
 
 //#define SHARED_HID_EP
 #define DYNAMIC_CONFIGURATION

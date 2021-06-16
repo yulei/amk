@@ -355,3 +355,8 @@ rgb_driver_t *rgb_driver_get(uint8_t index)
     }
     return driver;
 }
+
+void rgb_driver_prepare_sleep(void)
+{
+    //TODO
+}

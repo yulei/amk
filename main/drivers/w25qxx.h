@@ -34,3 +34,5 @@ amk_error_t w25qxx_write_sector(w25qxx_t* w25qxx, uint32_t address, const uint8_
 
 amk_error_t w25qxx_read_sector(w25qxx_t* w25qxx, uint32_t address, uint8_t *data, uint32_t size);
 amk_error_t w25qxx_read_bytes(w25qxx_t* w25qxx, uint32_t address, uint8_t *data, uint32_t size);
+
+amk_error_t w25qxx_erase_chip(w25qxx_t* w25qxx);

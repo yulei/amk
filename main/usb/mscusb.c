@@ -33,7 +33,7 @@ void tud_msc_inquiry_cb(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16
     (void) lun; // use same ID for both LUNs
 
     const char vid[] = "Matrix";
-    const char pid[] = "M65 Disk";
+    const char pid[] = "Vita";
     const char rev[] = "1.0";
 
     memcpy(vendor_id  , vid, strlen(vid));
@@ -163,6 +163,11 @@ void msc_init(void)
     w25qxx = w25qxx_init(&w25qxx_config);
 
     msc_init_kb();
+}
+
+void msc_erase(void)
+{
+    w25qxx_erase_chip(w25qxx);
 }
 
 __attribute__((weak))

@@ -1,6 +1,6 @@
 /**
- * common_config.h
- *  common config fot keymap 
+ * @file amk_config.h
+ * @brief common config for keymap 
  */
 
 #pragma once
@@ -14,11 +14,3 @@
 #include "amk_gpio.h"
 #include "amk_action.h"
 #include "amk_printf.h"
-
-#ifdef RGB_ENABLE
-#include "rgb_effects.h"
-#endif
-
-#ifdef RGB_MATRIX_ENABLE
-#include "rgb_matrix.h"
-#endif
