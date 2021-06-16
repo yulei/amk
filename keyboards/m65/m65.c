@@ -29,7 +29,8 @@ static void reset_to_msc(bool msc);
 enum {
     MODE_SINGLE,
     MODE_SEQUENCE,
-    MODE_RANDOM
+    MODE_RANDOM,
+    MODE_MAX
 };
 
 typedef struct {
@@ -59,6 +60,7 @@ static uint16_t anim_buf[ANIM_WIDTH*ANIM_HEIGHT];
 #define AUXI_HEIGHT     30
 static uint16_t auxi_buf[AUXI_WIDTH*AUXI_HEIGHT];
 
+static bool first_screen = true;
 static bool filling = false;
 static render_t renders[] = {
     {
@@ -247,6 +249,18 @@ bool hook_process_action_main(keyrecord_t *record)
     }
 
     switch(action.key.code) {
+        case KC_F20:
+            first_screen = !first_screen;
+            return true;
+        case KC_F21: {
+            render_t *render = NULL;
+            if (first_screen) {
+                render = &renders[0];
+            } else {
+                render = &renders[1];
+            }
+            render->mode = (render->mode+1) % MODE_MAX;
+        } return true;
         case KC_F23:
             msc_erase();
             reset_to_msc(true);
