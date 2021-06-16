@@ -61,7 +61,8 @@ void matrix_init_kb(void)
 void keyboard_prepare_sleep(void)
 {
     // turn off rgb
-    rgb_led_set_all(false);
+    rgb_led_prepare_sleep();
+
     // turn off caps
     gpio_write_pin(CAPS_LED_PIN, 0);
     gpio_set_input_floating(CAPS_LED_PIN);
