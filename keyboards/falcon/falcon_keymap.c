@@ -1,9 +1,8 @@
 /**
- * hhkbble_keymap.c
- *  default keymap for the hhkbble
+ * @file falcon_keymap.c
  */
 
-#include "hhkbble.h"
+#include "falcon.h"
 #include "keymap.h"
 
 #define _______ KC_TRNS

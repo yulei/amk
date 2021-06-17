@@ -36,15 +36,16 @@
 #define RGBLIGHT_EN_PIN             22
 #define RGBLIGHT_EN_HIGH
 
-#define RGB_LED_NUM                 4
+#define WS2812_LED_NUM              4
 #define WS2812_LED_PIN              12
 
-#define AW9523B_ADDR                0xB6
-
 #define CAPS_LED_PIN                18
-#define INDICATOR_PIN               25
 
 #define WDT_ENABLE                  1        
+
+#define RGB_LED_NUM                 4
+#define RGB_DEVICE_NUM              1
+#define RGB_SEGMENT_NUM             1
 
 //#define GZLL_IS_CLIENT              1
 //#define DISABLE_USB

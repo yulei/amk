@@ -1,9 +1,8 @@
 /**
- * hhkbble_action.c
- *  default action keymap for the hhkbble
+ * @file falcon_action.c
  */
 
-#include "hhkbble.h"
+#include "falcon.h"
 #include "actionmap.h"
 
 #define _______ AC_TRNS

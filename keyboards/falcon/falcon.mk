@@ -1,9 +1,9 @@
 
-SRCS += $(KEYBOARD_DIR)/hhkbble.c
+SRCS += $(KEYBOARD_DIR)/falcon.c
 
 MCU = NRF52832
-RGB_EFFECTS_ENABLE = all
-EECONFIG_FDS = yes
+EECONFIG_FLASH = yes
+RGB_LINEAR_ENABLE = yes
 
 ifeq (yes,$(strip $(ACTIONMAP_ENABLE)))
 	SRCS += $(wildcard $(KEYBOARD_DIR)/*_action.c)
