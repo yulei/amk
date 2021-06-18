@@ -87,8 +87,8 @@
 #define I2C1_SCL_PIN                GPIO_PIN_MAP(0,5)
 #define I2C1_SDA_PIN                GPIO_PIN_MAP(1,9)
 
-#define WS2812_LED_NUM              4
-#define WS2812_LED_PIN              2
+//#define WS2812_LED_NUM              4
+//#define WS2812_LED_PIN              2
 #define RGB_LED_NUM                 20
 #define RGB_DEVICE_NUM              1
 #define RGB_SEGMENT_NUM             2

@@ -15,6 +15,8 @@ typedef void (*rd_init)(rgb_driver_t *driver);
 typedef void (*rd_uninit)(rgb_driver_t* driver);
 typedef void (*rd_set_color)(rgb_driver_t* driver, uint32_t index, uint8_t hue, uint8_t sat, uint8_t val);
 typedef void (*rd_set_color_all)(rgb_driver_t *driver, uint8_t hue, uint8_t sat, uint8_t val);
+typedef void (*rd_set_color_rgb)(rgb_driver_t* driver, uint32_t index, uint8_t red, uint8_t green, uint8_t blue);
+typedef void (*rd_set_color_all_rgb)(rgb_driver_t *driver, uint8_t red, uint8_t green, uint8_t blue);
 typedef void (*rd_flush)(rgb_driver_t *driver);
 
 struct s_rgb_driver{
@@ -22,6 +24,8 @@ struct s_rgb_driver{
     rd_uninit uninit;
     rd_set_color set_color;
     rd_set_color_all set_color_all;
+    rd_set_color_rgb set_color_rgb;
+    rd_set_color_all_rgb set_color_all_rgb;
     rd_flush flush;
     rgb_device_t *device;
     void *data;

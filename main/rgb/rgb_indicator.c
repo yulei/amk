@@ -20,7 +20,7 @@ void rgb_indicator_set(uint8_t index, uint8_t red, uint8_t green, uint8_t blue)
     rgb_driver_t *driver = rgb_driver_get(g_rgb_leds[g_index].driver);
 
     if (driver) {
-        driver->set_color(driver, g_index, red, green, blue);
+        driver->set_color_rgb(driver, g_index, red, green, blue);
     }
 }
 
