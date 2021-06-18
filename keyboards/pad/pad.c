@@ -1,11 +1,13 @@
 /*
- * pad.c
+ * @file pad.c
  */
 
 #include "pad.h"
+#include "rgb_common.h"
 #include "is31fl3731.h"
+#include "rgb_driver.h"
 
-rgb_led_t g_is31_leds[] ={
+rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {0, C1_9, C3_10, C4_10},
     {0, C1_10, C2_10, C4_11},
     {0, C1_11, C2_11, C3_11},
@@ -35,92 +37,55 @@ rgb_led_t g_is31_leds[] ={
     {0, C9_3, C8_3, C7_3},
     {0, C9_4, C8_4, C7_4},
     {0, C9_5, C8_5, C7_5},
+    // 4 leds
+    {1,0,0,0},
+    {1,1,1,1},
+    {1,2,2,2},
+    {1,3,3,3},
+
 };
 
-rgb_matrix_t g_rgb_matrix = {
-    .attributes = {
-        {172,  0,0,0,2},
-        {255,  3,0,0,3},
-        {255,  0,0,0,3},
-        {255, 63,0,1,3},
-        {172, 63,0,1,2},
-        { 89, 63,0,1,1},
-
-        { 89,111,0,2,1},
-        {172,111,0,2,2},
-        {255, 85,0,2,3},
-        {255,159,0,3,3},
-        {255,159,0,3,3},
-        {172,159,0,3,2},
-        { 89,159,0,3,1},
-
-        {  5, 63,0,1,0},
-        {  5,111,0,2,0},
-        {  5,159,0,3,0},
-        {  5,208,0,4,0},
-        { 89,208,0,4,1},
-        {172,208,0,4,2},
-        {255,208,0,4,3},
-        {255,222,0,5,3},
-
-        {  0,252,0,5,0},
-        { 95,252,0,5,1},
-        { 95,255,0,5,1},
-        {172,255,0,5,2},
-        {255,255,0,5,3},
-    },
+rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
+    {RGB_DRIVER_IS31FL3731, 0xE8, 0, 0, 26},
+    {RGB_DRIVER_WS2812, 0, 0, 26, 4},
 };
 
+rgb_param_t g_rgb_matrix_params[RGB_MATRIX_NUM] = {
+    {0, 0, 26},
+};
 
-#ifdef RGB_MATRIX_ENABLE
-#include "action.h"
-#include "action_layer.h"
-bool hook_process_action_main(keyrecord_t *record)
-{
-    if (IS_NOEVENT(record->event) || !record->event.pressed) { 
-        return false;
-    }
-    action_t action = layer_switch_get_action(record->event);
-    if (action.kind.id != ACT_MODS) {
-        return false;
-    }
+rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
+    {1, 26, 4},
+};
 
-    switch(action.key.code) {
-        case KC_F13:
-            rgb_matrix_toggle();
-            amk_printf("Toggle rgb matrix: %d\n", rgb_matrix_enabled());
-            return true;
-        case KC_F14:
-            rgb_matrix_inc_mode();
-            return true;
-        case KC_F15:
-            rgb_matrix_inc_hue();
-            return true;
-        case KC_F16:
-            rgb_matrix_dec_hue();
-            return true;
-        case KC_F17:
-            rgb_matrix_inc_sat();
-            return true;
-        case KC_F18:
-            rgb_matrix_dec_sat();
-            return true;
-        case KC_F19:
-            rgb_matrix_inc_val();
-            return true;
-        case KC_F20:
-            rgb_matrix_dec_val();
-            return true;
-        case KC_F21:
-            rgb_matrix_inc_speed();
-            return true;
-        case KC_F22:
-            rgb_matrix_dec_speed();
-            return true;
-        default:
-            break;
-    }
+rgb_led_attr_t g_rgb_led_attrs[RGB_MATRIX_LED_NUM] = {
+    {172,  0,0,0,2},
+    {255,  3,0,0,3},
+    {255,  0,0,0,3},
+    {255, 63,0,1,3},
+    {172, 63,0,1,2},
+    { 89, 63,0,1,1},
 
-    return false;
-}
-#endif
+    { 89,111,0,2,1},
+    {172,111,0,2,2},
+    {255, 85,0,2,3},
+    {255,159,0,3,3},
+    {255,159,0,3,3},
+    {172,159,0,3,2},
+    { 89,159,0,3,1},
+
+    {  5, 63,0,1,0},
+    {  5,111,0,2,0},
+    {  5,159,0,3,0},
+    {  5,208,0,4,0},
+    { 89,208,0,4,1},
+    {172,208,0,4,2},
+    {255,208,0,4,3},
+    {255,222,0,5,3},
+
+    {  0,252,0,5,0},
+    { 95,252,0,5,1},
+    { 95,255,0,5,1},
+    {172,255,0,5,2},
+    {255,255,0,5,3},
+};

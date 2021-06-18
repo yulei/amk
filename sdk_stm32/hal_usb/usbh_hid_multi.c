@@ -77,12 +77,13 @@ static USBH_StatusTypeDef hid_multi_init(USBH_HandleTypeDef *phost)
     report_desc_buf_init(&report_desc_buffer);
 
     USBH_CfgDescTypeDef *pcfg = &phost->device.CfgDesc;
-    phid->itf_num = pcfg->bNumInterfaces;
-    for (int i = 0; i < phid->itf_num; i++) {
+    phid->itf_num = 0; //pcfg->bNumInterfaces;
+    for (int i = 0; i < pcfg->bNumInterfaces; i++) {
         USBH_InterfaceDescTypeDef *desc = &pcfg->Itf_Desc[i];
         if (desc->bInterfaceClass == USB_HID_CLASS) {
             hid_itf_init(phost, i, desc);
             status = USBH_OK;
+            phid->itf_num++;
         }
     }
 
@@ -275,8 +276,9 @@ static USBH_StatusTypeDef hid_itf_request(USBH_HandleTypeDef *phost, uint8_t itf
             phost->pUser(phost, HOST_USER_CLASS_ACTIVE);
             status = USBH_OK;
         } else if (classReqStatus == USBH_NOT_SUPPORTED) {
-            amk_printf("HID interface[%]: failed to set protocol\n", itf);
+            amk_printf("HID interface[%d]: failed to set protocol\n", itf);
             status = USBH_FAIL;
+            //status = USBH_OK;
         } else {
         }
         break;

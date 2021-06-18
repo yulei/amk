@@ -25,6 +25,6 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 const action_t fn_actions[] = {
     [0] = ACTION_LAYER_MOMENTARY(1),
-    [1] = ACTION_FUNCTION(AF_RGB_MATRIX_TOG),
-    [2] = ACTION_FUNCTION(AF_RGB_MATRIX_MOD),
+    [1] = ACTION_FUNCTION(AF_RGB_TOG),
+    [2] = ACTION_FUNCTION(AF_RGB_MOD),
 };

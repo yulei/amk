@@ -28,8 +28,8 @@
 #define DELAY_MIN   0
 #define DELAY_DEFAULT 1500
 
-#define GRADIENT_STEP_DEFAULT   17
-#define BREATH_STEP_DEFAULT     32
+#define GRADIENT_STEP_DEFAULT   8
+#define BREATH_STEP_DEFAULT     8
 #define INVALID_LED             0xFF
 
 #define SNAKE_SIZE 3
@@ -381,6 +381,7 @@ rgb_effect_t rgb_effect_matrix_init(rgb_config_t* config, uint8_t index, uint8_t
     index, state->config->enable, state->config->mode, state->config->speed, state->config->hue, state->config->sat, state->config->val);
 
     if ( !effect_config_valid(state->config)){
+        rgb_effects_debug("RGB Matrix config invalid, update to default\n");
         effect_update_default(state);
     }
 
