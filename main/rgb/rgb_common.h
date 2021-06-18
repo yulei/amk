@@ -50,8 +50,15 @@ typedef struct {
     uint8_t sat;
     uint8_t val;
     uint8_t type;
+    uint8_t index;
     void*   data;
 } rgb_config_t;
+
+typedef struct {
+    uint8_t config;
+    uint8_t led_start;
+    uint8_t led_num;
+} rgb_param_t;
 
 enum {
     RGB_EFFECT_ENABLE,
@@ -95,8 +102,13 @@ typedef void* rgb_effect_t;
 typedef void (*rgb_effect_fun_t)(rgb_effect_t*);
 
 extern rgb_led_t g_rgb_leds[];
+extern rgb_led_attr_t g_rgb_led_attrs[];
+
 extern rgb_device_t g_rgb_devices[];
 extern rgb_config_t g_rgb_configs[];
 
 rgb_t hsv_to_rgb(hsv_t hsv);
 rgb_t pick_color(uint8_t hue);
+uint8_t pick_hue(void);
+
+#define container_of(ptr, type, member) ((type *)((char *)(ptr) - offsetof(type, member)))

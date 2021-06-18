@@ -340,11 +340,11 @@ bool hook_process_action_main(keyrecord_t *record) {
     }
 
     switch(action.key.code) {
-    #ifdef RGB_ENABLE
-        case KC_F13:
-            rgb_led_config_next();
-            return true;
-    #endif
+    //#ifdef RGB_ENABLE
+    //    case KC_F13:
+    //        rgb_led_config_next();
+    //        return true;
+    //#endif
         case KC_F15:
             connect_target(BLE_PEER_DEVICE_0);
             return true;

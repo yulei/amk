@@ -1,8 +1,9 @@
 /**
- * rgb_common.c
- *  rgb common implementation
+ * @file rgb_common.c
+ * @brief rgb common implementation
  */
 
+#include <stdlib.h>
 #include "rgb_common.h"
 
 static const uint8_t CIE1931_CURVE[256] = {
@@ -74,4 +75,11 @@ rgb_t pick_color(uint8_t hue)
 {
     hsv_t hsv = {hue, 255, 255};
     return hsv_to_rgb(hsv);
+}
+
+// utilities
+#define RANDOM_DISTANCE 17
+uint8_t pick_hue(void)
+{
+    return (rand() % HUE_MAX) + RANDOM_DISTANCE;
 }

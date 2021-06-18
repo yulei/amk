@@ -23,16 +23,6 @@ typedef enum {
     AF_RGB_VALD,
     AF_RGB_SPDI,
     AF_RGB_SPDD,
-    AF_RGB_MATRIX_TOG,
-    AF_RGB_MATRIX_MOD,
-    AF_RGB_MATRIX_HUEI,
-    AF_RGB_MATRIX_HUED,
-    AF_RGB_MATRIX_SATI,
-    AF_RGB_MATRIX_SATD,
-    AF_RGB_MATRIX_VALI,
-    AF_RGB_MATRIX_VALD,
-    AF_RGB_MATRIX_SPDI,
-    AF_RGB_MATRIX_SPDD,
 } function_id_t;
 
 // try to use 0xE8-0xEF

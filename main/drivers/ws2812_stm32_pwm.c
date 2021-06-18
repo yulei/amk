@@ -60,6 +60,9 @@ void ws2812_init(pin_t pin)
 
 void ws2812_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
 {
+    rgb_led_t *led = &g_rgb_leds[index];
+    index = led->r;
+
     if (index < WS2812_LED_NUM) {
         uint32_t i = 0;
         // green

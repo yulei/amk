@@ -170,6 +170,12 @@ bool hook_process_action(keyrecord_t *record)
             send_keyboard_report();
             return true;
         }
+        #if RGB_ENABLE
+        else if (action.key.code == KC_F13){
+           rgb_led_config_next();
+           return true; 
+        }
+        #endif
     } break;
     case ACT_LMODS_TAP:
     case ACT_RMODS_TAP: {

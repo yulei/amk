@@ -52,9 +52,6 @@ struct s_rgb_linear_state {
 
 static rgb_linear_state_t effects_state[RGB_EFFECT_LINEAR_NUM];
 
-// utilities
-#define RANDOM_DISTANCE 17
-static uint8_t get_random_hue(uint8_t hue) { return (rand() % HUE_MAX) + RANDOM_DISTANCE; }
 
 static bool effects_config_valid(rgb_config_t *config)
 {
@@ -181,7 +178,7 @@ static void effects_mode_random(rgb_linear_state_t *state)
 {
     uint8_t hue = state->config->hue;
     for (int i = 0; i < state->led_num; i++) {
-        hue = get_random_hue(hue);
+        hue = pick_hue();
         effects_set_color_all(state, hue, state->config->sat, state->config->val);
     }
 }
@@ -249,7 +246,7 @@ static void effects_mode_circle(rgb_linear_state_t *state)
 static void effects_set_enable(rgb_linear_state_t *state, uint8_t enable)
 {
     state->config->enable = enable;
-    eeconfig_update_rgb(state->config, state->index);
+    eeconfig_update_rgb(state->config, state->config->index);
 }
 
 static void effects_update_default(rgb_linear_state_t *state)
@@ -260,7 +257,7 @@ static void effects_update_default(rgb_linear_state_t *state)
     state->config->hue      = HUE_DEFAULT;
     state->config->sat      = SAT_DEFAULT;
     state->config->val      = VAL_DEFAULT;
-    eeconfig_update_rgb(state->config, state->index);
+    eeconfig_update_rgb(state->config, state->config->index);
 }
 
 static void effects_state_init(rgb_linear_state_t *state)
@@ -298,7 +295,7 @@ rgb_effect_t rgb_effect_linear_init(rgb_config_t *config, uint8_t index, uint8_t
         eeconfig_init();
     }
 
-    eeconfig_read_rgb(state->config, index);
+    eeconfig_read_rgb(state->config, state->config->index);
     rgb_effects_debug("RGB config: index:%d, enable:%d, mode:%d, speed:%d, hue:%d, sat:%d, val:%d\n", 
     index, state->config->enable, state->config->mode, state->config->speed, state->config->hue, state->config->sat, state->config->val);
 

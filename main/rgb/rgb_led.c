@@ -13,6 +13,7 @@
 #endif
 #ifdef RGB_MATRIX_ENABLE
 #include "rgb_matrix.h"
+#include "rgb_effect_matrix.h"
 #endif
 #include "wait.h"
 #include "amk_eeprom.h"
@@ -140,6 +141,7 @@ void rgb_led_config_init(void)
         g_rgb_configs[i].sat = SAT_DEFAULT;
         g_rgb_configs[i].val = VAL_DEFAULT;
         g_rgb_configs[i].speed = SPEED_DEFAULT;
+        g_rgb_configs[i].index = i;
         eeconfig_write_rgb(&g_rgb_configs[i], i);
     }
 }
@@ -188,6 +190,7 @@ static void rgb_led_effect_init_mode(rgb_config_t *config)
 #endif
 #ifdef RGB_MATRIX_ENABLE
         case RGB_EFFECT_MATRIX:
+            rgb_effect_matrix_init_mode(config->data);
         break;
 #endif
         default:

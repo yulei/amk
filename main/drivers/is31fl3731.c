@@ -8,6 +8,7 @@
 #include "is31fl3731.h"
 #include "rgb_common.h"
 #include "i2c.h"
+#include "wait.h"
 
 #define PWM_BUFFER_SIZE     144
 #define CONTROL_BUFFER_SIZE 18
@@ -118,6 +119,7 @@ void init_driver(is31fl3731_driver_t *driver)
     i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT);
     data = 0;
     i2c_write_reg(i2c_inst, driver->i2c_led.addr, SHUTDOWN_REG, &data, 1, TIMEOUT);
+    wait_ms(10);
 
     // set mode
     data = PICTURE_MODE;
@@ -126,16 +128,17 @@ void init_driver(is31fl3731_driver_t *driver)
     i2c_write_reg(i2c_inst, driver->i2c_led.addr, PICTURE_FRAME_REG, &data, 1, TIMEOUT);
     i2c_write_reg(i2c_inst, driver->i2c_led.addr, AUDIO_SYNC_REG, &data, 1, TIMEOUT);
 
+    // select bank 0
     i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT);
-    // turn off leds, blinks, pwms
-    for (int i = 0; i < 0xB4; i++) {
-        i2c_write_reg(i2c_inst, driver->i2c_led.addr, i, &data, 1, TIMEOUT);
-    }
+    // turn off leds
+    i2c_send(i2c_inst, driver->i2c_led.addr, driver->pwm_buffer, PWM_BUFFER_SIZE + 1, TIMEOUT);
 
     data = BANK_FUNCTION_REG;
     i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT);
+    // enable chip
     data = 1;
     i2c_write_reg(i2c_inst, driver->i2c_led.addr, SHUTDOWN_REG, &data, 1, TIMEOUT);
+    // select bank 0
     data = 0;
     i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT);
 
