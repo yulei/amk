@@ -10,6 +10,7 @@
 #include "action_macro.h"
 #include "action_code.h"
 #include "keymap.h"
+#include "amk_action.h"
 
 #define LAYOUT_default( \
     K31, K30, K00, K10, K11, K20, K21, K40, K41, K60, K61, K70, K71, K50, K51, \

@@ -2,7 +2,7 @@
  * @file atsamd.c
  */
 
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 #include "usb_descriptors.h"
 
 struct flash_descriptor FLASH_0;

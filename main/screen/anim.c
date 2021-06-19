@@ -258,7 +258,7 @@ static bool anim_check_file(const char *path, const char* sig)
     }
     
     if (memcmp(sig, header.signature, 4) != 0) {
-        amk_printf("ANIM check: signature invalid: %c%c%c%c\n", header.signature[0], header.signature[1], header.signature[2], header.signature[3]);
+        amk_printf("ANIM check: signature invalid: %x\n", &header.signature[0]);
         goto exit;
     }
 

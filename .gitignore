@@ -1,10 +1,11 @@
 .vscode/
 build/
 keyboards/amkbd/
-nrf5_sdk/nRF5_SDK_*
+sdk_nrf5/nRF5_SDK_*
 misc/
 !misc/*.ioc
-samd_sdk/d21/gcc/*
-!samd_sdk/d21/gcc/Makefile
+sdk_samd/d21/gcc/*
+!sdk_samd/d21/gcc/Makefile
 *.DS_Store
 *.bin
+*.hex

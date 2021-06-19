@@ -214,6 +214,22 @@ amk_error_t w25qxx_read_bytes(w25qxx_t* w25qxx, uint32_t address, uint8_t *data,
     return AMK_SUCCESS;
 }
 
+amk_error_t w25qxx_erase_chip(w25qxx_t* w25qxx)
+{
+    w25qxx_wait(w25qxx);
+    w25qxx_enable_write(w25qxx);
+
+    gpio_write_pin(w25qxx->config.cs, 0);
+
+	w25qxx_spi_write(w25qxx, WQCMD_CHIP_ERASE);
+
+    gpio_write_pin(w25qxx->config.cs, 1);
+
+    w25qxx_wait(w25qxx);
+
+    return AMK_SUCCESS;
+}
+
 static uint32_t w25qxx_read_jedec(w25qxx_t *w25qxx)
 {
     uint8_t tx[4] = {WQCMD_JEDEC_ID, WQCMD_DUMMY, WQCMD_DUMMY, WQCMD_DUMMY};

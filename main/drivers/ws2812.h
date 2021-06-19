@@ -6,8 +6,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "rgb_color.h"
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 
 void ws2812_init(pin_t pin);
 

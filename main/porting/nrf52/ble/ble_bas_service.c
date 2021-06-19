@@ -3,7 +3,7 @@
  * @brief ble battery service
  */
 
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 #include "ble_bas.h"
 #include "ble_bas_service.h"
 

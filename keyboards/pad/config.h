@@ -23,16 +23,20 @@
                                 C0,  B8,  B7,  B6, \
                                C15, C14, C13,  B9}
 
-#define RGB_MATRIX_LED_NUM  26
-#define IS31_DRIVER_NUM     1
-#define IS31_ADDR1          0xE8
-#define IS31_LED_NUM1       26
-#define I2C_INSTANCE_ID     I2C2
-#define I2C_SCL_PIN         B9
-#define I2C_SDA_PIN         B10
+#define I2C_USE_INSTANCE_2
+#define IS31FL3731_I2C_ID   I2C_INSTANCE_2
+#define I2C2_SCL_PIN        B10
+#define I2C2_SDA_PIN        B11
 
-#define RGB_LED_NUM         4
+#define WS2812_LED_NUM      4
 #define WS2812_LED_PIN      A10
 #define PWM_TIM_PERIOD      105
 
-#define VECT_TAB_OFFSET         0x20000
+#define RGB_MATRIX_LED_NUM  26
+#define RGB_LED_NUM         30
+
+#define RGB_DEVICE_NUM      2
+#define RGB_SEGMENT_NUM     1
+#define RGB_MATRIX_NUM      1
+
+#define VECT_TAB_OFFSET     0x20000

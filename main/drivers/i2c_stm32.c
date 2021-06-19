@@ -7,52 +7,109 @@
 
 #include "generic_hal.h"
 #include "i2c.h"
-#include "gpio_pin.h"
+#include "amk_gpio.h"
+#include "amk_printf.h"
 
-#ifndef I2C_INSTANCE_ID
-    #define I2C_INSTANCE_ID     I2C1 
+typedef struct {
+    I2C_HandleTypeDef handle;
+    bool ready;
+} i2c_instance_t;
+
+#ifdef I2C_USE_INSTANCE_1
+    #define I2C1_ID     I2C1
+    #define I2C1_SCL    I2C1_SCL_PIN
+    #define I2C1_SDA    I2C1_SDA_PIN
+    static i2c_instance_t m_i2c1 = {
+        .ready = false,
+    };
 #endif
 
-#ifndef I2C_SCL_PIN
-    #define I2C_SCL_PIN         B8 
+#ifdef I2C_USE_INSTANCE_2
+    #define I2C2_ID     I2C2
+    #define I2C2_SCL    I2C2_SCL_PIN
+    #define I2C2_SDA    I2C2_SDA_PIN
+    static i2c_instance_t m_i2c2 = {
+        .ready = false,
+    };
 #endif
 
-#ifndef I2C_SDA_PIN
-    #define I2C_SDA_PIN         B9
-#endif
 
-
-I2C_HandleTypeDef i2c_handle;
-
-static bool twi_ready = false;
-bool i2c_ready(void) { return twi_ready; }
-
-
-void i2c_init(void)
+bool i2c_ready(i2c_handle_t i2c)
 {
-    if (i2c_ready()) {
-        return;
-    }
+    i2c_instance_t *inst = (i2c_instance_t*)i2c;
+    return inst->ready;
+}
 
-    i2c_handle.Instance = I2C_INSTANCE_ID;
-    i2c_handle.Init.ClockSpeed = 400000;
-    i2c_handle.Init.DutyCycle = I2C_DUTYCYCLE_2;
-    i2c_handle.Init.OwnAddress1 = 0;
-    i2c_handle.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-    i2c_handle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-    i2c_handle.Init.OwnAddress2 = 0;
-    i2c_handle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-    i2c_handle.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-    if (HAL_I2C_Init(&i2c_handle) == HAL_OK) {
-        twi_ready = true;
+static void i2c_inst_init(i2c_instance_t *inst, I2C_TypeDef *i2c)
+{
+    if (i2c_ready(inst))
+        return;
+
+#ifdef STM32F722xx
+    inst->handle.Instance = I2C1;
+    inst->handle.Init.Timing = 0x6000030D;
+    inst->handle.Init.OwnAddress1 = 0;
+    inst->handle.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+    inst->handle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+    inst->handle.Init.OwnAddress2 = 0;
+    inst->handle.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+    inst->handle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+    inst->handle.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+    if (HAL_I2C_Init(&inst->handle) != HAL_OK) {
+        amk_printf("HAL_I2C_Init() failed\n");
+    }
+    /** Configure Analogue filter
+    */
+    if (HAL_I2CEx_ConfigAnalogFilter(&inst->handle, I2C_ANALOGFILTER_ENABLE) != HAL_OK) {
+        amk_printf("HAL_I2CEx_ConfigAnalogFilter() failed\n");
+    }
+    /** Configure Digital filter
+    */
+    if (HAL_I2CEx_ConfigDigitalFilter(&inst->handle, 0) != HAL_OK) {
+        amk_printf("HAL_I2CEx_ConfigDigitalFilter() failed\n");
+    }
+#else
+    inst->handle.Instance = i2c;
+    inst->handle.Init.ClockSpeed = 400000;
+    inst->handle.Init.DutyCycle = I2C_DUTYCYCLE_2;
+    inst->handle.Init.OwnAddress1 = 0;
+    inst->handle.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+    inst->handle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+    inst->handle.Init.OwnAddress2 = 0;
+    inst->handle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+    inst->handle.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+    if (HAL_I2C_Init(&inst->handle) == HAL_OK) {
+        inst->ready = true;
     } else {
         //Error_Handler();
     }
+#endif
+    inst->ready = true;
 }
 
-amk_error_t i2c_send(uint8_t addr, const void* data, size_t length, size_t timeout)
+i2c_handle_t i2c_init(I2C_ID id)
 {
-    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&i2c_handle, addr, (void*)data, length, timeout);
+#ifdef I2C_USE_INSTANCE_1
+    if (id == I2C_INSTANCE_1) {
+        i2c_inst_init(&m_i2c1, I2C1_ID);
+        return &m_i2c1;
+    }
+#endif
+
+#ifdef I2C_USE_INSTANCE_2
+    if (id == I2C_INSTANCE_2) {
+        i2c_inst_init(&m_i2c2, I2C2_ID);
+        return &m_i2c2;
+    }
+#endif
+
+    return NULL;
+}
+
+amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t length, size_t timeout)
+{
+    i2c_instance_t *inst = (i2c_instance_t*)i2c;
+    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&inst->handle, addr, (void*)data, length, timeout);
     if (status == HAL_OK) {
         return AMK_SUCCESS;
     }
@@ -63,9 +120,10 @@ amk_error_t i2c_send(uint8_t addr, const void* data, size_t length, size_t timeo
     return AMK_ERROR;
 }
 
-amk_error_t i2c_recv(uint8_t addr, void* data, size_t length, size_t timeout)
+amk_error_t i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, size_t timeout)
 {
-    HAL_StatusTypeDef status = HAL_I2C_Master_Receive(&i2c_handle, addr, data, length, timeout);
+    i2c_instance_t *inst = (i2c_instance_t*)i2c;
+    HAL_StatusTypeDef status = HAL_I2C_Master_Receive(&inst->handle, addr, data, length, timeout);
     if (status == HAL_OK) {
         return AMK_SUCCESS;
     }
@@ -76,9 +134,10 @@ amk_error_t i2c_recv(uint8_t addr, void* data, size_t length, size_t timeout)
     return AMK_ERROR;
 }
 
-amk_error_t i2c_write_reg(uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
+amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
 {
-    HAL_StatusTypeDef status = HAL_I2C_Mem_Write(&i2c_handle, addr, reg, 1, (void*)data, length, timeout);
+    i2c_instance_t *inst = (i2c_instance_t*)i2c;
+    HAL_StatusTypeDef status = HAL_I2C_Mem_Write(&inst->handle, addr, reg, 1, (void*)data, length, timeout);
     if (status == HAL_OK) {
         return AMK_SUCCESS;
     }
@@ -89,9 +148,10 @@ amk_error_t i2c_write_reg(uint8_t addr, uint8_t reg, const void* data, size_t le
     return AMK_ERROR;
 }
 
-amk_error_t i2c_read_reg(uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
+amk_error_t i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
 {
-    HAL_StatusTypeDef status = HAL_I2C_Mem_Read(&i2c_handle, addr, reg, 1, data, length, timeout);
+    i2c_instance_t *inst = (i2c_instance_t*)i2c;
+    HAL_StatusTypeDef status = HAL_I2C_Mem_Read(&inst->handle, addr, reg, 1, data, length, timeout);
     if (status == HAL_OK) {
         return AMK_SUCCESS;
     }
@@ -102,12 +162,12 @@ amk_error_t i2c_read_reg(uint8_t addr, uint8_t reg, void* data, size_t length, s
     return AMK_ERROR;
 }
 
-void i2c_uninit(void)
+void i2c_uninit(i2c_handle_t i2c)
 {
-    if(!i2c_ready()) {
+    if(!i2c_ready(i2c)) {
         return;
     }
-
-    HAL_I2C_DeInit(&i2c_handle);
-    twi_ready = false;
+    i2c_instance_t *inst = (i2c_instance_t*)i2c;
+    HAL_I2C_DeInit(&inst->handle);
+    inst->ready = false;
 }

@@ -1,10 +1,10 @@
 /**
- * gpio_pin.c
+ * @file gpio_pin.c
  */
 
 #include <string.h>
 #include "generic_hal.h"
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 
 /*
 int gpio_read_pin(pin_t pin)

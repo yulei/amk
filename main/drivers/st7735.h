@@ -7,7 +7,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 
 typedef struct {
 #ifdef SCREEN_POWER_PIN

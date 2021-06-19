@@ -1,7 +1,7 @@
 
 PROJECT_NAME := amk
 NRF_MCUS := NRF52832 NRF52840
-STM32_MCUS := STM32F103 STM32F411 STM32F405 STM32F722 STM32L432
+STM32_MCUS := STM32F103 STM32F411 STM32F405 STM32F722 STM32L432 STM32L072
 ATSAMD_MCUS := ATSAMD21
 NUVOTON_MCUS := NUC126
 GD32_MCUS := GD32_E103 
@@ -23,11 +23,11 @@ GOALS := $(filter-out default list clean flash erase flash_softdevice sdk_config
 OUTPUT_DIR := build
 MAIN_DIR := main
 LIB_DIR := libs
-NRF5_DIR := nrf5_sdk
-STM32_DIR := stm32_sdk
-ATSAMD_DIR := atsamd_sdk
-NUVOTON_DIR := nuvoton_sdk
-GD32_DIR := gd32_sdk
+#NRF5_DIR := sdk_nrf5
+#STM32_DIR := sdk_stm32
+#ATSAMD_DIR := sdk_samd
+#NUVOTON_DIR := sdk_nuvoton
+#GD32_DIR := sdk_gd32
 
 ifneq (, $(GOALS))
 GOAL_LIST := $(subst /, ,$(GOALS))
@@ -56,15 +56,20 @@ include $(MAIN_DIR)/main.mk
 include $(LIB_DIR)/tmk.mk
 include $(LIB_DIR)/printf.mk
 ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
-include $(NRF5_DIR)/nrf5_sdk.mk
+VENDOR_DIR := libs/vendor/nordic
+include sdk_nrf5/nrf5_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
-include $(STM32_DIR)/stm32_sdk.mk
+VENDOR_DIR := libs/vendor/st
+include sdk_stm32/stm32_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(ATSAMD_MCUS)))
-include $(ATSAMD_DIR)/atsamd_sdk.mk
+VENDOR_DIR := libs/vendor/microchip
+include sdk_samd/atsamd_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(NUVOTON_MCUS)))
-include $(NUVOTON_DIR)/nuvoton_sdk.mk
+VENDOR_DIR := libs/vendor/nuvoton
+include sdk_nuvoton/nuvoton_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(GD32_MCUS)))
-include $(GD32_DIR)/gd32_sdk.mk
+VENDOR_DIR := libs/vendor/gigadevice
+include sdk_gd32/gd32_sdk.mk
 else
 $(error Unsupported MCU: $(MCU))
 endif
@@ -83,6 +88,8 @@ endif
 # Default target
 ifeq (,$(TARGET))
 default: list 
+else
+$(info Building $(TARGET) ...)
 endif
 
 clean:

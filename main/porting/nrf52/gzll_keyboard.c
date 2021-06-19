@@ -9,7 +9,7 @@
 #include "nrf_gzll.h"
 #include "nrf_gzll_error.h"
 #include "nrf_drv_clock.h"
-#include "eeconfig_fds.h"
+#include "eeconfig_flash.h"
 #include "rf_keyboard.h"
 #include "usb_interface.h"
 #include "report.h"
@@ -45,7 +45,7 @@ void gzll_keyboard_init(bool host)
     nrf_gzll_set_base_address_0(GZLL_BASE_ADDRESS_0);
     nrf_gzll_set_base_address_1(GZLL_BASE_ADDRESS_1);
 
-#ifdef EECONFIG_FDS
+#ifdef EECONFIG_FLASH
     fds_eeprom_init();
 #endif
 

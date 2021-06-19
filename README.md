@@ -21,4 +21,4 @@ make
 ```
 
 ## Note:
-If want to compile keyboards which were made by nrf52 (like the hhkbble), the [NRF5 SDK](https://www.nordicsemi.com/Software-and-Tools/Software/nRF5-SDK) must be downloaded and unzipped to the ```nrf5_sdk``` directory. The current version used by amk was 17.0.2.
+If want to compile keyboards which were made by nrf52 (like the hhkbble), the [NRF5 SDK](https://www.nordicsemi.com/Software-and-Tools/Software/nRF5-SDK) must be downloaded and unzipped to the ```vendor/nordic``` directory. The current version used by amk was 17.0.2.

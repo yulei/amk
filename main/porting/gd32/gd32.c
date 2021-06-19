@@ -1,8 +1,8 @@
 /**
- * @file atsamd.c
+ * @file gd32.c
  */
 
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 #include "usb_descriptors.h"
 #include "usb_comp.h"
 #include "drv_usb_hw.h"

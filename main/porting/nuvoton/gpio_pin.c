@@ -1,9 +1,9 @@
 /**
- * gpio_pin.c
+ * @file gpio_pin.c
  */
 
 #include "generic_hal.h"
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 
 #define PIN_CVT(pin)    GPIO_PIN_DATA((GET_PORT(pin)), (GET_PIN(pin)))
 #define PORT_CVT(pin)   (GPIO_T *)(GPIO_BASE + (GET_PORT(pin))*0x40)

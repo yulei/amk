@@ -9,7 +9,8 @@
 #include "ble_adv_service.h"
 #include "ble_hids_service.h"
 #include "ble_services.h"
-#include "eeconfig_fds.h"
+#include "amk_eeprom.h"
+#include "eeconfig_flash.h"
 #include "rf_keyboard.h"
 
 ble_driver_t ble_driver = {
@@ -123,12 +124,18 @@ static void ble_stack_init(void)
 void ble_keyboard_init(void)
 {
     ble_stack_init();
-#ifdef EECONFIG_FDS
+#ifdef EECONFIG_FLASH
     fds_eeprom_init();
 #endif
     ble_services_init();
 
     rf_keyboard_init(ble_send_report, ble_prepare_sleep);
+
+    ble_driver.current_peer = eeconfig_read_device();
+    if (ble_driver.current_peer >= BLE_PEER_DEVICE_MAX) {
+        ble_driver.current_peer = BLE_PEER_DEVICE_0;
+        eeconfig_update_device(ble_driver.current_peer);
+    } 
 }
 
 void ble_keyboard_start(bool erase_bonds)

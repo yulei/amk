@@ -12,17 +12,3 @@ SRCS += \
 
 INCS += \
 	$(GD32_PORTING_DIR) \
-
-ifeq (yes, $(EECONFIG_FRAM)) 
-	SRCS += $(MAIN_DIR)/eeconfig_fram.c
-	SRCS += $(MAIN_DIR)/drivers/mb85rcxx.c
-	SRCS += $(MAIN_DIR)/drivers/i2c.c
-	APP_DEF += -DEECONFIG_FRAM
-else
-	ifeq (yes, $(EECONFIG_FLASH))
-		SRCS += $(MAIN_DIR)/eeconfig_flash.c
-		APP_DEF += -DEECONFIG_FLASH
-	else
-		SRCS += $(MAIN_DIR)/eeconfig_mem.c
-	endif
-endif
