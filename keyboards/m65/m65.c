@@ -108,8 +108,8 @@ rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
     {RGB_DRIVER_WS2812, 0, 0, 0, 4},
 };
 
-rgb_linear_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
-    {0, 0, 0, 4},
+rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
+    {0, 0, 4},
 };
 #endif
 

@@ -58,8 +58,8 @@ rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
  //   { RGB_DRIVER_IS31FL3236, 0x78, 0, 4, 7},
 };
 
-rgb_linear_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
-    {0, 0, 0, 4},
-    {1, 1, 4, 16},
-    {1, 2, 20, 4},
+rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
+    {0, 0, 4},
+    {1, 4, 16},
+    {2, 20, 4},
 };

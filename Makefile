@@ -88,6 +88,8 @@ endif
 # Default target
 ifeq (,$(TARGET))
 default: list 
+else
+$(info Building $(TARGET) ...)
 endif
 
 clean:

@@ -1,16 +1,24 @@
 /**
  * @file keycode_convert.c
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "keycode_convert.h"
 #include "actionmap.h"
 #include "amk_action.h"
 
-// Can't use SAFE_RANGE here, it might change if someone adds
-// new values to enum quantum_keycodes.
-// Need to keep checking 0x5F10 is still in the safe range.
-// TODO: merge this into quantum_keycodes
-// Backlight keycodes are in range 0x5F00-0x5F0F
 enum via_keycodes {
     FN_MO13 = 0x5F10,
     FN_MO23,

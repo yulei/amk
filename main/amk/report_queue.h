@@ -1,6 +1,12 @@
 /**
- * report_queue.h
- *  queue for caching report
+ * Copyright 2021 astro. All rights reserved.
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file.
+ */
+
+/**
+ * @file report_queue.h
+ * @brief queue for caching report
  */
 
 #pragma once

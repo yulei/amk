@@ -31,8 +31,8 @@ rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
     {RGB_DRIVER_AW9523B, 0xB6, 0, 0, 4},
 };
 
-rgb_linear_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
-    {0, 0, 0, 4},
+rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
+    {0, 0, 4},
 };
 
 void rgb_led_init_pre(void)

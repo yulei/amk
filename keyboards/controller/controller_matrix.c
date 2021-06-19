@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdbool.h>
 
 #include "app_timer.h"
-#include "gpio_pin.h"
+#include "amk_gpio.h"
 
 #include "matrix.h"
 #include "wait.h"
@@ -232,4 +232,9 @@ bool matrix_keys_off(void)
         }
     }
     return true;
+}
+
+bool matrix_check_boot(void)
+{
+    return false;
 }

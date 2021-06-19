@@ -50,7 +50,9 @@ static void keyboard_timer_handler(void *p_context);
 extern void keyboard_set_rgb(bool on);
 __attribute__((weak)) void keyboard_prepare_sleep(void)
 {
+#ifdef RGB_ENABLE
     rgb_led_prepare_sleep();
+#endif
 }
 
 /* Host driver */
@@ -176,7 +178,9 @@ static void keyboard_timer_handler(void *p_context)
         rf_driver.sleep_count = 0;
         rf_driver.matrix_changed = 0;
     } else {
+#ifdef RGB_ENABLE
         if (!rgb_led_is_on()) {
+#endif
             rf_driver.scan_count++;
             if (0 == (rf_driver.scan_count % SLEEP_SCAN_OVERFLOW)) {
                 rf_driver.sleep_count++;
@@ -191,11 +195,13 @@ static void keyboard_timer_handler(void *p_context)
                     rf_driver.sleep_count = 0;
                 }
             }
+#ifdef RGB_ENABLE
         } else {
             if (rf_driver.battery_power <= BATTERY_LED_THRESHHOLD) {
                 rgb_led_set_all(false);
             }
         }
+#endif
     }
 }
 
