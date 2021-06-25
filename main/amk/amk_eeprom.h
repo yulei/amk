@@ -25,6 +25,7 @@
 #define EECONFIG_SIZE               64
 #define EEPROM_SIZE                 2048
 
+// eeconfig setting
 uint32_t eeconfig_read_kb(void);
 void eeconfig_write_kb(uint32_t data);
 void eeconfig_update_kb(uint32_t data);
@@ -41,7 +42,7 @@ uint8_t eeconfig_read_device(void);
 void eeconfig_write_device(uint8_t);
 void eeconfig_update_device(uint8_t);
 
-// wrapper functions
+// eeprom read/write functions
 uint8_t eeprom_read_byte(const uint8_t *Address);
 void eeprom_write_byte(uint8_t *Address, uint8_t Value);
 void eeprom_update_byte(uint8_t *Address, uint8_t Value);
@@ -58,8 +59,15 @@ void eeprom_read_block(void *buf, const void *addr, size_t len);
 void eeprom_write_block(const void *buf, void *addr, size_t len);
 void eeprom_update_block(const void *buf, void *addr, size_t len);
 
+
+//************************************
+// eeprom keymap
+//************************************
 #define EEKEYMAP_START_ADDR         EECONFIG_SIZE
-#define EEKEYMAP_SIZE               (EEPROM_SIZE-EECONFIG_SIZE)
+#ifndef EEKEYMAP_MAX_LAYER
+#define EEKEYMAP_MAX_LAYER          4
+#endif
+#define EEKEYMAP_SIZE               (MATRIX_COLS*MATRIX_ROWS*EEKEYMAP_MAX_LAYER)
 
 bool ee_keymap_is_valid(void);
 void ee_keymap_set_valid(bool valid);

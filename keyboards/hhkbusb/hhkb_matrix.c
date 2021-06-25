@@ -15,6 +15,7 @@
 #include "amk_gpio.h"
 #include "amk_keymap.h"
 #include "amk_printf.h"
+#include "amk_eeprom.h"
 
 #ifndef HHKB_MATRIX_DEBUG
 #define HHKB_MATRIX_DEBUG 1
@@ -123,7 +124,7 @@ typedef enum {
 } ble_state_t;
 
 #define BLE_SYNC_TIMEOUT    1000
-static uint16_t ble_keymaps[AMK_KEYMAP_MAX_LAYER][MATRIX_ROWS][MATRIX_COLS];
+static uint16_t ble_keymaps[EEKEYMAP_MAX_LAYER][MATRIX_ROWS][MATRIX_COLS];
 typedef struct {
     uint8_t     layer;
     uint8_t     row;
@@ -443,7 +444,7 @@ void amk_keymap_init(void)
 
 void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
 {
-    if (!((layer < AMK_KEYMAP_MAX_LAYER) && (row < MATRIX_ROWS) && (col < MATRIX_COLS))) return;
+    if (!((layer < EEKEYMAP_MAX_LAYER) && (row < MATRIX_ROWS) && (col < MATRIX_COLS))) return;
 
     ble_keymaps[layer][row][col] = keycode;
     uart_keymap_set(layer, row, col, keycode);
@@ -478,7 +479,7 @@ void amk_keymap_set_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 
 static void ble_sync_init(void)
 {
-    for (uint8_t layer = 0; layer < AMK_KEYMAP_MAX_LAYER; layer++) {
+    for (uint8_t layer = 0; layer < EEKEYMAP_MAX_LAYER; layer++) {
         for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
             for (uint8_t col = 0; col < MATRIX_COLS; col++) {
                 ble_keymaps[layer][row][col] = 0;
@@ -547,7 +548,7 @@ static void ble_sync_update(uint8_t layer, uint8_t row, uint8_t col, uint16_t ke
             ble_sync.col = 0;
             ble_sync.row++;
         } else {
-            if (layer < (AMK_KEYMAP_MAX_LAYER-1)) {
+            if (layer < (EEKEYMAP_MAX_LAYER-1)) {
                 ble_sync.col = 0;
                 ble_sync.row = 0;
                 ble_sync.layer++;

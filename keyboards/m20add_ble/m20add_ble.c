@@ -1,8 +1,8 @@
 /*
- * m20ble.c
+ * @file m20add_ble.c
  */
 
-#include "m20ble.h"
+#include "m20add_ble.h"
 #include "rgb_driver.h"
 #include "rgb_linear.h"
 #include "is31fl3731.h"

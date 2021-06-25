@@ -20,10 +20,10 @@
 #ifdef KEYMAP_CONFIG_ENABLE 
 
 #ifndef ACTIONMAP_ENABLE
-#error ACTIONMAP must be enabled with webconfig
+#error ACTIONMAP must be enabled with online keymap config 
 #endif
 
-static uint16_t amk_keymaps[AMK_KEYMAP_MAX_LAYER][MATRIX_ROWS][MATRIX_COLS];
+static uint16_t amk_keymaps[EEKEYMAP_MAX_LAYER][MATRIX_ROWS][MATRIX_COLS];
 extern const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS];
 
 action_t action_for_key(uint8_t layer, keypos_t key)
@@ -42,7 +42,7 @@ void amk_keymap_init(void)
 {
     memset(amk_keymaps, 0, sizeof(amk_keymaps));
     if (ee_keymap_is_valid()) {
-        for(int layer = 0; layer < AMK_KEYMAP_MAX_LAYER; layer++) {
+        for(int layer = 0; layer < EEKEYMAP_MAX_LAYER; layer++) {
             for (int row = 0; row < MATRIX_ROWS; row++) {
                 for (int col = 0; col < MATRIX_COLS; col++) {
                     amk_keymaps[layer][row][col] = ee_keymap_read_key(layer, row, col);
@@ -50,7 +50,7 @@ void amk_keymap_init(void)
             }
         }
     } else {
-        for(int layer = 0; layer < AMK_KEYMAP_MAX_LAYER; layer++) {
+        for(int layer = 0; layer < EEKEYMAP_MAX_LAYER; layer++) {
             for (int row = 0; row < MATRIX_ROWS; row++) {
                 for (int col = 0; col < MATRIX_COLS; col++) {
                     amk_keymaps[layer][row][col] = actionmaps[layer][row][col].code;
@@ -68,7 +68,7 @@ __attribute__((weak))
 void amk_keymap_reset(void)
 {
     memset(amk_keymaps, 0, sizeof(amk_keymaps));
-    for(int layer = 0; layer < AMK_KEYMAP_MAX_LAYER; layer++) {
+    for(int layer = 0; layer < EEKEYMAP_MAX_LAYER; layer++) {
         for (int row = 0; row < MATRIX_ROWS; row++) {
             for (int col = 0; col < MATRIX_COLS; col++) {
                 amk_keymaps[layer][row][col] = actionmaps[layer][row][col].code;
@@ -83,7 +83,7 @@ void amk_keymap_reset(void)
 __attribute__((weak))
 uint8_t amk_keymap_get_layer_count(void)
 {
-    return AMK_KEYMAP_MAX_LAYER;
+    return EEKEYMAP_MAX_LAYER;
 }
 
 __attribute__((weak))
