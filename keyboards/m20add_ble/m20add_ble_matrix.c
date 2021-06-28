@@ -11,7 +11,7 @@
 #include "amk_printf.h"
 
 #ifndef I2C_MATRIX_DEBUG
-#define I2C_MATRIX_DEBUG 0
+#define I2C_MATRIX_DEBUG 1
 #endif
 
 #if I2C_MATRIX_DEBUG

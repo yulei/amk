@@ -27,6 +27,14 @@
     #define S2_PIN B0
     #define RESET_PIN S1_PIN
     #define VECT_TAB_OFFSET 0x10000
+#elif defined(ADD)
+    #define PRODUCT 20Add 
+    #define MATRIX_ROWS 6
+    #define MATRIX_COLS 16
+    #define S1_PIN A7
+    #define S2_PIN B0
+    #define RESET_PIN S1_PIN
+    #define VECT_TAB_OFFSET 0x10000
 #else
 #error "BOARD not defined"
 #endif

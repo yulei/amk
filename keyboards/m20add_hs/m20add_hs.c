@@ -1,10 +1,10 @@
 /**
- * @file add_hs.c
+ * @file m20add_hs.c
  */
 
 #include <stdbool.h>
 
-#include "add_hs.h"
+#include "m20add_hs.h"
 #include "led.h"
 #include "wait.h"
 

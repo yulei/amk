@@ -33,7 +33,7 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
 };
 
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
-    { RGB_DRIVER_IS31FL3731, 0xE8, 0, 4, 20},
+    { RGB_DRIVER_IS31FL3731, 0xE8, 0, 0, 20},
 };
 
 rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {

@@ -10,7 +10,7 @@
 #define PRODUCT_ID 0x6500   // M65 with screen
 #define DEVICE_VER 0x0001
 #define MANUFACTURER Matrix Lab
-#define PRODUCT Matrix Vita
+#define PRODUCT Vita
 
 // key matrix
 #define MATRIX_ROWS     5
@@ -52,5 +52,7 @@
 #define RGB_DEVICE_NUM  1
 #define RGB_SEGMENT_NUM 1
 
-//#define SHARED_HID_EP
 #define DYNAMIC_CONFIGURATION
+
+#define VIAL_INSECURE
+#define VIAL_KEYBOARD_UID {0x01, 0x90, 0x17, 0x3A, 0xEC, 0xEE, 0x2B, 0x85}

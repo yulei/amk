@@ -1,8 +1,8 @@
 /**
- * @file add_hs_keymap.c
+ * @file m20add_hs_keymap.c
  */
 
-#include "add_hs.h"
+#include "m20add_hs.h"
 #define _______ KC_TRNS
 
 const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {

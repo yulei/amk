@@ -68,7 +68,7 @@
 #define CFG_TUSB_OS                 OPT_OS_NONE
 
 // CFG_TUSB_DEBUG is defined by compiler in DEBUG build
-#define CFG_TUSB_DEBUG              2
+#define CFG_TUSB_DEBUG              0
 #define CFG_TUSB_DEBUG_PRINTF       printf_
 /* USB DMA on some MCUs can only access a specific SRAM region with restriction on alignment.
  * Tinyusb use follows macros to declare transferring memory so that they can be put
@@ -86,8 +86,8 @@
 #endif
 
 //------------- CLASS -------------//
-#ifdef SHARED_HID_EP
-#define CFG_TUD_HID               1
+#if VIAL_ENABLE
+#define CFG_TUD_HID               3
 #else
 #define CFG_TUD_HID               2
 #endif
@@ -108,7 +108,7 @@
 #endif
 
 // interface configuration
-#define CFG_TUD_HID_EP_BUFSIZE      16
+#define CFG_TUD_HID_EP_BUFSIZE      32
 #define CFG_TUD_HID_POLL_INTERVAL   10
 #define CFG_TUD_ENDPOINT0_SIZE      64
 #define CFG_TUD_VENDOR_EPSIZE       64

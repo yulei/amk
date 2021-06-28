@@ -83,6 +83,14 @@ ifeq (yes,$(MSC_ENABLE))
 include $(LIB_DIR)/fatfs.mk
 endif
 
+ifeq (yes, $(strip $(VIAL_ENABLE)))
+$(MAIN_DIR)/vial/vial_porting.c: $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h
+
+$(KEYBOARD_DIR)/vial_generated_keyboard_definition.h: $(KEYBOARD_DIR)/vial.json
+	python3 util/vial_generate_definition.py $(KEYBOARD_DIR)/vial.json $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h
+
+endif
+
 .PHONY: default list clean flash erase
 
 # Default target
