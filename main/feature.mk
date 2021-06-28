@@ -79,7 +79,7 @@ ifeq (yes, $(strip $(VIAL_ENABLE)))
 	SRCS += $(MAIN_DIR)/vial/send_string.c
 	APP_DEFS += -DVIAL_ENABLE
 	APP_DEFS += -DKEYMAP_CONFIG_ENABLE	
-	APP_DEFS += -DACTIONMAP_ENABLE
+	ACTIONMAP_ENABLE := yes
 endif
 
 ifneq (yes, $(strip $(CUSTOM_MATRIX)))

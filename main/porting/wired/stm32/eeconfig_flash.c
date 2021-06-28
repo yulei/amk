@@ -8,14 +8,16 @@
 #include <stdbool.h>
 #include <string.h>
 #include "eeconfig.h"
+#include "amk_eeprom.h"
 #include "amk_printf.h"
 
 #if defined(STM32F103xB)
-#define FLASH_BASE_ADDRESS      0x801FC00
-#define FLASH_TOTAL_SIZE        0x400
-#define FLASH_INVALID_DATA      0xFFFFFFFF
-#define FLASH_INVALID_ADDRESS   0xFFFFFFFF
-#define FLASH_PAGE_NUM          1
+#error "eeconfig flash: stm32f103 was not supported currently"
+//#define FLASH_BASE_ADDRESS      0x801FC00
+//#define FLASH_TOTAL_SIZE        0x400
+//#define FLASH_INVALID_DATA      0xFFFFFFFF
+//#define FLASH_INVALID_ADDRESS   0xFFFFFFFF
+//#define FLASH_PAGE_NUM          1
 #elif defined(STM32F411xE) || defined(STM32F722xx) || defined(STM32F405xx)
 #define FLASH_BASE_ADDRESS      0x8010000
 #define FLASH_TOTAL_SIZE        0x10000
@@ -24,11 +26,11 @@
 #define FLASH_SECTOR_ID         FLASH_SECTOR_4
 #define FLASH_SECTOR_NUM        1
 #else
-#error "eeconfig: unsupported mcu"
+#error "eeconfig flash: unsupported mcu"
 #endif
 
-#define EEPROM_SIZE             (64+MATRIX_ROWS*MATRIX_COLS*2*4)
-#define EEPROM_KEYMAP_START     (64)
+//#define EEPROM_SIZE             (64+MATRIX_ROWS*MATRIX_COLS*2*4)
+//#define EEPROM_KEYMAP_START     (64)
 #define EEPROM_INVALID_ADDRESS  0xFFFF
 #define FLASH_EMPTY_VALUE       0xFF
 #define IS_VALID_ADDR(x)        ((x) >= 0 && (x) < EEPROM_SIZE)

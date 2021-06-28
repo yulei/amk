@@ -43,7 +43,7 @@ static uint8_t *get_macro_start(uint8_t id)
     // of buffer writing, possibly an aborted buffer
     // write. So do nothing.
     uint8_t *p = (uint8_t *)(EEKEYMAP_MACRO_START_ADDR + EEKEYMAP_MACRO_SIZE - 1);
-#if 0
+#if 1
     uint8_t data = eeprom_read_byte(p);
     if (data != 0) {
         amk_printf("macro buffer invalid: end=%d\n", data);
