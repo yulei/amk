@@ -20,7 +20,7 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
 };
 
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
-    { RGB_DRIVER_AW9523B, 0xB8, 0, 0, 4},
+    { RGB_DRIVER_AW9523B, 0xB6, 0, 0, 4},
     { RGB_DRIVER_WS2812, 0, 0, 4, 4},
 };
 
