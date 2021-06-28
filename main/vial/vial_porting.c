@@ -16,6 +16,7 @@
  */
 
 #include "vial_porting.h"
+#include "progmem.h"
 #include "vial_generated_keyboard_definition.h"
 #include "amk_printf.h"
 
@@ -367,7 +368,7 @@ void vial_process(uint8_t *data, uint8_t length)
                 amk_keymap_get_buffer(offset, size, &command_data[3]);
                 convert_keycode_buffer(&command_data[3], size, true);
             }
-            vial_debug("vial: id_dynamic_keymap_get_buffer\n");
+            vial_debug("vial: id_dynamic_keymap_get_buffer: offset:%d, size:%d\n", offset, size);
             break;
         }
         case id_dynamic_keymap_set_buffer: {
@@ -377,7 +378,7 @@ void vial_process(uint8_t *data, uint8_t length)
                 convert_keycode_buffer(&command_data[3], size, false);
                 amk_keymap_set_buffer(offset, size, &command_data[3]);
             }
-            vial_debug("via: id_dynamic_keymap_set_buffer\n");
+            vial_debug("via: id_dynamic_keymap_set_buffer: offset:%d, size:%d\n");
             break;
         }
 #if defined(VIAL_ENABLE) && !defined(VIAL_INSECURE)

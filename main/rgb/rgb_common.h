@@ -85,7 +85,7 @@ enum {
 
 #define HUE_MIN 0
 #define HUE_MAX 255
-#define HUE_DEFAULT HUE_MIN
+#define HUE_DEFAULT 85//HUE_MIN
 #define HUE_STEP 8
 
 #define SAT_MIN 0

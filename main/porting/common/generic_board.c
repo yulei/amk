@@ -46,6 +46,9 @@ static void send_system(uint16_t data);
 static void send_consumer(uint16_t data);
 
 uint8_t amk_led_state = 0;
+uint8_t amk_macro_state = 0;
+uint32_t amk_macro_delay = 0;
+
 static void remote_wakeup(void);
 
 /* host struct */

@@ -111,6 +111,7 @@ enum {
     ITF_NUM_HID_KBD,
     ITF_NUM_HID_OTHER,
     ITF_NUM_DUMMY,
+    #define ITF_NUM_VIAL ITF_NUM_DUMMY
     #define ITF_NUM_VENDOR ITF_NUM_DUMMY
     #define ITF_NUM_MSC ITF_NUM_DUMMY
     ITF_NUM_TOTAL
@@ -121,6 +122,8 @@ enum {
     EPNUM_HID_KBD       = 0x01,
     EPNUM_HID_OTHER,
     EPNUM_DUMMY,
+    #define EPNUM_VIAL_OUT      EPNUM_DUMMY
+    #define EPNUM_VIAL_IN       EPNUM_DUMMY
     #define EPNUM_VENDOR_OUT    EPNUM_DUMMY
     #define EPNUM_VENDOR_IN     EPNUM_DUMMY
     #define EPNUM_MSC_OUT       EPNUM_DUMMY
@@ -131,11 +134,7 @@ enum {
 // Interface number
 enum {
     ITF_NUM_HID_KBD,
-#ifdef SHARED_HID_EP
-    #define ITF_NUM_HID_OTHER ITF_NUM_HID_KBD
-#else
     ITF_NUM_HID_OTHER,
-#endif
 #ifdef VIAL_ENABLE
     ITF_NUM_VIAL,
 #endif
@@ -148,29 +147,6 @@ enum {
     ITF_NUM_TOTAL
 };
 
-#ifdef SHARED_HID_EP
-// Endpoint number
-enum {
-    EPNUM_HID_KBD       = 0x01,
-#ifdef WEBUSB_ENABLE
-    EPNUM_VENDOR_OUT    = 0x02,
-    #if defined(STM32F103xB) || defined(NRF52840_XXAA)
-    EPNUM_VENDOR_IN     = 0x03,
-    #else
-        #define EPNUM_VENDOR_IN EPNUM_VENDOR_OUT
-    #endif
-#endif
-#ifdef MSC_ENABLE
-    EPNUM_MSC_OUT       = 0x03,
-    #if defined(STM32F103xB) || defined(NRF52840_XXAA)
-    EPNUM_MSC_IN        = 0x04,
-    #else
-        #define EPNUM_MSC_IN    EPNUM_MSC_OUT
-    #endif
-#endif
-    EPNUM_MAX
-};
-#else
 enum {
     EPNUM_HID_KBD       = 0x01,
     EPNUM_HID_OTHER     = 0x02,
@@ -200,21 +176,18 @@ enum {
 #endif
     EPNUM_MAX
 };
-#endif //SHARED_HID_EP
+
 #endif// DYNAMIC_CONFIGURATION
 // Report id
 enum {
-#ifdef SHARED_HID_EP
-    HID_REPORT_ID_KEYBOARD = 1,
-#else
     HID_REPORT_ID_KEYBOARD = 0,
-#endif
     HID_REPORT_ID_MOUSE,
     HID_REPORT_ID_SYSTEM,
     HID_REPORT_ID_CONSUMER,
     HID_REPORT_ID_NKRO,
     HID_REPORT_ID_WEBUSB,
     HID_REPORT_ID_VIAL,
+    HID_REPORT_ID_MACRO,
     HID_REPORT_ID_UNKNOWN,
 };
 

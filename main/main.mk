@@ -3,6 +3,7 @@ SRCS += \
 	$(MAIN_DIR)/amk/main.c  \
 	$(MAIN_DIR)/amk/amk_action.c \
 	$(MAIN_DIR)/amk/amk_keymap.c \
+	$(MAIN_DIR)/amk/amk_macro.c \
 	$(MAIN_DIR)/amk/amk_printf.c \
 	$(MAIN_DIR)/amk/amk_eeprom.c \
 	$(MAIN_DIR)/amk/amk_boot.c \

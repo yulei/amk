@@ -76,19 +76,10 @@ uint32_t tud_descriptor_device_size(void)
 }
 
 // HID Keyboard Report Descriptor
-#ifdef SHARED_HID_EP
-static uint8_t desc_hid_report_kbd[] =
-{
-    TUD_HID_REPORT_DESC_KEYBOARD( HID_REPORT_ID(HID_REPORT_ID_KEYBOARD) ),
-    TUD_HID_REPORT_DESC_MOUSE( HID_REPORT_ID(HID_REPORT_ID_MOUSE) ),
-    TUD_HID_REPORT_DESC_EXTRA( HID_REPORT_ID_SYSTEM, HID_REPORT_ID_CONSUMER ),
-};
-#else
 static uint8_t desc_hid_report_kbd[] =
 {
     TUD_HID_REPORT_DESC_KEYBOARD(),
 };
-#endif
 
 // HID other report
 static uint8_t desc_hid_report_other[] =
@@ -155,25 +146,18 @@ uint32_t tud_descriptor_hid_report_vial_size(void)
 #define MSCUSB_DESC_LEN 0 
 #endif
 
-#ifdef SHARED_HID_EP
-#define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + WEBUSB_DESC_LEN + MSCUSB_DESC_LEN)
-#else
 #define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + VIAL_DESC_LEN + WEBUSB_DESC_LEN + MSCUSB_DESC_LEN)
-#endif
 
 #define CONFIG_LEN_MSC (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + MSCUSB_DESC_LEN)
-#define CONFIG_LEN_WEBUSB (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + WEBUSB_DESC_LEN)
+
+#define CONFIG_LEN_WEBUSB (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + VIAL_DESC_LEN + WEBUSB_DESC_LEN)
 
 static uint8_t desc_configuration[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
     TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
     // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
-#ifdef SHARED_HID_EP
-    TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
-#else
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
-#endif
 
 #ifdef VIAL_ENABLE
     TUD_HID_INOUT_DESCRIPTOR(ITF_NUM_VIAL, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_vial), EPNUM_VIAL_OUT, 0x80 | EPNUM_VIAL_IN, VIAL_EPSIZE, CFG_TUD_HID_POLL_INTERVAL),
@@ -195,12 +179,8 @@ static uint8_t desc_with_msc[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
     TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_LEN_MSC, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
     // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
-#ifdef SHARED_HID_EP
-    TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
-#else
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
-#endif
     // Interface number, string index, EP Out & EP In address, EP size
 #ifdef MSC_ENABLE
     TUD_MSC_DESCRIPTOR(ITF_NUM_MSC, 0, EPNUM_MSC_OUT, 0x80|EPNUM_MSC_IN, CFG_TUD_MSC_EPSIZE),
@@ -211,11 +191,10 @@ static uint8_t desc_with_webusb[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
     TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_LEN_WEBUSB, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
     // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
-#ifdef SHARED_HID_EP
-    TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
-#else
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#ifdef VIAL_ENABLE
+    TUD_HID_INOUT_DESCRIPTOR(ITF_NUM_VIAL, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_vial), EPNUM_VIAL_OUT, 0x80 | EPNUM_VIAL_IN, VIAL_EPSIZE, CFG_TUD_HID_POLL_INTERVAL),
 #endif
     // Interface number, string index, EP Out & IN address, EP size
 #ifdef WEBUSB_ENABLE
@@ -251,9 +230,6 @@ uint32_t tud_descriptor_configuration_size(uint8_t index)
 // Invoked when received GET HID REPORT DESCRIPTOR
 uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf)
 {
-#ifdef SHARED_HID_EP
-    return tud_descriptor_hid_report_kbd_cb();
-#else
     if (itf == ITF_NUM_HID_KBD) {
         return tud_descriptor_hid_report_kbd_cb();
     } else if (itf == ITF_NUM_HID_OTHER) {
@@ -265,14 +241,10 @@ uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf)
     }
     #endif
     return NULL;
-#endif
 }
 
 uint32_t tud_hid_descriptor_report_size(uint8_t itf)
 {
-#ifdef SHARED_HID_EP
-    return tud_descriptor_hid_report_kbd_size();
-#else
     if (itf == ITF_NUM_HID_KBD) {
         return tud_descriptor_hid_report_kbd_size();
     } else if (itf == ITF_NUM_HID_OTHER) {
@@ -284,23 +256,15 @@ uint32_t tud_hid_descriptor_report_size(uint8_t itf)
     }
     #endif
     return 0;
-#endif
 }
 
 static uint8_t desc_hid_kbd[] = {
-#ifdef SHARED_HID_EP
-    TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
-#else
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
-#endif
 };
 
 
 uint8_t const* tud_hid_descriptor_interface_cb(uint8_t itf)
 {
-    #ifdef SHARED_HID_EP
-    return tud_descriptor_hid_interface_kbd_cb();
-#else
     if (itf == ITF_NUM_HID_KBD) {
         return tud_descriptor_hid_interface_kbd_cb();
     } else if (itf == ITF_NUM_HID_OTHER) {
@@ -312,13 +276,10 @@ uint8_t const* tud_hid_descriptor_interface_cb(uint8_t itf)
     }
     #endif
     return NULL;
-#endif
 }
+
 uint32_t tud_hid_descriptor_interface_size(uint8_t itf)
 {
-#ifdef SHARED_HID_EP
-    return tud_descriptor_hid_interface_kbd_size();
-#else
     if (itf == ITF_NUM_HID_KBD) {
         return tud_descriptor_hid_interface_kbd_size();
     } else if (itf == ITF_NUM_HID_OTHER) {
@@ -330,7 +291,6 @@ uint32_t tud_hid_descriptor_interface_size(uint8_t itf)
     }
     #endif
     return 0;
-#endif
 }
 
 // Invoded when received GET HID DESCRIPTOR
@@ -344,7 +304,6 @@ uint32_t tud_descriptor_hid_interface_kbd_size(void)
     return sizeof(desc_hid_kbd);
 }
 
-#ifndef SHARED_HID_EP
 static uint8_t desc_hid_other[] = {
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
 };
@@ -359,7 +318,6 @@ uint32_t tud_descriptor_hid_interface_other_size(void)
 {
     return sizeof(desc_hid_other);
 }
-#endif
 
 #ifdef VIAL_ENABLE
 static uint8_t desc_hid_vial[] = {
@@ -474,7 +432,11 @@ char const* string_desc_arr [] =
     (const char[]) { 0x09, 0x04 },  // 0: is supported language is English (0x0409)
     TU_XSTRING(MANUFACTURER),       // 1: Manufacturer
     TU_XSTRING(PRODUCT),            // 2: Product
+#ifdef VIAL_ENABLE
     "vial:f64c2b3c",                // 3: Serials, should use chip ID
+#else
+    "amk:4d58",                     // 3: Serials, should use chip ID
+#endif
     "Configuration",                // 4: Device configuration 
     "HID Keyboard",                 // 5: Hid keyboard
     "HID Extra",                    // 6: Hid extra key

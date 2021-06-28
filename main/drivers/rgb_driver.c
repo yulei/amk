@@ -208,6 +208,7 @@ static void rd_aw9106b_flush(rgb_driver_t *driver)
 static void rd_3731_init(rgb_driver_t *driver)
 {
     driver->data = is31fl3731_init(driver->device->addr, driver->device->index, driver->device->led_start, driver->device->led_num);
+    rgb_driver_debug("IS31FL3731 inited\n");
 }
 
 static void rd_3731_uninit(rgb_driver_t *driver)

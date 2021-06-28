@@ -5,17 +5,27 @@
 #include "usb_interface.h"
 #include "usb_descriptors.h"
 #include "generic_hal.h"
-#include "amk_printf.h"
 #include "report_queue.h"
+#include "amk_keymap.h"
+#include "amk_printf.h"
 
 #ifdef VIAL_ENABLE
 #include "vial_porting.h"
+#include "vial_macro.h"
 #endif
 
 static hid_report_queue_t report_queue;
 
+#ifdef VIAL_ENABLE
+static hid_report_queue_t macro_queue;
+extern uint8_t amk_macro_state;
+extern uint32_t amk_macro_delay;
+static void process_macro(hid_report_queue_t *queue);
+#endif
+
 static bool usb_itf_ready(uint32_t type);
 static bool usb_itf_send_report(uint32_t type, const void* data, uint32_t size);
+static void process_report_queue(hid_report_queue_t *queue);
 
 void usb_init(void)
 {
@@ -25,13 +35,20 @@ void usb_init(void)
 
 void usb_task(void)
 {
+#ifdef VIAL_ENABLE
+    if (!hid_report_queue_empty(&macro_queue)) {
+        process_report_queue(&macro_queue);
+    } else 
+#endif
     if (!hid_report_queue_empty(&report_queue)) {
+#ifdef VIAL_ENABLE
         hid_report_t* item = hid_report_queue_peek(&report_queue);
-        if (usb_itf_ready(item->type)) {
-            amk_printf("ITF ready, type:%d, send report\n", item->type);
-            hid_report_t report;
-            hid_report_queue_get(&report_queue, &report);
-            usb_itf_send_report(report.type, report.data, report.size);
+        if (item->type == HID_REPORT_ID_MACRO) {
+            process_macro(&report_queue);
+        } else
+#endif
+        {
+            process_report_queue(&report_queue);
         }
     }
 
@@ -45,6 +62,7 @@ static bool usb_itf_ready(uint32_t type)
 {
     switch(type) {
     case HID_REPORT_ID_KEYBOARD:
+    case HID_REPORT_ID_MACRO:
         return tud_hid_n_ready(ITF_NUM_HID_KBD);
     case HID_REPORT_ID_MOUSE:
     case HID_REPORT_ID_SYSTEM:
@@ -90,6 +108,35 @@ static bool usb_itf_send_report(uint32_t report_type, const void* data, uint32_t
     return true;
 }
 
+static void process_report_queue(hid_report_queue_t * queue)
+{
+    hid_report_t* item = hid_report_queue_peek(queue);
+    if (usb_itf_ready(item->type)) {
+        amk_printf("ITF ready, type:%d, send report\n", item->type);
+        hid_report_t report;
+        hid_report_queue_get(queue, &report);
+        usb_itf_send_report(report.type, report.data, report.size);
+    }
+}
+
+#ifdef VIAL_ENABLE
+static void process_macro(hid_report_queue_t *queue)
+{
+    hid_report_t *item = hid_report_queue_peek(queue);
+    amk_macro_t *macro = (amk_macro_t*)&(item->data[0]);
+    macro->delay = 0;
+    amk_macro_state = 1;
+    if (!vial_macro_play(macro->id, &macro->offset, &macro->delay)) {
+        // macro finished
+        hid_report_queue_pop(queue);
+    }
+    if (macro->delay) {
+        amk_macro_delay = macro->delay;
+    }
+    amk_macro_state = 0;
+}
+#endif
+
 bool usb_ready(void)
 {
     return tud_ready();
@@ -111,7 +158,24 @@ void usb_send_report(uint8_t report_type, const void* data, size_t size)
     memcpy(item.data, data, size);
     item.type = report_type;
     item.size = size;
-    hid_report_queue_put(&report_queue, &item);
+#ifdef VIAL_ENABLE
+    if (amk_macro_state) {
+        item.delay = amk_macro_delay;
+        amk_macro_delay = 0;
+    } else
+#endif
+    {
+        item.delay = 0;
+    }
+
+#ifdef VIAL_ENABLE
+    if (amk_macro_state) {
+        hid_report_queue_put(&macro_queue, &item);
+    } else
+#endif
+    {
+        hid_report_queue_put(&report_queue, &item);
+    }
 }
 
 //=============================

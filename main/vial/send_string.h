@@ -16,7 +16,6 @@
 
 #include <stdint.h>
 
-#include "progmem.h"
 #include "send_string_keycodes.h"
 
 #define SEND_STRING(string) send_string_P(PSTR(string))
@@ -42,6 +41,4 @@ extern const uint8_t ascii_to_dead_lut[16];
 
 void send_string(const char *str);
 void send_string_with_delay(const char *str, uint8_t interval);
-void send_string_P(const char *str);
-void send_string_with_delay_P(const char *str, uint8_t interval);
 void send_char(char ascii_code);

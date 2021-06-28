@@ -30,6 +30,25 @@ typedef enum {
     AF_RGB_VALD,
     AF_RGB_SPDI,
     AF_RGB_SPDD,
+// via keycodes
+    AF_FN_MO13,
+    AF_FN_MO23,
+    AF_MACRO00,
+    AF_MACRO01,
+    AF_MACRO02,
+    AF_MACRO03,
+    AF_MACRO04,
+    AF_MACRO05,
+    AF_MACRO06,
+    AF_MACRO07,
+    AF_MACRO08,
+    AF_MACRO09,
+    AF_MACRO10,
+    AF_MACRO11,
+    AF_MACRO12,
+    AF_MACRO13,
+    AF_MACRO14,
+    AF_MACRO15,
 } function_id_t;
 
 // try to use 0xE8-0xEF
@@ -38,4 +57,4 @@ typedef enum {
 #define KC_HYPER    0xE9
 #define KC_GESC     0xEA 
 #define KC_SFTENT   0xEB
-#define KC_CTME     0xEB
+#define KC_CTME     0xEC

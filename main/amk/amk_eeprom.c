@@ -105,9 +105,8 @@ void eeconfig_update_device(uint8_t device)
     eeconfig_write_device(device);
 }
 
-#define KEYMAP_MAGIC_VALUE      0x4D585438
-#define KEYMAP_MAGIC_DEFAULT    0xFFFFFFFF
-#define KEYMAP_MAX_LAYER        4
+#define KEYMAP_MAGIC_VALUE      0x4D58
+#define KEYMAP_MAGIC_DEFAULT    0xFFFF
 #define KEYMAP_LAYER_SIZE      (MATRIX_ROWS*MATRIX_COLS*2)
 
 static uint16_t* ee_keymap_get_addr(uint8_t layer, uint8_t row, uint8_t col)
@@ -122,16 +121,16 @@ static uint8_t *ee_keymap_get_addr_by_offset(uint16_t offset)
 
 bool ee_keymap_is_valid(void)
 {
-    uint32_t magic = eeprom_read_dword(EECONFIG_KEYMAP_MAGIC);
+    uint16_t magic = eeprom_read_word(EECONFIG_KEYMAP_MAGIC);
     return (magic==KEYMAP_MAGIC_VALUE);
 }
 
 void ee_keymap_set_valid(bool valid)
 {
     if (valid) {
-        eeprom_write_dword(EECONFIG_KEYMAP_MAGIC, KEYMAP_MAGIC_VALUE);
+        eeprom_write_word(EECONFIG_KEYMAP_MAGIC, KEYMAP_MAGIC_VALUE);
     } else {
-        eeprom_write_dword(EECONFIG_KEYMAP_MAGIC, KEYMAP_MAGIC_DEFAULT);
+        eeprom_write_word(EECONFIG_KEYMAP_MAGIC, KEYMAP_MAGIC_DEFAULT);
     }
 }
 
@@ -151,18 +150,49 @@ void ee_keymap_write_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 {
     uint8_t *addr = ee_keymap_get_addr_by_offset(offset);
     for (int i = 0; i < size; i++) {
-        *data = eeprom_read_byte(addr);
-        data++;
-        addr++;
+        eeprom_write_byte(addr++, *data++);
     }
 }
+
 void ee_keymap_read_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 {
     uint8_t *addr = ee_keymap_get_addr_by_offset(offset);
+    for (int i = 0; i < size/2; i++) {
+        data[1] = eeprom_read_byte(addr++);
+        data[0] = eeprom_read_byte(addr++);
+        data += 2;
+    }
+}
+
+#define MACRO_MAGIC_VALUE      0x5348
+#define MACRO_MAGIC_DEFAULT    0xFFFF
+
+static uint8_t *ee_macro_get_addr_by_offset(uint16_t offset)
+{
+    return (uint8_t*)(EEKEYMAP_MACRO_START_ADDR + offset);
+}
+
+void ee_macro_reset(void)
+{
+    uint8_t *addr = ee_macro_get_addr_by_offset(0);
+    for (int i = 0; i < EEKEYMAP_MACRO_SIZE; i++) {
+        eeprom_write_byte(addr++, 0);
+    }
+}
+
+void ee_macro_read_buffer(uint16_t offset, uint16_t size, uint8_t *data)
+{
+    uint8_t *addr = ee_macro_get_addr_by_offset(offset);
     for (int i = 0; i < size; i++) {
-        eeprom_write_byte(addr, *data);
-        data++;
-        addr++;
+        *data++ = eeprom_read_byte(addr++);
+    }
+}
+
+void ee_macro_write_buffer(uint16_t offset, uint16_t size, uint8_t *data)
+{
+    uint8_t *addr = ee_macro_get_addr_by_offset(offset);
+    for (int i = 0; i < size; i++) {
+        eeprom_write_byte(addr++, *data++);
     }
 }
 
@@ -187,7 +217,6 @@ void eeconfig_init(void)
 #ifdef RGB_ENABLE
     rgb_led_config_init();
 #endif
-
 
     eeprom_write_byte(EECONFIG_LAYOUT_OPTIONS, 0);
     eeprom_write_byte(EECONFIG_DEVICE, 0);

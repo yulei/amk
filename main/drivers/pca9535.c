@@ -38,7 +38,9 @@ static i2c_handle_t i2c_inst;
 
 void pca9535_init(void)
 {
-    i2c_inst = i2c_init(PCA9535_I2C_ID);
+    if (!i2c_inst) {
+        i2c_inst = i2c_init(PCA9535_I2C_ID);
+    }
 }
 
 static void write_port(uint8_t p, uint8_t d)

@@ -16,9 +16,40 @@
 
 #include <ctype.h>
 
-#include "quantum.h"
-
 #include "send_string.h"
+#include "keycode.h"
+#include "action.h"
+//#include "wait.h"
+
+#ifndef TAP_CODE_DELAY
+#    define TAP_CODE_DELAY 0
+#endif
+#ifndef TAP_HOLD_CAPS_DELAY
+#    define TAP_HOLD_CAPS_DELAY 80
+#endif
+
+#define XXXXXXX KC_NO
+
+extern uint32_t amk_macro_delay;
+/** \brief Tap a keycode with a delay.
+ *
+ * \param code The basic keycode to tap.
+ * \param delay The amount of time in milliseconds to leave the keycode registered, before unregistering it.
+ */
+void tap_code_delay(uint8_t code, uint16_t delay) {
+    register_code(code);
+
+    amk_macro_delay = delay;
+    //while (delay--) wait_ms(1);
+
+    unregister_code(code);
+}
+
+/** \brief Tap a keycode with the default delay.
+ *
+ * \param code The basic keycode to tap. If `code` is `KC_CAPS`, the delay will be `TAP_HOLD_CAPS_DELAY`, otherwise `TAP_CODE_DELAY`, if defined.
+ */
+static void tap_code(uint8_t code) { tap_code_delay(code, code == KC_CAPS ? TAP_HOLD_CAPS_DELAY : TAP_CODE_DELAY); }
 
 // clang-format off
 
@@ -136,8 +167,6 @@ __attribute__((weak)) const uint8_t ascii_to_keycode_lut[128] PROGMEM = {
 
 void send_string(const char *str) { send_string_with_delay(str, 0); }
 
-void send_string_P(const char *str) { send_string_with_delay_P(str, 0); }
-
 void send_string_with_delay(const char *str, uint8_t interval) {
     while (1) {
         char ascii_code = *str;
@@ -165,7 +194,8 @@ void send_string_with_delay(const char *str, uint8_t interval) {
                     ms += keycode - '0';
                     keycode = *(++str);
                 }
-                while (ms--) wait_ms(1);
+                amk_macro_delay = ms;
+                //while (ms--) wait_ms(1);
             }
         } else {
             send_char(ascii_code);
@@ -174,58 +204,20 @@ void send_string_with_delay(const char *str, uint8_t interval) {
         // interval
         {
             uint8_t ms = interval;
-            while (ms--) wait_ms(1);
-        }
-    }
-}
-
-void send_string_with_delay_P(const char *str, uint8_t interval) {
-    while (1) {
-        char ascii_code = pgm_read_byte(str);
-        if (!ascii_code) break;
-        if (ascii_code == SS_QMK_PREFIX) {
-            ascii_code = pgm_read_byte(++str);
-            if (ascii_code == SS_TAP_CODE) {
-                // tap
-                uint8_t keycode = pgm_read_byte(++str);
-                tap_code(keycode);
-            } else if (ascii_code == SS_DOWN_CODE) {
-                // down
-                uint8_t keycode = pgm_read_byte(++str);
-                register_code(keycode);
-            } else if (ascii_code == SS_UP_CODE) {
-                // up
-                uint8_t keycode = pgm_read_byte(++str);
-                unregister_code(keycode);
-            } else if (ascii_code == SS_DELAY_CODE) {
-                // delay
-                int     ms      = 0;
-                uint8_t keycode = pgm_read_byte(++str);
-                while (isdigit(keycode)) {
-                    ms *= 10;
-                    ms += keycode - '0';
-                    keycode = pgm_read_byte(++str);
-                }
-                while (ms--) wait_ms(1);
-            }
-        } else {
-            send_char(ascii_code);
-        }
-        ++str;
-        // interval
-        {
-            uint8_t ms = interval;
-            while (ms--) wait_ms(1);
+            amk_macro_delay = ms;
+            //while (ms--) wait_ms(1);
         }
     }
 }
 
 void send_char(char ascii_code) {
+    #if 0
 #if defined(AUDIO_ENABLE) && defined(SENDSTRING_BELL)
     if (ascii_code == '\a') {  // BEL
         PLAY_SONG(bell_song);
         return;
     }
+#endif
 #endif
 
     uint8_t keycode    = pgm_read_byte(&ascii_to_keycode_lut[(uint8_t)ascii_code]);

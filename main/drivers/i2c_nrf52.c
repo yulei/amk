@@ -12,6 +12,17 @@
 #include "nrf_log.h"
 #include "nrf_gpio.h"
 #include "rf_power.h"
+#include "amk_printf.h"
+
+#ifndef NRF52_I2C_DEBUG
+#define NRF52_I2C_DEBUG 1
+#endif
+
+#if NRF52_I2C_DEBUG
+#define nrf52_i2c_debug  amk_printf
+#else
+#define nrf52_i2c_debug(...)
+#endif
 
 typedef struct {
     nrfx_twi_t  twi;
@@ -38,7 +49,7 @@ typedef struct {
 #endif
 
 
-#define TWI_ADDR(addr) ((addr)>>1)
+#define TWI_ADDR(addr) (((addr)>>1)&0x7F)
 
 static void set_done(i2c_instance_t *inst, bool state)
 {
@@ -78,7 +89,8 @@ static void i2c_inst_init(i2c_instance_t *inst)
     APP_ERROR_CHECK(err_code);
     inst->ready = true;
     nrfx_twi_enable(&inst->twi);
-    NRF_LOG_INFO("twi enabled");
+    //NRF_LOG_INFO("twi enabled");
+    nrf52_i2c_debug("twi enabled\n");
     rf_power_register(i2c_prepare_sleep, inst);
 }
 
@@ -92,22 +104,22 @@ static void i2c_event_handler(nrfx_twi_evt_t const *p_event, void *p_context)
         //error1 = AMK_SUCCESS;
         break;
     case NRFX_TWI_EVT_ADDRESS_NACK:
-        NRF_LOG_INFO("i2c address nack");
+        nrf52_i2c_debug("i2c address nack\n");
         inst->error = AMK_I2C_ERROR;
         //error1 = AMK_I2C_ERROR;
         break;
     case NRFX_TWI_EVT_DATA_NACK:
-        NRF_LOG_INFO("i2c data nack");
+        nrf52_i2c_debug("i2c data nack\n");
         inst->error = AMK_I2C_ERROR;
         //error1 = AMK_I2C_ERROR;
         break;
     case NRFX_TWI_EVT_OVERRUN:
-        NRF_LOG_INFO("i2c overrun");
+        nrf52_i2c_debug("i2c overrun");
         inst->error = AMK_I2C_ERROR;
         //error1 = AMK_I2C_ERROR;
         break;
     case NRFX_TWI_EVT_BUS_ERROR:
-        NRF_LOG_INFO("i2c bus error");
+        nrf52_i2c_debug("i2c bus error");
         inst->error = AMK_I2C_ERROR;
         //error1 = AMK_I2C_ERROR;
         break;
@@ -117,11 +129,12 @@ static void i2c_event_handler(nrfx_twi_evt_t const *p_event, void *p_context)
 
 i2c_handle_t i2c_init(I2C_ID id)
 {
+#ifdef I2C_USE_INSTANCE_1
     if (id == I2C_INSTANCE_1) {
         i2c_inst_init(&m_i2c1);
         return &m_i2c1;
     }
-
+#endif
     return NULL;
 }
 
@@ -140,7 +153,7 @@ amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void *data, size_t le
     ret_code_t err_code = nrfx_twi_tx(&inst->twi, TWI_ADDR(addr), data, length, false);
 
     if (err_code != NRFX_SUCCESS) {
-        NRF_LOG_INFO("twi TX error: %d\n", err_code);
+        nrf52_i2c_debug("twi TX error: %d\n", err_code);
         return AMK_I2C_ERROR;
     }
 
@@ -157,7 +170,7 @@ amk_error_t i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, 
     set_done(inst, false);
     ret_code_t err_code = nrfx_twi_rx(&inst->twi, TWI_ADDR(addr), data, length);
     if (err_code != NRFX_SUCCESS) {
-        NRF_LOG_INFO("twi RX error: %d\n", err_code);
+        nrf52_i2c_debug("twi RX error: %d\n", err_code);
         return AMK_I2C_ERROR;
     }
 
@@ -184,7 +197,7 @@ amk_error_t i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data
     nrfx_twi_xfer_desc_t txrx = NRFX_TWI_XFER_DESC_TXRX(TWI_ADDR(addr), &reg, 1, data, length);
     ret_code_t err_code = nrfx_twi_xfer(&inst->twi, &txrx, 0);
     if (err_code != NRFX_SUCCESS) {
-        NRF_LOG_INFO("twi XFER error: %d\n", err_code);
+        nrf52_i2c_debug("twi XFER error: %d\n", err_code);
         return AMK_I2C_ERROR;
     }
 
@@ -203,6 +216,6 @@ void i2c_uninit(i2c_handle_t i2c)
 
     nrfx_twi_uninit(&inst->twi);
 
-    NRF_LOG_INFO("twi disabled");
+    nrf52_i2c_debug("twi disabled\n");
     inst->ready = false;
 }

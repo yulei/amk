@@ -71,18 +71,15 @@ ifeq (yes, $(strip $(MSC_ENABLE)))
 	APP_DEFS += -DMSC_ENABLE
 endif
 
-ifeq (yes, $(strip $(KEYMAP_CONFIG_ENABLE)))
-	APP_DEFS += -DKEYMAP_CONFIG_ENABLE	
-endif
-
 ifeq (yes, $(strip $(VIAL_ENABLE)))
 	INCS += $(MAIN_DIR)/vial
 	SRCS += $(MAIN_DIR)/vial/vial_porting.c
+	SRCS += $(MAIN_DIR)/vial/vial_macro.c
 	SRCS += $(MAIN_DIR)/vial/keycode_convert.c
+	SRCS += $(MAIN_DIR)/vial/send_string.c
 	APP_DEFS += -DVIAL_ENABLE
-	ifneq (yes, $(strip $(VIAL_ENABLE)))
-		APP_DEFS += -DKEYMAP_CONFIG_ENABLE	
-	endif
+	APP_DEFS += -DKEYMAP_CONFIG_ENABLE	
+	APP_DEFS += -DACTIONMAP_ENABLE
 endif
 
 ifneq (yes, $(strip $(CUSTOM_MATRIX)))

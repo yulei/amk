@@ -17,7 +17,8 @@
 #include "eeconfig.h"
 
 #define EECONFIG_KEYBOARD           (uint32_t*)8
-#define EECONFIG_KEYMAP_MAGIC       (uint32_t*)12
+#define EECONFIG_KEYMAP_MAGIC       (uint16_t*)12
+#define EECONFIG_KEYMAP_MACRO_MAGIC (uint16_t*)14
 #define EECONFIG_RGB                (uint8_t*)16        // 6 * 8 bytes
 #define EECONFIG_LAYOUT_OPTIONS     (uint8_t*)62        // 1 bytes
 #define EECONFIG_DEVICE             (uint8_t*)63        // 1 bytes
@@ -69,9 +70,20 @@ void eeprom_update_block(const void *buf, void *addr, size_t len);
 #endif
 #define EEKEYMAP_SIZE               (MATRIX_COLS*MATRIX_ROWS*EEKEYMAP_MAX_LAYER)
 
+#define EEKEYMAP_MACRO_START_ADDR   (EECONFIG_SIZE+EEKEYMAP_SIZE)
+#define EEKEYMAP_MACRO_SIZE         (EEPROM_SIZE-EEKEYMAP_MACRO_START_ADDR)
+#ifndef EEKEYMAP_MACRO_COUNT
+#define EEKEYMAP_MACRO_COUNT        16
+#endif
+
 bool ee_keymap_is_valid(void);
 void ee_keymap_set_valid(bool valid);
+
 void ee_keymap_write_key(uint8_t layer, uint8_t row, uint8_t col, uint16_t key);
 uint16_t ee_keymap_read_key(uint8_t layer, uint8_t row, uint8_t col);
 void ee_keymap_write_buffer(uint16_t offset, uint16_t size, uint8_t *data);
 void ee_keymap_read_buffer(uint16_t offset, uint16_t size, uint8_t *data);
+
+void ee_macro_reset(void);
+void ee_macro_read_buffer(uint16_t offset, uint16_t size, uint8_t *data);
+void ee_macro_write_buffer(uint16_t offset, uint16_t size, uint8_t *data);

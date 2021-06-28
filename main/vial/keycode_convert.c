@@ -19,46 +19,6 @@
 #include "actionmap.h"
 #include "amk_action.h"
 
-enum via_keycodes {
-    FN_MO13 = 0x5F10,
-    FN_MO23,
-    MACRO00,
-    MACRO01,
-    MACRO02,
-    MACRO03,
-    MACRO04,
-    MACRO05,
-    MACRO06,
-    MACRO07,
-    MACRO08,
-    MACRO09,
-    MACRO10,
-    MACRO11,
-    MACRO12,
-    MACRO13,
-    MACRO14,
-    MACRO15,
-};
-
-enum user_keycodes {
-    USER00 = 0x5F80,
-    USER01,
-    USER02,
-    USER03,
-    USER04,
-    USER05,
-    USER06,
-    USER07,
-    USER08,
-    USER09,
-    USER10,
-    USER11,
-    USER12,
-    USER13,
-    USER14,
-    USER15,
-};
-
 typedef struct {
     uint16_t vial_keycode;
     action_t amk_keycode;
@@ -79,6 +39,24 @@ static const keycode_map_t keycode_map[] = {
     {.vial_keycode= RGB_VAD,            .amk_keycode = ACTION_FUNCTION(AF_RGB_VALD)},
     {.vial_keycode= RGB_SPI,            .amk_keycode = ACTION_FUNCTION(AF_RGB_SPDI)},
     {.vial_keycode= RGB_SPD,            .amk_keycode = ACTION_FUNCTION(AF_RGB_SPDD)},
+    {.vial_keycode= FN_MO13,            .amk_keycode = ACTION_FUNCTION(AF_FN_MO13)},
+    {.vial_keycode= FN_MO23,            .amk_keycode = ACTION_FUNCTION(AF_FN_MO23)},
+    {.vial_keycode= MACRO00,            .amk_keycode = ACTION_FUNCTION(AF_MACRO00)},
+    {.vial_keycode= MACRO01,            .amk_keycode = ACTION_FUNCTION(AF_MACRO01)},
+    {.vial_keycode= MACRO02,            .amk_keycode = ACTION_FUNCTION(AF_MACRO02)},
+    {.vial_keycode= MACRO03,            .amk_keycode = ACTION_FUNCTION(AF_MACRO03)},
+    {.vial_keycode= MACRO04,            .amk_keycode = ACTION_FUNCTION(AF_MACRO04)},
+    {.vial_keycode= MACRO05,            .amk_keycode = ACTION_FUNCTION(AF_MACRO05)},
+    {.vial_keycode= MACRO06,            .amk_keycode = ACTION_FUNCTION(AF_MACRO06)},
+    {.vial_keycode= MACRO07,            .amk_keycode = ACTION_FUNCTION(AF_MACRO07)},
+    {.vial_keycode= MACRO08,            .amk_keycode = ACTION_FUNCTION(AF_MACRO08)},
+    {.vial_keycode= MACRO09,            .amk_keycode = ACTION_FUNCTION(AF_MACRO09)},
+    {.vial_keycode= MACRO10,            .amk_keycode = ACTION_FUNCTION(AF_MACRO10)},
+    {.vial_keycode= MACRO11,            .amk_keycode = ACTION_FUNCTION(AF_MACRO11)},
+    {.vial_keycode= MACRO12,            .amk_keycode = ACTION_FUNCTION(AF_MACRO12)},
+    {.vial_keycode= MACRO13,            .amk_keycode = ACTION_FUNCTION(AF_MACRO13)},
+    {.vial_keycode= MACRO14,            .amk_keycode = ACTION_FUNCTION(AF_MACRO14)},
+    {.vial_keycode= MACRO15,            .amk_keycode = ACTION_FUNCTION(AF_MACRO15)},
 };
 
 static uint16_t map_keycode(uint16_t keycode, bool amk) 

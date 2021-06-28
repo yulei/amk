@@ -15,12 +15,17 @@
 #include "action_layer.h"
 #include "action_util.h"
 #include "keymap.h"
+#include "amk_macro.h"
 #include "amk_keymap.h"
 #include "amk_printf.h"
 #include "wait.h"
 
 #ifdef RGB_ENABLE
 #include "rgb_led.h"
+#endif
+
+#ifdef VIAL_ENABLE
+#include "vial_macro.h"
 #endif
 
 #if defined(NRF52) || defined(NRF52840_XXAA)
@@ -46,40 +51,90 @@ void keyboard_set_rgb(bool on)
 
 void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
-    if (!record->event.pressed) return; // do not process key released event
 
     switch (id) {
 #ifdef RGB_ENABLE
         case AF_RGB_TOG:
+            if (!record->event.pressed) return;
             keyboard_set_rgb(!rgb_led_config_enabled());
             amk_printf("Toggle rgb: %d\n", rgb_led_config_enabled());
             break;
         case AF_RGB_MOD:
+            if (!record->event.pressed) return;
             rgb_led_config_inc_param(RGB_EFFECT_MODE);
             break;
         case AF_RGB_HUEI:
+            if (!record->event.pressed) return;
             rgb_led_config_inc_param(RGB_EFFECT_HUE);
             break;
         case AF_RGB_HUED:
+            if (!record->event.pressed) return;
             rgb_led_config_dec_param(RGB_EFFECT_HUE);
             break;
         case AF_RGB_SATI:
+            if (!record->event.pressed) return;
             rgb_led_config_inc_param(RGB_EFFECT_SAT);
             break;
         case AF_RGB_SATD:
+            if (!record->event.pressed) return;
             rgb_led_config_dec_param(RGB_EFFECT_SAT);
             break;
         case AF_RGB_VALI:
+            if (!record->event.pressed) return;
             rgb_led_config_inc_param(RGB_EFFECT_VAL);
             break;
         case AF_RGB_VALD:
+            if (!record->event.pressed) return;
             rgb_led_config_dec_param(RGB_EFFECT_VAL);
             break;
         case AF_RGB_SPDI:
+            if (!record->event.pressed) return;
             rgb_led_config_inc_param(RGB_EFFECT_SPEED);
             break;
         case AF_RGB_SPDD:
+            if (!record->event.pressed) return;
             rgb_led_config_dec_param(RGB_EFFECT_SPEED);
+            break;
+#endif
+
+#ifdef VIAL_ENABLE
+        case AF_FN_MO13:
+            if (record->event.pressed) {
+                layer_on(1);
+                vial_update_tri_layer(1, 2, 3);
+            } else {
+                layer_off(1);
+                vial_update_tri_layer(1, 2, 3);
+            }
+            break;
+        case AF_FN_MO23:
+            if (record->event.pressed) {
+                layer_on(2);
+                vial_update_tri_layer(1, 2, 3);
+            } else {
+                layer_off(2);
+                vial_update_tri_layer(1, 2, 3);
+            }
+            break;
+
+        case AF_MACRO00:
+        case AF_MACRO01:
+        case AF_MACRO02:
+        case AF_MACRO03:
+        case AF_MACRO04:
+        case AF_MACRO05:
+        case AF_MACRO06:
+        case AF_MACRO07:
+        case AF_MACRO08:
+        case AF_MACRO09:
+        case AF_MACRO10:
+        case AF_MACRO11:
+        case AF_MACRO12:
+        case AF_MACRO13:
+        case AF_MACRO14:
+        case AF_MACRO15:
+            if (!record->event.pressed) return;
+            amk_macro_play(id-AF_MACRO00);
             break;
 #endif
         case AF_EEPROM_RESET:
