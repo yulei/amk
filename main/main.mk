@@ -26,20 +26,6 @@ include $(MAIN_DIR)/feature.mk
 
 ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
 	include $(MAIN_DIR)/porting/nrf52.mk
-endif
-
-ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
-	include $(MAIN_DIR)/porting/stm32.mk
-endif
-
-ifneq (,$(filter $(strip $(MCU)),$(ATSAMD_MCUS)))
-	include $(MAIN_DIR)/porting/atsamd.mk
-endif
-
-ifneq (,$(filter $(strip $(MCU)),$(NUVOTON_MCUS)))
-	include $(MAIN_DIR)/porting/nuvoton.mk
-endif
-
-ifneq (,$(filter $(strip $(MCU)),$(GD32_MCUS)))
-	include $(MAIN_DIR)/porting/gd32.mk
+else
+	include $(MAIN_DIR)/porting/wired.mk
 endif

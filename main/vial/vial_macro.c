@@ -10,6 +10,7 @@
 #include "debug.h"
 #include "amk_keymap.h"
 #include "amk_eeprom.h"
+#include "amk_printf.h"
 
 static void layer_state_set(uint32_t state)
 {
@@ -42,9 +43,13 @@ static uint8_t *get_macro_start(uint8_t id)
     // of buffer writing, possibly an aborted buffer
     // write. So do nothing.
     uint8_t *p = (uint8_t *)(EEKEYMAP_MACRO_START_ADDR + EEKEYMAP_MACRO_SIZE - 1);
-    if (eeprom_read_byte(p) != 0) {
+#if 0
+    uint8_t data = eeprom_read_byte(p);
+    if (data != 0) {
+        amk_printf("macro buffer invalid: end=%d\n", data);
         return NULL;
     }
+#endif
 
     // Skip N null characters
     // p will then point to the Nth macro

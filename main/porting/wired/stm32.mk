@@ -1,6 +1,5 @@
-include $(MAIN_DIR)/porting/common_porting.mk
 
-PLATFORM_PORTING_DIR := $(MAIN_DIR)/porting/stm32
+PLATFORM_PORTING_DIR := $(MAIN_DIR)/porting/wired/stm32
 
 SRCS += \
 	$(PLATFORM_PORTING_DIR)/gpio_pin.c \

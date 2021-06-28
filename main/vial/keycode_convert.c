@@ -322,6 +322,9 @@ uint16_t vial_to_amk(uint16_t keycode)
         case QK_RESET ... SAFE_RANGE: {
             amk_kc.code = map_keycode(keycode, false);
         }break;
+        case FN_MO13 ... MACRO15: {
+            amk_kc.code = map_keycode(keycode, false);
+        }
 
         default:
         break;

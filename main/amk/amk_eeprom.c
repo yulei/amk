@@ -167,6 +167,21 @@ void ee_keymap_read_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 #define MACRO_MAGIC_VALUE      0x5348
 #define MACRO_MAGIC_DEFAULT    0xFFFF
 
+bool ee_macro_is_valid(void)
+{
+    uint16_t magic = eeprom_read_word(EECONFIG_KEYMAP_MACRO_MAGIC);
+    return (magic==MACRO_MAGIC_VALUE);
+}
+
+void ee_macro_set_valid(bool valid)
+{
+    if (valid) {
+        eeprom_write_word(EECONFIG_KEYMAP_MACRO_MAGIC, MACRO_MAGIC_VALUE);
+    } else {
+        eeprom_write_word(EECONFIG_KEYMAP_MACRO_MAGIC, MACRO_MAGIC_DEFAULT);
+    }
+}
+
 static uint8_t *ee_macro_get_addr_by_offset(uint16_t offset)
 {
     return (uint8_t*)(EEKEYMAP_MACRO_START_ADDR + offset);

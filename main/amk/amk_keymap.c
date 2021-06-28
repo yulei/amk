@@ -43,6 +43,10 @@ void amk_keymap_init(void)
         amk_keymap_reset();
     }
 
+    if (!ee_macro_is_valid()) {
+        amk_keymap_macro_reset();
+    }
+
     amk_printf("amk_keymap_init finished\n");
 }
 
@@ -125,6 +129,8 @@ __attribute__((weak))
 void amk_keymap_macro_reset(void)
 {
     ee_macro_reset();
+    ee_macro_set_valid(true);
+    amk_printf("amk_macro_reset finished\n");
 }
 
 

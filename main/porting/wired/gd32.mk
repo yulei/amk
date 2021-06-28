@@ -1,6 +1,5 @@
-include $(MAIN_DIR)/porting/common_porting.mk
 
-GD32_PORTING_DIR := $(MAIN_DIR)/porting/gd32
+GD32_PORTING_DIR := $(MAIN_DIR)/porting/wired/gd32
 
 SRCS += \
 	$(GD32_PORTING_DIR)/gd32e10x_hw.c \

@@ -84,6 +84,9 @@ uint16_t ee_keymap_read_key(uint8_t layer, uint8_t row, uint8_t col);
 void ee_keymap_write_buffer(uint16_t offset, uint16_t size, uint8_t *data);
 void ee_keymap_read_buffer(uint16_t offset, uint16_t size, uint8_t *data);
 
+bool ee_macro_is_valid(void);
+void ee_macro_set_valid(bool valid);
+
 void ee_macro_reset(void);
 void ee_macro_read_buffer(uint16_t offset, uint16_t size, uint8_t *data);
 void ee_macro_write_buffer(uint16_t offset, uint16_t size, uint8_t *data);

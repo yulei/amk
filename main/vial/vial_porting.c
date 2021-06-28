@@ -288,7 +288,7 @@ void vial_process(uint8_t *data, uint8_t length)
             break;
         }
         case id_dynamic_keymap_reset: {
-            //amk_keymap_reset();//dynamic_keymap_reset();
+            amk_keymap_reset();//dynamic_keymap_reset();
             vial_debug("via: id_dynamic_keymap_reset\n");
             break;
         }
@@ -313,27 +313,27 @@ void vial_process(uint8_t *data, uint8_t length)
         case id_dynamic_keymap_macro_get_count: {
             //command_data[0] = dynamic_keymap_macro_get_count();
             //*command_id = id_unhandled;
-            command_data[0] = 0;//dynamic_keymap_macro_get_count();
-            vial_debug("unhandled command: id_dynamic_keymap_macro_get_count\n");
+            command_data[0] = amk_keymap_macro_get_count();
+            vial_debug("vial: id_dynamic_keymap_macro_get_count\n");
             break;
         }
         case id_dynamic_keymap_macro_get_buffer_size: {
-            //uint16_t size   = dynamic_keymap_macro_get_buffer_size();
-            //command_data[0] = size >> 8;
-            //command_data[1] = size & 0xFF;
+            uint16_t size   = amk_keymap_macro_get_buffer_size();
+            command_data[0] = size >> 8;
+            command_data[1] = size & 0xFF;
             //*command_id = id_unhandled;
-            command_data[0] = 0;
-            command_data[1] = 0;
-            vial_debug("unhandled command: id_dynamic_keymap_macro_get_buffer_size\n");
+            vial_debug("vial: id_dynamic_keymap_macro_get_buffer_size\n");
             break;
         }
         case id_dynamic_keymap_macro_get_buffer: {
-            //uint16_t offset = (command_data[0] << 8) | command_data[1];
-            //uint16_t size   = command_data[2];  // size <= 28
-            //if (size <= 28)
-            //    dynamic_keymap_macro_get_buffer(offset, size, &command_data[3]);
-            *command_id = id_unhandled;
-            vial_debug("unhandled command: id_dynamic_keymap_macro_get_buffer\n");
+            uint16_t offset = (command_data[0] << 8) | command_data[1];
+            uint16_t size   = command_data[2];  // size <= 28
+            if (size <= 28) {
+                amk_keymap_macro_get_buffer(offset, size, &command_data[3]);
+            } else {
+                *command_id = id_unhandled;
+            }
+            vial_debug("vial: id_dynamic_keymap_macro_get_buffer\n");
             break;
         }
         case id_dynamic_keymap_macro_set_buffer: {
@@ -342,18 +342,20 @@ void vial_process(uint8_t *data, uint8_t length)
             if (!vial_unlocked)
                 goto skip;
 #endif
-            //uint16_t offset = (command_data[0] << 8) | command_data[1];
-            //uint16_t size   = command_data[2];  // size <= 28
-            //if (size <= 28)
-            //    dynamic_keymap_macro_set_buffer(offset, size, &command_data[3]);
-            *command_id = id_unhandled;
-            vial_debug("unhandled command: id_dynamic_keymap_macro_set_buffer\n");
+            uint16_t offset = (command_data[0] << 8) | command_data[1];
+            uint16_t size   = command_data[2];  // size <= 28
+            if (size <= 28) {
+                amk_keymap_macro_set_buffer(offset, size, &command_data[3]);
+            } else {
+                *command_id = id_unhandled;
+            }
+            vial_debug("vial: id_dynamic_keymap_macro_set_buffer\n");
             break;
         }
         case id_dynamic_keymap_macro_reset: {
-            //dynamic_keymap_macro_reset();
-            *command_id = id_unhandled;
-            vial_debug("unhandled command: id_dynamic_keymap_macro_reset\n");
+            amk_keymap_macro_reset();
+            //*command_id = id_unhandled;
+            vial_debug("vial: id_dynamic_keymap_macro_reset\n");
             break;
         }
         case id_dynamic_keymap_get_layer_count: {
