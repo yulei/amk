@@ -1,7 +1,3 @@
-[submodule "libs/lvgl"]
-	path = libs/lvgl
-	url = https://github.com/yulei/lvgl
-	ignore = dirty
 [submodule "libs/tmk"]
 	path = libs/tmk
 	url = https://github.com/yulei/tmk_keyboard.git
