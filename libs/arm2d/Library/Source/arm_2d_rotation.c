@@ -103,7 +103,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /* faster atan(y/x) float version */
-static
+//static
 float32_t __atan2_f32(float32_t y, float32_t x)
 {
     float32_t       xabs = fabsf(x);
@@ -129,7 +129,7 @@ float32_t __atan2_f32(float32_t y, float32_t x)
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static
+//static
 void __arm_2d_rotate_get_rotated_corner(const arm_2d_location_t *ptLocation,
                                             const arm_2d_location_t *ptCenter,
                                             float fAngle,

@@ -47,7 +47,7 @@ static void i2c_inst_init(i2c_instance_t *inst, I2C_TypeDef *i2c)
 
 #ifdef STM32F722xx
     inst->handle.Instance = I2C1;
-    inst->handle.Init.Timing = 0x6000030D;
+    inst->handle.Init.Timing = 0x20404768;//0x6000030D;
     inst->handle.Init.OwnAddress1 = 0;
     inst->handle.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
     inst->handle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;

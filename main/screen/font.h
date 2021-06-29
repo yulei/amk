@@ -8,6 +8,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#define LV_ATTRIBUTE_LARGE_CONST
+
 /** This describes a glyph. */
 typedef struct {
     uint32_t bitmap_index : 20;     /**< Start index of the bitmap. A font can be max 1 MB. */
@@ -134,4 +136,4 @@ typedef struct {
 
 } lv_font_fmt_txt_dsc_t;
 
-const uint8_t * font_get_bitmap(uint32_t letter, const lv_font_fmt_txt_glyph_dsc_t **gdesc);
+const uint8_t * font_get_bitmap(uint32_t letter, lv_font_fmt_txt_glyph_dsc_t **gdesc);

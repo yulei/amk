@@ -72,7 +72,7 @@ CFLAGS += -fdata-sections
 CFLAGS += -fno-strict-aliasing
 CFLAGS += -fno-builtin
 CFLAGS += -fshort-enums
-
+CFLAGS += -fms-extensions
 # C++ flags common to all targets
 CXXFLAGS += $(COMMON_FLAGS)
 

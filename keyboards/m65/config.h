@@ -33,8 +33,6 @@
 
 // custom tusb definitions
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
-// custom lvgl definitions
-#define LV_CONF_PATH            lvgl_def.h
 
 #define VECT_TAB_OFFSET 0x20000
 

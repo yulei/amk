@@ -1,7 +1,7 @@
 ARM2D_DIR := $(LIB_DIR)/arm2d
 
 SRCS += \
-	$(ARM2D_DIR)/Library/Source/arm_2d_alpha_bleding.c \
+	$(ARM2D_DIR)/Library/Source/arm_2d_alpha_blending.c \
 	$(ARM2D_DIR)/Library/Source/arm_2d_async.c \
 	$(ARM2D_DIR)/Library/Source/arm_2d_conversion.c \
 	$(ARM2D_DIR)/Library/Source/arm_2d_draw.c \
@@ -15,4 +15,3 @@ SRCS += \
 INCS += \
 	$(ARM2D_DIR)/Library/Include \
 	$(ARM2D_DIR)/Helper/Include \
-

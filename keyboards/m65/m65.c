@@ -26,6 +26,8 @@ static void reset_to_msc(bool msc);
 #include "mscusb.h"
 #include "anim.h"
 #include "amk_printf.h"
+#include "rtc8563.h"
+#include "font.h"
 enum {
     MODE_SINGLE,
     MODE_SEQUENCE,
@@ -91,6 +93,33 @@ static render_t renders[] = {
     },
 };
 
+rtc_datetime_t rtc_dt = {
+    .second = 0,
+    .minute = 42,
+    .hour = 21,
+    .day = 29,
+    .month = 6,
+    .year = 21,
+};
+
+bool rtc_datetime_dirty = false;
+
+static void update_rtc_datetime(void)
+{
+    rtc_datetime_t dt = {0,0,0,0,0,0};
+    rtc8563_read_time(&dt);
+    if (rtc_dt.second != dt.second
+        || rtc_dt.minute != dt.minute
+        || rtc_dt.hour != dt.hour
+        || rtc_dt.day != dt.day
+        || rtc_dt.month != dt.month
+        || rtc_dt.year != dt.year) {
+        memcpy(&rtc_dt, &dt, sizeof(rtc_dt));
+        rtc_datetime_dirty = true;
+        amk_printf("rtc datetime: %02d-%02d-%02d\n", rtc_dt.hour, rtc_dt.minute, rtc_dt.second);
+    }
+}
+
 #endif
 
 #ifdef RGB_ENABLE
@@ -98,9 +127,9 @@ static render_t renders[] = {
 #include "rgb_linear.h"
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {0, 0, 0, 0},
-    {0, 0, 0, 0},
-    {0, 0, 0, 0},
-    {0, 0, 0, 0},
+    {0, 1, 1, 1},
+    {0, 2, 2, 2},
+    {0, 3, 3, 3},
 };
 
 
@@ -136,10 +165,45 @@ void matrix_init_kb(void)
             amk_printf("ANIM: faield to open root path\n");
         }
     }
+    rtc8563_init();
+    rtc8563_write_time(&rtc_dt);
 #endif
 }
 
 #ifdef MSC_ENABLE
+void reander_datetime(render_t *render)
+{
+    if (!rtc_datetime_dirty) {
+        return;
+    }
+    char buffer[9];
+    sprintf(buffer, "%02d-%02d-%02d", rtc_dt.hour, rtc_dt.minute, rtc_dt.second);
+    memset(render->buf, 0, AUXI_WIDTH*AUXI_HEIGHT*2);
+    for(int i = 0; i < 8; i++){
+        lv_font_fmt_txt_glyph_dsc_t *gdesc = NULL;
+        const uint8_t *glyph = font_get_bitmap(buffer[i], &gdesc);
+        if (!glyph) {
+            return;
+        }
+
+        uint32_t start_x = i*10;
+
+        for (int y = 0; y < gdesc->box_h; y++) {
+            for(int x = 0; x < gdesc->box_w; x++) {
+                uint32_t position = y*gdesc->box_w + x;
+                uint32_t bits = position % 8;
+                uint32_t offset = (position / 8) + (bits ? 1 : 0);
+                uint16_t color = (glyph[offset] & (1 << (7-bits))) ? 0xFFFF : 0;
+                render->buf[y*AUXI_WIDTH + (start_x+x)] = color;
+            }
+        }
+    }
+
+    screen_fill_rect_async(render->x, render->y, render->width, render->height, render->buf, render->buf_size);
+    filling = true;
+    rtc_datetime_dirty = false;
+}
+
 void render_task(render_t* render)
 {
     if (!render->anim)
@@ -210,6 +274,8 @@ void msc_init_kb(void)
 void msc_task_kb(void)
 {
     if (usb_setting & USB_MSC_BIT) return;
+
+    update_rtc_datetime();
 
     for (int i = 0; i < sizeof(renders)/sizeof(render_t); i++) {
         render_task(&renders[i]);

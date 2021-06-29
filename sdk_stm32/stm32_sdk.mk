@@ -61,7 +61,8 @@ INCS += \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Inc \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Inc/Legacy \
 	$(VENDOR_DIR)/device_$(MCU_SERIES)/Include \
-	$(VENDOR_DIR)/cmsis/Core/Include
+	$(VENDOR_DIR)/cmsis/Core/Include \
+	$(VENDOR_DIR)/cmsis/DSP/Include
 
 APP_DEFS += -DUSE_HAL_DRIVER
 

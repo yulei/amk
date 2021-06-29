@@ -2,7 +2,7 @@
  * @file font.c
  */
 
-#include "font_scp.c"
+#include "font_college.c"
 
 /** Searches base[0] to base[n - 1] for an item that matches *key.
  *
@@ -121,7 +121,7 @@ static uint32_t get_glyph_dsc_id(uint32_t letter)
 
 }
 
-const uint8_t * font_get_bitmap(uint32_t letter, const lv_font_fmt_txt_glyph_dsc_t **gdesc)
+const uint8_t * font_get_bitmap(uint32_t letter, lv_font_fmt_txt_glyph_dsc_t **gdesc)
 {
     if(letter == '\t') letter = ' ';
 
@@ -129,7 +129,7 @@ const uint8_t * font_get_bitmap(uint32_t letter, const lv_font_fmt_txt_glyph_dsc
     uint32_t gid = get_glyph_dsc_id(letter);
     if(!gid) return NULL;
 
-    *gdesc = &fdsc->glyph_dsc[gid];
+    *gdesc = (lv_font_fmt_txt_glyph_dsc_t*)&fdsc->glyph_dsc[gid];
 
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
         if(*gdesc) return &fdsc->glyph_bitmap[(*gdesc)->bitmap_index];

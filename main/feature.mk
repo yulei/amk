@@ -16,7 +16,7 @@ ifeq (yes, $(strip $(MATRIX_USE_PCA9535)))
 endif
 
 ifeq (yes, $(strip $(SCREEN_ENABLE)))
-	LVGL_ENABLE = yes
+#	include $(LIB_DIR)/arm2d.mk
 	APP_DEFS += -DSCREEN_ENABLE
 	SRCS += $(MAIN_DIR)/drivers/spi.c
 	SRCS += $(MAIN_DIR)/drivers/st7735.c
