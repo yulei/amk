@@ -21,6 +21,7 @@ void rgb_indicator_set(uint8_t index, uint8_t red, uint8_t green, uint8_t blue)
 
     if (driver) {
         driver->set_color_rgb(driver, g_index, red, green, blue);
+        driver->flush(driver);
     }
 }
 

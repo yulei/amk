@@ -61,8 +61,8 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
 
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
     { RGB_DRIVER_IS31FL3731, 0xE8, 0, 4, 20},
-    { RGB_DRIVER_AW9106B, 0xB6, 0, 24, 2},
-    { RGB_DRIVER_AW9106B, 0xB2, 1, 26, 2},
+    { RGB_DRIVER_AW9106B, 0xB6, 0, 20, 2},
+    { RGB_DRIVER_AW9106B, 0xB2, 1, 22, 2},
 };
 
 rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
@@ -73,8 +73,8 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
 uint8_t g_rgb_indicator_index[RGB_INDICATOR_LED_NUM] = { 20,21,22,23};
 
 #define CAPS_LED    0
-#define SCROLL_LED  2
-#define NUM_LED     3
+#define SCROLL_LED  3
+#define NUM_LED     2
 
 static const pin_t row_pins[MATRIX_ROWS] = { 11,14,15,16,17,29};
 static uint8_t col_pins[MATRIX_COLS] = {
@@ -185,14 +185,18 @@ void led_set(uint8_t led)
 #ifdef RGB_INDICATOR_ENABLE
     if (led & (1 << USB_LED_CAPS_LOCK)) {
         rgb_indicator_set(CAPS_LED, 0xFF, 0xFF, 0xFF);
+        hs_debug("set caps led\n");
     } else {
         rgb_indicator_set(CAPS_LED, 0, 0, 0);
+        hs_debug("clear caps led\n");
     }
 
     if (led & (1 << USB_LED_SCROLL_LOCK)) {
         rgb_indicator_set(SCROLL_LED, 0xFF, 0xFF, 0xFF);
+        hs_debug("set scroll led\n");
     } else {
         rgb_indicator_set(SCROLL_LED, 0, 0, 0);
+        hs_debug("clear scroll led\n");
     }
     
     //if (led & (1 << USB_LED_NUM_LOCK)) {
