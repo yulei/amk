@@ -65,7 +65,7 @@ void keyboard_prepare_sleep(void)
 
     // turn off caps
     gpio_write_pin(CAPS_LED_PIN, 0);
-    gpio_set_input_floating(CAPS_LED_PIN);
+    //gpio_set_input_floating(CAPS_LED_PIN);
 }
 
 const rgb_led_t g_aw9523b_leds[RGB_LED_NUM] = {
