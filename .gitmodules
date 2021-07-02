@@ -10,10 +10,6 @@
 	path = libs/printf
 	url = https://github.com/yulei/printf.git
 	ignore = dirty
-[submodule "libs/nofrendo"]
-	path = libs/nofrendo
-	url = https://github.com/yulei/nofrendo_arcada.git
-	ignore = dirty
 [submodule "libs/vendor"]
 	path = libs/vendor
 	url = https://github.com/yulei/vendor_sdk.git
