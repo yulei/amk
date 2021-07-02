@@ -47,7 +47,11 @@ DRESULT disk_read(BYTE pdrv, BYTE *buff, LBA_t sector, UINT count)
 
 DRESULT disk_write(BYTE pdrv, const BYTE *buff, LBA_t sector, UINT count)
 {
-    return RES_PARERR;
+    for(UINT i = 0; i < count; i++) {
+        w25qxx_write_sector(flash_driver, (sector+i)*4096, buff+i*4096, 4096);
+    }
+
+    return RES_OK;
 }
 
 #endif

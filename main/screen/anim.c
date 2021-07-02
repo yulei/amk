@@ -127,7 +127,7 @@ uint32_t anim_step(anim_t *anim, uint32_t *delay, void *buf, uint32_t size)
         return 0; // at the file end
     } 
 
-    *delay = anim->obj.header.delays[anim->obj.frame];
+    *delay = (anim->obj.header.frames==1) ? 1000 : anim->obj.header.delays[anim->obj.frame];
     uint32_t frame_size = anim->obj.header.width*anim->obj.header.height*anim->obj.header.format;
     if (size < frame_size) {
         amk_printf("ANIM buffer size too small, size=%d, frame=%d\n", size, frame_size);

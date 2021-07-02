@@ -28,6 +28,8 @@ static void reset_to_msc(bool msc);
 #include "amk_printf.h"
 #include "rtc8563.h"
 #include "font.h"
+#include "ff.h"
+
 enum {
     MODE_SINGLE,
     MODE_SEQUENCE,
@@ -93,7 +95,7 @@ static render_t renders[] = {
     },
 };
 
-rtc_datetime_t rtc_dt = {
+static rtc_datetime_t rtc_dt = {
     .second = 0,
     .minute = 42,
     .hour = 21,
@@ -102,21 +104,93 @@ rtc_datetime_t rtc_dt = {
     .year = 21,
 };
 
-bool rtc_datetime_dirty = false;
+static bool rtc_datetime_mode = false;
+static bool rtc_datetime_dirty = false;
+static uint32_t rtc_datetime_ticks = 0;
+#define RTC_FILE_SIG            "AMDT"
+#define RTC_FILE_SIZE           10
+#define RTC_CHECKING_INTERVAL   700
 
-static void update_rtc_datetime(void)
+static void rtc_datetime_scan(void);
+
+static void rtc_datetime_init(void)
 {
-    rtc_datetime_t dt = {0,0,0,0,0,0};
-    rtc8563_read_time(&dt);
-    if (rtc_dt.second != dt.second
-        || rtc_dt.minute != dt.minute
-        || rtc_dt.hour != dt.hour
-        || rtc_dt.day != dt.day
-        || rtc_dt.month != dt.month
-        || rtc_dt.year != dt.year) {
-        memcpy(&rtc_dt, &dt, sizeof(rtc_dt));
-        rtc_datetime_dirty = true;
-        amk_printf("rtc datetime: %02d-%02d-%02d\n", rtc_dt.hour, rtc_dt.minute, rtc_dt.second);
+    rtc8563_init();
+
+    rtc_datetime_scan();
+    if (rtc_datetime_dirty) {
+        rtc8563_write_time(&rtc_dt);
+    }
+}
+
+static void rtc_datetime_scan(void)
+{
+    DIR dir;
+    FRESULT res = f_opendir(&dir, "/");
+    if (res == FR_OK) {
+        for (;;) {
+            FILINFO fno;
+            res = f_readdir(&dir, &fno);
+            if (res != FR_OK || fno.fname[0] == 0){
+                break;
+            }
+
+            if ( (fno.fattrib & AM_DIR) == 0) {
+                FIL file;
+                if (FR_OK != f_open(&file, fno.fname, FA_READ)) {
+                    amk_printf("Datetime check: failed to open file: %s\n", fno.fname);
+                    continue;
+                }
+                if (f_size(&file) != RTC_FILE_SIZE) {
+                    f_close(&file);
+                    amk_printf("Datetime check: file size mismatch, skip file: %s\n", fno.fname);
+                    continue;
+                }
+                uint8_t buf[RTC_FILE_SIZE];
+                UINT readed = 0;
+                if (FR_OK != f_read(&file, buf, sizeof(buf), &readed)) {
+                    f_close(&file);
+                    amk_printf("Datetime check: failed to read file header: %s\n", fno.fname);
+                    continue;
+                }
+                if (memcmp(RTC_FILE_SIG, buf, 4) != 0) {
+                    f_close(&file);
+                    amk_printf("Datetime check: signature invalid\n");
+                    continue;
+                }
+                uint8_t *p      = &buf[4];
+                rtc_dt.year     = *p++;
+                rtc_dt.month    = *p++;
+                rtc_dt.day      = *p++;
+                rtc_dt.hour     = *p++;
+                rtc_dt.minute   = *p++;
+                rtc_dt.second   = *p++;
+                rtc_datetime_dirty = true;
+                f_close(&file);
+                f_unlink(fno.fname);
+                break;
+            }
+        }
+        f_closedir(&dir);
+    }
+}
+static void rtc_datetime_update(void)
+{
+    if (timer_elapsed32(rtc_datetime_ticks) > RTC_CHECKING_INTERVAL) {
+
+        rtc_datetime_t dt = {0,0,0,0,0,0};
+        rtc8563_read_time(&dt);
+        if (rtc_dt.second != dt.second
+            || rtc_dt.minute != dt.minute
+            || rtc_dt.hour != dt.hour
+            || rtc_dt.day != dt.day
+            || rtc_dt.month != dt.month
+            || rtc_dt.year != dt.year) {
+            memcpy(&rtc_dt, &dt, sizeof(rtc_dt));
+            rtc_datetime_dirty = true;
+            //amk_printf("rtc datetime: %02d-%02d-%02d\n", rtc_dt.hour, rtc_dt.minute, rtc_dt.second);
+        }
+        rtc_datetime_ticks = timer_read32();
     }
 }
 
@@ -165,13 +239,12 @@ void matrix_init_kb(void)
             amk_printf("ANIM: faield to open root path\n");
         }
     }
-    rtc8563_init();
-    rtc8563_write_time(&rtc_dt);
+    rtc_datetime_init();
 #endif
 }
 
 #ifdef MSC_ENABLE
-void reander_datetime(render_t *render)
+void render_datetime(render_t *render)
 {
     if (!rtc_datetime_dirty) {
         return;
@@ -271,15 +344,22 @@ void msc_init_kb(void)
     memset(auxi_buf, 0, sizeof(auxi_buf));
 }
 
+static void render_screen(uint8_t index)
+{
+    if ((index == 1) && (rtc_datetime_mode)){
+        render_datetime(&renders[index]);
+    } else {
+        render_task(&renders[index]);
+    }
+}
+
 void msc_task_kb(void)
 {
     if (usb_setting & USB_MSC_BIT) return;
 
-    update_rtc_datetime();
-
-    for (int i = 0; i < sizeof(renders)/sizeof(render_t); i++) {
-        render_task(&renders[i]);
-    }
+    rtc_datetime_update();
+    render_screen(0);
+    render_screen(1);
 }
 #endif
 
@@ -315,6 +395,9 @@ bool hook_process_action_main(keyrecord_t *record)
     }
 
     switch(action.key.code) {
+        case KC_F19:
+            rtc_datetime_mode = !rtc_datetime_mode;
+            return true;
         case KC_F20:
             first_screen = !first_screen;
             return true;
