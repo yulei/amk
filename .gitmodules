@@ -14,3 +14,7 @@
 	path = libs/vendor
 	url = https://github.com/yulei/vendor_sdk.git
 	ignore = dirty
+[submodule "libs/nofrendo"]
+	path = libs/nofrendo
+	url = https://github.com/yulei/arduino-nofrendo.git
+	ignore = dirty
