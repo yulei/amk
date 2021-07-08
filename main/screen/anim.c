@@ -30,6 +30,7 @@
 
 #define AUXI_SIG    "AUXI"
 #define ANIM_SIG    "ANIM"
+#define AMFT_SIG    "AMFT"
 #define FRAME_MAX   256
 typedef struct __attribute__((packed)) {
     char signature[4];  //"ANIM" or "AUXI"
@@ -120,6 +121,11 @@ uint32_t anim_get_bitformat(anim_t* anim)
     return anim->obj.header.format;
 }
 
+uint32_t anim_get_frames(anim_t* anim)
+{
+    return anim->obj.header.frames;
+}
+
 uint32_t anim_step(anim_t *anim, uint32_t *delay, void *buf, uint32_t size)
 {
     if (anim->obj.frame >= anim->obj.header.frames || anim->obj.frame >= FRAME_MAX) {
@@ -181,16 +187,28 @@ static bool anim_init(anim_t *anim, FIL *file)
         f_close(&anim->obj.file);
         return false;
     } else {
-        if (anim->type == ANIM_TYPE_MAIN) {
-            if (memcmp(ANIM_SIG, anim->obj.header.signature, 4) != 0) {
+        switch (anim->type) {
+            case ANIM_TYPE_MAIN:
+                if (memcmp(ANIM_SIG, anim->obj.header.signature, 4) != 0) {
+                    f_close(&anim->obj.file);
+                    return false;
+                }
+                break;
+            case ANIM_TYPE_AUX:
+                if (memcmp(AUXI_SIG, anim->obj.header.signature, 4) != 0) {
+                    f_close(&anim->obj.file);
+                    return false;
+                }
+                break;
+            case ANIM_TYPE_FONT:
+                if (memcmp(AMFT_SIG, anim->obj.header.signature, 4) != 0) {
+                    f_close(&anim->obj.file);
+                    return false;
+                }
+                break;
+            default:
                 f_close(&anim->obj.file);
                 return false;
-            }
-        } else {
-            if (memcmp(AUXI_SIG, anim->obj.header.signature, 4) != 0) {
-                f_close(&anim->obj.file);
-                return false;
-            }
         }
     }
 
@@ -211,7 +229,13 @@ static void anim_scan(anim_t *anim)
             res = f_readdir(&dir, &fno);
             if (res != FR_OK || fno.fname[0] == 0) break;
             if ( (fno.fattrib & AM_DIR) == 0) {
-                const char* sig = (anim->type == ANIM_TYPE_MAIN) ? ANIM_SIG : AUXI_SIG;
+                const char* sig = ANIM_SIG;
+                if (anim->type == ANIM_TYPE_AUX) {
+                    sig = AUXI_SIG;
+                }
+                if (anim->type == ANIM_TYPE_FONT) {
+                    sig = AMFT_SIG;
+                }
                 if (anim_check_file(fno.fname, sig)) {
                     memcpy(&anim->files[anim->total][0], fno.fname, ANIM_FILE_NAME_MAX);
                     anim->total++;
@@ -271,4 +295,24 @@ static bool anim_check_file(const char *path, const char* sig)
 exit:
     f_close(&file);
     return result;  
+}
+
+bool anim_load_font(const void* data, void* buf, uint32_t total_frames)
+{
+    anim_header_t header;
+    const uint8_t *src = (const uint8_t *)data; 
+    memcpy(&header, src, sizeof(anim_header_t));
+    if (header.frames < total_frames) {
+        return false;
+    }
+
+    uint8_t *dst = (uint8_t *)buf; 
+    uint32_t frame_size = header.width*header.height*2;
+    for (uint32_t i = 0; i < total_frames; i++) {
+        memcpy(dst, src, frame_size);
+        dst += frame_size;
+        src += frame_size;
+    }
+
+    return true;
 }

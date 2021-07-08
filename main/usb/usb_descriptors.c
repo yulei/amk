@@ -189,7 +189,11 @@ static uint8_t desc_with_msc[] = {
 
 static uint8_t desc_with_webusb[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
+#ifdef VIALENABLE
     TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_LEN_WEBUSB, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
+#else
+    TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL-1, 0, CONFIG_LEN_WEBUSB, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
+#endif
     // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),

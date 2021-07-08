@@ -22,7 +22,7 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/st7735.c
 	SRCS += $(MAIN_DIR)/screen/screen.c
 	SRCS += $(MAIN_DIR)/screen/fractal.c
-	SRCS += $(MAIN_DIR)/screen/font.c
+#	SRCS += $(MAIN_DIR)/screen/font.c
 endif
 
 ifeq (yes, $(strip $(RGB_LINEAR_ENABLE)))

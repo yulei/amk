@@ -27,7 +27,8 @@ static void reset_to_msc(bool msc);
 #include "anim.h"
 #include "amk_printf.h"
 #include "rtc8563.h"
-#include "font.h"
+#include "def_font.h"
+//#include "font.h"
 #include "ff.h"
 
 enum {
@@ -63,6 +64,11 @@ static uint16_t anim_buf[ANIM_WIDTH*ANIM_HEIGHT];
 #define AUXI_WIDTH      80
 #define AUXI_HEIGHT     30
 static uint16_t auxi_buf[AUXI_WIDTH*AUXI_HEIGHT];
+
+#define AMFT_WIDTH      10
+#define AMFT_HEIGHT     30
+#define AMFT_FRAMES     11
+static uint16_t font_buf[AMFT_WIDTH*AMFT_HEIGHT*AMFT_FRAMES];
 
 static bool first_screen = true;
 static bool filling = false;
@@ -104,7 +110,7 @@ static rtc_datetime_t rtc_dt = {
     .year = 21,
 };
 
-static bool rtc_datetime_mode = false;
+static bool rtc_datetime_mode = true;
 static bool rtc_datetime_dirty = false;
 static uint32_t rtc_datetime_ticks = 0;
 #define RTC_FILE_SIG            "AMDT"
@@ -174,6 +180,7 @@ static void rtc_datetime_scan(void)
         f_closedir(&dir);
     }
 }
+
 static void rtc_datetime_update(void)
 {
     if (timer_elapsed32(rtc_datetime_ticks) > RTC_CHECKING_INTERVAL) {
@@ -192,6 +199,63 @@ static void rtc_datetime_update(void)
         }
         rtc_datetime_ticks = timer_read32();
     }
+}
+
+static void rtc_datetime_inc_second(void)
+{
+    rtc_datetime_t dt = {0,0,0,0,0,0};
+    rtc8563_read_time(&dt);
+    dt.second += 1;
+    dt.minute += dt.second/60;
+    dt.hour += dt.minute/60;
+    dt.minute %= 60;
+    dt.second %= 60;
+    rtc8563_write_time(&dt);
+}
+
+static void rtc_datetime_dec_second(void)
+{
+    rtc_datetime_t dt = {0,0,0,0,0,0};
+    rtc8563_read_time(&dt);
+    if (dt.second > 0) {
+        dt.second--;
+    } else {
+        if (dt.minute > 0) {
+            dt.minute--;
+        } else {
+            dt.hour--;
+            dt.minute = 59;
+        }
+        dt.second = 59;
+    }
+    rtc8563_write_time(&dt);
+}
+
+static void font_init(void)
+{
+    anim_t * anim = anim_open(NULL, ANIM_TYPE_FONT);
+    if (anim) {
+        if (anim_get_frames(anim) < AMFT_FRAMES) {
+            anim_close(anim);
+            anim = NULL;
+        }
+    } 
+
+    if (anim == NULL) {
+        if (!anim_load_font(default_font, font_buf, AMFT_FRAMES)) {
+            amk_printf("Font load: failed to load default font\n");
+        }
+        return;
+    }
+
+    uint16_t *p = font_buf;
+    for(uint32_t i = 0; i < anim_get_frames(anim); i++) {
+        uint32_t delay = 0;
+        anim_step(anim, &delay, p, AMFT_WIDTH*AMFT_HEIGHT*2);
+        p += AMFT_WIDTH*AMFT_HEIGHT;
+    }
+
+    anim_close(anim);
 }
 
 #endif
@@ -239,6 +303,7 @@ void matrix_init_kb(void)
             amk_printf("ANIM: faield to open root path\n");
         }
     }
+    font_init();
     rtc_datetime_init();
 #endif
 }
@@ -249,26 +314,24 @@ void render_datetime(render_t *render)
     if (!rtc_datetime_dirty) {
         return;
     }
-    char buffer[9];
-    sprintf(buffer, "%02d-%02d-%02d", rtc_dt.hour, rtc_dt.minute, rtc_dt.second);
-    memset(render->buf, 0, AUXI_WIDTH*AUXI_HEIGHT*2);
-    for(int i = 0; i < 8; i++){
-        lv_font_fmt_txt_glyph_dsc_t *gdesc = NULL;
-        const uint8_t *glyph = font_get_bitmap(buffer[i], &gdesc);
-        if (!glyph) {
+
+    if (filling) {
+        if (screen_fill_ready()) {
+            filling = false;
+        } else {
             return;
         }
+    };
 
+    char buffer[9];
+    sprintf(buffer, "%02d:%02d:%02d", rtc_dt.hour, rtc_dt.minute, rtc_dt.second);
+    //amk_printf("%s\n", buffer);
+    memset(render->buf, 0, AUXI_WIDTH*AUXI_HEIGHT*2);
+    for(int i = 0; i < 8; i++){
         uint32_t start_x = i*10;
-
-        for (int y = 0; y < gdesc->box_h; y++) {
-            for(int x = 0; x < gdesc->box_w; x++) {
-                uint32_t position = y*gdesc->box_w + x;
-                uint32_t bits = position % 8;
-                uint32_t offset = (position / 8) + (bits ? 1 : 0);
-                uint16_t color = (glyph[offset] & (1 << (7-bits))) ? 0xFFFF : 0;
-                render->buf[y*AUXI_WIDTH + (start_x+x)] = color;
-            }
+        uint32_t font_index = buffer[i]-'0';
+        for (int y = 0; y < AMFT_HEIGHT; y++) {
+            memcpy(&(render->buf[y*AUXI_WIDTH+start_x]), &font_buf[font_index*AMFT_WIDTH*AMFT_HEIGHT + y*AMFT_WIDTH], AMFT_WIDTH*2);
         }
     }
 
@@ -395,8 +458,17 @@ bool hook_process_action_main(keyrecord_t *record)
     }
 
     switch(action.key.code) {
+        case KC_F17:
+            rtc_datetime_inc_second();
+            amk_printf("datetime_mode: increase second\n");
+            return true;
+        case KC_F18:
+            rtc_datetime_dec_second();
+            amk_printf("datetime_mode: decrease second\n");
+            return true;
         case KC_F19:
             rtc_datetime_mode = !rtc_datetime_mode;
+            amk_printf("datetime_mode switch: %d\n", rtc_datetime_mode);
             return true;
         case KC_F20:
             first_screen = !first_screen;
@@ -410,10 +482,10 @@ bool hook_process_action_main(keyrecord_t *record)
             }
             render->mode = (render->mode+1) % MODE_MAX;
         } return true;
-        case KC_F23:
-            msc_erase();
-            reset_to_msc(true);
-            return true;
+        //case KC_F23:
+        //    msc_erase();
+        //    reset_to_msc(true);
+        //    return true;
         case KC_F24: 
             reset_to_msc((usb_setting & USB_MSC_BIT) ? false : true);
             return true;

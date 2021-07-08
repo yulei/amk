@@ -1,7 +1,7 @@
 
 SRCS += \
 	$(KEYBOARD_DIR)/m65.c \
-	$(KEYBOARD_DIR)/m65_actionmap.c \
+	$(KEYBOARD_DIR)/m65_keymap.c \
 
 MCU = STM32F722
 TINYUSB_ENABLE = yes
@@ -11,7 +11,7 @@ MSC_ENABLE = yes
 #WEBUSB_ENABLE = yes
 EECONFIG_FLASH = yes
 RGB_LINEAR_ENABLE = yes
-VIAL_ENABLE = yes
+#VIAL_ENABLE = yes
 DATETIME_ENABLE = yes
 
 LINKER_PATH = $(KEYBOARD_DIR)

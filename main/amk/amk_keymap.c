@@ -17,6 +17,16 @@
 #include "keymap.h"
 #include "amk_printf.h"
 
+#ifndef AMK_KEYMAP_DEBUG
+#define AMK_KEYMAP_DEBUG 1
+#endif
+
+#if AMK_KEYMAP_DEBUG
+#define keymap_debug  amk_printf
+#else
+#define keymap_debug(...)
+#endif
+
 #ifdef KEYMAP_CONFIG_ENABLE 
 
 #ifndef ACTIONMAP_ENABLE
@@ -47,7 +57,7 @@ void amk_keymap_init(void)
         amk_keymap_macro_reset();
     }
 
-    amk_printf("amk_keymap_init finished\n");
+    keymap_debug("amk_keymap_init finished\n");
 }
 
 __attribute__((weak))
@@ -61,7 +71,7 @@ void amk_keymap_reset(void)
         }
     }
     ee_keymap_set_valid(true);
-    amk_printf("amk_keymap_reset finished\n");
+    keymap_debug("amk_keymap_reset finished\n");
 }
 
 __attribute__((weak))
@@ -77,7 +87,7 @@ void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
 
     if (amk_code == keycode) return;
 
-    amk_printf("amk_keymap_set: layer=%d, row=%d, col=%d, key=0x%x\n", layer, row, col, keycode);
+    keymap_debug("amk_keymap_set: layer=%d, row=%d, col=%d, key=0x%x\n", layer, row, col, keycode);
     ee_keymap_write_key(layer, row, col, keycode);
 }
 
@@ -85,7 +95,7 @@ __attribute__((weak))
 uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
 {
     uint16_t amk_code = ee_keymap_read_key(layer, row, col);
-    amk_printf("amk_keymap_get: layer=%d, row=%d, col=%d, key=0x%x\n", layer, row, col, amk_code);
+    keymap_debug("amk_keymap_get: layer=%d, row=%d, col=%d, key=0x%x\n", layer, row, col, amk_code);
     return amk_code;
 }
 
@@ -130,7 +140,7 @@ void amk_keymap_macro_reset(void)
 {
     ee_macro_reset();
     ee_macro_set_valid(true);
-    amk_printf("amk_macro_reset finished\n");
+    keymap_debug("amk_macro_reset finished\n");
 }
 
 
@@ -138,13 +148,13 @@ void amk_keymap_macro_reset(void)
 __attribute__((weak))
 void amk_keymap_init(void)
 {
-    amk_printf("amk_keymap_init in disabled mode\n");
+    keymap_debug("amk_keymap_init in disabled mode\n");
 }
 
 __attribute__((weak))
 void amk_keymap_reset(void)
 {
-    amk_printf("amk_keymap_reset in disabled mode\n");
+    keymap_debug("amk_keymap_reset in disabled mode\n");
 }
 
 __attribute__((weak))
