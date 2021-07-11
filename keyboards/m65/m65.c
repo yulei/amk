@@ -441,10 +441,10 @@ void led_set(uint8_t led)
 {
     if (led & (1 << USB_LED_CAPS_LOCK)) {
         amk_printf("turn caps on\n");
-        gpio_write_pin(CAPS_LED_PIN, 1);
+        gpio_write_pin(CAPS_LED_PIN, 0);
     } else {
         amk_printf("turn caps off\n");
-        gpio_write_pin(CAPS_LED_PIN, 0);
+        gpio_write_pin(CAPS_LED_PIN, 1);
     }
 }
 
