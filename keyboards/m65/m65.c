@@ -53,6 +53,7 @@ typedef struct {
     bool filling;
 } render_t;
 
+#define BYTE_PER_PIXEL  2
 #define ANIM_X_START    0
 #define ANIM_Y_START    0
 #define ANIM_WIDTH      80
@@ -83,7 +84,7 @@ static render_t renders[] = {
         .mode = MODE_SEQUENCE,
         .anim = NULL,
         .buf = anim_buf,
-        .buf_size = ANIM_WIDTH*ANIM_HEIGHT*2,
+        .buf_size = ANIM_WIDTH*ANIM_HEIGHT*BYTE_PER_PIXEL,
         .ticks = 0,
     },
     {
@@ -96,7 +97,7 @@ static render_t renders[] = {
         .mode = MODE_SEQUENCE,
         .anim = NULL,
         .buf = auxi_buf,
-        .buf_size = AUXI_WIDTH*AUXI_HEIGHT*2,
+        .buf_size = AUXI_WIDTH*AUXI_HEIGHT*BYTE_PER_PIXEL,
         .ticks = 0,
     },
 };
@@ -110,7 +111,7 @@ static rtc_datetime_t rtc_dt = {
     .year = 21,
 };
 
-static bool rtc_datetime_mode = true;
+static bool rtc_datetime_mode = false;
 static bool rtc_datetime_dirty = false;
 static uint32_t rtc_datetime_ticks = 0;
 #define RTC_FILE_SIG            "AMDT"
@@ -233,6 +234,8 @@ static void rtc_datetime_dec_second(void)
 
 static void font_init(void)
 {
+    memset(font_buf, 0, AMFT_WIDTH*AMFT_HEIGHT*BYTE_PER_PIXEL);
+
     anim_t * anim = anim_open(NULL, ANIM_TYPE_FONT);
     if (anim) {
         if (anim_get_frames(anim) < AMFT_FRAMES) {
@@ -251,7 +254,7 @@ static void font_init(void)
     uint16_t *p = font_buf;
     for(uint32_t i = 0; i < anim_get_frames(anim); i++) {
         uint32_t delay = 0;
-        anim_step(anim, &delay, p, AMFT_WIDTH*AMFT_HEIGHT*2);
+        anim_step(anim, &delay, p, AMFT_WIDTH*AMFT_HEIGHT*BYTE_PER_PIXEL);
         p += AMFT_WIDTH*AMFT_HEIGHT;
     }
 
@@ -326,12 +329,12 @@ void render_datetime(render_t *render)
     char buffer[9];
     sprintf(buffer, "%02d:%02d:%02d", rtc_dt.hour, rtc_dt.minute, rtc_dt.second);
     //amk_printf("%s\n", buffer);
-    memset(render->buf, 0, AUXI_WIDTH*AUXI_HEIGHT*2);
+    memset(render->buf, 0, AUXI_WIDTH*AUXI_HEIGHT*BYTE_PER_PIXEL);
     for(int i = 0; i < 8; i++){
-        uint32_t start_x = i*10;
+        uint32_t start_x = i*AMFT_WIDTH;
         uint32_t font_index = buffer[i]-'0';
         for (int y = 0; y < AMFT_HEIGHT; y++) {
-            memcpy(&(render->buf[y*AUXI_WIDTH+start_x]), &font_buf[font_index*AMFT_WIDTH*AMFT_HEIGHT + y*AMFT_WIDTH], AMFT_WIDTH*2);
+            memcpy(&(render->buf[y*AUXI_WIDTH+start_x]), &font_buf[font_index*AMFT_WIDTH*AMFT_HEIGHT + y*AMFT_WIDTH], AMFT_WIDTH*BYTE_PER_PIXEL);
         }
     }
 

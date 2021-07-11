@@ -105,3 +105,7 @@ ifeq (yes, $(strip $(DATETIME_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/rtc8563.c
 	APP_DEFS += -DDATETIME_ENABLE
 endif
+
+ifeq (yes, $(strip $(NOFRENDO_ENABLE)))
+	include libs/nofrendo.mk
+endif

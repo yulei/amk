@@ -306,6 +306,7 @@ bool anim_load_font(const void* data, void* buf, uint32_t total_frames)
         return false;
     }
 
+    src += header.offset;
     uint8_t *dst = (uint8_t *)buf; 
     uint32_t frame_size = header.width*header.height*2;
     for (uint32_t i = 0; i < total_frames; i++) {
