@@ -295,6 +295,7 @@ void matrix_init_kb(void)
     gpio_write_pin(FLASH_CS, 1);
 
     gpio_set_output_pushpull(CAPS_LED_PIN);
+    gpio_write_pin(CAPS_LED_PIN, 1);
 
 #ifdef SCREEN_ENABLE
     fractal_init();

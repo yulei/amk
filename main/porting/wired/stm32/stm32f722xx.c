@@ -21,6 +21,10 @@ DMA_HandleTypeDef hdma_tim2_ch1;
 
 RTC_HandleTypeDef hrtc;
 
+#ifdef WDT_ENABLED
+IWDG_HandleTypeDef hiwdg;
+#endif
+
 #ifdef TINYUSB_ENABLE
 void OTG_FS_IRQHandler(void)
 {
@@ -238,6 +242,20 @@ static void MX_RTC_Init(void)
     }
 }
 
+
+#ifdef WDT_ENABLED
+static void MX_IWDG_Init(void)
+{
+    hiwdg.Instance = IWDG;
+    hiwdg.Init.Prescaler = IWDG_PRESCALER_32;
+    hiwdg.Init.Window = 1999;
+    hiwdg.Init.Reload = 1999;
+    if (HAL_IWDG_Init(&hiwdg) != HAL_OK) {
+        Error_Handler();
+    }
+}
+#endif
+
 #if defined(TINYUSB_ENABLE)
 void usb_port_init(void)
 {
@@ -304,8 +322,15 @@ void custom_board_init(void)
     HAL_PWR_EnableBkUpAccess();
     HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0);
 #endif
+
+#ifdef WDT_ENABLED
+    MX_IWDG_Init();
+#endif
 }
 
+#ifdef WDT_ENABLED
 void custom_board_task(void)
 {
+    HAL_IWDG_Refresh(&hiwdg);
 }
+#endif
