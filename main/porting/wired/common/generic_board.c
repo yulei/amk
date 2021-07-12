@@ -113,8 +113,8 @@ void board_task(void)
 static void amk_init(void)
 {
 #ifdef SCREEN_ENABLE
-    amk_printf("screen_init\n");
-    screen_init();
+    //amk_printf("screen_init\n");
+    //screen_init();
 #endif
 
 #ifdef MSC_ENABLE

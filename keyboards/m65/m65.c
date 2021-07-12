@@ -9,6 +9,7 @@
 #include "led.h"
 #include "amk_gpio.h"
 #include "usb_descriptors.h"
+#include "wait.h"
 
 
 #ifdef DYNAMIC_CONFIGURATION
@@ -71,6 +72,7 @@ static uint16_t auxi_buf[AUXI_WIDTH*AUXI_HEIGHT];
 #define AMFT_FRAMES     11
 static uint16_t font_buf[AMFT_WIDTH*AMFT_HEIGHT*AMFT_FRAMES];
 
+static bool screen_enable = true;
 static bool first_screen = true;
 static bool filling = false;
 static render_t renders[] = {
@@ -285,11 +287,28 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
 
 static uint32_t last_ticks = 0;
 
+#ifdef SCREEN_ENABLE
+static void set_screen_state(bool enable)
+{
+    if (enable) {
+        gpio_set_output_pushpull(SCREEN_0_PWR);
+        gpio_write_pin(SCREEN_0_PWR, SCREEN_0_PWR_EN);
+        wait_ms(1);
+        screen_init();
+    } else {
+        gpio_set_output_pushpull(SCREEN_0_PWR);
+        gpio_write_pin(SCREEN_0_PWR, !SCREEN_0_PWR_EN);
+        wait_ms(1);
+    }
+}
+#endif
+
 //#if defined(DYNAMIC_CONFIGURATION) || defined(MSC_ENABLE)
 void matrix_init_kb(void)
 {
-    gpio_set_output_pushpull(SCREEN_0_PWR);
-    gpio_write_pin(SCREEN_0_PWR, SCREEN_0_PWR_EN);
+#ifdef SCREEN_ENABLE
+    set_screen_state(screen_enable);
+#endif
 
     gpio_set_output_pushpull(FLASH_CS);
     gpio_write_pin(FLASH_CS, 1);
@@ -427,6 +446,9 @@ void msc_task_kb(void)
     if (usb_setting & USB_MSC_BIT) return;
 
     rtc_datetime_update();
+
+    if (!screen_enable) return;
+
     render_screen(0);
     render_screen(1);
 }
@@ -464,6 +486,11 @@ bool hook_process_action_main(keyrecord_t *record)
     }
 
     switch(action.key.code) {
+        case KC_F16:
+            screen_enable = !screen_enable;
+            set_screen_state(screen_enable);
+            amk_printf("screen enabled: %d\n", screen_enable);
+            return true;
         case KC_F17:
             rtc_datetime_inc_second();
             amk_printf("datetime_mode: increase second\n");
