@@ -31,7 +31,7 @@
 #define AUXI_SIG    "AUXI"
 #define ANIM_SIG    "ANIM"
 #define AMFT_SIG    "AMFT"
-#define FRAME_MAX   256
+#define FRAME_MAX   656
 typedef struct __attribute__((packed)) {
     char signature[4];  //"ANIM" or "AUXI"
     uint16_t size;      // size of the header
