@@ -65,7 +65,7 @@ void dcd_init(uint8_t rhport)
 #if defined(STM32F103xB)
     dcd_usb.Init.ep0_mps = CFG_TUD_ENDPOINT0_SIZE;
 #else
-    #if !defined(STM32L432xx) && !defined(STM32L072xx)
+    #if defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F722xx)
     dcd_usb.Init.dma_enable = DISABLE;
     dcd_usb.Init.vbus_sensing_enable = DISABLE;
     dcd_usb.Init.use_dedicated_ep1 = DISABLE;
