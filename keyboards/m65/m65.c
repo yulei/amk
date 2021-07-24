@@ -38,7 +38,6 @@ static void reset_to_msc(bool msc);
 #include "amk_printf.h"
 #include "rtc8563.h"
 #include "def_font.h"
-//#include "font.h"
 #include "ff.h"
 
 enum {
@@ -245,7 +244,7 @@ static void rtc_datetime_dec_second(void)
 
 static void font_init(void)
 {
-    memset(font_buf, 0, AMFT_WIDTH*AMFT_HEIGHT*BYTE_PER_PIXEL);
+    memset(font_buf, 0, AMFT_WIDTH*AMFT_HEIGHT*BYTE_PER_PIXEL*AMFT_FRAMES);
 
     anim_t * anim = anim_open(NULL, ANIM_TYPE_FONT);
     if (anim) {
@@ -263,7 +262,7 @@ static void font_init(void)
     }
 
     uint16_t *p = font_buf;
-    for(uint32_t i = 0; i < anim_get_frames(anim); i++) {
+    for(uint32_t i = 0; i < AMFT_FRAMES; i++) {
         uint32_t delay = 0;
         anim_step(anim, &delay, p, AMFT_WIDTH*AMFT_HEIGHT*BYTE_PER_PIXEL);
         p += AMFT_WIDTH*AMFT_HEIGHT;
