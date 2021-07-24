@@ -269,7 +269,7 @@ static bool anim_check_file(const char *path, const char* sig)
 {
     FIL file;
     if (FR_OK != f_open(&file, path, FA_READ)) {
-        amk_printf("ANIM check: failed to open file: %s\n", path);
+        //amk_printf("ANIM check: failed to open file: %s\n", path);
         return false;
     }
 
@@ -277,7 +277,7 @@ static bool anim_check_file(const char *path, const char* sig)
     UINT readed = 0;
     bool result = false;
     if (FR_OK != f_read(&file, &header, sizeof(anim_header_t), &readed)) {
-        amk_printf("ANIM check: failed to read file header: %s\n", path);
+        //amk_printf("ANIM check: failed to read file header: %s\n", path);
         goto exit;
     }
     

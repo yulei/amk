@@ -97,6 +97,7 @@
 //Set Burst with Wrap
 #define WQCMD_SET_BURST_WITH_WRAP 0x77
 
+#define WQ_WAIT_TIMEOUT 2000
 static w25qxx_t w25qxxs[W25QXX_NUM];
 
 static uint32_t w25qxx_read_jedec(w25qxx_t *w25qxx);
@@ -264,13 +265,19 @@ static amk_error_t w25qxx_enable_write(w25qxx_t *w25qxx)
 
 static amk_error_t w25qxx_wait(w25qxx_t *w25qxx)
 {
+    uint32_t wait_max = WQ_WAIT_TIMEOUT;
     gpio_write_pin(w25qxx->config.cs, 0);
     uint8_t status = w25qxx_spi_write(w25qxx, WQCMD_READ_STATUS_1);
     do {
         status = w25qxx_spi_write(w25qxx, WQCMD_DUMMY);
 		wait_ms(1);
-    } while (( status & 0x01) == 0x01);
+        wait_max--;
+    } while (((status & 0x01) == 0x01) && (wait_max > 0));
+
     gpio_write_pin(w25qxx->config.cs, 1);
+    if (wait_max == 0) {
+        return AMK_SPI_TIMEOUT;
+    }
     return AMK_SUCCESS;
 }
 

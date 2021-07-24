@@ -44,7 +44,11 @@ void SysTick_Handler(void)
 
 static void fault_handler(void) 
 {
+    #if 0
+    __asm__("BKPT");
+    #else
     NVIC_SystemReset();
+    #endif
 }
 
 void NMI_Handler(void)

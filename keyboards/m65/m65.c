@@ -11,6 +11,15 @@
 #include "usb_descriptors.h"
 #include "wait.h"
 
+#ifndef M65_DEBUG
+#define M65_DEBUG 0
+#endif
+
+#if M65_DEBUG
+#define m65_debug  amk_printf
+#else
+#define m65_debug(...)
+#endif
 
 #ifdef DYNAMIC_CONFIGURATION
 extern RTC_HandleTypeDef hrtc;
@@ -147,24 +156,24 @@ static void rtc_datetime_scan(void)
             if ( (fno.fattrib & AM_DIR) == 0) {
                 FIL file;
                 if (FR_OK != f_open(&file, fno.fname, FA_READ)) {
-                    amk_printf("Datetime check: failed to open file: %s\n", fno.fname);
+                    //amk_printf("Datetime check: failed to open file: %s\n", fno.fname);
                     continue;
                 }
                 if (f_size(&file) != RTC_FILE_SIZE) {
                     f_close(&file);
-                    amk_printf("Datetime check: file size mismatch, skip file: %s\n", fno.fname);
+                    //amk_printf("Datetime check: file size mismatch, skip file: %s\n", fno.fname);
                     continue;
                 }
                 uint8_t buf[RTC_FILE_SIZE];
                 UINT readed = 0;
                 if (FR_OK != f_read(&file, buf, sizeof(buf), &readed)) {
                     f_close(&file);
-                    amk_printf("Datetime check: failed to read file header: %s\n", fno.fname);
+                    //amk_printf("Datetime check: failed to read file header: %s\n", fno.fname);
                     continue;
                 }
                 if (memcmp(RTC_FILE_SIG, buf, 4) != 0) {
                     f_close(&file);
-                    amk_printf("Datetime check: signature invalid\n");
+                    m65_debug("Datetime check: signature invalid\n");
                     continue;
                 }
                 uint8_t *p      = &buf[4];
@@ -248,7 +257,7 @@ static void font_init(void)
 
     if (anim == NULL) {
         if (!anim_load_font(default_font, font_buf, AMFT_FRAMES)) {
-            amk_printf("Font load: failed to load default font\n");
+            m65_debug("Font load: failed to load default font\n");
         }
         return;
     }
@@ -325,7 +334,7 @@ void matrix_init_kb(void)
     for (int i = 0; i < sizeof(renders)/sizeof(render_t); i++) {
         renders[i].anim = anim_open(NULL, renders[i].type);
         if (renders[i].anim) {
-            amk_printf("ANIM: faield to open root path\n");
+            m65_debug("ANIM: faield to open root path\n");
         }
     }
     font_init();
@@ -463,10 +472,10 @@ void screen_task_kb(void)
 void led_set(uint8_t led)
 {
     if (led & (1 << USB_LED_CAPS_LOCK)) {
-        amk_printf("turn caps on\n");
+        m65_debug("turn caps on\n");
         gpio_write_pin(CAPS_LED_PIN, 0);
     } else {
-        amk_printf("turn caps off\n");
+        m65_debug("turn caps off\n");
         gpio_write_pin(CAPS_LED_PIN, 1);
     }
 }
@@ -489,19 +498,19 @@ bool hook_process_action_main(keyrecord_t *record)
         case KC_F16:
             screen_enable = !screen_enable;
             set_screen_state(screen_enable);
-            amk_printf("screen enabled: %d\n", screen_enable);
+            m65_debug("screen enabled: %d\n", screen_enable);
             return true;
         case KC_F17:
             rtc_datetime_inc_second();
-            amk_printf("datetime_mode: increase second\n");
+            m65_debug("datetime_mode: increase second\n");
             return true;
         case KC_F18:
             rtc_datetime_dec_second();
-            amk_printf("datetime_mode: decrease second\n");
+            m65_debug("datetime_mode: decrease second\n");
             return true;
         case KC_F19:
             rtc_datetime_mode = !rtc_datetime_mode;
-            amk_printf("datetime_mode switch: %d\n", rtc_datetime_mode);
+            m65_debug("datetime_mode switch: %d\n", rtc_datetime_mode);
             return true;
         case KC_F20:
             first_screen = !first_screen;
