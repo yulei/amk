@@ -97,14 +97,15 @@
 //Set Burst with Wrap
 #define WQCMD_SET_BURST_WITH_WRAP 0x77
 
-#define WQ_WAIT_TIMEOUT 2000
+#define WQ_WRITE_TIMEOUT    2000
+#define WQ_READ_TIMEOUT     20
 static w25qxx_t w25qxxs[W25QXX_NUM];
 
 static uint32_t w25qxx_read_jedec(w25qxx_t *w25qxx);
 static amk_error_t w25qxx_erase_sector(w25qxx_t *w25qxx, uint32_t address);
 static uint8_t w25qxx_spi_write(w25qxx_t *w25qxx, uint8_t data);
 static amk_error_t w25qxx_enable_write(w25qxx_t *w25qxx);
-static amk_error_t w25qxx_wait(w25qxx_t *w25qxx);
+static amk_error_t w25qxx_wait(w25qxx_t *w25qxx, uint32_t timeout);
 static amk_error_t w25qxx_write_address(w25qxx_t *w25qxx, uint8_t cmd, uint32_t address);
 static bool w25qxx_sector_empty(w25qxx_t *w25qxx, uint32_t address);
 
@@ -127,38 +128,38 @@ w25qxx_t *w25qxx_init(w25qxx_config_t *config)
     case 0x4018:
         // W25Q128
         amk_printf("W25Q128 device identified: %x\n", id);
-        device->page_size = 256;
-        device->page_count = 65536;
-        device->sector_size = 4096;
-        device->sector_count = 4096;
-        device->type = W25Q128; 
         break;;
     default:
         amk_printf("Unknown W25QXX chip: %x\n", id);
-        device = NULL;
+        //device = NULL;
         break;
     }
 
+    device->page_size       = 256;
+    device->page_count      = 65536;
+    device->sector_size     = 4096;
+    device->sector_count    = 4096;
+    device->type = W25Q128; 
     gpio_write_pin(config->cs, 1);
     return device;
 }
 
 static amk_error_t w25qxx_erase_sector(w25qxx_t *w25qxx, uint32_t address)
 {
-    w25qxx_wait(w25qxx);
+    w25qxx_wait(w25qxx, WQ_WRITE_TIMEOUT);
     w25qxx_enable_write(w25qxx);
 
     gpio_write_pin(w25qxx->config.cs, 0);
     w25qxx_write_address(w25qxx, WQCMD_SECTOR_ERASE_4K, address);
     gpio_write_pin(w25qxx->config.cs, 1);
 
-    w25qxx_wait(w25qxx);
+    w25qxx_wait(w25qxx, WQ_WRITE_TIMEOUT);
     return AMK_SUCCESS;
 }
 
 static void w25qxx_write_page(w25qxx_t *w25qxx, uint32_t address, const uint8_t *data, uint32_t size)
 {
-    w25qxx_wait(w25qxx);
+    w25qxx_wait(w25qxx, WQ_WRITE_TIMEOUT);
     w25qxx_enable_write(w25qxx);
 
     gpio_write_pin(w25qxx->config.cs, 0);
@@ -166,7 +167,7 @@ static void w25qxx_write_page(w25qxx_t *w25qxx, uint32_t address, const uint8_t 
     spi_send(w25qxx->config.spi, data, size);
     gpio_write_pin(w25qxx->config.cs, 1);
 
-    w25qxx_wait(w25qxx);
+    w25qxx_wait(w25qxx, WQ_WRITE_TIMEOUT);
 }
 
 amk_error_t w25qxx_write_sector(w25qxx_t* w25qxx, uint32_t address, const uint8_t *data, uint32_t size)
@@ -217,7 +218,7 @@ amk_error_t w25qxx_read_bytes(w25qxx_t* w25qxx, uint32_t address, uint8_t *data,
 
 amk_error_t w25qxx_erase_chip(w25qxx_t* w25qxx)
 {
-    w25qxx_wait(w25qxx);
+    w25qxx_wait(w25qxx, WQ_WRITE_TIMEOUT);
     w25qxx_enable_write(w25qxx);
 
     gpio_write_pin(w25qxx->config.cs, 0);
@@ -226,7 +227,7 @@ amk_error_t w25qxx_erase_chip(w25qxx_t* w25qxx)
 
     gpio_write_pin(w25qxx->config.cs, 1);
 
-    w25qxx_wait(w25qxx);
+    w25qxx_wait(w25qxx, WQ_WRITE_TIMEOUT);
 
     return AMK_SUCCESS;
 }
@@ -263,9 +264,9 @@ static amk_error_t w25qxx_enable_write(w25qxx_t *w25qxx)
     return AMK_SUCCESS;
 }
 
-static amk_error_t w25qxx_wait(w25qxx_t *w25qxx)
+static amk_error_t w25qxx_wait(w25qxx_t *w25qxx, uint32_t timeout)
 {
-    uint32_t wait_max = WQ_WAIT_TIMEOUT;
+    uint32_t wait_max = timeout;
     gpio_write_pin(w25qxx->config.cs, 0);
     uint8_t status = w25qxx_spi_write(w25qxx, WQCMD_READ_STATUS_1);
     do {

@@ -16,13 +16,10 @@ ifeq (yes, $(strip $(MATRIX_USE_PCA9535)))
 endif
 
 ifeq (yes, $(strip $(SCREEN_ENABLE)))
-#	include $(LIB_DIR)/arm2d.mk
 	APP_DEFS += -DSCREEN_ENABLE
 	SRCS += $(MAIN_DIR)/drivers/spi.c
 	SRCS += $(MAIN_DIR)/drivers/st7735.c
 	SRCS += $(MAIN_DIR)/screen/screen.c
-	SRCS += $(MAIN_DIR)/screen/fractal.c
-#	SRCS += $(MAIN_DIR)/screen/font.c
 endif
 
 ifeq (yes, $(strip $(RGB_LINEAR_ENABLE)))

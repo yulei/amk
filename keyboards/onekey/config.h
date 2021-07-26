@@ -40,9 +40,9 @@
 #define I2C1_SCL_PIN    B8
 #define I2C1_SDA_PIN    B9
 
-//#define RGB_SEGMENT_NUM 2
-//#define RGB_LED_NUM     11
-#define RGB_SEGMENT_NUM 3
-#define RGB_LED_NUM     24
+#define RGB_SEGMENT_NUM 2
+#define RGB_LED_NUM     15
+//#define RGB_SEGMENT_NUM 3
+//#define RGB_LED_NUM     24
 
-#define VECT_TAB_OFFSET 0x20000
+//#define VECT_TAB_OFFSET 0x20000
