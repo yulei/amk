@@ -28,7 +28,6 @@ static void reset_to_msc(bool msc);
 
 #ifdef SCREEN_ENABLE
 #include "screen.h"
-#include "fractal.h"
 #endif
 
 
@@ -324,9 +323,6 @@ void matrix_init_kb(void)
     gpio_set_output_pushpull(CAPS_LED_PIN);
     gpio_write_pin(CAPS_LED_PIN, 1);
 
-#ifdef SCREEN_ENABLE
-    fractal_init();
-#endif
     last_ticks = timer_read32();
     // initialize renders
 #ifdef MSC_ENABLE
