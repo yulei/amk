@@ -329,9 +329,9 @@ void custom_board_init(void)
 #endif
 }
 
-#ifdef WDT_ENABLED
 void custom_board_task(void)
 {
+#ifdef WDT_ENABLED
     HAL_IWDG_Refresh(&hiwdg);
-}
 #endif
+}
