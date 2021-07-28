@@ -416,8 +416,8 @@ void render_task(render_t* render)
             if (play) {
                 anim_step(render->anim, &render->delay, render->buf, render->buf_size);
             } else {
-                anim_close(render->anim);
-                render->anim = NULL;
+                //anim_close(render->anim);
+                //render->anim = NULL;
             }
         }
         screen_fill_rect_async(render->x, render->y, render->width, render->height, render->buf, render->buf_size);
