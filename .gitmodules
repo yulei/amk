@@ -20,3 +20,6 @@
 [submodule "libs/tinyusb"]
 	path = libs/tinyusb
 	url = https://github.com/yulei/tinyusb.git
+[submodule "libs/rtos"]
+	path = libs/rtos
+	url = https://github.com/yulei/rtos.git
