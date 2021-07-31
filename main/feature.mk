@@ -100,6 +100,7 @@ endif
 
 ifeq (yes, $(strip $(DATETIME_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/rtc8563.c
+	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	APP_DEFS += -DDATETIME_ENABLE
 endif
 

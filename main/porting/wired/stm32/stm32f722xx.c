@@ -257,7 +257,7 @@ static void MX_IWDG_Init(void)
 #endif
 
 #if defined(TINYUSB_ENABLE)
-void usb_port_init(void)
+static void MX_USB_DEVICE_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
 
@@ -272,30 +272,24 @@ void usb_port_init(void)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF10_OTG_FS;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
+#if 0
+    /* Configure OTG-FS ID pin */
+    GPIO_InitStruct.Pin = GPIO_PIN_10;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Alternate = GPIO_AF10_OTG_FS;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+#endif
     /* Peripheral clock enable */
     __HAL_RCC_USB_OTG_FS_CLK_ENABLE();
-}
-#if defined(TINYUSB_USE_HAL)
-void HAL_PCD_MspInit(PCD_HandleTypeDef *hpcd)
-{
-    usb_port_init();
-}
-#else
-static void MX_USB_DEVICE_Init(void)
-{
-    usb_port_init();
 
 #define USB_DEVICE     ((USB_OTG_DeviceTypeDef *)(USB_OTG_FS_PERIPH_BASE + USB_OTG_DEVICE_BASE))
-    // explicitly disable VBUS sense 
-    USB_DEVICE->DCTL |= USB_OTG_DCTL_SDIS;
     /* Deactivate VBUS Sensing B */
     USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBDEN;
     /* B-peripheral session valid override enable */
     USB_OTG_FS->GOTGCTL |= USB_OTG_GOTGCTL_BVALOEN;
     USB_OTG_FS->GOTGCTL |= USB_OTG_GOTGCTL_BVALOVAL;
 }
-#endif
 #endif
 
 void custom_board_init(void)
@@ -304,7 +298,7 @@ void custom_board_init(void)
 
     MX_GPIO_Init();
     MX_DMA_Init();
-#if defined(TINYUSB_ENABLE) && !defined(TINYUUSB_USE_HAL)
+#if defined(TINYUSB_ENABLE)
     MX_USB_DEVICE_Init();
 #endif
     //MX_I2C1_Init();
