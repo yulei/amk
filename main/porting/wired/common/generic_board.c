@@ -14,6 +14,7 @@
 #include "suspend.h"
 #include "action_util.h"
 #include "mousekey.h"
+#include "wait.h"
 #include "amk_boot.h"
 
 #ifdef SCREEN_ENABLE
@@ -84,6 +85,9 @@ void board_task(void)
         if (suspend_wakeup_condition()) {
             // wake up remote
             remote_wakeup();
+            tud_disconnect();
+            wait_ms(100);
+            tud_connect();
         }
     } else {
         //if (usb_ready()) {

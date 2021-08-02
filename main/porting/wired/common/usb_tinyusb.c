@@ -33,6 +33,10 @@ void usb_init(void)
 {
     tusb_init();
     hid_report_queue_init(&report_queue);
+
+#ifdef VIAL_ENABLE
+    hid_report_queue_init(&macro_queue);
+#endif
 }
 
 void usb_task(void)
@@ -159,6 +163,7 @@ bool usb_suspended(void)
 
 void usb_remote_wakeup(void)
 {
+    hid_report_queue_init(&report_queue);
     tud_remote_wakeup();
 }
 
