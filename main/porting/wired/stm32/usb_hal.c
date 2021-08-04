@@ -99,6 +99,16 @@ void usb_remote_wakeup(void)
     HAL_PCD_DeActivateRemoteWakeup(pcd);
 }
 
+void usb_connect(bool on)
+{
+    PCD_HandleTypeDef *pcd = (PCD_HandleTypeDef *)(hUsbDeviceFS.pData);
+    if (on) {
+        HAL_PCD_DevConnect(pcd);
+    } else {
+        HAL_PCD_DevDisconnect(pcd);
+    }
+}
+
 void usb_send_report(uint8_t report_type, const void* data, size_t size)
 {
     hid_report_t item;

@@ -189,7 +189,7 @@ static uint8_t desc_with_msc[] = {
 
 static uint8_t desc_with_webusb[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
-#ifdef VIALENABLE
+#ifdef VIAL_ENABLE
     TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_LEN_WEBUSB, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
 #else
     TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL-1, 0, CONFIG_LEN_WEBUSB, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),

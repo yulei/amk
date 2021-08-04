@@ -10,7 +10,6 @@
 #include "amk_printf.h"
 
 bool usb_led_event = false;
-uint8_t usb_led_state = 0;
 
 typedef enum {
     ITF_IDLE = 0,
@@ -264,7 +263,7 @@ static uint8_t comp_ep0_tx_sent(struct _USBD_HandleTypeDef *pdev)
 
 static uint8_t comp_ep0_rx_ready(struct _USBD_HandleTypeDef *pdev)
 {
-    amk_printf("ep0 rx ready: led =0x%x\n", usb_led_state);
+    amk_printf("ep0 rx ready: led =0x%x\n", amk_led_state);
     usb_led_event = true;
     return USBD_OK;
 }
@@ -444,7 +443,7 @@ static uint8_t  hid_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, v
                 break;
                 case HID_REQ_CONTROL_SET_REPORT:
                 amk_printf("HID SET REPORT: \n");
-                USBD_CtlPrepareRx(pdev, &usb_led_state, 1U);
+                USBD_CtlPrepareRx(pdev, &amk_led_state, 1U);
                 break;
 
                 default:

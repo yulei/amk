@@ -167,6 +167,15 @@ void usb_remote_wakeup(void)
     tud_remote_wakeup();
 }
 
+void usb_connect(bool on)
+{
+    if(on) {
+        tud_connect();
+    } else {
+        tud_disconnect();
+    }
+}
+
 void usb_send_report(uint8_t report_type, const void* data, size_t size)
 {
     hid_report_t item;

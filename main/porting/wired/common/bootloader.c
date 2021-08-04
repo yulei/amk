@@ -7,10 +7,7 @@
 #include "bootloader.h"
 #include "wait.h"
 #include "amk_keymap.h"
-
-#if !defined(USB_HOST_ENABLE) && !defined(GD32E10X)
-#include "tusb.h"
-#endif
+#include "usb_interface.h"
 
 static uint32_t Bootloader_Magic=0x41544B42;
 
@@ -40,7 +37,7 @@ void bootloader_jump(void)
     amk_keymap_reset();
 
 #if !defined(USB_HOST_ENABLE) && !defined(GD32E10X)
-    tud_disconnect();
+    usb_connect(0);
 #endif
     wait_ms(10);
     NVIC_SystemReset();

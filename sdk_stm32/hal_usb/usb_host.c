@@ -96,7 +96,7 @@ void USBH_UpdateLedState(USBH_HandleTypeDef *phost)
 {
     if (Appli_state == APPLICATION_READY) {
         if (usb_led_event) {
-            if (USBH_OK == USBH_HID_SetReport(&hUsbHostHS, 0x02, 0, &usb_led_state, 1u, 0)) {
+            if (USBH_OK == USBH_HID_SetReport(&hUsbHostHS, 0x02, 0, &amk_led_state, 1u, 0)) {
                 usb_led_event = false;
             }
         }

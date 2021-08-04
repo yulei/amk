@@ -478,7 +478,8 @@ void led_set(uint8_t led)
 #ifdef DYNAMIC_CONFIGURATION
 #include "action.h"
 #include "action_layer.h"
-#include "tusb.h"
+#include "usb_interface.h"
+
 bool hook_process_action_main(keyrecord_t *record)
 {
     if (IS_NOEVENT(record->event) || !record->event.pressed) { 
@@ -541,7 +542,7 @@ static void reset_to_msc(bool msc)
 {
     HAL_PWR_EnableBkUpAccess();
     HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, msc ? 1 : 0);
-    tud_disconnect();
+    usb_connect(false);
     HAL_Delay(10);
     HAL_NVIC_SystemReset();
 }

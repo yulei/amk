@@ -85,9 +85,9 @@ void board_task(void)
         if (suspend_wakeup_condition()) {
             // wake up remote
             remote_wakeup();
-            tud_disconnect();
+            usb_connect(false);
             wait_ms(100);
-            tud_connect();
+            usb_connect(true);
         }
     } else {
         //if (usb_ready()) {

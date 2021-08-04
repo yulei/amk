@@ -8,4 +8,4 @@
 #include <stdint.h>
 
 extern bool usb_led_event;
-extern uint8_t usb_led_state;
+extern uint8_t amk_led_state;
