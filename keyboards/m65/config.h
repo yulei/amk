@@ -55,5 +55,5 @@
 #define VIAL_INSECURE
 #define VIAL_KEYBOARD_UID {0x01, 0x90, 0x17, 0x3A, 0xEC, 0xEE, 0x2B, 0x85}
 
-//#define WDT_ENABLED
-#define FAULT_BREAK
+#define WDT_ENABLED
+//#define FAULT_BREAK
