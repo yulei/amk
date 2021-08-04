@@ -18,3 +18,5 @@ ifeq (yes, $(strip $(VIAL_ENABLE)))
 else
 	SRCS += $(KEYBOARD_DIR)/m65_keymap.c
 endif
+
+include $(LIB_DIR)/threadx.mk

@@ -54,7 +54,7 @@ $(OBJ_DIRS):
 ifeq (1,$(NO_DEBUG))
 OPT = -Os -ggdb
 else
-OPT = -Og -ggdb -DDEBUG
+OPT = -Og -ggdb3 -DDEBUG
 endif
 
 ifeq (1,$(LTO_ENABLE))
