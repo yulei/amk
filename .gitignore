@@ -2,8 +2,8 @@
 build/
 keyboards/amkbd/
 sdk_nrf5/nRF5_SDK_*
-misc/
-!misc/*.ioc
+sdk_stm32/misc/*
+!sdk_stm32/misc/*.ioc
 sdk_samd/d21/gcc/*
 !sdk_samd/d21/gcc/Makefile
 *.DS_Store

@@ -27,7 +27,6 @@ static void DWT_Delay_Init(void)
 #endif
 }
 
-
 uint32_t systick_get_tick(void)
 {
     return HAL_GetTick();
@@ -44,7 +43,7 @@ void SysTick_Handler(void)
 
 static void fault_handler(void) 
 {
-    #if 0
+    #ifdef FAULT_BREAK
     __asm__("BKPT");
     #else
     NVIC_SystemReset();
