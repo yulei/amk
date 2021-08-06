@@ -8,6 +8,7 @@ SRCS += \
 	$(COMMON_PORTING_DIR)/generic_board.c \
 	$(COMMON_PORTING_DIR)/suspend.c \
 	$(COMMON_PORTING_DIR)/timer.c \
+	$(COMMON_PORTING_DIR)/usb_interface.c \
 
 INCS += \
 	$(COMMON_PORTING_DIR) \

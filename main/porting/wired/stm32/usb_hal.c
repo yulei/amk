@@ -2,55 +2,38 @@
  * usb_hal.c
  */
 
-#include "usb_interface.h"
+#include "amk_usb.h"
 #include "usb_descriptors.h"
 #include "generic_hal.h"
 #include "usb_device.h"
-#include "usb_descriptors.h"
 #include "usbd_composite.h"
-#include "amk_printf.h"
 #include "usb_host.h"
 #include "usbh_hid_multi.h"
 #include "report_parser.h"
-#include "report_queue.h"
+
+#include "amk_printf.h"
 
 #include "report.h"
 #include "wait.h"
 
 extern USBD_HandleTypeDef hUsbDeviceFS;
 
-static hid_report_queue_t report_queue;
-
-static bool usb_itf_ready(uint32_t type);
-static bool usb_itf_send_report(uint32_t report_type, const void* data, uint32_t size);
-
-void usb_init(void)
+void amk_usb_init(void)
 {
     MX_USB_DEVICE_Init();
 #ifdef USB_HOST_ENABLE
     MX_USB_HOST_Init();
 #endif
-    hid_report_queue_init(&report_queue);
 }
 
-void usb_task(void)
+void amk_usb_task(void)
 {
-    if (!hid_report_queue_empty(&report_queue)) {
-        hid_report_t* item = hid_report_queue_peek(&report_queue);
-        if (usb_itf_ready(item->type)) {
-            amk_printf("ITF ready, type:%d, send report\n", item->type);
-            hid_report_t report;
-            hid_report_queue_get(&report_queue, &report);
-            usb_itf_send_report(report.type, report.data, report.size);
-        }
-    }
-
 #ifdef USB_HOST_ENABLE
     MX_USB_HOST_Process();
 #endif
 }
 
-static bool usb_itf_ready(uint32_t type)
+bool amk_usb_itf_ready(uint32_t type)
 {
     switch(type) {
     case HID_REPORT_ID_KEYBOARD:
@@ -65,20 +48,11 @@ static bool usb_itf_ready(uint32_t type)
     return false;
 }
 
-static bool usb_itf_send_report(uint32_t report_type, const void* data, uint32_t size)
+bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t size)
 {
     switch(report_type) {
     case HID_REPORT_ID_KEYBOARD:
         usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_KEYBOARD, (uint8_t*)data, size);
-        {
-            report_keyboard_t *report = (report_keyboard_t*)data;
-            for (int i = 0; i < KEYBOARD_REPORT_KEYS; i++) {
-                if(report->keys[i] == KC_CAPS) {
-                    wait_ms(100); // for fixing caps under mac
-                    amk_printf("delay 50ms after sent caps\n");
-                }
-            }
-        }
         break;
     case HID_REPORT_ID_MOUSE:
         usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_MOUSE, (uint8_t*)data, size);
@@ -93,17 +67,17 @@ static bool usb_itf_send_report(uint32_t report_type, const void* data, uint32_t
     return true;
 }
 
-bool usb_ready(void)
+bool amk_usb_ready(void)
 {
     return (hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED);
 }
 
-bool usb_suspended(void)
+bool amk_usb_suspended(void)
 {
     return (hUsbDeviceFS.dev_state == USBD_STATE_SUSPENDED);
 }
 
-void usb_remote_wakeup(void)
+void amk_usb_remote_wakeup(void)
 {
     PCD_HandleTypeDef *pcd = (PCD_HandleTypeDef *)(hUsbDeviceFS.pData);
     HAL_PCD_ActivateRemoteWakeup(pcd);
@@ -111,7 +85,7 @@ void usb_remote_wakeup(void)
     HAL_PCD_DeActivateRemoteWakeup(pcd);
 }
 
-void usb_connect(bool on)
+void amk_usb_connect(bool on)
 {
     PCD_HandleTypeDef *pcd = (PCD_HandleTypeDef *)(hUsbDeviceFS.pData);
     if (on) {
@@ -119,15 +93,6 @@ void usb_connect(bool on)
     } else {
         HAL_PCD_DevDisconnect(pcd);
     }
-}
-
-void usb_send_report(uint8_t report_type, const void* data, size_t size)
-{
-    hid_report_t item;
-    memcpy(item.data, data, size);
-    item.type = report_type;
-    item.size = size;
-    hid_report_queue_put(&report_queue, &item);
 }
 
 #ifdef USB_HOST_ENABLE
@@ -215,9 +180,4 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
     extern USBD_HandleTypeDef hUsbDeviceFS;
     usbd_comp_send(&hUsbDeviceFS, report_id, buf, report_size);
 }
-#endif
-
-#ifdef WEBUSB_ENABLE
-void webusb_task(void)
-{}
 #endif

@@ -7,7 +7,7 @@
 
 // USB Device descriptor parameter
 #define VENDOR_ID  0x4D58   // MX
-#define PRODUCT_ID 0x6500   // M65 with screen
+#define PRODUCT_ID 0x6501   // M65 with screen
 #define DEVICE_VER 0x0001
 #define MANUFACTURER Matrix Lab
 #define PRODUCT Vita
@@ -55,5 +55,5 @@
 #define VIAL_INSECURE
 #define VIAL_KEYBOARD_UID {0x01, 0x90, 0x17, 0x3A, 0xEC, 0xEE, 0x2B, 0x85}
 
-#define WDT_ENABLED
-//#define FAULT_BREAK
+//#define WDT_ENABLED
+#define FAULT_BREAK
