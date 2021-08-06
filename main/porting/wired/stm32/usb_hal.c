@@ -14,6 +14,9 @@
 #include "report_parser.h"
 #include "report_queue.h"
 
+#include "report.h"
+#include "wait.h"
+
 extern USBD_HandleTypeDef hUsbDeviceFS;
 
 static hid_report_queue_t report_queue;
@@ -67,6 +70,15 @@ static bool usb_itf_send_report(uint32_t report_type, const void* data, uint32_t
     switch(report_type) {
     case HID_REPORT_ID_KEYBOARD:
         usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_KEYBOARD, (uint8_t*)data, size);
+        {
+            report_keyboard_t *report = (report_keyboard_t*)data;
+            for (int i = 0; i < KEYBOARD_REPORT_KEYS; i++) {
+                if(report->keys[i] == KC_CAPS) {
+                    wait_ms(100); // for fixing caps under mac
+                    amk_printf("delay 50ms after sent caps\n");
+                }
+            }
+        }
         break;
     case HID_REPORT_ID_MOUSE:
         usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_MOUSE, (uint8_t*)data, size);
