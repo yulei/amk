@@ -449,9 +449,9 @@ void msc_task_kb(void)
 {
     if (usb_setting & USB_MSC_BIT) return;
 
-    rtc_datetime_update();
-
     if (!screen_enable) return;
+
+    rtc_datetime_update();
 
     render_screen(0);
     render_screen(1);
