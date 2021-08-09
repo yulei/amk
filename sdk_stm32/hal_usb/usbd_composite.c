@@ -94,6 +94,66 @@ usbd_class_interface_t USBD_WEBUSB = {
 
 #endif
 
+#ifdef MSC_ENABLE
+
+#include  "usbd_msc_bot.h"
+#include  "usbd_msc_scsi.h"
+
+/* MSC Class Config */
+#define MSC_MEDIA_PACKET             CFG_TUD_MSC_EP_BUFSIZE 
+
+#define MSC_MAX_FS_PACKET            CFG_TUD_MSC_EPSIZE 
+
+#define BOT_GET_MAX_LUN              0xFE
+#define BOT_RESET                    0xFF
+
+#define USBD_MSC_EPIN                (0x80|EPNUM_MSC_IN)
+#define USBD_MSC_EPIN_SIZE           CFG_TUD_MSC_EPSIZE
+#define USBD_MSC_EPIN_TYPE           USBD_EP_TYPE_BULK 
+#define USBD_MSC_EPOUT               (EPNUM_MSC_OUT)
+#define USBD_MSC_EPOUT_SIZE          USBD_MSC_EPIN_SIZE
+#define USBD_MSC_EPOUT_TYPE          USBD_EP_TYPE_BULK
+
+#define MSC_EPOUT_ADDR USBD_MSC_EPOUT
+#define MSC_EPIN_ADDR USBD_MSC_EPIN
+
+typedef struct
+{
+  uint32_t                 max_lun;
+  uint32_t                 interface;
+  uint8_t                  bot_state;
+  uint8_t                  bot_status;
+  uint32_t                 bot_data_length;
+  uint8_t                  bot_data[MSC_MEDIA_PACKET];
+  USBD_MSC_BOT_CBWTypeDef  cbw;
+  USBD_MSC_BOT_CSWTypeDef  csw;
+
+  USBD_SCSI_SenseTypeDef   scsi_sense [SENSE_LIST_DEEPTH];
+  uint8_t                  scsi_sense_head;
+  uint8_t                  scsi_sense_tail;
+  uint8_t                  scsi_medium_state;
+
+  uint16_t                 scsi_blk_size;
+  uint32_t                 scsi_blk_nbr;
+
+  uint32_t                 scsi_blk_addr;
+  uint32_t                 scsi_blk_len;
+} USBD_MSC_BOT_HandleTypeDef;
+
+static uint8_t  msc_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, void* user); 
+static uint8_t  msc_datain(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user);
+static uint8_t  msc_dataout(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user);
+static uint8_t  msc_write(USBD_HandleTypeDef *pdev, uint8_t epnum, uint8_t* data, uint16_t size, void* user);
+
+usbd_class_interface_t USBD_MSC = {
+    msc_setup,
+    msc_datain,
+    msc_dataout,
+    msc_write,
+};
+
+#endif
+
 static uint8_t comp_init(USBD_HandleTypeDef *pdev, uint8_t cfgidx);
 static uint8_t comp_deinit(USBD_HandleTypeDef *pdev, uint8_t cfgidx);
 static uint8_t comp_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req);
@@ -152,6 +212,12 @@ static void webusb_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
 static WEBUSB_HandleTypeDef USBD_WEBUSB_DATA;
 #endif
 
+#ifdef MSC_ENABLE
+static void msc_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
+static void msc_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
+static USBD_MSC_BOT_HandleTypeDef USBD_MSC_DATA;
+#endif
+
 static usbd_composite_t usbd_composite = {
     .interfaces = {
         {.index = ITF_NUM_HID_KBD,
@@ -190,6 +256,19 @@ static usbd_composite_t usbd_composite = {
         .init = webusb_init,
         .uninit = webusb_uninit,
         .data = &USBD_WEBUSB_DATA},
+#endif
+#ifdef MSC_ENABLE
+        {.index = ITF_NUM_MSC,
+        .epin = USBD_MSC_EPIN,
+        .epin_size = USBD_MSC_EPIN_SIZE,
+        .epin_type = USBD_MSC_EPIN_TYPE,
+        .epout = USBD_MSC_EPOUT,
+        .epout_size = USBD_MSC_EPOUT_SIZE,
+        .epout_type = USBD_MSC_EPOUT_TYPE,
+        .instance = &USBD_MSC,
+        .init = msc_init,
+        .uninit = msc_uninit,
+        .data = &USBD_MSC_DATA},
 #endif
     },
     .size = USBD_MAX_NUM_INTERFACES
@@ -387,31 +466,7 @@ void hid_other_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
     ((HID_HandleTypeDef *)interface->data)->state = ITF_IDLE;
     ((HID_HandleTypeDef *)interface->data)->keyboard = 0;
 }
-#ifdef WEBUSB_ENABLE
-void webusb_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
-{
-    USBD_StatusTypeDef ret = USBD_OK;
-    ret = USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
-    amk_printf("WEBUSB init, Open epin=%d, status=%d\n", interface->epin, ret);
-    pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
-    ret = USBD_LL_OpenEP(pdev, interface->epout, interface->epout_type, interface->epout_size);
-    amk_printf("WEBUSB init, Open epout=%d, status=%d\n", interface->epout, ret);
-    pdev->ep_out[interface->epout].is_used = 1U;
 
-    WEBUSB_HandleTypeDef* ph = (WEBUSB_HandleTypeDef *)interface->data;
-    ret = USBD_LL_PrepareReceive(pdev, interface->epout, ph->recv_buffer, WEBUSB_PACKET_SIZE);
-    amk_printf("WEBUSB init: prepare receive: epnum=%d, status=%d\n", interface->epout, ret);
-    ph->state = ITF_IDLE;
-}
-
-void webusb_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
-{
-    USBD_LL_CloseEP(pdev, interface->epin);
-    pdev->ep_in[interface->epin & 0xFU].is_used = 0U;
-    USBD_LL_CloseEP(pdev, interface->epout);
-    pdev->ep_out[interface->epout].is_used = 0U;
-}
-#endif
 // ================================================================================
 // HID class driver
 // ================================================================================
@@ -544,6 +599,30 @@ static uint8_t  hid_write(USBD_HandleTypeDef *pdev, uint8_t epnum, uint8_t* data
 // WEBUSB class driver
 // ================================================================================
 #ifdef WEBUSB_ENABLE
+void webusb_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
+{
+    USBD_StatusTypeDef ret = USBD_OK;
+    ret = USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
+    amk_printf("WEBUSB init, Open epin=%d, status=%d\n", interface->epin, ret);
+    pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
+    ret = USBD_LL_OpenEP(pdev, interface->epout, interface->epout_type, interface->epout_size);
+    amk_printf("WEBUSB init, Open epout=%d, status=%d\n", interface->epout, ret);
+    pdev->ep_out[interface->epout].is_used = 1U;
+
+    WEBUSB_HandleTypeDef* ph = (WEBUSB_HandleTypeDef *)interface->data;
+    ret = USBD_LL_PrepareReceive(pdev, interface->epout, ph->recv_buffer, WEBUSB_PACKET_SIZE);
+    amk_printf("WEBUSB init: prepare receive: epnum=%d, status=%d\n", interface->epout, ret);
+    ph->state = ITF_IDLE;
+}
+
+void webusb_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
+{
+    USBD_LL_CloseEP(pdev, interface->epin);
+    pdev->ep_in[interface->epin & 0xFU].is_used = 0U;
+    USBD_LL_CloseEP(pdev, interface->epout);
+    pdev->ep_out[interface->epout].is_used = 0U;
+}
+
 static uint8_t webusb_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, void* user)
 {
     uint16_t len = 0U;
@@ -648,4 +727,171 @@ static uint8_t webusb_write(USBD_HandleTypeDef *pdev, uint8_t epnum, uint8_t* da
         return USBD_BUSY;
     }
 }
+#endif
+
+// ================================================================================
+// Mass storage class driver
+// ================================================================================
+#ifdef MSC_ENABLE
+static void msc_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
+{
+    USBD_StatusTypeDef ret = USBD_OK;
+    ret = USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
+    amk_printf("MSC init, Open epin=%d, status=%d\n", interface->epin, ret);
+    pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
+    ret = USBD_LL_OpenEP(pdev, interface->epout, interface->epout_type, interface->epout_size);
+    amk_printf("MSC init, Open epout=%d, status=%d\n", interface->epout, ret);
+    pdev->ep_out[interface->epout].is_used = 1U;
+
+    MSC_BOT_Init(pdev, interface->data);
+}
+
+static void msc_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
+{
+    (void)USBD_LL_CloseEP(pdev, interface->epin);
+    pdev->ep_in[interface->epin & 0xFU].is_used = 0U;
+
+    (void)USBD_LL_CloseEP(pdev, interface->epout);
+    pdev->ep_out[interface->epout].is_used = 0U;
+
+    MSC_BOT_DeInit(pdev, interface->data);
+}
+
+extern USBD_StorageTypeDef storage_ops;
+
+static uint8_t  msc_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, void* user)
+{
+    USBD_MSC_BOT_HandleTypeDef *hmsc = (USBD_MSC_BOT_HandleTypeDef *)user;
+    USBD_StatusTypeDef ret = USBD_OK;
+    uint16_t status_info = 0U;
+
+    switch (req->bmRequest & USB_REQ_TYPE_MASK)
+    {
+        /* Class request */
+    case USB_REQ_TYPE_CLASS:
+        switch (req->bRequest)
+        {
+        case BOT_GET_MAX_LUN:
+        if ((req->wValue  == 0U) && (req->wLength == 1U) &&
+            ((req->bmRequest & 0x80U) == 0x80U))
+        {
+            hmsc->max_lun = (uint32_t)storage_ops.GetMaxLun();
+            (void)USBD_CtlSendData(pdev, (uint8_t *)&hmsc->max_lun, 1U);
+        }
+        else
+        {
+            USBD_CtlError(pdev, req);
+            ret = USBD_FAIL;
+        }
+        break;
+
+        case BOT_RESET :
+        if ((req->wValue  == 0U) && (req->wLength == 0U) &&
+            ((req->bmRequest & 0x80U) != 0x80U))
+        {
+            MSC_BOT_Reset(pdev, hmsc);
+        }
+        else
+        {
+            USBD_CtlError(pdev, req);
+            ret = USBD_FAIL;
+        }
+        break;
+
+        default:
+        USBD_CtlError(pdev, req);
+        ret = USBD_FAIL;
+        break;
+        }
+        break;
+        /* Interface & Endpoint request */
+    case USB_REQ_TYPE_STANDARD:
+        switch (req->bRequest)
+        {
+        case USB_REQ_GET_STATUS:
+        if (pdev->dev_state == USBD_STATE_CONFIGURED)
+        {
+            (void)USBD_CtlSendData(pdev, (uint8_t *)&status_info, 2U);
+        }
+        else
+        {
+            USBD_CtlError(pdev, req);
+            ret = USBD_FAIL;
+        }
+        break;
+
+        case USB_REQ_GET_INTERFACE:
+        if (pdev->dev_state == USBD_STATE_CONFIGURED)
+        {
+            (void)USBD_CtlSendData(pdev, (uint8_t *)&hmsc->interface, 1U);
+        }
+        else
+        {
+            USBD_CtlError(pdev, req);
+            ret = USBD_FAIL;
+        }
+        break;
+
+        case USB_REQ_SET_INTERFACE:
+        if (pdev->dev_state == USBD_STATE_CONFIGURED)
+        {
+            hmsc->interface = (uint8_t)(req->wValue);
+        }
+        else
+        {
+            USBD_CtlError(pdev, req);
+            ret = USBD_FAIL;
+        }
+        break;
+
+        case USB_REQ_CLEAR_FEATURE:
+        if (pdev->dev_state == USBD_STATE_CONFIGURED)
+        {
+            if (req->wValue == USB_FEATURE_EP_HALT)
+            {
+            /* Flush the FIFO */
+            (void)USBD_LL_FlushEP(pdev, (uint8_t)req->wIndex);
+
+            /* Handle BOT error */
+            MSC_BOT_CplClrFeature(pdev, (uint8_t)req->wIndex, hmsc);
+            }
+        }
+        break;
+
+        default:
+        USBD_CtlError(pdev, req);
+        ret = USBD_FAIL;
+        break;
+        }
+        break;
+
+    default:
+        USBD_CtlError(pdev, req);
+        ret = USBD_FAIL;
+        break;
+    }
+
+    return (uint8_t)ret;
+}
+
+static uint8_t  msc_datain(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user)
+{
+    MSC_BOT_DataIn(pdev, epnum, user);
+    return (uint8_t)USBD_OK;
+}
+
+static uint8_t  msc_dataout(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user)
+{
+    MSC_BOT_DataOut(pdev, epnum, user);
+    return (uint8_t)USBD_OK;
+}
+
+static uint8_t  msc_write(USBD_HandleTypeDef *pdev, uint8_t epnum, uint8_t* data, uint16_t size, void* user)
+{
+    return (uint8_t)USBD_OK;
+}
+
+#include "usbd_msc_bot.c"
+#include "usbd_msc_scsi.c"
+
 #endif

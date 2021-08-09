@@ -4,7 +4,6 @@
  *  Note: current only support w25qxx devices
  */
 
-#include "tusb.h"
 #include "mscusb.h"
 #include "w25qxx.h"
 
@@ -20,6 +19,40 @@
 
 static w25qxx_config_t w25qxx_config;
 static w25qxx_t *w25qxx;
+
+__attribute__((weak))
+void msc_init_kb(void) {}
+
+#ifndef W25QXX_SPI_ID
+#define W25QXX_SPI_ID SPI_INSTANCE_ID_1
+#endif
+
+void msc_init(void)
+{
+    w25qxx_config.cs = FLASH_CS;
+    w25qxx_config.spi = spi_init(W25QXX_SPI_ID);
+    w25qxx = w25qxx_init(&w25qxx_config);
+
+    msc_init_kb();
+}
+
+void msc_erase(void)
+{
+    w25qxx_erase_chip(w25qxx);
+}
+
+__attribute__((weak))
+void msc_task_kb(void) {}
+
+void msc_task(void)
+{
+    msc_task_kb();
+}
+
+
+#ifdef TINYUSB_ENABLE
+#include "tusb.h"
+
 // Invoked to determine max LUN
 uint8_t tud_msc_get_maxlun_cb(void)
 {
@@ -149,31 +182,77 @@ int32_t tud_msc_scsi_cb (uint8_t lun, uint8_t const scsi_cmd[16], void* buffer, 
     return resplen;
 }
 
-__attribute__((weak))
-void msc_init_kb(void) {}
+#else
 
-#ifndef W25QXX_SPI_ID
-#define W25QXX_SPI_ID SPI_INSTANCE_ID_1
+#include "usbd_composite.h"
+
+#define INQUIRY_DATA_LEN 0x24U
+
+const int8_t inquiry_data[] = {/* 36 */
+  /* LUN 0 */
+  0x00,
+  0x80,
+  0x02,
+  0x02,
+  (INQUIRY_DATA_LEN - 5),
+  0x00,
+  0x00,
+  0x00,
+  'M', 'A', 'T', 'R', 'I', 'X', ' ', ' ', /* Manufacturer : 8 bytes */
+  'V', 'I', 'T', 'A', ' ', ' ', ' ', ' ', /* Product      : 16 Bytes */
+  ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+  '1', '.', '0' ,'1'                      /* Version      : 4 Bytes */
+};
+
+static int8_t storage_init(uint8_t lun)
+{
+    return (USBD_OK);
+}
+
+static int8_t storage_get_capacity(uint8_t lun, uint32_t *block_num, uint16_t *block_size)
+{
+    *block_num  = DISK_BLOCK_NUM;
+    *block_size = DISK_BLOCK_SIZE;
+    return (USBD_OK);
+}
+
+static int8_t storage_is_ready(uint8_t lun)
+{
+    return (USBD_OK);
+}
+
+static int8_t storage_is_write_protected(uint8_t lun)
+{
+    return (USBD_OK);
+}
+
+static int8_t storage_read(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len)
+{
+    w25qxx_read_sector(w25qxx, blk_addr*DISK_BLOCK_SIZE, buf, DISK_BLOCK_SIZE*blk_len);
+    return (USBD_OK);
+}
+
+static int8_t storage_write(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len)
+{
+    w25qxx_write_sector(w25qxx, blk_addr*DISK_BLOCK_SIZE, buf, DISK_BLOCK_SIZE*blk_len);
+    return (USBD_OK);
+}
+
+static int8_t storage_get_max_lun(void)
+{
+    return (DISK_COUNT-1);
+}
+
+USBD_StorageTypeDef storage_ops =
+{
+    storage_init,
+    storage_get_capacity,
+    storage_is_ready,
+    storage_is_write_protected,
+    storage_read,
+    storage_write,
+    storage_get_max_lun,
+    (int8_t *)inquiry_data
+};
+
 #endif
-
-void msc_init(void)
-{
-    w25qxx_config.cs = FLASH_CS;
-    w25qxx_config.spi = spi_init(W25QXX_SPI_ID);
-    w25qxx = w25qxx_init(&w25qxx_config);
-
-    msc_init_kb();
-}
-
-void msc_erase(void)
-{
-    w25qxx_erase_chip(w25qxx);
-}
-
-__attribute__((weak))
-void msc_task_kb(void) {}
-
-void msc_task(void)
-{
-    msc_task_kb();
-}
