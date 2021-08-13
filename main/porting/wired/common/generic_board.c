@@ -69,8 +69,10 @@ void board_init(void)
     system_init();
     amk_printf("custom_board_init\n");
     custom_board_init();
+#ifndef RTOS_ENABLE
     amk_printf("usb_init\n");
     usb_init();
+#endif
     amk_printf("amk_init\n");
     amk_init();
     amk_printf("board_init end\n");

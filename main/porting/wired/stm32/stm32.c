@@ -32,6 +32,7 @@ uint32_t systick_get_tick(void)
     return HAL_GetTick();
 }
 
+#ifndef STM32F722xx
 void SysTick_Handler(void)
 {
     HAL_IncTick();
@@ -40,6 +41,7 @@ void SysTick_Handler(void)
     //screen_ticks(1);
     #endif
 }
+#endif
 
 static void fault_handler(void) 
 {

@@ -12,11 +12,11 @@ void wait_ms(int ms)
 
 void wait_us(int us)
 {
-#ifdef STM32L072xx
+//#ifdef STM32L072xx
     __IO uint32_t ticks = us * (SystemCoreClock/1000000);
     while( ticks--) ;
-#else
-    __IO int32_t ticks = DWT->CYCCNT + us * (SystemCoreClock/1000000);
-    while (DWT->CYCCNT <= ticks);
-#endif
+//#else
+//    __IO int32_t ticks = DWT->CYCCNT + us * (SystemCoreClock/1000000);
+//    while (DWT->CYCCNT <= ticks);
+//#endif
 }

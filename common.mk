@@ -17,7 +17,7 @@ GNU_PREFIX := arm-none-eabi
 CC      := $(GNU_INSTALL_ROOT)$(GNU_PREFIX)-gcc
 CXX     := $(GNU_INSTALL_ROOT)$(GNU_PREFIX)-c++
 AS      := $(GNU_INSTALL_ROOT)$(GNU_PREFIX)-as
-AR      := $(GNU_INSTALL_ROOT)$(GNU_PREFIX)-ar -r
+AR      := $(GNU_INSTALL_ROOT)$(GNU_PREFIX)-ar -rcs
 LD      := $(GNU_INSTALL_ROOT)$(GNU_PREFIX)-ld
 NM      := $(GNU_INSTALL_ROOT)$(GNU_PREFIX)-nm
 OBJDUMP := $(GNU_INSTALL_ROOT)$(GNU_PREFIX)-objdump
@@ -29,6 +29,9 @@ BUILD_DIR := $(OUTPUT_DIR)/$(TARGET)
 
 OBJS += $(patsubst %.s,$(BUILD_DIR)/%.o,$(patsubst %.S,$(BUILD_DIR)/%.o,$(filter %.s %.S,$(SRCS))))
 OBJS += $(patsubst %.c,$(BUILD_DIR)/%.o,$(patsubst %.cpp,$(BUILD_DIR)/%.o,$(filter-out %.s %.S,$(SRCS))))
+
+LIB_OBJS += $(patsubst %.s,$(BUILD_DIR)/%.o,$(patsubst %.S,$(BUILD_DIR)/%.o,$(filter %.s %.S,$(LIB_SRCS))))
+LIB_OBJS += $(patsubst %.c,$(BUILD_DIR)/%.o,$(patsubst %.cpp,$(BUILD_DIR)/%.o,$(filter-out %.s %.S,$(LIB_SRCS))))
 
 ifndef PROGRESS 
 T := $(shell $(MAKE) $(GOALS) --no-print-directory \
@@ -43,6 +46,11 @@ endif
 OBJ_DIRS = $(sort $(dir $(OBJS)))
 $(OBJS): | $(OBJ_DIRS)
 $(OBJ_DIRS):
+	$(NO_ECHO)$(MK) $@
+
+LIB_OBJ_DIRS = $(sort $(dir $(LIB_OBJS)))
+$(LIB_OBJS): | $(LIB_OBJ_DIRS)
+$(LIB_OBJ_DIRS):
 	$(NO_ECHO)$(MK) $@
 
 #$(info $(SRCS))
@@ -106,9 +114,9 @@ ALL_LDFLAGS = $(LDFLAGS) -Xlinker -Map=$(OUTPUT_DIR)/$(TARGET).map
 PLATFORM := $(if $(filter Windows%,$(OS)),windows,posix)
 # Success message
 ifeq (posix, $(PLATFORM))
-RES_STR := echo "\033[60G[\033[32mok\033[0m]"
+RES_STR := echo "\033[80G[\033[32mok\033[0m]"
 else
-RES_STR := echo -e "\033[60G[\033[32mok\033[0m]"
+RES_STR := echo -e "\033[80G[\033[32mok\033[0m]"
 endif
 
 # Create object files from C source files
@@ -133,16 +141,33 @@ $(BUILD_DIR)/%.o : %.S
 	@$(PROGRESS) Assembling: $(notdir $<)
 	$(ASSEMBLING)
 
-
 ifeq (NRF52840, $(strip $(MCU)))
 $(TARGET): $(addprefix $(OUTPUT_DIR)/$(TARGET), .elf .bin .hex .uf2)
 else
 $(TARGET): $(addprefix $(OUTPUT_DIR)/$(TARGET), .elf .bin .hex)
 endif
+
+ifneq ($(strip $(LIB_SRCS)),)
+DEP_LIBS += $(addprefix $(OUTPUT_DIR)/$(TARGET), .a)
+LIB_LIST = $(addprefix $(OUTPUT_DIR)/$(TARGET), .arlst)
+
+$(TARGET): $(DEP_LIBS)
+
+$(OUTPUT_DIR):
+	+$(MK) $(OUTPUT_DIR)
+
+# Create lib files
+%.a: $(LIB_OBJS) | $(OUTPUT_DIR)
+	$(info Archiving: $(notdir $@))
+	$(file >$(LIB_LIST), $^)
+	$(NO_ECHO)$(AR) $@ @$(LIB_LIST)
+
+endif
+
 # Create elf files 
-%.elf: $(OBJS)
+%.elf: $(OBJS) $(DEP_LIBS)
 	$(info Linking: $(notdir $@))
-	$(NO_ECHO)$(CC) -o $@ $(ALL_LDFLAGS) $^ $(LIBS)
+	$(NO_ECHO)$(CC) -o $@ $(ALL_LDFLAGS) $^ $(LIBS) $(DEP_LIBS)
 	$(NO_ECHO)$(SIZE) $@
 
 # Create binary .bin file from the .elf file

@@ -6,6 +6,16 @@
 #include "generic_hal.h"
 #include "amk_printf.h"
 
+#ifndef SPI_DEBUG
+#define SPI_DEBUG 1
+#endif
+
+#if SPI_DEBUG
+#define spi_debug  amk_printf
+#else
+#define spi_debug(...)
+#endif
+
 #define TIMEOUT_DEFAULT 100
 
 #ifdef SPI_USE_INSTANCE_1
@@ -77,7 +87,7 @@ amk_error_t spi_send(spi_handle_t spi, const void *data, size_t length)
     SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)spi;
     HAL_StatusTypeDef status = HAL_SPI_Transmit(hspi, (uint8_t *)data, length, TIMEOUT_DEFAULT);
     if (status != HAL_OK) {
-        amk_printf("spi send error: %d\n", status);
+        spi_debug("spi send error: %d\n", status);
         return AMK_SPI_ERROR;
     }
 
@@ -90,7 +100,7 @@ amk_error_t spi_recv(spi_handle_t spi, void* data, size_t length)
     HAL_StatusTypeDef status = HAL_SPI_Receive(hspi, (uint8_t*)data, length, TIMEOUT_DEFAULT);
 
     if (status != HAL_OK) {
-        amk_printf("spi recv error: %d\n", status);
+        spi_debug("spi recv error: %d\n", status);
         return AMK_SPI_ERROR;
     }
 
@@ -102,7 +112,7 @@ amk_error_t spi_xfer(spi_handle_t spi, const void *tx_buffer, void *rx_buffer, s
     SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)spi;
     HAL_StatusTypeDef status = HAL_SPI_TransmitReceive(hspi, (uint8_t*)tx_buffer, (uint8_t*)rx_buffer, length, TIMEOUT_DEFAULT);
     if (status != HAL_OK) {
-        amk_printf("spi xfer error: %d\n", status);
+        spi_debug("spi xfer error: %d\n", status);
         return AMK_SPI_ERROR;
     }
 
@@ -119,5 +129,5 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 
 void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
 {
-    amk_printf("SPI DMA error:\n", hspi->ErrorCode);
+    spi_debug("SPI DMA error:\n", hspi->ErrorCode);
 }

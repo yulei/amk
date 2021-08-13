@@ -6,6 +6,16 @@
 #include "wait.h"
 #include "amk_printf.h"
 
+#ifndef W25QXX_DEBUG
+#define W25QXX_DEBUG 0
+#endif
+
+#if W25QXX_DEBUG
+#define w25qxx_debug  amk_printf
+#else
+#define w25qxx_debug(...)
+#endif
+
 #ifndef W25QXX_NUM
 #define W25QXX_NUM 1
 #endif
@@ -127,10 +137,10 @@ w25qxx_t *w25qxx_init(w25qxx_config_t *config)
     switch(id&0xFFFF) {
     case 0x4018:
         // W25Q128
-        amk_printf("W25Q128 device identified: %x\n", id);
+        w25qxx_debug("W25Q128 device identified: %x\n", id);
         break;;
     default:
-        amk_printf("Unknown W25QXX chip: %x\n", id);
+        w25qxx_debug("Unknown W25QXX chip: %x\n", id);
         //device = NULL;
         break;
     }
@@ -173,7 +183,7 @@ static void w25qxx_write_page(w25qxx_t *w25qxx, uint32_t address, const uint8_t 
 amk_error_t w25qxx_write_sector(w25qxx_t* w25qxx, uint32_t address, const uint8_t *data, uint32_t size)
 {
     if (address % w25qxx->sector_size) {
-        amk_printf("unsupport wrtie operation: address=%d, size=%d\n", address, size);
+        w25qxx_debug("unsupport wrtie operation: address=%d, size=%d\n", address, size);
         return AMK_ERROR;
     }
 
@@ -181,7 +191,7 @@ amk_error_t w25qxx_write_sector(w25qxx_t* w25qxx, uint32_t address, const uint8_
     if (!w25qxx_sector_empty(w25qxx, address)) {
         // ease the sector first
         if (w25qxx_erase_sector(w25qxx, address) != AMK_SUCCESS) {
-            amk_printf("failed to erase flash sector at: 0x%x\n", address);
+            w25qxx_debug("failed to erase flash sector at: 0x%x\n", address);
             return AMK_SPI_ERROR;
         }
     }
@@ -198,7 +208,7 @@ amk_error_t w25qxx_write_sector(w25qxx_t* w25qxx, uint32_t address, const uint8_
 amk_error_t w25qxx_read_sector(w25qxx_t* w25qxx, uint32_t address, uint8_t *data, uint32_t size)
 {
     if (address % w25qxx->sector_size) {
-        amk_printf("unsupport read operation: address=%d, size=%d\n", address, size);
+        w25qxx_debug("unsupport read operation: address=%d, size=%d\n", address, size);
         return AMK_ERROR;
     }
 

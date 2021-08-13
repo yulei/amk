@@ -1,10 +1,10 @@
 USBX_DIR := $(LIB_DIR)/rtos/usbx
 
 INCS += \
-	$(USBX_DIR)/common/inc \
-	$(USBX_DIR)/usbx_device_classes/inc \
+	$(USBX_DIR)/common/core/inc \
+	$(USBX_DIR)/common/usbx_device_classes/inc \
 
-SRCS += \
+LIB_SRCS += \
 	$(USBX_DIR)/common/core/src/ux_trace_event_insert.c \
 	$(USBX_DIR)/common/core/src/ux_trace_event_update.c \
 	$(USBX_DIR)/common/core/src/ux_trace_object_register.c \
@@ -135,7 +135,7 @@ SRCS += \
 USBX_DCD_DIR := $(LIB_DIR)/rtos/usbx_stm32_device_controllers
 
 INCS += $(USBX_DCD_DIR)
-SRCS += \
+LIB_SRCS += \
 	$(USBX_DCD_DIR)/ux_dcd_stm32_callback.c \
 	$(USBX_DCD_DIR)/ux_dcd_stm32_endpoint_create.c \
 	$(USBX_DCD_DIR)/ux_dcd_stm32_endpoint_destroy.c \
@@ -149,6 +149,8 @@ SRCS += \
 	$(USBX_DCD_DIR)/ux_dcd_stm32_interrupt_handler.c \
 	$(USBX_DCD_DIR)/ux_dcd_stm32_transfer_request.c \
 	$(USBX_DCD_DIR)/ux_dcd_stm32_uninitialize.c \
+
+APP_DEFS += -DUX_INCLUDE_USER_DEFINE_FILE
 
 ifeq (STM32F722, $(strip $(MCU)))
 INCS += $(USBX_DIR)/ports/cortex_m7/gnu/inc

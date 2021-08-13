@@ -262,5 +262,7 @@
 #define TX_TIMER_ENABLE_PERFORMANCE_INFO
 */
 
+#define  TX_TIMER_TICKS_PER_SECOND  1000
+
 #endif
 

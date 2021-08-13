@@ -1,6 +1,5 @@
 
 SRCS += \
-	$(MAIN_DIR)/amk/main.c  \
 	$(MAIN_DIR)/amk/amk_action.c \
 	$(MAIN_DIR)/amk/amk_keymap.c \
 	$(MAIN_DIR)/amk/amk_macro.c \
@@ -28,4 +27,15 @@ ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
 	include $(MAIN_DIR)/porting/nrf52.mk
 else
 	include $(MAIN_DIR)/porting/wired.mk
+endif
+
+ifeq (yes, $(strip $(RTOS_ENABLE)))
+	SRCS += $(MAIN_DIR)/rtos/rtos_main.c
+	SRCS += $(MAIN_DIR)/rtos/tx_initialize_low_level.S
+	APP_DEFS += -DRTOS_ENABLE
+	include $(LIB_DIR)/threadx.mk
+	include $(LIB_DIR)/filex.mk
+	include $(LIB_DIR)/usbx.mk
+else
+	SRCS += $(MAIN_DIR)/amk/main.c
 endif

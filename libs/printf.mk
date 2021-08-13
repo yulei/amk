@@ -5,3 +5,5 @@ SRCS += \
 
 INCS += \
 	$(PRINTF_DIR) \
+
+APP_DEFS += -DPRINTF_INCLUDE_CONFIG_H
