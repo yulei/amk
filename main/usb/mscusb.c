@@ -231,10 +231,12 @@ static int8_t storage_is_write_protected(uint8_t lun)
 {
     return (USBD_OK);
 }
-
+#ifdef WDT_ENABLED
+extern void wdt_refresh(void);
+#endif
 static int8_t storage_read(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len)
 {
-#ifdef WDT_ENABLE
+#ifdef WDT_ENABLED
     wdt_refresh();
 #endif
     w25qxx_read_sector(w25qxx, blk_addr*DISK_BLOCK_SIZE, buf, DISK_BLOCK_SIZE*blk_len);
@@ -243,7 +245,7 @@ static int8_t storage_read(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_
 
 static int8_t storage_write(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len)
 {
-#ifdef WDT_ENABLE
+#ifdef WDT_ENABLED
     wdt_refresh();
 #endif
     w25qxx_write_sector(w25qxx, blk_addr*DISK_BLOCK_SIZE, buf, DISK_BLOCK_SIZE*blk_len);
