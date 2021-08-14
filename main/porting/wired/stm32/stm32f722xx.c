@@ -23,6 +23,10 @@ RTC_HandleTypeDef hrtc;
 
 #ifdef WDT_ENABLED
 IWDG_HandleTypeDef hiwdg;
+void wdt_refresh(void)
+{
+    HAL_IWDG_Refresh(&hiwdg);
+}
 #endif
 
 #ifdef TINYUSB_ENABLE
