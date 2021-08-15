@@ -78,7 +78,9 @@ ifeq (yes, $(strip $(TINYUSB_ENABLE)))
 		APP_DEFS += -DHAL_PCD_MODULE_ENABLED
 	endif #TINYUSB_USE_HAL
 else
-	include $(STM32SDK_DIR)/hal_usb.mk
+	ifneq (yes, $(strip $(RTOS_ENABLE)))
+		include $(STM32SDK_DIR)/hal_usb.mk
+	endif
 	SRCS += $(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_pcd.c 
 	SRCS += $(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_pcd_ex.c
 	SRCS += $(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_ll_usb.c 

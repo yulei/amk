@@ -45,4 +45,4 @@
 //#define RGB_SEGMENT_NUM 3
 //#define RGB_LED_NUM     24
 
-//#define VECT_TAB_OFFSET 0x20000
+#define VECT_TAB_OFFSET 0x20000

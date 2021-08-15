@@ -5,7 +5,6 @@
 #include "generic_hal.h"
 
 static void DWT_Delay_Init(void);
-
 void system_init(void)
 {
     HAL_Init();

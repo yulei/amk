@@ -9,3 +9,4 @@ sdk_samd/d21/gcc/*
 *.DS_Store
 *.bin
 *.hex
+*.elf

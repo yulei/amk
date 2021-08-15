@@ -132,26 +132,9 @@ LIB_SRCS += \
 	$(USBX_DIR)/common/core/src/ux_device_stack_transfer_request.c \
 	$(USBX_DIR)/common/core/src/ux_device_stack_uninitialize.c
 
-USBX_DCD_DIR := $(LIB_DIR)/rtos/usbx_stm32_device_controllers
-
-INCS += $(USBX_DCD_DIR)
-LIB_SRCS += \
-	$(USBX_DCD_DIR)/ux_dcd_stm32_callback.c \
-	$(USBX_DCD_DIR)/ux_dcd_stm32_endpoint_create.c \
-	$(USBX_DCD_DIR)/ux_dcd_stm32_endpoint_destroy.c \
-	$(USBX_DCD_DIR)/ux_dcd_stm32_endpoint_reset.c \
-	$(USBX_DCD_DIR)/ux_dcd_stm32_endpoint_stall.c \
-	$(USBX_DCD_DIR)/ux_dcd_stm32_endpoint_status.c \
-	$(USBX_DCD_DIR)/ux_dcd_stm32_frame_number_get.c \
-	$(USBX_DCD_DIR)/ux_dcd_stm32_function.c \
-	$(USBX_DCD_DIR)/ux_dcd_stm32_initialize_complete.c \
-	$(USBX_DCD_DIR)/ux_dcd_stm32_initialize.c \
-	$(USBX_DCD_DIR)/ux_dcd_stm32_interrupt_handler.c \
-	$(USBX_DCD_DIR)/ux_dcd_stm32_transfer_request.c \
-	$(USBX_DCD_DIR)/ux_dcd_stm32_uninitialize.c \
-
 APP_DEFS += -DUX_INCLUDE_USER_DEFINE_FILE
 
 ifeq (STM32F722, $(strip $(MCU)))
 INCS += $(USBX_DIR)/ports/cortex_m7/gnu/inc
+include $(LIB_DIR)/usbx_dcd_stm32.mk
 endif

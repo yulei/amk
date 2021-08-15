@@ -8,10 +8,15 @@ SRCS += \
 	$(COMMON_PORTING_DIR)/generic_board.c \
 	$(COMMON_PORTING_DIR)/suspend.c \
 	$(COMMON_PORTING_DIR)/timer.c \
-	$(COMMON_PORTING_DIR)/usb_interface.c \
+
+
 
 INCS += \
 	$(COMMON_PORTING_DIR) \
+
+ifneq (yes, $(RTOS_ENABLE))
+	SRCS += $(COMMON_PORTING_DIR)/usb_interface.c
+endif
 
 ifeq (yes, $(TINYUSB_ENABLE))
 	SRCS += $(COMMON_PORTING_DIR)/usb_tinyusb.c

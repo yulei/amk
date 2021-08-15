@@ -10,7 +10,9 @@ INCS += \
 	$(PLATFORM_PORTING_DIR) \
 
 ifneq (yes, $(TINYUSB_ENABLE))
-	SRCS += $(PLATFORM_PORTING_DIR)/usb_hal.c
+	ifneq (yes, $(RTOS_ENABLE))
+		SRCS += $(PLATFORM_PORTING_DIR)/usb_hal.c
+	endif
 endif
 
 ifeq (STM32F411, $(strip $(MCU)))

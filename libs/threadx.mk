@@ -195,13 +195,13 @@ APP_DEFS += -DTX_INCLUDE_USER_DEFINE_FILE
 
 ifeq (STM32F722, $(strip $(MCU)))
 INCS += $(THREADX_DIR)/ports/cortex_m7/gnu/inc
-LIB_SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_thread_context_restore.S
-LIB_SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_thread_context_save.S
-LIB_SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_thread_interrupt_control.S
-LIB_SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_thread_interrupt_disable.S
-LIB_SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_thread_interrupt_restore.S
-LIB_SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_thread_schedule.S
-LIB_SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_thread_stack_build.S
-LIB_SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_thread_system_return.S
-LIB_SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_timer_interrupt.S
+SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_thread_context_restore.S
+SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_thread_context_save.S
+SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_thread_interrupt_control.S
+SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_thread_interrupt_disable.S
+SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_thread_interrupt_restore.S
+SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_thread_schedule.S
+SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_thread_stack_build.S
+SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_thread_system_return.S
+SRCS += $(THREADX_DIR)/ports/cortex_m7/gnu/src/tx_timer_interrupt.S
 endif

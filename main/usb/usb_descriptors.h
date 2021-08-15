@@ -6,6 +6,12 @@
 
 #include "tusb.h"
 
+#define TUD_COMPOSITE_DEVICE_DESCRIPTOR(usb_ver, vender_id, product_id, device_ver, str_manufacture, str_product, str_serial ) \
+    18, TUSB_DESC_DEVICE, U16_TO_U8S_LE(usb_ver), \
+    0x00, 0x00, 0x00, CFG_TUD_ENDPOINT0_SIZE, \
+    U16_TO_U8S_LE(vender_id), U16_TO_U8S_LE(product_id), U16_TO_U8S_LE(device_ver), \
+    str_manufacture, str_product, str_serial, 1
+
 #define USB_MSC_BIT         (1u << 1)
 #define USB_WEBUSB_BIT      (1u << 2)
 

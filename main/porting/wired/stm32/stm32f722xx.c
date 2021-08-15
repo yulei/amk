@@ -35,11 +35,13 @@ void OTG_FS_IRQHandler(void)
     tud_int_handler(0);
 }
 #else
+#ifndef RTOS_ENABLE
 extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
 void OTG_FS_IRQHandler(void)
 {
     HAL_PCD_IRQHandler(&hpcd_USB_OTG_FS);
 }
+#endif
 #endif
 
 void Error_Handler(void)

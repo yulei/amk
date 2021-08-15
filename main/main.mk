@@ -32,9 +32,10 @@ endif
 ifeq (yes, $(strip $(RTOS_ENABLE)))
 	SRCS += $(MAIN_DIR)/rtos/rtos_main.c
 	SRCS += $(MAIN_DIR)/rtos/tx_initialize_low_level.S
+	SRCS += $(MAIN_DIR)/rtos/usb_usbx.S
+	SRCS += $(MAIN_DIR)/rtos/usbx_desc.S
 	APP_DEFS += -DRTOS_ENABLE
 	include $(LIB_DIR)/threadx.mk
-	include $(LIB_DIR)/filex.mk
 	include $(LIB_DIR)/usbx.mk
 else
 	SRCS += $(MAIN_DIR)/amk/main.c
