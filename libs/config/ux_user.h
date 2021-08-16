@@ -98,7 +98,7 @@
 
 /* #define UX_PERIODIC_RATE 1000
 */
-#define UX_PERIODIC_RATE (TX_TIMER_TICKS_PER_SECOND)
+//#define UX_PERIODIC_RATE (TX_TIMER_TICKS_PER_SECOND)
 
 /* Define control transfer timeout value in millisecond.
    The default is 10000 milliseconds.  */

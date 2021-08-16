@@ -13,8 +13,8 @@
 #define USB_BASE_ADDRESS 0x40040000
 
 PCD_HandleTypeDef  pcd_handle;
-
-static UX_SLAVE_CLASS_HID *get_hid_by_itf(ULONG itf);
+UX_SLAVE_CLASS_HID *keyboard_class = UX_NULL;
+UX_SLAVE_CLASS_HID *other_class = UX_NULL;
 
 void usb_init(void)
 {
@@ -90,37 +90,29 @@ void usb_send_report(uint8_t report_type, const void* data, size_t size)
     switch(report_type) {
     case HID_REPORT_ID_KEYBOARD:
         event.ux_device_class_hid_event_report_id = HID_REPORT_ID_KEYBOARD;
-        ux_device_class_hid_event_set(get_hid_by_itf(ITF_NUM_HID_KBD), &event);
+        if (keyboard_class) {
+            ux_device_class_hid_event_set(keyboard_class, &event);
+        }
         break;
     case HID_REPORT_ID_MOUSE:
         event.ux_device_class_hid_event_report_id = HID_REPORT_ID_MOUSE;
-        ux_device_class_hid_event_set(get_hid_by_itf(ITF_NUM_HID_OTHER), &event);
+        if (other_class) {
+            ux_device_class_hid_event_set(other_class, &event);
+        }
         break;
     case HID_REPORT_ID_SYSTEM:
         event.ux_device_class_hid_event_report_id = HID_REPORT_ID_SYSTEM;
-        ux_device_class_hid_event_set(get_hid_by_itf(ITF_NUM_HID_OTHER), &event);
+        if (other_class) {
+            ux_device_class_hid_event_set(other_class, &event);
+        }
         break;
     case HID_REPORT_ID_CONSUMER:
         event.ux_device_class_hid_event_report_id = HID_REPORT_ID_CONSUMER;
-        ux_device_class_hid_event_set(get_hid_by_itf(ITF_NUM_HID_OTHER), &event);
+        if (other_class) {
+            ux_device_class_hid_event_set(other_class, &event);
+        }
         break;
     }
-}
-
-static UX_SLAVE_CLASS_HID *get_hid_by_itf(ULONG itf)
-{
-    UX_SLAVE_DEVICE *device = &_ux_system_slave->ux_system_slave_device;
-    UX_SLAVE_INTERFACE *interface = device->ux_slave_device_first_interface;
-
-    while(interface != UX_NULL) {
-        if (interface->ux_slave_interface_descriptor.bInterfaceNumber == itf) {
-            return interface->ux_slave_interface_class_instance;
-        }
-
-        interface = interface->ux_slave_interface_next_interface;
-    }
-
-    return UX_NULL;
 }
 
 void HAL_PCD_MspInit(PCD_HandleTypeDef* pcdHandle)

@@ -25,12 +25,33 @@ static UCHAR desc_device_fullspeed [] = {
     TUD_COMPOSITE_DEVICE_DESCRIPTOR(0x0200, VENDOR_ID, PRODUCT_ID, DEVICE_VER, DESC_STR_MANUFACTURE, DESC_STR_PRODUCT, DESC_STR_SERIAL),
 
     // Config descriptor
-    TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
+    TUD_CONFIG_DESCRIPTOR(1, 2, 0, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
 
     // Interface descriptor
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_ITF_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
 };
+
+#ifdef DYNAMIC_CONFIGURATION
+#ifndef MSC_ENABLE
+#error "Dynamic configuration only use with msc enabled currently"
+#endif
+
+#define  MSC_CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + TUD_MSC_DESC_LEN)
+
+static UCHAR desc_device_fullspeed_msc [] = {
+    // Device descriptor
+    TUD_COMPOSITE_DEVICE_DESCRIPTOR(0x0200, VENDOR_ID, (uint16_t)(~PRODUCT_ID), DEVICE_VER, DESC_STR_MANUFACTURE, DESC_STR_PRODUCT, DESC_STR_SERIAL),
+
+    // Config descriptor
+    TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, MSC_CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
+
+    // Interface descriptor
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_ITF_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+    TUD_MSC_DESCRIPTOR(ITF_NUM_MSC, 0, EPNUM_MSC_OUT, 0x80|EPNUM_MSC_IN, CFG_TUD_MSC_EPSIZE),
+};
+#endif
 
 static UCHAR desc_string [] = {
     0x09, 0x04, DESC_STR_MANUFACTURE, 0x0A,
@@ -48,11 +69,22 @@ static UCHAR desc_language_id[] = {
 
 UCHAR* usbx_desc_device_fullspeed(void)
 {
+#ifdef DYNAMIC_CONFIGURATION
+    if (usb_setting & USB_MSC_BIT) {
+        return desc_device_fullspeed_msc;
+    }
+#endif
+
     return desc_device_fullspeed;
 }
 
 ULONG usbx_desc_device_fullspeed_size(void)
 {
+#ifdef DYNAMIC_CONFIGURATION
+    if (usb_setting & USB_MSC_BIT) {
+        return sizeof(desc_device_fullspeed_msc);
+    }
+#endif
     return sizeof(desc_device_fullspeed);
 }
 
