@@ -7,6 +7,7 @@
 #include "tusb.h"
 #include "usb_interface.h"
 #include "amk_printf.h"
+#include "report.h"
 
 void usb_init(void)
 {
@@ -56,6 +57,14 @@ void usb_send_report(uint8_t report_type, const void* data, size_t size)
         wait_interface(ITF_NUM_HID_KBD);
         if (!tud_hid_n_report(ITF_NUM_HID_KBD, HID_REPORT_ID_KEYBOARD, data, (uint8_t)size)) {
             amk_printf("failed to sent keyboard report\n");
+        } else {
+            report_keyboard_t *keyboard = (report_keyboard_t*)data;
+            for (int i = 0; i < KEYBOARD_REPORT_KEYS; i++) {
+                if(keyboard->keys[i] == KC_CAPS) {
+                    osDelay(100); // fix caps lock under mac
+                    amk_printf("delay 100ms after sent caps\n");
+                }
+            }
         }
         break;
     case HID_REPORT_ID_MOUSE:
