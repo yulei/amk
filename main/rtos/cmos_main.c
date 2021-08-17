@@ -1,5 +1,5 @@
 /**
- * @file cmsis_os_main.c
+ * @file cmos_main.c
  */
 
 #include "cmsis_os2.h"
@@ -16,7 +16,6 @@ int main(int argc, char ** argv)
 
     osKernelInitialize();
     osThreadNew(usb_thread, NULL, NULL);
-    osThreadNew(main_thread, NULL, NULL);
     osKernelStart();
 
     // never reach here
@@ -27,6 +26,9 @@ int main(int argc, char ** argv)
 void usb_thread(void *arg)
 {
     usb_init();
+
+    osThreadNew(main_thread, NULL, NULL);
+
     while (1) {
         usb_task();
     }

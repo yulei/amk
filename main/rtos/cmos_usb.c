@@ -1,5 +1,5 @@
 /**
- * @file cmsis_os_usb.c
+ * @file cmos_usb.c
  */
 
 #include "generic_hal.h"

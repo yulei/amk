@@ -1,5 +1,5 @@
 /**
- * @file usb_usbx.c
+ * @file usbx_usb.c
  */
 
 #include "generic_hal.h"

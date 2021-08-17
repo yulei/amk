@@ -1,5 +1,5 @@
 /**
- * @file rtos_main.c
+ * @file usbx_main.c
  */
 
 #include <stdint.h>
