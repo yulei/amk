@@ -18,3 +18,8 @@ ifeq (STM32F722, $(strip $(MCU)))
 	INCS += $(FREERTOS_DIR)/kernel/portable/GCC/ARM_CM7/r0p1
 	SRCS += $(FREERTOS_DIR)/kernel/portable/GCC/ARM_CM7/r0p1/port.c
 endif
+
+ifeq (STM32F411, $(strip $(MCU)))
+	INCS += $(FREERTOS_DIR)/kernel/portable/GCC/ARM_CM4F/
+	SRCS += $(FREERTOS_DIR)/kernel/portable/GCC/ARM_CM4F/port.c
+endif

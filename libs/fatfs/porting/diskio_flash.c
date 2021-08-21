@@ -12,10 +12,6 @@
 static w25qxx_t* flash_driver = NULL;
 
 
-#ifdef WDT_ENABLED
-extern void wdt_refresh(void);
-#endif
-
 /*-----------------------------------------------------------------------*/
 /* Get Drive Status                                                      */
 /*-----------------------------------------------------------------------*/
@@ -40,9 +36,6 @@ DSTATUS disk_initialize(BYTE pdrv)
 /*-----------------------------------------------------------------------*/
 DRESULT disk_read(BYTE pdrv, BYTE *buff, LBA_t sector, UINT count)
 {
-#ifdef WDT_ENABLED
-    wdt_refresh();
-#endif
     w25qxx_read_bytes(flash_driver, sector*4096, buff, count*4096);
 	return RES_OK;
 }
@@ -56,9 +49,6 @@ DRESULT disk_read(BYTE pdrv, BYTE *buff, LBA_t sector, UINT count)
 DRESULT disk_write(BYTE pdrv, const BYTE *buff, LBA_t sector, UINT count)
 {
     for(UINT i = 0; i < count; i++) {
-#ifdef WDT_ENABLED
-        wdt_refresh();
-#endif
         w25qxx_write_sector(flash_driver, (sector+i)*4096, buff+i*4096, 4096);
     }
 
