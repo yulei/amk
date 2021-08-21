@@ -123,11 +123,11 @@ void spi_uninit(spi_handle_t spi)
 {}
 
 // SPI DMA callback
-void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
-{
-}
+//void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
+//{
+//}
 
-void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
-{
-    spi_debug("SPI DMA error:\n", hspi->ErrorCode);
-}
+//void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
+//{
+//    spi_debug("SPI DMA error:\n", hspi->ErrorCode);
+//}

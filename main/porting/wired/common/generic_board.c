@@ -94,9 +94,9 @@ void board_task(void)
             //usb_connect(true);
         }
     } else {
-        //if (usb_ready()) {
-        keyboard_task();
-        //}
+        if (usb_ready()) {
+            keyboard_task();
+        }
     }
 
 #ifdef SCREEN_ENABLE

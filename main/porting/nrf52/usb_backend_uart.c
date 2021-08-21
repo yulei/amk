@@ -97,6 +97,12 @@ void nrf_usb_send_report(nrf_report_id report, const void *data, size_t size)
             uart_send_cmd(CMD_CONSUMER_REPORT, (uint8_t*)data, size);
             NRF_LOG_INFO("consumer report: 0x%x", *((uint32_t*)data));
             break;
+        case NRF_REPORT_ID_COMMAND:{
+            uint8_t cmd = *((uint8_t*)data);
+            uart_send_cmd(cmd, NULL, 0);
+            NRF_LOG_INFO("command report: 0x%x", cmd);
+            break;
+        }
         default:
             NRF_LOG_INFO("Unknow report id: %d", report);
             break;
