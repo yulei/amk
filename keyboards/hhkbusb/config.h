@@ -50,9 +50,10 @@
     #define SCREEN_0_CS     A10
     #define SCREEN_0_RESET  A9
     #define SCREEN_0_DC     A8
+    #define SSD1357_SPI_ID  SPI_INSTANCE_2
 
     #define FLASH_CS        A4
-    #define W25QXX_SPI_ID   SPI_INSTANCE_2
+    #define W25QXX_SPI_ID   SPI_INSTANCE_1
 
     #define I2C_USE_INSTANCE_1
     #define I2C1_SCL_PIN    B8

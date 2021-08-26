@@ -7,7 +7,7 @@
 #include "amk_printf.h"
 
 #ifndef W25QXX_DEBUG
-#define W25QXX_DEBUG 0
+#define W25QXX_DEBUG 1
 #endif
 
 #if W25QXX_DEBUG
@@ -119,6 +119,12 @@ static amk_error_t w25qxx_wait(w25qxx_t *w25qxx, uint32_t timeout);
 static amk_error_t w25qxx_write_address(w25qxx_t *w25qxx, uint8_t cmd, uint32_t address);
 static bool w25qxx_sector_empty(w25qxx_t *w25qxx, uint32_t address);
 
+#if 0 //def RTOS_ENABLE
+#include "cmsis_os2.h"
+osSemaphoreId_t readSema;
+spi_handle_t current_spi;
+#endif
+
 w25qxx_t *w25qxx_current(void)
 {
     return &w25qxxs[0];
@@ -151,6 +157,10 @@ w25qxx_t *w25qxx_init(w25qxx_config_t *config)
     device->sector_count    = 4096;
     device->type = W25Q128; 
     gpio_write_pin(config->cs, 1);
+#if 0 //def RTOS_ENABLE
+    readSema = osSemaphoreNew(1, 0, NULL);
+    current_spi = config->spi;
+#endif
     return device;
 }
 
@@ -205,11 +215,6 @@ amk_error_t w25qxx_write_sector(w25qxx_t* w25qxx, uint32_t address, const uint8_
     return AMK_SUCCESS;
 }
 
-amk_error_t w25qxx_write_sector_async(w25qxx_t* w25qxx, uint32_t address, const uint8_t *data, uint32_t size)
-{
-    return AMK_ERROR;
-}
-
 amk_error_t w25qxx_read_sector(w25qxx_t* w25qxx, uint32_t address, uint8_t *data, uint32_t size)
 {
     if (address % w25qxx->sector_size) {
@@ -220,25 +225,28 @@ amk_error_t w25qxx_read_sector(w25qxx_t* w25qxx, uint32_t address, uint8_t *data
     return w25qxx_read_bytes(w25qxx, address, data, size);
 }
 
-amk_error_t w25qxx_read_sector_async(w25qxx_t* w25qxx, uint32_t address, uint8_t *data, uint32_t size)
+#if 0 //def RTOS_ENABLE
+void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-    return AMK_ERROR;
+    if (hspi == current_spi) {
+        osSemaphoreRelease(readSema);
+    }
 }
-
+#endif
 amk_error_t w25qxx_read_bytes(w25qxx_t* w25qxx, uint32_t address, uint8_t *data, uint32_t size)
 {
     gpio_write_pin(w25qxx->config.cs, 0);
     w25qxx_write_address(w25qxx, WQCMD_FAST_READ, address);
 	w25qxx_spi_write(w25qxx, 0);
+#if 0 //def RTOS_ENABLE
+    spi_recv_async(w25qxx->config.spi, data, size);
+    osSemaphoreAcquire(readSema, osWaitForever);
+#else
     spi_recv(w25qxx->config.spi, data, size);
+#endif
     gpio_write_pin(w25qxx->config.cs, 1);
 
     return AMK_SUCCESS;
-}
-
-amk_error_t w25qxx_read_bytes_async(w25qxx_t* w25qxx, uint32_t address, uint8_t *data, uint32_t size)
-{
-    return AMK_ERROR;
 }
 
 amk_error_t w25qxx_erase_chip(w25qxx_t* w25qxx)

@@ -26,8 +26,9 @@
 #include "anim.h"
 #include "amk_printf.h"
 #include "ff.h"
-#include "cmsis_os2.h"
+//#include "cmsis_os2.h"
 
+void disp_init(void);
 
 extern RTC_HandleTypeDef hrtc;
 static void reset_to_msc(bool msc)
@@ -39,8 +40,7 @@ static void reset_to_msc(bool msc)
     HAL_NVIC_SystemReset();
 }
 
-osSemaphoreId_t dispSema;
-osSemaphoreId_t dataSema;
+//osSemaphoreId_t dispSema;
 
 static uint32_t last_ticks = 0;
 
@@ -88,7 +88,7 @@ static bool first_screen = true;
 #endif
 
 static bool screen_enable = true;
-//static bool filling = false;
+static bool filling = false;
 static render_t renders[] = {
     {
         .type = ANIM_TYPE_MAIN,
@@ -284,15 +284,15 @@ void render_datetime(render_t *render)
         return;
     }
 
-    osSemaphoreAcquire(dispSema, osWaitForever);
+    //osSemaphoreAcquire(dispSema, osWaitForever);
 
-    /*if (filling) {
+    if (filling) {
         if (screen_fill_ready()) {
             filling = false;
         } else {
             return;
         }
-    };*/
+    };
 
     char buffer[9];
     sprintf(buffer, "%02d:%02d:%02d", rtc_dt.hour, rtc_dt.minute, rtc_dt.second);
@@ -307,7 +307,7 @@ void render_datetime(render_t *render)
     }
 
     screen_fill_rect_async(render->x, render->y, render->width, render->height, render->buf, render->buf_size);
-    //filling = true;
+    filling = true;
     rtc_datetime_dirty = false;
 }
 
@@ -340,14 +340,14 @@ void render_task(render_t* render)
         }
     }*/
 
-    osSemaphoreAcquire(dispSema, osWaitForever);
-    /*if (filling) {
+    //osSemaphoreAcquire(dispSema, osWaitForever);
+    if (filling) {
         if (screen_fill_ready()) {
             filling = false;
         } else {
             return;
         }
-    };*/
+    };
 
     uint32_t elapsed = timer_elapsed32(render->ticks);
     if ( elapsed > render->delay) {
@@ -380,7 +380,7 @@ void render_task(render_t* render)
             }
         }
         screen_fill_rect_async(render->x, render->y, render->width, render->height, render->buf, render->buf_size);
-        //filling = true;
+        filling = true;
         render->ticks = timer_read32();
     }
 }
@@ -393,6 +393,7 @@ void msc_init_kb(void)
 
     memset(anim_buf, 0, sizeof(anim_buf));
     memset(auxi_buf, 0, sizeof(auxi_buf));
+    disp_init();
 }
 
 static void render_screen(uint8_t index)
@@ -405,6 +406,20 @@ static void render_screen(uint8_t index)
      {
         render_task(&renders[index]);
     }
+}
+
+void msc_task_kb(void)
+{
+    if (usb_setting & USB_MSC_BIT) return;
+
+    if (!screen_enable) return;
+
+#ifdef DATETIME_ENABLE
+    rtc_datetime_update();
+#endif
+
+    render_screen(0);
+    render_screen(1);
 }
 
 void toggle_screen(void)
@@ -441,10 +456,11 @@ void disp_init(void)
     rtc_datetime_init();
 #endif
     if (!(usb_setting & USB_MSC_BIT)) {
-        osThreadNew(disp_thread, NULL, NULL);
+        //osThreadNew(disp_thread, NULL, NULL);
     }
 }
 
+#if 0
 void disp_thread(void *argument)
 {
     dispSema = osSemaphoreNew(1, 1, NULL);
@@ -473,10 +489,6 @@ void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
     disp_debug("spi tx cp callback\n");
 }
 
-void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
-{
-    disp_debug("spi rx cp callback\n");
-}
 
 void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 {
@@ -491,3 +503,4 @@ void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
 
     disp_debug("spi failed to transfer: id=%d\n", (hspi==&hspi1) ? 1 : 2);
 }
+#endif

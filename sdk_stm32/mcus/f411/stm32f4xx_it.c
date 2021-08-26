@@ -23,6 +23,7 @@
 #include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "amk_printf.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -66,6 +67,7 @@ extern DMA_HandleTypeDef hdma_spi2_tx;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern DMA_HandleTypeDef hdma_usart1_tx;
 extern TIM_HandleTypeDef htim5;
+extern UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN EV */
 
@@ -311,6 +313,49 @@ void DMA2_Stream7_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
+__attribute__((weak)) void uart_recv_char(uint8_t c){}
 
+void uart_error_process(UART_HandleTypeDef * huart, uint32_t sr)
+{
+    amk_printf("UART ERROR: 0x%x\n", sr);
+    /* UART frame error interrupt occurred --------------------------------------*/
+    if ((sr & USART_SR_FE) != 0U) {
+        __HAL_UART_CLEAR_FLAG(huart, UART_FLAG_FE);
+    }
+
+    /* UART noise error interrupt occurred --------------------------------------*/
+    if ((sr & USART_SR_NE) != 0U) {
+        __HAL_UART_CLEAR_FLAG(huart, UART_FLAG_NE);
+    }
+
+    /* UART Over-Run interrupt occurred -----------------------------------------*/
+    if ((sr & USART_SR_ORE) != 0U) {
+        __HAL_UART_CLEAR_FLAG(huart, UART_FLAG_ORE);
+    }
+}
+
+/**
+  * @brief This function handles USART1 global interrupt.
+  */
+void USART1_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART1_IRQn 0 */
+  uint32_t sr = huart1.Instance->SR;
+  uint32_t cr1 = huart1.Instance->CR1;
+  if (((sr & USART_SR_RXNE) != 0) && ((cr1 & USART_CR1_RXNEIE) != 0))
+  {// received one char
+    uint8_t d = huart1.Instance->DR & 0x000000FF;
+    uart_recv_char(d);
+  }
+
+  if (sr & (uint32_t)( USART_SR_FE | USART_SR_ORE | USART_SR_NE )) {
+    uart_error_process(&huart1, sr);
+  }
+  /* USER CODE END USART1_IRQn 0 */
+  //HAL_UART_IRQHandler(&huart1);
+  /* USER CODE BEGIN USART1_IRQn 1 */
+
+  /* USER CODE END USART1_IRQn 1 */
+}
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -109,5 +109,16 @@ void HAL_ResumeTick(void)
   /* Enable TIM5 Update interrupt */
   __HAL_TIM_ENABLE_IT(&htim5, TIM_IT_UPDATE);
 }
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
 
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM5) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

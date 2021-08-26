@@ -15,7 +15,7 @@ typedef enum {
 
 typedef struct {
     pin_t cs;
-    spi_handle_t *spi;
+    spi_handle_t spi;
 } w25qxx_config_t;
 
 typedef struct {
@@ -31,11 +31,8 @@ w25qxx_t *w25qxx_init(w25qxx_config_t *config);
 w25qxx_t *w25qxx_current(void);
 // to simplify the implementation, only support sector write
 amk_error_t w25qxx_write_sector(w25qxx_t* w25qxx, uint32_t address, const uint8_t *data, uint32_t size);
-amk_error_t w25qxx_write_sector_async(w25qxx_t* w25qxx, uint32_t address, const uint8_t *data, uint32_t size);
 
 amk_error_t w25qxx_read_sector(w25qxx_t* w25qxx, uint32_t address, uint8_t *data, uint32_t size);
-amk_error_t w25qxx_read_sector_async(w25qxx_t* w25qxx, uint32_t address, uint8_t *data, uint32_t size);
 amk_error_t w25qxx_read_bytes(w25qxx_t* w25qxx, uint32_t address, uint8_t *data, uint32_t size);
-amk_error_t w25qxx_read_bytes_async(w25qxx_t* w25qxx, uint32_t address, uint8_t *data, uint32_t size);
 
 amk_error_t w25qxx_erase_chip(w25qxx_t* w25qxx);

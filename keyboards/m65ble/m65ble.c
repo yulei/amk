@@ -19,8 +19,8 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {0, 0, 0, 0},
     {0, 0, 0, 0},
     // indicator leds
-    {1, AW_DIM1, AW_DIM2, AW_DIM0},  // CAPS
-    {1, AW_DIM4, AW_DIM5, AW_DIM3},  // ESC
+    {1, AW_DIM1, AW_DIM2, AW_DIM0},  // ESC
+    {1, AW_DIM4, AW_DIM5, AW_DIM3},  // CAPS
 };
 
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
@@ -34,8 +34,8 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
 
 uint8_t g_rgb_indicator_index[RGB_INDICATOR_LED_NUM] = { 4,5};
 
-#define CAPS_LED    0
-#define ESC_LED     1
+#define CAPS_LED    1
+#define ESC_LED     0
 
 void matrix_init_kb(void)
 {
