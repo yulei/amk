@@ -30,6 +30,12 @@ typedef enum {
     AF_RGB_VALD,
     AF_RGB_SPDI,
     AF_RGB_SPDD,
+    AF_KC_LSPO,
+    AF_KC_RSPC,
+    AF_KC_LCPO,
+    AF_KC_RCPC,
+    AF_KC_LAPO,
+    AF_KC_RAPC,
 // via keycodes
     AF_FN_MO13,
     AF_FN_MO23,
