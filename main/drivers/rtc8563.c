@@ -87,7 +87,7 @@ void rtc8563_read_time(rtc_datetime_t *datetime)
     uint8_t buf[7];
     amk_error_t error = i2c_read_reg(i2c_inst, RTC8563_ADDR, SECONDS_REGISTER, buf, 7, TIMEOUT);
     if (error != AMK_SUCCESS) {
-        rtc8563_debug("RTC8563: failed to write time:%d\n", error);
+        rtc8563_debug("RTC8563: failed to read time:%d\n", error);
         return;
     }
 

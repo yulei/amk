@@ -5,6 +5,7 @@
 #include "generic_hal.h"
 #include "tusb.h"
 #include "amk_printf.h"
+#include "usb_descriptors.h"
 
 I2C_HandleTypeDef hi2c1;
 DMA_HandleTypeDef hdma_i2c1_tx;
@@ -252,6 +253,17 @@ void custom_board_init(void)
     MX_RTC_Init();
     MX_SPI2_Init();
     MX_USART1_UART_Init();
+#ifdef DYNAMIC_CONFIGURATION
+    uint32_t magic = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1);
+    //if (magic == 0) {
+    if (magic > 0) {
+        usb_setting |= USB_MSC_BIT;
+    } else {
+        usb_setting |= USB_WEBUSB_BIT;
+    }
+    HAL_PWR_EnableBkUpAccess();
+    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0);
+#endif
 
     usb_port_init();
 }

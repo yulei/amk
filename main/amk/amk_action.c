@@ -32,11 +32,21 @@
 #include "common_config.h"
 #endif
 
+#ifndef AMK_ACTION_DEBUG
+#define AMK_ACTION_DEBUG 1
+#endif
+
+#if AMK_ACTION_DEBUG
+#define action_debug  amk_printf
+#else
+#define action_debug(...)
+#endif
+
 __attribute__((weak))
 void keyboard_set_rgb(bool on)
 {
 #ifdef RGB_ENABLE
-    amk_printf("keyboard_set_rgb: %d\n", on);
+    action_debug("keyboard_set_rgb: %d\n", on);
     if (on) {
         if (!rgb_led_config_enabled()) {
             rgb_led_config_toggle();
@@ -51,98 +61,158 @@ void keyboard_set_rgb(bool on)
 
 void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
+    if (opt == FUNC_TAP) {
+        uint8_t tap_count = record->tap.count;
+        uint8_t mod = 0;
+        uint8_t key = KC_NO;
+        switch (id) {
+            case AF_KC_LSPO:
+                mod |= (MOD_LSFT>>8);
+                key = KC_9;
+                break;
+            case AF_KC_RSPC:
+                mod |= (MOD_RSFT>>8);
+                key = KC_0;
+                break;
+            case AF_KC_LCPO:
+                mod |= (MOD_LCTL>>8);
+                key = KC_9;
+                break;
+            case AF_KC_RCPC:
+                mod |= (MOD_RCTL>>8);
+                key = KC_0;
+                break;
+            case AF_KC_LAPO:
+                mod |= (MOD_LALT>>8);
+                key = KC_9;
+                break;
+            case AF_KC_RAPC:
+                mod |= (MOD_RALT>>8);
+                key = KC_0;
+                break;
+            default:
+                return;
+        };
 
-    switch (id) {
-#ifdef RGB_ENABLE
-        case AF_RGB_TOG:
-            if (!record->event.pressed) return;
-            keyboard_set_rgb(!rgb_led_config_enabled());
-            amk_printf("Toggle rgb: %d\n", rgb_led_config_enabled());
-            break;
-        case AF_RGB_MOD:
-            if (!record->event.pressed) return;
-            rgb_led_config_inc_param(RGB_EFFECT_MODE);
-            break;
-        case AF_RGB_HUEI:
-            if (!record->event.pressed) return;
-            rgb_led_config_inc_param(RGB_EFFECT_HUE);
-            break;
-        case AF_RGB_HUED:
-            if (!record->event.pressed) return;
-            rgb_led_config_dec_param(RGB_EFFECT_HUE);
-            break;
-        case AF_RGB_SATI:
-            if (!record->event.pressed) return;
-            rgb_led_config_inc_param(RGB_EFFECT_SAT);
-            break;
-        case AF_RGB_SATD:
-            if (!record->event.pressed) return;
-            rgb_led_config_dec_param(RGB_EFFECT_SAT);
-            break;
-        case AF_RGB_VALI:
-            if (!record->event.pressed) return;
-            rgb_led_config_inc_param(RGB_EFFECT_VAL);
-            break;
-        case AF_RGB_VALD:
-            if (!record->event.pressed) return;
-            rgb_led_config_dec_param(RGB_EFFECT_VAL);
-            break;
-        case AF_RGB_SPDI:
-            if (!record->event.pressed) return;
-            rgb_led_config_inc_param(RGB_EFFECT_SPEED);
-            break;
-        case AF_RGB_SPDD:
-            if (!record->event.pressed) return;
-            rgb_led_config_dec_param(RGB_EFFECT_SPEED);
-            break;
-#endif
-
-#ifdef VIAL_ENABLE
-        case AF_FN_MO13:
-            if (record->event.pressed) {
-                layer_on(1);
-                vial_update_tri_layer(1, 2, 3);
+        if (record->event.pressed) {
+            if (tap_count > 0) {
+                if (record->tap.interrupted) {
+                    action_debug("MODS_TAP: Tap: Cancel: add_mods\n");
+                    // ad hoc: set 0 to cancel tap
+                    record->tap.count = 0;
+                    register_mods(mod);
+                } else {
+                    action_debug("MODS_TAP: Tap: register_code\n");
+                    add_weak_mods(mod);
+                    register_code(key);
+                }
             } else {
-                layer_off(1);
-                vial_update_tri_layer(1, 2, 3);
+                action_debug("MODS_TAP: No tap: add_mods\n");
+                register_mods(mod);
             }
-            break;
-        case AF_FN_MO23:
-            if (record->event.pressed) {
-                layer_on(2);
-                vial_update_tri_layer(1, 2, 3);
+        } else {
+            if (tap_count > 0) {
+                action_debug("MODS_TAP: Tap: unregister_code\n");
+                del_weak_mods(mod);
+                unregister_code(key);
             } else {
-                layer_off(2);
-                vial_update_tri_layer(1, 2, 3);
+                action_debug("MODS_TAP: No tap: add_mods\n");
+                unregister_mods(mod);
             }
-            break;
+        }
+    } else {
+        switch (id) {
+    #ifdef RGB_ENABLE
+            case AF_RGB_TOG:
+                if (!record->event.pressed) return;
+                keyboard_set_rgb(!rgb_led_config_enabled());
+                action_debug("Toggle rgb: %d\n", rgb_led_config_enabled());
+                break;
+            case AF_RGB_MOD:
+                if (!record->event.pressed) return;
+                rgb_led_config_inc_param(RGB_EFFECT_MODE);
+                break;
+            case AF_RGB_HUEI:
+                if (!record->event.pressed) return;
+                rgb_led_config_inc_param(RGB_EFFECT_HUE);
+                break;
+            case AF_RGB_HUED:
+                if (!record->event.pressed) return;
+                rgb_led_config_dec_param(RGB_EFFECT_HUE);
+                break;
+            case AF_RGB_SATI:
+                if (!record->event.pressed) return;
+                rgb_led_config_inc_param(RGB_EFFECT_SAT);
+                break;
+            case AF_RGB_SATD:
+                if (!record->event.pressed) return;
+                rgb_led_config_dec_param(RGB_EFFECT_SAT);
+                break;
+            case AF_RGB_VALI:
+                if (!record->event.pressed) return;
+                rgb_led_config_inc_param(RGB_EFFECT_VAL);
+                break;
+            case AF_RGB_VALD:
+                if (!record->event.pressed) return;
+                rgb_led_config_dec_param(RGB_EFFECT_VAL);
+                break;
+            case AF_RGB_SPDI:
+                if (!record->event.pressed) return;
+                rgb_led_config_inc_param(RGB_EFFECT_SPEED);
+                break;
+            case AF_RGB_SPDD:
+                if (!record->event.pressed) return;
+                rgb_led_config_dec_param(RGB_EFFECT_SPEED);
+                break;
+    #endif
 
-        case AF_MACRO00:
-        case AF_MACRO01:
-        case AF_MACRO02:
-        case AF_MACRO03:
-        case AF_MACRO04:
-        case AF_MACRO05:
-        case AF_MACRO06:
-        case AF_MACRO07:
-        case AF_MACRO08:
-        case AF_MACRO09:
-        case AF_MACRO10:
-        case AF_MACRO11:
-        case AF_MACRO12:
-        case AF_MACRO13:
-        case AF_MACRO14:
-        case AF_MACRO15:
-            if (!record->event.pressed) return;
-            amk_macro_play(id-AF_MACRO00);
-            break;
-#endif
-        case AF_EEPROM_RESET:
-            eeconfig_init();
-            break;
-        default:
-            break;
-    }
+    #ifdef VIAL_ENABLE
+            case AF_FN_MO13:
+                if (record->event.pressed) {
+                    layer_on(1);
+                    vial_update_tri_layer(1, 2, 3);
+                } else {
+                    layer_off(1);
+                    vial_update_tri_layer(1, 2, 3);
+                }
+                break;
+            case AF_FN_MO23:
+                if (record->event.pressed) {
+                    layer_on(2);
+                    vial_update_tri_layer(1, 2, 3);
+                } else {
+                    layer_off(2);
+                    vial_update_tri_layer(1, 2, 3);
+                }
+                break;
+
+            case AF_MACRO00:
+            case AF_MACRO01:
+            case AF_MACRO02:
+            case AF_MACRO03:
+            case AF_MACRO04:
+            case AF_MACRO05:
+            case AF_MACRO06:
+            case AF_MACRO07:
+            case AF_MACRO08:
+            case AF_MACRO09:
+            case AF_MACRO10:
+            case AF_MACRO11:
+            case AF_MACRO12:
+            case AF_MACRO13:
+            case AF_MACRO14:
+            case AF_MACRO15:
+                if (!record->event.pressed) return;
+                amk_macro_play(id-AF_MACRO00);
+                break;
+    #endif
+            case AF_EEPROM_RESET:
+                eeconfig_init();
+                break;
+            default:
+                break;
+        }
+    }    
 }
 
 
@@ -263,18 +333,18 @@ bool hook_process_action(keyrecord_t *record)
             register_mods(mods);
             if (tap_count > 0) {
                 if (record->tap.interrupted) {
-                    amk_printf("MODS_TAP: Tap: Cancel: add_mods\n");
+                    action_debug("MODS_TAP: Tap: Cancel: add_mods\n");
                     // ad hoc: set 0 to cancel tap
                     record->tap.count = 0;
                 } else {
-                    amk_printf("MODS_TAP: Tap: register_code\n");
+                    action_debug("MODS_TAP: Tap: register_code\n");
                     register_code(code);
                 }
             }
         } else {
             unregister_mods(mods);
             if (tap_count > 0) {
-                amk_printf("MODS_TAP: Tap: unregister_code\n");
+                action_debug("MODS_TAP: Tap: unregister_code\n");
                 unregister_code(code);
             }
         }

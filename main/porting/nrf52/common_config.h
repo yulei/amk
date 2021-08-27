@@ -112,6 +112,8 @@ typedef enum {
     CMD_KEYMAP_SET_ACK,
     CMD_KEYMAP_GET,
     CMD_KEYMAP_GET_ACK,
+    CMD_TOGGLE_SCREEN,
+    CMD_TOGGLE_MSC,
 } command_t;
 
 #define UART_TX_BUF_SIZE                    128                                        /**< UART TX buffer size. */
@@ -129,6 +131,7 @@ typedef enum {
     NRF_REPORT_ID_MOUSE,
     NRF_REPORT_ID_SYSTEM,
     NRF_REPORT_ID_CONSUMER,
+    NRF_REPORT_ID_COMMAND,
     NRF_REPORT_ID_LAST,
 } nrf_report_id;
 

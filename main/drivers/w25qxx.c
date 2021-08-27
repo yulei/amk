@@ -6,6 +6,16 @@
 #include "wait.h"
 #include "amk_printf.h"
 
+#ifndef W25QXX_DEBUG
+#define W25QXX_DEBUG 1
+#endif
+
+#if W25QXX_DEBUG
+#define w25qxx_debug  amk_printf
+#else
+#define w25qxx_debug(...)
+#endif
+
 #ifndef W25QXX_NUM
 #define W25QXX_NUM 1
 #endif
@@ -109,6 +119,12 @@ static amk_error_t w25qxx_wait(w25qxx_t *w25qxx, uint32_t timeout);
 static amk_error_t w25qxx_write_address(w25qxx_t *w25qxx, uint8_t cmd, uint32_t address);
 static bool w25qxx_sector_empty(w25qxx_t *w25qxx, uint32_t address);
 
+#if 0 //def RTOS_ENABLE
+#include "cmsis_os2.h"
+osSemaphoreId_t readSema;
+spi_handle_t current_spi;
+#endif
+
 w25qxx_t *w25qxx_current(void)
 {
     return &w25qxxs[0];
@@ -127,10 +143,10 @@ w25qxx_t *w25qxx_init(w25qxx_config_t *config)
     switch(id&0xFFFF) {
     case 0x4018:
         // W25Q128
-        amk_printf("W25Q128 device identified: %x\n", id);
+        w25qxx_debug("W25Q128 device identified: %x\n", id);
         break;;
     default:
-        amk_printf("Unknown W25QXX chip: %x\n", id);
+        w25qxx_debug("Unknown W25QXX chip: %x\n", id);
         //device = NULL;
         break;
     }
@@ -141,6 +157,10 @@ w25qxx_t *w25qxx_init(w25qxx_config_t *config)
     device->sector_count    = 4096;
     device->type = W25Q128; 
     gpio_write_pin(config->cs, 1);
+#if 0 //def RTOS_ENABLE
+    readSema = osSemaphoreNew(1, 0, NULL);
+    current_spi = config->spi;
+#endif
     return device;
 }
 
@@ -173,7 +193,7 @@ static void w25qxx_write_page(w25qxx_t *w25qxx, uint32_t address, const uint8_t 
 amk_error_t w25qxx_write_sector(w25qxx_t* w25qxx, uint32_t address, const uint8_t *data, uint32_t size)
 {
     if (address % w25qxx->sector_size) {
-        amk_printf("unsupport wrtie operation: address=%d, size=%d\n", address, size);
+        w25qxx_debug("unsupport wrtie operation: address=%d, size=%d\n", address, size);
         return AMK_ERROR;
     }
 
@@ -181,7 +201,7 @@ amk_error_t w25qxx_write_sector(w25qxx_t* w25qxx, uint32_t address, const uint8_
     if (!w25qxx_sector_empty(w25qxx, address)) {
         // ease the sector first
         if (w25qxx_erase_sector(w25qxx, address) != AMK_SUCCESS) {
-            amk_printf("failed to erase flash sector at: 0x%x\n", address);
+            w25qxx_debug("failed to erase flash sector at: 0x%x\n", address);
             return AMK_SPI_ERROR;
         }
     }
@@ -198,19 +218,32 @@ amk_error_t w25qxx_write_sector(w25qxx_t* w25qxx, uint32_t address, const uint8_
 amk_error_t w25qxx_read_sector(w25qxx_t* w25qxx, uint32_t address, uint8_t *data, uint32_t size)
 {
     if (address % w25qxx->sector_size) {
-        amk_printf("unsupport read operation: address=%d, size=%d\n", address, size);
+        w25qxx_debug("unsupport read operation: address=%d, size=%d\n", address, size);
         return AMK_ERROR;
     }
 
     return w25qxx_read_bytes(w25qxx, address, data, size);
 }
 
+#if 0 //def RTOS_ENABLE
+void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+    if (hspi == current_spi) {
+        osSemaphoreRelease(readSema);
+    }
+}
+#endif
 amk_error_t w25qxx_read_bytes(w25qxx_t* w25qxx, uint32_t address, uint8_t *data, uint32_t size)
 {
     gpio_write_pin(w25qxx->config.cs, 0);
     w25qxx_write_address(w25qxx, WQCMD_FAST_READ, address);
 	w25qxx_spi_write(w25qxx, 0);
+#if 0 //def RTOS_ENABLE
+    spi_recv_async(w25qxx->config.spi, data, size);
+    osSemaphoreAcquire(readSema, osWaitForever);
+#else
     spi_recv(w25qxx->config.spi, data, size);
+#endif
     gpio_write_pin(w25qxx->config.cs, 1);
 
     return AMK_SUCCESS;

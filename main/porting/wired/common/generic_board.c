@@ -69,8 +69,10 @@ void board_init(void)
     system_init();
     amk_printf("custom_board_init\n");
     custom_board_init();
+#ifndef RTOS_ENABLE
     amk_printf("usb_init\n");
     usb_init();
+#endif
     amk_printf("amk_init\n");
     amk_init();
     amk_printf("board_init end\n");
@@ -79,27 +81,29 @@ void board_init(void)
 
 void board_task(void)
 {
+#ifndef RTOS_ENABLE
     usb_task();
+#endif
 
     if (usb_suspended()) {
         if (suspend_wakeup_condition()) {
             // wake up remote
             remote_wakeup();
-            usb_connect(false);
+            //usb_connect(false);
             wait_ms(100);
-            usb_connect(true);
+            //usb_connect(true);
         }
     } else {
-        //if (usb_ready()) {
-        keyboard_task();
-        //}
+        if (usb_ready()) {
+            keyboard_task();
+        }
     }
 
 #ifdef SCREEN_ENABLE
     screen_task();
 #endif
 
-#ifdef MSC_ENABLE
+#if defined(MSC_ENABLE)//&& !defined(RTOS_ENABLE)
     msc_task();
 #endif
 
@@ -121,7 +125,7 @@ static void amk_init(void)
     //screen_init();
 #endif
 
-#ifdef MSC_ENABLE
+#if defined(MSC_ENABLE) //&& !defined(RTOS_ENABLE)
     amk_printf("msc_init\n");
     msc_init();
 #endif

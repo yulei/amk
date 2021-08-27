@@ -27,12 +27,12 @@ static screen_driver_t screen_drivers[SCREEN_NUM] = {
 void screen_init(void)
 {
     for (int i = 0; i < SCREEN_NUM; i++) {
-        gpio_write_pin(screen_drivers[i].reset, 0);
-        gpio_write_pin(screen_drivers[i].cs, 1);
-        gpio_write_pin(screen_drivers[i].dc, 1);
         gpio_set_output_pushpull(screen_drivers[i].reset);
         gpio_set_output_pushpull(screen_drivers[i].cs);
         gpio_set_output_pushpull(screen_drivers[i].dc);
+        gpio_write_pin(screen_drivers[i].reset, 0);
+        gpio_write_pin(screen_drivers[i].cs, 1);
+        gpio_write_pin(screen_drivers[i].dc, 1);
 #ifdef SCREEN_DRIVER_ST7735
         st7735_init(&screen_drivers[i]);
 #else

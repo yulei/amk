@@ -160,6 +160,12 @@ uint32_t anim_step(anim_t *anim, uint32_t *delay, void *buf, uint32_t size)
         return 0;
     }
 
+    if (size != readed) {
+        amk_printf("ANIM read file size mismatch, should=%d, actually=%d\n", size, readed);
+        safe_close(&anim->obj.file);
+        return 0;
+    }
+
     anim->obj.frame++;
     return readed;
 }

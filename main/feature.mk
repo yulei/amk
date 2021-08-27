@@ -65,7 +65,11 @@ ifeq (yes, $(strip $(MSC_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/anim.c
 	SRCS += $(MAIN_DIR)/drivers/w25qxx.c
 	SRCS += $(MAIN_DIR)/drivers/spi.c
+#	ifeq (yes, $(strip $(RTOS_ENABLE)))
+#	SRCS += $(MAIN_DIR)/rtos/usbx_msc.c
+#	else
 	SRCS += $(MAIN_DIR)/usb/mscusb.c
+#	endif
 	APP_DEFS += -DMSC_ENABLE
 endif
 
@@ -106,4 +110,8 @@ endif
 
 ifeq (yes, $(strip $(NOFRENDO_ENABLE)))
 	include libs/nofrendo.mk
+endif
+
+ifeq (yes, $(strip $(DYNAMIC_CONFIGURATION)))
+	APP_DEFS += -DDYNAMIC_CONFIGURATION
 endif

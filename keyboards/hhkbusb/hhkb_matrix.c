@@ -82,7 +82,13 @@ static bool report_queue_get(report_queue_t* queue, report_item_t* item)
 }
 
 // uart communication definitions
+#ifdef STM32F411xE
+#define CONFIG_USER_START   0x08010000
+#define CONFIG_USER_SECTOR  FLASH_SECTOR_4 
+#else
 #define CONFIG_USER_START 0x0800FC00
+#endif
+
 #define CONFIG_USER_SIZE 0x00000400
 #define CONFIG_JUMP_TO_APP_OFFSET 0x09
 #define CMD_MAX_LEN 64
@@ -110,6 +116,8 @@ typedef enum
     CMD_KEYMAP_SET_ACK,
     CMD_KEYMAP_GET,
     CMD_KEYMAP_GET_ACK,
+    CMD_TOGGLE_SCREEN,
+    CMD_TOGGLE_MSC,
 } command_t;
 
 static uint8_t command_buf[CMD_MAX_LEN];
@@ -230,6 +238,9 @@ static void enqueue_command(uint8_t *cmd)
     report_queue_put(&report_queue, &item);
 }
 
+extern void toggle_screen(void);
+extern void toggle_msc(void);
+
 static void process_command(report_item_t *item)
 {
     switch (item->type) {
@@ -286,7 +297,12 @@ static void process_command(report_item_t *item)
     case CMD_KEYMAP_GET_ACK:
         ble_sync_update(item->data[0], item->data[1], item->data[2], (item->data[3]<<8) | item->data[4]);
         break;
-
+    case CMD_TOGGLE_SCREEN:
+//        toggle_screen();
+        break;
+    case CMD_TOGGLE_MSC:
+//        toggle_msc();
+        break;
     default:
         break;
     }
@@ -315,12 +331,20 @@ static void clear_jump_to_app(void)
     if (buf[CONFIG_JUMP_TO_APP_OFFSET] != 0) {
         buf[CONFIG_JUMP_TO_APP_OFFSET] = 0;
         FLASH_EraseInitTypeDef erase;
+#ifdef STM32F411xE
+        erase.TypeErase     = FLASH_TYPEERASE_SECTORS;
+        erase.Banks         = FLASH_BANK_1;
+        erase.Sector        = FLASH_SECTOR_4;
+        erase.NbSectors     = 1;
+        erase.VoltageRange  = FLASH_VOLTAGE_RANGE_3;
+#else
         erase.TypeErase = FLASH_TYPEERASE_PAGES;
 #ifdef STM32F103xB
         erase.Banks = FLASH_BANK_1;
 #endif
         erase.PageAddress = CONFIG_USER_START;
         erase.NbPages = 1;
+#endif
         uint32_t error = 0;
         HAL_FLASHEx_Erase(&erase, &error);
     }

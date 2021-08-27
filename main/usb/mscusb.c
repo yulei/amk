@@ -27,6 +27,10 @@ void msc_init_kb(void) {}
 #define W25QXX_SPI_ID SPI_INSTANCE_ID_1
 #endif
 
+#ifdef WDT_ENABLE
+void wdt_refresh(void);
+#endif
+
 void msc_init(void)
 {
     w25qxx_config.cs = FLASH_CS;
@@ -116,6 +120,9 @@ bool tud_msc_start_stop_cb(uint8_t lun, uint8_t power_condition, bool start, boo
 // Copy disk's data to buffer (up to bufsize) and return number of copied bytes.
 int32_t tud_msc_read10_cb(uint8_t lun, uint32_t lba, uint32_t offset, void* buffer, uint32_t bufsize)
 {
+#ifdef WDT_ENABLE
+    wdt_refresh();
+#endif
     w25qxx_read_sector(w25qxx, lba*DISK_BLOCK_SIZE, buffer, bufsize);
     return bufsize;
 }
@@ -124,6 +131,9 @@ int32_t tud_msc_read10_cb(uint8_t lun, uint32_t lba, uint32_t offset, void* buff
 // Process data in buffer to disk's storage and return number of written bytes
 int32_t tud_msc_write10_cb(uint8_t lun, uint32_t lba, uint32_t offset, uint8_t* buffer, uint32_t bufsize)
 {
+#ifdef WDT_ENABLE
+    wdt_refresh();
+#endif
     w25qxx_write_sector(w25qxx, lba*DISK_BLOCK_SIZE, buffer, bufsize);
     return bufsize;
 }
@@ -230,7 +240,7 @@ extern void wdt_refresh(void);
 #endif
 static int8_t storage_read(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len)
 {
-#ifdef WDT_ENABLED
+#ifdef WDT_ENABLE
     wdt_refresh();
 #endif
     w25qxx_read_sector(w25qxx, blk_addr*DISK_BLOCK_SIZE, buf, DISK_BLOCK_SIZE*blk_len);
@@ -239,7 +249,7 @@ static int8_t storage_read(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_
 
 static int8_t storage_write(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len)
 {
-#ifdef WDT_ENABLED
+#ifdef WDT_ENABLE
     wdt_refresh();
 #endif
     w25qxx_write_sector(w25qxx, blk_addr*DISK_BLOCK_SIZE, buf, DISK_BLOCK_SIZE*blk_len);

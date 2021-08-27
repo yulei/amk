@@ -15,7 +15,7 @@ typedef enum {
 
 typedef struct {
     pin_t cs;
-    spi_handle_t *spi;
+    spi_handle_t spi;
 } w25qxx_config_t;
 
 typedef struct {

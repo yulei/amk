@@ -17,6 +17,7 @@
 #include "report.h"
 #include "host.h"
 #include "keyboard.h"
+#include "action.h"
 #include "matrix_scan.h"
 #include "wait.h"
 
@@ -321,6 +322,12 @@ static void connect_target(uint8_t device)
     }
 }
 
+__attribute__((weak))
+bool hook_process_action_kb(action_t *action)
+{
+    return false;
+}
+
 // bluetooth control command
 // F13 : next rgb config
 // F15 : set device 0
@@ -335,13 +342,13 @@ static void connect_target(uint8_t device)
 // F24 : toggle ble/gazell mode
 #include "action.h"
 #include "action_layer.h"
-bool hook_process_action_main(keyrecord_t *record) {
+bool hook_process_action_main(keyrecord_t *record)
 {
     if (IS_NOEVENT(record->event) || !record->event.pressed) { 
         return false;
     }
     action_t action = layer_switch_get_action(record->event);
-    if (action.kind.id != ACT_MODS) {
+    if (action.kind.id != ACT_MODS && action.kind.id != ACT_RMODS) {
         return false;
     }
 
@@ -363,13 +370,13 @@ bool hook_process_action_main(keyrecord_t *record) {
         case KC_F18:
             connect_target(BLE_PEER_DEVICE_3);
             return true;
-        case KC_F19:
+        //case KC_F19:
             // reset keymap
-            amk_keymap_reset();
-            return true;
-        case KC_F20: // disable sleep mode
-            rf_driver.output_target &= ~SLEEP_ENABLED;
-            return true;
+        //    amk_keymap_reset();
+        //    return true;
+        //case KC_F20: // disable sleep mode
+        //    rf_driver.output_target &= ~SLEEP_ENABLED;
+        //    return true;
         case KC_F21: // toggle usb/ble output
             if (rf_driver.output_target & OUTPUT_RF) {
                 if (rf_driver.vbus_enabled) {
@@ -411,10 +418,8 @@ bool hook_process_action_main(keyrecord_t *record) {
             } return true;
         default:
             break;
-        }
     }
-
-    return false;
+    return hook_process_action_kb(&action);
 }
 
 #if WDT_ENABLE
