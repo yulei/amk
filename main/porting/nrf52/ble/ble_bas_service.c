@@ -74,7 +74,11 @@ void ble_bas_service_prepare_sleep(void)
     app_timer_stop(m_battery_sample_timer_id);
     nrf_drv_saadc_abort();
     nrf_drv_saadc_uninit();
+    #ifdef BATTERY_SAADC_ENABLE_LOW
+    nrf_gpio_pin_set(BATTERY_SAADC_ENABLE_PIN);
+    #else
     nrf_gpio_pin_clear(BATTERY_SAADC_ENABLE_PIN);
+    #endif
 }
 
 /**@brief Function for performing a battery measurement, and update the Battery Level characteristic in the Battery Service.
@@ -112,7 +116,12 @@ static void battery_level_meas_timeout_handler(void * p_context)
 {
     UNUSED_PARAMETER(p_context);
     // turn battery on and kick off sampling timer
+    #ifdef BATTERY_SAADC_ENABLE_LOW
+    nrf_gpio_pin_clear(BATTERY_SAADC_ENABLE_PIN);
+    #else
     nrf_gpio_pin_set(BATTERY_SAADC_ENABLE_PIN);
+    #endif
+
     app_timer_start(m_battery_sample_timer_id, BATTERY_LEVEL_MEAS_SAMPLE, NULL);
     NRF_LOG_INFO("battery measurement started.");
 }
@@ -201,7 +210,11 @@ static void battery_saadc_handler(nrf_drv_saadc_evt_t const * p_event)
         err_code = nrf_drv_saadc_buffer_convert(p_event->data.done.p_buffer, SAADC_SAMPLES);
         APP_ERROR_CHECK(err_code);
         // turn off battery and sampling timer
+        #ifdef BATTERY_SAADC_ENABLE_LOW
+        nrf_gpio_pin_set(BATTERY_SAADC_ENABLE_PIN);
+        #else
         nrf_gpio_pin_clear(BATTERY_SAADC_ENABLE_PIN);
+        #endif
         app_timer_stop(m_battery_sample_timer_id);
     }
 }
@@ -227,5 +240,9 @@ static void battery_saadc_init(void)
     APP_ERROR_CHECK(err_code);
 
     nrf_gpio_cfg_output(BATTERY_SAADC_ENABLE_PIN);
+    #ifdef BATTERY_SAADC_ENABLE_LOW
+    nrf_gpio_pin_set(BATTERY_SAADC_ENABLE_PIN);
+    #else
     nrf_gpio_pin_clear(BATTERY_SAADC_ENABLE_PIN);
+    #endif
 }

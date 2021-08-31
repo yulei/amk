@@ -16,6 +16,7 @@
 #define MATRIX_COLS 15
 #define MATRIX_ROW_PINS { 28, 29, 30, 9, 13}
 #define MATRIX_COL_PINS { 24, 23, 22, 7, 6, 4, 3, 10, 2, 1, 0, 31, 18, 17, 16}
+//#define MATRIX_COL_PINS { 24, 23, 22, 7, 6, 4, 3, 10, 2, 10, 10, 31, 18, 17, 16}
 
 #define BOOT_ROW_PIN    28
 #define BOOT_COL_PIN    24
@@ -27,6 +28,7 @@
 #define UART_RX_PIN                 20
 #define UART_TX_PIN                 19
 #define BATTERY_SAADC_ENABLE_PIN    8
+#define BATTERY_SAADC_ENABLE_LOW
 #define BATTERY_SAADC_PIN           NRF_SAADC_INPUT_AIN3
 
 #define I2C_USE_INSTANCE_1

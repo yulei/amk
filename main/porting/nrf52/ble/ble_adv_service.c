@@ -20,7 +20,20 @@ BLE_ADVERTISING_DEF(m_advertising);                                 /**< Adverti
 static void on_adv_evt(ble_adv_evt_t ble_adv_evt);
 static void adv_error_handler(uint32_t nrf_error);
 static void sleep_mode_enter(void);
-static void update_gap_addr(uint16_t device);
+
+#ifdef MULTI_PEERS
+static void update_gap_addr(uint16_t device)
+{
+    ble_gap_addr_t ble;
+    ret_code_t ret = sd_ble_gap_addr_get(&ble);
+    APP_ERROR_CHECK(ret);
+
+    ble.addr[1] = (uint8_t)device;
+
+    ret = sd_ble_gap_addr_set(&ble);
+    APP_ERROR_CHECK(ret);
+}
+#endif
 
 void ble_adv_service_init(void)
 {
@@ -68,7 +81,9 @@ void ble_adv_service_start(bool erase_bonds)
     } else {
         NRF_LOG_INFO("Current available peer count: %d", pm_peer_count());
         ble_pm_whitelist_set(PM_PEER_ID_LIST_SKIP_NO_ID_ADDR);
+    #ifdef MULTI_PEERS
         update_gap_addr(ble_driver.current_peer);
+    #endif
         ret_code_t ret = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
         APP_ERROR_CHECK(ret);
     }
@@ -76,6 +91,7 @@ void ble_adv_service_start(bool erase_bonds)
 
 void ble_adv_service_restart(void)
 {
+#ifdef MULTI_PEERS
     if (ble_driver.conn_handle != BLE_CONN_HANDLE_INVALID) {
         // disable auto advertise
         ble_adv_modes_config_t config = m_advertising.adv_modes_config;
@@ -99,6 +115,7 @@ void ble_adv_service_restart(void)
         }
         APP_ERROR_CHECK(ret);
     }
+#endif
 }
 
 void ble_adv_service_prepare_sleep(void)
@@ -149,8 +166,10 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
         break;
 
     case BLE_ADV_EVT_IDLE:
-        if (rf_driver.vbus_enabled && (rf_driver.output_target&USB_ENABLED)) {
+        if (rf_driver.vbus_enabled) {// && (rf_driver.output_target&USB_ENABLED)) {
+            #ifdef MULTI_PEERS
             update_gap_addr(ble_driver.current_peer);
+            #endif
             ble_advertising_start(&m_advertising, BLE_ADV_MODE_SLOW);
         } else {
             NRF_LOG_INFO("Enter sleep mode.");
@@ -169,6 +188,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
             NRF_LOG_DEBUG("pm_whitelist_get returns %d addr in whitelist and %d irk whitelist", addr_cnt, irk_cnt);
             // Set the correct identities list (no excluding peers with no Central Address Resolution).
             ble_pm_identities_set(PM_PEER_ID_LIST_SKIP_NO_IRK);
+            #ifdef MULTI_PEERS
             if (ble_driver.current_peer >= addr_cnt) {
                 NRF_LOG_DEBUG("current peer was not exist in the whitelist");
                 err_code = ble_advertising_whitelist_reply(&m_advertising, NULL, 0, NULL, 0);
@@ -177,6 +197,9 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
                 ble_gap_irk_t  irk = whitelist_irks[ble_driver.current_peer];
                 err_code = ble_advertising_whitelist_reply(&m_advertising, &addr, 1, &irk, 1);
             }
+            #else
+            err_code = ble_advertising_whitelist_reply(&m_advertising, whitelist_addrs, addr_cnt, whitelist_irks, irk_cnt);
+            #endif
             APP_ERROR_CHECK(err_code);
         }
         break; //BLE_ADV_EVT_WHITELIST_REQUEST
@@ -214,18 +237,4 @@ static void sleep_mode_enter(void)
 {
     // try to go to system-off mode
     nrf_pwr_mgmt_shutdown(NRF_PWR_MGMT_SHUTDOWN_GOTO_SYSOFF);
-}
-
-static void update_gap_addr(uint16_t device)
-{
-#if 1
-    ble_gap_addr_t ble;
-    ret_code_t ret = sd_ble_gap_addr_get(&ble);
-    APP_ERROR_CHECK(ret);
-
-    ble.addr[1] = (uint8_t)device;
-
-    ret = sd_ble_gap_addr_set(&ble);
-    APP_ERROR_CHECK(ret);
-#endif
 }

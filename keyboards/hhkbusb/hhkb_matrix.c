@@ -298,10 +298,10 @@ static void process_command(report_item_t *item)
         ble_sync_update(item->data[0], item->data[1], item->data[2], (item->data[3]<<8) | item->data[4]);
         break;
     case CMD_TOGGLE_SCREEN:
-//        toggle_screen();
+        toggle_screen();
         break;
     case CMD_TOGGLE_MSC:
-//        toggle_msc();
+        toggle_msc();
         break;
     default:
         break;

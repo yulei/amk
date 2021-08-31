@@ -16,8 +16,10 @@
 ble_driver_t ble_driver = {
     .peer_id = PM_PEER_ID_INVALID,
     .conn_handle = BLE_CONN_HANDLE_INVALID,
+#ifdef MULTI_PEERS
     .current_peer = BLE_PEER_DEVICE_0,
     .restart_advertise = false,
+#endif
 };
 
 static void ble_send_report(uint8_t type, uint8_t *data, uint8_t size);
@@ -37,21 +39,27 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
         case BLE_GAP_EVT_CONNECTED:
             NRF_LOG_INFO("Connected");
             ble_driver.conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
+            sd_ble_gap_rssi_start(ble_driver.conn_handle, 5, 5);
+
             ble_qwr_update_handle(ble_driver.conn_handle);
             //sd_ble_gap_tx_power_set(BLE_GAP_TX_POWER_ROLE_CONN, ble_driver.conn_handle, DEFAULT_TX_POWER_LEVEL);
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
-            NRF_LOG_INFO("Disconnected");
+            NRF_LOG_INFO("Disconnected, conn_handle=%d, reason=%d, clock=%d", p_ble_evt->evt.gap_evt.conn_handle, p_ble_evt->evt.gap_evt.params.disconnected.reason, NRF_CLOCK->LFCLKSRC);
             // Dequeue all keys without transmission.
             ble_hids_service_flush(false);
+            sd_ble_gap_rssi_stop(ble_driver.conn_handle);
 
             ble_driver.conn_handle = BLE_CONN_HANDLE_INVALID;
+
+            #ifdef MULTI_PEERS
             if (ble_driver.restart_advertise) {
                 ble_driver.restart_advertise = false;
                 ble_adv_service_restart();
                 NRF_LOG_INFO("Restart connection");
             }
+            #endif
 
             break; // BLE_GAP_EVT_DISCONNECTED
 
@@ -87,6 +95,10 @@ static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
             err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gatts_evt.conn_handle,
                                              BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
             APP_ERROR_CHECK(err_code);
+            break;
+
+        case BLE_GAP_EVT_RSSI_CHANGED:
+            NRF_LOG_INFO("RSSI changed: %d", p_ble_evt->evt.gap_evt.params.rssi_changed.rssi);
             break;
 
         default:
@@ -131,11 +143,13 @@ void ble_keyboard_init(void)
 
     rf_keyboard_init(ble_send_report, ble_prepare_sleep);
 
+#ifdef MULTI_PEERS
     ble_driver.current_peer = eeconfig_read_device();
     if (ble_driver.current_peer >= BLE_PEER_DEVICE_MAX) {
         ble_driver.current_peer = BLE_PEER_DEVICE_0;
         eeconfig_update_device(ble_driver.current_peer);
     } 
+#endif
 }
 
 void ble_keyboard_start(bool erase_bonds)

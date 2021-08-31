@@ -312,6 +312,7 @@ static void usb_leds(uint8_t leds)
 
 static void connect_target(uint8_t device)
 {
+#ifdef MULTI_PEERS
     if (rf_driver.is_ble) {
         if ((device!=ble_driver.current_peer) && (device<=pm_peer_count())) {
             NRF_LOG_INFO("restart advertising for device:%d, current=%d", device, ble_driver.current_peer);
@@ -320,6 +321,7 @@ static void connect_target(uint8_t device)
             ble_adv_service_restart();
         }
     }
+#endif
 }
 
 __attribute__((weak))

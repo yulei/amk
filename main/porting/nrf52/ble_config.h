@@ -11,7 +11,7 @@
 
 #include "nrf_sdh_ble.h"
 
-#define DEFAULT_TX_POWER_LEVEL              0                                          /**< The default tx power level */
+#define DEFAULT_TX_POWER_LEVEL              4                                          /**< The default tx power level */
 #define APP_ADV_FAST_INTERVAL               0x0028                                     /**< Fast advertising interval (in units of 0.625 ms. This value corresponds to 25 ms.). */
 #define APP_ADV_SLOW_INTERVAL               0x0C80                                     /**< Slow advertising interval (in units of 0.625 ms. This value corrsponds to 2 seconds). */
 
@@ -55,8 +55,10 @@
 typedef struct {
     pm_peer_id_t    peer_id;                        /**< Device reference handle to the current bonded central. */
     uint16_t        conn_handle;                    /**< Handle of the current connection. */
+#ifdef MULTI_PEERS
     uint16_t        current_peer;                   /**< Current connected peer */
     bool            restart_advertise;              /**< Restart advertising after disconnected */
+#endif
 } ble_driver_t;
 
 typedef enum {

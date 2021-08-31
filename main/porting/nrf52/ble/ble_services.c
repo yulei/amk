@@ -72,6 +72,7 @@ void ble_pm_whitelist_set(pm_peer_id_list_skip_t skip)
 
     NRF_LOG_INFO("\tm_whitelist_peer_cnt %d, MAX_PEERS_WLIST %d", peer_id_count, BLE_GAP_WHITELIST_ADDR_MAX_COUNT);
 
+#ifdef MULTI_PEERS
     if (ble_driver.current_peer >= peer_id_count) {
         err_code = pm_whitelist_set(NULL, 0);
     } else {
@@ -79,6 +80,9 @@ void ble_pm_whitelist_set(pm_peer_id_list_skip_t skip)
         pm_peer_id_t cur = peer_ids[ble_driver.current_peer];
         err_code = pm_whitelist_set(&cur, 1);
     } 
+#else
+    err_code = pm_whitelist_set(peer_ids, peer_id_count);
+#endif
 
     APP_ERROR_CHECK(err_code);
 }
@@ -96,6 +100,7 @@ void ble_pm_identities_set(pm_peer_id_list_skip_t skip)
     ret_code_t err_code = pm_peer_id_list(peer_ids, &peer_id_count, PM_PEER_ID_INVALID, skip);
     APP_ERROR_CHECK(err_code);
 
+#ifdef MULTI_PEERS
     if (ble_driver.current_peer >= peer_id_count) {
         err_code = pm_device_identities_list_set(NULL, 0);
     } else {
@@ -103,6 +108,9 @@ void ble_pm_identities_set(pm_peer_id_list_skip_t skip)
         pm_peer_id_t cur = peer_ids[ble_driver.current_peer];
         err_code = pm_device_identities_list_set(&cur, 1);
     } 
+#else
+        err_code = pm_device_identities_list_set(peer_ids, peer_id_count);
+#endif
     APP_ERROR_CHECK(err_code);
 }
 
@@ -140,10 +148,12 @@ static void pm_evt_handler(pm_evt_t const * p_evt)
     pm_handler_flash_clean(p_evt);
 
     switch (p_evt->evt_id) {
+    case PM_EVT_CONN_SEC_SUCCEEDED:
+        ble_driver.peer_id = p_evt->peer_id;
+        break;
     case PM_EVT_PEERS_DELETE_SUCCEEDED:
         ble_adv_service_start(false);
         break;
-
     case PM_EVT_PEER_DATA_UPDATE_SUCCEEDED:
         if (p_evt->params.peer_data_update_succeeded.flash_changed
             && (p_evt->params.peer_data_update_succeeded.data_id == PM_PEER_DATA_ID_BONDING)) {
@@ -216,6 +226,9 @@ static void gatt_init(void)
 {
     ret_code_t err_code = nrf_ble_gatt_init(&m_gatt, NULL);
     APP_ERROR_CHECK(err_code);
+
+    //err_code = nrf_ble_gatt_att_mtu_periph_set(&m_gatt, 64);
+    //APP_ERROR_CHECK(err_code);
 }
 
 
