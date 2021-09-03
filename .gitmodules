@@ -17,9 +17,6 @@
 [submodule "libs/umm_malloc"]
 	path = libs/umm_malloc
 	url = https://github.com/yulei/umm_malloc.git
-[submodule "libs/tinyusb"]
-	path = libs/tinyusb
-	url = https://github.com/yulei/tinyusb.git
 [submodule "libs/rtos"]
 	path = libs/rtos
 	url = https://github.com/yulei/rtos.git
