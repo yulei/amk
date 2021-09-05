@@ -71,7 +71,7 @@ static uint8_t *get_macro_start(uint8_t id)
     return p;
 }
 
-bool vial_macro_play(uint8_t id, uint32_t *offset, uint32_t *delay)
+bool vial_macro_play(uint8_t id, uint16_t *offset, uint32_t *delay)
 {
     if (id >= amk_keymap_macro_get_count()) {
         return false;
@@ -81,7 +81,7 @@ bool vial_macro_play(uint8_t id, uint32_t *offset, uint32_t *delay)
     if (*offset == 0) {
         p = get_macro_start(id);
     } else {
-        p = (uint8_t*)(*offset);
+        p = (uint8_t*)((uintptr_t)(*offset));
     }
 
     if (!p) {

@@ -22,12 +22,6 @@ uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col);
 void amk_keymap_get_buffer(uint16_t offset, uint16_t size, uint8_t *data);
 void amk_keymap_set_buffer(uint16_t offset, uint16_t size, uint8_t *data);
 
-typedef struct {
-    uint32_t    id;
-    uint32_t    offset;
-    uint32_t    delay;
-} amk_macro_t;
-
 uint8_t amk_keymap_macro_get_count(void);
 uint16_t amk_keymap_macro_get_buffer_size(void);
 void amk_keymap_macro_get_buffer(uint16_t offset, uint16_t size, uint8_t *data);

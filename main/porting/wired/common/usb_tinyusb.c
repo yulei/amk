@@ -11,6 +11,10 @@
 #include "amk_keymap.h"
 #include "amk_printf.h"
 
+#ifdef VIAL_ENABLE
+#include "vial_porting.h"
+#endif
+
 void amk_usb_init(void)
 {
     tusb_init();

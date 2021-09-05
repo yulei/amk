@@ -32,6 +32,7 @@
 //#define EEPROM_SIZE             (64+MATRIX_ROWS*MATRIX_COLS*2*4)
 //#define EEPROM_KEYMAP_START     (64)
 #define EEPROM_INVALID_ADDRESS  0xFFFF
+#define EEPROM_EMPTY_VALUE      0x00
 #define FLASH_EMPTY_VALUE       0xFF
 #define IS_VALID_ADDR(x)        ((x) >= 0 && (x) < EEPROM_SIZE)
 
@@ -153,14 +154,16 @@ static void fee_erase(void)
     flash_erase_pages();
 
     // reset the content of the buffer
-    memset(&buffer[0], FLASH_EMPTY_VALUE, sizeof(buffer));
+    //memset(&buffer[0], FLASH_EMPTY_VALUE, sizeof(buffer));
+    memset(&buffer[0], EEPROM_EMPTY_VALUE, sizeof(buffer));
 }
 
 static void fee_backup(void)
 {
     uint32_t begin = FLASH_BASE_ADDRESS;
     uint32_t end = begin + FLASH_TOTAL_SIZE;
-    memset(&buffer[0], FLASH_EMPTY_VALUE, sizeof(buffer));
+    //memset(&buffer[0], FLASH_EMPTY_VALUE, sizeof(buffer));
+    memset(&buffer[0], EEPROM_EMPTY_VALUE, sizeof(buffer));
     while (begin < end) {
         uint16_t addr = 0;
         uint16_t data = 0;
@@ -179,7 +182,7 @@ static void fee_restore(void)
 {
     uint32_t cur = FLASH_BASE_ADDRESS;
     for (uint8_t i = 0; i < EEPROM_SIZE; i++) {
-        if (buffer[i] != FLASH_EMPTY_VALUE) {
+        if (buffer[i] != EEPROM_EMPTY_VALUE) {
             flash_write(cur, i, buffer[i]);
             cur += 4;
         }
@@ -230,7 +233,7 @@ bool fee_write(uintptr_t address, uint8_t data)
 uint8_t fee_read(uintptr_t address)
 {
     if (!IS_VALID_ADDR(address)) {
-        return FLASH_EMPTY_VALUE;
+        return EEPROM_EMPTY_VALUE;
     }
 
     // Get Byte from caches
@@ -257,13 +260,13 @@ void flash_read(uint32_t address, uint16_t* offset, uint16_t* data)
 {
     uint32_t value = *((__IO uint32_t*)(address));
     *offset = (value >> 16) & 0xFFFF;
-    *data = (value >> 0) & 0xFFFF;
+    *data = (~value) & 0xFFFF;
 }
 
 bool flash_write(uint32_t address, uint16_t offset, uint16_t data)
 {
     bool ret = true;
-    uint32_t value = (offset << 16) | data;
+    uint32_t value = (offset << 16) | (~data);
     flash_unlock();
     HAL_StatusTypeDef status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, address, value);
     if (status != HAL_OK) {

@@ -312,17 +312,18 @@ void vial_process(uint8_t *data, uint8_t length)
         }
         case id_dynamic_keymap_macro_get_count: {
             //command_data[0] = dynamic_keymap_macro_get_count();
-            *command_id = id_unhandled;
-            //command_data[0] = amk_keymap_macro_get_count();
-            vial_debug("vial: id_dynamic_keymap_macro_get_count\n");
+            //*command_id = id_unhandled;
+            command_data[0] = amk_keymap_macro_get_count();
+            vial_debug("vial: id_dynamic_keymap_macro_get_count: %d\n", command_data[0]);
             break;
         }
         case id_dynamic_keymap_macro_get_buffer_size: {
-            uint16_t size   = 0;//amk_keymap_macro_get_buffer_size();
+            uint16_t size   = //0;
+            amk_keymap_macro_get_buffer_size();
             command_data[0] = size >> 8;
             command_data[1] = size & 0xFF;
             *command_id = id_unhandled;
-            vial_debug("vial: id_dynamic_keymap_macro_get_buffer_size\n");
+            vial_debug("vial: id_dynamic_keymap_macro_get_buffer_size: %d\n", size);
             break;
         }
         case id_dynamic_keymap_macro_get_buffer: {

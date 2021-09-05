@@ -9,7 +9,7 @@
 void amk_macro_play(uint8_t id)
 {
 #ifdef VIAL_ENABLE
-    report_macro_t report;
+    amk_macro_t report;
     report.id = id;
     report.offset = 0;
     report.delay = 0;

@@ -162,6 +162,9 @@ void dcd_edpt_close(uint8_t rhport, uint8_t ep_addr)
     HAL_PCD_EP_Close(&dcd_usb, ep_addr);
 }
 
+void dcd_edpt_close_all (uint8_t rhport)
+{}
+
 bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t total_bytes)
 {
     uint8_t const epnum = tu_edpt_number(ep_addr);

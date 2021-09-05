@@ -11,6 +11,7 @@
 #include "wait.h"
 #include "amk_keymap.h"
 #include "amk_printf.h"
+#include "amk_macro.h"
 
 #ifdef VIAL_ENABLE
 #include "vial_porting.h"
