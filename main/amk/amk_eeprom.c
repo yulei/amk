@@ -106,7 +106,7 @@ void eeconfig_update_device(uint8_t device)
 }
 
 #define KEYMAP_MAGIC_VALUE      0x4D58
-#define KEYMAP_MAGIC_DEFAULT    0xFFFF
+#define KEYMAP_MAGIC_DEFAULT    0x0000
 #define KEYMAP_LAYER_SIZE      (MATRIX_ROWS*MATRIX_COLS*2)
 
 static uint16_t* ee_keymap_get_addr(uint8_t layer, uint8_t row, uint8_t col)
@@ -165,7 +165,7 @@ void ee_keymap_read_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 }
 
 #define MACRO_MAGIC_VALUE      0x5348
-#define MACRO_MAGIC_DEFAULT    0xFFFF
+#define MACRO_MAGIC_DEFAULT    0x0000
 
 bool ee_macro_is_valid(void)
 {
@@ -238,6 +238,7 @@ void eeconfig_init(void)
 
     // reset keymap to original state
     amk_keymap_reset();
+    amk_keymap_macro_reset();
 }
 
 void eeconfig_enable(void)
@@ -247,7 +248,7 @@ void eeconfig_enable(void)
 
 void eeconfig_disable(void)
 {
-    eeprom_write_word(EECONFIG_MAGIC, 0xFFFF);
+    eeprom_write_word(EECONFIG_MAGIC, 0);
 }
 
 bool eeconfig_is_enabled(void)

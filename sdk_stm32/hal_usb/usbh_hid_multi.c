@@ -277,8 +277,9 @@ static USBH_StatusTypeDef hid_itf_request(USBH_HandleTypeDef *phost, uint8_t itf
             status = USBH_OK;
         } else if (classReqStatus == USBH_NOT_SUPPORTED) {
             amk_printf("HID interface[%d]: failed to set protocol\n", itf);
-            status = USBH_FAIL;
-            //status = USBH_OK;
+            pitf->valid = 1;
+            //status = USBH_FAIL;
+            status = USBH_OK;
         } else {
         }
         break;

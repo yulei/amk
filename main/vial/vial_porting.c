@@ -288,7 +288,8 @@ void vial_process(uint8_t *data, uint8_t length)
             break;
         }
         case id_dynamic_keymap_reset: {
-            amk_keymap_reset();//dynamic_keymap_reset();
+            amk_keymap_reset();
+            amk_keymap_macro_reset();
             vial_debug("via: id_dynamic_keymap_reset\n");
             break;
         }

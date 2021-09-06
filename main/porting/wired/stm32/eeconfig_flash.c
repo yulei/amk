@@ -260,13 +260,15 @@ void flash_read(uint32_t address, uint16_t* offset, uint16_t* data)
 {
     uint32_t value = *((__IO uint32_t*)(address));
     *offset = (value >> 16) & 0xFFFF;
-    *data = (~value) & 0xFFFF;
+    uint16_t tmp = value & 0xFFFF;
+    *data = ~tmp;
 }
 
 bool flash_write(uint32_t address, uint16_t offset, uint16_t data)
 {
     bool ret = true;
-    uint32_t value = (offset << 16) | (~data);
+    data = ~data;
+    uint32_t value = (offset << 16) | data;
     flash_unlock();
     HAL_StatusTypeDef status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, address, value);
     if (status != HAL_OK) {
