@@ -28,23 +28,7 @@
 
 static i2c_handle_t i2c_inst;
 
-static uint8_t bcd2dec(uint8_t bcd)
-{
-    return (((bcd & 0xF0)>>4) *10) + (bcd & 0xF);
-}
-
-static uint8_t dec2bcd(uint8_t dec)
-{
-	return ((dec / 10)<<4) + (dec % 10);
-}
-
-static uint8_t dayofweek(int day, int month, int year)
-{
-    int weekday  = (day += month < 3 ? year-- : year - 2, 23*month/9 + day + 4 + year/4- year/100 + year/400) % 7;
-    return (uint8_t)weekday;
-}
-
-void rtc8563_init(void)
+void rtc_driver_init(void)
 {
     if (!i2c_inst) {
         i2c_inst = i2c_init(RTC8563_I2C_ID);
@@ -65,7 +49,7 @@ void rtc8563_init(void)
     rtc8563_debug("rtc8563: write control 1 register=%d, error=%d\n", d, error);
 }
 
-void rtc8563_write_time(const rtc_datetime_t *datetime)
+void rtc_driver_write(const rtc_datetime_t *datetime)
 {
     uint8_t buf[7];
     buf[0] = dec2bcd(datetime->second);
@@ -82,7 +66,7 @@ void rtc8563_write_time(const rtc_datetime_t *datetime)
     }
 }
 
-void rtc8563_read_time(rtc_datetime_t *datetime)
+void rtc_driver_read(rtc_datetime_t *datetime)
 {
     uint8_t buf[7];
     amk_error_t error = i2c_read_reg(i2c_inst, RTC8563_ADDR, SECONDS_REGISTER, buf, 7, TIMEOUT);

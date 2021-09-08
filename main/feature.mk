@@ -103,7 +103,12 @@ else
 endif
 
 ifeq (yes, $(strip $(DATETIME_ENABLE)))
+	ifeq (bl5372, $(strip $(RTC_DRIVER)))
+	SRCS += $(MAIN_DIR)/drivers/bl5372.c
+	else
 	SRCS += $(MAIN_DIR)/drivers/rtc8563.c
+	endif
+
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	APP_DEFS += -DDATETIME_ENABLE
 endif

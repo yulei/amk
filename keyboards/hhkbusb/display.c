@@ -11,6 +11,11 @@
 #include "usb_interface.h"
 #include "wait.h"
 
+#ifdef DATETIME_ENABLE
+#include "rtc_driver.h"
+#include "def_font.h"
+#endif
+
 #ifndef DISP_DEBUG
 #define DISP_DEBUG 0
 #endif
@@ -84,7 +89,7 @@ static uint16_t auxi_buf[AUXI_WIDTH*AUXI_HEIGHT];
 #define AMFT_HEIGHT     30
 #define AMFT_FRAMES     11
 static uint16_t font_buf[AMFT_WIDTH*AMFT_HEIGHT*AMFT_FRAMES];
-static bool first_screen = true;
+//static bool first_screen = true;
 #endif
 
 static bool screen_enable = true;
@@ -139,11 +144,11 @@ static void rtc_datetime_scan(void);
 
 static void rtc_datetime_init(void)
 {
-    rtc8563_init();
+    rtc_driver_init();
 
     rtc_datetime_scan();
     if (rtc_datetime_dirty) {
-        rtc8563_write_time(&rtc_dt);
+        rtc_driver_write(&rtc_dt);
     }
 }
 
@@ -204,7 +209,7 @@ static void rtc_datetime_update(void)
     if (timer_elapsed32(rtc_datetime_ticks) > RTC_CHECKING_INTERVAL) {
 
         rtc_datetime_t dt = {0,0,0,0,0,0};
-        rtc8563_read_time(&dt);
+        rtc_driver_read(&dt);
         if (rtc_dt.second != dt.second
             || rtc_dt.minute != dt.minute
             || rtc_dt.hour != dt.hour
@@ -219,22 +224,22 @@ static void rtc_datetime_update(void)
     }
 }
 
-static void rtc_datetime_inc_second(void)
+void rtc_datetime_inc_second(void)
 {
     rtc_datetime_t dt = {0,0,0,0,0,0};
-    rtc8563_read_time(&dt);
+    rtc_driver_read(&dt);
     dt.second += 1;
     dt.minute += dt.second/60;
     dt.hour += dt.minute/60;
     dt.minute %= 60;
     dt.second %= 60;
-    rtc8563_write_time(&dt);
+    rtc_driver_write(&dt);
 }
 
-static void rtc_datetime_dec_second(void)
+void rtc_datetime_dec_second(void)
 {
     rtc_datetime_t dt = {0,0,0,0,0,0};
-    rtc8563_read_time(&dt);
+    rtc_driver_read(&dt);
     if (dt.second > 0) {
         dt.second--;
     } else {
@@ -246,7 +251,7 @@ static void rtc_datetime_dec_second(void)
         }
         dt.second = 59;
     }
-    rtc8563_write_time(&dt);
+    rtc_driver_write(&dt);
 }
 
 static void font_init(void)

@@ -70,7 +70,7 @@ static void i2c_inst_init(i2c_instance_t *inst, I2C_TypeDef *i2c)
     }
 #else
     inst->handle.Instance = i2c;
-    inst->handle.Init.ClockSpeed = 400000;
+    inst->handle.Init.ClockSpeed = 1000000;//400000;
     inst->handle.Init.DutyCycle = I2C_DUTYCYCLE_2;
     inst->handle.Init.OwnAddress1 = 0;
     inst->handle.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
