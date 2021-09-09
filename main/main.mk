@@ -30,15 +30,15 @@ else
 endif
 
 ifeq (yes, $(strip $(RTOS_ENABLE)))
-#	SRCS += $(MAIN_DIR)/rtos/usbx_main.c
-#	SRCS += $(MAIN_DIR)/rtos/tx_initialize_low_level.S
-#	SRCS += $(MAIN_DIR)/rtos/usbx_usb.c
-#	SRCS += $(MAIN_DIR)/rtos/usbx_desc.c
-#	include $(LIB_DIR)/threadx.mk
-#	include $(LIB_DIR)/usbx.mk
-	SRCS += $(MAIN_DIR)/rtos/cmos_main.c
-	SRCS += $(MAIN_DIR)/rtos/cmos_usb.c
-	include $(LIB_DIR)/freertos.mk
+	SRCS += $(MAIN_DIR)/rtos/usbx_main.c
+	SRCS += $(MAIN_DIR)/rtos/tx_initialize_low_level.S
+	SRCS += $(MAIN_DIR)/rtos/usbx_usb.c
+	SRCS += $(MAIN_DIR)/rtos/usbx_desc.c
+	include $(LIB_DIR)/threadx.mk
+	include $(LIB_DIR)/usbx.mk
+#	SRCS += $(MAIN_DIR)/rtos/cmos_main.c
+#	SRCS += $(MAIN_DIR)/rtos/cmos_usb.c
+#	include $(LIB_DIR)/freertos.mk
 	APP_DEFS += -DRTOS_ENABLE
 else
 	SRCS += $(MAIN_DIR)/amk/main.c

@@ -6,12 +6,12 @@
 #include "wait.h"
 
 #ifdef RTOS_ENABLE
-#include "cmsis_os2.h"
+#include "tx_api.h"
 void wait_ms(int ms)
 {
-    HAL_Delay(ms);
+    //HAL_Delay(ms);
     //osDelay(ms);
-    //tx_thread_sleep((ms*1000)/TX_TIMER_TICKS_PER_SECOND);
+    tx_thread_sleep((ms*1000)/TX_TIMER_TICKS_PER_SECOND);
 }
 #else
 void wait_ms(int ms)

@@ -313,7 +313,7 @@ static void set_screen_state(bool enable)
 //#if defined(DYNAMIC_CONFIGURATION) || defined(MSC_ENABLE)
 void matrix_init_kb(void)
 {
-#ifdef SCREEN_ENABLE
+#if defined(SCREEN_ENABLE) && !defined(RTOS_ENABLE)
     set_screen_state(screen_enable);
 #endif
 
@@ -324,17 +324,6 @@ void matrix_init_kb(void)
     gpio_write_pin(CAPS_LED_PIN, 1);
 
     last_ticks = timer_read32();
-    // initialize renders
-#ifdef MSC_ENABLE
-    for (int i = 0; i < sizeof(renders)/sizeof(render_t); i++) {
-        renders[i].anim = anim_open(NULL, renders[i].type);
-        if (renders[i].anim) {
-            m65_debug("ANIM: faield to open root path\n");
-        }
-    }
-    font_init();
-    rtc_datetime_init();
-#endif
 }
 
 #ifdef MSC_ENABLE
@@ -434,6 +423,15 @@ void msc_init_kb(void)
 
     memset(anim_buf, 0, sizeof(anim_buf));
     memset(auxi_buf, 0, sizeof(auxi_buf));
+
+    for (int i = 0; i < sizeof(renders)/sizeof(render_t); i++) {
+        renders[i].anim = anim_open(NULL, renders[i].type);
+        if (renders[i].anim) {
+            m65_debug("ANIM: faield to open root path\n");
+        }
+    }
+    font_init();
+    rtc_datetime_init();
 }
 
 static void render_screen(uint8_t index)
@@ -546,4 +544,44 @@ static void reset_to_msc(bool msc)
     HAL_Delay(10);
     HAL_NVIC_SystemReset();
 }
+#endif
+
+#ifdef RTOS_ENABLE
+
+#include "tx_api.h"
+
+void disp_thread_entry(ULONG thread_input)
+{
+    set_screen_state(screen_enable);
+
+    gpio_set_output_pushpull(FLASH_CS);
+    gpio_write_pin(FLASH_CS, 1);
+
+    if (!(usb_setting & USB_MSC_BIT)) {
+        if (!anim_mount(true) ) reset_to_msc(true);
+
+        memset(anim_buf, 0, sizeof(anim_buf));
+        memset(auxi_buf, 0, sizeof(auxi_buf));
+
+        for (int i = 0; i < sizeof(renders)/sizeof(render_t); i++) {
+            renders[i].anim = anim_open(NULL, renders[i].type);
+            if (renders[i].anim) {
+                m65_debug("ANIM: faield to open root path\n");
+            }
+        }
+        font_init();
+        rtc_datetime_init();
+    }
+
+    while( 1) {
+        if(screen_enable && !(usb_setting & USB_MSC_BIT)) {
+            rtc_datetime_update();
+
+            render_screen(0);
+            render_screen(1);
+        } 
+        tx_thread_sleep(1);
+    }
+}
+
 #endif

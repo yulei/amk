@@ -119,20 +119,18 @@
    class, then the UX_MAX_CLASSES value can be set to 3 regardless of the number of devices 
    that belong to these classes.  */
 
-/* #define UX_MAX_CLASSES  3
-*/
+#define UX_MAX_CLASSES              3
 
 
 /* Defined, this value is the maximum number of classes in the device stack that can be loaded by
    USBX.  */
 
-/* #define UX_MAX_SLAVE_CLASS_DRIVER    1
-*/
+#define UX_MAX_SLAVE_CLASS_DRIVER   3
+
 
 /* Defined, this value is the maximum number of interfaces in the device framework.  */
 
-/* #define UX_MAX_SLAVE_INTERFACES    16
-*/
+#define UX_MAX_SLAVE_INTERFACES     4
 
 /* Defined, this value represents the number of different host controllers available in the system. 
    For USB 1.1 support, this value will usually be 1. For USB 2.0 support, this value can be more 
@@ -156,9 +154,7 @@
 /* Defined, this value represents the current number of SCSI logical units represented in the device
    storage class driver.  */
 
-/* #define UX_MAX_SLAVE_LUN    1
-*/
-
+//#define UX_MAX_SLAVE_LUN    1
 
 /* Defined, this value represents the maximum number of SCSI logical units represented in the
    host storage class driver.  */
@@ -170,16 +166,14 @@
 /* Defined, this value represents the maximum number of bytes received on a control endpoint in
    the device stack. The default is 256 bytes but can be reduced in memory constraint environments.  */
 
-/* #define UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH 256
-*/
-
+//#define UX_SLAVE_REQUEST_CONTROL_MAX_LENGTH  64
 
 /* Defined, this value represents the maximum number of bytes that can be received or transmitted
    on any endpoint. This value cannot be less than the maximum packet size of any endpoint. The default 
    is 4096 bytes but can be reduced in memory constraint environments. For cd-rom support in the storage 
    class, this value cannot be less than 2048.  */
 
-//#define UX_SLAVE_REQUEST_DATA_MAX_LENGTH    (1024 * 2)
+#define UX_SLAVE_REQUEST_DATA_MAX_LENGTH    (1024 * 4)
 
 
 /* Defined, this value includes code to handle storage Multi-Media Commands (MMC). E.g., DVD-ROM.
@@ -190,7 +184,7 @@
 
 /* Defined, this value represents the maximum number of bytes that a storage payload can send/receive.
    The default is 8K bytes but can be reduced in memory constraint environments.  */
-//#define UX_HOST_CLASS_STORAGE_MEMORY_BUFFER_SIZE            (1024 * 8)
+//#define UX_HOST_CLASS_STORAGE_MEMORY_BUFFER_SIZE            (1024 * 4)
 
 /* Define USBX Mass Storage Thread Stack Size. The default is to use UX_THREAD_STACK_SIZE. */
 

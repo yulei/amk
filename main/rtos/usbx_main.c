@@ -14,6 +14,11 @@
 #define MAIN_STACK_SIZE             4096
 static CHAR main_stack[MAIN_STACK_SIZE];
 
+#define DISP_THREAD_PRIO            11
+#define DISP_PREEMPTION_THRESHOLD   (DISP_THREAD_PRIO)
+#define DISP_STACK_SIZE             4096
+static CHAR disp_stack[MAIN_STACK_SIZE];
+
 #define USBX_MEMORY_SIZE        (32*1024)
 static CHAR usbx_memory[USBX_MEMORY_SIZE];
 
@@ -26,6 +31,8 @@ static VOID hid_other_deactivate(VOID *);
 
 TX_THREAD main_thread;
 void main_thread_entry(ULONG thread_input);
+TX_THREAD disp_thread;
+void disp_thread_entry(ULONG thread_input);
 
 static void error_handler(void);
 static UINT usbx_device_change_callback(ULONG state);
@@ -77,6 +84,9 @@ void tx_application_define(void *first_unused_memory)
 #endif
     tx_thread_create(&main_thread, "main thread", main_thread_entry, 0, main_stack, MAIN_STACK_SIZE, 
                     MAIN_THREAD_PRIO, MAIN_PREEMPTION_THRESHOLD, TX_NO_TIME_SLICE, TX_AUTO_START);
+
+    tx_thread_create(&disp_thread, "display thread", disp_thread_entry, 0, disp_stack, DISP_STACK_SIZE, 
+                    DISP_THREAD_PRIO, DISP_PREEMPTION_THRESHOLD, TX_NO_TIME_SLICE, TX_AUTO_START);
 }
 
 int main(int argc, char ** argv)

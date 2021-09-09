@@ -9,7 +9,7 @@ MSC_ENABLE = yes
 EECONFIG_FLASH = yes
 #RGB_LINEAR_ENABLE = yes
 DATETIME_ENABLE = yes
-VIAL_ENABLE = yes
+#VIAL_ENABLE = yes
 #RTOS_ENABLE = yes
 DYNAMIC_CONFIGURATION = yes
 
@@ -20,5 +20,3 @@ ifeq (yes, $(strip $(VIAL_ENABLE)))
 else
 	SRCS += $(KEYBOARD_DIR)/m65_keymap.c
 endif
-
-include $(LIB_DIR)/freertos.mk

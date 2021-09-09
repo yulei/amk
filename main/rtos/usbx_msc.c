@@ -48,6 +48,7 @@ static UCHAR storage_product_serial[] = {
 
 UX_SLAVE_CLASS_STORAGE_PARAMETER    storage_parameter;
 
+static void storage_init(void);
 static UINT storage_status(VOID *storage, ULONG lun, ULONG media_id, ULONG *media_status);
 static UINT storage_read(VOID *storage, ULONG lun, UCHAR *data_pointer,
                    ULONG number_blocks, ULONG lba, ULONG *media_status);
@@ -81,7 +82,11 @@ void usbx_msc_init(void)
         while(1);
     }
 
+    storage_init();
+}
 
+static void storage_init(void)
+{
     // init flash driver
     w25qxx_config.cs = FLASH_CS;
     w25qxx_config.spi = spi_init(W25QXX_SPI_ID);

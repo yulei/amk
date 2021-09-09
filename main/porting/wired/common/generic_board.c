@@ -103,7 +103,7 @@ void board_task(void)
     screen_task();
 #endif
 
-#if defined(MSC_ENABLE)//&& !defined(RTOS_ENABLE)
+#if defined(MSC_ENABLE) && !defined(RTOS_ENABLE)
     msc_task();
 #endif
 
@@ -120,12 +120,7 @@ void board_task(void)
 
 static void amk_init(void)
 {
-#ifdef SCREEN_ENABLE
-    //amk_printf("screen_init\n");
-    //screen_init();
-#endif
-
-#if defined(MSC_ENABLE) //&& !defined(RTOS_ENABLE)
+#if defined(MSC_ENABLE) && !defined(RTOS_ENABLE)
     amk_printf("msc_init\n");
     msc_init();
 #endif

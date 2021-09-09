@@ -6,6 +6,10 @@
 #include "generic_hal.h"
 #include "timer.h"
 
+#ifdef RTOS_ENABLE
+#include "tx_api.h"
+#endif
+
 extern uint32_t systick_get_tick(void);
 
 void timer_init(void) {}
@@ -19,7 +23,11 @@ uint16_t timer_read(void)
 
 uint32_t timer_read32(void)
 {
+    #ifdef RTOS_ENABLE
+    return tx_time_get();
+    #else
     return systick_get_tick();
+    #endif
 }
 
 uint16_t timer_elapsed(uint16_t last)

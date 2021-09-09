@@ -134,7 +134,5 @@ LIB_SRCS += \
 
 APP_DEFS += -DUX_INCLUDE_USER_DEFINE_FILE
 
-ifeq (STM32F722, $(strip $(MCU)))
-INCS += $(USBX_DIR)/ports/cortex_m7/gnu/inc
+INCS += $(USBX_DIR)/ports/cortex_$(MCU_ARCH)/gnu/inc
 include $(LIB_DIR)/usbx_dcd_stm32.mk
-endif

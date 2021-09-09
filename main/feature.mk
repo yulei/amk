@@ -65,11 +65,11 @@ ifeq (yes, $(strip $(MSC_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/anim.c
 	SRCS += $(MAIN_DIR)/drivers/w25qxx.c
 	SRCS += $(MAIN_DIR)/drivers/spi.c
-#	ifeq (yes, $(strip $(RTOS_ENABLE)))
-#	SRCS += $(MAIN_DIR)/rtos/usbx_msc.c
-#	else
-	SRCS += $(MAIN_DIR)/usb/mscusb.c
-#	endif
+	ifeq (yes, $(strip $(RTOS_ENABLE)))
+		SRCS += $(MAIN_DIR)/rtos/usbx_msc.c
+	else
+		SRCS += $(MAIN_DIR)/usb/mscusb.c
+	endif
 	APP_DEFS += -DMSC_ENABLE
 endif
 
