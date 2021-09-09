@@ -360,16 +360,18 @@ bool hook_process_action_main(keyrecord_t *record)
     //        rgb_led_config_next();
     //        return true;
     //#endif
-        case KC_F15:
+        case FN_CONNECT_TARGET_0:
             connect_target(BLE_PEER_DEVICE_0);
             return true;
-        case KC_F16:
+#ifdef FN_CONNECT_TARGET_1
+        case FN_CONNECT_TARGET_1:
             connect_target(BLE_PEER_DEVICE_1);
             return true;
-        case KC_F17:
+#endif
+        case FN_CONNECT_TARGET_2:
             connect_target(BLE_PEER_DEVICE_2);
             return true;
-        case KC_F18:
+        case FN_CONNECT_TARGET_3:
             connect_target(BLE_PEER_DEVICE_3);
             return true;
         //case KC_F19:
@@ -379,7 +381,7 @@ bool hook_process_action_main(keyrecord_t *record)
         //case KC_F20: // disable sleep mode
         //    rf_driver.output_target &= ~SLEEP_ENABLED;
         //    return true;
-        case KC_F21: // toggle usb/ble output
+        case FN_SWITCH_BLE_USB: // toggle usb/ble output
             if (rf_driver.output_target & OUTPUT_RF) {
                 if (rf_driver.vbus_enabled) {
                     NRF_LOG_INFO("set output to USB");
@@ -394,18 +396,18 @@ bool hook_process_action_main(keyrecord_t *record)
                 rf_driver.output_target |= OUTPUT_RF;
             } return true;
 
-        case KC_F22: // reset to erase bond mode
+        case FN_REBOND: // reset to erase bond mode
             NRF_LOG_INFO("reset to erase bond");
             sd_power_gpregret_set(RST_REGISTER, RST_ERASE_BOND);
             sd_nvic_SystemReset();
             return true;
 
-        case KC_F23: // usb mcu to bootloader mode
+        case FN_BOOTLOADER: // usb mcu to bootloader mode
             NRF_LOG_INFO("send reboot command");
             nrf_usb_reboot();
             return true;
-
-        case KC_F24: // toggle BLE or GAZELL
+#ifdef FN_SWITCH_BLE_GZLL
+        case FN_SWITCH_BLE_GZLL: // toggle BLE or GAZELL
             if (rf_driver.is_ble) {
                 NRF_LOG_INFO("switch to gzll");
                 sd_power_gpregret_set(RST_REGISTER, RST_USE_GZLL);
@@ -418,6 +420,7 @@ bool hook_process_action_main(keyrecord_t *record)
                 NRF_POWER->GPREGRET &= ~RST_USE_GZLL;
                 NVIC_SystemReset();
             } return true;
+#endif
         default:
             break;
     }

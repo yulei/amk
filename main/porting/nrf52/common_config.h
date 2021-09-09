@@ -95,6 +95,43 @@
 #define LEDS_NUMBER 0
 #define BUTTONS_NUMBER 0
 
+// control keys
+#ifndef FN_CONNECT_TARGET_0
+#define FN_CONNECT_TARGET_0 KC_F15
+#endif
+
+#ifndef FN_CONNECT_TARGET_1
+#ifndef DISABLE_CONNECT_TARGET_1
+#define FN_CONNECT_TARGET_1 KC_F16
+#endif
+#endif
+
+#ifndef FN_CONNECT_TARGET_2
+#define FN_CONNECT_TARGET_2 KC_F17
+#endif
+
+#ifndef FN_CONNECT_TARGET_3
+#define FN_CONNECT_TARGET_3 KC_F18
+#endif
+
+#ifndef FN_SWITCH_BLE_USB
+#define FN_SWITCH_BLE_USB KC_F21
+#endif
+
+#ifndef FN_REBOND
+#define FN_REBOND KC_F22
+#endif
+
+#ifndef FN_BOOTLOADER
+#define FN_BOOTLOADER KC_F23
+#endif
+
+#ifndef FN_SWITCH_BLE_GZLL
+#ifndef DISABLE_GZLL
+#define FN_SWITCH_BLE_GZLL KC_F24
+#endif
+#endif
+
 // UART communication
 #define SYNC_BYTE_1 0xAA
 #define SYNC_BYTE_2 0x55
