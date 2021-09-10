@@ -30,6 +30,7 @@ static w25qxx_t *w25qxx;
 #define MSC_WRITE_FLAG      0x02
 TX_EVENT_FLAGS_GROUP        EventFlag;
 
+#if 0
 static UCHAR storage_vender_id[] = {
     'M', 'a', 't', 'r', 'i', 'x', ' ', 'L', 'a', 'b', '\0',
 };
@@ -45,6 +46,7 @@ static UCHAR storage_product_rev[] = {
 static UCHAR storage_product_serial[] = {
     'a', 'm', 'k', ':', '4', 'd', '5', '8', '\0',
 };
+#endif
 
 UX_SLAVE_CLASS_STORAGE_PARAMETER    storage_parameter;
 
@@ -58,18 +60,19 @@ static UINT storage_write(VOID *storage, ULONG lun, UCHAR *data_pointer,
 
 void usbx_msc_init(void)
 {   
-    storage_parameter.ux_slave_class_storage_instance_activate = UX_NULL;
-    storage_parameter.ux_slave_class_storage_instance_deactivate = UX_NULL;
-    storage_parameter.ux_slave_class_storage_parameter_vendor_id = storage_vender_id;
-    storage_parameter.ux_slave_class_storage_parameter_product_id = storage_product_id;
-    storage_parameter.ux_slave_class_storage_parameter_product_rev = storage_product_rev;
-    storage_parameter.ux_slave_class_storage_parameter_product_serial = storage_product_serial;
+    //storage_parameter.ux_slave_class_storage_instance_activate = UX_NULL;
+    //storage_parameter.ux_slave_class_storage_instance_deactivate = UX_NULL;
+    //storage_parameter.ux_slave_class_storage_parameter_vendor_id = storage_vender_id;
+    //storage_parameter.ux_slave_class_storage_parameter_product_id = storage_product_id;
+    //storage_parameter.ux_slave_class_storage_parameter_product_rev = storage_product_rev;
+    //storage_parameter.ux_slave_class_storage_parameter_product_serial = storage_product_serial;
 
     storage_parameter.ux_slave_class_storage_parameter_number_lun = DISK_COUNT;
     storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_last_lba = (ULONG)(DISK_BLOCK_NUM - 1);
     storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_block_length = DISK_BLOCK_SIZE;
     storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_type = UX_SLAVE_CLASS_STORAGE_MEDIA_FAT_DISK;
     storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_removable_flag = 0x80;
+    //storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_removable_flag = UX_FALSE;
     storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_read = storage_read;
     storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_write = storage_write;
     storage_parameter.ux_slave_class_storage_parameter_lun[0].ux_slave_class_storage_media_status = storage_status;

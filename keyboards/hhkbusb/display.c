@@ -439,6 +439,13 @@ void toggle_msc(void)
     reset_to_msc((usb_setting & USB_MSC_BIT) ? false : true);
 }
 
+void toggle_datetime(void)
+{
+#ifdef DATETIME_ENABLE
+    rtc_datetime_mode = !rtc_datetime_mode;
+#endif
+}
+
 void disp_thread(void *argument);
 
 void disp_init(void) 

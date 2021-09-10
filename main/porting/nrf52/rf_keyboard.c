@@ -368,12 +368,16 @@ bool hook_process_action_main(keyrecord_t *record)
             connect_target(BLE_PEER_DEVICE_1);
             return true;
 #endif
+#ifdef FN_CONNECT_TARGET_2
         case FN_CONNECT_TARGET_2:
             connect_target(BLE_PEER_DEVICE_2);
             return true;
+#endif
+#ifdef FN_CONNECT_TARGET_3
         case FN_CONNECT_TARGET_3:
             connect_target(BLE_PEER_DEVICE_3);
             return true;
+#endif
         //case KC_F19:
             // reset keymap
         //    amk_keymap_reset();

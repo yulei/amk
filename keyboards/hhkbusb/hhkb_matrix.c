@@ -118,6 +118,7 @@ typedef enum
     CMD_KEYMAP_GET_ACK,
     CMD_TOGGLE_SCREEN,
     CMD_TOGGLE_MSC,
+    CMD_TOGGLE_DATETIME,
 } command_t;
 
 static uint8_t command_buf[CMD_MAX_LEN];
@@ -240,6 +241,7 @@ static void enqueue_command(uint8_t *cmd)
 
 extern void toggle_screen(void);
 extern void toggle_msc(void);
+extern void toggle_datetime(void);
 
 static void process_command(report_item_t *item)
 {
@@ -302,6 +304,9 @@ static void process_command(report_item_t *item)
         break;
     case CMD_TOGGLE_MSC:
         toggle_msc();
+        break;
+    case CMD_TOGGLE_DATETIME:
+        toggle_datetime();
         break;
     default:
         break;

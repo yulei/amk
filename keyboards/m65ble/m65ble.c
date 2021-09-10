@@ -73,10 +73,13 @@ bool hook_process_action_kb(action_t *action)
     //}
 
     switch(action->key.code) {
-        case KC_F19:
+        case KC_F16:
             toggle_command(CMD_TOGGLE_SCREEN);
             return true;
-        case KC_F14: 
+        case KC_F19: 
+            toggle_command(CMD_TOGGLE_DATETIME);
+            return true;
+        case KC_F24: 
             toggle_command(CMD_TOGGLE_MSC);
             return true;
 

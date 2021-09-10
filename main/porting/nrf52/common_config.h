@@ -107,11 +107,15 @@
 #endif
 
 #ifndef FN_CONNECT_TARGET_2
+#ifndef DISABLE_CONNECT_TARGET_2
 #define FN_CONNECT_TARGET_2 KC_F17
+#endif
 #endif
 
 #ifndef FN_CONNECT_TARGET_3
+#ifndef DISABLE_CONNECT_TARGET_3
 #define FN_CONNECT_TARGET_3 KC_F18
+#endif
 #endif
 
 #ifndef FN_SWITCH_BLE_USB
@@ -151,6 +155,7 @@ typedef enum {
     CMD_KEYMAP_GET_ACK,
     CMD_TOGGLE_SCREEN,
     CMD_TOGGLE_MSC,
+    CMD_TOGGLE_DATETIME,
 } command_t;
 
 #define UART_TX_BUF_SIZE                    128                                        /**< UART TX buffer size. */

@@ -36,7 +36,7 @@ else
 endif #TINYUSB_USE_HAL
 
 ifeq (NRF52840, $(strip $(MCU)))
-SRCS += $(TINYUSB_DIR)/portable/nordic/nrf5x/dcd_nrf5x.c
+SRCS += $(SDK_NRF5)/dcd_nrf5x.c
 endif
 
 ifeq (yes, $(strip $(MSC_ENABLE)))
