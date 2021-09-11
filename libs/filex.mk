@@ -245,6 +245,4 @@ LIB_SRCS += \
 
 APP_DEFS += -DFX_INCLUDE_USER_DEFINE_FILE
 
-ifeq (STM32F722, $(strip $(MCU)))
-INCS += $(FILEX_DIR)/ports/cortex_m7/gnu/inc
-endif
+INCS += $(FILEX_DIR)/ports/cortex_$(MCU_ARCH)/gnu/inc

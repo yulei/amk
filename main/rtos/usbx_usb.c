@@ -41,7 +41,12 @@ void usb_init(void)
     HAL_PCDEx_SetTxFiFo(&pcd_handle, 0, 0x20);
     HAL_PCDEx_SetTxFiFo(&pcd_handle, 1, 0x10);
     HAL_PCDEx_SetTxFiFo(&pcd_handle, 2, 0x10);
+#ifdef UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT
     HAL_PCDEx_SetTxFiFo(&pcd_handle, 3, 0x80);
+#else
+    HAL_PCDEx_SetTxFiFo(&pcd_handle, 3, 0x40);
+    HAL_PCDEx_SetTxFiFo(&pcd_handle, 4, 0x40);
+#endif
 
     if (HAL_PCD_Start(&pcd_handle) != HAL_OK) {
         while(1);

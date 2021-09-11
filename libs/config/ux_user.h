@@ -349,7 +349,7 @@
 
 /* Defined, this macro enables device bi-directional-endpoint support.  */
 
-/* #define UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT  */
+#define UX_DEVICE_BIDIRECTIONAL_ENDPOINT_SUPPORT
 
 /* Defined, this value will only enable the host side of usbx.  */
 /* #define UX_HOST_SIDE_ONLY   */

@@ -9,9 +9,7 @@
 #include "tx_api.h"
 void wait_ms(int ms)
 {
-    //HAL_Delay(ms);
-    //osDelay(ms);
-    tx_thread_sleep((ms*1000)/TX_TIMER_TICKS_PER_SECOND);
+    tx_thread_sleep((ms*TX_TIMER_TICKS_PER_SECOND)/1000);
 }
 #else
 void wait_ms(int ms)

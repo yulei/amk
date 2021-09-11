@@ -134,6 +134,7 @@ enum {
     #define EPNUM_VENDOR_IN     EPNUM_DUMMY
     #define EPNUM_MSC_OUT       EPNUM_DUMMY
     #define EPNUM_MSC_IN        EPNUM_DUMMY
+    //EPNUM_MSC_IN,
     EPNUM_MAX
 };
 #else
