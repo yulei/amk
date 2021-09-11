@@ -1,19 +1,18 @@
 /**
- * hhkbusb_matrix.c
+ * @file usbmaster.c
  */
 
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 #include "generic_hal.h"
-#include "report.h"
-#include "matrix.h"
-#include "host.h"
-#include "timer.h"
-#include "gpio_pin.h"
+#include "usbmaster.h"
 #include "usb_descriptors.h"
+#include "ring_buffer.h"
+#include "amk_gpio.h"
 #include "amk_keymap.h"
 #include "amk_printf.h"
+#include "amk_eeprom.h"
 
 #ifndef HHKB_MATRIX_DEBUG
 #define HHKB_MATRIX_DEBUG 1
@@ -80,7 +79,13 @@ static bool report_queue_get(report_queue_t* queue, report_item_t* item)
 }
 
 // uart communication definitions
+#ifdef STM32F411xE
+#define CONFIG_USER_START   0x08010000
+#define CONFIG_USER_SECTOR  FLASH_SECTOR_4 
+#else
 #define CONFIG_USER_START 0x0800FC00
+#endif
+
 #define CONFIG_USER_SIZE 0x00000400
 #define CONFIG_JUMP_TO_APP_OFFSET 0x09
 #define CMD_MAX_LEN 64
@@ -108,10 +113,16 @@ typedef enum
     CMD_KEYMAP_SET_ACK,
     CMD_KEYMAP_GET,
     CMD_KEYMAP_GET_ACK,
+    CMD_TOGGLE_SCREEN,
+    CMD_TOGGLE_MSC,
+    CMD_TOGGLE_DATETIME,
 } command_t;
 
 static uint8_t command_buf[CMD_MAX_LEN];
 static uint32_t command_buf_count = 0;
+
+static uint8_t ring_buffer_data[128];
+static ring_buffer_t ring_buffer;
 
 typedef enum {
     BS_IDLE,
@@ -119,7 +130,7 @@ typedef enum {
 } ble_state_t;
 
 #define BLE_SYNC_TIMEOUT    1000
-static uint16_t ble_keymaps[AMK_KEYMAP_MAX_LAYER][MATRIX_ROWS][MATRIX_COLS];
+static uint16_t ble_keymaps[EEKEYMAP_MAX_LAYER][MATRIX_ROWS][MATRIX_COLS];
 typedef struct {
     uint8_t     layer;
     uint8_t     row;
@@ -225,6 +236,10 @@ static void enqueue_command(uint8_t *cmd)
     report_queue_put(&report_queue, &item);
 }
 
+extern void toggle_screen(void);
+extern void toggle_msc(void);
+extern void toggle_datetime(void);
+
 static void process_command(report_item_t *item)
 {
     switch (item->type) {
@@ -281,7 +296,15 @@ static void process_command(report_item_t *item)
     case CMD_KEYMAP_GET_ACK:
         ble_sync_update(item->data[0], item->data[1], item->data[2], (item->data[3]<<8) | item->data[4]);
         break;
-
+    case CMD_TOGGLE_SCREEN:
+        toggle_screen();
+        break;
+    case CMD_TOGGLE_MSC:
+        toggle_msc();
+        break;
+    case CMD_TOGGLE_DATETIME:
+        toggle_datetime();
+        break;
     default:
         break;
     }
@@ -310,12 +333,20 @@ static void clear_jump_to_app(void)
     if (buf[CONFIG_JUMP_TO_APP_OFFSET] != 0) {
         buf[CONFIG_JUMP_TO_APP_OFFSET] = 0;
         FLASH_EraseInitTypeDef erase;
+#ifdef STM32F411xE
+        erase.TypeErase     = FLASH_TYPEERASE_SECTORS;
+        erase.Banks         = FLASH_BANK_1;
+        erase.Sector        = FLASH_SECTOR_4;
+        erase.NbSectors     = 1;
+        erase.VoltageRange  = FLASH_VOLTAGE_RANGE_3;
+#else
         erase.TypeErase = FLASH_TYPEERASE_PAGES;
 #ifdef STM32F103xB
         erase.Banks = FLASH_BANK_1;
 #endif
         erase.PageAddress = CONFIG_USER_START;
         erase.NbPages = 1;
+#endif
         uint32_t error = 0;
         HAL_FLASHEx_Erase(&erase, &error);
     }
@@ -336,11 +367,12 @@ static void send_set_leds(uint8_t led)
     leds_cmd[4] = CMD_SET_LEDS;     // command type
     leds_cmd[5] = led;              // led status
 
-    HAL_UART_Transmit_DMA(&huart1, &leds_cmd[0], 6);
+    //HAL_UART_Transmit_DMA(&huart1, &leds_cmd[0], 6);
+    HAL_UART_Transmit(&huart1, &leds_cmd[0], 6, HAL_MAX_DELAY);
 }
 
 static matrix_row_t matrix[MATRIX_ROWS];
-static uint8_t recv_char;
+//static uint8_t recv_char;
 
 void matrix_init(void)
 {
@@ -348,7 +380,9 @@ void matrix_init(void)
     memset(command_buf, 0, sizeof(command_buf));
     command_buf_count = 0;
 
-    HAL_UART_Receive_IT(&huart1, &recv_char, 1);
+    rb_init(&ring_buffer, ring_buffer_data, 128);
+    __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
+    //HAL_UART_Receive_IT(&huart1, &recv_char, 1);
     gpio_set_input_pullup(reset_pin);
     ble_sync_init();
 }
@@ -357,6 +391,15 @@ uint8_t matrix_scan(void)
 {
     if (gpio_read_pin(reset_pin) == 0) {
         reset_to_bootloader(PIN_RESET);
+    }
+
+    while (rb_used_count(&ring_buffer) > 0) {
+        uint8_t c = 0;
+        __disable_irq();
+        c = rb_read_byte(&ring_buffer);
+        __enable_irq();
+
+        process_data(c);
     }
 
     ble_sync_process();
@@ -382,7 +425,8 @@ void led_set(uint8_t usb_led)
 
 void uart_recv_char(uint8_t c)
 {
-    process_data(c);
+    rb_write_byte(&ring_buffer, c);
+    //process_data(c);
 }
 
 void uart_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
@@ -400,7 +444,8 @@ void uart_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
 
     set_cmd[3] = CMD_KEYMAP_SET+layer+row+col+set_cmd[8]+set_cmd[9]; // checksum
 
-    HAL_UART_Transmit_DMA(&huart1, &set_cmd[0], 10);
+    //HAL_UART_Transmit_DMA(&huart1, &set_cmd[0], 10);
+    HAL_UART_Transmit(&huart1, &set_cmd[0], 10, HAL_MAX_DELAY);
 }
 
 void uart_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
@@ -416,7 +461,8 @@ void uart_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
 
     get_cmd[3] = CMD_KEYMAP_GET+layer+row+col; // checksum
 
-    HAL_UART_Transmit_DMA(&huart1, &get_cmd[0], 8);
+    //HAL_UART_Transmit_DMA(&huart1, &get_cmd[0], 8);
+    HAL_UART_Transmit(&huart1, &get_cmd[0], 8, HAL_MAX_DELAY);
 }
 
 void amk_keymap_init(void)
@@ -424,7 +470,7 @@ void amk_keymap_init(void)
 
 void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
 {
-    if (!((layer < AMK_KEYMAP_MAX_LAYER) && (row < MATRIX_ROWS) && (col < MATRIX_COLS))) return;
+    if (!((layer < EEKEYMAP_MAX_LAYER) && (row < MATRIX_ROWS) && (col < MATRIX_COLS))) return;
 
     ble_keymaps[layer][row][col] = keycode;
     uart_keymap_set(layer, row, col, keycode);
@@ -459,7 +505,7 @@ void amk_keymap_set_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 
 static void ble_sync_init(void)
 {
-    for (uint8_t layer = 0; layer < AMK_KEYMAP_MAX_LAYER; layer++) {
+    for (uint8_t layer = 0; layer < EEKEYMAP_MAX_LAYER; layer++) {
         for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
             for (uint8_t col = 0; col < MATRIX_COLS; col++) {
                 ble_keymaps[layer][row][col] = 0;
@@ -500,7 +546,8 @@ static void ble_sync_process(void)
         ping_cmd[0] = SYNC_BYTE_1;
         ping_cmd[1] = SYNC_BYTE_2;
         ping_cmd[2] = SYNC_PING;
-        HAL_UART_Transmit_DMA(&huart1, &ping_cmd[0], 3);
+        //HAL_UART_Transmit_DMA(&huart1, &ping_cmd[0], 3);
+        HAL_UART_Transmit(&huart1, &ping_cmd[0], 3, HAL_MAX_DELAY);
     } else {
         // get current keymap
         hhkb_matrix_debug("BLE SYNC: uart keymap get: layer:%d, row:%d, col:%d\n", ble_sync.layer, ble_sync.row, ble_sync.col);
@@ -527,7 +574,7 @@ static void ble_sync_update(uint8_t layer, uint8_t row, uint8_t col, uint16_t ke
             ble_sync.col = 0;
             ble_sync.row++;
         } else {
-            if (layer < (AMK_KEYMAP_MAX_LAYER-1)) {
+            if (layer < (EEKEYMAP_MAX_LAYER-1)) {
                 ble_sync.col = 0;
                 ble_sync.row = 0;
                 ble_sync.layer++;
@@ -545,5 +592,5 @@ static void ble_sync_update(uint8_t layer, uint8_t row, uint8_t col, uint16_t ke
     ble_sync.state = BS_IDLE;
 }
 
-#include "action.h"
+//
 const action_t PROGMEM actionmaps[4][MATRIX_ROWS][MATRIX_COLS];

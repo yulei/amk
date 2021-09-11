@@ -16,6 +16,7 @@ APP_DEFS += \
 	-DSPI_USE_INSTANCE_2 \
 	-DSTM32F722xx \
     -DCFG_TUSB_MCU=OPT_MCU_STM32F7 \
+	-DSYSTEM_CLOCK=216000000
 
 SDK_DEFS += -mcpu=cortex-m7 -mthumb -mfpu=fpv5-sp-d16 -mfloat-abi=hard
 

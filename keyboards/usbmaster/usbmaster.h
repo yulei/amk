@@ -1,5 +1,5 @@
 /**
- * hhkbusb.h
+ * @file usbmaster.h
  */
 
 #pragma once
@@ -10,3 +10,7 @@
 #include "action_macro.h"
 #include "action_code.h"
 #include "keymap.h"
+#include "report.h"
+#include "matrix.h"
+#include "host.h"
+#include "timer.h"

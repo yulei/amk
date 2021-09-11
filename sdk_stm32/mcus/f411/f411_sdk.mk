@@ -14,6 +14,8 @@ APP_DEFS += \
 	-DSPI_USE_INSTANCE_2 \
 	-DSTM32F411xE \
     -DCFG_TUSB_MCU=OPT_MCU_STM32F4 \
+	-DSYSTEM_CLOCK=96000000
+
 
 SDK_DEFS += -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16
 

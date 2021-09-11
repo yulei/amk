@@ -38,7 +38,7 @@
     .global     __tx_IntHandler                     @ Int 0
 @
 @
-SYSTEM_CLOCK      =   216000000
+@SYSTEM_CLOCK      =   216000000
 SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / 1000) -1)
 
     .text 32
