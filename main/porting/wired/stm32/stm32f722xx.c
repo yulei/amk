@@ -1,5 +1,5 @@
 /**
- * stm32_l431xx.c
+ * stm32_f722xx.c
  */
 
 #include "generic_hal.h"

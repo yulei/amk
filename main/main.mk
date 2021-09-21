@@ -17,7 +17,7 @@ INCS += \
 	$(MAIN_DIR)/rgb \
 	$(MAIN_DIR)/screen \
 	$(MAIN_DIR)/usb \
-	$(MAIN_DIR)/rtt \
+	$(MAIN_DIR)/segger \
 	$(LIB_DIR)/tinyusb/src \
 
 

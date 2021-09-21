@@ -1,7 +1,7 @@
 COMMON_PORTING_DIR := $(MAIN_DIR)/porting/wired/common
 
 SRCS += \
-	$(MAIN_DIR)/rtt/SEGGER_RTT.c
+	$(MAIN_DIR)/segger/SEGGER_RTT.c
 
 SRCS += \
 	$(COMMON_PORTING_DIR)/bootloader.c \
