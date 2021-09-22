@@ -1,7 +1,13 @@
-if(MCU_TYPE STREQUAL stm32f722)
+if(MCU_TYPE STREQUAL "stm32f722")
     set(SDK_MCU_SERIES f7)
     set(SDK_MCU_FAMILY stm32f7xx)
     set(SDK_MCU_TYPE f722)
+endif()
+
+if(MCU_TYPE STREQUAL "stm32f405")
+    set(SDK_MCU_SERIES f4)
+    set(SDK_MCU_FAMILY stm32f4xx)
+    set(SDK_MCU_TYPE f405)
 endif()
 
 set(VENDOR_DIR ${CMAKE_CURRENT_LIST_DIR}/../libs/vendor/st)
@@ -86,8 +92,8 @@ if(NOT TINYUSB_ENABLE AND NOT RTOS_ENABLE)
         target_include_directories(${KEYBOARD}
             PRIVATE
             ${CMAKE_CURRENT_LIST_DIR}/hal_usb
-            ${VENDOR_DIR}/usb_device/Inc
-            ${VENDOR_DIR}/usb_host/Inc
+            ${VENDOR_DIR}/usb_device/Core/Inc
+            ${VENDOR_DIR}/usb_host/Core/Inc
             ${CMAKE_CURRENT_LIST_DIR}/../libs/tinyusb/src 
         )
     endif()

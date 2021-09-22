@@ -72,8 +72,8 @@ if(RGB_ENABLE)
         ${CMAKE_CURRENT_LIST_DIR}/drivers/rgb_driver.c
         ${CMAKE_CURRENT_LIST_DIR}/rgb/rgb_common.c
         ${CMAKE_CURRENT_LIST_DIR}/rgb/rgb_led.c
+        ${CMAKE_CURRENT_LIST_DIR}/rgb/rgb_effect_linear.c
         )
-    set(RGB_ENABLE yes)
 endif()
 
 if(MSC_ENABLE)

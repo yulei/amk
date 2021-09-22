@@ -9,12 +9,12 @@
 #include "amk_gpio.h"
 #include "amk_printf.h"
 
-#include "drivers/ws2812.h"
-#include "drivers/aw9523b.h"
-#include "drivers/aw9106b.h"
-#include "drivers/is31fl3731.h"
-#include "drivers/is31fl3236.h"
-#include "drivers/is31fl3733.h"
+#include "ws2812.h"
+#include "aw9523b.h"
+#include "aw9106b.h"
+#include "is31fl3731.h"
+#include "is31fl3236.h"
+#include "is31fl3733.h"
 
 #ifndef RGB_DRIVER_DEBUG
 #define RGB_DRIVER_DEBUG 1

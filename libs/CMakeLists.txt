@@ -33,7 +33,6 @@ if(MOUSEKEY_ENABLE)
 	)
 	target_compile_definitions(${KEYBOARD} PUBLIC "MOUSEKEY_ENABLE")
 	target_compile_definitions(${KEYBOARD} PUBLIC "MOUSE_ENABLE")
-	message(STATUS "enable mousekey")
 endif()
 
 if(EXTRAKEY_ENABLE)
