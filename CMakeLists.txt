@@ -13,18 +13,12 @@ if(NOT DEFINED KEYBOARD)
 endif()
 
 
-set(LINKER_PATH "")
-set(LINKER_SCRIPT "")
-
 set(KEYBOARD_DIR ${CMAKE_CURRENT_LIST_DIR}/keyboards/${KEYBOARD} )
 
 include(${KEYBOARD_DIR}/${KEYBOARD}.cmake)
-#add_subdirectory(${KEYBOARD_DIR})
-
 set_target_properties(${KEYBOARD} PROPERTIES OUTPUT_NAME "${KEYBOARD}.elf")
 
 set(SDK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/sdk_${MCU_FAMILY})
-
 add_subdirectory(${SDK_DIR})
 
 set(MAIN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/main)
@@ -38,11 +32,12 @@ set(LIBS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 add_subdirectory(${LIBS_DIR})
 
 set(LDFLAGS "-L${LINKER_PATH} -T${LINKER_SCRIPT}")
-
 message(STATUS "LDFLAGS:${LDFLAGS}")
 
 target_compile_options(${KEYBOARD}
     PRIVATE
+    ${MCU_FLAGS}
+    -specs=nano.specs
     -Wall
     -Werror
     -ffunction-sections
@@ -55,23 +50,20 @@ target_compile_options(${KEYBOARD}
 
 target_link_options(${KEYBOARD}
     PRIVATE
+    ${MCU_FLAGS}
     -L${LINKER_PATH}
     -T${LINKER_SCRIPT}
-    -mcpu=cortex-m7
-    -mthumb
-    -mfpu=fpv5-sp-d16
-    -mfloat-abi=hard
     -specs=nano.specs
+    -specs=nosys.specs
     -lc
     -lm
     -lnosys
     -Wl,-Map=${KEYBOARD}.map,--cref
     -Wl,--gc-sections
+    -Wl,--print-memory-usage 
     )
 
-add_custom_command(TARGET ${KEYBOARD} POST_BUILD COMMAND ${SIZE} ${KEYBOARD}.elf)
 
-add_custom_command(TARGET ${KEYBOARD}
-        POST_BUILD
-        COMMAND ${OBJCOPY} -O ihex ${KEYBOARD}.elf ${KEYBOARD}.hex
-        COMMAND ${OBJCOPY} -O binary ${KEYBOARD}.elf ${KEYBOARD}.bin)
+add_custom_command(TARGET ${KEYBOARD} POST_BUILD COMMAND ${OBJCOPY} -O ihex ${KEYBOARD}.elf ${KEYBOARD}.hex)
+add_custom_command(TARGET ${KEYBOARD} POST_BUILD COMMAND ${OBJCOPY} -O binary ${KEYBOARD}.elf ${KEYBOARD}.bin)
+add_custom_command(TARGET ${KEYBOARD} POST_BUILD COMMAND ${SIZE} ${KEYBOARD}.elf)

@@ -1,15 +1,10 @@
 
 # printf
-#add_library(printf STATIC ${CMAKE_CURRENT_LIST_DIR}/printf/printf.c) 
 target_sources(${KEYBOARD} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/printf/printf.c)
 target_include_directories(${KEYBOARD} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/printf ${CMAKE_CURRENT_LIST_DIR}/config)
 target_compile_definitions(${KEYBOARD} PRIVATE -DPRINTF_INCLUDE_CONFIG_H)
 
-#target_link_libraries(${KEYBOARD} printf)
-
 # tmk
-#add_library(tmk STATIC "")
-
 target_sources(${KEYBOARD}
 	PRIVATE
 	${CMAKE_CURRENT_LIST_DIR}/tmk/tmk_core/common/host.c
@@ -60,11 +55,8 @@ endif()
 
 target_compile_options(${KEYBOARD} PUBLIC -include ${KEYBOARD_DIR}/config.h)
 
-#target_link_libraries(${KEYBOARD} tmk)
-
 # tinyusb
-if(${TINYUSB_ENABLE})
-#    add_library(tinyusb STATIC "")
+if(TINYUSB_ENABLE)
     target_sources(${KEYBOARD}
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/tinyusb/src/tusb.c
@@ -80,7 +72,7 @@ if(${TINYUSB_ENABLE})
 		${CMAKE_CURRENT_LIST_DIR}/config
         )
     
-    if(${TINYUSB_USE_HAL})
+    if(TINYUSB_USE_HAL)
         target_sources(${KEYBOARD}
             PRIVATE
             ${CMAKE_CURRENT_LIST_DIR}/../sdk_stm32/hal_usb/dcd_hal_stm32.c
@@ -99,7 +91,7 @@ if(${TINYUSB_ENABLE})
         message(STATUS "tinyusb use hal not defined")
     endif()
 
-    if(${MSC_ENABLE})
+    if(MSC_ENABLE)
         target_sources(${KEYBOARD}
             PRIVATE
             ${CMAKE_CURRENT_LIST_DIR}/tinyusb/src/class/msc/msc_device.c
@@ -107,4 +99,19 @@ if(${TINYUSB_ENABLE})
     endif()
 
     target_compile_definitions(${KEYBOARD} PUBLIC "TINYUSB_ENABLE")
+endif()
+
+# fatfs
+if(MSC_ENABLE)
+	target_sources(${KEYBOARD}
+		PRIVATE
+		${CMAKE_CURRENT_LIST_DIR}/fatfs/source/ff.c
+		${CMAKE_CURRENT_LIST_DIR}/fatfs/porting/diskio_flash.c
+		)
+
+	target_include_directories(${KEYBOARD}
+		PUBLIC
+		${CMAKE_CURRENT_LIST_DIR}/fatfs/source
+		${CMAKE_CURRENT_LIST_DIR}/fatfs/porting
+		)
 endif()

@@ -13,21 +13,15 @@ target_sources(${KEYBOARD}
     ${VENDOR_DIR}/driver_${SDK_MCU_SERIES}/Src/${SDK_MCU_FAMILY}_hal_iwdg.c
     )
 
-target_compile_options(${KEYBOARD}
-    PRIVATE
-    -mcpu=cortex-m7
-    -mthumb
-    -mfpu=fpv5-sp-d16
-    -mfloat-abi=hard
-    )
+set(MCU_FLAGS -mcpu=cortex-m7 -mthumb -mfpu=fpv5-sp-d16 -mfloat-abi=hard CACHE STRING INTERNAL)
 
 target_compile_definitions(${KEYBOARD} 
     PRIVATE 
-    -DSPI_USE_INSTANCE_1
-    -DSPI_USE_INSTANCE_2
-    -DSTM32F722xx
-    -DCFG_TUSB_MCU=OPT_MCU_STM32F7
-    -DSYSTEM_CLOCK=216000000
+    SPI_USE_INSTANCE_1
+    SPI_USE_INSTANCE_2
+    STM32F722xx
+    CFG_TUSB_MCU=OPT_MCU_STM32F7
+    SYSTEM_CLOCK=216000000
     )
 
 set(SDK_MCU_LD STM32F722RETx)

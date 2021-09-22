@@ -1,7 +1,7 @@
 
 
-if($(MATRIX_USE_TCA6424))
-    target_compile_definitions(${KEYBOARD} public "MATRIX_I2C_PINS")
+if(MATRIX_USE_TCA6424)
+    target_compile_definitions(${KEYBOARD} PRIVATE "MATRIX_I2C_PINS")
     target_sources(${KEYBOARD}
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/drivers/tca6424.c
@@ -9,8 +9,8 @@ if($(MATRIX_USE_TCA6424))
         )
 endif()
 
-if($(MATRIX_USE_PCA9535))
-    target_compile_definitions(${KEYBOARD} public "MATRIX_I2C_PINS")
+if(MATRIX_USE_PCA9535)
+    target_compile_definitions(${KEYBOARD} PRIVATE "MATRIX_I2C_PINS")
     target_sources(${KEYBOARD}
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/drivers/pca9535.c
@@ -18,8 +18,8 @@ if($(MATRIX_USE_PCA9535))
         )
 endif()
 
-if($(SCREEN_ENABLE))
-    target_compile_definitions(${KEYBOARD} public "SCREEN_ENABLE")
+if(SCREEN_ENABLE)
+    target_compile_definitions(${KEYBOARD} PRIVATE "SCREEN_ENABLE")
     target_sources(${KEYBOARD}
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/drivers/spi.c
@@ -28,8 +28,8 @@ if($(SCREEN_ENABLE))
         )
 endif()
 
-if($(RGB_LINEAR_ENABLE))
-    target_compile_definitions(${KEYBOARD} public "RGB_LINEAR_ENABLE")
+if(RGB_LINEAR_ENABLE)
+    target_compile_definitions(${KEYBOARD} PRIVATE "RGB_LINEAR_ENABLE")
     target_sources(${KEYBOARD}
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/rgb/rgb_linear.c
@@ -38,8 +38,8 @@ if($(RGB_LINEAR_ENABLE))
 endif()
 
 
-if($(RGB_INDICATOR_ENABLE))
-    target_compile_definitions(${KEYBOARD} public "RGB_INDICATOR_ENABLE")
+if(RGB_INDICATOR_ENABLE)
+    target_compile_definitions(${KEYBOARD} PRIVATE "RGB_INDICATOR_ENABLE")
     target_sources(${KEYBOARD}
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/rgb/rgb_indicator.c
@@ -48,8 +48,8 @@ if($(RGB_INDICATOR_ENABLE))
 endif()
 
 
-if($(RGB_MATRIX_ENABLE))
-    target_compile_definitions(${KEYBOARD} public "RGB_MATRIX_ENABLE")
+if(RGB_MATRIX_ENABLE)
+    target_compile_definitions(${KEYBOARD} PRIVATE "RGB_MATRIX_ENABLE")
     target_sources(${KEYBOARD}
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/rgb/rgb_matrix.c
@@ -58,8 +58,8 @@ if($(RGB_MATRIX_ENABLE))
     set(RGB_ENABLE yes)
 endif()
 
-if($(RGB_ENABLE))
-    target_compile_definitions(${KEYBOARD} public "RGB_ENABLE")
+if(RGB_ENABLE)
+    target_compile_definitions(${KEYBOARD} PRIVATE "RGB_ENABLE")
     target_sources(${KEYBOARD}
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/drivers/aw9106b.c
@@ -76,15 +76,15 @@ if($(RGB_ENABLE))
     set(RGB_ENABLE yes)
 endif()
 
-if($(MSC_ENABLE))
-    target_compile_definitions(${KEYBOARD} public "MSC_ENABLE")
+if(MSC_ENABLE)
+    target_compile_definitions(${KEYBOARD} PRIVATE "MSC_ENABLE")
     target_sources(${KEYBOARD}
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/drivers/w25qxx.c
         ${CMAKE_CURRENT_LIST_DIR}/drivers/spi.c
         ${CMAKE_CURRENT_LIST_DIR}/screen/anim.c
         )
-    if(${RTOS_ENABLE})
+    if(RTOS_ENABLE)
         target_sources(${KEYBOARD}
             PRIVATE
             ${CMAKE_CURRENT_LIST_DIR}/rtos/usbx_msc.c
@@ -97,9 +97,9 @@ if($(MSC_ENABLE))
     endif()
 endif()
 
-if($(VIAL_ENABLE))
-    target_compile_definitions(${KEYBOARD} public "VIAL_ENABLE")
-    target_compile_definitions(${KEYBOARD} public "KEYMAP_CONFIG_ENABLE")
+if(VIAL_ENABLE)
+    target_compile_definitions(${KEYBOARD} PRIVATE "VIAL_ENABLE")
+    target_compile_definitions(${KEYBOARD} PRIVATE "KEYMAP_CONFIG_ENABLE")
     target_sources(${KEYBOARD}
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/vial/vial_porting.c
@@ -114,26 +114,26 @@ if($(VIAL_ENABLE))
     set(ACTIONMAP_ENABLE yes)
 endif()
 
-if(NOT $(CUSTOM_MATRIX))
+if(NOT CUSTOM_MATRIX)
     target_sources(${KEYBOARD}
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/amk/matrix_scan.c
         )
 endif()
 
-if($(EECONFIG_FRAM))
-    target_compile_definitions(${KEYBOARD} public "EECONFIG_FRAM")
+if(EECONFIG_FRAM)
+    target_compile_definitions(${KEYBOARD} PRIVATE "EECONFIG_FRAM")
     target_sources(${KEYBOARD}
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/amk/eeconfig_fram.c
         ${CMAKE_CURRENT_LIST_DIR}/drivers/mb85rcxx.c
         ${CMAKE_CURRENT_LIST_DIR}/drivers/i2c.c
         )
-elseif($(EECONFIG_FLASH))
-    target_compile_definitions(${KEYBOARD} public "EECONFIG_FLASH")
+elseif(EECONFIG_FLASH)
+    target_compile_definitions(${KEYBOARD} PRIVATE "EECONFIG_FLASH")
     target_sources(${KEYBOARD}
         PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR}/amk/eeconfig_flash.c
+        ${CMAKE_CURRENT_LIST_DIR}/porting/wired/stm32/eeconfig_flash.c
         )
 else()
     target_sources(${KEYBOARD}
@@ -142,13 +142,13 @@ else()
         )
 endif()
 
-if($(DATETIME_ENABLE))
-    target_compile_definitions(${KEYBOARD} public "DATETIME_ENABLE")
+if(DATETIME_ENABLE)
+    target_compile_definitions(${KEYBOARD} PRIVATE "DATETIME_ENABLE")
     target_sources(${KEYBOARD}
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/drivers/i2c.c
         )
-    if(${RTC_DRIVER} STREQUAL bl5372)
+    if(RTC_DRIVER STREQUAL "bl5372")
         target_sources(${KEYBOARD}
             PRIVATE
             ${CMAKE_CURRENT_LIST_DIR}/drivers/bl5372.c
@@ -161,6 +161,6 @@ if($(DATETIME_ENABLE))
     endif()
 endif()
 
-if($(DYNAMIC_CONFIGURATION))
-    target_compile_definitions(${KEYBOARD} public "DYNAMIC_CONFIGURATION")
+if(DYNAMIC_CONFIGURATION)
+    target_compile_definitions(${KEYBOARD} PRIVATE "DYNAMIC_CONFIGURATION")
 endif()

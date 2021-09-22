@@ -23,7 +23,7 @@ target_include_directories(${KEYBOARD}
     ${LIB_DIR}/tinyusb/src
 )
 
-if(${RTOS_ENABLE})
+if(RTOS_ENABLE)
     target_sources(${KEYBOARD}
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/rtos/usbx_main.c
@@ -31,7 +31,7 @@ if(${RTOS_ENABLE})
         ${CMAKE_CURRENT_LIST_DIR}/rtos/usbx_usb.c
         ${CMAKE_CURRENT_LIST_DIR}/rtos/usbx_desc.c
     )
-    target_compile_definitions(${KEYBOARD} public "RTOS_ENABLE")
+    target_compile_definitions(${KEYBOARD} PRIVATE "RTOS_ENABLE")
 
     #include ${LIBS_DIR}/threadx.cmake
     #include ${LIBS_DIR}/usbx.cmake
@@ -44,4 +44,11 @@ else()
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/feature.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/porting/wired.cmake)
+
+set(NRF5_MCUS "nrf52832" "nrf52840")
+set(STM32_MCUS "stm32f722" "stm32f411" "stm32f405" "stm32f103" "stm32l072" )
+
+if(${MCU_TYPE} IN_LIST STM32_MCUS)
+    include(${CMAKE_CURRENT_LIST_DIR}/porting/wired.cmake)
+endif()
+

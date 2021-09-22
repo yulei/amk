@@ -1,4 +1,4 @@
-if(stm32f722 STREQUAL ${MCU_TYPE})
+if(MCU_TYPE STREQUAL stm32f722)
     set(SDK_MCU_SERIES f7)
     set(SDK_MCU_FAMILY stm32f7xx)
     set(SDK_MCU_TYPE f722)
@@ -42,7 +42,7 @@ target_compile_definitions(${KEYBOARD} PRIVATE "USE_HAL_DRIVER")
 
 include(${CMAKE_CURRENT_LIST_DIR}/mcus/${SDK_MCU_TYPE}/${SDK_MCU_TYPE}_sdk.cmake)
 
-if(${TINYUSB_ENABLE} AND ${TINYUSB_USE_HAL})
+if(NOT TINYUSB_ENABLE} OR TINYUSB_USE_HAL)
     target_sources(${KEYBOARD}
         PRIVATE
         ${VENDOR_DIR}/driver_${SDK_MCU_SERIES}/Src/${SDK_MCU_FAMILY}_hal_pcd.c
@@ -50,21 +50,51 @@ if(${TINYUSB_ENABLE} AND ${TINYUSB_USE_HAL})
         ${VENDOR_DIR}/driver_${SDK_MCU_SERIES}/Src/${SDK_MCU_FAMILY}_ll_usb.c
         )
     target_compile_definitions(${KEYBOARD} PRIVATE "HAL_PCD_MODULE_ENABLED")
-else ()
-#	ifneq (yes, $(strip $(RTOS_ENABLE)))
-#		include $(STM32SDK_DIR)/hal_usb.mk
-#	endif
-#	SRCS += $(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_pcd.c 
-#	SRCS += $(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_pcd_ex.c
-#	SRCS += $(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_ll_usb.c 
-#	APP_DEFS += -DHAL_PCD_MODULE_ENABLED
 endif()
 
-if( NOT DEFINED ${LINKER_PATH})
-    set(LINKER_PATH	${CMAKE_CURRENT_LIST_DIR}/mcus/linker PARENT_SCOPE)
+if(NOT TINYUSB_ENABLE AND NOT RTOS_ENABLE)
+    target_sources(${KEYBOARD}
+        PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/hal_usb/usb_device.c
+        ${CMAKE_CURRENT_LIST_DIR}/hal_usb/usbd_conf.c
+        ${CMAKE_CURRENT_LIST_DIR}/hal_usb/usbd_desc.c
+        ${CMAKE_CURRENT_LIST_DIR}/hal_usb/usbd_composite.c
+        ${VENDOR_DIR}/usb_device/Core/Src/usbd_core.c
+        ${VENDOR_DIR}/usb_device/Core/Src/usbd_ctlreq.c
+        ${VENDOR_DIR}/usb_device/Core/Src/usbd_ioreq.c
+    )
+    if(USB_HOST_ENABLE)
+        target_sources(${KEYBOARD}
+            PRIVATE
+            ${CMAKE_CURRENT_LIST_DIR}/hal_usb/report_parser.c
+            ${CMAKE_CURRENT_LIST_DIR}/hal_usb/usbh_hid_multi.c
+            ${CMAKE_CURRENT_LIST_DIR}/hal_usb/usb_host.c
+            ${CMAKE_CURRENT_LIST_DIR}/hal_usb/usbh_conf.c
+            ${VENDOR_DIR}/usb_host/Core/Src/usbh_core.c
+            ${VENDOR_DIR}/usb_host/Core/Src/usbh_ctlreq.c
+            ${VENDOR_DIR}/usb_host/Core/Src/usbh_ioreq.c
+            ${VENDOR_DIR}/usb_host/Core/Src/usbh_pipes.c
+            ${VENDOR_DIR}/usb_host/Core/Src/usbh_pipes.c
+            ${VENDOR_DIR}/driver_${SDK_MCU_SERIES}/Src/${SDK_MCU_FAMILY}_hal_hcd.c
+            ${VENDOR_DIR}/driver_${SDK_MCU_SERIES}/Src/${SDK_MCU_FAMILY}_ll_usb.c
+        )
+        target_compile_definitions(${KEYBOARD} 
+            PRIVATE 
+            -DUSB_HOST_ENABLE
+            -DHAL_HCD_MODULE_ENABLED
+            )
+        target_include_directories(${KEYBOARD}
+            PRIVATE
+            ${CMAKE_CURRENT_LIST_DIR}/hal_usb
+            ${VENDOR_DIR}/usb_device/Inc
+            ${VENDOR_DIR}/usb_host/Inc
+            ${CMAKE_CURRENT_LIST_DIR}/../libs/tinyusb/src 
+        )
+    endif()
 endif()
 
-set(LINKER_SCRIPT ${SDK_MCU_LD}_FLASH.ld PARENT_SCOPE)
+if(NOT DEFINED LINKER_PATH)
+    set(LINKER_PATH	${CMAKE_CURRENT_LIST_DIR}/mcus/linker CACHE STRING INTERNAL)
+endif()
 
-message(STATUS "linker_path: ${LINKER_PATH}")
-message(STATUS "linker_script: ${LINKER_SCRIPT}")
+set(LINKER_SCRIPT ${SDK_MCU_LD}_FLASH.ld CACHE STRING INTERNAL)

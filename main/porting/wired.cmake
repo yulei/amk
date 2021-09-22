@@ -13,20 +13,18 @@ target_include_directories(${KEYBOARD}
     ${CMAKE_CURRENT_LIST_DIR}/wired/common
     )
 
-if(NOT DEFINED ${RTOS_ENABLE})
+if(NOT RTOS_ENABLE)
     target_sources(${KEYBOARD}
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/wired/common/usb_interface.c
         )
-    message(STATUS "use usb_interface.c")
 endif()
 
-if(${TINYUSB_ENABLE})
+if(TINYUSB_ENABLE)
     target_sources(${KEYBOARD}
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/wired/common/usb_tinyusb.c
         )
-    message(STATUS "use usb_tinyusb.c")
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/wired/${MCU_FAMILY}.cmake)
