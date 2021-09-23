@@ -52,3 +52,7 @@ if(${MCU_TYPE} IN_LIST STM32_MCUS)
     include(${CMAKE_CURRENT_LIST_DIR}/porting/wired.cmake)
 endif()
 
+if(${MCU_TYPE} IN_LIST NRF5_MCUS)
+    include(${CMAKE_CURRENT_LIST_DIR}/porting/nrf52.cmake)
+endif()
+

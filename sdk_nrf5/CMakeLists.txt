@@ -1,0 +1,230 @@
+
+set(VENDOR_DIR "${CMAKE_CURRENT_LIST_DIR}/../libs/vendor/nordic/nRF5_SDK_17.0.2_d674dde")
+
+target_sources(${KEYBOARD}
+    PRIVATE
+	${VENDOR_DIR}/components/boards/boards.c
+	${VENDOR_DIR}/components/ble/ble_advertising/ble_advertising.c
+	${VENDOR_DIR}/components/ble/ble_link_ctx_manager/ble_link_ctx_manager.c
+	${VENDOR_DIR}/components/ble/ble_services/ble_bas/ble_bas.c
+	${VENDOR_DIR}/components/ble/ble_services/ble_dis/ble_dis.c
+	${VENDOR_DIR}/components/ble/ble_services/ble_hids/ble_hids.c
+	${VENDOR_DIR}/components/ble/common/ble_advdata.c
+	${VENDOR_DIR}/components/ble/common/ble_conn_params.c
+	${VENDOR_DIR}/components/ble/common/ble_conn_state.c
+	${VENDOR_DIR}/components/ble/common/ble_srv_common.c
+	${VENDOR_DIR}/components/ble/nrf_ble_gatt/nrf_ble_gatt.c
+	${VENDOR_DIR}/components/ble/nrf_ble_qwr/nrf_ble_qwr.c
+	${VENDOR_DIR}/components/ble/peer_manager/auth_status_tracker.c
+	${VENDOR_DIR}/components/ble/peer_manager/gatt_cache_manager.c
+	${VENDOR_DIR}/components/ble/peer_manager/gatts_cache_manager.c
+	${VENDOR_DIR}/components/ble/peer_manager/id_manager.c
+	${VENDOR_DIR}/components/ble/peer_manager/peer_data_storage.c
+	${VENDOR_DIR}/components/ble/peer_manager/peer_database.c
+	${VENDOR_DIR}/components/ble/peer_manager/peer_id.c
+	${VENDOR_DIR}/components/ble/peer_manager/peer_manager.c
+	${VENDOR_DIR}/components/ble/peer_manager/peer_manager_handler.c
+	${VENDOR_DIR}/components/ble/peer_manager/pm_buffer.c
+	${VENDOR_DIR}/components/ble/peer_manager/security_dispatcher.c
+	${VENDOR_DIR}/components/ble/peer_manager/security_manager.c
+	${VENDOR_DIR}/components/libraries/atomic_fifo/nrf_atfifo.c
+	${VENDOR_DIR}/components/libraries/atomic_flags/nrf_atflags.c
+	${VENDOR_DIR}/components/libraries/atomic/nrf_atomic.c
+	${VENDOR_DIR}/components/libraries/balloc/nrf_balloc.c
+	${VENDOR_DIR}/components/libraries/crc16/crc16.c
+	${VENDOR_DIR}/components/libraries/experimental_section_vars/nrf_section_iter.c
+	${VENDOR_DIR}/components/libraries/fifo/app_fifo.c
+	${VENDOR_DIR}/components/libraries/fds/fds.c
+	${VENDOR_DIR}/components/libraries/fstorage/nrf_fstorage.c
+	${VENDOR_DIR}/components/libraries/fstorage/nrf_fstorage_sd.c
+	${VENDOR_DIR}/components/libraries/hardfault/hardfault_implementation.c
+	${VENDOR_DIR}/components/libraries/hardfault/nrf52/handler/hardfault_handler_gcc.c
+	${VENDOR_DIR}/components/libraries/log/src/nrf_log_backend_rtt.c
+	${VENDOR_DIR}/components/libraries/log/src/nrf_log_backend_serial.c
+	${VENDOR_DIR}/components/libraries/log/src/nrf_log_default_backends.c
+	${VENDOR_DIR}/components/libraries/log/src/nrf_log_frontend.c
+	${VENDOR_DIR}/components/libraries/log/src/nrf_log_str_formatter.c
+	${VENDOR_DIR}/components/libraries/memobj/nrf_memobj.c
+	${VENDOR_DIR}/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c
+	${VENDOR_DIR}/components/libraries/queue/nrf_queue.c
+	${VENDOR_DIR}/components/libraries/ringbuf/nrf_ringbuf.c
+	${VENDOR_DIR}/components/libraries/scheduler/app_scheduler.c
+	${VENDOR_DIR}/components/libraries/sortlist/nrf_sortlist.c
+	${VENDOR_DIR}/components/libraries/strerror/nrf_strerror.c
+	${VENDOR_DIR}/components/libraries/timer/app_timer2.c
+	${VENDOR_DIR}/components/libraries/timer/drv_rtc.c
+	${VENDOR_DIR}/components/libraries/uart/app_uart_fifo.c
+	${VENDOR_DIR}/components/libraries/util/app_error.c
+	${VENDOR_DIR}/components/libraries/util/app_error_weak.c
+	${VENDOR_DIR}/components/libraries/util/app_util_platform.c
+	${VENDOR_DIR}/components/libraries/util/nrf_assert.c
+	${VENDOR_DIR}/components/softdevice/common/nrf_sdh.c
+	${VENDOR_DIR}/components/softdevice/common/nrf_sdh_ble.c
+	${VENDOR_DIR}/components/softdevice/common/nrf_sdh_soc.c
+	${VENDOR_DIR}/modules/nrfx/soc/nrfx_atomic.c
+	${VENDOR_DIR}/modules/nrfx/drivers/src/nrfx_clock.c
+	${VENDOR_DIR}/modules/nrfx/drivers/src/nrfx_gpiote.c
+	${VENDOR_DIR}/modules/nrfx/drivers/src/nrfx_pwm.c
+	${VENDOR_DIR}/modules/nrfx/drivers/src/nrfx_saadc.c
+	${VENDOR_DIR}/modules/nrfx/drivers/src/nrfx_uart.c
+	${VENDOR_DIR}/modules/nrfx/drivers/src/nrfx_uarte.c
+	${VENDOR_DIR}/modules/nrfx/drivers/src/nrfx_power.c
+	${VENDOR_DIR}/modules/nrfx/drivers/src/nrfx_twi.c
+	${VENDOR_DIR}/modules/nrfx/drivers/src/nrfx_wdt.c
+	${VENDOR_DIR}/modules/nrfx/drivers/src/nrfx_rtc.c
+	${VENDOR_DIR}/modules/nrfx/drivers/src/prs/nrfx_prs.c
+	${VENDOR_DIR}/integration/nrfx/legacy/nrf_drv_clock.c
+	${VENDOR_DIR}/integration/nrfx/legacy/nrf_drv_power.c
+	${VENDOR_DIR}/integration/nrfx/legacy/nrf_drv_uart.c
+	${VENDOR_DIR}/external/fprintf/nrf_fprintf.c
+	${VENDOR_DIR}/external/fprintf/nrf_fprintf_format.c
+	${VENDOR_DIR}/external/segger_rtt/SEGGER_RTT.c
+	${VENDOR_DIR}/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c
+	${VENDOR_DIR}/external/segger_rtt/SEGGER_RTT_printf.c
+	${VENDOR_DIR}/external/utf_converter/utf.c
+)
+
+target_include_directories(${KEYBOARD}
+    PRIVATE
+	${VENDOR_DIR}/components
+	${VENDOR_DIR}/components/boards
+	${VENDOR_DIR}/components/ble/common
+	${VENDOR_DIR}/components/ble/ble_advertising
+	${VENDOR_DIR}/components/ble/ble_link_ctx_manager
+	${VENDOR_DIR}/components/ble/nrf_ble_gatt
+	${VENDOR_DIR}/components/ble/nrf_ble_qwr
+	${VENDOR_DIR}/components/ble/peer_manager
+	${VENDOR_DIR}/components/ble/ble_services/ble_bas
+	${VENDOR_DIR}/components/ble/ble_services/ble_dfu
+	${VENDOR_DIR}/components/ble/ble_services/ble_dis
+	${VENDOR_DIR}/components/ble/ble_services/ble_hids
+	${VENDOR_DIR}/components/libraries/atomic
+	${VENDOR_DIR}/components/libraries/atomic_fifo
+	${VENDOR_DIR}/components/libraries/atomic_flags
+	${VENDOR_DIR}/components/libraries/balloc
+	${VENDOR_DIR}/components/libraries/bsp
+	${VENDOR_DIR}/components/libraries/bootloader/ble_dfu
+	${VENDOR_DIR}/components/libraries/crc16
+	${VENDOR_DIR}/components/libraries/crc32
+	${VENDOR_DIR}/components/libraries/crypto
+	${VENDOR_DIR}/components/libraries/delay
+	${VENDOR_DIR}/components/libraries/ecc
+	${VENDOR_DIR}/components/libraries/experimental_section_vars
+	${VENDOR_DIR}/components/libraries/fifo
+	${VENDOR_DIR}/components/libraries/fds
+	${VENDOR_DIR}/components/libraries/fstorage
+	${VENDOR_DIR}/components/libraries/gpiote
+	${VENDOR_DIR}/components/libraries/hardfault
+	${VENDOR_DIR}/components/libraries/log
+	${VENDOR_DIR}/components/libraries/log/src
+	${VENDOR_DIR}/components/libraries/low_power_pwm
+	${VENDOR_DIR}/components/libraries/memobj
+	${VENDOR_DIR}/components/libraries/mem_manager
+	${VENDOR_DIR}/components/libraries/mpu
+	${VENDOR_DIR}/components/libraries/mutex
+	${VENDOR_DIR}/components/libraries/pwr_mgmt
+	${VENDOR_DIR}/components/libraries/pwm
+	${VENDOR_DIR}/components/libraries/queue
+	${VENDOR_DIR}/components/libraries/ringbuf
+	${VENDOR_DIR}/components/libraries/scheduler
+	${VENDOR_DIR}/components/libraries/sortlist
+	${VENDOR_DIR}/components/libraries/strerror
+	${VENDOR_DIR}/components/libraries/stack_guard
+	${VENDOR_DIR}/components/libraries/svc
+	${VENDOR_DIR}/components/libraries/timer
+	${VENDOR_DIR}/components/libraries/twi_mngr
+	${VENDOR_DIR}/components/libraries/util
+	${VENDOR_DIR}/components/libraries/uart
+	${VENDOR_DIR}/components/proprietary_rf/gzll
+	${VENDOR_DIR}/components/softdevice/common
+	${VENDOR_DIR}/components/toolchain/cmsis/include
+	${VENDOR_DIR}/integration/nrfx
+	${VENDOR_DIR}/integration/nrfx/legacy
+	${VENDOR_DIR}/modules/nrfx
+	${VENDOR_DIR}/modules/nrfx/mdk
+	${VENDOR_DIR}/modules/nrfx/hal
+	${VENDOR_DIR}/modules/nrfx/drivers/include
+	${VENDOR_DIR}/external/fprintf
+	${VENDOR_DIR}/external/segger_rtt
+	${CMAKE_CURRENT_LIST_DIR}
+)
+
+target_compile_definitions(${KEYBOARD}
+	PRIVATE
+	APP_UART
+	APP_TIMER_V2
+	APP_TIMER_V2_RTC1_ENABLED
+	BOARD_CUSTOM
+	CONFIG_NFCT_PINS_AS_GPIOS
+	FLOAT_ABI_HARD
+	NRF_SD_BLE_API_VERSION=7
+	SOFTDEVICE_PRESENT
+	__HEAP_SIZE=8192
+	__STACK_SIZE=8192
+	GAZELL_PRESENT
+    CFG_TUSB_MCU=OPT_MCU_NRF5X
+	#CONFIG_GPIO_AS_PINRESET
+)
+
+set(MCU_FLAGS -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16 CACHE STRING INTERNAL)
+set(LINKER_PATH ${VENDOR_DIR}/modules/nrfx/mdk CACHE STRING INTERNAL)
+set(LINKER_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/${MCU_TYPE}.ld CACHE STRING INTERNAL)
+
+if(MCU_TYPE MATCHES "nrf52832")
+	target_sources(${KEYBOARD}
+		PRIVATE
+		${VENDOR_DIR}/modules/nrfx/mdk/gcc_startup_nrf52.S
+		${VENDOR_DIR}/modules/nrfx/mdk/system_nrf52.c
+	)
+
+	target_include_directories(${KEYBOARD}
+ 		PRIVATE
+		${VENDOR_DIR}/components/softdevice/s132/headers
+		${VENDOR_DIR}/components/softdevice/s132/headers/nrf52
+	)
+
+	target_compile_definitions(${KEYBOARD}
+		PRIVATE
+		GPIO_NRF5X
+		NRF52
+		NRF52832_XXAA
+		NRF52_PAN_74
+		S132
+	)
+	target_link_libraries(${KEYBOARD} ${VENDOR_DIR}/components/proprietary_rf/gzll/gcc/gzll_nrf52_gcc.a)
+endif()
+
+if(MCU_TYPE MATCHES "nrf52840")
+	target_sources(${KEYBOARD}
+		PRIVATE
+		${VENDOR_DIR}/modules/nrfx/mdk/gcc_startup_nrf52840.S
+		${VENDOR_DIR}/modules/nrfx/mdk/system_nrf52840.c
+	)
+
+	target_include_directories(${KEYBOARD}
+ 		PRIVATE
+		${VENDOR_DIR}/components/softdevice/s140/headers
+		${VENDOR_DIR}/components/softdevice/s140/headers/nrf52
+		${VENDOR_DIR}/modules/nrfx/drivers/src
+	)
+
+	target_compile_definitions(${KEYBOARD}
+		PRIVATE
+		NRF52840_XXAA
+		S140
+	)
+	target_link_libraries(${KEYBOARD} ${VENDOR_DIR}/components/proprietary_rf/gzll/gcc/gzll_nrf52840_gcc.a)
+endif()
+
+if(NRF_AMK_DEBUG)
+	target_compile_definitions(${KEYBOARD}
+		PRIVATE
+		NRF_AMK_DEBUG
+		DEBUG
+	)
+
+	target_sources(${KEYBOARD}
+		PRIVATE
+		${VENDOR_DIR}/components/libraries/util/app_error_handler_gcc.c
+	)
+endif()

@@ -131,10 +131,17 @@ if(EECONFIG_FRAM)
         )
 elseif(EECONFIG_FLASH)
     target_compile_definitions(${KEYBOARD} PRIVATE "EECONFIG_FLASH")
-    target_sources(${KEYBOARD}
-        PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR}/porting/wired/stm32/eeconfig_flash.c
+    if(MCU_FAMILY MATCHES "nrf5")
+        target_sources(${KEYBOARD}
+            PRIVATE
+            ${CMAKE_CURRENT_LIST_DIR}/porting/nrf52/eeconfig_flash.c
         )
+    else()
+        target_sources(${KEYBOARD}
+            PRIVATE
+            ${CMAKE_CURRENT_LIST_DIR}/porting/wired/stm32/eeconfig_flash.c
+        )
+    endif()
 else()
     target_sources(${KEYBOARD}
         PRIVATE

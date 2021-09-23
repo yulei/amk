@@ -44,7 +44,7 @@ if(ACTIONMAP_ENABLE)
 		PRIVATE
 		${CMAKE_CURRENT_LIST_DIR}/tmk/tmk_core/common/actionmap.c
 	)
-	target_compile_definitions(tmk PUBLIC "EXTRAKEY_ENABLE")
+	target_compile_definitions(${KEYBOARD} PUBLIC "ACTIONMAP_ENABLE")
 else()
 	target_sources(${KEYBOARD}
 	PRIVATE

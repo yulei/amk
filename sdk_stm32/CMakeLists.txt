@@ -1,13 +1,19 @@
-if(MCU_TYPE STREQUAL "stm32f722")
+if(MCU_TYPE MATCHES "stm32f722")
     set(SDK_MCU_SERIES f7)
     set(SDK_MCU_FAMILY stm32f7xx)
     set(SDK_MCU_TYPE f722)
 endif()
 
-if(MCU_TYPE STREQUAL "stm32f405")
+if(MCU_TYPE MATCHES "stm32f405")
     set(SDK_MCU_SERIES f4)
     set(SDK_MCU_FAMILY stm32f4xx)
     set(SDK_MCU_TYPE f405)
+endif()
+
+if(MCU_TYPE MATCHES "stm32f411")
+    set(SDK_MCU_SERIES f4)
+    set(SDK_MCU_FAMILY stm32f4xx)
+    set(SDK_MCU_TYPE f411)
 endif()
 
 set(VENDOR_DIR ${CMAKE_CURRENT_LIST_DIR}/../libs/vendor/st)
