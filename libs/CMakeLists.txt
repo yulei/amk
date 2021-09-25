@@ -94,15 +94,19 @@ endif()
 
 # fatfs
 if(MSC_ENABLE)
-	target_sources(${KEYBOARD}
-		PRIVATE
-		${CMAKE_CURRENT_LIST_DIR}/fatfs/source/ff.c
-		${CMAKE_CURRENT_LIST_DIR}/fatfs/porting/diskio_flash.c
-		)
+	#if(RTOS_ENABLE)
+	#	include(${CMAKE_CURRENT_LIST_DIR}/filex.cmake)
+	#else()
+		target_sources(${KEYBOARD}
+			PRIVATE
+			${CMAKE_CURRENT_LIST_DIR}/fatfs/source/ff.c
+			${CMAKE_CURRENT_LIST_DIR}/fatfs/porting/diskio_flash.c
+			)
 
-	target_include_directories(${KEYBOARD}
-		PUBLIC
-		${CMAKE_CURRENT_LIST_DIR}/fatfs/source
-		${CMAKE_CURRENT_LIST_DIR}/fatfs/porting
-		)
+		target_include_directories(${KEYBOARD}
+			PUBLIC
+			${CMAKE_CURRENT_LIST_DIR}/fatfs/source
+			${CMAKE_CURRENT_LIST_DIR}/fatfs/porting
+			)
+	#endif()
 endif()

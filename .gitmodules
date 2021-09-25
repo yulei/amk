@@ -26,3 +26,6 @@
 [submodule "libs/cmsis_5"]
 	path = libs/cmsis_5
 	url = https://github.com/ARM-software/CMSIS_5.git
+[submodule "libs/tinygl"]
+	path = libs/tinygl
+	url = https://github.com/yulei/tinygl.git
