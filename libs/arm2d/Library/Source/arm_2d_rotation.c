@@ -62,15 +62,12 @@ extern "C" {
 #   pragma clang diagnostic ignored "-Wundef"
 #elif defined(__IS_COMPILER_ARM_COMPILER_5__)
 #   pragma diag_suppress 174,177,188,68,513,144
-#elif __IS_COMPILER_GCC__
+#elif defined(__IS_COMPILER_GCC__)
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
 #endif
 
 #include <arm_math.h>
-
-
-
 
 /*============================ MACROS ========================================*/
 #undef __PI
@@ -87,23 +84,44 @@ extern "C" {
  *----------------------------------------------------------------------------*/
 
 
+#define __API_PIXEL_AVERAGE_RESULT_RGB565()                     \
+    (   tPixel.R >>= 8,                                         \
+        tPixel.G >>= 8,                                         \
+        tPixel.B >>= 8,                                         \
+        __arm_2d_rgb565_pack(&tPixel));
+
+#define __API_PIXEL_AVERAGE_RESULT_RGB888()                     \
+    (   tPixel.R >>= 8,                                         \
+        tPixel.G >>= 8,                                         \
+        tPixel.B >>= 8,                                         \
+        __arm_2d_rgb888_pack(&tPixel));
 
 #define __API_COLOUR                rgb565
 #define __API_INT_TYPE              uint16_t
 #define __API_PIXEL_BLENDING        __ARM_2D_PIXEL_BLENDING_RGB565
-
+#define __API_PIXEL_AVERAGE         __ARM_2D_PIXEL_AVERAGE_RGB565
+#define __API_PIXEL_AVERAGE_RESULT  __API_PIXEL_AVERAGE_RESULT_RGB565
 #include "__arm_2d_rotate.inc"
 
 #define __API_COLOUR                rgb888
 #define __API_INT_TYPE              uint32_t
 #define __API_PIXEL_BLENDING        __ARM_2D_PIXEL_BLENDING_RGB888
+#define __API_PIXEL_AVERAGE         __ARM_2D_PIXEL_AVERAGE_RGB888
+#define __API_PIXEL_AVERAGE_RESULT  __API_PIXEL_AVERAGE_RESULT_RGB888
 
 #include "__arm_2d_rotate.inc"
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ TYPES =========================================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ PROTOTYPES ====================================*/
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ IMPLEMENTATION ================================*/
+
+#if 0
 
 /* faster atan(y/x) float version */
-//static
+static
 float32_t __atan2_f32(float32_t y, float32_t x)
 {
     float32_t       xabs = fabsf(x);
@@ -123,13 +141,7 @@ float32_t __atan2_f32(float32_t y, float32_t x)
     return copysignf(1.0f, y) * copysignf(1.0f, x) * atan2est;
 }
 
-/*============================ TYPES =========================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ PROTOTYPES ====================================*/
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ IMPLEMENTATION ================================*/
-
-//static
+static
 void __arm_2d_rotate_get_rotated_corner(const arm_2d_location_t *ptLocation,
                                             const arm_2d_location_t *ptCenter,
                                             float fAngle,
@@ -145,6 +157,7 @@ void __arm_2d_rotate_get_rotated_corner(const arm_2d_location_t *ptLocation,
     ptOutBuffer->fX = (-iY * sinAngle + iX * cosAngle + ptCenter->iX);
 
 }
+#endif
 
 #if __ARM_2D_CFG_FORCED_FIXED_POINT_ROTATION__
 
@@ -730,9 +743,9 @@ static arm_2d_region_t *__arm_2d_calculate_region(  const arm_2d_point_float_t *
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop
-#elif __IS_COMPILER_ARM_COMPILER_5__
+#elif defined(__IS_COMPILER_ARM_COMPILER_5__)
 #   pragma diag_warning 174,177,188,68,513,144
-#elif __IS_COMPILER_GCC__
+#elif defined(__IS_COMPILER_GCC__)
 #   pragma GCC diagnostic pop
 #endif
 

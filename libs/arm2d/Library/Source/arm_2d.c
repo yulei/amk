@@ -59,12 +59,13 @@ extern "C" {
 #   pragma clang diagnostic ignored "-Wgnu-statement-expression"
 #   pragma clang diagnostic ignored "-Wswitch-enum"
 #   pragma clang diagnostic ignored "-Wswitch"
-#elif __IS_COMPILER_ARM_COMPILER_5__
+#elif defined(__IS_COMPILER_ARM_COMPILER_5__)
 #   pragma diag_suppress 174,177,188,68,513
-#elif __IS_COMPILER_GCC__
+#elif defined(__IS_COMPILER_GCC__)
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wenum-compare"
 #   pragma GCC diagnostic ignored "-Wpedantic"
+#   pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif
 
 /*============================ MACROS ========================================*/
@@ -618,11 +619,6 @@ arm_fsm_rt_t __arm_2d_op_frontend_region_process( arm_2d_op_core_t *ptOP)
     if (!arm_2d_region_intersect(   &tDrawRegion, 
                                     &tTargetRegion, 
                                     &tDrawRegion)) {
-        //! no overlapping
-        if (ARM_2D_RUNTIME_FEATURE.TREAT_OUT_OF_RANGE_AS_COMPLETE) {
-            //! nothing to draw
-            return arm_fsm_rt_cpl;
-        } 
         return (arm_fsm_rt_t)ARM_2D_ERR_OUT_OF_REGION;
     }
 
@@ -655,14 +651,6 @@ arm_fsm_rt_t __arm_2d_op_frontend_region_process( arm_2d_op_core_t *ptOP)
         }
     #endif
     } while(0);
-   
-    if (ARM_2D_ERR_OUT_OF_REGION == tResult) {
-                                        
-        if (ARM_2D_RUNTIME_FEATURE.TREAT_OUT_OF_RANGE_AS_COMPLETE) {
-            //! nothing to draw
-            return arm_fsm_rt_cpl;
-        } 
-    } 
 
     return tResult;
 }
@@ -757,10 +745,6 @@ arm_fsm_rt_t __arm_2d_op_frontend_region_process_with_src( arm_2d_op_core_t *ptO
                                     &tTargetRegion, 
                                     &tDrawRegion)) {
         //! no overlapping
-        if (ARM_2D_RUNTIME_FEATURE.TREAT_OUT_OF_RANGE_AS_COMPLETE) {
-            //! nothing to draw
-            return arm_fsm_rt_cpl;
-        } 
         return (arm_fsm_rt_t)ARM_2D_ERR_OUT_OF_REGION;
     }
 
@@ -788,17 +772,8 @@ arm_fsm_rt_t __arm_2d_op_frontend_region_process_with_src( arm_2d_op_core_t *ptO
                                         &tTargetRegion,
                                         &tClippdRegion,
                                         this.wMode & ~ARM_2D_CP_MODE_FILL);
-        //arm_2d_region_t tClippedRegion;
-        if (ARM_2D_ERR_OUT_OF_REGION == tResult) {
-                                            
-            if (ARM_2D_RUNTIME_FEATURE.TREAT_OUT_OF_RANGE_AS_COMPLETE) {
-                //! nothing to draw
-                return arm_fsm_rt_cpl;
-            } 
-            
-            return tResult;
-            
-        } else if (tResult < 0) {
+                                        
+        if (tResult < 0) {
             return tResult;
         }
 
@@ -935,19 +910,6 @@ arm_fsm_rt_t __arm_2d_op_frontend_region_process_with_src( arm_2d_op_core_t *ptO
                                                     this.Target.ptTile,
                                                     &tTargetRegion,
                                                     this.wMode);
-                                            
-        if (ARM_2D_ERR_OUT_OF_REGION == tResult) {
-                                            
-            if (ARM_2D_RUNTIME_FEATURE.TREAT_OUT_OF_RANGE_AS_COMPLETE) {
-                //! nothing to draw
-                return arm_fsm_rt_cpl;
-            } 
-            
-            return tResult;
-            
-        } else if (tResult < 0) {
-            return tResult;
-        }
     }
 
     return tResult;
@@ -1007,6 +969,13 @@ arm_fsm_rt_t __arm_2d_op_frontend_op_decoder(arm_2d_op_core_t *ptThis)
     default:
         /* control operation */
         tResult = __arm_2d_op_frontend_control(ptThis);
+    }
+    
+    if (ARM_2D_ERR_OUT_OF_REGION == tResult) {                                 
+        if (ARM_2D_RUNTIME_FEATURE.TREAT_OUT_OF_RANGE_AS_COMPLETE) {
+            //! nothing to draw
+            tResult = arm_fsm_rt_cpl;
+        } 
     }
     
     return tResult;
@@ -1164,9 +1133,9 @@ arm_fsm_rt_t arm_2d_task(arm_2d_task_t *ptTask)
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop
-#elif __IS_COMPILER_ARM_COMPILER_5__
+#elif defined(__IS_COMPILER_ARM_COMPILER_5__)
 #   pragma diag_warning 174,177,188,68,513,144
-#elif __IS_COMPILER_GCC__
+#elif defined(__IS_COMPILER_GCC__)
 #   pragma GCC diagnostic pop
 #endif
 

@@ -62,13 +62,14 @@ extern "C" {
 #   pragma clang diagnostic ignored "-Wswitch"
 #   pragma clang diagnostic ignored "-Wimplicit-fallthrough"
 #   pragma clang diagnostic ignored "-Wgnu-statement-expression"
-#elif __IS_COMPILER_ARM_COMPILER_5__
+#elif defined(__IS_COMPILER_ARM_COMPILER_5__)
 #   pragma diag_suppress 174,177,188,68,513,144
-#elif __IS_COMPILER_GCC__
+#elif defined(__IS_COMPILER_GCC__)
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wswitch"
 #   pragma GCC diagnostic ignored "-Wenum-compare"
 #   pragma GCC diagnostic ignored "-Wpedantic"
+#   pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif
 
 /*============================ MACROS ========================================*/
@@ -367,18 +368,22 @@ void __arm_2d_notify_sub_task_cpl(  __arm_2d_sub_task_t *ptTask,
 {
     ARM_2D_UNUSED(bFromHW);
     
-    assert(NULL != ptTask);
-    assert(ptTask->ptOP->Status.u4SubTaskCount > 0);
+    arm_2d_op_core_t *ptOP = ptTask->ptOP;
     
-    ptTask->ptOP->Status.u4SubTaskCount--;
-    __arm_2d_notify_op_cpl(ptTask->ptOP, tResult);
+    assert(NULL != ptTask);
+    assert(NULL != ptOP);
+    assert(ptOP->Status.u4SubTaskCount > 0);
 
     //! free sub task
     __arm_2d_sub_task_free(ptTask);
     
     //if (bFromHW) {
-        arm_2d_notif_aync_sub_task_cpl(ptTask->ptOP->pUserParam);
+        arm_2d_notif_aync_sub_task_cpl(ptOP->pUserParam);
     //}
+    
+    ptOP->Status.u4SubTaskCount--;
+    __arm_2d_notify_op_cpl(ptOP, tResult);
+    
 }
 
 /*! \note You can override this to add support for new types of interface
@@ -508,7 +513,7 @@ arm_fsm_rt_t __arm_2d_frontend_task(arm_2d_task_t *ptThis)
     if (NULL == ptOP) {
         return arm_fsm_rt_cpl;
     }
-    
+
     tResult = __arm_2d_op_frontend_op_decoder(ptOP);
     
     if ((arm_fsm_rt_cpl == tResult) || (tResult < 0)) {
@@ -520,7 +525,13 @@ arm_fsm_rt_t __arm_2d_frontend_task(arm_2d_task_t *ptThis)
         }
         ptOP->Status.u4SubTaskCount = 0;
         __arm_2d_notify_op_cpl(ptOP, tResult);
-    } 
+    } else if (arm_fsm_rt_async == tResult) {
+        arm_irq_safe {
+            ARM_LIST_QUEUE_DEQUEUE( ARM_2D_CTRL.OPFIFO.ptHead, 
+                                    ARM_2D_CTRL.OPFIFO.ptTail,
+                                    ptOP);
+        }
+    }
     
     /* release resources here */
     __arm_2d_sub_task_cancel_booking();
@@ -813,9 +824,6 @@ bool arm_2d_port_wait_for_async(uintptr_t pUserParam)
     return false;
 }
 
-
-
-
 __OVERRIDE_WEAK
 /*! \brief sync up with operation 
  *! \retval true operation is busy
@@ -827,14 +835,21 @@ bool arm_2d_op_wait_async(arm_2d_op_core_t *ptOP)
 
     volatile arm_2d_op_status_t *ptStatus 
         = (volatile arm_2d_op_status_t *)&(this.Status);
-
-    while (ptStatus->bIsBusy) {
+        
+    bool bIsBusy = false;
+    do {
+        bIsBusy = ptStatus->bIsBusy;
+        
+        if (!bIsBusy) {
+            break;
+        }
+        
         if (!arm_2d_port_wait_for_async(this.pUserParam)) {
             break;
         }
-    } 
+    } while(bIsBusy);
     
-    return !ptStatus->bIsBusy;
+    return !bIsBusy;
 }
 
 
@@ -852,33 +867,36 @@ bool __arm_2d_op_acquire(arm_2d_op_core_t *ptOP)
     bool bResult = false;
     do {
         arm_irq_safe {
-            bResult = !ptStatus->bIsBusy;
-            if (bResult) {
+            bResult = ptStatus->bIsBusy;
+            if (!bResult) {
                 this.tResult = arm_fsm_rt_async;
-                ptStatus->tValue = 0;                                                 //! reset status
-                ptStatus->bIsBusy = true;                                             //! set busy flag
+                ptStatus->tValue = 0;                                           //! reset status
+                ptStatus->bIsBusy = true;                                       //! set busy flag
             }
         }
         
-        if (bResult) {
+        if (!bResult) {
             break;
         }
-    
+
         if (!arm_2d_port_wait_for_async(this.pUserParam)) {
             break;
         }
-    } while (!bResult);
+
+    } while (bResult);
     
-    return bResult;
+    
+    
+    return !bResult;
 }
 
 
 
 #if defined(__clang__)
 #   pragma clang diagnostic pop
-#elif __IS_COMPILER_ARM_COMPILER_5__
+#elif defined(__IS_COMPILER_ARM_COMPILER_5__)
 #   pragma diag_warning 174,177,188,68,513,144
-#elif __IS_COMPILER_GCC__
+#elif defined(__IS_COMPILER_GCC__)
 #   pragma GCC diagnostic pop
 #endif
 
