@@ -46,8 +46,9 @@ target_include_directories(${KEYBOARD}
     ${VENDOR_DIR}/driver_${SDK_MCU_SERIES}/Inc
     ${VENDOR_DIR}/driver_${SDK_MCU_SERIES}/Inc/Legacy
     ${VENDOR_DIR}/device_${SDK_MCU_SERIES}/Include
-    ${VENDOR_DIR}/cmsis/Core/Include
-    ${VENDOR_DIR}/cmsis/DSP/Include
+    ${CMAKE_CURRENT_LIST_DIR}/../libs/cmsis_5/CMSIS/Core/Include
+    #${VENDOR_DIR}/cmsis/Core/Include
+    #${VENDOR_DIR}/cmsis/DSP/Include
     )
 
 target_compile_definitions(${KEYBOARD} PRIVATE "USE_HAL_DRIVER")

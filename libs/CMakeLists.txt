@@ -72,20 +72,12 @@ if(TINYUSB_ENABLE)
         )
     
     if(TINYUSB_USE_HAL)
-        target_sources(${KEYBOARD}
-            PRIVATE
-            ${CMAKE_CURRENT_LIST_DIR}/../sdk_stm32/hal_usb/dcd_hal_stm32.c
-            )
-		target_include_directories(${KEYBOARD}
-			PUBLIC
-			${CMAKE_CURRENT_LIST_DIR}/../main/porting/wired/stm32
-			${CMAKE_CURRENT_LIST_DIR}/../main/amk
-			${CMAKE_CURRENT_LIST_DIR}/../libs/vendor/st/cmsis/Include
-			${CMAKE_CURRENT_LIST_DIR}/../libs/vendor/st/device_f7/Include
-			${CMAKE_CURRENT_LIST_DIR}/../libs/vendor/st/driver_f7/Inc
-			${CMAKE_CURRENT_LIST_DIR}/../libs/printf
-			${CMAKE_CURRENT_LIST_DIR}/../sdk_stm32/mcus/f722
-			)
+		if(MCU_FAMILY MATCHES "stm32")
+			target_sources(${KEYBOARD}
+				PRIVATE
+				${CMAKE_CURRENT_LIST_DIR}/../sdk_stm32/hal_usb/dcd_hal_stm32.c
+				)
+		endif()
     else()
         message(STATUS "tinyusb use hal not defined")
     endif()

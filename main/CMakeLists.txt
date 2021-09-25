@@ -20,7 +20,7 @@ target_include_directories(${KEYBOARD}
     ${CMAKE_CURRENT_LIST_DIR}/screen
     ${CMAKE_CURRENT_LIST_DIR}/usb
     ${CMAKE_CURRENT_LIST_DIR}/segger
-    ${LIB_DIR}/tinyusb/src
+    ${LIBS_DIR}/tinyusb/src
 )
 
 if(RTOS_ENABLE)
@@ -33,8 +33,22 @@ if(RTOS_ENABLE)
     )
     target_compile_definitions(${KEYBOARD} PRIVATE "RTOS_ENABLE")
 
-    #include ${LIBS_DIR}/threadx.cmake
-    #include ${LIBS_DIR}/usbx.cmake
+    if(MCU_TYPE MATCHES "stm32f411")
+        set(MCU_ARCH m4)
+    endif()
+
+    if(MCU_TYPE MATCHES "stm32f405")
+        set(MCU_ARCH m4)
+    endif()
+
+    if(MCU_TYPE MATCHES "stm32f722")
+        set(MCU_ARCH m7)
+    endif()
+
+    #include(${LIBS_DIR}/threadx.cmake)
+    #include(${LIBS_DIR}/usbx.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/../libs/threadx.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/../libs/usbx.cmake)
 
 else()
     target_sources(${KEYBOARD}

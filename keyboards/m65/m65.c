@@ -552,6 +552,8 @@ static void reset_to_msc(bool msc)
 
 void disp_thread_entry(ULONG thread_input)
 {
+    //while(1) tx_thread_sleep(5);
+
     set_screen_state(screen_enable);
 
     gpio_set_output_pushpull(FLASH_CS);

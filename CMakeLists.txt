@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.15.1)
 project(amk VERSION 1.0.0)
 
 enable_language(C ASM)
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
@@ -66,4 +66,5 @@ target_link_options(${KEYBOARD}
 
 add_custom_command(TARGET ${KEYBOARD} POST_BUILD COMMAND ${OBJCOPY} -O ihex ${KEYBOARD}.elf ${KEYBOARD}.hex)
 add_custom_command(TARGET ${KEYBOARD} POST_BUILD COMMAND ${OBJCOPY} -O binary ${KEYBOARD}.elf ${KEYBOARD}.bin)
+
 add_custom_command(TARGET ${KEYBOARD} POST_BUILD COMMAND ${SIZE} ${KEYBOARD}.elf)

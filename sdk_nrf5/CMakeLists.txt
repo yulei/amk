@@ -195,6 +195,13 @@ if(MCU_TYPE MATCHES "nrf52832")
 endif()
 
 if(MCU_TYPE MATCHES "nrf52840")
+	if(TINYUSB_ENABLE)
+		target_sources(${KEYBOARD}
+			PRIVATE
+			${CMAKE_CURRENT_LIST_DIR}/dcd_nrf5x.c
+		)
+	endif()
+
 	target_sources(${KEYBOARD}
 		PRIVATE
 		${VENDOR_DIR}/modules/nrfx/mdk/gcc_startup_nrf52840.S

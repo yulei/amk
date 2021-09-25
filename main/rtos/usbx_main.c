@@ -11,12 +11,12 @@
 
 #define MAIN_THREAD_PRIO            10
 #define MAIN_PREEMPTION_THRESHOLD   (MAIN_THREAD_PRIO)
-#define MAIN_STACK_SIZE             4096
+#define MAIN_STACK_SIZE             8192
 static CHAR main_stack[MAIN_STACK_SIZE];
 
 #define DISP_THREAD_PRIO            11
 #define DISP_PREEMPTION_THRESHOLD   (DISP_THREAD_PRIO)
-#define DISP_STACK_SIZE             4096
+#define DISP_STACK_SIZE             8192
 static CHAR disp_stack[MAIN_STACK_SIZE];
 
 #define USBX_MEMORY_SIZE        (32*1024)
