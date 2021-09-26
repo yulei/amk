@@ -47,6 +47,28 @@ void keyboard_prepare_sleep(void)
     rgb_led_prepare_sleep();
 }
 
+void hook_layer_change(uint32_t layer_state)
+{
+#ifdef RGB_INDICATOR_ENABLE
+    uint8_t r = 0;
+    uint8_t g = 0;
+    uint8_t b = 0;
+    if(layer_state & ((1)<<1)){
+        b = 0xFF;
+    } 
+
+    if(layer_state & ((1)<<2)){
+        r = 0xFF;
+    } 
+
+    if(layer_state & ((1)<<3)){
+        g = 0xFF;
+    } 
+    rgb_indicator_set(ESC_LED, r, g, b);
+    amk_printf("turn layer led on\n");
+#endif
+}
+
 void led_set(uint8_t led)
 {
 #ifdef RGB_INDICATOR_ENABLE
