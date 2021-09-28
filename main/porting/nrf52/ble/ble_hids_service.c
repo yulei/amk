@@ -5,13 +5,14 @@
 
 #include "ble_hids.h"
 #include "ble_hids_service.h"
+#include "usb_desc_def.h"
 #include "usb_descriptors.h"
 #include "report_queue.h"
 
 const static uint8_t hid_report_descriptor [] = {
-    TUD_HID_REPORT_DESC_KEYBOARD( HID_REPORT_ID(NRF_REPORT_ID_KEYBOARD) ),
-    TUD_HID_REPORT_DESC_MOUSE   ( HID_REPORT_ID(NRF_REPORT_ID_MOUSE) ),
-    TUD_HID_REPORT_DESC_EXTRA   ( NRF_REPORT_ID_SYSTEM, NRF_REPORT_ID_CONSUMER),
+    UDD_HID_REPORT_DESC_KEYBOARD( KBD_REPORT_ID(NRF_REPORT_ID_KEYBOARD) ),
+    UDD_HID_REPORT_DESC_MOUSE   ( NRF_REPORT_ID_MOUSE ),
+    UDD_HID_REPORT_DESC_EXTRA   ( NRF_REPORT_ID_SYSTEM, NRF_REPORT_ID_CONSUMER),
 };
 
 typedef struct {

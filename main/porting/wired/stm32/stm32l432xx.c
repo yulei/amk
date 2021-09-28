@@ -5,6 +5,10 @@
 #include "generic_hal.h"
 #include "usb_descriptors.h"
 
+#ifdef TINYUSB_ENABLE
+#include "tusb.h"
+#endif
+
 UART_HandleTypeDef huart1;
 DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart1_tx;

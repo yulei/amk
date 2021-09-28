@@ -7,6 +7,10 @@
 #include "amk_printf.h"
 #include "usb_descriptors.h"
 
+#ifdef TINYUSB_ENABLE
+#include "tusb.h"
+#endif
+
 I2C_HandleTypeDef hi2c1;
 DMA_HandleTypeDef hdma_i2c1_tx;
 DMA_HandleTypeDef hdma_i2c1_rx;

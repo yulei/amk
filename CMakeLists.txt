@@ -1,12 +1,17 @@
 
 cmake_minimum_required(VERSION 3.15.1)
 
+# toolchain file
+set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/cmake/arm-none-eabi.cmake)
+
+# project
 project(amk VERSION 1.0.0)
 
 enable_language(C ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
+
 
 if(NOT DEFINED KEYBOARD)
     set(KEYBOARD onekey)
@@ -31,9 +36,7 @@ set(EXTRAKEY_ENABLE yes)
 set(LIBS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 add_subdirectory(${LIBS_DIR})
 
-set(LDFLAGS "-L${LINKER_PATH} -T${LINKER_SCRIPT}")
-message(STATUS "LDFLAGS:${LDFLAGS}")
-
+message(STATUS "LDFLAGS:-L${LINKER_PATH} -T${LINKER_SCRIPT}")
 target_compile_options(${KEYBOARD}
     PRIVATE
     ${MCU_FLAGS}

@@ -6,8 +6,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-
-#include "usb_descriptors.h"
+#include <string.h>
 
 void usb_init(void);
 void usb_task(void);

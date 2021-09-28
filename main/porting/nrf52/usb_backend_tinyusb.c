@@ -3,6 +3,7 @@
  *     usb backend with tinyusb
  */
 
+#include "tusb.h"
 #include "usb_interface.h"
 #include "nrf_delay.h"
 #include "nrf_drv_clock.h"

@@ -6,10 +6,20 @@
 #include "usbd_ctlreq.h"
 #include "usbd_composite.h"
 #include "usb_descriptors.h"
+#include "usb_desc_def.h"
 #include "usb_led.h"
 #include "amk_printf.h"
 
 bool usb_led_event = false;
+
+#define HID_REQ_SET_PROTOCOL                       0x0BU
+#define HID_REQ_GET_PROTOCOL                       0x03U
+
+#define HID_REQ_SET_IDLE                           0x0AU
+#define HID_REQ_GET_IDLE                           0x02U
+
+#define HID_REQ_SET_REPORT                         0x09U
+#define HID_REQ_GET_REPORT                         0x01U
 
 typedef enum {
     ITF_IDLE = 0,
@@ -31,14 +41,14 @@ typedef struct {
 //#define USBD_COMPOSITE_MAX_INTERFACE    ITF_NUM_TOTAL
 // hid keyboard and other(mouse, system, consumer)
 #define USBD_HID_KBD_EPIN               (0x80|EPNUM_HID_KBD)
-#define USBD_HID_KBD_EPIN_SIZE          CFG_TUD_HID_EP_BUFSIZE
+#define USBD_HID_KBD_EPIN_SIZE          UDD_HID_EP_SIZE
 #define USBD_HID_KBD_EPIN_TYPE          USBD_EP_TYPE_INTR 
 #define USBD_HID_KBD_EPOUT              0
 #define USBD_HID_KBD_EPOUT_SIZE         0
 #define USBD_HID_KBD_EPOUT_TYPE         0
 
 #define USBD_HID_OTHER_EPIN             (0x80|EPNUM_HID_OTHER)
-#define USBD_HID_OTHER_EPIN_SIZE        CFG_TUD_HID_EP_BUFSIZE
+#define USBD_HID_OTHER_EPIN_SIZE        UDD_HID_EP_SIZE
 #define USBD_HID_OTHER_EPIN_TYPE        USBD_EP_TYPE_INTR 
 #define USBD_HID_OTHER_EPOUT            0
 #define USBD_HID_OTHER_EPOUT_SIZE       0
@@ -481,22 +491,22 @@ static uint8_t  hid_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, v
     switch (req->bmRequest & USB_REQ_TYPE_MASK) {
         case USB_REQ_TYPE_CLASS :
             switch (req->bRequest) {
-                case HID_REQ_CONTROL_SET_PROTOCOL:
+                case HID_REQ_SET_PROTOCOL:
                 hhid->protocol = (uint8_t)(req->wValue);
                 break;
 
-                case HID_REQ_CONTROL_GET_PROTOCOL:
+                case HID_REQ_GET_PROTOCOL:
                 USBD_CtlSendData(pdev, (uint8_t *)(void *)&hhid->protocol, 1U);
                 break;
 
-                case HID_REQ_CONTROL_SET_IDLE:
+                case HID_REQ_SET_IDLE:
                 hhid->idle = (uint8_t)(req->wValue >> 8);
                 break;
 
-                case HID_REQ_CONTROL_GET_IDLE:
+                case HID_REQ_GET_IDLE:
                 USBD_CtlSendData(pdev, (uint8_t *)(void *)&hhid->idle, 1U);
                 break;
-                case HID_REQ_CONTROL_SET_REPORT:
+                case HID_REQ_SET_REPORT:
                 amk_printf("HID SET REPORT: \n");
                 USBD_CtlPrepareRx(pdev, &amk_led_state, 1U);
                 break;

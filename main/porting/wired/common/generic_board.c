@@ -4,9 +4,10 @@
 
 #include "generic_hal.h"
 #include "board.h"
-#include "amk_printf.h"
+#include "usb_descriptors.h"
 #include "usb_interface.h"
 #include "amk_keymap.h"
+#include "amk_printf.h"
 
 #include "report.h"
 #include "host.h"
@@ -32,6 +33,8 @@
 #ifdef RGB_ENABLE
 #include "rgb_led.h"
 #endif
+
+uint32_t usb_setting = 0;
 
 extern void system_init(void);
 extern void custom_board_init(void);

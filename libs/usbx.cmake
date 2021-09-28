@@ -174,7 +174,6 @@ target_sources(${KEYBOARD}
 target_include_directories(${KEYBOARD}
     PUBLIC
     ${USBX_DCD_DIR}
-	${CMAKE_CURRENT_LIST_DIR}/tinyusb/src
 )
 
 # ports

@@ -5,6 +5,10 @@
 #include "generic_hal.h"
 #include "usb_descriptors.h"
 
+#ifdef TINYUSB_ENABLE
+#include "tusb.h"
+#endif
+
 DMA_HandleTypeDef hdma_i2c1_rx;
 DMA_HandleTypeDef hdma_i2c1_tx;
 

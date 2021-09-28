@@ -8,7 +8,6 @@ target_sources(${KEYBOARD}
 	${CMAKE_CURRENT_LIST_DIR}/amk/amk_eeprom.c
 	${CMAKE_CURRENT_LIST_DIR}/amk/amk_boot.c
 	${CMAKE_CURRENT_LIST_DIR}/amk/report_queue.c
-	${CMAKE_CURRENT_LIST_DIR}/usb/usb_descriptors.c
 )
 
 target_include_directories(${KEYBOARD}
@@ -20,7 +19,6 @@ target_include_directories(${KEYBOARD}
     ${CMAKE_CURRENT_LIST_DIR}/screen
     ${CMAKE_CURRENT_LIST_DIR}/usb
     ${CMAKE_CURRENT_LIST_DIR}/segger
-    ${LIBS_DIR}/tinyusb/src
 )
 
 if(RTOS_ENABLE)
@@ -54,6 +52,11 @@ else()
     target_sources(${KEYBOARD}
         PRIVATE
 	    ${CMAKE_CURRENT_LIST_DIR}/amk/main.c
+	    ${CMAKE_CURRENT_LIST_DIR}/usb/usb_descriptors.c
+    )
+    target_include_directories(${KEYBOARD}
+        PUBLIC
+        ${CMAKE_CURRENT_LIST_DIR}/../libs/tinyusb/src
     )
 endif()
 

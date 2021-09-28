@@ -6,6 +6,10 @@
 #include "usb_descriptors.h"
 #include "amk_printf.h"
 
+#ifdef TINYUSB_ENABLE
+#include "tusb.h"
+#endif
+
 RTC_HandleTypeDef hrtc;
 UART_HandleTypeDef huart1;
 

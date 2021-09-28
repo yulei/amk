@@ -3,8 +3,104 @@
  */
 
 #include "usb_descriptors.h"
+#include "tusb.h"
 
-uint32_t usb_setting = 0;
+#define TUD_COMPOSITE_DEVICE_DESCRIPTOR(usb_ver, vender_id, product_id, device_ver, str_manufacture, str_product, str_serial ) \
+    18, TUSB_DESC_DEVICE, U16_TO_U8S_LE(usb_ver), \
+    0x00, 0x00, 0x00, CFG_TUD_ENDPOINT0_SIZE, \
+    U16_TO_U8S_LE(vender_id), U16_TO_U8S_LE(product_id), U16_TO_U8S_LE(device_ver), \
+    str_manufacture, str_product, str_serial, 1
+
+// Extra key report
+#define TUD_HID_REPORT_DESC_EXTRA(system, consumer) \
+    HID_USAGE_PAGE ( HID_USAGE_PAGE_DESKTOP           )         ,\
+    HID_USAGE      ( HID_USAGE_DESKTOP_SYSTEM_CONTROL )         ,\
+    HID_COLLECTION ( HID_COLLECTION_APPLICATION       )         ,\
+    HID_REPORT_ITEM( system, 8, RI_TYPE_GLOBAL, 1     )         ,\
+    HID_LOGICAL_MIN_N( 0x0001, 2                           )    ,\
+    HID_LOGICAL_MAX_N( 0x0037, 2                           )    ,\
+    /* System Power Down */ \
+    HID_USAGE_MIN_N  ( 0x0081, 2                           )    ,\
+    /* System Display LCD Autoscale */ \
+    HID_USAGE_MAX_N  ( 0x00B7, 2                           )    ,\
+    HID_REPORT_COUNT ( 1                                   )    ,\
+    HID_REPORT_SIZE  ( 16                                  )    ,\
+    HID_INPUT        ( HID_DATA | HID_ARRAY | HID_ABSOLUTE )    ,\
+    HID_COLLECTION_END, \
+    HID_USAGE_PAGE ( HID_USAGE_PAGE_CONSUMER    )               ,\
+    HID_USAGE      ( HID_USAGE_CONSUMER_CONTROL )               ,\
+    HID_COLLECTION ( HID_COLLECTION_APPLICATION )               ,\
+    HID_REPORT_ITEM( consumer, 8, RI_TYPE_GLOBAL, 1        )    ,\
+    HID_LOGICAL_MIN_N( 0x0001, 2                           )    ,\
+    HID_LOGICAL_MAX_N( 0x029C, 2                           )    ,\
+    HID_USAGE_MIN_N  ( 0x0001, 2                           )    ,\
+    HID_USAGE_MAX_N  ( 0x029C, 2                           )    ,\
+    HID_REPORT_COUNT ( 1                                   )    ,\
+    HID_REPORT_SIZE  ( 16                                  )    ,\
+    HID_INPUT        ( HID_DATA | HID_ARRAY | HID_ABSOLUTE )    ,\
+    HID_COLLECTION_END \
+
+#define TUD_HID_REPORT_DESC_NKRO(...) \
+    HID_USAGE_PAGE ( HID_USAGE_PAGE_DESKTOP           )         ,\
+    HID_USAGE      ( HID_USAGE_DESKTOP_KEYBOARD       )         ,\
+    HID_COLLECTION ( HID_COLLECTION_APPLICATION       )         ,\
+    /* Report ID if any */ \
+    __VA_ARGS__ \
+    /* 8 bits Modifier Keys (Shfit, Control, Alt) */ \
+    HID_USAGE_PAGE ( HID_USAGE_PAGE_KEYBOARD )                       ,\
+        HID_USAGE_MIN    ( 224                                    )  ,\
+        HID_USAGE_MAX    ( 231                                    )  ,\
+        HID_LOGICAL_MIN  ( 0                                      )  ,\
+        HID_LOGICAL_MAX  ( 1                                      )  ,\
+        HID_REPORT_COUNT ( 8                                      )  ,\
+        HID_REPORT_SIZE  ( 1                                      )  ,\
+        HID_INPUT        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE )  ,\
+    HID_USAGE_PAGE ( HID_USAGE_PAGE_KEYBOARD ) ,\
+        HID_USAGE_MIN    ( 0                                   )  ,\
+        HID_USAGE_MAX    ( (NKRO_KEYCODE_SIZE-1)*8             )  ,\
+        HID_LOGICAL_MIN  ( 0                                   )  ,\
+        HID_LOGICAL_MAX  ( 1                                   )  ,\
+        HID_REPORT_COUNT ( (NKRO_KEYCODE_SIZE-1)*8             )  ,\
+        HID_REPORT_SIZE  ( 1                                   )  ,\
+        HID_INPUT        ( HID_DATA | HID_ARRAY | HID_ABSOLUTE )  ,\
+    /* 5-bit LED Indicator Kana | Compose | ScrollLock | CapsLock | NumLock */ \
+    HID_USAGE_PAGE  ( HID_USAGE_PAGE_LED ) ,\
+        HID_USAGE_MIN    ( 1                                       ) ,\
+        HID_USAGE_MAX    ( 5                                       ) ,\
+        HID_REPORT_COUNT ( 5                                       ) ,\
+        HID_REPORT_SIZE  ( 1                                       ) ,\
+        HID_OUTPUT       ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE  ) ,\
+        /* led padding */ \
+        HID_REPORT_COUNT ( 1                                       ) ,\
+        HID_REPORT_SIZE  ( 3                                       ) ,\
+        HID_OUTPUT       ( HID_CONSTANT                            ) ,\
+    HID_COLLECTION_END \
+
+#define VIAL_USAGE_PAGE     0xFF60
+#define VIAL_USAGE_ID       0x61
+#define VIAL_EPSIZE         CFG_TUD_HID_EP_BUFSIZE
+
+#define TUD_HID_REPORT_DESC_VIAL(report_size, ...) \
+    HID_USAGE_PAGE_N ( VIAL_USAGE_PAGE, 2                                           ),\
+    HID_USAGE        ( VIAL_USAGE_ID                                                ),\
+    HID_COLLECTION   ( HID_COLLECTION_APPLICATION                                   ),\
+        /* Report ID if any */\
+        __VA_ARGS__ \
+        /* Input */ \
+        HID_USAGE       ( 0x62                                                      ),\
+        HID_LOGICAL_MIN ( 0x00                                                      ),\
+        HID_LOGICAL_MAX ( 0xff                                                      ),\
+        HID_REPORT_SIZE ( 8                                                         ),\
+        HID_REPORT_COUNT( report_size                                               ),\
+        HID_INPUT       ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE                    ),\
+        /* Output */ \
+        HID_USAGE       ( 0x63                                                      ),\
+        HID_LOGICAL_MIN ( 0x00                                                      ),\
+        HID_LOGICAL_MAX ( 0xff                                                      ),\
+        HID_REPORT_SIZE ( 8                                                         ),\
+        HID_REPORT_COUNT( report_size                                               ),\
+        HID_OUTPUT      ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE | HID_NON_VOLATILE ),\
+    HID_COLLECTION_END \
 
 // Device Descriptors
 tusb_desc_device_t const desc_device =
