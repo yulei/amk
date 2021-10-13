@@ -5,9 +5,6 @@ set(MCU_TYPE stm32f411)
 #set(MCU_TYPE stm32l072)
 set(LINKER_PATH ${CMAKE_CURRENT_LIST_DIR} CACHE STRING INTERNAL)
 
-set(TINYUSB_ENABLE yes)
-set(TINYUSB_USE_HAL yes)
-
 add_executable(${KEYBOARD} 
     ${KEYBOARD_DIR}/usbmaster.c
     ${KEYBOARD_DIR}/ring_buffer.c
