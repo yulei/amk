@@ -11,3 +11,4 @@ sdk_samd/d21/gcc/*
 *.bin
 *.hex
 *.elf
+*.uf2

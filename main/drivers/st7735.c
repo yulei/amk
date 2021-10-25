@@ -247,13 +247,13 @@ static void set_address_window(st7735_t *driver, uint8_t x0, uint8_t y0, uint8_t
     write_command(driver, ST7735_RAMWR);
 }
 
-#ifndef SSD1357_SPI_ID
-#define SSD1357_SPI_ID  SPI_INSTANCE_1
+#ifndef ST7735_SPI_ID
+#define ST7735_SPI_ID  SPI_INSTANCE_1
 #endif
 
 void st7735_init(st7735_t *driver)
 {
-    spi = spi_init(SSD1357_SPI_ID);
+    spi = spi_init(ST7735_SPI_ID);
     st7735_select(driver);
     st7735_reset(driver);
     execute_commands(driver, init_cmds1);

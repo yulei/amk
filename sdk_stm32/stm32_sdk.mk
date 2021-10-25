@@ -9,8 +9,12 @@ endif
 ifeq (STM32F405, $(strip $(MCU)))
 MCU_SERIES := f4
 MCU_FAMILY := stm32f4xx
+ifeq (yes, $(strip $(USE_F405_V2)))
+MCU_TYPE := f405_v2
+else
 MCU_TYPE := f405
-TINYUSB_ENABLE := no
+endif
+#TINYUSB_ENABLE := no
 endif
 
 ifeq (STM32F722, $(strip $(MCU)))

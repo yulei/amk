@@ -46,6 +46,7 @@ amk_error_t spi_send_async(spi_handle_t spi, const void *data, size_t length)
     if (spi_ready(spi)) {
         HAL_StatusTypeDef status = HAL_SPI_Transmit_DMA(hspi, (uint8_t *)data, length);
         if (status != HAL_OK) {
+            spi_debug("Failed async spi transmit, error=%d\n", status);
             return AMK_SPI_ERROR;
         }
         return AMK_SUCCESS;

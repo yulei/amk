@@ -20,7 +20,11 @@ ifeq (STM32F411, $(strip $(MCU)))
 endif
 
 ifeq (STM32F405, $(strip $(MCU)))
-	SRCS += $(PLATFORM_PORTING_DIR)/stm32f405xx.c
+	ifeq (yes, $(strip $(USE_F405_V2)))
+		SRCS += $(PLATFORM_PORTING_DIR)/stm32f405xx_v2.c
+	else
+		SRCS += $(PLATFORM_PORTING_DIR)/stm32f405xx.c
+	endif
 endif
 
 ifeq (STM32F722, $(strip $(MCU)))
