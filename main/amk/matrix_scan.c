@@ -184,7 +184,7 @@ uint8_t matrix_scan(void)
         debouncing_time = timer_read();
     }
 
-    if (debouncing && timer_elapsed(debouncing_time) > DEBOUNCE) {
+    if (debouncing && timer_elapsed(debouncing_time) >= DEBOUNCE) {
         for (int row = 0; row < MATRIX_ROWS; row++) {
             matrix[row] = matrix_debouncing[row];
         }
