@@ -132,6 +132,11 @@ void rf_keyboard_jump_bootloader(void)
     nrf_usb_reboot();
 }
 
+bool rf_keyboard_vbus_enabled(void)
+{
+    return rf_driver.vbus_enabled;
+}
+
 static void keyboard_timer_init(void)
 {
     ret_code_t err_code;

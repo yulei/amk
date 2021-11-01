@@ -87,6 +87,8 @@ static void toggle_command(uint8_t cmd)
     nrf_usb_send_report(NRF_REPORT_ID_COMMAND, &cmd, 1);
 }
 
+#include "rf_keyboard.h"
+static bool screen_on = true;
 bool hook_process_action_kb(action_t *action)
 {
     //uint8_t mods = get_mods();
@@ -94,9 +96,18 @@ bool hook_process_action_kb(action_t *action)
     //    return false;
     //}
 
+    if (!rf_keyboard_vbus_enabled()) {
+        if (action->key.code == KC_F16) {
+            nrf_gpio_pin_write(RGBLIGHT_EN_PIN, screen_on ? 0 : 1);
+            screen_on = !screen_on;
+        }
+        return false;
+    }
+
     switch(action->key.code) {
         case KC_F16:
             toggle_command(CMD_TOGGLE_SCREEN);
+            screen_on = !screen_on;
             return true;
         case KC_F19: 
             toggle_command(CMD_TOGGLE_DATETIME);

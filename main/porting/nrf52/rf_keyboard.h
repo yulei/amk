@@ -14,3 +14,5 @@ void rf_keyboard_start(void);
 void rf_keyboard_prepare_sleep(void);
 
 void rf_keyboard_jump_bootloader(void);
+
+bool rf_keyboard_vbus_enabled(void);
