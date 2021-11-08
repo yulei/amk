@@ -87,6 +87,8 @@
 #define DISABLE_CONNECT_TARGET_2
 #define DISABLE_CONNECT_TARGET_3
 
+#define VBUS_DEBOUNCE
+
 //#define GZLL_IS_CLIENT              1
 //#define DISABLE_USB
 //#define SLEEP_COUNT_MAX             2

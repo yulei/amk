@@ -45,6 +45,32 @@ static void vbus_timer_handler(void * p_context);
 void nrf_usb_preinit(void) {}
 void nrf_usb_postinit(void) {}
 
+#ifdef VBUS_DEBOUNCE
+#define VBUS_DEBOUNCE_COUNT 100
+void vbus_debounce(void)
+{
+    static bool last_state = false;
+    static uint32_t debounce_count = 0;
+
+    bool on = nrf_gpio_pin_read(VBUS_DETECT_PIN) ? true : false;
+    if (last_state != on) {
+        debounce_count = 0;
+        last_state = on;
+    } else {
+        debounce_count++;
+    }
+
+    if (debounce_count > VBUS_DEBOUNCE_COUNT) {
+        if (usb_config.vbus_enabled != on) {
+            usb_update_state();
+        }
+        debounce_count = 0;
+    } else {
+        app_timer_start(m_vbus_timer_id, VBUS_DETECT_DELAY_INTERVAL, NULL);
+    }
+}
+#endif
+
 void nrf_usb_task(void) 
 {
     bool on = nrf_gpio_pin_read(VBUS_DETECT_PIN) ? true : false;
@@ -68,7 +94,10 @@ void nrf_usb_init(nrf_usb_event_handler_t *eh)
     usb_buffer.count = 0;
 
     nrf_gpio_cfg_input(VBUS_DETECT_PIN, NRF_GPIO_PIN_NOPULL);
+
+#ifndef VBUS_DEBOUNCE
     usb_update_state();
+#endif
 
     ret_code_t err_code;
     err_code = app_timer_create(&m_vbus_timer_id, APP_TIMER_MODE_SINGLE_SHOT, vbus_timer_handler);
@@ -113,8 +142,10 @@ void nrf_usb_wakeup(void) {}
 
 void nrf_usb_prepare_sleep(void)
 {
+#ifndef VBUS_DEBOUNCE
     nrf_gpio_cfg_sense_input(VBUS_DETECT_PIN, NRF_GPIO_PIN_PULLDOWN, NRF_GPIO_PIN_SENSE_HIGH);
     nrf_delay_ms(1);
+#endif
 }
 
 void nrf_usb_reboot(void)
@@ -336,9 +367,13 @@ static uint8_t compute_checksum(const uint8_t* data, uint32_t size)
 
 static void vbus_timer_handler(void * p_context)
 {
+#ifdef VBUS_DEBOUNCE
+    vbus_debounce();
+#else
     bool on = nrf_gpio_pin_read(VBUS_DETECT_PIN) ? true : false;
 
     if (usb_config.vbus_enabled != on) {
         usb_update_state();
     }
+#endif
 }
