@@ -114,14 +114,19 @@ void rgb_led_task(void)
 #ifdef RGB_MATRIX_ENABLE
     rgb_matrix_task();
 #endif
+
+#ifdef RGBLIGHT_EN_PIN
     if (rgb_led_is_on()) {
+#endif
         for (int i = 0; i < RGB_DEVICE_NUM; i++) {
             rgb_driver_t *driver = rgb_driver_get(i);
             driver->flush(driver);
         }
+#ifdef RGBLIGHT_EN_PIN
     } else {
         rgb_led_set_power(false);
     }
+#endif
 }
 
 rgb_driver_t *rgb_led_map(uint8_t led_index)

@@ -44,13 +44,14 @@
 
 #define WS2812_LED_NUM  4
 #define WS2812_LED_PIN  A0
-#define PWM_TIM_PERIOD  105
-#define PWM_TIM htim5
+#define PWM_TIM_PERIOD  104
+#define PWM_TIM htim2
 #define PWM_TIM_CHANNEL TIM_CHANNEL_1
 
-#define RGB_LED_NUM     4
-#define RGB_DEVICE_NUM  1
-#define RGB_SEGMENT_NUM 1
+#define RGB_LED_NUM             4
+#define RGB_DEVICE_NUM          1
+#define RGB_SEGMENT_NUM         1
+//#define RGB_INDICATOR_LED_NUM   1
 
 //#define VIAL_INSECURE
 //#define VIAL_KEYBOARD_UID {0x01, 0x90, 0x17, 0x3A, 0xEC, 0xEE, 0x2B, 0x85}

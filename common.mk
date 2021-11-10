@@ -141,11 +141,13 @@ $(BUILD_DIR)/%.o : %.S
 	@$(PROGRESS) Assembling: $(notdir $<)
 	$(ASSEMBLING)
 
-ifeq (NRF52840, $(strip $(MCU)))
-$(TARGET): $(addprefix $(OUTPUT_DIR)/$(TARGET), .elf .bin .hex .uf2)
-else
-$(TARGET): $(addprefix $(OUTPUT_DIR)/$(TARGET), .elf .bin .hex)
+OUTPUT_FILES = $(addprefix $(OUTPUT_DIR)/$(TARGET), .elf .bin .hex)
+
+ifeq (yes, $(strip $(UF2_ENABLE)))
+OUTPUT_FILES += $(addprefix $(OUTPUT_DIR)/$(TARGET), .uf2)
 endif
+
+$(TARGET): $(OUTPUT_FILES)
 
 ifneq ($(strip $(LIB_SRCS)),)
 DEP_LIBS += $(addprefix $(OUTPUT_DIR)/$(TARGET), .a)
@@ -184,7 +186,7 @@ endif
 # Create uf2 file from the .hex file
 %.uf2: %.hex
 	$(info Creating: $(notdir $@))
-	$(NO_ECHO)$(UF2) $< -c -f 0xADA52840 -o $@
+	$(NO_ECHO)$(UF2) $< -c -f $(UF2_FAMILY) -o $@
 
 # Include the dependency files
 -include $(OBJS:%.o=%.d)

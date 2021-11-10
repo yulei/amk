@@ -292,6 +292,23 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
 };
 #endif
 
+#ifdef RGB_INDICATOR_ENABLE
+#include "rgb_indicator.h"
+uint8_t g_rgb_indicator_index[RGB_INDICATOR_LED_NUM] = {0};
+#define CAPS_LED    0
+
+void led_set(uint8_t led)
+{
+    if (led & (1 << USB_LED_CAPS_LOCK)) {
+        rgb_indicator_set(CAPS_LED, 0xFF, 0xFF, 0xFF);
+        amk_printf("turn caps on\n");
+    } else {
+        rgb_indicator_set(CAPS_LED, 0, 0, 0);
+        amk_printf("turn caps off\n");
+    }
+}
+#endif
+
 static uint32_t last_ticks = 0;
 
 #ifdef SCREEN_ENABLE
@@ -464,19 +481,6 @@ void screen_task_kb(void)
 {
 }
 #endif
-
-void led_set(uint8_t led)
-{
-#ifdef CAPS_LED_PIN
-    if (led & (1 << USB_LED_CAPS_LOCK)) {
-        m65_debug("turn caps on\n");
-        gpio_write_pin(CAPS_LED_PIN, 0);
-    } else {
-        m65_debug("turn caps off\n");
-        gpio_write_pin(CAPS_LED_PIN, 1);
-    }
-#endif
-}
 
 #ifdef DYNAMIC_CONFIGURATION
 #include "action.h"

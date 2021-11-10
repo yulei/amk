@@ -3,3 +3,5 @@ SRCS += $(wildcard $(KEYBOARD_DIR)/*.c)
 
 MCU = NRF52840
 #CUSTOM_MATRIX = yes
+UF2_ENABLE = yes
+UF2_FAMILY = 0xADA52840 
