@@ -40,14 +40,22 @@ bool i2c_ready(i2c_handle_t i2c)
     return inst->ready;
 }
 
-static void i2c_inst_init(i2c_instance_t *inst, I2C_TypeDef *i2c)
+void i2c_inst_init(i2c_instance_t *inst, I2C_TypeDef *i2c)
 {
     if (i2c_ready(inst))
         return;
 
-#ifdef STM32F722xx
+#if defined(STM32F722xx) || defined(STM32L072xx)
+    #ifndef I2C_USE_INSTANCE_2
     inst->handle.Instance = I2C1;
+    #else
+    inst->handle.Instance = I2C2;
+    #endif
+    #ifdef STM32F722xx
     inst->handle.Init.Timing = 0x20404768;//0x6000030D;
+    #else
+    inst->handle.Init.Timing = 0x00707CBB;//0x00300F38; 
+    #endif
     inst->handle.Init.OwnAddress1 = 0;
     inst->handle.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
     inst->handle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
