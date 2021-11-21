@@ -653,7 +653,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     /* TIM4_CH2 Init */
     hdma_tim4_ch2.Instance = DMA1_Stream3;
     hdma_tim4_ch2.Init.Channel = DMA_CHANNEL_2;
-    hdma_tim4_ch2.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_tim4_ch2.Init.Direction = DMA_MEMORY_TO_PERIPH;
     hdma_tim4_ch2.Init.PeriphInc = DMA_PINC_DISABLE;
     hdma_tim4_ch2.Init.MemInc = DMA_MINC_ENABLE;
     hdma_tim4_ch2.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
