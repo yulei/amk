@@ -11,23 +11,35 @@
 #include "tusb.h"
 #endif
 
+#ifdef I2C_USE_INSTANCE_1
 I2C_HandleTypeDef hi2c1;
 DMA_HandleTypeDef hdma_i2c1_tx;
 DMA_HandleTypeDef hdma_i2c1_rx;
+#endif
 
 RTC_HandleTypeDef hrtc;
 
+#ifdef SPI_USE_INSTANCE_1
 SPI_HandleTypeDef hspi1;
-SPI_HandleTypeDef hspi2;
 DMA_HandleTypeDef hdma_spi1_rx;
 DMA_HandleTypeDef hdma_spi1_tx;
+#endif
+
+#ifdef SPI_USE_INSTANCE_2
+SPI_HandleTypeDef hspi2;
 DMA_HandleTypeDef hdma_spi2_rx;
 DMA_HandleTypeDef hdma_spi2_tx;
+#endif
 
+#ifdef UART_USE_INSTANCE_1
 UART_HandleTypeDef huart1;
 DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart1_tx;
+#endif
 
+#ifdef USE_ADC
+ADC_HandleTypeDef hadc1;
+#endif
 
 void OTG_FS_IRQHandler(void)
 {
@@ -90,6 +102,41 @@ static void MX_GPIO_Init(void)
     __HAL_RCC_GPIOB_CLK_ENABLE();
 }
 
+#ifdef USE_ADC
+static void MX_ADC1_Init(void)
+{
+    ADC_ChannelConfTypeDef sConfig = {0};
+    /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
+     */
+    hadc1.Instance = ADC1;
+    hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
+    hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+    hadc1.Init.ScanConvMode = DISABLE;
+    hadc1.Init.ContinuousConvMode = DISABLE;
+    hadc1.Init.DiscontinuousConvMode = DISABLE;
+    hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+    hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+    hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+    hadc1.Init.NbrOfConversion = 1;
+    hadc1.Init.DMAContinuousRequests = DISABLE;
+    hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+    if (HAL_ADC_Init(&hadc1) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+     */
+    sConfig.Channel = ADC_CHANNEL_2;
+    sConfig.Rank = 1;
+    sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+    if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+}
+#endif
+
+#ifdef I2C_USE_INSTANCE_1
 static void MX_I2C1_Init(void)
 {
     hi2c1.Instance = I2C1;
@@ -105,7 +152,9 @@ static void MX_I2C1_Init(void)
         Error_Handler();
     }
 }
+#endif
 
+#ifdef SPI_USE_INSTANCE_1
 static void MX_SPI1_Init(void)
 {
     hspi1.Instance = SPI1;
@@ -124,7 +173,9 @@ static void MX_SPI1_Init(void)
         Error_Handler();
     }
 }
+#endif
 
+#ifdef SPI_USE_INSTANCE_2
 static void MX_SPI2_Init(void)
 {
     hspi2.Instance = SPI2;
@@ -143,7 +194,9 @@ static void MX_SPI2_Init(void)
         Error_Handler();
     }
 }
+#endif
 
+#ifdef UART_USE_INSTANCE_1
 static void MX_USART1_UART_Init(void)
 {
     huart1.Instance = USART1;
@@ -158,6 +211,7 @@ static void MX_USART1_UART_Init(void)
         Error_Handler();
     }
 }
+#endif
 
 static void MX_DMA_Init(void)
 {
@@ -252,11 +306,24 @@ void custom_board_init(void)
     MX_GPIO_Init();
 
     MX_DMA_Init();
+
+#ifdef I2C_USE_INSTANCE_1
     MX_I2C1_Init();
+#endif
+#ifdef SPI_USE_INSTANCE_1
     MX_SPI1_Init();
+#endif
     MX_RTC_Init();
+#ifdef SPI_USE_INSTANCE_2
     MX_SPI2_Init();
+#endif
+#ifdef UART_USE_INSTANCE_1
     MX_USART1_UART_Init();
+#endif
+#ifdef USE_ADC
+    MX_ADC1_Init();
+#endif
+
 #ifdef DYNAMIC_CONFIGURATION
     uint32_t magic = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1);
     //if (magic == 0) {

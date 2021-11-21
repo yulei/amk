@@ -171,7 +171,7 @@ endif
 	$(info Linking: $(notdir $@))
 	$(NO_ECHO)$(CC) -o $@ $(ALL_LDFLAGS) $^ $(LIBS) $(DEP_LIBS)
 	$(NO_ECHO)$(SIZE) $@
-	$(NO_ECHO)$(CP) $@ ./
+#	$(NO_ECHO)$(CP) $@ ./
 
 # Create binary .bin file from the .elf file
 %.bin: %.elf

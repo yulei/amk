@@ -172,6 +172,7 @@ void DebugMon_Handler(void)
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
 
+#ifdef I2C_USE_INSTANCE_1
 /**
   * @brief This function handles DMA1 stream0 global interrupt.
   */
@@ -200,6 +201,9 @@ void DMA1_Stream1_IRQHandler(void)
   /* USER CODE END DMA1_Stream1_IRQn 1 */
 }
 
+#endif
+#ifdef SPI_USE_INSTANCE_2
+
 /**
   * @brief This function handles DMA1 stream3 global interrupt.
   */
@@ -227,6 +231,7 @@ void DMA1_Stream4_IRQHandler(void)
 
   /* USER CODE END DMA1_Stream4_IRQn 1 */
 }
+#endif
 
 /**
   * @brief This function handles TIM5 global interrupt.
@@ -241,6 +246,8 @@ void TIM5_IRQHandler(void)
 
   /* USER CODE END TIM5_IRQn 1 */
 }
+
+#ifdef SPI_USE_INSTANCE_1
 
 /**
   * @brief This function handles DMA2 stream0 global interrupt.
@@ -270,6 +277,8 @@ void DMA2_Stream2_IRQHandler(void)
   /* USER CODE END DMA2_Stream2_IRQn 1 */
 }
 
+#endif
+
 /**
   * @brief This function handles USB On The Go FS global interrupt.
   */
@@ -283,6 +292,8 @@ void DMA2_Stream2_IRQHandler(void)
 
   /* USER CODE END OTG_FS_IRQn 1 */
 //}
+
+#ifdef UART_USE_INSTANCE_1
 
 /**
   * @brief This function handles DMA2 stream5 global interrupt.
@@ -357,5 +368,6 @@ void USART1_IRQHandler(void)
 
   /* USER CODE END USART1_IRQn 1 */
 }
+#endif
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
