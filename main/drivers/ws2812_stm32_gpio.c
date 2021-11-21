@@ -6,80 +6,41 @@
  */
 
 #include <stdbool.h>
-#include "stm32l0xx_ll_gpio.h"
 #include "rgb_common.h"
 #include "ws2812.h"
 #include "amk_printf.h"
 #include "wait.h"
 
-#define LED_BUFFER_SIZE         (WS2812_LED_NUM * 3)
-#define RESET_TIME              (50)
 
+#if !defined(WS2812_TRST_US)
+#    define WS2812_TRST_US 280
+#endif
+
+#define LED_BUFFER_SIZE (WS2812_LED_NUM*3)
 static uint8_t ws2812_leds[LED_BUFFER_SIZE];
 static bool ws2812_ready = false;
 static bool ws2812_dirty = false;
-
 static pin_t ws2812_pin;
 
-#if 0
-static GPIO_TypeDef *ws2812_port;
-static uint32_t ws2812_pin;
+#define NOP_FUDGE 0.4
 
-static uint32_t get_mask(uint16_t pin)
-{
-    switch(pin) {
-        case GPIO_PIN_0:
-            return LL_GPIO_PIN_0;
-        case GPIO_PIN_1:
-            return LL_GPIO_PIN_1;
-        case GPIO_PIN_2:
-            return LL_GPIO_PIN_2;
-        case GPIO_PIN_3:
-            return LL_GPIO_PIN_3;
-        case GPIO_PIN_4:
-            return LL_GPIO_PIN_4;
-        case GPIO_PIN_5:
-            return LL_GPIO_PIN_5;
-        case GPIO_PIN_6:
-            return LL_GPIO_PIN_6;
-        case GPIO_PIN_7:
-            return LL_GPIO_PIN_7;
-        case GPIO_PIN_8:
-            return LL_GPIO_PIN_8;
-        case GPIO_PIN_9:
-            return LL_GPIO_PIN_9;
-        case GPIO_PIN_10:
-            return LL_GPIO_PIN_10;
-        case GPIO_PIN_11:
-            return LL_GPIO_PIN_11;
-        case GPIO_PIN_12:
-            return LL_GPIO_PIN_12;
-        case GPIO_PIN_13:
-            return LL_GPIO_PIN_13;
-        case GPIO_PIN_14:
-            return LL_GPIO_PIN_14;
-        case GPIO_PIN_15:
-            return LL_GPIO_PIN_15;
-        default:
-            break;
-    }
-
-    amk_printf("not valid gpio pin\n");
-    return LL_GPIO_PIN_ALL;
-}
-#endif
-
-#define NOP_TIME (100/4)
-#define CYCLES_PER_SEC (32 * 4 / (6))
-#define NS_PER_SEC (10)
+#define NUMBER_NOPS 6
+#define CYCLES_PER_SEC (96000000 / NUMBER_NOPS * NOP_FUDGE)
+#define NS_PER_SEC (1000000000L)  // Note that this has to be SIGNED since we want to be able to check for negative values of derivatives
 #define NS_PER_CYCLE (NS_PER_SEC / CYCLES_PER_SEC)
 #define NS_TO_CYCLES(n) ((n) / NS_PER_CYCLE)
 
-#define wait_long \
-        __asm__ volatile("nop; nop; nop; nop; nop; nop; nop; nop; nop;"); 
-
-#define wait_short \
-        __asm__ volatile("nop; nop; nop; ");
+#define wait_ns(x)                                  \
+    do {                                            \
+        for (int i = 0; i < NS_TO_CYCLES(x); i++) { \
+            __asm__ volatile("nop\n\t"              \
+                             "nop\n\t"              \
+                             "nop\n\t"              \
+                             "nop\n\t"              \
+                             "nop\n\t"              \
+                             "nop\n\t");            \
+        }                                           \
+    } while (0)
 
 // These are the timing constraints taken mostly from the WS2812 datasheets
 // These are chosen to be conservative and avoid problems rather than for maximum throughput
@@ -94,23 +55,24 @@ static uint32_t get_mask(uint16_t pin)
 // to values like 600000 ns. If it is too small, the pixels will show nothing most of the time.
 #define RES (1000 * WS2812_TRST_US)  // Width of the low gap between bits to cause a frame to latch
 
-static void send_byte(uint8_t byte)
+void send_byte(uint8_t byte)
 {
     // WS2812 protocol wants most significant bits first
     for (unsigned char bit = 0; bit < 8; bit++) {
-        if (byte & (1 << (7 - bit))) {
+        bool is_one = byte & (1 << (7 - bit));
+        // using something like wait_ns(is_one ? T1L : T0L) here throws off timings
+        if (is_one) {
             // 1
-            LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_11);
-            wait_long;
-            LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_11);
-            wait_short;
-
+            gpio_write_pin(ws2812_pin, 1);
+            wait_ns(T1H);
+            gpio_write_pin(ws2812_pin, 0);
+            wait_ns(T1L);
         } else {
             // 0
-            LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_11);
-            wait_short;
-            LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_11);
-            wait_long;
+            gpio_write_pin(ws2812_pin, 1);
+            wait_ns(T0H);
+            gpio_write_pin(ws2812_pin, 0);
+            wait_ns(T0L);
         }
     }
 }
@@ -118,13 +80,6 @@ static void send_byte(uint8_t byte)
 void ws2812_init(pin_t pin)
 {
     if (ws2812_ready) return;
-
-    //ws2812_port = GET_PORT(pin);
-    //ws2812_pin = get_mask(GET_PIN(pin));
-
-    //LL_GPIO_SetPinOutputType(ws2812_port, ws2812_pin, LL_GPIO_OUTPUT_PUSHPULL);
-    //LL_GPIO_ResetOutputPin(ws2812_port, ws2812_pin);
-
 
     ws2812_pin = pin;
     gpio_set_output_pushpull(ws2812_pin);
@@ -135,7 +90,7 @@ void ws2812_init(pin_t pin)
 
     uint32_t i = 0;
     for (i = 0; i < LED_BUFFER_SIZE; i++) {
-        ws2812_leds[i] = 0xFF;
+        ws2812_leds[i] = 0;
     }
 }
 
@@ -146,11 +101,11 @@ void ws2812_set_color(int index, uint8_t red, uint8_t green, uint8_t blue)
 
     if (i < WS2812_LED_NUM) {
         // green
-        ws2812_leds[i*3+0] = 0xFF;//green;
+        ws2812_leds[i*3+0] = green;
         // red
-        ws2812_leds[i*3+1] = 0xFF;//red;
+        ws2812_leds[i*3+1] = red;
         // blue
-        ws2812_leds[i*3+2] = 0xFF;//blue;
+        ws2812_leds[i*3+2] = blue;
     }
     ws2812_dirty = true;
 }
@@ -180,6 +135,7 @@ void ws2812_update_buffers(pin_t pin)
         send_byte(i*3+1);
         send_byte(i*3+2);
     }
+    wait_ns(RES);
     __enable_irq();
     ws2812_dirty = false;
 }
