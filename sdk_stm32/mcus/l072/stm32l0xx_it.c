@@ -116,7 +116,7 @@ void PendSV_Handler(void)
 /* please refer to the startup file (startup_stm32l0xx.s).                    */
 /******************************************************************************/
 
-#ifdef USE_UART_INSTANCE_1
+#ifdef USE_UART1
 __attribute__((weak)) void uart_recv_char(uint8_t c){}
 
 void uart_error_process(UART_HandleTypeDef * huart, uint32_t isr)
@@ -156,7 +156,7 @@ void USART1_IRQHandler(void)
 
 #endif
 
-#ifdef USE_ADC
+#ifdef USE_ADC1
 extern DMA_HandleTypeDef hdma_adc;
 
 /**

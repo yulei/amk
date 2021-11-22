@@ -172,7 +172,7 @@ void DebugMon_Handler(void)
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
 
-#ifdef I2C_USE_INSTANCE_1
+#ifdef USE_I2C1 
 /**
   * @brief This function handles DMA1 stream0 global interrupt.
   */
@@ -247,7 +247,7 @@ void TIM5_IRQHandler(void)
   /* USER CODE END TIM5_IRQn 1 */
 }
 
-#ifdef SPI_USE_INSTANCE_1
+#ifdef USE_SPI1
 
 /**
   * @brief This function handles DMA2 stream0 global interrupt.

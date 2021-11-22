@@ -24,17 +24,17 @@
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
-#ifdef I2C_USE_INSTANCE_1
+#ifdef USE_I2C1
 extern DMA_HandleTypeDef hdma_i2c1_tx;
 extern DMA_HandleTypeDef hdma_i2c1_rx;
 #endif
 
-#ifdef SPI_USE_INSTANCE_1
+#ifdef USE_SPI1
 extern DMA_HandleTypeDef hdma_spi1_rx;
 extern DMA_HandleTypeDef hdma_spi1_tx;
 #endif
 
-#ifdef SPI_USE_INSTANCE_2
+#ifdef USE_SPI2
 extern DMA_HandleTypeDef hdma_spi2_rx;
 extern DMA_HandleTypeDef hdma_spi2_tx;
 #endif
@@ -98,7 +98,7 @@ void HAL_MspInit(void)
   /* USER CODE END MspInit 1 */
 }
 
-#ifdef USE_ADC
+#ifdef USE_ADC1
 /**
 * @brief ADC MSP Initialization
 * This function configures the hardware resources used in this example
@@ -162,7 +162,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 }
 #endif
 
-#ifdef I2C_USE_INSTANCE_1
+#ifdef USE_I2C1 
 /**
 * @brief I2C MSP Initialization
 * This function configures the hardware resources used in this example
@@ -326,7 +326,7 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef* hrtc)
 
 }
 
-#if defined(SPI_USE_INSTANCE_1) || defined(SPI_USE_INSTANCE_2)
+#if defined(USE_SPI1) || defined(USE_SPI2)
 /**
 * @brief SPI MSP Initialization
 * This function configures the hardware resources used in this example

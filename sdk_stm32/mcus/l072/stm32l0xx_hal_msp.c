@@ -198,7 +198,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
 }
 #endif
 
-#ifdef USE_ADC
+#ifdef USE_ADC1
 extern DMA_HandleTypeDef hdma_adc;
 //#define KEY_IN_Pin        GPIO_PIN_1
 //#define KEY_IN_GPIO_Port  GPIOA
@@ -292,7 +292,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 
 #endif
 
-#ifdef USE_UART_INSTANCE_1
+#ifdef USE_UART1
 /**
 * @brief UART MSP Initialization
 * This function configures the hardware resources used in this example

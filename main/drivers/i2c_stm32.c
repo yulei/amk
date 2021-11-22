@@ -15,7 +15,7 @@ typedef struct {
     bool ready;
 } i2c_instance_t;
 
-#ifdef I2C_USE_INSTANCE_1
+#ifdef USE_I2C1
     #define I2C1_ID     I2C1
     #define I2C1_SCL    I2C1_SCL_PIN
     #define I2C1_SDA    I2C1_SDA_PIN
@@ -24,7 +24,7 @@ typedef struct {
     };
 #endif
 
-#ifdef I2C_USE_INSTANCE_2
+#ifdef USE_I2C2 
     #define I2C2_ID     I2C2
     #define I2C2_SCL    I2C2_SCL_PIN
     #define I2C2_SDA    I2C2_SDA_PIN
@@ -97,14 +97,14 @@ void i2c_inst_init(i2c_instance_t *inst, I2C_TypeDef *i2c)
 
 i2c_handle_t i2c_init(I2C_ID id)
 {
-#ifdef I2C_USE_INSTANCE_1
+#ifdef USE_I2C1
     if (id == I2C_INSTANCE_1) {
         i2c_inst_init(&m_i2c1, I2C1_ID);
         return &m_i2c1;
     }
 #endif
 
-#ifdef I2C_USE_INSTANCE_2
+#ifdef USE_I2C2 
     if (id == I2C_INSTANCE_2) {
         i2c_inst_init(&m_i2c2, I2C2_ID);
         return &m_i2c2;

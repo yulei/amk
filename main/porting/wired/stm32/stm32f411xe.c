@@ -11,7 +11,7 @@
 #include "tusb.h"
 #endif
 
-#ifdef I2C_USE_INSTANCE_1
+#ifdef USE_I2C1 
 I2C_HandleTypeDef hi2c1;
 DMA_HandleTypeDef hdma_i2c1_tx;
 DMA_HandleTypeDef hdma_i2c1_rx;
@@ -19,25 +19,25 @@ DMA_HandleTypeDef hdma_i2c1_rx;
 
 RTC_HandleTypeDef hrtc;
 
-#ifdef SPI_USE_INSTANCE_1
+#ifdef USE_SPI1
 SPI_HandleTypeDef hspi1;
 DMA_HandleTypeDef hdma_spi1_rx;
 DMA_HandleTypeDef hdma_spi1_tx;
 #endif
 
-#ifdef SPI_USE_INSTANCE_2
+#ifdef USE_SPI2
 SPI_HandleTypeDef hspi2;
 DMA_HandleTypeDef hdma_spi2_rx;
 DMA_HandleTypeDef hdma_spi2_tx;
 #endif
 
-#ifdef UART_USE_INSTANCE_1
+#ifdef USE_UART1
 UART_HandleTypeDef huart1;
 DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart1_tx;
 #endif
 
-#ifdef USE_ADC
+#ifdef USE_ADC1
 ADC_HandleTypeDef hadc1;
 #endif
 
@@ -107,7 +107,7 @@ static void MX_GPIO_Init(void)
     __HAL_RCC_GPIOB_CLK_ENABLE();
 }
 
-#ifdef USE_ADC
+#ifdef USE_ADC1
 static void MX_ADC1_Init(void)
 {
     ADC_ChannelConfTypeDef sConfig = {0};
@@ -141,7 +141,7 @@ static void MX_ADC1_Init(void)
 }
 #endif
 
-#ifdef I2C_USE_INSTANCE_1
+#ifdef USE_I2C1 
 static void MX_I2C1_Init(void)
 {
     hi2c1.Instance = I2C1;
@@ -159,7 +159,7 @@ static void MX_I2C1_Init(void)
 }
 #endif
 
-#ifdef SPI_USE_INSTANCE_1
+#ifdef USE_SPI1
 static void MX_SPI1_Init(void)
 {
     hspi1.Instance = SPI1;
@@ -180,7 +180,7 @@ static void MX_SPI1_Init(void)
 }
 #endif
 
-#ifdef SPI_USE_INSTANCE_2
+#ifdef USE_SPI2
 static void MX_SPI2_Init(void)
 {
     hspi2.Instance = SPI2;
@@ -201,7 +201,7 @@ static void MX_SPI2_Init(void)
 }
 #endif
 
-#ifdef UART_USE_INSTANCE_1
+#ifdef USE_UART1 
 static void MX_USART1_UART_Init(void)
 {
     huart1.Instance = USART1;
@@ -349,23 +349,23 @@ void custom_board_init(void)
 
     MX_DMA_Init();
 
-#ifdef I2C_USE_INSTANCE_1
+#ifdef USE_I2C1
     MX_I2C1_Init();
 #endif
-#ifdef SPI_USE_INSTANCE_1
+#ifdef USE_SPI1
     MX_SPI1_Init();
 #endif
     MX_RTC_Init();
-#ifdef SPI_USE_INSTANCE_2
+#ifdef USE_SPI2
     MX_SPI2_Init();
 #endif
-#ifdef UART_USE_INSTANCE_1
+#ifdef USE_UART1
     MX_USART1_UART_Init();
 #endif
 #ifdef PWM_TIM
     MX_TIM4_Init();
 #endif
-#ifdef USE_ADC
+#ifdef USE_ADC1
     MX_ADC1_Init();
 #endif
 

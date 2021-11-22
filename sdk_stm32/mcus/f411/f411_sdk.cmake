@@ -15,8 +15,8 @@ set(MCU_FLAGS -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp
 
 target_compile_definitions(${KEYBOARD} 
     PRIVATE
-    SPI_USE_INSTANCE_1
-	SPI_USE_INSTANCE_2
+    USE_SPI1
+	USE_SPI2
 	STM32F411xE
     CFG_TUSB_MCU=OPT_MCU_STM32F4
 	SYSTEM_CLOCK=96000000

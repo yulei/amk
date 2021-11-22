@@ -72,3 +72,5 @@
 
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 #define PROGMEM
+
+#define USE_UART1

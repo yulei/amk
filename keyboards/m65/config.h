@@ -21,6 +21,7 @@
 
 #define CAPS_LED_PIN    A10
 
+#define USE_SPI1
 #define SCREEN_NUM      1
 #define SCREEN_0_PWR    C0
 #define SCREEN_0_PWR_EN 0
@@ -28,6 +29,7 @@
 #define SCREEN_0_RESET  A3
 #define SCREEN_0_DC     A4
 
+#define USE_SPI2
 #define FLASH_CS        B12
 #define W25QXX_SPI_ID   SPI_INSTANCE_2
 

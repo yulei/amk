@@ -18,10 +18,10 @@
 
 #define TIMEOUT_DEFAULT 100
 
-#ifdef SPI_USE_INSTANCE_1
+#ifdef USE_SPI1
 extern SPI_HandleTypeDef hspi1;
 #endif
-#ifdef SPI_USE_INSTANCE_2
+#ifdef USE_SPI2
 extern SPI_HandleTypeDef hspi2;
 #endif
 

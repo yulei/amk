@@ -33,7 +33,7 @@ typedef struct {
     bool        ready;
 } i2c_instance_t;
 
-#ifdef I2C_USE_INSTANCE_1
+#ifdef USE_I2C1
     #define I2C1_ID     0
     #define I2C1_SCL    I2C1_SCL_PIN
     #define I2C1_SDA    I2C1_SDA_PIN
@@ -129,7 +129,7 @@ static void i2c_event_handler(nrfx_twi_evt_t const *p_event, void *p_context)
 
 i2c_handle_t i2c_init(I2C_ID id)
 {
-#ifdef I2C_USE_INSTANCE_1
+#ifdef USE_I2C1
     if (id == I2C_INSTANCE_1) {
         i2c_inst_init(&m_i2c1);
         return &m_i2c1;

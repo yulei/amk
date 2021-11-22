@@ -17,8 +17,8 @@ set(MCU_FLAGS -mcpu=cortex-m7 -mthumb -mfpu=fpv5-sp-d16 -mfloat-abi=hard CACHE S
 
 target_compile_definitions(${KEYBOARD} 
     PRIVATE 
-    SPI_USE_INSTANCE_1
-    SPI_USE_INSTANCE_2
+    USE_SPI1
+    USE_SPI2
     STM32F722xx
     CFG_TUSB_MCU=OPT_MCU_STM32F7
     SYSTEM_CLOCK=216000000

@@ -10,10 +10,10 @@
 #endif
 
 RTC_HandleTypeDef hrtc;
-#ifdef USE_UART_INSTANCE_1
+#ifdef USE_UART1
 UART_HandleTypeDef huart1;
 #endif
-#ifdef USE_ADC
+#ifdef USE_ADC1
 ADC_HandleTypeDef hadc;
 DMA_HandleTypeDef hdma_adc;
 #endif
@@ -166,7 +166,7 @@ static void MX_RTC_Init(void)
     }
 }
 
-#ifdef USE_UART_INSTANCE_1
+#ifdef USE_UART1
 static void MX_USART1_UART_Init(void)
 {
     huart1.Instance = USART1;
@@ -195,7 +195,7 @@ static void MX_USB_DEVICE_Init(void)
     HAL_NVIC_SetPriority(USB_IRQn, 0, 0);
 }
 
-#ifdef USE_ADC
+#ifdef USE_ADC1
 static void MX_ADC_Init(void)
 {
     ADC_ChannelConfTypeDef sConfig = {0};
@@ -281,14 +281,14 @@ void custom_board_init(void)
 {
     SystemClock_Config();
     MX_GPIO_Init();
-#ifdef USE_ADC
+#ifdef USE_ADC1
     MX_ADC_Init();
 #endif
     MX_DMA_Init();
     MX_RTC_Init();
     MX_TIM2_Init();
     MX_USB_DEVICE_Init();
-#ifdef USE_UART_INSTANCE_1
+#ifdef USE_UART1
     MX_USART1_UART_Init();
 #endif
 }
