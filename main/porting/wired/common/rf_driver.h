@@ -1,0 +1,38 @@
+/**
+ * @file rf_driver.h
+ */
+
+#pragma once
+
+#include <stdint.h>
+
+#define CMD_MAX_LEN 64
+#define SYNC_BYTE_1 0xAA
+#define SYNC_BYTE_2 0x55
+#define SYNC_PING   0xA5
+#define SYNC_PONG   0x5A
+
+enum
+{
+    CMD_KEY_REPORT,
+    CMD_MOUSE_REPORT,
+    CMD_SYSTEM_REPORT,
+    CMD_CONSUMER_REPORT,
+    CMD_RESET_TO_BOOTLOADER,
+    CMD_SET_LEDS,
+    CMD_KEYMAP_SET,
+    CMD_KEYMAP_SET_ACK,
+    CMD_KEYMAP_GET,
+    CMD_KEYMAP_GET_ACK,
+    CMD_TOGGLE_SCREEN,
+    CMD_TOGGLE_MSC,
+    CMD_TOGGLE_DATETIME,
+};
+
+void rf_driver_init(void);
+
+void rf_driver_task(void);
+
+void rf_driver_toggle(void);
+
+void rf_driver_put_report(uint32_t type, void* data, uint32_t size);

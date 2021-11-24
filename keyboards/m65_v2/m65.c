@@ -77,7 +77,9 @@ static uint16_t auxi_buf[AUXI_WIDTH*AUXI_HEIGHT];
 #define AMFT_WIDTH      10
 #define AMFT_HEIGHT     30
 #define AMFT_FRAMES     11
+#ifdef DATETIME_ENABLE
 static uint16_t font_buf[AMFT_WIDTH*AMFT_HEIGHT*AMFT_FRAMES];
+#endif
 
 static bool screen_enable = true;
 static bool first_screen = true;
@@ -111,6 +113,7 @@ static render_t renders[] = {
     },
 };
 
+#ifdef DATETIME_ENABLE
 static rtc_datetime_t rtc_dt = {
     .second = 0,
     .minute = 42,
@@ -271,6 +274,7 @@ static void font_init(void)
 }
 
 #endif
+#endif
 
 #ifdef RGB_ENABLE
 #include "rgb_driver.h"
@@ -346,6 +350,7 @@ void matrix_init_kb(void)
 }
 
 #ifdef MSC_ENABLE
+#ifdef DATETIME_ENABLE
 void render_datetime(render_t *render)
 {
     if (!rtc_datetime_dirty) {
@@ -376,7 +381,7 @@ void render_datetime(render_t *render)
     filling = true;
     rtc_datetime_dirty = false;
 }
-
+#endif
 void render_task(render_t* render)
 {
     if (!render->anim)
@@ -450,15 +455,20 @@ void msc_init_kb(void)
             m65_debug("ANIM: faield to open root path\n");
         }
     }
+    #ifdef DATETIME_ENABLE
     font_init();
     rtc_datetime_init();
+    #endif
 }
 
 static void render_screen(uint8_t index)
 {
+    #ifdef DATETIME_ENABLE
     if ((index == 1) && (rtc_datetime_mode)){
         render_datetime(&renders[index]);
-    } else {
+    } else 
+    #endif
+    {
         render_task(&renders[index]);
     }
 }
@@ -469,7 +479,9 @@ void msc_task_kb(void)
 
     if (!screen_enable) return;
 
+    #ifdef DATETIME_ENABLE
     rtc_datetime_update();
+    #endif
 
     render_screen(0);
     render_screen(1);
@@ -503,6 +515,7 @@ bool hook_process_action_main(keyrecord_t *record)
             set_screen_state(screen_enable);
             m65_debug("screen enabled: %d\n", screen_enable);
             return true;
+            #ifdef DATETIME_ENABLE
         case KC_F17:
             rtc_datetime_inc_second();
             m65_debug("datetime_mode: increase second\n");
@@ -515,6 +528,7 @@ bool hook_process_action_main(keyrecord_t *record)
             rtc_datetime_mode = !rtc_datetime_mode;
             m65_debug("datetime_mode switch: %d\n", rtc_datetime_mode);
             return true;
+            #endif
         case KC_F20:
             first_screen = !first_screen;
             return true;

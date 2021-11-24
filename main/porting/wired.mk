@@ -14,12 +14,17 @@ SRCS += \
 INCS += \
 	$(COMMON_PORTING_DIR) \
 
-ifneq (yes, $(RTOS_ENABLE))
+ifneq (yes, $(strip $(RTOS_ENABLE)))
 	SRCS += $(COMMON_PORTING_DIR)/usb_interface.c
 endif
 
-ifeq (yes, $(TINYUSB_ENABLE))
+ifeq (yes, $(strip $(TINYUSB_ENABLE)))
 	SRCS += $(COMMON_PORTING_DIR)/usb_tinyusb.c
+endif
+
+ifeq (yes, $(strip $(RF_ENABLE)))
+	SRCS += $(COMMON_PORTING_DIR)/rf_driver.c
+	APP_DEFS += -DRF_ENABLE
 endif
 
 ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
@@ -28,12 +33,4 @@ endif
 
 ifneq (,$(filter $(strip $(MCU)),$(ATSAMD_MCUS)))
 	include $(MAIN_DIR)/porting/wired/atsamd.mk
-endif
-
-ifneq (,$(filter $(strip $(MCU)),$(NUVOTON_MCUS)))
-	include $(MAIN_DIR)/porting/wired/nuvoton.mk
-endif
-
-ifneq (,$(filter $(strip $(MCU)),$(GD32_MCUS)))
-	include $(MAIN_DIR)/porting/wired/gd32.mk
 endif

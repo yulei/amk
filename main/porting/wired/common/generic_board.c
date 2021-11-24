@@ -34,6 +34,10 @@
 #include "rgb_led.h"
 #endif
 
+#ifdef RF_ENABLE
+#include "rf_driver.h"
+#endif
+
 uint32_t usb_setting = 0;
 
 extern void system_init(void);
@@ -79,6 +83,11 @@ void board_init(void)
     amk_printf("amk_init\n");
     amk_init();
     amk_printf("board_init end\n");
+
+#ifdef RF_ENABLE
+    rf_driver_init();
+    amk_printf("rf_driver_initend\n");
+#endif
 }
 
 
@@ -118,6 +127,10 @@ void board_task(void)
     rgb_led_task();
 #endif
 
+
+#ifdef RF_ENABLE
+    rf_driver_task();
+#endif
     custom_board_task();
 }
 
@@ -143,22 +156,50 @@ uint8_t keyboard_leds(void)
 
 void send_keyboard(report_keyboard_t *report)
 {
-    usb_send_report(HID_REPORT_ID_KEYBOARD, report, sizeof(report_keyboard_t));
+#ifdef RF_ENABLE
+    if(usb_setting & OUTPUT_RF) {
+        rf_driver_put_report(CMD_KEY_REPORT, report, sizeof(report_keyboard_t));
+    } else 
+#endif
+    {
+        usb_send_report(HID_REPORT_ID_KEYBOARD, report, sizeof(report_keyboard_t));
+    }
 }
 
 void send_mouse(report_mouse_t *report)
 {
-    usb_send_report(HID_REPORT_ID_MOUSE, report, sizeof(report_mouse_t));
+#ifdef RF_ENABLE
+    if(usb_setting & OUTPUT_RF) {
+        rf_driver_put_report(CMD_MOUSE_REPORT, report, sizeof(report_mouse_t));
+    } else 
+#endif
+    {
+        usb_send_report(HID_REPORT_ID_MOUSE, report, sizeof(report_mouse_t));
+    }
 }
 
 void send_system(uint16_t data)
 {
-    usb_send_report(HID_REPORT_ID_SYSTEM, &data, sizeof(data));
+#ifdef RF_ENABLE
+    if(usb_setting & OUTPUT_RF) {
+        rf_driver_put_report(CMD_SYSTEM_REPORT, &data, sizeof(data));
+    } else 
+#endif
+    {
+        usb_send_report(HID_REPORT_ID_SYSTEM, &data, sizeof(data));
+    }
 }
 
 void send_consumer(uint16_t data)
 {
-    usb_send_report(HID_REPORT_ID_CONSUMER, &data, sizeof(data));
+#ifdef RF_ENABLE
+    if(usb_setting & OUTPUT_RF) {
+        rf_driver_put_report(CMD_CONSUMER_REPORT, &data, sizeof(data));
+    } else 
+#endif
+    {
+        usb_send_report(HID_REPORT_ID_CONSUMER, &data, sizeof(data));
+    }
 }
 
 void remote_wakeup(void)

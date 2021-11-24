@@ -7,6 +7,7 @@ SRCS += \
 	$(MAIN_DIR)/amk/amk_eeprom.c \
 	$(MAIN_DIR)/amk/amk_boot.c \
 	$(MAIN_DIR)/amk/report_queue.c \
+	$(MAIN_DIR)/amk/ring_buffer.c \
 	$(MAIN_DIR)/usb/usb_descriptors.c \
 
 INCS += \
@@ -36,9 +37,6 @@ ifeq (yes, $(strip $(RTOS_ENABLE)))
 	SRCS += $(MAIN_DIR)/rtos/usbx_desc.c
 	include $(LIB_DIR)/threadx.mk
 	include $(LIB_DIR)/usbx.mk
-#	SRCS += $(MAIN_DIR)/rtos/cmos_main.c
-#	SRCS += $(MAIN_DIR)/rtos/cmos_usb.c
-#	include $(LIB_DIR)/freertos.mk
 	APP_DEFS += -DRTOS_ENABLE
 else
 	SRCS += $(MAIN_DIR)/amk/main.c

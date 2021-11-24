@@ -44,6 +44,7 @@
     #define RESET_PIN S1_PIN
     #define VECT_TAB_OFFSET 0x20000
 
+    #define USE_SPI1
     #define SCREEN_NUM      1
     #define SCREEN_0_PWR    A15
     #define SCREEN_0_PWR_EN 0
@@ -52,6 +53,7 @@
     #define SCREEN_0_DC     A8
     #define SSD1357_SPI_ID  SPI_INSTANCE_2
 
+    #define USE_SPI2
     #define FLASH_CS        A4
     #define W25QXX_SPI_ID   SPI_INSTANCE_1
 

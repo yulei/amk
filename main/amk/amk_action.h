@@ -36,6 +36,7 @@ typedef enum {
     AF_KC_RCPC,
     AF_KC_LAPO,
     AF_KC_RAPC,
+    AF_RF_TOG,  // toggle rf output
 // via keycodes
     AF_FN_MO13,
     AF_FN_MO23,

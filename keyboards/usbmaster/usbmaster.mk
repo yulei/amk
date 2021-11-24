@@ -1,7 +1,6 @@
 
 SRCS += \
 	$(KEYBOARD_DIR)/usbmaster.c \
-	$(KEYBOARD_DIR)/ring_buffer.c \
 	$(KEYBOARD_DIR)/display.c \
 
 

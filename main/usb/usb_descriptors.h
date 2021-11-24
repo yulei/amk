@@ -10,6 +10,8 @@
 
 #define USB_MSC_BIT         (1u << 1)
 #define USB_WEBUSB_BIT      (1u << 2)
+#define OUTPUT_RF          (1u << 3)
+
 extern uint32_t usb_setting;
 
 #define NKRO_KEYCODE_SIZE   32
