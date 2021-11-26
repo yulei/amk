@@ -311,7 +311,7 @@ bool hook_process_action(keyrecord_t *record)
             return true;
         }
         #ifdef RGB_ENABLE
-        else if (action.key.code == KC_F13){
+        else if (action.key.code == KC_F13 && event.pressed){
            rgb_led_config_next();
            return true; 
         }

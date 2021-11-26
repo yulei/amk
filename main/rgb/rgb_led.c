@@ -21,7 +21,7 @@
 #include "amk_printf.h"
 
 #ifndef RGB_LED_DEBUG
-#define RGB_LED_DEBUG 0
+#define RGB_LED_DEBUG 1
 #endif
 
 #if RGB_LED_DEBUG
@@ -154,6 +154,7 @@ void rgb_led_config_init(void)
 void rgb_led_config_next(void)
 {
     rgb_config_cur = (rgb_config_cur+1) % RGB_LED_CONFIG_NUM;
+    rgb_led_debug("rgb config current: %d\n", rgb_config_cur);
 }
 
 bool rgb_led_config_enabled(void)

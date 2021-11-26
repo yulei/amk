@@ -156,6 +156,8 @@ static void process_report(report_item_t *item)
     }
 
     HAL_UART_Transmit(&huart1, command, item->size+5, 10);
+
+    rf_driver_debug("send report: type=%d, size=%d\n", item->type, item->size);
 }
 
 static uint8_t compute_checksum(uint8_t *data, uint32_t size)
@@ -172,7 +174,7 @@ static void rf_cmd_set_leds(uint8_t led)
     rf_driver_debug("Led set state:%d\n", led);
 }
 
-void rf_driver_init(void)
+void rf_driver_init(bool use_rf)
 {
     // turn on rf power
     gpio_set_output_pushpull(RF_POWER_PIN);
@@ -192,6 +194,10 @@ void rf_driver_init(void)
     rb_init(&ring_buffer, ring_buffer_data, 128);
 
     __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
+
+    if (use_rf && !(usb_setting&USB_OUTPUT_RF)) {
+        rf_driver_toggle();
+    }
 }
 
 void rf_driver_task(void)
@@ -213,11 +219,6 @@ void rf_driver_task(void)
     }
 }
 
-void uart_recv_char(uint8_t c)
-{
-    rb_write_byte(&ring_buffer, c);
-}
-
 void rf_driver_put_report(uint32_t type, void* data, uint32_t size)
 {
     report_item_t item;
@@ -230,11 +231,16 @@ void rf_driver_put_report(uint32_t type, void* data, uint32_t size)
 
 void rf_driver_toggle(void)
 {
-    if (usb_setting & OUTPUT_RF) {
-        usb_setting &= ~OUTPUT_RF;
+    if (usb_setting & USB_OUTPUT_RF) {
+        usb_setting &= ~USB_OUTPUT_RF;
         rf_driver_debug("disable rf output\n");
     } else {
-        usb_setting |= OUTPUT_RF;
+        usb_setting |= USB_OUTPUT_RF;
         rf_driver_debug("enable rf output\n");
     }
+}
+
+void uart_recv_char(uint8_t c)
+{
+    rb_write_byte(&ring_buffer, c);
 }

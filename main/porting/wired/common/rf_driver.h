@@ -5,6 +5,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define CMD_MAX_LEN 64
 #define SYNC_BYTE_1 0xAA
@@ -29,7 +30,7 @@ enum
     CMD_TOGGLE_DATETIME,
 };
 
-void rf_driver_init(void);
+void rf_driver_init(bool use_rf);
 
 void rf_driver_task(void);
 

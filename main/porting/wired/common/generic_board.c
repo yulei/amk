@@ -85,7 +85,7 @@ void board_init(void)
     amk_printf("board_init end\n");
 
 #ifdef RF_ENABLE
-    rf_driver_init();
+    rf_driver_init(true);
     amk_printf("rf_driver_initend\n");
 #endif
 }
@@ -127,10 +127,10 @@ void board_task(void)
     rgb_led_task();
 #endif
 
-
 #ifdef RF_ENABLE
     rf_driver_task();
 #endif
+
     custom_board_task();
 }
 
@@ -146,6 +146,9 @@ static void amk_init(void)
     boot_init();
     host_set_driver(&amk_driver);
     amk_keymap_init();
+#ifdef RF_ENABLE
+    rf_driver_init(true);
+#endif
 }
 
 // tmk integration
@@ -157,7 +160,7 @@ uint8_t keyboard_leds(void)
 void send_keyboard(report_keyboard_t *report)
 {
 #ifdef RF_ENABLE
-    if(usb_setting & OUTPUT_RF) {
+    if(usb_setting & USB_OUTPUT_RF) {
         rf_driver_put_report(CMD_KEY_REPORT, report, sizeof(report_keyboard_t));
     } else 
 #endif
@@ -169,7 +172,7 @@ void send_keyboard(report_keyboard_t *report)
 void send_mouse(report_mouse_t *report)
 {
 #ifdef RF_ENABLE
-    if(usb_setting & OUTPUT_RF) {
+    if(usb_setting & USB_OUTPUT_RF) {
         rf_driver_put_report(CMD_MOUSE_REPORT, report, sizeof(report_mouse_t));
     } else 
 #endif
@@ -181,7 +184,7 @@ void send_mouse(report_mouse_t *report)
 void send_system(uint16_t data)
 {
 #ifdef RF_ENABLE
-    if(usb_setting & OUTPUT_RF) {
+    if(usb_setting & USB_OUTPUT_RF) {
         rf_driver_put_report(CMD_SYSTEM_REPORT, &data, sizeof(data));
     } else 
 #endif
@@ -193,7 +196,7 @@ void send_system(uint16_t data)
 void send_consumer(uint16_t data)
 {
 #ifdef RF_ENABLE
-    if(usb_setting & OUTPUT_RF) {
+    if(usb_setting & USB_OUTPUT_RF) {
         rf_driver_put_report(CMD_CONSUMER_REPORT, &data, sizeof(data));
     } else 
 #endif
