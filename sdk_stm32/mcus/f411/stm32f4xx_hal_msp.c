@@ -39,7 +39,7 @@ extern DMA_HandleTypeDef hdma_spi2_rx;
 extern DMA_HandleTypeDef hdma_spi2_tx;
 #endif
 
-#ifdef UART_USE_INSTANCE_1
+#ifdef USE_UART1
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern DMA_HandleTypeDef hdma_usart1_tx;
 #endif
@@ -520,7 +520,7 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
 }
 #endif
 
-#ifdef UART_USE_INSTANCE_1
+#ifdef USE_UART1
 /**
 * @brief UART MSP Initialization
 * This function configures the hardware resources used in this example

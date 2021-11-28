@@ -17,7 +17,7 @@
 #endif
 
 #ifndef RGB_EFFECTS_DEBUG
-#define RGB_EFFECTS_DEBUG 0
+#define RGB_EFFECTS_DEBUG 1
 #endif
 
 #if RGB_EFFECTS_DEBUG
@@ -288,6 +288,7 @@ rgb_effect_t rgb_effect_linear_init(rgb_config_t *config, uint8_t index, uint8_t
     state->config = config;
     state->config->type = RGB_EFFECT_LINEAR;
     state->config->data = state;
+    state->config->index = index;
     state->index = index;
     state->led_start = led_start;
     state->led_num = led_num;
