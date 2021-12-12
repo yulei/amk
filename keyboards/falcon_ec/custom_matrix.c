@@ -94,9 +94,12 @@ static uint32_t adc_read(void)
 static bool sense_key(pin_t row)
 {
     bool key_down = false;
+    gpio_write_pin(DISCHARGE_PIN, 1);
+    wait_us(2);
+    gpio_write_pin(DISCHARGE_PIN, 0);
     gpio_write_pin(row, 1);
     uint32_t data = adc_read();
-    if (data > 1024) {
+    if (data > SENSE_TH) {
         key_down = true;
         custom_matrix_debug("key down: 0x%lx, data=%d\n", row, data);
     } else {
