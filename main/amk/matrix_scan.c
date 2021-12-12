@@ -127,7 +127,7 @@ bool matrix_scan_custom(matrix_row_t* raw)
     #ifndef MATRIX_DIRECT_PINS
         for (int col = 0; col < MATRIX_COLS; col++) {
             gpio_write_pin(col_pins[col], 1);
-            wait_us(30);
+            wait_us(10);
 
             for(uint8_t row = 0; row < MATRIX_ROWS; row++) {
                 matrix_row_t last_row_value    = raw[row];
