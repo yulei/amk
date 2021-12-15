@@ -18,7 +18,7 @@
 #define custom_matrix_debug(...)
 #endif
 
-static pin_t custom_row_pins[] = {ROW_1_PIN, ROW_2_PIN, ROW_3_PIN, ROW_4_PIN};
+static pin_t custom_row_pins[] = {ROW_1_PIN, ROW_3_PIN, ROW_4_PIN, ROW_2_PIN};
 static pin_t custom_col_pins[] = {COL_C_PIN, COL_B_PIN, COL_A_PIN};
 
 void matrix_init_custom(void)
@@ -108,7 +108,7 @@ static bool sense_key(pin_t row)
 
     // clean up
     gpio_write_pin(row, 0);
-    wait_us(10);
+    wait_us(20);
     return key_down;
 }
 
