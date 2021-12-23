@@ -64,7 +64,7 @@ void matrix_init_custom(void)
     gpio_set_output_pushpull(COL_C_PIN);
     gpio_write_pin(COL_C_PIN, 0);
 
-    // initialize opamp and capacity discharge
+    // initialize opamp and capacitor discharge
     gpio_set_output_pushpull(OPA_EN_PIN);
     gpio_write_pin(OPA_EN_PIN, 1);
     gpio_set_output_pushpull(DISCHARGE_PIN);

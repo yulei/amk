@@ -5,8 +5,11 @@
 
 #pragma once
 
+#include <stdbool.h>
+
 #include "i2c_led.h"
 
+bool is31fl3236_available(uint8_t addr);
 i2c_led_t *is31fl3236_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t led_num);
 void is31fl3236_uninit(i2c_led_t *driver);
 

@@ -41,6 +41,7 @@
 #endif
 
 static i2c_handle_t i2c_inst;
+static bool fl3236_available = true;
 
 typedef struct {
     i2c_led_t       i2c_led;
@@ -55,6 +56,11 @@ static is31fl3236_driver_t is31_drivers[IS31FL3236_NUM] = {0};
 
 static void init_driver(is31fl3236_driver_t *driver);
 static void uninit_driver(i2c_led_t *driver);
+
+bool is31fl3236_available(uint8_t addr)
+{
+    return fl3236_available;
+}
 
 i2c_led_t *is31fl3236_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t led_num)
 {
@@ -76,6 +82,8 @@ i2c_led_t *is31fl3236_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8
 
 void is31fl3236_uninit(i2c_led_t *driver)
 {   
+    if (!is31fl3236_available(0)) return;
+
     // turn chip off
     uninit_driver(driver);
 
@@ -104,6 +112,8 @@ void is31fl3236_set_color_all(i2c_led_t *driver, uint8_t red, uint8_t green, uin
 
 void is31fl3236_update_buffers(i2c_led_t *driver)
 {
+    if (!is31fl3236_available(0)) return;
+   
     uint32_t status = AMK_SUCCESS;
     is31fl3236_driver_t *is31 = (is31fl3236_driver_t*)(driver->data);
     bool need_update = is31->pwm_dirty || is31->control_dirty;
@@ -152,7 +162,10 @@ void init_driver(is31fl3236_driver_t *driver)
     status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, RESET_REG, &data, 1, TIMEOUT);
     if (status != AMK_SUCCESS) {
         fl3236_debug("IS31FL3236: failed to reset: %d\n", status);
+        fl3236_available = false;
+        return;
     }
+
 
     wait_ms(10);
 
