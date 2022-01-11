@@ -25,11 +25,12 @@ void wait_us(int us)
     __HAL_TIM_SET_COUNTER(&WAIT_TIMER_ID,0);
 	while (__HAL_TIM_GET_COUNTER(&WAIT_TIMER_ID) < us);
 #else
-    __IO uint32_t ticks = us * (SystemCoreClock/1000000);
-    while( ticks--) ;
-#endif
-//#else
-//    __IO int32_t ticks = DWT->CYCCNT + us * (SystemCoreClock/1000000);
-//    while (DWT->CYCCNT <= ticks);
+//    __IO uint32_t ticks = us * (SystemCoreClock/1000000);
+//    while( ticks--) ;
 //#endif
+//#else
+    __IO uint32_t start = DWT->CYCCNT;
+    __IO uint32_t delay = us * (SystemCoreClock/1000000);
+    while (DWT->CYCCNT - start < delay);
+#endif
 }
