@@ -98,6 +98,18 @@ static void effect_set_color_all_rgb(rgb_matrix_state_t *state, uint8_t red, uin
         effect_set_color_rgb(state, i, red, green, blue);
     }
 }
+
+__attribute__((weak)) uint8_t rgb_matrix_map_row_column_to_led_kb(uint8_t row, uint8_t column, uint8_t *led_i) { return 0; }
+
+uint8_t rgb_matrix_map_row_column_to_led(uint8_t row, uint8_t column, uint8_t *led_i) {
+    uint8_t led_count = rgb_matrix_map_row_column_to_led_kb(row, column, led_i);
+    uint8_t led_index = g_led_config.matrix_co[row][column];
+    if (led_index != NO_LED) {
+        led_i[led_count] = led_index;
+        led_count++;
+    }
+    return led_count;
+}
 // Generic effect runners
 #include "qmk/runners/rgb_matrix_runners.inc"
 
@@ -262,17 +274,6 @@ static void effect_update_default(rgb_matrix_state_t *state)
     eeconfig_update_rgb(state->config, state->config->index);
 }
 
-__attribute__((weak)) uint8_t rgb_matrix_map_row_column_to_led_kb(uint8_t row, uint8_t column, uint8_t *led_i) { return 0; }
-
-uint8_t rgb_matrix_map_row_column_to_led(uint8_t row, uint8_t column, uint8_t *led_i) {
-    uint8_t led_count = rgb_matrix_map_row_column_to_led_kb(row, column, led_i);
-    uint8_t led_index = g_led_config.matrix_co[row][column];
-    if (led_index != NO_LED) {
-        led_i[led_count] = led_index;
-        led_count++;
-    }
-    return led_count;
-}
 
 rgb_effect_t rgb_effect_matrix_init(rgb_config_t* config, uint8_t index, uint8_t led_start, uint8_t led_num)
 {
@@ -286,10 +287,10 @@ rgb_effect_t rgb_effect_matrix_init(rgb_config_t* config, uint8_t index, uint8_t
     state->flags = LED_FLAG_ALL;
     state->g_rgb_timer = 0;
 #ifdef RGB_MATRIX_KEYREACTIVE_ENABLED
-    state->g_last_hit_tracker = {0};
+    memset(&state->g_last_hit_tracker, 0, sizeof(last_hit_t));
 #endif
 #ifdef RGB_MATRIX_FRAMEBUFFER_EFFECTS
-    state->g_rgb_frame_buffer = {0};
+    memset(&state->g_rgb_frame_buffer, 0, MATRIX_ROWS*MATRIX_COLS);
 #endif
     state->suspend_state = false;
     state->rgb_last_enable = UINT8_MAX;
@@ -301,7 +302,7 @@ rgb_effect_t rgb_effect_matrix_init(rgb_config_t* config, uint8_t index, uint8_t
 #endif  // RGB_DISABLE_TIMEOUT > 0
     state->rgb_timer_buffer = 0;
 #ifdef RGB_MATRIX_KEYREACTIVE_ENABLED
-    state->last_hit_buffer = 0;
+    memset(&state->last_hit_buffer, 0, sizeof(last_hit_t));
 #endif  // RGB_MATRIX_KEYREACTIVE_ENABLED
 
 #ifdef RGB_MATRIX_KEYREACTIVE_ENABLED
@@ -537,5 +538,53 @@ void rgb_effect_matrix_init_mode(rgb_effect_t effect)
     //effect_mode_init(state);
 }
 
-void hook_matrix_change_rgb(rgb_matrix_state_t *state, keyevent_t event)
-{}
+static void process_rgb_matrix(rgb_matrix_state_t *state, uint8_t row, uint8_t col, bool pressed) {
+#ifndef RGB_MATRIX_SPLIT
+    //if (!is_keyboard_master()) return;
+#endif
+#if RGB_DISABLE_TIMEOUT > 0
+    state->rgb_anykey_timer = 0;
+#endif  // RGB_DISABLE_TIMEOUT > 0
+
+#ifdef RGB_MATRIX_KEYREACTIVE_ENABLED
+    uint8_t led[LED_HITS_TO_REMEMBER];
+    uint8_t led_count = 0;
+
+#    if defined(RGB_MATRIX_KEYRELEASES)
+    if (!pressed)
+#    elif defined(RGB_MATRIX_KEYPRESSES)
+    if (pressed)
+#    endif  // defined(RGB_MATRIX_KEYRELEASES)
+    {
+        led_count = rgb_matrix_map_row_column_to_led(row, col, led);
+    }
+
+    if (state->last_hit_buffer.count + led_count > LED_HITS_TO_REMEMBER) {
+        memcpy(&state->last_hit_buffer.x[0], &state->last_hit_buffer.x[led_count], LED_HITS_TO_REMEMBER - led_count);
+        memcpy(&state->last_hit_buffer.y[0], &state->last_hit_buffer.y[led_count], LED_HITS_TO_REMEMBER - led_count);
+        memcpy(&state->last_hit_buffer.tick[0], &state->last_hit_buffer.tick[led_count], (LED_HITS_TO_REMEMBER - led_count) * 2);  // 16 bit
+        memcpy(&state->last_hit_buffer.index[0], &state->last_hit_buffer.index[led_count], LED_HITS_TO_REMEMBER - led_count);
+        state->last_hit_buffer.count = LED_HITS_TO_REMEMBER - led_count;
+    }
+
+    for (uint8_t i = 0; i < led_count; i++) {
+        uint8_t index                = state->last_hit_buffer.count;
+        state->last_hit_buffer.x[index]     = g_led_config.point[led[i]].x;
+        state->last_hit_buffer.y[index]     = g_led_config.point[led[i]].y;
+        state->last_hit_buffer.index[index] = led[i];
+        state->last_hit_buffer.tick[index]  = 0;
+        state->last_hit_buffer.count++;
+    }
+#endif  // RGB_MATRIX_KEYREACTIVE_ENABLED
+
+#if defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS) && defined(ENABLE_RGB_MATRIX_TYPING_HEATMAP)
+    if (state->config->mode == RGB_MATRIX_TYPING_HEATMAP) {
+        process_rgb_matrix_typing_heatmap(state, row, col);
+    }
+#endif  // defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS) && defined(ENABLE_RGB_MATRIX_TYPING_HEATMAP)
+}
+
+void hook_matrix_change_rgb(keyevent_t event)
+{
+    process_rgb_matrix(&matrix_state, event.key.row, event.key.col, event.pressed);
+}

@@ -6,26 +6,26 @@ RGB_MATRIX_EFFECT(TYPING_HEATMAP)
 #            define RGB_MATRIX_TYPING_HEATMAP_DECREASE_DELAY_MS 25
 #        endif
 
-void process_rgb_matrix_typing_heatmap(uint8_t row, uint8_t col) {
+void process_rgb_matrix_typing_heatmap(rgb_matrix_state_t *state, uint8_t row, uint8_t col) {
     uint8_t m_row = row - 1;
     uint8_t p_row = row + 1;
     uint8_t m_col = col - 1;
     uint8_t p_col = col + 1;
 
-    if (m_col < col) g_rgb_frame_buffer[row][m_col] = qadd8(g_rgb_frame_buffer[row][m_col], 16);
-    g_rgb_frame_buffer[row][col] = qadd8(g_rgb_frame_buffer[row][col], 32);
-    if (p_col < MATRIX_COLS) g_rgb_frame_buffer[row][p_col] = qadd8(g_rgb_frame_buffer[row][p_col], 16);
+    if (m_col < col) state->g_rgb_frame_buffer[row][m_col] = qadd8(state->g_rgb_frame_buffer[row][m_col], 16);
+    state->g_rgb_frame_buffer[row][col] = qadd8(state->g_rgb_frame_buffer[row][col], 32);
+    if (p_col < MATRIX_COLS) state->g_rgb_frame_buffer[row][p_col] = qadd8(state->g_rgb_frame_buffer[row][p_col], 16);
 
     if (p_row < MATRIX_ROWS) {
-        if (m_col < col) g_rgb_frame_buffer[p_row][m_col] = qadd8(g_rgb_frame_buffer[p_row][m_col], 13);
-        g_rgb_frame_buffer[p_row][col] = qadd8(g_rgb_frame_buffer[p_row][col], 16);
-        if (p_col < MATRIX_COLS) g_rgb_frame_buffer[p_row][p_col] = qadd8(g_rgb_frame_buffer[p_row][p_col], 13);
+        if (m_col < col) state->g_rgb_frame_buffer[p_row][m_col] = qadd8(state->g_rgb_frame_buffer[p_row][m_col], 13);
+        state->g_rgb_frame_buffer[p_row][col] = qadd8(state->g_rgb_frame_buffer[p_row][col], 16);
+        if (p_col < MATRIX_COLS) state->g_rgb_frame_buffer[p_row][p_col] = qadd8(state->g_rgb_frame_buffer[p_row][p_col], 13);
     }
 
     if (m_row < row) {
-        if (m_col < col) g_rgb_frame_buffer[m_row][m_col] = qadd8(g_rgb_frame_buffer[m_row][m_col], 13);
-        g_rgb_frame_buffer[m_row][col] = qadd8(g_rgb_frame_buffer[m_row][col], 16);
-        if (p_col < MATRIX_COLS) g_rgb_frame_buffer[m_row][p_col] = qadd8(g_rgb_frame_buffer[m_row][p_col], 13);
+        if (m_col < col) state->g_rgb_frame_buffer[m_row][m_col] = qadd8(state->g_rgb_frame_buffer[m_row][m_col], 13);
+        state->g_rgb_frame_buffer[m_row][col] = qadd8(state->g_rgb_frame_buffer[m_row][col], 16);
+        if (p_col < MATRIX_COLS) state->g_rgb_frame_buffer[m_row][p_col] = qadd8(state->g_rgb_frame_buffer[m_row][p_col], 13);
     }
 }
 
@@ -42,14 +42,14 @@ bool TYPING_HEATMAP(rgb_matrix_state_t *state) {
 
     if (state->rgb_effect_params.init) {
         //rgb_matrix_set_color_all(0, 0, 0);
-        effect_set_color(state, 0, 0, 0);
+        effect_set_color_all(state, 0, 0, 0);
         memset(&state->g_rgb_frame_buffer[0][0], 0, MATRIX_ROWS*MATRIX_COLS);//sizeof g_rgb_frame_buffer);
     }
 
     // The heatmap animation might run in several iterations depending on
     // `RGB_MATRIX_LED_PROCESS_LIMIT`, therefore we only want to update the
     // timer when the animation starts.
-    if (params->iter == 0) {
+    if (state->rgb_effect_params.iter == 0) {
         decrease_heatmap_values = timer_elapsed(heatmap_decrease_timer) >= RGB_MATRIX_TYPING_HEATMAP_DECREASE_DELAY_MS;
 
         // Restart the timer if we are going to decrease the heatmap this frame.
@@ -68,7 +68,7 @@ bool TYPING_HEATMAP(rgb_matrix_state_t *state) {
         uint8_t led[LED_HITS_TO_REMEMBER];
         uint8_t led_count = rgb_matrix_map_row_column_to_led(row, col, led);
         for (uint8_t j = 0; j < led_count; ++j) {
-            if (!HAS_ANY_FLAGS(g_led_config.flags[led[j]], params->flags)) continue;
+            if (!HAS_ANY_FLAGS(g_led_config.flags[led[j]], state->rgb_effect_params.flags)) continue;
 
             HSV hsv = {170 - qsub8(val, 85), state->config->sat, scale8((qadd8(170, val) - 170) * 3, state->config->val)};
             effect_set_color(state, led[j], hsv.h, hsv.s, hsv.v);

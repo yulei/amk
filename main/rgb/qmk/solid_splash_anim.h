@@ -19,7 +19,7 @@ HSV SOLID_SPLASH_math(rgb_matrix_state_t *state, HSV hsv, int16_t dx, int16_t dy
 }
 
 #            ifdef ENABLE_RGB_MATRIX_SOLID_SPLASH
-bool SOLID_SPLASH(rgb_matrix_state_t *state) { return effect_runner_reactive_splash(qsub8(g_last_hit_tracker.count, 1), state, &SOLID_SPLASH_math); }
+bool SOLID_SPLASH(rgb_matrix_state_t *state) { return effect_runner_reactive_splash(qsub8(state->g_last_hit_tracker.count, 1), state, &SOLID_SPLASH_math); }
 #            endif
 
 #            ifdef ENABLE_RGB_MATRIX_SOLID_MULTISPLASH

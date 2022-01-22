@@ -16,7 +16,7 @@ bool DIGITAL_RAIN(rgb_matrix_state_t *state) {
 
     static uint8_t drop = 0;
 
-    if (params->init) {
+    if (state->rgb_effect_params.init) {
         //rgb_matrix_set_color_all(0, 0, 0);
         effect_set_color_all(state, 0, 0, 0);
         memset(&state->g_rgb_frame_buffer[0][0], 0, MATRIX_ROWS*MATRIX_COLS);//sizeof(state->g_rgb_frame_buffer));
