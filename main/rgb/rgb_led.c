@@ -13,7 +13,8 @@
 #endif
 #ifdef RGB_MATRIX_ENABLE
 #include "rgb_matrix.h"
-#include "rgb_effect_matrix.h"
+//#include "rgb_effect_matrix.h"
+#include "rgb_effect_matrix_qmk.h"
 #endif
 #include "wait.h"
 #include "amk_eeprom.h"

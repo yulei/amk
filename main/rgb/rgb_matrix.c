@@ -3,7 +3,8 @@
  */
 
 #include "rgb_matrix.h"
-#include "rgb_effect_matrix.h"
+//#include "rgb_effect_matrix.h"
+#include "rgb_effect_matrix_qmk.h"
 
 typedef struct {
     rgb_effect_t effects[RGB_MATRIX_NUM];

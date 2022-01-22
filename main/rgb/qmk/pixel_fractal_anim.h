@@ -31,8 +31,7 @@ static bool PIXEL_FRACTAL(rgb_matrix_state_t *state) {
 
     inline uint32_t interval(void) { return 3000 / scale16by8(qadd8(state->config->speed, 16), 16); }
 
-    //RGB rgb = rgb_matrix_hsv_to_rgb(rgb_matrix_config.hsv);
-    HSV     hsv = {state->config->hue, state->config->sat, state->config->val};
+    HSV hsv = {state->config->hue, state->config->sat, state->config->val};
 
     for (uint8_t h = 0; h < MATRIX_ROWS; ++h) {
         for (uint8_t l = 0; l < MID_COL - 1; ++l) {  // Light and move left columns outwards

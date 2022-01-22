@@ -11,7 +11,6 @@ bool effect_runner_reactive_splash(uint8_t start, rgb_matrix_state_t *state, rea
     for (uint8_t i = led_min; i < led_max; i++) {
         RGB_MATRIX_TEST_LED_FLAGS();
         HSV hsv  = {state->config->hue, state->config->sat, state->config->val};
-        //HSV hsv = rgb_matrix_config.hsv;
         hsv.v   = 0;
         for (uint8_t j = start; j < count; j++) {
             int16_t  dx   = g_led_config.point[i].x - state->g_last_hit_tracker.x[j];
@@ -22,9 +21,6 @@ bool effect_runner_reactive_splash(uint8_t start, rgb_matrix_state_t *state, rea
         }
         hsv.v   = scale8(hsv.v, state->config->val);
         effect_set_color(state, i, hsv.h, hsv.s, hsv.v);
-
-        //RGB rgb = rgb_matrix_hsv_to_rgb(hsv);
-        //rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
     }
     return rgb_matrix_check_finished_leds(led_max);
 }

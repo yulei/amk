@@ -14,9 +14,6 @@ bool GRADIENT_UP_DOWN(rgb_matrix_state_t *state) {
         // Relies on hue being 8-bit and wrapping
         hsv.h   = state->config->hue + scale * (g_led_config.point[i].y >> 4);
         effect_set_color(state, i, hsv.h, hsv.s, hsv.v);
-
-        //RGB rgb = rgb_matrix_hsv_to_rgb(hsv);
-        //rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
     }
     return rgb_matrix_check_finished_leds(led_max);
 }

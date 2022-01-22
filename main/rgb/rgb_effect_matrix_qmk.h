@@ -7,16 +7,6 @@
 #include "rgb_driver.h"
 #include "qmk/lib8tion/lib8tion.h"
 
-#if defined(__GNUC__)
-#    define PACKED __attribute__((__packed__))
-#else
-#    define PACKED
-#endif
-
-#if defined(_MSC_VER)
-#    pragma pack(push, 1)
-#endif
-
 #if defined(RGB_MATRIX_KEYPRESSES) || defined(RGB_MATRIX_KEYRELEASES)
 #    define RGB_MATRIX_KEYREACTIVE_ENABLED
 #endif
@@ -27,7 +17,7 @@
 #endif  // LED_HITS_TO_REMEMBER
 
 #ifdef RGB_MATRIX_KEYREACTIVE_ENABLED
-typedef struct PACKED {
+typedef struct {
     uint8_t  count;
     uint8_t  x[LED_HITS_TO_REMEMBER];
     uint8_t  y[LED_HITS_TO_REMEMBER];
@@ -40,13 +30,13 @@ typedef enum rgb_task_states { STARTING, RENDERING, FLUSHING, SYNCING } rgb_task
 
 typedef uint8_t led_flags_t;
 
-typedef struct PACKED {
+typedef struct {
     uint8_t     iter;
     led_flags_t flags;
     bool        init;
 } effect_params_t;
 
-typedef struct PACKED {
+typedef struct {
     uint8_t x;
     uint8_t y;
 } led_point_t;
@@ -64,25 +54,11 @@ typedef struct PACKED {
 #define NO_LED 255
 #define DRIVER_LED_TOTAL RGB_MATRIX_LED_NUM
 
-typedef struct PACKED {
+typedef struct {
     uint8_t     matrix_co[MATRIX_ROWS][MATRIX_COLS];
     led_point_t point[DRIVER_LED_TOTAL];
     uint8_t     flags[DRIVER_LED_TOTAL];
 } led_config_t;
-
-/*
-typedef union {
-    uint32_t raw;
-    struct PACKED {
-        uint8_t     enable : 2;
-        uint8_t     mode : 6;
-        HSV         hsv;
-        uint8_t     speed;  // EECONFIG needs to be increased to support this
-        led_flags_t flags;
-    };
-} rgb_config_t;
-*/
-
 
 #ifndef RGB_MATRIX_LED_FLUSH_LIMIT
 #    define RGB_MATRIX_LED_FLUSH_LIMIT 16
@@ -155,6 +131,7 @@ enum rgb_matrix_effects {
     RGB_MATRIX_EFFECT_MAX
 };
 
+#define RM_EFFECT_MAX RGB_MATRIX_EFFECT_MAX
 //extern uint32_t     g_rgb_timer;
 extern led_config_t g_led_config;
 #ifdef RGB_MATRIX_KEYREACTIVE_ENABLED

@@ -72,9 +72,6 @@ bool TYPING_HEATMAP(rgb_matrix_state_t *state) {
 
             HSV hsv = {170 - qsub8(val, 85), state->config->sat, scale8((qadd8(170, val) - 170) * 3, state->config->val)};
             effect_set_color(state, led[j], hsv.h, hsv.s, hsv.v);
-
-            //RGB rgb = rgb_matrix_hsv_to_rgb(hsv);
-            //rgb_matrix_set_color(led[j], rgb.r, rgb.g, rgb.b);
         }
 
         if (decrease_heatmap_values) {

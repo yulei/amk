@@ -4,7 +4,6 @@ RGB_MATRIX_EFFECT(SOLID_COLOR)
 bool SOLID_COLOR(rgb_matrix_state_t *state) {
     RGB_MATRIX_USE_LIMITS(led_min, led_max);
 
-    //RGB rgb = rgb_matrix_hsv_to_rgb(rgb_matrix_config.hsv);
     HSV hsv = {state->config->hue, state->config->sat, state->config->val};
     for (uint8_t i = led_min; i < led_max; i++) {
         RGB_MATRIX_TEST_LED_FLAGS();

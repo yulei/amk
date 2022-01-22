@@ -6,9 +6,6 @@ static void jellybean_raindrops_set_color(int i, rgb_matrix_state_t *state) {
     if (!HAS_ANY_FLAGS(g_led_config.flags[i], state->rgb_effect_params.flags)) return;
     HSV hsv = {rand() & 0xFF, qadd8(rand() & 0x7F, 0x80), state->config->val};
     effect_set_color(state, i, hsv.h, hsv.s, hsv.v);
-
-    //RGB rgb = rgb_matrix_hsv_to_rgb(hsv);
-    //rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
 }
 
 bool JELLYBEAN_RAINDROPS(rgb_matrix_state_t *state) {

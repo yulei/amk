@@ -30,32 +30,32 @@ struct s_rgb_matrix_state {
     uint8_t             led_num;
     uint32_t            g_rgb_timer;
 #ifdef RGB_MATRIX_KEYREACTIVE_ENABLED
-    last_hit_t g_last_hit_tracker;
+    last_hit_t          g_last_hit_tracker;
 #endif
 #ifdef RGB_MATRIX_FRAMEBUFFER_EFFECTS
-    uint8_t g_rgb_frame_buffer[MATRIX_ROWS][MATRIX_COLS];
+    uint8_t             g_rgb_frame_buffer[MATRIX_ROWS][MATRIX_COLS];
 #endif
-bool            suspend_state;//     = false;
-uint8_t         rgb_last_enable;//   = UINT8_MAX;
-uint8_t         rgb_last_effect;//   = UINT8_MAX;
-effect_params_t rgb_effect_params;// = {0, LED_FLAG_ALL, false};
-rgb_task_states rgb_task_state;//    = SYNCING;
+    bool                suspend_state;
+    uint8_t             rgb_last_enable;
+    uint8_t             rgb_last_effect;
+    effect_params_t     rgb_effect_params;
+    rgb_task_states     rgb_task_state;
 #if RGB_DISABLE_TIMEOUT > 0
-uint32_t rgb_anykey_timer;
+    uint32_t            rgb_anykey_timer;
 #endif  // RGB_DISABLE_TIMEOUT > 0
-uint32_t rgb_timer_buffer;
+    uint32_t            rgb_timer_buffer;
 #ifdef RGB_MATRIX_KEYREACTIVE_ENABLED
-last_hit_t last_hit_buffer;
+    last_hit_t          last_hit_buffer;
 #endif  // RGB_MATRIX_KEYREACTIVE_ENABLED
 };
 
-#    define sync_timer_init()
-#    define sync_timer_clear()
-#    define sync_timer_update(t)
-#    define sync_timer_read() timer_read()
-#    define sync_timer_read32() timer_read32()
-#    define sync_timer_elapsed(t) timer_elapsed(t)
-#    define sync_timer_elapsed32(t) timer_elapsed32(t)
+#define sync_timer_init()
+#define sync_timer_clear()
+#define sync_timer_update(t)
+#define sync_timer_read() timer_read()
+#define sync_timer_read32() timer_read32()
+#define sync_timer_elapsed(t) timer_elapsed(t)
+#define sync_timer_elapsed32(t) timer_elapsed32(t)
 
 #ifndef RGB_MATRIX_CENTER
 const led_point_t k_rgb_matrix_center = {112, 32};
@@ -63,15 +63,12 @@ const led_point_t k_rgb_matrix_center = {112, 32};
 const led_point_t k_rgb_matrix_center = RGB_MATRIX_CENTER;
 #endif
 
-__attribute__((weak)) RGB rgb_matrix_hsv_to_rgb(HSV hsv) { return hsv_to_rgb(hsv); }
-
 static void effect_set_color(rgb_matrix_state_t *state, uint8_t index, uint8_t hue, uint8_t sat, uint8_t val)
 {
     uint8_t g_index = index + state->led_start;
     rgb_driver_t *driver = rgb_led_map(g_index);
     if (driver) {
         driver->set_color(driver, g_index, hue, sat, val);
-        //driver->set_color_rgb(driver, g_index, 0, 255, 0);
     }
 }
 
