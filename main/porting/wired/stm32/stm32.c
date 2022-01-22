@@ -3,12 +3,14 @@
  */
 
 #include "generic_hal.h"
+#include "wait.h"
 
 static void DWT_Delay_Init(void);
 void system_init(void)
 {
     HAL_Init();
     DWT_Delay_Init();
+    //wait_ms(10000);
 #ifdef EECONFIG_FLASH 
 extern void fee_init(void);
     fee_init();

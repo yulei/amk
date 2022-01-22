@@ -18,7 +18,7 @@
 #define custom_matrix_debug(...)
 #endif
 
-static pin_t custom_row_pins[] = {ROW_1_PIN, ROW_3_PIN, ROW_4_PIN, ROW_2_PIN};
+static pin_t custom_row_pins[] = {ROW_3_PIN, ROW_1_PIN, ROW_4_PIN, ROW_2_PIN};
 static pin_t custom_col_pins[] = {COL_C_PIN, COL_B_PIN, COL_A_PIN};
 
 void matrix_init_custom(void)
@@ -94,9 +94,8 @@ static uint32_t adc_read(void)
 static bool sense_key(pin_t row)
 {
     bool key_down = false;
-    gpio_write_pin(DISCHARGE_PIN, 1);
-    wait_us(2);
     gpio_write_pin(DISCHARGE_PIN, 0);
+    wait_us(1);
     gpio_write_pin(row, 1);
     uint32_t data = adc_read();
     if (data > SENSE_TH) {
@@ -108,7 +107,8 @@ static bool sense_key(pin_t row)
 
     // clean up
     gpio_write_pin(row, 0);
-    wait_us(20);
+    gpio_write_pin(DISCHARGE_PIN, 1);
+    wait_us(30);
     return key_down;
 }
 
@@ -146,6 +146,7 @@ static bool scan_half(matrix_row_t *raw, bool right)
 {
     bool changed = false;
     uint8_t col = right ? 8 : 0;
+    //wait_us(10);
 
     for (int x = 0; x < 2; x++) {
         gpio_write_pin(custom_col_pins[0], x);

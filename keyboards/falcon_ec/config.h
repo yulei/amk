@@ -32,7 +32,7 @@
 #define KEY_IN_CHANNEL  ADC_CHANNEL_2
 #define KEY_IN_PIN      GPIO_PIN_2
 #define KEY_IN_PORT     GPIOA
-#define SENSE_TH        1024
+#define SENSE_TH        1124
 
 #define CAPS_LED_PIN    A6
 

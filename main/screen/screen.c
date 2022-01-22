@@ -39,13 +39,13 @@ void screen_init(void)
 {
     for (int i = 0; i < SCREEN_NUM; i++) {
     #ifdef POWER_CHIP_PIN
-        gpio_set_output_pushpull(screen_drivers[i].ctrl);
+        //gpio_set_output_pushpull(screen_drivers[i].ctrl);
     #endif
         gpio_set_output_pushpull(screen_drivers[i].reset);
         gpio_set_output_pushpull(screen_drivers[i].cs);
         gpio_set_output_pushpull(screen_drivers[i].dc);
     #ifdef POWER_CHIP_PIN
-        gpio_write_pin(screen_drivers[i].ctrl, 0);
+        //gpio_write_pin(screen_drivers[i].ctrl, 0);
     #endif
         gpio_write_pin(screen_drivers[i].reset, 0);
         gpio_write_pin(screen_drivers[i].cs, 1);

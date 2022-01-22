@@ -7,8 +7,18 @@
 #include "wait.h"
 
 #define RM_DELAY      0x80
+
+#ifdef SCREEN_DRIVER_RM67160
+#define RM_X_START    0
+#define RM_Y_START    0
 #define RM_WIDTH      180
 #define RM_HEIGHT     120
+#else
+#define RM_X_START    4
+#define RM_Y_START    0
+#define RM_WIDTH      120
+#define RM_HEIGHT     240
+#endif
 
 #define RM_NOP        0x00
 #define RM_SWRESET    0x01  //Software Reset
@@ -64,10 +74,11 @@
 #define RM_CMDMS      0xFE  //CMD Mode Switch, Manufacture Command Set Control
 #define RM_RDCMDS     0xFF  //Read CMD Status
 
-#if 1
+#ifdef SCREEN_DRIVER_RM67160
 const uint8_t
     init_cmds1[] = {
-        136,
+        126, 
+        //136,
         0xFE, 1, 0x04,  //page4
         0x00, 1, 0xDC,
         0x01, 1, 0x00,
@@ -198,7 +209,22 @@ const uint8_t
         
         0xFE, 1, 0x05,  //page5
         0x05, 1, 0x15,  //ELVSS -2.4V depends on power ic
-        
+#if 0        
+        0xFE,       1, 0x00,                        //page0
+        RM_WRDISBV, 1, 0xFF,                        // write brightness
+        RM_TEON,    1, 0x00,                        // tear on
+        RM_COLMOD,  1, 0x55,                        // pixel format, rgb565
+        RM_MADCTR,  1, 0x00,                        // scan mode forward
+        RM_CASET,   4, 0x00, 0x00, 0x00, 0xB3,      // set column, 0-179
+        RM_RASET,   4, 0x00, 0x00, 0x00, 0x77,      // set row, 0-119
+        RM_WRCTRLD, 1, 0x28,                        // Brightness control on, Display dimming control on
+        RM_SLPOUT,  1|RM_DELAY, 0x00, 120,          // sleep out, then wait 120ms
+        RM_DISPON,  1|RM_DELAY, 0x00, 20            // display on, then wait 20ms
+#endif
+    };
+const uint8_t
+    init_cmds2[] = {
+        10,
         0xFE,       1, 0x00,                        //page0
         RM_WRDISBV, 1, 0xFF,                        // write brightness
         RM_TEON,    1, 0x00,                        // tear on
@@ -210,27 +236,183 @@ const uint8_t
         RM_SLPOUT,  1|RM_DELAY, 0x00, 120,          // sleep out, then wait 120ms
         RM_DISPON,  1|RM_DELAY, 0x00, 20            // display on, then wait 20ms
     };
+#else
+const uint8_t
+    init_cmds1[] = {
+        146,
+        0xFE, 1, 0x01,  //page01
+        0x04, 1, 0xA0, 	
+        0x05, 1, 0x70, 		
+        0x06, 1, 0x3C, 	
+        0x25, 1, 0x06, 
+        0x26, 1, 0x57, 
+        0x27, 1, 0x12, 
+        0x28, 1, 0x12, 	
+        0x2A, 1, 0x06,
+        0x2B, 1, 0x57, 
+        0x2D, 1, 0x12, 
+        0x2F, 1, 0x12,
+        0x37, 1, 0x0C,
+        0x6D, 1, 0x18, //SKIP Frame setting
+        0x29, 1, 0x01,
+        0x30, 1, 0x41, //write_com(0x17); write_para(0x44);
+        0x3A, 1, 0x1D, //Switch timing setting	
+        0x3B, 1, 0x00,
+        0x3D, 1, 0x16,
+        0x3F, 1, 0x2D,
+        0x40, 1, 0x14,
+        0x41, 1, 0x0D,
+        0x42, 1, 0x63, //Switch output setting
+        0x43, 1, 0x36,
+        0x44, 1, 0x41,
+        0x45, 1, 0x14,
+        0x46, 1, 0x52,
+        0x47, 1, 0x25,
+        0x48, 1, 0x63,
+        0x49, 1, 0x36,
+        0x4A, 1, 0x41,
+        0x4B, 1, 0x14,
+        0x4C, 1, 0x52,
+        0x4D, 1, 0x25,
+        0x4E, 1, 0x63, //Source Data output setting
+        0x4F, 1, 0x36,	
+        0x50, 1, 0x41,
+        0x51, 1, 0xFF,
+        0x52, 1, 0x52,
+        0x53, 1, 0x25,
+        0x54, 1, 0x63,
+        0x55, 1, 0x36,
+        0x56, 1, 0x41,
+        0x57, 1, 0x14,	
+        0x58, 1, 0x52,
+        0x59, 1, 0x25,	
+        0x66, 1, 0x10, //idle mode power setting //write_com(0x66); write_para(0x90);
+        0x67, 1, 0x40,
+        0x70, 1, 0xA5,
+        0x72, 1, 0x1A,
+        0x73, 1, 0x15,
+        0x74, 1, 0x0C,
+        0x6A, 1, 0x1F, //external swire pulse
+  
+        0xFE, 1, 0x04, //page04 //GOA Setting
+        0x00, 1, 0xDC,
+        0x01, 1, 0x00,
+        0x02, 1, 0x02,
+        0x03, 1, 0x00,
+        0x04, 1, 0x00,
+        0x05, 1, 0x01,
+        0x06, 1, 0x09,
+        0x07, 1, 0x0A,
+        0x08, 1, 0x00,
+        0x09, 1, 0xDC,
+        0x0A, 1, 0x00,
+        0x0B, 1, 0x02,
+        0x0C, 1, 0x00,
+        0x0D, 1, 0x00,
+        0x0E, 1, 0x00,
+        0x0F, 1, 0x09,
+        0x10, 1, 0x0A,
+        0x11, 1, 0x00,
+        0x12, 1, 0xDC,
+        0x13, 1, 0x00,
+        0x14, 1, 0x02,
+        0x15, 1, 0x00,
+        0x16, 1, 0x08,
+        0x17, 1, 0x01,
+        0x18, 1, 0xA3,
+        0x19, 1, 0x00,
+        0x1A, 1, 0x00,
+        0x1B, 1, 0xDC,
+        0x1C, 1, 0x00,
+        0x1D, 1, 0x02,
+        0x1E, 1, 0x00,
+        0x1F, 1, 0x08,
+        0x20, 1, 0x00,
+        0x21, 1, 0xA3,
+        0x22, 1, 0x00,
+        0x23, 1, 0x00,
+        0x4C, 1, 0x89,//skip frame 
+        0x4D, 1, 0x00,
+        0x4E, 1, 0x01,
+        0x4F, 1, 0x08,
+        0x50, 1, 0x01,
+        0x51, 1, 0x85,
+        0x52, 1, 0x7C,
+        0x53, 1, 0x8A, 
+        0x54, 1, 0x50,
+        0x55, 1, 0x02,
+        0x56, 1, 0x48,
+        0x58, 1, 0x34,
+        0x59, 1, 0x00,
+        0x5E, 1, 0xBB,
+        0x5F, 1, 0xBB,
+        0x60, 1, 0x09,
+        0x61, 1, 0xB1,
+        0x62, 1, 0xBB,
+        0x65, 1, 0x05,
+        0x66, 1, 0x04,
+        0x67, 1, 0x00,
+        0x78, 1, 0xBB,
+        0x79, 1, 0x8B,
+        0x7A, 1, 0x32,
+  
+        0xFE, 1, 0x01,  //page01 //power setting
+        0x0E, 1, 0x85,
+        0x0F, 1, 0x85,
+        0x10, 1, 0x11,
+        0x11, 1, 0xA0,
+        0x12, 1, 0xA0,
+        0x13, 1, 0x81,
+        0x14, 1, 0x81,
+        0x15, 1, 0x82,
+        0x16, 1, 0x82,
+        0x18, 1, 0x55,
+        0x19, 1, 0x33,
+        0x1E, 1, 0x02,
+        0x5B, 1, 0x10, //write_com(0x5E); write_para(0x17); //write_com(0x5F); write_para(0x17);
+        0x62, 1, 0x15,
+        0x63, 1, 0x15,
+        0x6A, 1, 0x00,
+        0x70, 1, 0x55,
+        0x1D, 1, 0x02,
+        0x89, 1, 0xF8,
+        0x8A, 1, 0x80,
+        0x8B, 1, 0x01,
+
+        0xFE, 1, 0x00,  //user command
+        RM_CASET,   4, 0x00, 0x04, 0x00, 0x7B,
+        RM_RASET,   4, 0x00, 0x00, 0x00, 0xEF,
+        RM_TEON,    1, 0x01,
+        RM_MADCTR,  1, 0x00,    //æ‰«ææ–¹å‘
+        RM_COLMOD,  1, 0x75,    //16.7Mè‰²é»˜è®?
+        RM_WRDISBV, 1, 0xA0,    //äº®åº¦è°ƒèŠ‚ï¼Œé»˜è®?xff
+        RM_STDSPIM, 1, 0x80,	//set_DSPI Mode .å†™ramä½¿èƒ½
+        RM_SLPOUT,  1|RM_DELAY, 0x00, 120,          // sleep out, then wait 120ms
+        RM_DISPON,  1|RM_DELAY, 0x00, 20            // display on, then wait 20ms
+};
 #endif
 
 #ifdef POWER_CHIP_PIN
 #define CTRL_PULSE  21
+extern void dwt_wait_us(uint32_t us);
 static void ctrl_pulse(pin_t pin)
 {
     gpio_write_pin(pin, 0);
-    wait_us(5);
+    dwt_wait_us(10);
     gpio_write_pin(pin, 1);
-    wait_us(5);
+    dwt_wait_us(10);
 }
 
 static void init_vneg(pin_t pin)
 {
     gpio_set_output_pushpull(pin);
     gpio_write_pin(pin, 1);
-    wait_ms(100); // wait until chip stable
+    wait_ms(20); // wait until chip stable
 
     for (uint32_t i = 0; i < CTRL_PULSE; i++) {
         ctrl_pulse(pin);
     }
+    wait_ms(30); // wait until vneg stable 
 }
 
 #endif
@@ -249,11 +431,11 @@ void rm67160_unselect(rm67160_t *driver)
 void rm67160_reset(rm67160_t *driver)
 {
     gpio_write_pin(driver->reset, 1);
-    wait_ms(20);
+    wait_ms(100);
     gpio_write_pin(driver->reset, 0);
-    wait_ms(20);
+    wait_ms(100);
     gpio_write_pin(driver->reset, 1);
-    wait_ms(120);
+    wait_ms(500);
 }
 
 static void write_command(rm67160_t *driver, uint8_t cmd)
@@ -278,13 +460,13 @@ void set_address_window(rm67160_t *driver, uint8_t x0, uint8_t y0, uint8_t x1, u
 {
     // column address set
     write_command(driver, RM_CASET);
-    uint8_t data[] = { 0x00, x0, 0x00, x1};
+    uint8_t data[] = { 0x00, RM_X_START+x0, 0x00, RM_X_START+x1};
     write_data(driver, data, sizeof(data));
 
     // row address set
     write_command(driver, RM_RASET);   
-    data[1] = y0;
-    data[3] = y1;
+    data[1] = RM_Y_START+y0;
+    data[3] = RM_Y_START+y1;
     write_data(driver, data, sizeof(data));
 
     // write to RAM
@@ -325,15 +507,19 @@ void execute_commands(rm67160_t *driver, const uint8_t *addr)
 
 void rm67160_init(rm67160_t *driver)
 {
+    wait_ms(1000);
+#if 1
+    spi = spi_init(RM67160_SPI_ID);
+
+    rm67160_reset(driver);
+    rm67160_select(driver);
+    execute_commands(driver, init_cmds1);
+    execute_commands(driver, init_cmds2);
+
+
 #ifdef POWER_CHIP_PIN
     init_vneg(driver->ctrl);
 #endif
-#if 1
-    spi = spi_init(RM67160_SPI_ID);
-    rm67160_select(driver);
-    rm67160_reset(driver);
-    execute_commands(driver, init_cmds1);
-
     set_address_window(driver, 0, 0, RM_WIDTH-1, RM_HEIGHT-1);
     uint16_t color = 0xFFFF;
     for (int x = 0; x < RM_WIDTH; x++) {
@@ -342,6 +528,8 @@ void rm67160_init(rm67160_t *driver)
         }
     }
     rm67160_unselect(driver);
+
+
 #endif
 }
 
