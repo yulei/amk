@@ -46,7 +46,7 @@ void i2c_inst_init(i2c_instance_t *inst, I2C_TypeDef *i2c)
         return;
 
 #if defined(STM32F722xx) || defined(STM32L072xx)
-    #ifndef I2C_USE_INSTANCE_2
+    #ifndef USE_I2C2 
     inst->handle.Instance = I2C1;
     #else
     inst->handle.Instance = I2C2;
@@ -78,7 +78,7 @@ void i2c_inst_init(i2c_instance_t *inst, I2C_TypeDef *i2c)
     }
 #else
     inst->handle.Instance = i2c;
-    inst->handle.Init.ClockSpeed = 1000000;//400000;
+    inst->handle.Init.ClockSpeed = 400000;
     inst->handle.Init.DutyCycle = I2C_DUTYCYCLE_2;
     inst->handle.Init.OwnAddress1 = 0;
     inst->handle.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
@@ -90,6 +90,7 @@ void i2c_inst_init(i2c_instance_t *inst, I2C_TypeDef *i2c)
         inst->ready = true;
     } else {
         //Error_Handler();
+        amk_printf("HAL_I2C_Init() failed\n");
     }
 #endif
     inst->ready = true;

@@ -20,7 +20,7 @@ USE_F405_V2 = yes
 UF2_ENABLE = yes
 UF2_FAMILY = STM32F4
 
-LINKER_PATH = $(KEYBOARD_DIR)
+#LINKER_PATH = $(KEYBOARD_DIR)
 
 ifeq (yes, $(strip $(VIAL_ENABLE)))
 	SRCS += $(KEYBOARD_DIR)/m65_actionmap.c

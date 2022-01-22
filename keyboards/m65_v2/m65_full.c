@@ -64,8 +64,8 @@ typedef struct {
 #define BYTE_PER_PIXEL  2
 #define ANIM_X_START    0
 #define ANIM_Y_START    20
-#define ANIM_WIDTH      40//160
-#define ANIM_HEIGHT     40//80
+#define ANIM_WIDTH      64//40//160
+#define ANIM_HEIGHT     64//40//80
 static uint16_t anim_buf[ANIM_WIDTH*ANIM_HEIGHT];
 
 #define AUXI_X_START    0
@@ -437,8 +437,8 @@ void render_task(render_t* render)
         }
         //screen_fill_rect_async(render->x, render->y, render->width, render->height, render->buf, render->buf_size);
         screen_fill_rect(render->x, render->y, render->width, render->height, render->buf, render->buf_size);
-        screen_fill_rect(render->x+60, render->y, render->width, render->height, render->buf, render->buf_size);
-        screen_fill_rect(render->x+120, render->y, render->width, render->height, render->buf, render->buf_size);
+        //screen_fill_rect(render->x+60, render->y, render->width, render->height, render->buf, render->buf_size);
+        //screen_fill_rect(render->x+120, render->y, render->width, render->height, render->buf, render->buf_size);
         filling = true;
         render->ticks = timer_read32();
     }

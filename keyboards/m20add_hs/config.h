@@ -25,7 +25,6 @@
 #define BATTERY_SAADC_PIN           NRF_SAADC_INPUT_AIN3
 
 #define USE_I2C1
-#define I2C_USE_INSTANCE_1
 #define I2C1_SCL_PIN                7
 #define I2C1_SDA_PIN                8
 

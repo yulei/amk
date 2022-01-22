@@ -36,7 +36,7 @@
 #define PWM_TIM_CHANNEL TIM_CHANNEL_1
 
 #define RGB_DEVICE_NUM  2
-#define I2C_USE_INSTANCE_1
+#define USE_I2C1
 #define I2C1_SCL_PIN    B8
 #define I2C1_SDA_PIN    B9
 

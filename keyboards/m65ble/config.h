@@ -33,7 +33,7 @@
 #define BATTERY_SAADC_ENABLE_LOW
 #define BATTERY_SAADC_PIN           NRF_SAADC_INPUT_AIN3
 
-#define I2C_USE_INSTANCE_1
+#define USE_I2C1
 #define I2C1_SCL_PIN                27
 #define I2C1_SDA_PIN                26
 
@@ -63,7 +63,7 @@
 #define BATTERY_SAADC_ENABLE_LOW
 #define BATTERY_SAADC_PIN           NRF_SAADC_INPUT_AIN4
 
-#define I2C_USE_INSTANCE_1
+#define USE_I2C1 
 #define I2C1_SCL_PIN                27
 #define I2C1_SDA_PIN                26
 

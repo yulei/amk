@@ -64,8 +64,8 @@ typedef struct {
 #define BYTE_PER_PIXEL  2
 #define ANIM_X_START    0
 #define ANIM_Y_START    0
-#define ANIM_WIDTH      80
-#define ANIM_HEIGHT     80
+#define ANIM_WIDTH      64//80
+#define ANIM_HEIGHT     64//80
 static uint16_t anim_buf[ANIM_WIDTH*ANIM_HEIGHT];
 
 #define AUXI_X_START    0
@@ -434,9 +434,9 @@ void render_task(render_t* render)
                 //render->anim = NULL;
             }
         }
-        screen_fill_rect_async(render->x, render->y, render->width, render->height, render->buf, render->buf_size);
-        //screen_fill_rect(render->x, render->y, render->width, render->height, render->buf, render->buf_size);
-        filling = true;
+        //screen_fill_rect_async(render->x, render->y, render->width, render->height, render->buf, render->buf_size);
+        screen_fill_rect(render->x, render->y, render->width, render->height, render->buf, render->buf_size);
+        //filling = true;
         render->ticks = timer_read32();
     }
 }
@@ -485,7 +485,7 @@ void msc_task_kb(void)
     #endif
 
     render_screen(0);
-    render_screen(1);
+    //render_screen(1);
 }
 #endif
 

@@ -526,7 +526,7 @@ static uint8_t  hid_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, v
                         ret = USBD_FAIL;
                     } break;
                 case USB_REQ_GET_DESCRIPTOR:
-                    if (req->wValue >> 8 == HID_DESC_TYPE_REPORT) {
+                    if (req->wValue >> 8 == UDD_HID_DESC_TYPE_REPORT) {
                         if (hhid->keyboard) {
                         len = tud_descriptor_hid_report_kbd_size();
                         pbuf = (uint8_t*)tud_descriptor_hid_report_kbd_cb();
@@ -534,7 +534,7 @@ static uint8_t  hid_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, v
                         len = tud_descriptor_hid_report_other_size();
                         pbuf = (uint8_t*)tud_descriptor_hid_report_other_cb();
                         }
-                    } else if (req->wValue >> 8 == HID_DESC_TYPE_HID) {
+                    } else if (req->wValue >> 8 == UDD_HID_DESC_TYPE_HID) {
                         if (hhid->keyboard) {
                             len = tud_descriptor_hid_interface_kbd_size();
                             pbuf = (uint8_t*)tud_descriptor_hid_interface_kbd_cb();

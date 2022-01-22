@@ -83,7 +83,7 @@
 #define BATTERY_SAADC_ENABLE_PIN    GPIO_PIN_MAP(0,31)
 #define BATTERY_SAADC_PIN           NRF_SAADC_INPUT_AIN6
 
-#define I2C_USE_INSTANCE_1
+#define USE_I2C1
 #define I2C1_SCL_PIN                GPIO_PIN_MAP(0,5)
 #define I2C1_SDA_PIN                GPIO_PIN_MAP(1,9)
 

@@ -36,9 +36,9 @@
 // custom tusb definitions
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 
-#define VECT_TAB_OFFSET 0x20000
+//#define VECT_TAB_OFFSET 0x20000
 
-#define I2C_USE_INSTANCE_1
+#define USE_I2C1
 #define I2C1_SCL_PIN    B8
 #define I2C1_SDA_PIN    B9
 

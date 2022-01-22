@@ -57,7 +57,7 @@
     #define FLASH_CS        A4
     #define W25QXX_SPI_ID   SPI_INSTANCE_1
 
-    #define I2C_USE_INSTANCE_1
+    #define USE_I2C1
     #define I2C1_SCL_PIN    B8
     #define I2C1_SDA_PIN    B9
 
