@@ -27,7 +27,7 @@
 #endif
 
 #define DELAY_MIN   0
-#define DELAY_DEFAULT 1500
+#define DELAY_DEFAULT 150
 
 #define RAINBOW_STEP_DEFAULT    32
 #define BREATH_STEP_DEFAULT     32
@@ -288,7 +288,7 @@ rgb_effect_t rgb_effect_linear_init(rgb_config_t *config, uint8_t index, uint8_t
     state->config = config;
     state->config->type = RGB_EFFECT_LINEAR;
     state->config->data = state;
-    state->config->index = index;
+    //state->config->index = index;
     state->index = index;
     state->led_start = led_start;
     state->led_num = led_num;

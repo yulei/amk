@@ -79,9 +79,9 @@ enum {
 #define MODE_DEFAULT    0
 
 #define SPEED_MIN 1
-#define SPEED_MAX 15
-#define SPEED_DEFAULT 7
-#define SPEED_STEP  1
+#define SPEED_MAX 255
+#define SPEED_DEFAULT (SPEED_MAX/2)
+#define SPEED_STEP  16
 
 #define HUE_MIN 0
 #define HUE_MAX 255

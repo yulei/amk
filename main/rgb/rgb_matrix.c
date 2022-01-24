@@ -17,6 +17,7 @@ void rgb_matrix_init(void)
     // initialize rgb matrix 
     for (int i = 0; i < RGB_MATRIX_NUM; i++) {
         uint8_t config = g_rgb_matrix_params[i].config;
+        g_rgb_configs[config].index = config;
         rgb_matrix.effects[i] = rgb_effect_matrix_init(&g_rgb_configs[config], i, g_rgb_matrix_params[i].led_start, g_rgb_matrix_params[i].led_num);
     }
 }

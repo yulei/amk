@@ -30,7 +30,7 @@ static USBH_StatusTypeDef hid_itf_request(USBH_HandleTypeDef *phost, uint8_t itf
 static USBH_StatusTypeDef hid_itf_process(USBH_HandleTypeDef *phost, uint8_t itf);
 static USBH_StatusTypeDef hid_itf_sof(USBH_HandleTypeDef *phost, uint8_t itf);
 
-static void hid_desc_parse(HID_DescTypeDef *desc, uint8_t *buf);
+static void hid_desc_parse(HID_DescTypeDef *desc, uint8_t *buf, uint8_t itf);
 
 USBH_ClassTypeDef  HID_Multi_Class = {
     "HID Multi",
@@ -51,6 +51,7 @@ static void report_desc_buf_init(report_desc_buf_t* buf)
     memset(&buf->data[0], 0, sizeof(uint32_t)*REPORT_DESC_BUF_SIZE);
     buf->total = sizeof(uint32_t)*REPORT_DESC_BUF_SIZE;
     buf->allocated = 0;
+    amk_printf("report desc buf inited\n");
 }
 
 static uint8_t* report_desc_buf_alloc(report_desc_buf_t* buf, uint32_t size)
@@ -63,6 +64,7 @@ static uint8_t* report_desc_buf_alloc(report_desc_buf_t* buf, uint32_t size)
 
     uint8_t* p = (uint8_t*)(&buf->data[buf->allocated]);
     buf->allocated += aligned;
+    amk_printf("report desc allocated: size=%d\n", aligned);
     return p;
 }
 
@@ -162,6 +164,7 @@ static USBH_StatusTypeDef hid_itf_init(USBH_HandleTypeDef *phost, uint8_t itf, U
     pitf->ctl_state     = HID_REQ_INIT;
     pitf->packet_size   = desc->Ep_Desc[0].wMaxPacketSize;
     pitf->poll          = desc->Ep_Desc[0].bInterval;
+    //pitf->hid_desc      = desc;
     USBH_HID_FifoInit(&pitf->fifo, pitf->fifo_buf, HID_QUEUE_SIZE*HID_PACKET_SIZE);
 
     if (pitf->poll < HID_MIN_POLL) {
@@ -220,7 +223,7 @@ static USBH_StatusTypeDef hid_itf_request(USBH_HandleTypeDef *phost, uint8_t itf
     switch (pitf->ctl_state) {
     case HID_REQ_INIT:
     case HID_REQ_GET_HID_DESC: 
-        hid_desc_parse(&pitf->hid_desc, phost->device.CfgDesc_Raw);
+        hid_desc_parse(&pitf->hid_desc, phost->device.CfgDesc_Raw, itf);
         pitf->report_desc = report_desc_buf_alloc(&report_desc_buffer, pitf->hid_desc.wDescriptorLength);
         pitf->ctl_state = HID_REQ_GET_REPORT_DESC;
         break;
@@ -254,6 +257,9 @@ static USBH_StatusTypeDef hid_itf_request(USBH_HandleTypeDef *phost, uint8_t itf
             amk_printf("HID interface[%d]: failed to get report descriptor\n", itf);
             status = USBH_FAIL;
         } else {
+            if (status != USBH_BUSY) {
+                amk_printf("HID interface[%d]: failed to get report descriptor, status=%d\n", itf, status);
+            }
         }
         break;
     case HID_REQ_SET_IDLE:
@@ -487,13 +493,14 @@ USBH_StatusTypeDef USBH_HID_SetProtocol(USBH_HandleTypeDef *phost, uint8_t proto
     return USBH_CtlReq(phost, 0U, 0U);
 }
 
-static void  hid_desc_parse(HID_DescTypeDef *desc, uint8_t *buf)
+static void  hid_desc_parse(HID_DescTypeDef *desc, uint8_t *buf, uint8_t itf)
 {
     USBH_DescHeader_t *pdesc = (USBH_DescHeader_t *)buf;
     uint16_t CfgDescLen;
     uint16_t ptr;
 
     CfgDescLen = LE16(buf + 2U);
+    uint8_t cur = 0;
 
     if (CfgDescLen > USB_CONFIGURATION_DESC_SIZE) {
         ptr = USB_LEN_CFG_DESC;
@@ -502,14 +509,18 @@ static void  hid_desc_parse(HID_DescTypeDef *desc, uint8_t *buf)
             pdesc = USBH_GetNextDesc((uint8_t *)pdesc, &ptr);
 
             if (pdesc->bDescriptorType == USB_DESC_TYPE_HID) {
-                desc->bLength = *(uint8_t *)((uint8_t *)pdesc + 0U);
-                desc->bDescriptorType = *(uint8_t *)((uint8_t *)pdesc + 1U);
-                desc->bcdHID = LE16((uint8_t *)pdesc + 2U);
-                desc->bCountryCode = *(uint8_t *)((uint8_t *)pdesc + 4U);
-                desc->bNumDescriptors = *(uint8_t *)((uint8_t *)pdesc + 5U);
-                desc->bReportDescriptorType = *(uint8_t *)((uint8_t *)pdesc + 6U);
-                desc->wDescriptorLength = LE16((uint8_t *)pdesc + 7U);
-                break;
+                if( cur != itf) {
+                    cur++;
+                } else {
+                    desc->bLength = *(uint8_t *)((uint8_t *)pdesc + 0U);
+                    desc->bDescriptorType = *(uint8_t *)((uint8_t *)pdesc + 1U);
+                    desc->bcdHID = LE16((uint8_t *)pdesc + 2U);
+                    desc->bCountryCode = *(uint8_t *)((uint8_t *)pdesc + 4U);
+                    desc->bNumDescriptors = *(uint8_t *)((uint8_t *)pdesc + 5U);
+                    desc->bReportDescriptorType = *(uint8_t *)((uint8_t *)pdesc + 6U);
+                    desc->wDescriptorLength = LE16((uint8_t *)pdesc + 7U);
+                    break;
+                }
             }
         }
     }

@@ -28,6 +28,7 @@ void rp_reset(void)
 
 bool rp_parse(uint32_t itf, const void* data, uint32_t size)
 {
+    amk_printf("report parse: itf=%d\n", itf);
     if (itf >= ITF_MAX) {
         amk_printf("invalid itf=%d\n", itf);
         return false;
@@ -53,6 +54,7 @@ bool rp_parse(uint32_t itf, const void* data, uint32_t size)
             case HID_ITEM_TYPE_MAIN:
                 switch(tag){
                 case HID_MAIN_ITEM_TAG_INPUT:
+                    //amk_printf("rf_type: %d\n", itf_desc->desc[index].rd_type);
                     switch (itf_desc->desc[index].rd_type) {
                     case RDI_CONSUMER:
                         itf_desc->desc[index].consumer.keycode_size = (report_count*report_size)/8;
@@ -249,5 +251,6 @@ bool next_token(uint8_t* p, uint8_t* type, uint8_t* tag, uint8_t* size, uint32_t
         }
     }
 
+    amk_printf("report: type=%d, tag=%d, size=%d, value=%d\n", *type, *tag, *size, *value);
     return true;
 }

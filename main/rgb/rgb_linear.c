@@ -17,6 +17,7 @@ void rgb_linear_init(void)
     // initialize rgb effects
     for (int i = 0; i < RGB_SEGMENT_NUM; i++) {
         uint8_t config = g_rgb_linear_params[i].config;
+        g_rgb_configs[config].index = config;
         rgb_linear.effects[i] = rgb_effect_linear_init(&g_rgb_configs[config], i, g_rgb_linear_params[i].led_start, g_rgb_linear_params[i].led_num);
     }
 }

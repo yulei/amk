@@ -375,4 +375,9 @@ void hook_matrix_change(keyevent_t event)
     extern void hook_matrix_change_rgb(keyevent_t event);
     hook_matrix_change_rgb(event);
 #endif
+
+#ifdef TYPING_SPEED
+    extern void hook_matrix_change_typing(keyevent_t event);
+    hook_matrix_change_typing(event);
+#endif
 }
