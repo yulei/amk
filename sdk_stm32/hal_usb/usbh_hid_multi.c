@@ -127,6 +127,8 @@ static USBH_StatusTypeDef hid_multi_request(USBH_HandleTypeDef *phost)
         }
     }
 
+    // notify user all done
+    phost->pUser(phost, HOST_USER_CLASS_ACTIVE);
     amk_printf("HID multi class request all done\n");
     return USBH_OK;
 }
@@ -279,7 +281,7 @@ static USBH_StatusTypeDef hid_itf_request(USBH_HandleTypeDef *phost, uint8_t itf
             pitf->valid = 1;
 
             /* all requests performed*/
-            phost->pUser(phost, HOST_USER_CLASS_ACTIVE);
+            //phost->pUser(phost, HOST_USER_CLASS_ACTIVE);
             status = USBH_OK;
         } else if (classReqStatus == USBH_NOT_SUPPORTED) {
             amk_printf("HID interface[%d]: failed to set protocol\n", itf);

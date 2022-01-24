@@ -104,19 +104,22 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
 
     // read data out
     static uint8_t buf[64];
+    uint8_t *p_buf = NULL;
     uint8_t report_id = 0;
     uint8_t report_size = 0;
     memset(&buf[0], 0, sizeof(buf));
     switch(itf->type) {
     case HID_MOUSE:
         report_id = HID_REPORT_ID_MOUSE;
-        buf[0] = report_id;
-        USBH_HID_FifoRead(&itf->fifo, &buf[1], itf->report_size);
-        report_size = 5 + 1;
+        //buf[0] = report_id;
+        USBH_HID_FifoRead(&itf->fifo, &buf[0], itf->report_size);
+        report_size = 5;
+        p_buf = &buf[0];
         break;
     case HID_KEYBOARD:
         report_id = HID_REPORT_ID_KEYBOARD;
         report_size = itf->report_size;
+        p_buf = &buf[0];
         USBH_HID_FifoRead(&itf->fifo, &buf[0], itf->report_size);
         break;
     case HID_EXTRA: {
@@ -129,33 +132,34 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
                 // found
                 switch (ird->desc[i].rd_type) {
                     case RDI_KEYBOARD:
+                        p_buf = &buf[1];
                         if (ird->desc[i].keyboard.keycode_size > 8) {
                             // nkro?
                             report_id = HID_REPORT_ID_NKRO;
-                            buf[0] = report_id;
+                            //buf[0] = report_id;
                             report_size = NKRO_KEYCODE_SIZE;
                         } else {
-                            if (itf->report_size > 8) {
-                                memcpy(&buf[0], &buf[1], 8);// removed the report id
-                            }
                             report_id = HID_REPORT_ID_KEYBOARD;
                             report_size = 8;
                         }
                     break;
                     case RDI_MOUSE:
                         report_id = HID_REPORT_ID_MOUSE;
-                        buf[0] = report_id;
-                        report_size = 6;
+                        //buf[0] = report_id;
+                        p_buf = &buf[1];
+                        report_size = 5;
                     break;
                     case RDI_SYSTEM:
                         report_id = HID_REPORT_ID_SYSTEM;
-                        buf[0] = report_id;
-                        report_size = 3;
+                        //buf[0] = report_id;
+                        p_buf = &buf[1];
+                        report_size = 2;
                     break;
                     case RDI_CONSUMER:
                         report_id = HID_REPORT_ID_CONSUMER;
-                        buf[0] = report_id;
-                        report_size = 3;
+                        //buf[0] = report_id;
+                        p_buf = &buf[1];
+                        report_size = 2;
                     break;
                 }
                 break;
@@ -178,6 +182,6 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
     }
 
     extern USBD_HandleTypeDef hUsbDeviceFS;
-    usbd_comp_send(&hUsbDeviceFS, report_id, buf, report_size);
+    usbd_comp_send(&hUsbDeviceFS, report_id, p_buf, report_size);
 }
 #endif

@@ -27,7 +27,7 @@
 #endif
 
 #define DELAY_MIN   0
-#define DELAY_DEFAULT 150
+#define DELAY_DEFAULT 15000
 
 #define RAINBOW_STEP_DEFAULT    32
 #define BREATH_STEP_DEFAULT     32
