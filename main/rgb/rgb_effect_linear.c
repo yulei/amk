@@ -27,7 +27,7 @@
 #endif
 
 #define DELAY_MIN   0
-#define DELAY_DEFAULT 15000
+#define DELAY_DEFAULT 1500
 
 #define RAINBOW_STEP_DEFAULT    32
 #define BREATH_STEP_DEFAULT     32
@@ -43,6 +43,7 @@ struct s_rgb_linear_state {
     uint32_t                counter;
     uint32_t                rainbow_step;
     uint32_t                breath_step;
+    bool                    breath_dir;
     uint32_t                circle_step;
     bool                    wipe_on;
     uint8_t                 index;
@@ -103,6 +104,7 @@ static void effects_mode_init(rgb_linear_state_t *state)
         case RL_EFFECT_RANDOM:
             break;
         case RL_EFFECT_BREATH:
+            state->breath_dir = true;
             break;
         case RL_EFFECT_WIPE:
             state->wipe_on = true;
@@ -207,7 +209,20 @@ static void effects_mode_breath(rgb_linear_state_t *state)
     uint8_t breath = VAL_MAX / state->breath_step;
 
     effects_set_color_all(state, state->config->hue, state->config->sat, state->config->val);
-    state->config->val += breath;
+    uint8_t old_val = state->config->val;
+    if (state->breath_dir) {
+        state->config->val += breath;
+        if( old_val > state->config->val) {
+            state->config->val = old_val;
+            state->breath_dir = false;
+        }
+    } else {
+        state->config->val -= breath;
+        if (old_val < state->config->val) {
+            state->config->val = old_val;
+            state->breath_dir = true;
+        }
+    }
 }
 
 static void effects_mode_wipe(rgb_linear_state_t *state)
