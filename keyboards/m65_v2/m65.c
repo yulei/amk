@@ -64,8 +64,8 @@ typedef struct {
 #define BYTE_PER_PIXEL  2
 #define ANIM_X_START    0
 #define ANIM_Y_START    0
-#define ANIM_WIDTH      64//80
-#define ANIM_HEIGHT     64//80
+#define ANIM_WIDTH      80//64//80
+#define ANIM_HEIGHT     80//64//80
 static uint16_t anim_buf[ANIM_WIDTH*ANIM_HEIGHT];
 
 #define AUXI_X_START    0
@@ -113,6 +113,28 @@ static render_t renders[] = {
     },
 };
 
+static uint32_t typing_speed = 1;
+#ifdef  TYPING_SPEED
+static uint16_t last_typing = 0;
+void hook_matrix_change_typing(keyevent_t event)
+{
+    uint16_t elapsed = TIMER_DIFF_16(event.time, last_typing);
+    typing_speed += elapsed/10;
+    last_typing = event.time;
+}
+
+void update_speed(void)
+{
+    uint16_t elapsed = timer_elapsed(last_typing);
+    if (typing_speed > elapsed/10){
+        typing_speed -= elapsed/10;
+    } else {
+        typing_speed = 1;
+    }
+}
+
+#endif
+
 #ifdef DATETIME_ENABLE
 static rtc_datetime_t rtc_dt = {
     .second = 0,
@@ -129,6 +151,7 @@ static uint32_t rtc_datetime_ticks = 0;
 #define RTC_FILE_SIG            "AMDT"
 #define RTC_FILE_SIZE           10
 #define RTC_CHECKING_INTERVAL   700
+
 
 static void rtc_datetime_scan(void);
 
@@ -405,7 +428,10 @@ void render_task(render_t* render)
     };
 
     uint32_t elapsed = timer_elapsed32(render->ticks);
-    if ( elapsed > render->delay) {
+    #ifdef TYPING_SPEED
+    update_speed();
+    #endif
+    if ( (elapsed*typing_speed) > render->delay) {
         if ( 0 == anim_step(render->anim, &render->delay, render->buf, render->buf_size)) {
             bool play = false;
             switch(render->mode) {
@@ -434,9 +460,9 @@ void render_task(render_t* render)
                 //render->anim = NULL;
             }
         }
-        //screen_fill_rect_async(render->x, render->y, render->width, render->height, render->buf, render->buf_size);
-        screen_fill_rect(render->x, render->y, render->width, render->height, render->buf, render->buf_size);
-        //filling = true;
+        screen_fill_rect_async(render->x, render->y, render->width, render->height, render->buf, render->buf_size);
+        //screen_fill_rect(render->x, render->y, render->width, render->height, render->buf, render->buf_size);
+        filling = true;
         render->ticks = timer_read32();
     }
 }
@@ -485,7 +511,7 @@ void msc_task_kb(void)
     #endif
 
     render_screen(0);
-    //render_screen(1);
+    render_screen(1);
 }
 #endif
 

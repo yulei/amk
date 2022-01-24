@@ -36,7 +36,7 @@
 // custom tusb definitions
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 
-//#define VECT_TAB_OFFSET 0x20000
+#define VECT_TAB_OFFSET 0x20000
 
 #define USE_I2C1
 #define I2C1_SCL_PIN    B8
@@ -58,3 +58,4 @@
 
 //#define WDT_ENABLED
 #define FAULT_BREAK
+//#define TYPING_SPEED

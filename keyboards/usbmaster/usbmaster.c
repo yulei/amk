@@ -296,6 +296,7 @@ static void process_command(report_item_t *item)
     case CMD_KEYMAP_GET_ACK:
         ble_sync_update(item->data[0], item->data[1], item->data[2], (item->data[3]<<8) | item->data[4]);
         break;
+#ifdef SCREEN_ENABLE
     case CMD_TOGGLE_SCREEN:
         toggle_screen();
         break;
@@ -305,6 +306,7 @@ static void process_command(report_item_t *item)
     case CMD_TOGGLE_DATETIME:
         toggle_datetime();
         break;
+#endif
     default:
         break;
     }
