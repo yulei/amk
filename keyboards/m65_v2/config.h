@@ -58,4 +58,4 @@
 
 //#define WDT_ENABLED
 #define FAULT_BREAK
-//#define TYPING_SPEED
+#define TYPING_SPEED

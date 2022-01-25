@@ -113,27 +113,53 @@ static render_t renders[] = {
     },
 };
 
-static uint32_t typing_speed = 1;
 #ifdef  TYPING_SPEED
-static uint16_t last_typing = 0;
+#define TYPING_INTERVAL     100
+#define TYPING_SPEED_MAX    10
+
+bool typing_enable = false;
+static uint32_t typing_speed    = 0;
+static uint32_t typing_last     = 0;
+static uint32_t typing_counter  = 0;
+static uint32_t typing_update   = 0;
+
 void hook_matrix_change_typing(keyevent_t event)
 {
-    uint16_t elapsed = TIMER_DIFF_16(event.time, last_typing);
-    typing_speed += elapsed/10;
-    last_typing = event.time;
+    typing_last = timer_read32();
+
+    typing_counter++;
 }
 
 void update_speed(void)
 {
-    uint16_t elapsed = timer_elapsed(last_typing);
-    if (typing_speed > elapsed/10){
-        typing_speed -= elapsed/10;
-    } else {
-        typing_speed = 1;
+    uint32_t elapsed = timer_elapsed32(typing_update);
+    if(elapsed > TYPING_INTERVAL) {
+        if(typing_counter) {
+            typing_speed = ((typing_speed + typing_counter) > TYPING_SPEED_MAX) ? TYPING_SPEED_MAX : (typing_speed + typing_counter);
+            typing_counter = 0;
+        } else {
+            typing_speed = (typing_speed > 0) ? (typing_speed-1) : 0;
+        }
+        typing_update = timer_read32();
     }
 }
 
 #endif
+
+static bool need_refresh(uint32_t last, uint32_t delay)
+{
+    uint32_t elapsed = timer_elapsed32(last);
+    #ifdef TYPING_SPEED
+    if (typing_enable) {
+        update_speed();
+        return (elapsed*typing_speed) > delay;
+    } else {
+        return elapsed > delay;
+    }
+    #else
+        return elapsed > delay;
+    #endif
+}
 
 #ifdef DATETIME_ENABLE
 static rtc_datetime_t rtc_dt = {
@@ -427,11 +453,7 @@ void render_task(render_t* render)
         }
     };
 
-    uint32_t elapsed = timer_elapsed32(render->ticks);
-    #ifdef TYPING_SPEED
-    update_speed();
-    #endif
-    if ( (elapsed*typing_speed) > render->delay) {
+    if ( need_refresh(render->ticks, render->delay)) {
         if ( 0 == anim_step(render->anim, &render->delay, render->buf, render->buf_size)) {
             bool play = false;
             switch(render->mode) {
@@ -537,6 +559,11 @@ bool hook_process_action_main(keyrecord_t *record)
     }
 
     switch(action.key.code) {
+        case KC_F14:
+            typing_enable = !typing_enable;
+            if(typing_enable) update_speed();
+            m65_debug("typing enabled: %d\n", typing_enable);
+            return true;
         case KC_F16:
             screen_enable = !screen_enable;
             set_screen_state(screen_enable);
