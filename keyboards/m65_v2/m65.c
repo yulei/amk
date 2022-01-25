@@ -127,6 +127,8 @@ void hook_matrix_change_typing(keyevent_t event)
 {
     typing_last = timer_read32();
 
+    if (!typing_enable) return;
+
     typing_counter++;
 }
 
