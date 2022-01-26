@@ -18,6 +18,11 @@ ADC_HandleTypeDef hadc;
 DMA_HandleTypeDef hdma_adc;
 #endif
 
+#ifdef PWM_TIM
+TIM_HandleTypeDef htim3;
+DMA_HandleTypeDef hdma_tim3_ch1;
+#endif
+
 TIM_HandleTypeDef htim2;
 
 void USB_IRQHandler(void)
@@ -248,8 +253,14 @@ static void MX_DMA_Init(void)
     /* DMA1_Channel1_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+    #ifdef PWM_TIM
+      /* DMA1_Channel4_5_6_7_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA1_Channel4_5_6_7_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Channel4_5_6_7_IRQn);
+    #endif
 }
 
+#ifdef WAIT_TIM
 static void MX_TIM2_Init(void)
 {
     TIM_ClockConfigTypeDef sClockSourceConfig = {0};
@@ -276,6 +287,48 @@ static void MX_TIM2_Init(void)
 
     HAL_TIM_Base_Start(&htim2);
 }
+#endif
+
+#ifdef PWM_TIM
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+
+static void MX_TIM3_Init(void)
+{
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
+    TIM_OC_InitTypeDef sConfigOC = {0};
+
+    htim3.Instance = TIM3;
+    htim3.Init.Prescaler = 0;
+    htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim3.Init.Period = 39;
+    htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    sConfigOC.OCMode = TIM_OCMODE_PWM1;
+    sConfigOC.Pulse = 0;
+    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+    if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    if (HAL_TIMEx_RemapConfig(&htim3, TIM3_TI1_GPIO|TIM3_TI2_GPIOB5_AF4) != HAL_OK)
+    {
+        Error_Handler();
+    }
+
+    HAL_TIM_MspPostInit(&htim3);
+}
+#endif
 
 void custom_board_init(void)
 {
@@ -286,7 +339,12 @@ void custom_board_init(void)
 #endif
     MX_DMA_Init();
     MX_RTC_Init();
+#ifdef WAIT_TIM
     MX_TIM2_Init();
+#endif
+#ifdef PWM_TIM
+    MX_TIM3_Init();
+#endif
     MX_USB_DEVICE_Init();
 #ifdef USE_UART1
     MX_USART1_UART_Init();

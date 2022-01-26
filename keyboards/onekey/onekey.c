@@ -6,15 +6,16 @@
 #include "rgb_common.h"
 #include "rgb_driver.h"
 #include "rgb_linear.h"
-#include "is31fl3236.h"
-#include "is31fl3731.h"
+//#include "is31fl3236.h"
+//#include "is31fl3731.h"
 
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {0,0,0,0},
-    {0,0,0,0},
-    {0,0,0,0},
-    {0,0,0,0},
+    {0,1,1,1},
+    {0,2,2,2},
+    {0,3,3,3},
 
+#if 0
     {1, OUT_36, OUT_35, OUT_34},
     {1, OUT_33, OUT_32, OUT_31},
     {1, OUT_30, OUT_29, OUT_28},
@@ -27,7 +28,6 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {1, OUT_9, OUT_8, OUT_7},
     {1, OUT_6, OUT_5, OUT_4},
 
-#if 0
     {1, C1_1,   C3_2,   C4_2},
     {1, C1_2,   C2_2,   C4_3},
     {1, C1_3,   C2_3,   C3_3},
@@ -61,11 +61,11 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
     { RGB_DRIVER_WS2812, 0, 0, 0, 4},
 //    { RGB_DRIVER_IS31FL3731, 0xE8, 0, 4, 20},
-    { RGB_DRIVER_IS31FL3236, 0x78, 0, 4, 11},
+//    { RGB_DRIVER_IS31FL3236, 0x78, 0, 4, 11},
 };
 
 rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
     {0, 0, 4},
-    {1, 4, 11},
+//    {1, 4, 11},
 //    {2, 20, 4},
 };

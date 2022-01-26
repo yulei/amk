@@ -190,6 +190,19 @@ void ADC1_COMP_IRQHandler(void)
 }
 #endif
 
+#ifdef PWM_TIM
+extern DMA_HandleTypeDef hdma_tim3_ch1;
+void DMA1_Channel4_5_6_7_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel4_5_6_7_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel4_5_6_7_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_tim3_ch1);
+  /* USER CODE BEGIN DMA1_Channel4_5_6_7_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel4_5_6_7_IRQn 1 */
+}
+#endif
 /**
   * @brief This function handles USB event interrupt / USB wake-up interrupt through EXTI line 18.
   */

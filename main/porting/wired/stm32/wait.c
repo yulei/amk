@@ -21,9 +21,11 @@ void wait_ms(int ms)
 void wait_us(int us)
 {
 #ifdef STM32L072xx
-    extern TIM_HandleTypeDef WAIT_TIMER_ID;
-    __HAL_TIM_SET_COUNTER(&WAIT_TIMER_ID,0);
-	while (__HAL_TIM_GET_COUNTER(&WAIT_TIMER_ID) < us);
+    //extern TIM_HandleTypeDef WAIT_TIMER_ID;
+    //__HAL_TIM_SET_COUNTER(&WAIT_TIMER_ID,0);
+	//while (__HAL_TIM_GET_COUNTER(&WAIT_TIMER_ID) < us);
+    __IO uint32_t ticks = us * (SystemCoreClock/1000000);
+    while( ticks--) ;
 #else
     #if 1
     __IO uint32_t ticks = us * (SystemCoreClock/1000000);

@@ -28,8 +28,12 @@ extern TIM_HandleTypeDef PWM_TIM;
 #define RESET_SLOTS_END         (100)
 #define WS2812_LAST_SLOT        (1)
 #define LED_BUFFER_SIZE         (RESET_SLOTS_BEGIN + LED_DATA_SIZE + WS2812_LAST_SLOT + RESET_SLOTS_END)
+#ifndef WS2812_1
 #define WS2812_1                ((PWM_TIM_PERIOD*2)/3)
+#endif
+#ifndef WS2812_0
 #define WS2812_0                (PWM_TIM_PERIOD/3)
+#endif
 #define WS2812_RESET            (0)
 
 static uint32_t ws2812_leds[LED_BUFFER_SIZE];
