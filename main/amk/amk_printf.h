@@ -24,3 +24,8 @@ int amk_printf_ts(const char* format, ...);
 #else
 #define amk_printf(fmt, ...)
 #endif
+
+#define AMK_CONCAT_(a, b) a##b
+#define AMK_CONCAT(a, b) AMK_CONCAT_(a, b)
+
+#define AMK_ASSERT(expr, msg) enum { AMK_CONCAT(amk_assert_, __COUNTER__) = 1/((e) ? 1 : 0) }

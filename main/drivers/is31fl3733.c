@@ -29,8 +29,8 @@
 #define FUNCTION_CS_PULLUP_REG      0x10
 #define FUNCTION_RESET_REG          0x11
 
-#define PWM_BUFFER_SIZE             0xBF
-#define CONTROL_BUFFER_SIZE         0x17
+#define PWM_BUFFER_SIZE             0xC0
+#define CONTROL_BUFFER_SIZE         0x18
 #define COMMAND_UNLOCK              0xC5
 
 #define TIMEOUT                     100
@@ -46,9 +46,9 @@ static i2c_handle_t i2c_inst;
 
 typedef struct {
     i2c_led_t       i2c_led;
-    uint8_t         pwm_buffer[PWM_BUFFER_SIZE+1];
+    uint8_t         pwm_buffer[PWM_BUFFER_SIZE];
     bool            pwm_dirty;
-    uint8_t         control_buffer[CONTROL_BUFFER_SIZE+1];
+    uint8_t         control_buffer[CONTROL_BUFFER_SIZE];
     bool            control_dirty;
     bool            ready;
 } is31fl3733_driver_t;
@@ -89,9 +89,9 @@ void is31fl3733_set_color(i2c_led_t *driver, uint8_t index, uint8_t red, uint8_t
 {
     rgb_led_t *led = &g_rgb_leds[index];
     is31fl3733_driver_t *is31 = (is31fl3733_driver_t*)(driver->data);
-    is31->pwm_buffer[led->r + 1] = red;
-    is31->pwm_buffer[led->g + 1] = green;
-    is31->pwm_buffer[led->b + 1] = blue;
+    is31->pwm_buffer[led->r] = red;
+    is31->pwm_buffer[led->g] = green;
+    is31->pwm_buffer[led->b] = blue;
     is31->pwm_dirty = true;
 }
 
@@ -106,7 +106,7 @@ void is31fl3733_update_buffers(i2c_led_t *driver)
 {
     is31fl3733_driver_t *is31 = (is31fl3733_driver_t*)(driver->data);
     if (is31->pwm_dirty) {
-        i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1, TIMEOUT);
+        i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE, TIMEOUT);
         is31->pwm_dirty = false;
     }
 }
@@ -117,9 +117,9 @@ static void init_driver(is31fl3733_driver_t *driver)
         i2c_inst = i2c_init(IS31FL3733_I2C_ID);
     }
 
-    memset(driver->pwm_buffer, 0, PWM_BUFFER_SIZE + 1);
+    memset(driver->pwm_buffer, 0, PWM_BUFFER_SIZE);
     driver->pwm_dirty           = false;
-    memset(driver->control_buffer, 0, CONTROL_BUFFER_SIZE + 1);
+    memset(driver->control_buffer, 0, CONTROL_BUFFER_SIZE);
     driver->control_dirty       = false;
 
     // unlock 
@@ -143,7 +143,7 @@ static void init_driver(is31fl3733_driver_t *driver)
         driver->control_buffer[reg_g] |= (1 << bit_g);
         driver->control_buffer[reg_b] |= (1 << bit_b);
     }
-    i2c_send(i2c_inst, driver->i2c_led.addr, driver->control_buffer, CONTROL_BUFFER_SIZE+1, TIMEOUT);
+    i2c_send(i2c_inst, driver->i2c_led.addr, driver->control_buffer, CONTROL_BUFFER_SIZE, TIMEOUT);
 
     // unlock
     data = COMMAND_UNLOCK;
@@ -154,7 +154,7 @@ static void init_driver(is31fl3733_driver_t *driver)
     i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT);
 
     // set all pwm
-    i2c_send(i2c_inst, driver->i2c_led.addr, driver->pwm_buffer, PWM_BUFFER_SIZE+1, TIMEOUT);
+    i2c_send(i2c_inst, driver->i2c_led.addr, driver->pwm_buffer, PWM_BUFFER_SIZE, TIMEOUT);
 
     // unlock
     data = COMMAND_UNLOCK;
@@ -171,6 +171,10 @@ static void init_driver(is31fl3733_driver_t *driver)
     // enable the chip
     data = 1;
     i2c_write_reg(i2c_inst, driver->i2c_led.addr, FUNCTION_CONFIGURATION_REG, &data, 1, TIMEOUT);
+
+    // select pwm page
+    data = PAGE_PWM;
+    i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT);
 }
 
 static void uninit_driver(i2c_led_t *driver)

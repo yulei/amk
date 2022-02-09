@@ -21,9 +21,9 @@ typedef struct {
 
 typedef struct {
     uint8_t driver;
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
+    uint16_t r;
+    uint16_t g;
+    uint16_t b;
 } rgb_led_t;
 
 typedef struct {
