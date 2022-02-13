@@ -26,3 +26,6 @@
 [submodule "libs/tinygl"]
 	path = libs/tinygl
 	url = https://github.com/yulei/tinygl.git
+[submodule "libs/lvgl"]
+	path = libs/lvgl
+	url = https://github.com/yulei/lvgl
