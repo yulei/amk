@@ -23,10 +23,6 @@ static w25qxx_t *w25qxx;
 __attribute__((weak))
 void msc_init_kb(void) {}
 
-#ifndef W25QXX_SPI_ID
-#define W25QXX_SPI_ID SPI_INSTANCE_ID_1
-#endif
-
 #ifdef WDT_ENABLE
 void wdt_refresh(void);
 #endif

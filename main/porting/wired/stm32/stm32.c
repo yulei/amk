@@ -33,7 +33,7 @@ uint32_t systick_get_tick(void)
     return HAL_GetTick();
 }
 
-#if !defined(STM32F722xx) && !defined(STM32F411xE)
+#if !defined(STM32F722xx)// && !defined(STM32F411xE)
 void SysTick_Handler(void)
 {
     HAL_IncTick();

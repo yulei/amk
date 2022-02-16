@@ -166,8 +166,8 @@ static void MX_SPI1_Init(void)
     hspi1.Init.Mode = SPI_MODE_MASTER;
     hspi1.Init.Direction = SPI_DIRECTION_2LINES;
     hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-    hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
-    hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
+    hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+    hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
     hspi1.Init.NSS = SPI_NSS_SOFT;
     hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
     hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
@@ -187,10 +187,10 @@ static void MX_SPI2_Init(void)
     hspi2.Init.Mode = SPI_MODE_MASTER;
     hspi2.Init.Direction = SPI_DIRECTION_2LINES;
     hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
-    hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
-    hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
+    hspi2.Init.CLKPolarity = SPI_POLARITY_HIGH;
+    hspi2.Init.CLKPhase = SPI_PHASE_2EDGE;
     hspi2.Init.NSS = SPI_NSS_SOFT;
-    hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+    hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
     hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
     hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
     hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -349,13 +349,14 @@ void custom_board_init(void)
 
     MX_DMA_Init();
 
+    MX_RTC_Init();
+
 #ifdef USE_I2C1
     MX_I2C1_Init();
 #endif
 #ifdef USE_SPI1
     MX_SPI1_Init();
 #endif
-    MX_RTC_Init();
 #ifdef USE_SPI2
     MX_SPI2_Init();
 #endif

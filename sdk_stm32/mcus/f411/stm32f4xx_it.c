@@ -233,6 +233,7 @@ void DMA1_Stream4_IRQHandler(void)
 }
 #endif
 
+#if 0
 /**
   * @brief This function handles TIM5 global interrupt.
   */
@@ -246,6 +247,7 @@ void TIM5_IRQHandler(void)
 
   /* USER CODE END TIM5_IRQn 1 */
 }
+#endif
 
 #ifdef USE_SPI1
 

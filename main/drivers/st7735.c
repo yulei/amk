@@ -251,9 +251,11 @@ static void set_address_window(st7735_t *driver, uint8_t x0, uint8_t y0, uint8_t
     write_command(driver, ST7735_RAMWR);
 }
 
+/*
 #ifndef ST7735_SPI_ID
 #define ST7735_SPI_ID  SPI_INSTANCE_1
 #endif
+*/
 
 void st7735_init(st7735_t *driver)
 {

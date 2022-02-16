@@ -19,9 +19,6 @@
 #define DISK_BLOCK_SIZE     (4096)
 #define DISK_BLOCK_NUM      (DISK_TOTAL_SIZE/DISK_BLOCK_SIZE)
 
-#ifndef W25QXX_SPI_ID
-#define W25QXX_SPI_ID SPI_INSTANCE_ID_1
-#endif
 static w25qxx_config_t w25qxx_config;
 static w25qxx_t *w25qxx;
 

@@ -25,6 +25,7 @@ typedef uint32_t amk_error_t;
 enum {
     AMK_I2C_TIMEOUT = AMK_I2C_ERROR_START,
     AMK_I2C_ERROR,
+    AMK_I2C_BUSY,
 };
 
 enum {

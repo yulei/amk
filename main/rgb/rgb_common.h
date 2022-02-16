@@ -20,7 +20,7 @@ typedef struct {
 } hsv_t;
 
 typedef struct {
-    uint8_t driver;
+    uint16_t driver;
     uint16_t r;
     uint16_t g;
     uint16_t b;
