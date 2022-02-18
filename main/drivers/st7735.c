@@ -6,9 +6,12 @@
 #include "spi.h"
 #include "wait.h"
 
-#define ST7735_IS_160X80 1
+#ifndef SCREEN_ROTATION
+#define SCREEN_ROTATION 0
+#endif
+
 // normal directory
-#if 1
+#if (SCREEN_ROTATION == 0)
 #define ST7735_XSTART 26
 #define ST7735_YSTART 1
 #define ST7735_WIDTH  80
@@ -16,7 +19,7 @@
 #define ST7735_ROTATION (ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_BGR)
 #endif
 
-#if 0
+#if (SCREEN_ROTATION == 1)
 // rotate left
 #define ST7735_XSTART       1
 #define ST7735_YSTART       26
@@ -25,7 +28,7 @@
 #define ST7735_ROTATION (ST7735_MADCTL_MX | ST7735_MADCTL_MV | ST7735_MADCTL_BGR)
 #endif
 
-#if 0
+#if (SCREEN_ROTATION == 2)
 // rotate right
 #define ST7735_XSTART 1
 #define ST7735_YSTART 26
@@ -130,18 +133,6 @@ static const uint8_t
     ST7735_COLMOD , 1      ,  // 15: set color mode, 1 arg, no delay:
       0x05 },                 //     16-bit color
 
-#if (defined(ST7735_IS_128X128) || defined(ST7735_IS_160X128))
-  init_cmds2[] = {            // Init for 7735R, part 2 (1.44" display)
-    2,                        //  2 commands in list:
-    ST7735_CASET  , 4      ,  //  1: Column addr set, 4 args, no delay:
-      0x00, 0x00,             //     XSTART = 0
-      0x00, 0x7F,             //     XEND = 127
-    ST7735_RASET  , 4      ,  //  2: Row addr set, 4 args, no delay:
-      0x00, 0x00,             //     XSTART = 0
-      0x00, 0x7F },           //     XEND = 127
-#endif // ST7735_IS_128X128
-
-#ifdef ST7735_IS_160X80
   init_cmds2[] = {            // Init for 7735S, part 2 (160x80 display)
     3,                        //  3 commands in list:
     ST7735_CASET  , 4      ,  //  1: Column addr set, 4 args, no delay:
@@ -151,7 +142,6 @@ static const uint8_t
       0x00, 0x00,             //     XSTART = 0
       0x00, 0x9F ,            //     XEND = 159
     ST7735_INVON, 0 },        //  3: Invert colors
-#endif
 
   init_cmds3[] = {            // Init for 7735R, part 3 (red or green tab)
     4,                        //  4 commands in list:

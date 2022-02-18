@@ -17,6 +17,12 @@ endif
 #TINYUSB_ENABLE := no
 endif
 
+ifeq (STM32F446, $(strip $(MCU)))
+MCU_SERIES := f4
+MCU_FAMILY := stm32f4xx
+MCU_TYPE := f446
+endif
+
 ifeq (STM32F722, $(strip $(MCU)))
 MCU_SERIES := f7
 MCU_FAMILY := stm32f7xx
