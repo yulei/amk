@@ -6,6 +6,12 @@
 #include "spi.h"
 #include "wait.h"
 
+/*
+#ifndef RM67160_SPI_ID
+#define RM67160_SPI_ID  SPI_INSTANCE_1
+#endif
+*/
+
 #define RM_DELAY      0x80
 
 #ifdef SCREEN_DRIVER_RM67160
@@ -416,44 +422,50 @@ static void init_vneg(pin_t pin)
 }
 
 #endif
-static spi_handle_t spi;
+
+typedef struct {
+    spi_lcd_param_t param;
+    spi_handle_t    spi;
+} rm67160_t;
+
+static rm67160_t rm67160_driver;
 
 static void rm67160_select(rm67160_t *driver)
 {
-    gpio_write_pin(driver->cs, 0);
+    gpio_write_pin(driver->param.cs, 0);
 }
 
 void rm67160_unselect(rm67160_t *driver)
 {
-    gpio_write_pin(driver->cs, 1);
+    gpio_write_pin(driver->param.cs, 1);
 }
 
 void rm67160_reset(rm67160_t *driver)
 {
-    gpio_write_pin(driver->reset, 1);
+    gpio_write_pin(driver->param.reset, 1);
     wait_ms(100);
-    gpio_write_pin(driver->reset, 0);
+    gpio_write_pin(driver->param.reset, 0);
     wait_ms(100);
-    gpio_write_pin(driver->reset, 1);
+    gpio_write_pin(driver->param.reset, 1);
     wait_ms(500);
 }
 
 static void write_command(rm67160_t *driver, uint8_t cmd)
 {
-    gpio_write_pin(driver->dc, 0);
-    spi_send(spi, &cmd, sizeof(cmd));
+    gpio_write_pin(driver->param.dc, 0);
+    spi_send(driver->spi, &cmd, sizeof(cmd));
 }
 
 static void write_data(rm67160_t *driver, const uint8_t* buff, size_t buff_size)
 {
-    gpio_write_pin(driver->dc, 1);
-    spi_send(spi, buff, buff_size);
+    gpio_write_pin(driver->param.dc, 1);
+    spi_send(driver->spi, buff, buff_size);
 }
 
 void write_data_async(rm67160_t *driver, const uint8_t* buff, size_t buff_size)
 {
-    gpio_write_pin(driver->dc, 1);
-    spi_send_async(spi, buff, buff_size);
+    gpio_write_pin(driver->param.dc, 1);
+    spi_send_async(driver->spi, buff, buff_size);
 }
 
 void set_address_window(rm67160_t *driver, uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
@@ -500,16 +512,28 @@ void execute_commands(rm67160_t *driver, const uint8_t *addr)
     }
 }
 
-
-#ifndef RM67160_SPI_ID
-#define RM67160_SPI_ID  SPI_INSTANCE_1
-#endif
-
-void rm67160_init(rm67160_t *driver)
+void rm67160_config(spi_lcd_param_t *param, spi_lcd_driver_t* lcd)
 {
+    rm67160_driver.param = *param;
+    rm67160_driver.spi = spi_init(RM67160_SPI_ID);
+
+    lcd->data = &rm67160_driver;
+    lcd->init = rm67160_init;
+    lcd->uninit = rm67160_uninit;
+    lcd->fill = rm67160_fill;
+    lcd->fill_rect = rm67160_fill_rect;
+    lcd->fill_rect_async = rm67160_fill_rect_async;
+    lcd->fill_ready = rm67160_fill_ready;
+    lcd->release = rm67160_release;
+}
+
+void rm67160_init(spi_lcd_driver_t *lcd)
+{
+    rm67160_t *driver = (rm67160_t*)lcd->data;
+
     wait_ms(1000);
 #if 1
-    spi = spi_init(RM67160_SPI_ID);
+    //spi = spi_init(RM67160_SPI_ID);
 
     rm67160_reset(driver);
     rm67160_select(driver);
@@ -533,36 +557,41 @@ void rm67160_init(rm67160_t *driver)
 #endif
 }
 
-void rm67160_fill_rect(rm67160_t *driver, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const void *data, size_t size)
+void rm67160_fill_rect(spi_lcd_driver_t *lcd, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const void *data, size_t size)
 {
+    rm67160_t *driver = (rm67160_t*)lcd->data;
     rm67160_select(driver);
     set_address_window(driver, x, y, x+w-1, y+h-1);
     write_data(driver, data, size);
     rm67160_unselect(driver);
 }
 
-void rm67160_fill_rect_async(rm67160_t *driver, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const void *data, size_t size)
+void rm67160_fill_rect_async(spi_lcd_driver_t *lcd, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const void *data, size_t size)
 {
+    rm67160_t *driver = (rm67160_t*)lcd->data;
     rm67160_select(driver);
     set_address_window(driver, x, y, x+w-1, y+h-1);
     write_data_async(driver, data, size);
     //rm67160_unselect(driver);
 }
 
-bool rm67160_fill_ready(rm67160_t *driver)
+bool rm67160_fill_ready(spi_lcd_driver_t *lcd)
 {
-    return spi_ready(spi);
+    rm67160_t *driver = (rm67160_t*)lcd->data;
+    return spi_ready(driver->spi);
 }
 
-void rm67160_release(rm67160_t *driver)
+void rm67160_release(spi_lcd_driver_t *lcd)
 {
+    rm67160_t *driver = (rm67160_t*)lcd->data;
     rm67160_unselect(driver);
 }
 
-void rm67160_fill(rm67160_t *driver, const void* data)
+void rm67160_fill(spi_lcd_driver_t *lcd, const void* data)
 {
+    rm67160_t *driver = (rm67160_t*)lcd->data;
     rm67160_fill_rect(driver, 0, 0, RM_WIDTH, RM_HEIGHT, data, RM_WIDTH*RM_HEIGHT*2);
 }
 
-void rm67160_uninit(rm67160_t *driver)
+void rm67160_uninit(spi_lcd_driver_t *lcd)
 {}

@@ -28,6 +28,9 @@
 #define SCREEN_0_CS     A2
 #define SCREEN_0_RESET  A3
 #define SCREEN_0_DC     A4
+//#define ST7735_SPI_ID   SPI_INSTANCE_1
+#define ST7789_SPI_ID   SPI_INSTANCE_1
+
 
 #define USE_SPI2
 #define FLASH_CS        B12

@@ -202,21 +202,21 @@ void DMA1_Stream1_IRQHandler(void)
 }
 
 #endif
-#ifdef SPI_USE_INSTANCE_2
+#ifdef USE_SPI2
 
 /**
   * @brief This function handles DMA1 stream3 global interrupt.
   */
-void DMA1_Stream3_IRQHandler(void)
-{
+//void DMA1_Stream3_IRQHandler(void)
+//{
   /* USER CODE BEGIN DMA1_Stream3_IRQn 0 */
 
   /* USER CODE END DMA1_Stream3_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_spi2_rx);
+//  HAL_DMA_IRQHandler(&hdma_spi2_rx);
   /* USER CODE BEGIN DMA1_Stream3_IRQn 1 */
 
   /* USER CODE END DMA1_Stream3_IRQn 1 */
-}
+//}
 
 /**
   * @brief This function handles DMA1 stream4 global interrupt.
@@ -295,7 +295,7 @@ void DMA2_Stream2_IRQHandler(void)
   /* USER CODE END OTG_FS_IRQn 1 */
 //}
 
-#ifdef UART_USE_INSTANCE_1
+#ifdef USE_UART1
 
 /**
   * @brief This function handles DMA2 stream5 global interrupt.

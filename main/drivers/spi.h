@@ -11,6 +11,7 @@
 typedef enum {
     SPI_INSTANCE_1,
     SPI_INSTANCE_2,
+    SPI_INSTANCE_3,
 } spi_instance_t;
 
 typedef void *spi_handle_t;

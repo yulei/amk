@@ -21,15 +21,28 @@
 #ifdef USE_SPI1
 extern SPI_HandleTypeDef hspi1;
 #endif
+
 #ifdef USE_SPI2
 extern SPI_HandleTypeDef hspi2;
 #endif
 
+#ifdef USE_SPI3
+extern SPI_HandleTypeDef hspi3;
+#endif
+
 spi_handle_t spi_init(spi_instance_t inst)
 {
+#ifdef USE_SPI1
     if (inst == SPI_INSTANCE_1) return &hspi1;
+#endif
 
+#ifdef USE_SPI2
     if (inst == SPI_INSTANCE_2) return &hspi2;
+#endif
+
+#ifdef USE_SPI3
+    if (inst == SPI_INSTANCE_3) return &hspi3;
+#endif
 
     return NULL;
 }

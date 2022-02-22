@@ -18,12 +18,19 @@ endif
 ifeq (yes, $(strip $(SCREEN_ENABLE)))
 	APP_DEFS += -DSCREEN_ENABLE
 	SRCS += $(MAIN_DIR)/drivers/spi.c
+	SRCS += $(MAIN_DIR)/drivers/spi_lcd.c
+
 	ifeq (RM67160, $(strip $(SCREEN_DRIVER)))
-		SRCS += $(MAIN_DIR)/drivers/rm67160.c
 		APP_DEFS += -DSCREEN_DRIVER_RM67160
-		APP_DEFS += -DSCREEN_DRIVER
+		SRCS += $(MAIN_DIR)/drivers/rm67160.c
 	else
-		SRCS += $(MAIN_DIR)/drivers/st7735.c
+		ifeq (ST7789, $(strip $(SCREEN_DRIVER)))
+			APP_DEFS += -DSCREEN_DRIVER_ST7789
+			SRCS += $(MAIN_DIR)/drivers/st7789.c
+		else
+			APP_DEFS += -DSCREEN_DRIVER_ST7735
+			SRCS += $(MAIN_DIR)/drivers/st7735.c
+		endif
 	endif
 	SRCS += $(MAIN_DIR)/screen/screen.c
 endif

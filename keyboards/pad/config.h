@@ -30,6 +30,8 @@
 
 #define WS2812_LED_NUM      4
 #define WS2812_LED_PIN      A10
+#define PWM_TIM             htim1
+#define PWM_TIM_CHANNEL     TIM_CHANNEL_3
 #define PWM_TIM_PERIOD      105
 
 #define RGB_MATRIX_LED_NUM  26

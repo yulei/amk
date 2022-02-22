@@ -6,6 +6,12 @@
 #include "spi.h"
 #include "wait.h"
 
+/*
+#ifndef ST7789_SPI_ID
+#define ST7789_SPI_ID  SPI_INSTANCE_1
+#endif
+*/
+
 #define ST7789_IS_240X135 1
 
 #if ST7789_IS_240X135
@@ -14,8 +20,8 @@
 #define ST7789_YSTART     53
 #define ST7789_WIDTH      135
 #define ST7789_HEIGHT     240
-//#define ST7789_ROTATION (ST7789_MADCTL_MX | ST7789_MADCTL_MY | ST7789_MADCTL_RGB)
-#define ST7789_ROTATION (ST7789_MADCTL_MX | ST7789_MADCTL_MV | ST7789_MADCTL_ML | ST7789_MADCTL_RGB)
+#define ST7789_ROTATION (ST7789_MADCTL_MX | ST7789_MADCTL_MY | ST7789_MADCTL_RGB)
+//#define ST7789_ROTATION (ST7789_MADCTL_MX | ST7789_MADCTL_MV | ST7789_MADCTL_ML | ST7789_MADCTL_RGB)
 #endif
 
 #define DELAY               0x80
@@ -109,41 +115,46 @@ static const uint8_t init_cmds2[] = {            // Init for 7789, rotation
     ST7789_MADCTL, 1, 
     ST7789_ROTATION};
 
-static spi_handle_t spi;
+typedef struct {
+    spi_lcd_param_t param;
+    spi_handle_t    spi;
+} st7789_t;
+
+static st7789_t st7789_driver;
 
 static void st7789_select(st7789_t *driver)
 {
-    gpio_write_pin(driver->cs, 0);
+    gpio_write_pin(driver->param.cs, 0);
 }
 
-void st7789_unselect(st7789_t *driver)
+static void st7789_unselect(st7789_t *driver)
 {
-    gpio_write_pin(driver->cs, 1);
+    gpio_write_pin(driver->param.cs, 1);
 }
 
 static void st7789_reset(st7789_t *driver)
 {
-    gpio_write_pin(driver->reset, 0);
+    gpio_write_pin(driver->param.reset, 0);
     wait_ms(5);
-    gpio_write_pin(driver->reset, 1);
+    gpio_write_pin(driver->param.reset, 1);
 }
 
 static void write_command(st7789_t *driver, uint8_t cmd)
 {
-    gpio_write_pin(driver->dc, 0);
-    spi_send(spi, &cmd, sizeof(cmd));
+    gpio_write_pin(driver->param.dc, 0);
+    spi_send(driver->spi, &cmd, sizeof(cmd));
 }
 
 static void write_data(st7789_t *driver, const uint8_t* buff, size_t buff_size)
 {
-    gpio_write_pin(driver->dc, 1);
-    spi_send(spi, buff, buff_size);
+    gpio_write_pin(driver->param.dc, 1);
+    spi_send(driver->spi, buff, buff_size);
 }
 
 static void write_data_async(st7789_t *driver, const uint8_t* buff, size_t buff_size)
 {
-    gpio_write_pin(driver->dc, 1);
-    spi_send_async(spi, buff, buff_size);
+    gpio_write_pin(driver->param.dc, 1);
+    spi_send_async(driver->spi, buff, buff_size);
 }
 
 static void execute_commands(st7789_t *driver, const uint8_t *addr)
@@ -190,13 +201,26 @@ static void set_address_window(st7789_t *driver, uint8_t x0, uint8_t y0, uint8_t
     write_command(driver, ST7789_RAMWR);
 }
 
-#ifndef ST7789_SPI_ID
-#define ST7789_SPI_ID  SPI_INSTANCE_1
-#endif
-
-void st7789_init(st7789_t *driver)
+void st7789_config(spi_lcd_param_t *param, spi_lcd_driver_t* lcd)
 {
-    spi = spi_init(ST7789_SPI_ID);
+    st7789_driver.param = *param;
+    st7789_driver.spi = spi_init(ST7789_SPI_ID);
+
+    lcd->data = &st7789_driver;
+    lcd->init = st7789_init;
+    lcd->uninit = st7789_uninit;
+    lcd->fill = st7789_fill;
+    lcd->fill_rect = st7789_fill_rect;
+    lcd->fill_rect_async = st7789_fill_rect_async;
+    lcd->fill_ready = st7789_fill_ready;
+    lcd->release = st7789_release;
+}
+
+void st7789_init(spi_lcd_driver_t *lcd)
+{
+    st7789_t *driver = (st7789_t*)lcd->data;
+    //spi = spi_init(ST7789_SPI_ID);
+
     st7789_select(driver);
     st7789_reset(driver);
     execute_commands(driver, init_cmds1);
@@ -211,36 +235,40 @@ void st7789_init(st7789_t *driver)
     st7789_unselect(driver);
 }
 
-void st7789_fill_rect(st7789_t *driver, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const void *data, size_t size)
+void st7789_fill_rect(spi_lcd_driver_t *lcd, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const void *data, size_t size)
 {
+    st7789_t *driver = (st7789_t*)lcd->data;
     st7789_select(driver);
     set_address_window(driver, x, y, x+w-1, y+h-1);
     write_data(driver, data, size);
     st7789_unselect(driver);
 }
 
-void st7789_fill_rect_async(st7789_t *driver, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const void *data, size_t size)
+void st7789_fill_rect_async(spi_lcd_driver_t *lcd, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const void *data, size_t size)
 {
+    st7789_t *driver = (st7789_t*)lcd->data;
     st7789_select(driver);
     set_address_window(driver, x, y, x+w-1, y+h-1);
     write_data_async(driver, data, size);
     //st7789_unselect(driver);
 }
 
-bool st7789_fill_ready(st7789_t *driver)
+bool st7789_fill_ready(spi_lcd_driver_t *lcd)
 {
-    return spi_ready(spi);
+    st7789_t *driver = (st7789_t*)lcd->data;
+    return spi_ready(driver->spi);
 }
 
-void st7789_release(st7789_t *driver)
+void st7789_release(spi_lcd_driver_t *lcd)
 {
+    st7789_t *driver = (st7789_t*)lcd->data;
     st7789_unselect(driver);
 }
 
-void st7789_fill(st7789_t *driver, const void* data)
+void st7789_fill(spi_lcd_driver_t *lcd, const void* data)
 {
-    st7789_fill_rect(driver, 0, 0, ST7789_WIDTH, ST7789_HEIGHT, data, ST7789_WIDTH*ST7789_HEIGHT*2);
+    st7789_fill_rect(lcd, 0, 0, ST7789_WIDTH, ST7789_HEIGHT, data, ST7789_WIDTH*ST7789_HEIGHT*2);
 }
 
-void st7789_uninit(st7789_t *driver)
+void st7789_uninit(spi_lcd_driver_t *lcd)
 {}

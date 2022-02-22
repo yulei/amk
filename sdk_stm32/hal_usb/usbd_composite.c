@@ -108,6 +108,7 @@ usbd_class_interface_t USBD_WEBUSB = {
 
 #include  "usbd_msc_bot.h"
 #include  "usbd_msc_scsi.h"
+#include "tusb_def.h"
 
 /* MSC Class Config */
 #define MSC_MEDIA_PACKET             CFG_TUD_MSC_EP_BUFSIZE 
