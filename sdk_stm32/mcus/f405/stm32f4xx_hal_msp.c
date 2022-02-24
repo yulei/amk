@@ -133,6 +133,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
     /* Peripheral clock enable */
     __HAL_RCC_I2C1_CLK_ENABLE();
 
+#if 0
     /* I2C1 DMA Init */
     /* I2C1_RX Init */
     hdma_i2c1_rx.Instance = DMA1_Stream0;
@@ -169,7 +170,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
     }
 
     __HAL_LINKDMA(hi2c,hdmatx,hdma_i2c1_tx);
-
+#endif
   /* USER CODE BEGIN I2C1_MspInit 1 */
 
   /* USER CODE END I2C1_MspInit 1 */

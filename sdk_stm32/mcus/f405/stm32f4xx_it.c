@@ -57,7 +57,10 @@
 
 /* External variables --------------------------------------------------------*/
 extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
+
+#ifdef USB_HOST_ENABLE
 extern HCD_HandleTypeDef hhcd_USB_OTG_HS;
+#endif
 
 #ifdef USE_I2C1
 extern DMA_HandleTypeDef hdma_i2c1_rx;
@@ -79,9 +82,9 @@ extern DMA_HandleTypeDef hdma_spi3_tx;
 extern DMA_HandleTypeDef hdma_tim1_ch3;
 #endif
 /* USER CODE BEGIN EV */
-
 /* USER CODE END EV */
 
+#if 0
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */
 /******************************************************************************/
@@ -139,13 +142,14 @@ void PendSV_Handler(void)
   /* USER CODE END SysTick_IRQn 1 */
 //}
 
+#endif
 /******************************************************************************/
 /* STM32F4xx Peripheral Interrupt Handlers                                    */
 /* Add here the Interrupt Handlers for the used peripherals.                  */
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
-
+#ifndef TINYUSB_ENABLE
 /**
   * @brief This function handles USB On The Go FS global interrupt.
   */
@@ -159,7 +163,9 @@ void OTG_FS_IRQHandler(void)
 
   /* USER CODE END OTG_FS_IRQn 1 */
 }
+#endif
 
+#ifdef USB_HOST_ENABLE
 /**
   * @brief This function handles USB On The Go HS global interrupt.
   */
@@ -173,6 +179,7 @@ void OTG_HS_IRQHandler(void)
 
   /* USER CODE END OTG_HS_IRQn 1 */
 }
+#endif
 
 /* USER CODE BEGIN 1 */
 #ifdef USE_I2C1

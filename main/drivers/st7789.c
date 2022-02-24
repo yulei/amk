@@ -12,16 +12,47 @@
 #endif
 */
 
-#define ST7789_IS_240X135 1
+#define ST7789_IS_135X240   1
 
-#if ST7789_IS_240X135
-#define ST7789_XSTART     40
-//#define ST7789_YSTART     52
-#define ST7789_YSTART     53
-#define ST7789_WIDTH      135
-#define ST7789_HEIGHT     240
-#define ST7789_ROTATION (ST7789_MADCTL_MX | ST7789_MADCTL_MY | ST7789_MADCTL_RGB)
-//#define ST7789_ROTATION (ST7789_MADCTL_MX | ST7789_MADCTL_MV | ST7789_MADCTL_ML | ST7789_MADCTL_RGB)
+#if ST7789_IS_135X240
+#define ORG_XSTART          40
+#define ORG_YSTART1         52
+#define ORG_YSTART2         53
+#define ORG_WIDTH           135
+#define ORG_HEIGHT          240
+
+#if  0
+#define ST7789_ROTATION     (ST7789_MADCTL_MX | ST7789_MADCTL_MY | ST7789_MADCTL_RGB)
+#define ST7789_XSTART       ORG_YSTART2
+#define ST7789_YSTART       ORG_XSTART
+#define ST7789_WIDTH        ORG_WIDTH
+#define ST7789_HEIGHT       ORG_HEIGHT
+#endif
+
+#if 1
+#define ST7789_ROTATION     (ST7789_MADCTL_MY | ST7789_MADCTL_MV | ST7789_MADCTL_RGB)
+#define ST7789_XSTART       ORG_XSTART
+#define ST7789_YSTART       ORG_YSTART1
+#define ST7789_WIDTH        ORG_HEIGHT
+#define ST7789_HEIGHT       ORG_WIDTH
+#endif
+
+#if 0
+#define ST7789_ROTATION     (ST7789_MADCTL_RGB)
+#define ST7789_XSTART       ORG_YSTART1
+#define ST7789_YSTART       ORG_XSTART
+#define ST7789_WIDTH        ORG_WIDTH
+#define ST7789_HEIGHT       ORG_HEIGHT
+#endif
+
+#if 0
+#define ST7789_ROTATION     (ST7789_MADCTL_MX | ST7789_MADCTL_MV | ST7789_MADCTL_RGB)
+#define ST7789_XSTART       ORG_XSTART
+#define ST7789_YSTART       ORG_YSTART2
+#define ST7789_WIDTH        ORG_WIDTH
+#define ST7789_HEIGHT       ORG_HEIGHT
+#endif
+
 #endif
 
 #define DELAY               0x80
@@ -188,13 +219,20 @@ static void set_address_window(st7789_t *driver, uint8_t x0, uint8_t y0, uint8_t
 {
     // column address set
     write_command(driver, ST7789_CASET);
-    uint8_t data[] = { 0x00, x0 + ST7789_XSTART, 0x00, x1 + ST7789_XSTART };
+    uint16_t begin = x0 + ST7789_XSTART;
+    uint16_t end = x1 + ST7789_XSTART;
+    uint8_t data[] = { (begin>>8), (begin&0xFF), (end>>8), (end&0xFF)};
     write_data(driver, data, sizeof(data));
 
     // row address set
     write_command(driver, ST7789_RASET);
-    data[1] = y0 + ST7789_YSTART;
-    data[3] = y1 + ST7789_YSTART;
+    begin = y0 + ST7789_YSTART;
+    end = y1 + ST7789_YSTART;
+
+    data[0] = begin>>8;
+    data[1] = end&0xFF;
+    data[2] = (end>>8);
+    data[3] = (end&0xFF);
     write_data(driver, data, sizeof(data));
 
     // write to RAM

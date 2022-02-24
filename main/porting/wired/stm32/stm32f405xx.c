@@ -4,6 +4,11 @@
 
 #include "generic_hal.h"
 #include "amk_printf.h"
+#include "usb_descriptors.h"
+
+#ifdef TINYUSB_ENABLE
+#include "tusb.h"
+#endif
 
 #ifdef USE_I2C1
 I2C_HandleTypeDef hi2c1;
@@ -35,6 +40,21 @@ DMA_HandleTypeDef hdma_tim1_ch3;
 #endif
 
 RTC_HandleTypeDef hrtc;
+
+#if 0
+#ifdef TINYUSB_ENABLE
+void OTG_FS_IRQHandler(void)
+{
+    tud_int_handler(0);
+}
+#else
+extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
+void OTG_FS_IRQHandler(void)
+{
+    HAL_PCD_IRQHandler(&hpcd_USB_OTG_FS);
+}
+#endif
+#endif
 
 void Error_Handler(void)
 {
@@ -89,10 +109,9 @@ void SystemClock_Config(void)
 static void MX_GPIO_Init(void)
 {
     __HAL_RCC_GPIOH_CLK_ENABLE();
-    __HAL_RCC_GPIOD_CLK_ENABLE();
-    __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
 }
 
 static void MX_DMA_Init(void)
@@ -128,6 +147,7 @@ static void MX_DMA_Init(void)
     HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
     /* DMA2_Stream6_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(DMA2_Stream6_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA2_Stream6_IRQn);
 }
 
 #ifdef PWM_TIM
@@ -197,7 +217,7 @@ static void MX_RTC_Init(void)
     }
 }
 
-#if 0
+#ifdef USE_I2C1
 /**
   * @brief I2C1 Initialization Function
   * @param None
@@ -205,6 +225,7 @@ static void MX_RTC_Init(void)
   */
 static void MX_I2C1_Init(void)
 {
+    return;
 
   /* USER CODE BEGIN I2C1_Init 0 */
 
@@ -214,7 +235,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 100000;
+  hi2c1.Init.ClockSpeed = 400000;
   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
@@ -232,6 +253,8 @@ static void MX_I2C1_Init(void)
 
 }
 
+#endif
+#ifdef USE_I2C2
 /**
   * @brief I2C2 Initialization Function
   * @param None
@@ -239,6 +262,7 @@ static void MX_I2C1_Init(void)
   */
 static void MX_I2C2_Init(void)
 {
+    return;
 
   /* USER CODE BEGIN I2C2_Init 0 */
 
@@ -248,7 +272,7 @@ static void MX_I2C2_Init(void)
 
   /* USER CODE END I2C2_Init 1 */
   hi2c2.Instance = I2C2;
-  hi2c2.Init.ClockSpeed = 100000;
+  hi2c2.Init.ClockSpeed = 400000;
   hi2c2.Init.DutyCycle = I2C_DUTYCYCLE_2;
   hi2c2.Init.OwnAddress1 = 0;
   hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
@@ -311,6 +335,42 @@ static void MX_SPI3_Init(void)
 }
 #endif
 
+#if defined(TINYUSB_ENABLE)
+static void MX_USB_DEVICE_Init(void)
+{
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    /**USB_OTG_FS GPIO Configuration
+    PA11     ------> USB_OTG_FS_DM
+    PA12     ------> USB_OTG_FS_DP
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_11|GPIO_PIN_12;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF10_OTG_FS;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+#if 0
+    /* Configure OTG-FS ID pin */
+    GPIO_InitStruct.Pin = GPIO_PIN_10;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Alternate = GPIO_AF10_OTG_FS;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+#endif
+    /* Peripheral clock enable */
+    __HAL_RCC_USB_OTG_FS_CLK_ENABLE();
+
+#define USB_DEVICE     ((USB_OTG_DeviceTypeDef *)(USB_OTG_FS_PERIPH_BASE + USB_OTG_DEVICE_BASE))
+    /* Deactivate VBUS Sensing B */
+    USB_DEVICE->DCTL |= USB_OTG_DCTL_SDIS;
+    USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_NOVBUSSENS;
+    USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSBSEN;
+    USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSASEN;
+}
+#endif
+
 void custom_board_init(void)
 {
     SystemClock_Config();
@@ -318,22 +378,45 @@ void custom_board_init(void)
     MX_GPIO_Init();
     MX_DMA_Init();
 
+#if defined(TINYUSB_ENABLE)
+    MX_USB_DEVICE_Init();
+#endif
+
 #ifdef PWM_TIM
     MX_TIM1_Init();
 #endif
+
     MX_RTC_Init();
 
-//    MX_I2C1_Init();
-//    MX_I2C2_Init();
+#ifdef USE_I2C1
+    MX_I2C1_Init();
+#endif
+
+#ifdef USE_I2C2
+    MX_I2C2_Init();
+#endif
+
 #ifdef USE_SPI1
     MX_SPI1_Init();
 #endif
+
 #ifdef USE_SPI3
     MX_SPI3_Init();
+#endif
+
+#ifdef DYNAMIC_CONFIGURATION
+    uint32_t magic = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1);
+    //if (magic == 0) {
+    if (magic > 0) {
+        usb_setting |= USB_MSC_BIT;
+    } else {
+        usb_setting |= USB_WEBUSB_BIT;
+    }
+    HAL_PWR_EnableBkUpAccess();
+    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0);
 #endif
 }
 
 void custom_board_task(void)
 {
 }
-

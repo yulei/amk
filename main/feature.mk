@@ -136,3 +136,9 @@ endif
 ifeq (yes, $(strip $(DYNAMIC_CONFIGURATION)))
 	APP_DEFS += -DDYNAMIC_CONFIGURATION
 endif
+
+ifeq (yes, $(strip $(INA219_ENABLE)))
+	SRCS += $(MAIN_DIR)/drivers/i2c.c
+	SRCS += $(MAIN_DIR)/drivers/ina219.c
+	APP_DEFS += -DINA219_ENABLE
+endif
