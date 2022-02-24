@@ -100,6 +100,7 @@ void rf_keyboard_init(rf_send_report_t send_report, rf_prepare_sleep_t prepare_s
 #endif
     keyboard_timer_init();
     amk_keymap_init();
+    NRF_LOG_INFO("rf keyboard inited");
 }
 
 void rf_keyboard_start()
