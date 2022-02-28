@@ -111,7 +111,5 @@ rgb_t hsv_to_rgb(hsv_t hsv);
 rgb_t pick_color(uint8_t hue);
 uint8_t pick_hue(void);
 
-#define container_of(ptr, type, member) ((type *)((char *)(ptr) - offsetof(type, member)))
-
 #define HSV hsv_t
 #define RGB rgb_t

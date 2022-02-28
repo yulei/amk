@@ -199,6 +199,7 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
+#ifndef TINYUSB_ENABLE
 
 /**
   * @brief This function handles USB On The Go FS global interrupt.
@@ -213,7 +214,9 @@ void OTG_FS_IRQHandler(void)
 
   /* USER CODE END OTG_FS_IRQn 1 */
 }
+#endif
 
+#ifdef USB_HOST_ENABLE
 /**
   * @brief This function handles USB On The Go HS global interrupt.
   */
@@ -227,6 +230,7 @@ void OTG_HS_IRQHandler(void)
 
   /* USER CODE END OTG_HS_IRQn 1 */
 }
+#endif
 
 /* USER CODE BEGIN 1 */
 

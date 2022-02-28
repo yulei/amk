@@ -70,6 +70,14 @@ enum
 #define UDD_MSC_EP_SIZE     64
 #define UDD_MSC_BUFFER_SIZE 4096
 
+#define UDD_AUDIO_FREQ_221  22100U
+#define UDD_AUDIO_FREQ_441  44100U
+#define UDD_AUDIO_FREQ_480  48000U
+
+#ifndef UDD_AUDIO_FREQ
+#define UDD_AUDIO_FREQ      UDD_AUDIO_FREQ_480
+#endif
+
 #define UDD_DEVICE_DESCRIPTOR(usb_ver, ep0_size, vendor, product, version, str_manufacture, str_product, str_serial ) \
     18, UDD_DESC_DEVICE, UDD_LOW(usb_ver), UDD_HIGH(usb_ver), 0x00, 0x00, 0x00, ep0_size, \
     UDD_LOW(vendor), UDD_HIGH(vendor), UDD_LOW(product), UDD_HIGH(product), UDD_LOW(version), UDD_HIGH(version), \

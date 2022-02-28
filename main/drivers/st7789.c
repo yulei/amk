@@ -230,7 +230,7 @@ static void set_address_window(st7789_t *driver, uint8_t x0, uint8_t y0, uint8_t
     end = y1 + ST7789_YSTART;
 
     data[0] = begin>>8;
-    data[1] = end&0xFF;
+    data[1] = begin&0xFF;
     data[2] = (end>>8);
     data[3] = (end&0xFF);
     write_data(driver, data, sizeof(data));

@@ -108,25 +108,23 @@ usbd_class_interface_t USBD_WEBUSB = {
 
 #include  "usbd_msc_bot.h"
 #include  "usbd_msc_scsi.h"
-#include "tusb_def.h"
 
 /* MSC Class Config */
-#define MSC_MEDIA_PACKET             CFG_TUD_MSC_EP_BUFSIZE 
+#define MSC_MEDIA_PACKET            UDD_MSC_BUFFER_SIZE
+#define MSC_MAX_FS_PACKET           UDD_MSC_EP_SIZE
 
-#define MSC_MAX_FS_PACKET            CFG_TUD_MSC_EPSIZE 
+#define BOT_GET_MAX_LUN             0xFE
+#define BOT_RESET                   0xFF
 
-#define BOT_GET_MAX_LUN              0xFE
-#define BOT_RESET                    0xFF
+#define USBD_MSC_EPIN               (0x80|EPNUM_MSC_IN)
+#define USBD_MSC_EPIN_SIZE          MSC_MAX_FS_PACKET
+#define USBD_MSC_EPIN_TYPE          USBD_EP_TYPE_BULK 
+#define USBD_MSC_EPOUT              (EPNUM_MSC_OUT)
+#define USBD_MSC_EPOUT_SIZE         USBD_MSC_EPIN_SIZE
+#define USBD_MSC_EPOUT_TYPE         USBD_EP_TYPE_BULK
 
-#define USBD_MSC_EPIN                (0x80|EPNUM_MSC_IN)
-#define USBD_MSC_EPIN_SIZE           CFG_TUD_MSC_EPSIZE
-#define USBD_MSC_EPIN_TYPE           USBD_EP_TYPE_BULK 
-#define USBD_MSC_EPOUT               (EPNUM_MSC_OUT)
-#define USBD_MSC_EPOUT_SIZE          USBD_MSC_EPIN_SIZE
-#define USBD_MSC_EPOUT_TYPE          USBD_EP_TYPE_BULK
-
-#define MSC_EPOUT_ADDR USBD_MSC_EPOUT
-#define MSC_EPIN_ADDR USBD_MSC_EPIN
+#define MSC_EPOUT_ADDR              USBD_MSC_EPOUT
+#define MSC_EPIN_ADDR               USBD_MSC_EPIN
 
 typedef struct
 {
