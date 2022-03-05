@@ -8,6 +8,8 @@
 
 #define UDD_HIGH(x) ((uint8_t)(((x) >> 8) & 0x00ff))
 #define UDD_LOW(x)  ((uint8_t)((x) & 0x00ff))
+#define UDD_STR(x)  #x
+#define UDD_XSTR(x) UDD_STR(x)
 
 enum
 {
@@ -15,7 +17,7 @@ enum
     UDD_DESC_CONFIGURATION  = 0x02,
     UDD_DESC_STRING         = 0x03,
     UDD_DESC_INTERFACE      = 0x04,
-    UDD_DESC_ENDPOINT       = 0x05
+    UDD_DESC_ENDPOINT       = 0x05,
 };
 
 enum
@@ -26,9 +28,61 @@ enum
 
 enum
 {
+    UDD_CLASS_AUDIO     = 1,
     UDD_CLASS_HID       = 3,
     UDD_CLASS_MSC       = 8,
     UDD_CLASS_VENDOR    = 0xFF,
+};
+
+enum
+{
+    UDD_AUDIO_SUBCLASS_UNDEFINED    = 0,
+    UDD_AUDIO_SUBCLASS_CONTROL      = 1,
+    UDD_AUDIO_SUBCLASS_STREAMING    = 2,
+    UDD_AUDIO_SUBCLASS_MIDI         = 3,
+};
+
+enum
+{
+    UDD_AUDIO_PROTOCOL_UNDEFINED    = 0,
+};
+
+enum
+{
+    UDD_AUDIO_DESC_UNDEFINED        = 0x20,
+    UDD_AUDIO_DESC_DEVICE           = 0x21,
+    UDD_AUDIO_DESC_CONFIGURATION    = 0x22,
+    UDD_AUDIO_DESC_STRING           = 0x23,
+    UDD_AUDIO_DESC_INTERFACE        = 0x24,
+    UDD_AUDIO_DESC_ENDPOINT         = 0x25,
+};
+
+enum
+{
+    UDD_AUDIO_CONTROL_DESC_UNDEFINED        = 0x00,
+    UDD_AUDIO_CONTROL_DESC_HEADER           = 0x01,
+    UDD_AUDIO_CONTROL_DESC_INPUT_TERMINAL   = 0x02,
+    UDD_AUDIO_CONTROL_DESC_OUTPUT_TERMINAL  = 0x03,
+    UDD_AUDIO_CONTROL_DESC_MIXER_UNIT       = 0x04,
+    UDD_AUDIO_CONTROL_DESC_SELECTOR_UNIT    = 0x05,
+    UDD_AUDIO_CONTROL_DESC_FEATURE_UNIT     = 0x06,
+    UDD_AUDIO_CONTROL_DESC_PROCESSING_UNIT  = 0x07,
+    UDD_AUDIO_CONTROL_DESC_EXTENSION_UNIT   = 0x08,
+};
+
+enum
+{
+    UDD_AUDIO_STREAMING_DESC_UNDEFINED      = 0x00,
+    UDD_AUDIO_STREAMING_DESC_GENERAL        = 0x01,
+    UDD_AUDIO_STREAMING_DESC_FORMAT_TYPE    = 0x02,
+    UDD_AUDIO_STREAMING_DESC_FORMAT_SPECIFIC= 0x03,
+};
+
+enum 
+{
+    UDD_AUDIO_TERMINAL_UNDEFINED    = 0x0100,
+    UDD_AUDIO_TERMINAL_STREAMING    = 0x0101,
+    UDD_AUDIO_TERMINAL_VENDOR       = 0x01FF,
 };
 
 enum
@@ -43,6 +97,7 @@ enum
     UDD_HID_DESC_TYPE_REPORT    = 0x22,
     UDD_HID_DESC_TYPE_PHYSICAL  = 0x23,
 };
+
 
 enum
 {
@@ -62,6 +117,35 @@ enum
     UDD_EP_INTERRUPT    = 3,
 };
 
+// descriptor size
+#define UDD_CONFIG_DESC_LEN         (9)
+#define UDD_HID_DESC_LEN            (9+9+7)
+#define UDD_HID_GENERIC_DESC_LEN    (9+9+7+7)
+
+#ifdef VIAL_ENABLE
+#define UDD_VIAL_DESC_LEN           UDD_HID_GENERIC_DESC_LEN 
+#else
+#define UDD_VIAL_DESC_LEN 0 
+#endif
+
+#ifdef MSC_ENABLE
+#define UDD_MSC_DESC_LEN            (9+7+7)
+#else
+#define UDD_MSC_DESC_LEN            (0)
+#endif
+
+#ifdef AUDIO_ENABLE
+#define UDD_AUDIO_DESC_LEN          (9+9+9+12+9+9+9+9+7+11+9+7)
+#else
+#define UDD_AUDIO_DESC_LEN          (0)
+#endif
+
+#define UDD_AUDIO_INPUT_TERMINAL_DESC_LEN       (12)
+#define UDD_AUDIO_FEATURE_UNIT_DESC_LEN         (9)
+#define UDD_AUDIO_OUTPUT_TERMINAL_DESC_LEN      (9)
+#define UDD_AUDIO_STREAMING_INTERFACE_DESC_LEN  (7)
+
+#define UDD_AUDIO_CLASS_DESC_LEN                (9+UDD_AUDIO_INPUT_TERMINAL_DESC_LEN+UDD_AUDIO_FEATURE_UNIT_DESC_LEN+UDD_AUDIO_OUTPUT_TERMINAL_DESC_LEN)
 
 // endpoint configuration
 #define UDD_EP0_SIZE        64
@@ -76,6 +160,24 @@ enum
 
 #ifndef UDD_AUDIO_FREQ
 #define UDD_AUDIO_FREQ      UDD_AUDIO_FREQ_480
+#endif
+
+#ifndef UDD_AUDIO_CHANNELS
+#define UDD_AUDIO_CHANNELS  2
+#endif
+
+#ifndef UDD_AUDIO_SAMPLE_FRAME
+#define UDD_AUDIO_SAMPLE_FRAME  2
+#endif
+
+#ifndef UDD_AUDIO_SAMPLE_BITS
+#define UDD_AUDIO_SAMPLE_BITS   16
+#endif
+
+#define UDD_AUDIO_PACKET_SIZE ((UDD_AUDIO_FREQ*UDD_AUDIO_CHANNELS*UDD_AUDIO_SAMPLE_SIZE)/1000)
+
+#ifndef UDD_AUDIO_INTERVAL
+#define UDD_AUDIO_INTERVAL  1
 #endif
 
 #define UDD_DEVICE_DESCRIPTOR(usb_ver, ep0_size, vendor, product, version, str_manufacture, str_product, str_serial ) \
@@ -102,10 +204,34 @@ enum
     7, UDD_DESC_ENDPOINT, epout, UDD_EP_BULK, UDD_LOW(epsize), UDD_HIGH(epsize), 0,\
     7, UDD_DESC_ENDPOINT, epin, UDD_EP_BULK, UDD_LOW(epsize), UDD_HIGH(epsize), 0
 
-#define UDD_CONFIG_DESC_LEN         (9)
-#define UDD_HID_DESC_LEN            (9+9+7)
-#define UDD_HID_GENERIC_DESC_LEN    (9+9+7+7)
-#define UDD_MSC_DESC_LEN            (9+7+7)
+#define UDD_AUDIO_CLASS_DESCRIPTOR_HEADER(itf_control, itf_streaming, total) \
+    9, UDD_AUDIO_DESC_INTERFACE, UDD_AUDIO_SUBCLASS_CONTROL, 0, 1, total,  itf_control, itf_streaming, itf_streaming
+
+#define UDD_AUDIO_INPUT_TERMINAL_DESCRIPTOR() \
+    12, UDD_AUDIO_DESC_INTERFACE, UDD_AUDIO_CONTROL_DESC_INPUT_TERMINAL, 1, UDD_LOW(UDD_AUDIO_TERMINAL_STREAMING) \
+    UDD_HIGH(UDD_AUDIO_TERMINAL_STREAMING), 0, 1, 0, 0, 0, 0
+
+#define UDD_AUDIO_FEATURE_UNIT_DESCRIPTOR() \
+    9, UDD_AUDIO_DESC_INTERFACE, UDD_AUDIO_CONTROL_DESC_FEATURE_UNIT, 2, 1, 1, 1, 0, 0
+
+#define UDD_AUDIO_OUTPUT_TERMINAL_DESCRIPTOR() \
+    9, UDD_AUDIO_DESC_INTERFACE, UDD_AUDIO_CONTROL_DESC_OUTPUT_TERMINAL, 2, 1, 3, 0, 2, 0
+
+#define UDD_AUDIO_STREAMING_DESCRIPTOR() \
+    7, UDD_AUDIO_DESC_INTERFACE, UDD_AUDIO_SUBCLASS_STREAMING, 1, 1, 1, 0
+
+#define UDD_AUDIO_FORMAT_TYPE_DESCRIPTOR(type, channels, frame, bits, frequency) \
+    11, UDD_AUDIO_DESC_INTERFACE, UDD_AUDIO_STREAMING_DESC_FORMAT_TYPE, type, channels, frame, bits, 1, \
+    (uint8_t)(frequency), (uint8_t)((frequency >> 8)), (uint8_t)((frequency>> 16))
+
+#define UDD_AUDIO_ENDPOINT_STANDARD_DESCRIPTOR(epnum, size) \
+    9, UDD_DESC_ENDPOINT, epnum, UDD_EP_ISOCHRONOUS, UDD_LOW(size), UDD_HIGH(size), UDD_AUDIO_INTERVAL, 0, 0
+
+#define UDD_AUDIO_ENDPOINT_STREAMING_DESCRIPTOR(attr, unit, delay) \
+    7, UDD_AUDIO_DESC_ENDPOINT, 0x01, attr, unit, delay
+
+#define UDD_AUDIO_INTERFACE_DESCRIPTOR(itf, alt, epnum, sub) \
+    9, UDD_DESC_INTERFACE, itf, alt, epnum, UDD_CLASS_AUDIO, sub, UDD_AUDIO_PROTOCOL_UNDEFINED, 0
 
 #define UDD_USAGE_PAGE(x)	        0x05, x
 #define UDD_USAGE_PAGE_2(x)	        0x06, UDD_LOW(x), UDD_HIGH(x)
@@ -154,7 +280,7 @@ enum
 \
         UDD_USAGE_PAGE(0x07), \
         UDD_USAGE_MINIMUM(0x00), \
-        UDD_USAGE_MAXIMUM(0xFF), \
+        UDD_USAGE_MAXIMUM_2(0x00FF), \
         UDD_LOGICAL_MINIMUM(0x00), \
         UDD_LOGICAL_MAXIMUM_2(0x00FF), \
         UDD_REPORT_COUNT(0x06), \
@@ -242,7 +368,7 @@ enum
         UDD_INPUT(UDD_HID_DATA | UDD_HID_ARRAY | UDD_HID_ABSOLUTE), \
     UDD_END_COLLECTION(0)
 
-#ifndef  REPORT_BITS
+#ifndef REPORT_BITS
 #define REPORT_BITS 30
 #endif
 

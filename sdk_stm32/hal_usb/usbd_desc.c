@@ -21,7 +21,7 @@
 #include "usbd_core.h"
 #include "usbd_desc.h"
 #include "usbd_conf.h"
-#include "usb_descriptors.h"
+#include "udd_desc.h"
 #include "amk_printf.h"
 
 #define USBD_CONFIGURATION_STRING_FS "HID Config"
@@ -61,8 +61,8 @@ __ALIGN_BEGIN uint8_t USBD_StringSerial[USB_SIZ_STRING_SERIAL] __ALIGN_END = {US
 uint8_t *USBD_FS_DeviceDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 {
   UNUSED(speed);
-  *length = tud_descriptor_device_size();
-  return (uint8_t*)tud_descriptor_device_cb();
+  *length = udd_descriptor_device_size();
+  return (uint8_t*)udd_descriptor_device();
 }
 
 /**
@@ -148,8 +148,8 @@ uint8_t *USBD_FS_BOSDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 {
   (void)speed;
 #ifdef WEBUSB_ENABLE
-  *length = tud_descriptor_bos_size();
-  return (uint8_t*)tud_descriptor_bos_cb();
+  *length = udd_descriptor_bos_size();
+  return (uint8_t*)udd_descriptor_bos();
 #else
   *length = 0;
   return NULL;

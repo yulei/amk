@@ -5,6 +5,7 @@
 #include "generic_hal.h"
 #include "amk_printf.h"
 #include "usb_descriptors.h"
+//#include "udd_desc.h"
 
 #ifdef TINYUSB_ENABLE
 #include "tusb.h"

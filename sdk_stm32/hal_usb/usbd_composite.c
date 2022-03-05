@@ -5,8 +5,8 @@
 #include "usbd_ioreq.h"
 #include "usbd_ctlreq.h"
 #include "usbd_composite.h"
-#include "usb_descriptors.h"
 #include "usb_desc_def.h"
+#include "udd_desc.h"
 #include "usb_led.h"
 #include "amk_printf.h"
 
@@ -340,8 +340,8 @@ static uint8_t comp_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
 
 static uint8_t* comp_get_fscfgdesc(uint16_t *length)
 {
-    *length = tud_descriptor_configuration_size(0);
-    return (uint8_t*)tud_descriptor_configuration_cb(0);
+    *length = udd_descriptor_configuration_size(0);
+    return (uint8_t*)udd_descriptor_configuration(0);
 }
 
 static uint8_t comp_ep0_tx_sent(struct _USBD_HandleTypeDef *pdev)
@@ -527,21 +527,21 @@ static uint8_t  hid_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, v
                 case USB_REQ_GET_DESCRIPTOR:
                     if (req->wValue >> 8 == UDD_HID_DESC_TYPE_REPORT) {
                         if (hhid->keyboard) {
-                        len = tud_descriptor_hid_report_kbd_size();
+                        len = udd_descriptor_hid_report_kbd_size();
                         amk_printf("keyboard report desc size: %d\n", len);
-                        pbuf = (uint8_t*)tud_descriptor_hid_report_kbd_cb();
+                        pbuf = (uint8_t*)udd_descriptor_hid_report_kbd();
                         } else {
-                        len = tud_descriptor_hid_report_other_size();
+                        len = udd_descriptor_hid_report_other_size();
                         amk_printf("other report desc size: %d\n", len);
-                        pbuf = (uint8_t*)tud_descriptor_hid_report_other_cb();
+                        pbuf = (uint8_t*)udd_descriptor_hid_report_other();
                         }
                     } else if (req->wValue >> 8 == UDD_HID_DESC_TYPE_HID) {
                         if (hhid->keyboard) {
-                            len = tud_descriptor_hid_interface_kbd_size();
-                            pbuf = (uint8_t*)tud_descriptor_hid_interface_kbd_cb();
+                            len = udd_descriptor_hid_interface_kbd_size();
+                            pbuf = (uint8_t*)udd_descriptor_hid_interface_kbd();
                         } else {
-                            len = tud_descriptor_hid_interface_other_size();
-                            pbuf = (uint8_t*)tud_descriptor_hid_interface_other_cb();
+                            len = udd_descriptor_hid_interface_other_size();
+                            pbuf = (uint8_t*)udd_descriptor_hid_interface_other();
                         }
                     } else {
                         USBD_CtlError(pdev, req);

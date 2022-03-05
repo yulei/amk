@@ -1,16 +1,16 @@
 /**
- *  usb_descriptors.h
+ *  @file udd_desc.h
  */ 
 
 #pragma once
 
-//#include "tusb.h"
 #include <stdint.h>
 #include <stddef.h>
 
 #define USB_MSC_BIT         (1u << 1)
 #define USB_WEBUSB_BIT      (1u << 2)
 #define USB_OUTPUT_RF       (1u << 3)
+#define USB_AUDIO_BIT       (1u << 4)
 
 extern uint32_t usb_setting;
 
@@ -22,9 +22,9 @@ enum {
     ITF_NUM_HID_KBD,
     ITF_NUM_HID_OTHER,
     ITF_NUM_DUMMY,
-    #define ITF_NUM_VIAL ITF_NUM_DUMMY
-    #define ITF_NUM_VENDOR ITF_NUM_DUMMY
-    #define ITF_NUM_MSC ITF_NUM_DUMMY
+    #define ITF_NUM_VIAL            ITF_NUM_DUMMY
+    #define ITF_NUM_VENDOR          ITF_NUM_DUMMY
+    #define ITF_NUM_MSC             ITF_NUM_DUMMY
     ITF_NUM_TOTAL
 };
 
@@ -39,7 +39,6 @@ enum {
     #define EPNUM_VENDOR_IN     EPNUM_DUMMY
     #define EPNUM_MSC_OUT       EPNUM_DUMMY
     #define EPNUM_MSC_IN        EPNUM_DUMMY
-    //EPNUM_MSC_IN,
     EPNUM_MAX
 };
 #else
@@ -91,7 +90,7 @@ enum {
     #endif
 #endif
 #ifdef AUDIO_ENABLE
-    EPNUM_AUDIO_OUT     = 0x03,
+    EPNUM_AUDIO_OUT       = 0x03,
 #endif
     EPNUM_MAX
 };
@@ -116,36 +115,36 @@ enum {
     VENDOR_REQUEST_MICROSOFT = 2
 };
 
-uint8_t const* tud_descriptor_device_cb(void);
-uint32_t tud_descriptor_device_size(void);
+uint8_t const* udd_descriptor_device(void);
+uint32_t udd_descriptor_device_size(void);
 
-uint8_t const* tud_descriptor_configuration_cb(uint8_t index);
-uint32_t tud_descriptor_configuration_size(uint8_t index);
+uint8_t const* udd_descriptor_configuration(uint8_t index);
+uint32_t udd_descriptor_configuration_size(uint8_t index);
 
-uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf);
-uint32_t tud_hid_descriptor_report_size(uint8_t itf);
+uint8_t const* udd_hid_descriptor_report(uint8_t itf);
+uint32_t udd_hid_descriptor_report_size(uint8_t itf);
 
-uint8_t const* tud_descriptor_hid_report_kbd_cb(void);
-uint32_t tud_descriptor_hid_report_kbd_size(void);
+uint8_t const* udd_descriptor_hid_report_kbd(void);
+uint32_t udd_descriptor_hid_report_kbd_size(void);
 
-uint8_t const* tud_descriptor_hid_report_other_cb(void);
-uint32_t tud_descriptor_hid_report_other_size(void);
+uint8_t const* udd_descriptor_hid_report_other(void);
+uint32_t udd_descriptor_hid_report_other_size(void);
 
-uint8_t const* tud_hid_descriptor_interface_cb(uint8_t itf);
-uint32_t tud_hid_descriptor_interface_size(uint8_t itf);
+uint8_t const* udd_hid_descriptor_interface(uint8_t itf);
+uint32_t udd_hid_descriptor_interface_size(uint8_t itf);
 
-uint8_t const* tud_descriptor_hid_interface_kbd_cb(void);
-uint32_t tud_descriptor_hid_interface_kbd_size(void);
+uint8_t const* udd_descriptor_hid_interface_kbd(void);
+uint32_t udd_descriptor_hid_interface_kbd_size(void);
 
-uint8_t const* tud_descriptor_hid_interface_other_cb(void);
-uint32_t tud_descriptor_hid_interface_other_size(void);
+uint8_t const* udd_descriptor_hid_interface_other(void);
+uint32_t udd_descriptor_hid_interface_other_size(void);
 
 #ifdef VIAL_ENABLE
-uint8_t const* tud_descriptor_hid_report_vial_cb(void);
-uint32_t tud_descriptor_hid_report_vial_size(void);
+uint8_t const* udd_descriptor_hid_report_vial(void);
+uint32_t udd_descriptor_hid_report_vial_size(void);
 
-uint8_t const* tud_descriptor_hid_interface_vial_cb(void);
-uint32_t tud_descriptor_hid_interface_vial_size(void);
+uint8_t const* udd_descriptor_hid_interface_vial(void);
+uint32_t udd_descriptor_hid_interface_vial_size(void);
 #endif
 
 #ifdef WEBUSB_ENABLE
@@ -153,14 +152,14 @@ enum {
     WEBUSB_KEYMAP_SET = 1,
     WEBUSB_KEYMAP_GET,
 };
-uint8_t const* tud_descriptor_bos_cb(void);
-uint32_t tud_descriptor_bos_size(void);
+uint8_t const* udd_descriptor_bos(void);
+uint32_t udd_descriptor_bos_size(void);
 
-uint8_t const* tud_descriptor_url_cb(void);
-uint32_t tud_descriptor_url_size(void);
+uint8_t const* udd_descriptor_url(void);
+uint32_t udd_descriptor_url_size(void);
 
-uint8_t const* tud_descriptor_msos20_cb(void);
-uint32_t tud_descriptor_msos20_size(void);
+uint8_t const* udd_descriptor_msos20(void);
+uint32_t udd_descriptor_msos20_size(void);
 #endif
 
 // String index
@@ -175,6 +174,6 @@ enum {
     DESC_STR_INTERFACE_WEBUSB,
 };
 
-uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid);
+uint16_t const* udd_descriptor_string(uint8_t index, uint16_t langid);
 
 uint8_t *get_descriptor_str(uint8_t index, uint16_t *length);

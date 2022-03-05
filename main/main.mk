@@ -8,6 +8,7 @@ SRCS += \
 	$(MAIN_DIR)/amk/amk_boot.c \
 	$(MAIN_DIR)/amk/report_queue.c \
 	$(MAIN_DIR)/amk/ring_buffer.c \
+	$(MAIN_DIR)/usb/udd_desc_stub.c \
 	$(MAIN_DIR)/usb/usb_descriptors.c \
 
 INCS += \

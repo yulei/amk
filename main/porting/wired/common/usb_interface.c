@@ -5,6 +5,7 @@
 #include "usb_interface.h"
 #include "amk_usb.h"
 #include "usb_descriptors.h"
+//#include "udd_desc.h"
 #include "usb_interface.h"
 #include "generic_hal.h"
 #include "report_queue.h"
