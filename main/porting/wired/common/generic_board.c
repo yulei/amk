@@ -23,10 +23,6 @@
 #include "screen.h"
 #endif
 
-#ifdef WEBUSB_ENABLE
-#include "webusb.h"
-#endif
-
 #ifdef MSC_ENABLE
 #include "mscusb.h"
 #endif
@@ -118,10 +114,6 @@ void board_task(void)
 
 #if defined(MSC_ENABLE) && !defined(RTOS_ENABLE)
     msc_task();
-#endif
-
-#ifdef WEBUSB_ENABLE
-    webusb_task();
 #endif
 
 #ifdef RGB_ENABLE

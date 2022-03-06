@@ -62,7 +62,7 @@
   */
 
 /*---------- -----------*/
-#if defined(WEBUSB_ENABLE) || defined(MSC_ENABLE)
+#if defined(MSC_ENABLE)
 #define USBD_MAX_NUM_INTERFACES     3U
 #else
 #define USBD_MAX_NUM_INTERFACES     2U

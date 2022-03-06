@@ -7,11 +7,7 @@
 #include "usb_desc_def.h"
 #include "udd_desc.h"
 
-#ifdef WEBUSB_ENABLE
-#define USB_BCD 0x0210
-#else
 #define USB_BCD 0x0200
-#endif
 
 // Device Descriptors
 static uint8_t desc_device_fullspeed [] = {
@@ -100,12 +96,6 @@ uint32_t udd_descriptor_hid_report_vial_size(void)
 #endif
 
 // Configuration Descriptor
-#ifdef WEBUSB_ENABLE
-#define WEBUSB_DESC_LEN UDD_VENDOR_DESC_LEN
-#else 
-#define WEBUSB_DESC_LEN 0 
-#endif
-
 #define  CONFIG_TOTAL_LEN  (UDD_CONFIG_DESC_LEN + UDD_HID_DESC_LEN + UDD_HID_DESC_LEN + UDD_VIAL_DESC_LEN + UDD_AUDIO_DESC_LEN)
 
 static uint8_t desc_config_fullspeed [] = {

@@ -18,6 +18,7 @@
 #include "vial_porting.h"
 #include "progmem.h"
 #include "vial_generated_keyboard_definition.h"
+#include "tusb.h"
 #include "amk_printf.h"
 
 #ifndef VIAL_DEBUG_PRINT

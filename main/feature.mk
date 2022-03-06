@@ -72,11 +72,6 @@ ifeq (yes, $(strip $(RGB_ENABLE)))
 	APP_DEFS += -DRGB_ENABLE
 endif
 
-ifeq (yes, $(strip $(WEBUSB_ENABLE)))
-	SRCS += $(MAIN_DIR)/usb/webusb.c
-	APP_DEFS += -DWEBUSB_ENABLE
-endif
-
 ifeq (yes, $(strip $(MSC_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/anim.c
 	SRCS += $(MAIN_DIR)/drivers/w25qxx.c

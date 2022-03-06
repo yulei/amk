@@ -75,35 +75,6 @@ usbd_class_interface_t USBD_HID = {
     hid_write,
 };
 
-#ifdef WEBUSB_ENABLE
-// webusb 
-#define USBD_VENDOR_EPIN                (0x80|EPNUM_VENDOR_IN)
-#define USBD_VENDOR_EPIN_SIZE           CFG_TUD_VENDOR_EPSIZE
-#define USBD_VENDOR_EPIN_TYPE           USBD_EP_TYPE_BULK 
-#define USBD_VENDOR_EPOUT               (EPNUM_VENDOR_OUT)
-#define USBD_VENDOR_EPOUT_SIZE          USBD_VENDOR_EPIN_SIZE
-#define USBD_VENDOR_EPOUT_TYPE          USBD_EP_TYPE_BULK
-#define WEBUSB_PACKET_SIZE  64
-typedef struct {
-    ITF_StateTypeDef state;
-    uint8_t recv_buffer[WEBUSB_PACKET_SIZE];
-    uint8_t send_buffer[WEBUSB_PACKET_SIZE];
-} WEBUSB_HandleTypeDef;
-
-static uint8_t  webusb_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, void* user); 
-static uint8_t  webusb_datain(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user);
-static uint8_t  webusb_dataout(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user);
-static uint8_t  webusb_write(USBD_HandleTypeDef *pdev, uint8_t epnum, uint8_t* data, uint16_t size, void* user);
-
-usbd_class_interface_t USBD_WEBUSB = {
-    webusb_setup,
-    webusb_datain,
-    webusb_dataout,
-    webusb_write,
-};
-
-#endif
-
 #ifdef MSC_ENABLE
 
 #include  "usbd_msc_bot.h"
@@ -215,12 +186,6 @@ static void hid_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
 static HID_HandleTypeDef USBD_HID_DATA_KBD;
 static HID_HandleTypeDef USBD_HID_DATA_OTHER;
 
-#ifdef WEBUSB_ENABLE
-static void webusb_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
-static void webusb_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
-static WEBUSB_HandleTypeDef USBD_WEBUSB_DATA;
-#endif
-
 #ifdef MSC_ENABLE
 static void msc_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
 static void msc_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
@@ -253,19 +218,6 @@ static usbd_composite_t usbd_composite = {
         .uninit = hid_uninit,
         .data = &USBD_HID_DATA_OTHER},
 
-#ifdef WEBUSB_ENABLE
-        {.index = ITF_NUM_VENDOR,
-        .epin = USBD_VENDOR_EPIN,
-        .epin_size = USBD_VENDOR_EPIN_SIZE,
-        .epin_type = USBD_VENDOR_EPIN_TYPE,
-        .epout = USBD_VENDOR_EPOUT,
-        .epout_size = USBD_VENDOR_EPOUT_SIZE,
-        .epout_type = USBD_VENDOR_EPOUT_TYPE,
-        .instance = &USBD_WEBUSB,
-        .init = webusb_init,
-        .uninit = webusb_uninit,
-        .data = &USBD_WEBUSB_DATA},
-#endif
 #ifdef MSC_ENABLE
         {.index = ITF_NUM_MSC,
         .epin = USBD_MSC_EPIN,
@@ -439,14 +391,7 @@ usbd_interface_t* find_interface_by_type(uint32_t type)
     if (type == HID_REPORT_ID_KEYBOARD) {
         return &usbd_composite.interfaces[ITF_NUM_HID_KBD];
     } else {
-        #ifdef WEBUSB_ENABLE
-        if (type == HID_REPORT_ID_WEBUSB) {
-            return &usbd_composite.interfaces[ITF_NUM_VENDOR];
-        } else
-        #endif
-        {
-            return &usbd_composite.interfaces[ITF_NUM_HID_OTHER];
-        }
+        return &usbd_composite.interfaces[ITF_NUM_HID_OTHER];
     }
 }
 
@@ -605,140 +550,6 @@ static uint8_t  hid_write(USBD_HandleTypeDef *pdev, uint8_t epnum, uint8_t* data
         return USBD_BUSY;
     }
 }
-
-// ================================================================================
-// WEBUSB class driver
-// ================================================================================
-#ifdef WEBUSB_ENABLE
-void webusb_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
-{
-    USBD_StatusTypeDef ret = USBD_OK;
-    ret = USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
-    amk_printf("WEBUSB init, Open epin=%d, status=%d\n", interface->epin, ret);
-    pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
-    ret = USBD_LL_OpenEP(pdev, interface->epout, interface->epout_type, interface->epout_size);
-    amk_printf("WEBUSB init, Open epout=%d, status=%d\n", interface->epout, ret);
-    pdev->ep_out[interface->epout].is_used = 1U;
-
-    WEBUSB_HandleTypeDef* ph = (WEBUSB_HandleTypeDef *)interface->data;
-    ret = USBD_LL_PrepareReceive(pdev, interface->epout, ph->recv_buffer, WEBUSB_PACKET_SIZE);
-    amk_printf("WEBUSB init: prepare receive: epnum=%d, status=%d\n", interface->epout, ret);
-    ph->state = ITF_IDLE;
-}
-
-void webusb_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
-{
-    USBD_LL_CloseEP(pdev, interface->epin);
-    pdev->ep_in[interface->epin & 0xFU].is_used = 0U;
-    USBD_LL_CloseEP(pdev, interface->epout);
-    pdev->ep_out[interface->epout].is_used = 0U;
-}
-
-static uint8_t webusb_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, void* user)
-{
-    uint16_t len = 0U;
-    uint8_t *pbuf = NULL;
-    USBD_StatusTypeDef ret = USBD_OK;
-
-    if ((req->bmRequest&USB_REQ_TYPE_MASK) == USB_REQ_TYPE_VENDOR) {
-        switch (req->bRequest) {
-        case VENDOR_REQUEST_WEBUSB: {
-            len = tud_descriptor_url_size();
-            pbuf = (uint8_t*)tud_descriptor_url_cb();
-            amk_printf("WEBUSB Setup: size=%d\n", len);
-        } break;
-        case VENDOR_REQUEST_MICROSOFT: {
-            if ( req->wIndex == 7 ) {
-                len = tud_descriptor_msos20_size();
-                pbuf = (uint8_t*)tud_descriptor_msos20_cb();
-                amk_printf("Microsoft Setup: size=%d\n", len);
-            }
-        } break;
-        default:
-            amk_printf("WEBUSB Setup unknow vender request: request=%d, index=%d\n", req->bRequest, req->wIndex);
-            break;
-        }
-    } else {
-        amk_printf("WEBUSB Setup unknow interface request: request=%d, index=%d\n", req->bRequest, req->wIndex);
-    }
-
-    if (len > 0) {
-        ret = USBD_CtlSendData(pdev, pbuf, len);
-    }
-
-    return ret;
-}
-
-static uint8_t  webusb_datain(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user)
-{
-    WEBUSB_HandleTypeDef* hwusb = (WEBUSB_HandleTypeDef*)user;
-    hwusb->state = ITF_IDLE;
-    return USBD_OK;
-}
-
-
-extern void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode);
-extern uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col);
-
-static uint8_t webusb_dataout(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user)
-{
-    WEBUSB_HandleTypeDef* hwusb = (WEBUSB_HandleTypeDef*)user;
-    amk_printf("WEBUSB DataOut: epnum=%d status=%d is_used=%d total_length=%d rem_length=%d fist_data=%d, rxDataSize=%d\n",
-            epnum,
-            pdev->ep_out[epnum].status,
-            pdev->ep_out[epnum].is_used,
-            pdev->ep_out[epnum].total_length,
-            pdev->ep_out[epnum].rem_length,
-            hwusb->recv_buffer[0],
-            USBD_LL_GetRxDataSize(pdev, epnum));
-
-    switch (hwusb->recv_buffer[0]) {
-        case WEBUSB_KEYMAP_SET: {
-            amk_keymap_set(hwusb->recv_buffer[1], hwusb->recv_buffer[2], hwusb->recv_buffer[3], (hwusb->recv_buffer[5]<<8) | hwusb->recv_buffer[4]);
-            amk_printf("cmd=%d, layer=%d, row=%d, col=%d, keycode=%d\n",
-                        hwusb->recv_buffer[0], 
-                        hwusb->recv_buffer[1],
-                        hwusb->recv_buffer[2],
-                        hwusb->recv_buffer[3],
-                        (hwusb->recv_buffer[5]<<8) | hwusb->recv_buffer[4]);
-            USBD_StatusTypeDef status = USBD_LL_Transmit(pdev, epnum | 0x80, hwusb->send_buffer, 32);
-            amk_printf("WEBUSB keymap SET writeback: status=%d\n", status);
-            } break;
-            
-        case WEBUSB_KEYMAP_GET: {
-            uint16_t keycode = amk_keymap_get(hwusb->recv_buffer[1], hwusb->recv_buffer[2], hwusb->recv_buffer[3]);
-            amk_printf("cmd=%d, layer=%d, row=%d, col=%d\n",
-                        hwusb->recv_buffer[0], 
-                        hwusb->recv_buffer[1],
-                        hwusb->recv_buffer[2],
-                        hwusb->recv_buffer[3]);
-            hwusb->recv_buffer[4] = keycode&0xFF;
-            hwusb->recv_buffer[5] = (keycode>>8)&0xFF;
-            memcpy(hwusb->send_buffer, hwusb->recv_buffer, 32);
-            USBD_StatusTypeDef status = USBD_LL_Transmit(pdev, epnum | 0x80, hwusb->send_buffer, 32);
-            amk_printf("WEBUSB keymap GET writeback: status=%d\n", status);
-            } break;
-        default:
-            amk_printf("WEBUSB unknown command: %d\n",hwusb->recv_buffer[0]);
-            break;
-    }
-
-    USBD_LL_PrepareReceive(pdev, epnum, hwusb->recv_buffer, WEBUSB_PACKET_SIZE);
-    return USBD_OK;
-}
-
-static uint8_t webusb_write(USBD_HandleTypeDef *pdev, uint8_t epnum, uint8_t* data, uint16_t size, void* user)
-{
-    WEBUSB_HandleTypeDef* hwusb = (WEBUSB_HandleTypeDef*)user;
-    if (hwusb->state == ITF_IDLE) {
-        hwusb->state = ITF_BUSY;
-        memcpy(hwusb->send_buffer, data, size);
-        return USBD_LL_Transmit(pdev, epnum|0x80, hwusb->send_buffer, size);
-    } else {
-        return USBD_BUSY;
-    }
-}
-#endif
 
 // ================================================================================
 // Mass storage class driver

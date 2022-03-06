@@ -19,6 +19,8 @@
 #include "send_string.h"
 #include "keycode.h"
 #include "action.h"
+#include "usb_interface.h"
+#include "usb_common.h"
 //#include "wait.h"
 
 #ifndef TAP_CODE_DELAY
@@ -39,7 +41,7 @@ extern uint32_t amk_macro_delay;
 void tap_code_delay(uint8_t code, uint16_t delay) {
     register_code(code);
 
-    amk_macro_delay = delay;
+    usb_send_report(HID_REPORT_ID_DELAY, &delay, sizeof(delay));
     //while (delay--) wait_ms(1);
 
     unregister_code(code);

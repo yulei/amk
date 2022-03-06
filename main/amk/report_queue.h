@@ -18,9 +18,8 @@
 #define HID_QUEUE_ITEM_SIZE         32
 
 typedef struct {
-    uint32_t    type;
-    uint32_t    size;
-    uint32_t    delay;
+    uint16_t    type;
+    uint16_t    size;
     uint8_t     data[HID_QUEUE_ITEM_SIZE];
 } hid_report_t;
 

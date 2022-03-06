@@ -11,6 +11,8 @@
 #include "amk_keymap.h"
 #include "amk_eeprom.h"
 #include "amk_printf.h"
+#include "usb_interface.h"
+#include "usb_common.h"
 
 static void layer_state_set(uint32_t state)
 {
@@ -71,7 +73,7 @@ static uint8_t *get_macro_start(uint8_t id)
     return p;
 }
 
-bool vial_macro_play(uint8_t id, uint16_t *offset, uint32_t *delay)
+bool vial_macro_play(uint8_t id, uint16_t *offset)
 {
     if (id >= amk_keymap_macro_get_count()) {
         return false;
@@ -122,11 +124,13 @@ bool vial_macro_play(uint8_t id, uint16_t *offset, uint32_t *delay)
             // For delay, decode the delay and wait_ms for that amount
             uint8_t d0 = eeprom_read_byte(p++);
             uint8_t d1 = eeprom_read_byte(p++);
+            uint16_t delay = 0;
             if (d0 == 0 || d1 == 0)
-                *delay = 0;
+                delay = 0;
             // we cannot use 0 for these, need to subtract 1 and use 255 instead of 256 for delay calculation
             int ms = (d0 - 1) + (d1 - 1) * 255;
-            *delay = ms;
+            delay = ms;
+            usb_send_report(HID_REPORT_ID_DELAY, &delay, sizeof(delay));
             *offset = (uint32_t)p;
             return true;
         }
