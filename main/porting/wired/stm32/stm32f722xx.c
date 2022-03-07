@@ -25,7 +25,7 @@ DMA_HandleTypeDef hdma_tim2_ch1;
 
 RTC_HandleTypeDef hrtc;
 
-#ifdef WDT_ENABLED
+#ifdef WDT_ENABLE
 IWDG_HandleTypeDef hiwdg;
 void wdt_refresh(void)
 {
@@ -253,7 +253,7 @@ static void MX_RTC_Init(void)
 }
 
 
-#ifdef WDT_ENABLED
+#ifdef WDT_ENABLE
 static void MX_IWDG_Init(void)
 {
     hiwdg.Instance = IWDG;
@@ -328,14 +328,14 @@ void custom_board_init(void)
     HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0);
 #endif
 
-#ifdef WDT_ENABLED
+#ifdef WDT_ENABLE
     MX_IWDG_Init();
 #endif
 }
 
 void custom_board_task(void)
 {
-#ifdef WDT_ENABLED
+#ifdef WDT_ENABLE
     HAL_IWDG_Refresh(&hiwdg);
 #endif
 }

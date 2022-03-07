@@ -29,6 +29,7 @@
 #define OPA_EN_PIN      A4
 #define DISCHARGE_PIN   C13
 
+#define USE_ADC1
 #define KEY_IN_CHANNEL  ADC_CHANNEL_2
 #define KEY_IN_PIN      GPIO_PIN_2
 #define KEY_IN_PORT     GPIOA

@@ -14,8 +14,8 @@ RTC_HandleTypeDef hrtc;
 UART_HandleTypeDef huart1;
 #endif
 #ifdef USE_ADC1
-ADC_HandleTypeDef hadc;
-DMA_HandleTypeDef hdma_adc;
+ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
 #endif
 
 #ifdef PWM_TIM
@@ -207,27 +207,27 @@ static void MX_ADC_Init(void)
 
     /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
      */
-    hadc.Instance = ADC1;
-    hadc.Init.OversamplingMode = DISABLE;
-    hadc.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
-    hadc.Init.Resolution = ADC_RESOLUTION_12B;
-    hadc.Init.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
-    hadc.Init.ScanConvMode = ADC_SCAN_DIRECTION_FORWARD;
-    hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-    hadc.Init.ContinuousConvMode = DISABLE;
-    hadc.Init.DiscontinuousConvMode = DISABLE;
-    hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-    hadc.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-    hadc.Init.DMAContinuousRequests = DISABLE;
-    hadc.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
-    hadc.Init.Overrun = ADC_OVR_DATA_PRESERVED;
-    hadc.Init.LowPowerAutoWait = DISABLE;
-    hadc.Init.LowPowerFrequencyMode = DISABLE;
-    hadc.Init.LowPowerAutoPowerOff = DISABLE;
-    if (HAL_ADC_Init(&hadc) != HAL_OK) {
+    hadc1.Instance = ADC1;
+    hadc1.Init.OversamplingMode = DISABLE;
+    hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
+    hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+    hadc1.Init.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+    hadc1.Init.ScanConvMode = ADC_SCAN_DIRECTION_FORWARD;
+    hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+    hadc1.Init.ContinuousConvMode = DISABLE;
+    hadc1.Init.DiscontinuousConvMode = DISABLE;
+    hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+    hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+    hadc1.Init.DMAContinuousRequests = DISABLE;
+    hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+    hadc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
+    hadc1.Init.LowPowerAutoWait = DISABLE;
+    hadc1.Init.LowPowerFrequencyMode = DISABLE;
+    hadc1.Init.LowPowerAutoPowerOff = DISABLE;
+    if (HAL_ADC_Init(&hadc1) != HAL_OK) {
         Error_Handler();
     }
-    if (HAL_ADCEx_Calibration_Start(&hadc, ADC_SINGLE_ENDED) != HAL_OK) {
+    if (HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED) != HAL_OK) {
         Error_Handler();
     }
 
@@ -235,7 +235,7 @@ static void MX_ADC_Init(void)
      */
     sConfig.Channel = KEY_IN_CHANNEL;
     sConfig.Rank = ADC_RANK_CHANNEL_NUMBER;
-    if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK) {
+    if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK) {
         Error_Handler();
     }
 }

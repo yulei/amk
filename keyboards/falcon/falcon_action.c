@@ -5,7 +5,7 @@
 #include "falcon.h"
 #include "actionmap.h"
 
-#define _______ AC_TRNS
+//#define _______ AC_TRNS
 #define AC_FN0 ACTION_LAYER_MOMENTARY(1)
 #define AC_FN1 ACTION_LAYER_TAP_KEY(1, KC_SPC)
 #define AC_FN2 ACTION_FUNCTION(AF_RGB_TOG)

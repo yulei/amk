@@ -4,7 +4,7 @@
 
 #include "m65.h"
 
-#define _______ AC_TRNS
+//#define _______ AC_TRNS
 
 #define AC_MO_1 ACTION_LAYER_MOMENTARY(1)
 #define AC_RGBT ACTION_FUNCTION(AF_RGB_TOG)
