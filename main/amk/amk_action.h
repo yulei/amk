@@ -66,17 +66,16 @@ typedef enum {
 #define KC_SFTENT   0xEB
 #define KC_CTME     0xEC
 
-#define AC_CTMB     KC_CTMB
-#define AC_MEH      KC_MEH
-#define AC_HYPER    KC_HYPER
-#define AC_GESC     KC_GESC
-#define AC_SFTENT   KC_SFTENT
-#define AC_CTME     KC_CTME
+#define AC_CTMB     ACTION_KEY(KC_CTMB)
+#define AC_MEH      ACTION_KEY(KC_MEH)
+#define AC_HYPER    ACTION_KEY(KC_HYPER)
+#define AC_GESC     ACTION_KEY(KC_GESC)
+#define AC_SFTENT   ACTION_KEY(KC_SFTENT)
+#define AC_CTME     ACTION_KEY(KC_CTME)
 
 #ifdef ACTIONMAP_ENABLE
-#define AM(X)       AC_##X
+#define _______     AC_TRNS
 #else
-#define AM(X)       KC_##X
+#define _______     KC_TRNS
 #endif
 
-#define _______     AM(TRNS)

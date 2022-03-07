@@ -22,7 +22,7 @@
 
 // qmk keycode definitions
 // from quantum_keycodes.h
-#define _______ KC_TRNS
+//#define _______ KC_TRNS
 #define XXXXXXX KC_NO
 
 enum quantum_keycodes {

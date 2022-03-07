@@ -50,6 +50,7 @@ static void hcd_state_init(hcd_usb_state_t *state, HCD_HandleTypeDef *hcd)
     state->connected = false;
     state->port_enabled = false;
     for (uint32_t i = 0; i < HCD_MAX_CHANNELS; i++) {
+        state->pipes[i].dev_addr = 0;
         state->pipes[i].endpoint = 0;
         state->pipes[i].channel = 0;
         state->pipes[i].used = 0;

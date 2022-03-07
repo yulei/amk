@@ -11,7 +11,7 @@
 #define PRODUCT         Falcon EC
 
 #define MATRIX_ROWS     4
-#define MATRIX_COLS     16
+#define MATRIX_COLS     15
 #define MATRIX_ROW_PINS {}
 #define MATRIX_COL_PINS {}
 
@@ -50,3 +50,7 @@
 #define DEBOUNCE        5
 
 #define VECT_TAB_OFFSET 0x20000
+#define HSE_VALUE       16000000
+
+#define VIAL_INSECURE
+#define VIAL_KEYBOARD_UID {0x7D, 0xCE, 0x7A, 0x3A, 0xE0, 0xE5, 0xBC, 0xF0}

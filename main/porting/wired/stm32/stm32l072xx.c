@@ -15,7 +15,6 @@ UART_HandleTypeDef huart1;
 #endif
 #ifdef USE_ADC1
 ADC_HandleTypeDef hadc1;
-DMA_HandleTypeDef hdma_adc1;
 #endif
 
 #ifdef PWM_TIM
