@@ -285,9 +285,14 @@ static uint8_t desc_with_msc[] = {
 #endif
 };
 
+#ifdef VIAL_ENABLE
+#define ITF_NUM_VIAL_TOTAL  3
+#else
+#define ITF_NUM_VIAL_TOTAL  2
+#endif
 static uint8_t desc_with_vial[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
-    TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_LEN_VIAL, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
+    TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_VIAL_TOTAL, 0, CONFIG_LEN_VIAL, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
     // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_ITF_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),

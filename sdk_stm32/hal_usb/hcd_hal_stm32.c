@@ -4,6 +4,8 @@
  * 
  */
 
+#include <string.h>
+
 #include "generic_hal.h"
 #include "host/hcd.h"
 #include "amk_printf.h"
@@ -24,14 +26,23 @@
 #define HCD_USB_IRQn        OTG_HS_IRQn
 #define HCD_USB_PORT        1
 #else
-    #error "HAL USB HOST unsupported mcu"
+    #error "HAL USB HOST not supported by the MCU"
 #endif
 
+#define HCD_DIR_OUT     0x00
+#define HCD_DIR_IN      0x01
+#define HCD_PID_CTRL    0x00
+#define HCD_PID_DATA    0x00
+
+#define HCD_EP_DIR(ep_num) (((ep_num)&0x80) ? HCD_DIR_IN : HCD_DIR_OUT)
+
 typedef struct {
-    uint8_t dev_addr;
-    uint8_t endpoint;
-    uint8_t channel;
-    uint8_t used;
+    uint8_t     channel;
+    uint8_t     dev_addr;
+    uint8_t     ep_num;
+    uint8_t     ep_type;
+    uint16_t    packet_size;
+    uint8_t     used;
 } hcd_usb_pipe_t;
 
 typedef struct {
@@ -50,29 +61,28 @@ static void hcd_state_init(hcd_usb_state_t *state, HCD_HandleTypeDef *hcd)
     state->connected = false;
     state->port_enabled = false;
     for (uint32_t i = 0; i < HCD_MAX_CHANNELS; i++) {
-        state->pipes[i].dev_addr = 0;
-        state->pipes[i].endpoint = 0;
-        state->pipes[i].channel = 0;
-        state->pipes[i].used = 0;
+        memset(&state->pipes[i], 0, sizeof(hcd_usb_pipe_t));
     }
     state->hcd_handle = hcd;
     hcd->pData = state;
 }
 
-static hc_usb_pipe_t allocate_pipe(uint8_t addr, uint8_t ep)
+static hc_usb_pipe_t* allocate_pipe(uint8_t addr, uint8_t ep_num, uint8_t ep_type, uint16_t packet_size)
 {
     hc_usb_pipe_t *pipe = NULL;
     for (uint32_t i = 0; i < HCD_MAX_CHANNELS; i++) {
         if (hcd_state.pipes[i].used == 0) {
             pipe = &hcd_state.pipes[i];
             pipe->dev_addr = addr;
-            pipe->endpoint = ep;
+            pipe->ep_num = ep_num;
+            pipe->ep_type = ep_type;
+            pipe->packet_size = packet_size;
             pipe->channel = i;
             pipe->used = 1;
             break;
         } else {
-            if ((pipe->dev_addr==addr) && (pipe->endpoint == ep)) {
-                hcd_debug("pipe already allocated: addr=%d, ep=%d\n", addr, ep);
+            if ((pipe->dev_addr==addr) && (pipe->ep_num == ep_num)) {
+                hcd_debug("pipe already allocated: addr=%d, ep=%d\n", addr, ep_num);
             }
         }
     }
@@ -107,7 +117,25 @@ static void close_pipe(uint8_t pipe)
         return;
     }
 
+    if (hcd_state.pipes[pipe].used == 0) {
+        hcd_debug("pipe[%d] not inuse\n", pipe);
+        return;
+    }
+
+    hcd_state.pipes[pipe].used = 0;
     HAL_HCD_HC_Halt(&hcd_usb, pipe);
+}
+
+static hcd_usb_pipe_t* get_pipe(uint8_t dev_addr, uint8_t ep_num)
+{
+    for (uint32_t i = 0; i < HCD_MAX_CHANNELS; i++) {
+        if (hcd_state.pipes[i].used &&(hcd_state.pipes[i].ep_num == ep_num)) {
+            return &hcd_state.pipes[i];
+        }
+    }
+
+    hcd_debug("can't find valid pipe for addr=%d, ep_num=%d\n", dev_addr, ep_num);
+    return NULL;
 }
 
 static void set_pipe_toggle(uint8_t pipe, uint8_t toggle)
@@ -232,14 +260,13 @@ void hcd_device_close(uint8_t rhport, uint8_t dev_addr)
 
 bool hcd_edpt_open(uint8_t rhport, uint8_t dev_addr, tusb_desc_endpoint_t const * ep_desc)
 {
-    hcd_usb_pipe_t *pipe = allocate_pipe(dev_addr, ep_desc->bEndpointAddress);
+    hcd_usb_pipe_t *pipe = allocate_pipe(dev_addr, ep_desc->bEndpointAddress, ep_desc->bDescriptorType, ep_desc->wMaxPacketSize.size);
     if (!pipe) {
         hcd_debug("failed to allocated pipe: addr=%d, ep=%d\n", dev_addr, ep_desc->bEndpointAddress);
         return false;
     }
 
-    if (!open_pipe(pipe->channel, ep_desc->bEndpointAddress, dev_addr, HAL_HCD_GetCurrentSpeed(&hcd_usb), 
-                    ep_desc->bDescriptorType, ep_desc->wMaxPacketSize.size)) {
+    if (!open_pipe(pipe->channel, pipe->ep_num, dev_addr, HAL_HCD_GetCurrentSpeed(&hcd_usb), pipe->ep_type, pipe->packet_size)) {
         free_pipe(pipe->channel);
         return false;
     }
@@ -249,13 +276,28 @@ bool hcd_edpt_open(uint8_t rhport, uint8_t dev_addr, tusb_desc_endpoint_t const 
     return true;
 }
 
-bool hcd_edpt_xfer(uint8_t rhport, uint8_t dev_addr, uint8_t ep_addr, uint8_t * buffer, uint16_t buflen)
+bool hcd_edpt_xfer(uint8_t rhport, uint8_t dev_addr, uint8_t ep_num, uint8_t * buffer, uint16_t buflen)
 {
+    hcd_usb_pipe_t *pipe = get_pipe(dev_addr, ep_num);
+    if (pipe == NULL) {
+        hcd_debug("xfer pipe not initialized\n");
+        return false;
+    }
+
+    HAL_HCD_HC_SubmitRequest(&hcd_usb, pipe->channel, HCD_EP_DIR(ep_num), pipe->ep_type, HCD_PID_DATA, buffer, buflen, 0);
     return true;
 }
 
 bool hcd_setup_send(uint8_t rhport, uint8_t dev_addr, uint8_t const setup_packet[8])
 {
+    hcd_usb_pipe_t *pipe = get_pipe(dev_addr, 0);
+    if (pipe == NULL) {
+        hcd_debug("setup pipe not initialized\n");
+        return false;
+    }
+
+    HAL_HCD_HC_SubmitRequest(&hcd_usb, pipe->channel, HCD_EP_DIR(pipe->ep_num), pipe->ep_type, HCD_PID_CTRL, &setup_packet[0], 8, 0);
+
     return true;
 }
 
@@ -292,4 +334,17 @@ void HAL_HCD_PortDisabled_Callback(HCD_HandleTypeDef *hhcd)
 }
 
 void HAL_HCD_HC_NotifyURBChange_Callback(HCD_HandleTypeDef *hhcd, uint8_t chnum, HCD_URBStateTypeDef urb_state)
-{}
+{
+    switch (urb_state) {
+    case URB_IDLE:
+    case URB_DONE:
+    case URB_NOTREADY:
+    case URB_NYET:
+    case URB_ERROR:
+    case URB_STALL:
+        break;
+    
+    default:
+        break;
+    }
+}
