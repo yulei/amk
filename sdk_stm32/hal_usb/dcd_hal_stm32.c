@@ -149,7 +149,7 @@ void dcd_disconnect(uint8_t rhport)
 
 bool dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const * p_ep)
 {
-    HAL_StatusTypeDef status = HAL_PCD_EP_Open(&dcd_usb, p_ep->bEndpointAddress, p_ep->wMaxPacketSize.size, p_ep->bmAttributes.xfer);
+    HAL_StatusTypeDef status = HAL_PCD_EP_Open(&dcd_usb, p_ep->bEndpointAddress, p_ep->wMaxPacketSize, p_ep->bmAttributes.xfer);
     if (status != HAL_OK) {
         amk_printf("Failed to open ep:%d, status:%d\n", p_ep->bEndpointAddress, status);
         return false;

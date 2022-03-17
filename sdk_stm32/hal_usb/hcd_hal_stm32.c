@@ -138,6 +138,19 @@ static hcd_usb_pipe_t* get_pipe(uint8_t dev_addr, uint8_t ep_num)
     return NULL;
 }
 
+static hcd_usb_pipe_t *get_pipe_by_channel(uint8_t ch_num)
+{
+    for (uint32_t i = 0; i < HCD_MAX_CHANNELS; i++) {
+        if (hcd_state.pipes[i].used &&(hcd_state.pipes[i].channel == ch_num)) {
+            return &hcd_state.pipes[i];
+        }
+    }
+
+    hcd_debug("can't find valid pipe for channel: %dd\n", ch_num);
+    return NULL;
+}
+
+
 static void set_pipe_toggle(uint8_t pipe, uint8_t toggle)
 {
     if (pipe >= HCD_MAX_CHANNELS) {
@@ -260,7 +273,7 @@ void hcd_device_close(uint8_t rhport, uint8_t dev_addr)
 
 bool hcd_edpt_open(uint8_t rhport, uint8_t dev_addr, tusb_desc_endpoint_t const * ep_desc)
 {
-    hcd_usb_pipe_t *pipe = allocate_pipe(dev_addr, ep_desc->bEndpointAddress, ep_desc->bDescriptorType, ep_desc->wMaxPacketSize.size);
+    hcd_usb_pipe_t *pipe = allocate_pipe(dev_addr, ep_desc->bEndpointAddress, ep_desc->bDescriptorType, ep_desc->wMaxPacketSize);
     if (!pipe) {
         hcd_debug("failed to allocated pipe: addr=%d, ep=%d\n", dev_addr, ep_desc->bEndpointAddress);
         return false;
@@ -333,11 +346,17 @@ void HAL_HCD_PortDisabled_Callback(HCD_HandleTypeDef *hhcd)
     hcd_state.port_enabled = false;
 }
 
-void HAL_HCD_HC_NotifyURBChange_Callback(HCD_HandleTypeDef *hhcd, uint8_t chnum, HCD_URBStateTypeDef urb_state)
+void HAL_HCD_HC_NotifyURBChange_Callback(HCD_HandleTypeDef *hhcd, uint8_t ch_num, HCD_URBStateTypeDef urb_state)
 {
     switch (urb_state) {
+    case URB_DONE:{
+        hcd_usb_pipe_t *pipe = get_pipe_by_channel(ch_num);
+        if ( pipe) {
+            hcd_event_xfer_complete(pipe->dev_addr, pipe->ep_num, HAL_HCD_HC_GetXferCount(&hcd_usb, ch_num), XFER_RESULT_SUCCESS, true);
+        }
+    }
+        break;
     case URB_IDLE:
-    case URB_DONE:
     case URB_NOTREADY:
     case URB_NYET:
     case URB_ERROR:
