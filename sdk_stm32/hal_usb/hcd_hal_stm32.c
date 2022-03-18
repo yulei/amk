@@ -67,9 +67,9 @@ static void hcd_state_init(hcd_usb_state_t *state, HCD_HandleTypeDef *hcd)
     hcd->pData = state;
 }
 
-static hc_usb_pipe_t* allocate_pipe(uint8_t addr, uint8_t ep_num, uint8_t ep_type, uint16_t packet_size)
+static hcd_usb_pipe_t* allocate_pipe(uint8_t addr, uint8_t ep_num, uint8_t ep_type, uint16_t packet_size)
 {
-    hc_usb_pipe_t *pipe = NULL;
+    hcd_usb_pipe_t *pipe = NULL;
     for (uint32_t i = 0; i < HCD_MAX_CHANNELS; i++) {
         if (hcd_state.pipes[i].used == 0) {
             pipe = &hcd_state.pipes[i];
@@ -93,7 +93,7 @@ static hc_usb_pipe_t* allocate_pipe(uint8_t addr, uint8_t ep_num, uint8_t ep_typ
 static void free_pipe(uint8_t ep)
 {
     for (uint32_t i = 0; i < HCD_MAX_CHANNELS; i++) {
-        if (hcd_state.pipes[i].used &&(hcd_state.pipes[i].endpoint == ep)) {
+        if (hcd_state.pipes[i].used &&(hcd_state.pipes[i].ep_num == ep)) {
             hcd_state.pipes[i].used = 0;
             hcd_debug("free pipe: ep=%d, channel=%d\n", ep, hcd_state.pipes[i].channel);
             break;
@@ -186,11 +186,15 @@ bool hcd_init(uint8_t rhport)
 
     if (HAL_HCD_Init(&hcd_usb) != HAL_OK) {
         hcd_debug("failed to initialize usb host\n");
+        return false;
     }
 
     if (HAL_HCD_Start(&hcd_usb) != HAL_OK) {
         hcd_debug("Failed to start usb host\n");
+        return false;
     }
+
+    return true;
 }
 
 // Interrupt Handler
@@ -214,7 +218,7 @@ void hcd_int_disable(uint8_t rhport)
 // Get frame number (1ms)
 uint32_t hcd_frame_number(uint8_t rhport)
 {
-    HAL_HCD_GetCurrentFrame(&hcd_usb);
+    return HAL_HCD_GetCurrentFrame(&hcd_usb);
 }
 
 //--------------------------------------------------------------------+
@@ -244,10 +248,8 @@ tusb_speed_t hcd_port_speed_get(uint8_t rhport)
     tusb_speed_t speed = TUSB_SPEED_INVALID;
     switch (HAL_HCD_GetCurrentSpeed(&hcd_usb)) {
         case HCD_SPEED_FULL:
+        //case HCD_SPEED_LOW:
             speed = TUSB_SPEED_FULL;
-            break;
-        case HCD_SPEED_LOW:
-            speed = TUSB_SPEED_LOW;
             break;
         case HCD_SPEED_HIGH:
         default:
@@ -309,7 +311,7 @@ bool hcd_setup_send(uint8_t rhport, uint8_t dev_addr, uint8_t const setup_packet
         return false;
     }
 
-    HAL_HCD_HC_SubmitRequest(&hcd_usb, pipe->channel, HCD_EP_DIR(pipe->ep_num), pipe->ep_type, HCD_PID_CTRL, &setup_packet[0], 8, 0);
+    HAL_HCD_HC_SubmitRequest(&hcd_usb, pipe->channel, HCD_EP_DIR(pipe->ep_num), pipe->ep_type, HCD_PID_CTRL,(uint8_t*)(&setup_packet[0]), 8, 0);
 
     return true;
 }

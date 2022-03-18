@@ -3,7 +3,6 @@ TINYUSB_DIR := $(LIB_DIR)/tinyusb/src
 SRCS += \
 	$(TINYUSB_DIR)/tusb.c \
 	$(TINYUSB_DIR)/class/hid/hid_device.c \
-	$(TINYUSB_DIR)/class/vendor/vendor_device.c \
 	$(TINYUSB_DIR)/common/tusb_fifo.c \
 	$(TINYUSB_DIR)/device/usbd.c \
 	$(TINYUSB_DIR)/device/usbd_control.c \
@@ -13,6 +12,13 @@ INCS += \
 
 ifeq (yes, $(strip $(TINYUSB_USE_HAL)))
 	SRCS += $(STM32SDK_DIR)/hal_usb/dcd_hal_stm32.c
+	ifeq (yes, $(strip $(TINYUSB_HOST_ENABLE)))
+		SRCS += $(STM32SDK_DIR)/hal_usb/hcd_hal_stm32.c
+		SRCS += $(TINYUSB_DIR)/class/hid/hid_host.c
+		SRCS += $(TINYUSB_DIR)/host/usbh_control.c
+		SRCS += $(TINYUSB_DIR)/host/usbh.c
+		APP_DEFS += -DTINYUSB_HOST_ENABLE
+	endif
 else
 	ifeq (STM32F103, $(strip $(MCU)))
 	SRCS += $(TINYUSB_DIR)/portable/st/stm32_fsdev/dcd_stm32_fsdev.c

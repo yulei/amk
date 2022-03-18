@@ -87,6 +87,10 @@ ifeq (yes, $(strip $(TINYUSB_ENABLE)))
 		SRCS += $(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_pcd_ex.c
 		SRCS += $(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_ll_usb.c 
 		APP_DEFS += -DHAL_PCD_MODULE_ENABLED
+		ifeq (yes, $(strip $(TINYUSB_HOST_ENABLE)))
+			SRCS += $(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_hcd.c 
+			APP_DEFS += -DHAL_HCD_MODULE_ENABLED
+		endif
 	endif #TINYUSB_USE_HAL
 else
 	ifneq (yes, $(strip $(RTOS_ENABLE)))

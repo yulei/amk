@@ -137,3 +137,8 @@ ifeq (yes, $(strip $(INA219_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/ina219.c
 	APP_DEFS += -DINA219_ENABLE
 endif
+
+ifeq (yes, $(strip $(TINYUSB_HOST_ENABLE)))
+	SRCS += $(MAIN_DIR)/usb/hostusb.c
+	SRCS += $(MAIN_DIR)/usb/hid_report_parser.c
+endif

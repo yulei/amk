@@ -25,6 +25,9 @@ void amk_usb_init(void)
 void amk_usb_task(void)
 {
     tud_task();
+#ifdef TINYUSB_HOST_ENABLE
+    tuh_task();
+#endif
 }
 
 bool amk_usb_itf_ready(uint32_t type)
