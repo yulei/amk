@@ -3,6 +3,8 @@ TINYUSB_DIR := $(LIB_DIR)/tinyusb/src
 SRCS += \
 	$(TINYUSB_DIR)/tusb.c \
 	$(TINYUSB_DIR)/class/hid/hid_device.c \
+	$(TINYUSB_DIR)/class/audio/audio_device.c \
+	$(TINYUSB_DIR)/class/msc/msc_device.c \
 	$(TINYUSB_DIR)/class/vendor/vendor_device.c \
 	$(TINYUSB_DIR)/common/tusb_fifo.c \
 	$(TINYUSB_DIR)/device/usbd.c \
@@ -37,10 +39,6 @@ endif #TINYUSB_USE_HAL
 
 ifeq (NRF52840, $(strip $(MCU)))
 SRCS += $(SDK_NRF5)/dcd_nrf5x.c
-endif
-
-ifeq (yes, $(strip $(MSC_ENABLE)))
-SRCS += $(TINYUSB_DIR)/class/msc/msc_device.c
 endif
 
 APP_DEFS += -DTINYUSB_ENABLE
