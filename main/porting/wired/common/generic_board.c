@@ -27,6 +27,10 @@
 #include "mscusb.h"
 #endif
 
+#ifdef MSC_ENABLE
+#include "audiousb.h"
+#endif
+
 #ifdef RGB_ENABLE
 #include "rgb_led.h"
 #endif
@@ -90,6 +94,7 @@ void board_init(void)
 
 void board_task(void)
 {
+
 #ifndef RTOS_ENABLE
     usb_task();
 #endif
@@ -108,12 +113,17 @@ void board_task(void)
         //}
     }
 
-#ifdef SCREEN_ENABLE
-    screen_task();
-#endif
 
 #if defined(MSC_ENABLE) && !defined(RTOS_ENABLE)
     msc_task();
+#endif
+
+#ifdef AUDIO_ENABLE
+    audio_task();
+#endif
+
+#ifdef SCREEN_ENABLE
+    screen_task();
 #endif
 
 #ifdef RGB_ENABLE
@@ -132,6 +142,11 @@ static void amk_init(void)
 #if defined(MSC_ENABLE) && !defined(RTOS_ENABLE)
     amk_printf("msc_init\n");
     msc_init();
+#endif
+
+#ifdef AUDIO_ENABLE
+    amk_printf("audio_init\n");
+    audio_init();
 #endif
 
     amk_printf("keyboard_init\n");

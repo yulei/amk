@@ -103,15 +103,79 @@
         HID_OUTPUT      ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE | HID_NON_VOLATILE ),\
     HID_COLLECTION_END \
 
+// audio descriptior
+// AUDIO simple descriptor (UAC2) for mono speaker
+// - 1 Input Terminal, 2 Feature Unit (Mute and Volume Control), 3 Output Terminal, 4 Clock Source
+
+#define TUD_AUDIO_MONO_SPEAKER_DESC_LEN (TUD_AUDIO_DESC_IAD_LEN\
+  + TUD_AUDIO_DESC_STD_AC_LEN\
+  + TUD_AUDIO_DESC_CS_AC_LEN\
+  + TUD_AUDIO_DESC_CLK_SRC_LEN\
+  + TUD_AUDIO_DESC_INPUT_TERM_LEN\
+  + TUD_AUDIO_DESC_OUTPUT_TERM_LEN\
+  + TUD_AUDIO_DESC_FEATURE_UNIT_ONE_CHANNEL_LEN\
+  + TUD_AUDIO_DESC_STD_AS_INT_LEN\
+  + TUD_AUDIO_DESC_STD_AS_INT_LEN\
+  + TUD_AUDIO_DESC_CS_AS_INT_LEN\
+  + TUD_AUDIO_DESC_TYPE_I_FORMAT_LEN\
+  + TUD_AUDIO_DESC_STD_AS_ISO_EP_LEN\
+  + TUD_AUDIO_DESC_CS_AS_ISO_EP_LEN\
+  + TUD_AUDIO_DESC_STD_AS_ISO_FB_EP_LEN)
+
+#define TUD_AUDIO_DESC_IAD_UDF(_firstitfs, _nitfs, _stridx) \
+  TUD_AUDIO_DESC_IAD_LEN, TUSB_DESC_INTERFACE_ASSOCIATION, _firstitfs, _nitfs, TUSB_CLASS_AUDIO, AUDIO_FUNCTION_SUBCLASS_UNDEFINED, 0x20, _stridx
+#define TUD_AUDIO_DESC_STD_AC_UDF(_itfnum, _nEPs, _stridx) /* _nEPs is 0 or 1 */\
+  TUD_AUDIO_DESC_STD_AC_LEN, TUSB_DESC_INTERFACE, _itfnum, /* fixed to zero */ 0x00, _nEPs, TUSB_CLASS_AUDIO, AUDIO_SUBCLASS_CONTROL, 0x20, _stridx
+#define TUD_AUDIO_DESC_STD_AS_INT_UDF(_itfnum, _altset, _nEPs, _stridx) \
+  TUD_AUDIO_DESC_STD_AS_INT_LEN, TUSB_DESC_INTERFACE, _itfnum, _altset, _nEPs, TUSB_CLASS_AUDIO, AUDIO_SUBCLASS_STREAMING, 0x20, _stridx
+
+#define TUD_AUDIO_MONO_SPEAKER_DESCRIPTOR(_itfnum, _stridx, _nBytesPerSample, _nBitsUsedPerSample, _epout, _epsize, _epfb) \
+  /* Standard Interface Association Descriptor (IAD) */\
+  TUD_AUDIO_DESC_IAD_UDF(/*_firstitfs*/ _itfnum, /*_nitfs*/ 0x02, /*_stridx*/ 0x00),\
+  /* Standard AC Interface Descriptor(4.7.1) */\
+  TUD_AUDIO_DESC_STD_AC_UDF(/*_itfnum*/ _itfnum, /*_nEPs*/ 0x00, /*_stridx*/ _stridx),\
+  /* Class-Specific AC Interface Header Descriptor(4.7.2) */\
+  TUD_AUDIO_DESC_CS_AC(/*_bcdADC*/ 0x0200, /*_category*/ AUDIO_FUNC_DESKTOP_SPEAKER, /*_totallen*/ TUD_AUDIO_DESC_CLK_SRC_LEN+TUD_AUDIO_DESC_INPUT_TERM_LEN+TUD_AUDIO_DESC_OUTPUT_TERM_LEN+TUD_AUDIO_DESC_FEATURE_UNIT_ONE_CHANNEL_LEN, /*_ctrl*/ AUDIO_CS_AS_INTERFACE_CTRL_LATENCY_POS),\
+  /* Clock Source Descriptor(4.7.2.1) */\
+  TUD_AUDIO_DESC_CLK_SRC(/*_clkid*/ 0x04, /*_attr*/ AUDIO_CLOCK_SOURCE_ATT_INT_FIX_CLK, /*_ctrl*/ (AUDIO_CTRL_R << AUDIO_CLOCK_SOURCE_CTRL_CLK_FRQ_POS), /*_assocTerm*/ 0x01,  /*_stridx*/ 0x00),\
+  /* Input Terminal Descriptor(4.7.2.4) */\
+  TUD_AUDIO_DESC_INPUT_TERM(/*_termid*/ 0x01, /*_termtype*/ AUDIO_TERM_TYPE_USB_STREAMING, /*_assocTerm*/ 0x00, /*_clkid*/ 0x04, /*_nchannelslogical*/ 0x01, /*_channelcfg*/ AUDIO_CHANNEL_CONFIG_NON_PREDEFINED, /*_idxchannelnames*/ 0x00, /*_ctrl*/ 0 * (AUDIO_CTRL_R << AUDIO_IN_TERM_CTRL_CONNECTOR_POS), /*_stridx*/ 0x00),\
+  /* Output Terminal Descriptor(4.7.2.5) */\
+  TUD_AUDIO_DESC_OUTPUT_TERM(/*_termid*/ 0x03, /*_termtype*/ AUDIO_TERM_TYPE_OUT_DESKTOP_SPEAKER, /*_assocTerm*/ 0x01, /*_srcid*/ 0x02, /*_clkid*/ 0x04, /*_ctrl*/ 0x0000, /*_stridx*/ 0x00),\
+  /* Feature Unit Descriptor(4.7.2.8) */\
+  TUD_AUDIO_DESC_FEATURE_UNIT_ONE_CHANNEL(/*_unitid*/ 0x02, /*_srcid*/ 0x01, /*_ctrlch0master*/ 0 * (AUDIO_CTRL_RW << AUDIO_FEATURE_UNIT_CTRL_MUTE_POS | AUDIO_CTRL_RW << AUDIO_FEATURE_UNIT_CTRL_VOLUME_POS), /*_ctrlch1*/ 0 * (AUDIO_CTRL_RW << AUDIO_FEATURE_UNIT_CTRL_MUTE_POS | AUDIO_CTRL_RW << AUDIO_FEATURE_UNIT_CTRL_VOLUME_POS), /*_stridx*/ 0x00),\
+  /* Standard AS Interface Descriptor(4.9.1) */\
+  /* Interface 1, Alternate 0 - default alternate setting with 0 bandwidth */\
+  TUD_AUDIO_DESC_STD_AS_INT_UDF(/*_itfnum*/ (uint8_t)((_itfnum) + 1), /*_altset*/ 0x00, /*_nEPs*/ 0x00, /*_stridx*/ 0x00),\
+  /* Standard AS Interface Descriptor(4.9.1) */\
+  /* Interface 1, Alternate 1 - alternate interface for data streaming */\
+  TUD_AUDIO_DESC_STD_AS_INT_UDF(/*_itfnum*/ (uint8_t)((_itfnum) + 1), /*_altset*/ 0x01, /*_nEPs*/ 0x02, /*_stridx*/ 0x00),\
+  /* Class-Specific AS Interface Descriptor(4.9.2) */\
+  TUD_AUDIO_DESC_CS_AS_INT(/*_termid*/ 0x01, /*_ctrl*/ AUDIO_CTRL_NONE, /*_formattype*/ AUDIO_FORMAT_TYPE_I, /*_formats*/ AUDIO_DATA_FORMAT_TYPE_I_PCM, /*_nchannelsphysical*/ 0x01, /*_channelcfg*/ AUDIO_CHANNEL_CONFIG_NON_PREDEFINED, /*_stridx*/ 0x00),\
+  /* Type I Format Type Descriptor(2.3.1.6 - Audio Formats) */\
+  TUD_AUDIO_DESC_TYPE_I_FORMAT(_nBytesPerSample, _nBitsUsedPerSample),\
+  /* Standard AS Isochronous Audio Data Endpoint Descriptor(4.10.1.1) */\
+  TUD_AUDIO_DESC_STD_AS_ISO_EP(/*_ep*/ _epout, /*_attr*/ (TUSB_XFER_ISOCHRONOUS | TUSB_ISO_EP_ATT_ASYNCHRONOUS | TUSB_ISO_EP_ATT_DATA), /*_maxEPsize*/ _epsize, /*_interval*/ TUD_OPT_HIGH_SPEED ? 0x04 : 0x01),\
+  /* Class-Specific AS Isochronous Audio Data Endpoint Descriptor(4.10.1.2) */\
+  TUD_AUDIO_DESC_CS_AS_ISO_EP(/*_attr*/ AUDIO_CS_AS_ISO_DATA_EP_ATT_NON_MAX_PACKETS_OK, /*_ctrl*/ AUDIO_CTRL_NONE, /*_lockdelayunit*/ AUDIO_CS_AS_ISO_DATA_EP_LOCK_DELAY_UNIT_UNDEFINED, /*_lockdelay*/ 0x0000),\
+  /* Standard AS Isochronous Feedback Endpoint Descriptor(4.10.2.1) */\
+  TUD_AUDIO_DESC_STD_AS_ISO_FB_EP(/*_ep*/ _epfb, /*_interval*/ 1)\
+
 // Device Descriptors
 tusb_desc_device_t const desc_device =
 {
     .bLength            = sizeof(tusb_desc_device_t),
     .bDescriptorType    = TUSB_DESC_DEVICE,
     .bcdUSB             = 0x0200,
+#ifdef AUDIO_ENABLE
+    .bDeviceClass       = TUSB_CLASS_MISC,
+    .bDeviceSubClass    = MISC_SUBCLASS_COMMON,
+    .bDeviceProtocol    = MISC_PROTOCOL_IAD,
+#else
     .bDeviceClass       = 0x00,
     .bDeviceSubClass    = 0x00,
     .bDeviceProtocol    = 0x00,
+#endif
     .bMaxPacketSize0    = CFG_TUD_ENDPOINT0_SIZE,
 
     .idVendor           = VENDOR_ID,
@@ -234,11 +298,19 @@ uint32_t tud_descriptor_hid_report_vial_size(void)
 #define MSCUSB_DESC_LEN 0 
 #endif
 
-#define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + VIAL_DESC_LEN + MSCUSB_DESC_LEN)
+#ifdef AUDIO_ENABLE
+#define AUDIOUSB_DESC_LEN   TUD_AUDIO_MONO_SPEAKER_DESC_LEN 
+#else
+#define AUDIOUSB_DESC_LEN   0
+#endif
+
+#define CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + VIAL_DESC_LEN + MSCUSB_DESC_LEN + AUDIOUSB_DESC_LEN)
 
 #define CONFIG_LEN_MSC (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + MSCUSB_DESC_LEN)
 
 #define CONFIG_LEN_VIAL (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + VIAL_DESC_LEN)
+
+#define CONFIG_LEN_AUDIO (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + AUDIOUSB_DESC_LEN)
 
 static uint8_t desc_configuration[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
@@ -257,25 +329,21 @@ static uint8_t desc_configuration[] = {
 #endif
 
 #ifdef AUDIO_ENABLE
-    UDD_AUDIO_INTERFACE_DESCRIPTOR(ITF_NUM_AUDIO_CONTROL, 0, 0, UDD_AUDIO_SUBCLASS_CONTROL),
-    UDD_AUDIO_CLASS_DESCRIPTOR_HEADER(ITF_NUM_AUDIO_CONTROL, ITF_NUM_AUDIO_STREAMING, UDD_AUDIO_CLASS_DESC_LEN),
-    UDD_AUDIO_INPUT_TERMINAL_DESCRIPTOR(),
-    UDD_AUDIO_FEATURE_UNIT_DESCRIPTOR(),
-    UDD_AUDIO_OUTPUT_TERMINAL_DESCRIPTOR(),
-    UDD_AUDIO_INTERFACE_DESCRIPTOR(ITF_NUM_AUDIO_STREAMING, 0, 0, UDD_AUDIO_SUBCLASS_STREAMING),
-    UDD_AUDIO_INTERFACE_DESCRIPTOR(ITF_NUM_AUDIO_STREAMING, 1, 1, UDD_AUDIO_SUBCLASS_STREAMING),
-    UDD_AUDIO_STREAMING_DESCRIPTOR(),
-    UDD_AUDIO_FORMAT_TYPE_DESCRIPTOR(1, UDD_AUDIO_CHANNELS, UDD_AUDIO_SAMPLE_FRAME, UDD_AUDIO_SAMPLE_BITS, UDD_AUDIO_FREQ),
-    UDD_AUDIO_ENDPOINT_STANDARD_DESCRIPTOR(EPNUM_AUDIO_OUT, UDD_AUDIO_PACKET_SIZE),
-    UDD_AUDIO_ENDPOINT_STREAMING_DESCRIPTOR(0, 0, 0)
+    TUD_AUDIO_MONO_SPEAKER_DESCRIPTOR(ITF_NUM_AUDIO, 0, CFG_TUD_AUDIO_FUNC_1_N_BYTES_PER_SAMPLE_RX, CFG_TUD_AUDIO_FUNC_1_N_BITS_PER_SAMPLE_RX, EPNUM_AUDIO_OUT, CFG_TUD_AUDIO_EP_SZ_OUT, 0x80|EPNUM_AUDIO_IN),
 #endif
 
 };
 
 #ifdef DYNAMIC_CONFIGURATION
+
+#ifdef MSC_ENABLE
+#define ITF_NUM_MSC_TOTAL  3
+#else
+#define ITF_NUM_MSC_TOTAL  2
+#endif
 static uint8_t desc_with_msc[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
-    TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_LEN_MSC, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
+    TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_MSC_TOTAL, 0, CONFIG_LEN_MSC, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
     // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_ITF_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
@@ -300,6 +368,23 @@ static uint8_t desc_with_vial[] = {
     TUD_HID_INOUT_DESCRIPTOR(ITF_NUM_VIAL, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_vial), EPNUM_VIAL_OUT, 0x80 | EPNUM_VIAL_IN, VIAL_EPSIZE, CFG_TUD_HID_POLL_INTERVAL),
 #endif
 };
+
+#ifdef AUDIO_ENABLE
+#define ITF_NUM_AUDIO_TOTAL  4
+#else
+#define ITF_NUM_AUDIO_TOTAL  2
+#endif
+static uint8_t desc_with_audio[] = {
+    // Config number, interface count, string index, total length, attribute, power in mA
+    TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_AUDIO_TOTAL, 0, CONFIG_LEN_AUDIO, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
+    // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_ITF_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#ifdef AUDIO_ENABLE
+    TUD_AUDIO_MONO_SPEAKER_DESCRIPTOR(ITF_NUM_AUDIO, 0, CFG_TUD_AUDIO_FUNC_1_N_BYTES_PER_SAMPLE_RX, CFG_TUD_AUDIO_FUNC_1_N_BITS_PER_SAMPLE_RX, EPNUM_AUDIO_OUT, CFG_TUD_AUDIO_EP_SZ_OUT, 0x80|EPNUM_AUDIO_IN),
+#endif
+};
+
 #endif
 
 // Invoked when received GET CONFIGURATION DESCRIPTOR
@@ -309,7 +394,12 @@ uint8_t const* tud_descriptor_configuration_cb(uint8_t index)
     if (usb_setting & USB_MSC_BIT) {
         return desc_with_msc;
     }
-    return desc_with_vial;
+
+    if (usb_setting & USB_VIAL_BIT) {
+        return desc_with_vial;
+    }
+
+    return desc_with_audio;
 #endif
 
     return desc_configuration;
@@ -321,7 +411,12 @@ uint32_t tud_descriptor_configuration_size(uint8_t index)
     if (usb_setting & USB_MSC_BIT) {
         return sizeof(desc_with_msc);
     }
-    return sizeof(desc_with_vial);
+
+    if (usb_setting & USB_VIAL_BIT) {
+        return sizeof(desc_with_vial);
+    }
+
+    return sizeof(desc_with_audio);
 #endif
     return sizeof(desc_configuration);
 }

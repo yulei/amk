@@ -22,9 +22,12 @@ enum {
     ITF_NUM_HID_OTHER,
 #if defined(VIAL_ENABLE) || defined(MSC_ENABLE) || defined(AUDIO_ENABLE)
     ITF_NUM_DUMMY,
-    #define ITF_NUM_VIAL    ITF_NUM_DUMMY
-    #define ITF_NUM_MSC     ITF_NUM_DUMMY
-    #define ITF_NUM_AUDIO   ITF_NUM_DUMMY
+    #define ITF_NUM_VIAL            ITF_NUM_DUMMY
+    #define ITF_NUM_MSC             ITF_NUM_DUMMY
+    #define ITF_NUM_AUDIO           ITF_NUM_DUMMY  
+#endif
+#ifdef AUDIO_ENABLE
+    ITF_NUM_AUDIO_STREAMING,
 #endif
     ITF_NUM_TOTAL
 };
@@ -40,6 +43,7 @@ enum {
     #define EPNUM_MSC_OUT       EPNUM_DUMMY
     #define EPNUM_MSC_IN        EPNUM_DUMMY 
     #define EPNUM_AUDIO_OUT     EPNUM_DUMMY
+    #define EPNUM_AUDIO_IN      EPNUM_DUMMY
 #endif
     EPNUM_MAX
 };
@@ -55,7 +59,7 @@ enum {
     ITF_NUM_MSC,
 #endif
 #ifdef AUDIO_ENABLE
-    ITF_NUM_AUDIO_CONTROL,
+    ITF_NUM_AUDIO,
     ITF_NUM_AUDIO_STREAMING,
 #endif
     ITF_NUM_TOTAL
@@ -82,6 +86,7 @@ enum {
 #endif
 #ifdef AUDIO_ENABLE
     EPNUM_AUDIO_OUT     = 0x03,
+    #define EPNUM_AUDIO_IN  EPNUM_AUDIO_IN
 #endif
     EPNUM_MAX
 };

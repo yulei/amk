@@ -84,6 +84,11 @@ ifeq (yes, $(strip $(MSC_ENABLE)))
 	APP_DEFS += -DMSC_ENABLE
 endif
 
+ifeq (yes, $(strip $(AUDIO_ENABLE)))
+	SRCS += $(MAIN_DIR)/usb/audiousb.c
+	APP_DEFS += -DAUDIO_ENABLE
+endif
+
 ifeq (yes, $(strip $(VIAL_ENABLE)))
 	INCS += $(MAIN_DIR)/vial
 	SRCS += $(MAIN_DIR)/vial/vial_porting.c

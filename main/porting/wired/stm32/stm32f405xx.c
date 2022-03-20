@@ -42,7 +42,7 @@ DMA_HandleTypeDef hdma_tim1_ch3;
 
 RTC_HandleTypeDef hrtc;
 
-#if 0
+#if 1
 #ifdef TINYUSB_ENABLE
 void OTG_FS_IRQHandler(void)
 {
