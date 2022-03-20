@@ -47,7 +47,7 @@
 #define RGB_SEGMENT_NUM 1
 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
-#define DEBOUNCE        5
+#define DEBOUNCE        0
 
 #define VECT_TAB_OFFSET 0x20000
 #define HSE_VALUE       16000000
