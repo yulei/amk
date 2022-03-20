@@ -185,6 +185,27 @@ bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t t
     return true;
 }
 
+static uint8_t ff_buf[1024];
+static tu_fifo_t *cur_ff = NULL;
+static bool ff_valid = false;
+
+bool dcd_edpt_xfer_fifo(uint8_t rhport, uint8_t ep_addr, tu_fifo_t * ff, uint16_t total_bytes)
+{
+    if (total_bytes > 1024) {
+        amk_printf("XFER fifo oversize, ep:%d, size:%d\n", ep_addr, total_bytes);
+        return false;
+    }
+
+    uint8_t const dir = tu_edpt_dir(ep_addr);
+    if (dir == TUSB_DIR_OUT) {
+        cur_ff = ff;
+        ff_valid = true;
+    } else {
+        tu_fifo_read_n(ff, ff_buf, total_bytes);
+    }
+    return dcd_edpt_xfer(rhport, ep_addr, ff_buf, total_bytes);
+}
+
 void dcd_edpt_stall(uint8_t rhport, uint8_t ep_addr)
 {
     HAL_PCD_EP_SetStall(&dcd_usb, ep_addr);
@@ -203,6 +224,11 @@ void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef *usb, uint8_t epnum)
     //if (last_out_size==0) {
     //    dcd_event_xfer_complete(0, epnum, 0, XFER_RESULT_SUCCESS, true); 
     //} else {
+        if (ff_valid) {
+            int readed = HAL_PCD_EP_GetRxCount(usb, epnum);
+            tu_fifo_write_n(cur_ff, ff_buf,  readed);
+            ff_valid = false;
+        }
         dcd_event_xfer_complete(0, epnum, HAL_PCD_EP_GetRxCount(usb, epnum), XFER_RESULT_SUCCESS, true); 
     //}
 }
