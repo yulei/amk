@@ -73,7 +73,10 @@ INCS += \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Inc/Legacy \
 	$(VENDOR_DIR)/device_$(MCU_SERIES)/Include \
 	$(VENDOR_DIR)/cmsis/Core/Include \
-	$(VENDOR_DIR)/cmsis/DSP/Include
+
+ifeq (yes, $(strip $(AUDIO_ENABLE)))
+include $(LIB_DIR)/cmsis_dsp.mk
+endif
 
 APP_DEFS += -DUSE_HAL_DRIVER
 
