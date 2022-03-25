@@ -20,7 +20,7 @@
 #include "amk_boot.h"
 
 #ifdef SCREEN_ENABLE
-#include "screen.h"
+#include "render.h"
 #endif
 
 #ifdef MSC_ENABLE
@@ -84,11 +84,6 @@ void board_init(void)
     amk_printf("amk_init\n");
     amk_init();
     amk_printf("board_init end\n");
-
-#ifdef RF_ENABLE
-    rf_driver_init(true);
-    amk_printf("rf_driver_initend\n");
-#endif
 }
 
 
@@ -123,7 +118,7 @@ void board_task(void)
 #endif
 
 #ifdef SCREEN_ENABLE
-    screen_task();
+    render_task();
 #endif
 
 #ifdef RGB_ENABLE
@@ -149,12 +144,19 @@ static void amk_init(void)
     audio_init();
 #endif
 
+#ifdef SCREEN_ENABLE
+    amk_printf("render_init\n");
+    render_init();
+#endif
+
     amk_printf("keyboard_init\n");
     keyboard_init();
     boot_init();
     host_set_driver(&amk_driver);
     amk_keymap_init();
+
 #ifdef RF_ENABLE
+    amk_printf("rf_driver_init\n");
     rf_driver_init(true);
 #endif
 }

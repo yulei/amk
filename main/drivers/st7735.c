@@ -167,8 +167,8 @@ static const uint8_t
       100 };                  //     100 ms delay
 
 typedef struct {
-    spi_lcd_param_t param;
-    spi_handle_t    spi;
+    screen_driver_param_t param;
+    spi_handle_t          spi;
 } st7735_t;
 
 static st7735_t st7735_driver;
@@ -252,22 +252,21 @@ static void set_address_window(st7735_t *driver, uint8_t x0, uint8_t y0, uint8_t
     write_command(driver, ST7735_RAMWR);
 }
 
-void st7735_config(spi_lcd_param_t *param, spi_lcd_driver_t* lcd)
+void st7735_config(screen_driver_t *driver, screen_driver_param_t *param)
 {
     st7735_driver.param = *param;
     st7735_driver.spi = spi_init(ST7735_SPI_ID);
 
-    lcd->data = &st7735_driver;
-    lcd->init = st7735_init;
-    lcd->uninit = st7735_uninit;
-    lcd->fill = st7735_fill;
-    lcd->fill_rect = st7735_fill_rect;
-    lcd->fill_rect_async = st7735_fill_rect_async;
-    lcd->fill_ready = st7735_fill_ready;
-    lcd->release = st7735_release;
+    driver->data        = &st7735_driver;
+    driver->init        = st7735_init;
+    driver->uninit      = st7735_uninit;
+    driver->fill        = st7735_fill_rect;
+    driver->fill_async  = st7735_fill_rect_async;
+    driver->ready       = st7735_fill_ready;
+    driver->release     = st7735_release;
 }
 
-void st7735_init(spi_lcd_driver_t *lcd)
+void st7735_init(screen_driver_t *lcd)
 {
     st7735_t *driver = (st7735_t*)lcd->data;
     //st7735_driver.param = *param;
@@ -287,7 +286,7 @@ void st7735_init(spi_lcd_driver_t *lcd)
     st7735_unselect(driver);
 }
 
-void st7735_fill_rect(spi_lcd_driver_t *lcd, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const void *data, size_t size)
+void st7735_fill_rect(screen_driver_t *lcd, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const void *data, size_t size)
 {
     st7735_t *driver = (st7735_t*)lcd->data;
     st7735_select(driver);
@@ -296,7 +295,7 @@ void st7735_fill_rect(spi_lcd_driver_t *lcd, uint32_t x, uint32_t y, uint32_t w,
     st7735_unselect(driver);
 }
 
-void st7735_fill_rect_async(spi_lcd_driver_t *lcd, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const void *data, size_t size)
+void st7735_fill_rect_async(screen_driver_t *lcd, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const void *data, size_t size)
 {
     st7735_t *driver = (st7735_t*)lcd->data;
     st7735_select(driver);
@@ -305,22 +304,22 @@ void st7735_fill_rect_async(spi_lcd_driver_t *lcd, uint32_t x, uint32_t y, uint3
     //st7735_unselect(driver);
 }
 
-bool st7735_fill_ready(spi_lcd_driver_t *lcd)
+bool st7735_fill_ready(screen_driver_t *lcd)
 {
     st7735_t *driver = (st7735_t*)lcd->data;
     return spi_ready(driver->spi);
 }
 
-void st7735_release(spi_lcd_driver_t *lcd)
+void st7735_release(screen_driver_t *lcd)
 {
     st7735_t *driver = (st7735_t*)lcd->data;
     st7735_unselect(driver);
 }
 
-void st7735_fill(spi_lcd_driver_t *lcd, const void* data)
+void st7735_fill(screen_driver_t *lcd, const void* data)
 {
     st7735_fill_rect(lcd, 0, 0, ST7735_WIDTH, ST7735_HEIGHT, data, ST7735_WIDTH*ST7735_HEIGHT*2);
 }
 
-void st7735_uninit(spi_lcd_driver_t *lcd)
+void st7735_uninit(screen_driver_t *lcd)
 {}

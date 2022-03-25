@@ -42,5 +42,5 @@ struct spi_lcd_driver {
     void *data;
 };
 
-spi_lcd_driver_t* sp_lcd_create(spi_lcd_type_t type, spi_lcd_param_t param);
+spi_lcd_driver_t* spi_lcd_create(spi_lcd_type_t type, spi_lcd_param_t param);
 void spi_lcd_destroy(spi_lcd_driver_t *spi_lcd_driver);

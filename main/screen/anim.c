@@ -65,6 +65,7 @@ struct anim_t {
 
 static anim_t anim_inst[ANIM_TYPE_MAX];
 static FATFS flashfs;
+static bool flashfs_mounted = false;
 
 static bool anim_init(anim_t *anim);
 static void anim_scan(anim_t *anim);
@@ -76,9 +77,15 @@ bool anim_mount(bool mount)
 {
     FRESULT res = FR_OK;
     if (mount) {
+        if (flashfs_mounted) return true;
+
         res = f_mount(&flashfs, "", 1);
+        if (res == FR_OK) flashfs_mounted = true;
     } else {
+        if (!flashfs_mounted) return true;
+
         res = f_unmount("");
+        flashfs_mounted = false;
     }
     return (res == FR_OK);
 }

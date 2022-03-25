@@ -1,9 +1,9 @@
 /**
- * @file spi_lcd.c
+ * @file screen_driver.c
  * 
  */
 
-#include "spi_lcd.h"
+#include "screen_driver.h"
 #include "st7735.h"
 #include "st7789.h"
 #include "rm67160.h"
@@ -45,7 +45,7 @@ static bool driver_init(spi_lcd_type_t type, spi_lcd_obj_t *obj)
     return false;
 }
 
-spi_lcd_driver_t* sp_lcd_create(spi_lcd_type_t type, spi_lcd_param_t param)
+spi_lcd_driver_t* spi_lcd_create(spi_lcd_type_t type, spi_lcd_param_t param)
 {
     spi_lcd_obj_t *obj = NULL;
     for (int i = 0; i < SCREEN_NUM; i++) {

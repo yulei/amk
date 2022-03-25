@@ -18,7 +18,8 @@ endif
 ifeq (yes, $(strip $(SCREEN_ENABLE)))
 	APP_DEFS += -DSCREEN_ENABLE
 	SRCS += $(MAIN_DIR)/drivers/spi.c
-	SRCS += $(MAIN_DIR)/drivers/spi_lcd.c
+	#SRCS += $(MAIN_DIR)/drivers/spi_lcd.c
+	SRCS += $(MAIN_DIR)/drivers/screen_driver.c
 
 	ifeq (RM67160, $(strip $(SCREEN_DRIVER)))
 		APP_DEFS += -DSCREEN_DRIVER_RM67160
@@ -32,7 +33,10 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 			SRCS += $(MAIN_DIR)/drivers/st7735.c
 		endif
 	endif
+	SRCS += $(MAIN_DIR)/screen/render.c
 	SRCS += $(MAIN_DIR)/screen/screen.c
+	SRCS += $(MAIN_DIR)/screen/display.c
+	SRCS += $(MAIN_DIR)/screen/anim_display.c
 endif
 
 ifeq (yes, $(strip $(RGB_LINEAR_ENABLE)))

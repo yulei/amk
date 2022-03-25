@@ -14,6 +14,8 @@
 #if defined(NRF52832_XXAA) || defined(NRF52840_XXAA)
     #include "nrf_gpio.h"
     typedef uint32_t pin_t;
+    #define INVALID_PIN 0xFFFFFFFF
+
     #define P0_0 NRF_GPIO_PIN_MAP(0,0)
     #define P0_1 NRF_GPIO_PIN_MAP(0,1)
     #define P0_2 NRF_GPIO_PIN_MAP(0,2)
@@ -83,6 +85,7 @@
 #elif defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F722xx) || defined(STM32F103xB) || defined(STM32L432xx) || defined(STM32L072xx) || defined(STM32F446xx)
     #include "generic_hal.h"
 
+    #define INVALID_PIN 0xFFFFFFFF
     typedef uint32_t pin_t;
 
     #define PIN_BIT(pin, pos) ((((pin)>>(pos))&1) == 1 ? (pos) : (pin))

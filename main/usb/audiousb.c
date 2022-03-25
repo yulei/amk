@@ -56,7 +56,6 @@ enum {
 
 #define AUDIO_BUFFER_SIZE   (48*16)
 #define AUDIO_FFT_SIZE      256
-//#define ARM_CFFT            arm_cfft_sR_q15_len256
 #define ARM_CFFT            arm_cfft_sR_f32_len256
 
 arm_cfft_radix4_instance_f32 arm_cfft;
