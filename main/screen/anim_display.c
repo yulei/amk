@@ -50,7 +50,7 @@ static bool anim_display_init(display_t *display, screen_t *screen)
     anim_display_obj_t *obj = (anim_display_obj_t*)display->data;
     obj->screen = screen;
     obj->buffer_size = obj->param.width*obj->param.height*2;
-    obj->buffer = render_buffer_allocate(obj->buffer_size);
+    obj->buffer = screen->get_buffer(screen);
     memset(obj->buffer, 0, obj->buffer_size);
     obj->ticks = timer_read32();
     obj->delay = 0;
@@ -156,7 +156,7 @@ bool anim_display_create(display_t *display, display_param_t *param)
         obj->display = display;
         obj->param = *param;
         obj->used = 1;
-        obj->enabled = true;
+        obj->enabled = param->enabled;
 
         display->data = obj;
         display->init = anim_display_init;

@@ -57,6 +57,7 @@ typedef struct {
     uint32_t    height;
     uint8_t     file_type;
     uint8_t     audio_format;
+    uint8_t     enabled;
 } display_param_t;
 
 typedef struct screen_driver_s screen_driver_t;
@@ -79,6 +80,7 @@ typedef struct screen_s {
     void (*uninit)(screen_t *screen);
     void (*fill_rect)(screen_t *screen, uint32_t x, uint32_t y, uint32_t width, uint32_t height, const void *data, uint32_t size);
     void (*fill_rect_async)(screen_t *screen, uint32_t x, uint32_t y, uint32_t width, uint32_t height, const void *data, uint32_t size);
+    uint8_t* (*get_buffer)(screen_t *screen);
     bool (*ready)(screen_t *screen);
     bool (*test)(screen_t *screen);
     void *data;

@@ -5,6 +5,7 @@
 
 #include "display.h"
 #include "anim_display.h"
+#include "audio_display.h"
 
 typedef struct {
     screen_t        *screen;
@@ -21,7 +22,7 @@ static bool display_init(display_t *display, display_param_t *param)
     case ANIM_DISPLAY:
         return anim_display_create(display, param);
     case AUDIO_DISPLAY:
-        break;
+        return audio_display_create(display, param);
     default:
         break;
     }

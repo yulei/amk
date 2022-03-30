@@ -32,7 +32,7 @@ static void init_displays(void)
 {
     for (int i = 0; i < DISPLAY_NUM; i++) {
         displays[i] = display_create(&display_params[i]);
-        displays[i]->init(displays[i], screens[i]);
+        displays[i]->init(displays[i], screens[display_params[i].screen]);
     }
 }
 

@@ -37,6 +37,7 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/screen.c
 	SRCS += $(MAIN_DIR)/screen/display.c
 	SRCS += $(MAIN_DIR)/screen/anim_display.c
+	SRCS += $(MAIN_DIR)/screen/audio_display.c
 endif
 
 ifeq (yes, $(strip $(RGB_LINEAR_ENABLE)))

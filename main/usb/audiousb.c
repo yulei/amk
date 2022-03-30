@@ -9,6 +9,7 @@
 #include "arm_const_structs.h"
 
 #include "audiousb.h"
+#include "ring_buffer.h"
 #include "amk_printf.h"
 
 #ifndef AUDIO_DEBUG
@@ -55,7 +56,9 @@ enum {
 //#define ARM_CFFT            arm_cfft_sR_q15_len128
 
 #define AUDIO_BUFFER_SIZE   (48*16)
+#ifndef AUDIO_FFT_SIZE
 #define AUDIO_FFT_SIZE      256
+#endif
 #define ARM_CFFT            arm_cfft_sR_f32_len256
 
 arm_cfft_radix4_instance_f32 arm_cfft;
@@ -154,6 +157,10 @@ void fft_test(float32_t *work_buf, float32_t *results)
     output_mag_data_f32(results, AUDIO_FFT_SIZE);
 }
 
+extern ring_buffer_t audio_buffer;
+
+#define RESULTS_SIZE (AUDIO_FFT_SIZE/2)
+
 void audio_task(void)
 {
     static float32_t work_buf[AUDIO_FFT_SIZE*2];
@@ -167,7 +174,6 @@ void audio_task(void)
         audio_state.valid -= AUDIO_FFT_SIZE;
         audio_state.offset = (audio_state.offset + AUDIO_FFT_SIZE) % AUDIO_BUFFER_SIZE;
 
-#if 1
         /* Process the data through the CFFT/CIFFT module */
         arm_cfft_radix4_init_f32(&arm_cfft, AUDIO_FFT_SIZE, 0, 1);
         arm_cfft_radix4_f32(&arm_cfft, work_buf);
@@ -176,11 +182,16 @@ void audio_task(void)
         /* Process the data through the Complex Magnitude Module for
         calculating the magnitude at each bin */
         arm_cmplx_mag_f32(work_buf, results, AUDIO_FFT_SIZE);
-        //arm_cmplx_mag_f32(work_buf, results, AUDIO_FFT_SIZE);
+    #if 0
         output_mag_data_f32(results, AUDIO_FFT_SIZE);
-#else
-        fft_test(work_buf, results);
-#endif
+    #else
+        if (rb_free_count(&audio_buffer) >= RESULTS_SIZE*sizeof(float32_t)) {
+            rb_write(&audio_buffer, (uint8_t*)&results, RESULTS_SIZE*sizeof(float32_t));
+            audio_debug("Audio data write to ring buffer: count=%d, size=%d\r\n", RESULTS_SIZE, RESULTS_SIZE*sizeof(float32_t));
+        } else {
+            audio_debug("Audio data dropped due to ring buffer full\r\n");
+        }
+    #endif
     }
 }
 
@@ -351,11 +362,26 @@ bool tud_audio_set_itf_cb(uint8_t rhport, tusb_control_request_t const * p_reque
     return true;
 }
 
+#define TMP_PACKET_LEN  48
+
 bool tud_audio_rx_done_pre_read_cb(uint8_t rhport, uint16_t n_bytes_received, uint8_t func_id, uint8_t ep_out, uint8_t cur_alt_setting)
 {
     (void)rhport;
     (void)func_id;
     (void)cur_alt_setting;
+
+    if (audio_state.valid >= AUDIO_BUFFER_SIZE) {
+        // buffer full just drop current
+        uint8_t packet[TMP_PACKET_LEN];
+        for (int i = 0; i < n_bytes_received/TMP_PACKET_LEN; i++) {
+            tud_audio_read(packet, TMP_PACKET_LEN);
+        }
+        if (n_bytes_received%TMP_PACKET_LEN) {
+            tud_audio_read(packet, n_bytes_received%TMP_PACKET_LEN);
+        }
+        audio_debug("Audio data dropped: ep=%d, received=%d\r\n", ep_out, n_bytes_received);
+        return true;
+    }
 
     int32_t readed = tud_audio_read(&audio_state.buffer[audio_state.offset], n_bytes_received);
     audio_state.valid += readed / 2;

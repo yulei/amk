@@ -7,6 +7,8 @@
 typedef struct {
     screen_driver_t*    driver;
     screen_param_t      param;
+    uint8_t*            buffer;
+    uint32_t            buffer_size;
     screen_t            screen;
     uint8_t             used;
 } screen_obj_t;
@@ -18,6 +20,11 @@ static bool screen_init(screen_t *screen, screen_driver_t *driver)
     screen_obj_t *obj = (screen_obj_t*)screen->data;
 
     obj->driver = driver;
+    obj->buffer_size = obj->param.width*obj->param.height*2;
+    obj->buffer = render_buffer_allocate(obj->buffer_size);
+    if (!obj->buffer) {
+        return false;
+    }
 
     return true;
 }
@@ -51,6 +58,13 @@ static bool screen_ready(screen_t *screen)
     return false;
 }
 
+static uint8_t* screen_get_buffer(screen_t *screen)
+{
+    screen_obj_t *obj = (screen_obj_t*)screen->data;
+
+    return obj->buffer;
+}
+
 static bool screen_test(screen_t *screen)
 {
     screen_obj_t *obj = (screen_obj_t*)screen->data;
@@ -74,11 +88,13 @@ screen_t* screen_create(screen_param_t *param)
         obj->used = 1;
         obj->param = *param;
 
+
         obj->screen.data = obj;
         obj->screen.init = screen_init;
         obj->screen.uninit = screen_uninit;
         obj->screen.fill_rect = screen_fill_rect;
         obj->screen.fill_rect_async = screen_fill_rect_async;
+        obj->screen.get_buffer = screen_get_buffer;
         obj->screen.ready = screen_ready;
         obj->screen.test = screen_test;
 
