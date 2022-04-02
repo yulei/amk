@@ -395,11 +395,14 @@ uint8_t const* tud_descriptor_configuration_cb(uint8_t index)
         return desc_with_msc;
     }
 
-    if (usb_setting & USB_VIAL_BIT) {
-        return desc_with_vial;
+    if (usb_setting & USB_AUDIO_BIT) {
+        return desc_with_audio;
     }
 
-    return desc_with_audio;
+    //if (usb_setting & USB_VIAL_BIT) {
+        return desc_with_vial;
+    //}
+
 #endif
 
     return desc_configuration;
@@ -412,11 +415,14 @@ uint32_t tud_descriptor_configuration_size(uint8_t index)
         return sizeof(desc_with_msc);
     }
 
-    if (usb_setting & USB_VIAL_BIT) {
-        return sizeof(desc_with_vial);
+    if (usb_setting & USB_AUDIO_BIT) {
+        return sizeof(desc_with_audio);
     }
 
-    return sizeof(desc_with_audio);
+    //if (usb_setting & USB_VIAL_BIT) {
+        return sizeof(desc_with_vial);
+    //}
+
 #endif
     return sizeof(desc_configuration);
 }

@@ -23,6 +23,12 @@
 #define audio_debug(...)
 #endif
 
+#define AUDIO_FREQ_SIZE     12
+
+#ifndef AUDIO_DISPLAY_DELAY
+#define AUDIO_DISPLAY_DELAY 60
+#endif
+
 enum {
     MODE_BAR,
     MODE_MAX
@@ -57,7 +63,7 @@ static bool audio_display_init(display_t *display, screen_t *screen)
     rb_init(&audio_buffer, audio_data, AUDIO_FFT_BUFFER_SIZE);
 
     obj->ticks = timer_read32();
-    obj->delay = 60;
+    obj->delay = AUDIO_DISPLAY_DELAY;
 
     return true;
 }
@@ -72,7 +78,7 @@ typedef struct {
     uint16_t last;
 } audio_freq_index_t;
 
-const audio_freq_index_t audio_freqs[] = {
+const audio_freq_index_t audio_freqs[AUDIO_FREQ_SIZE] = {
     {1,2},
     {2,3},
     {3,4},
@@ -89,7 +95,7 @@ const audio_freq_index_t audio_freqs[] = {
 
 static void convert_audio_data(float const* src, uint8_t *out)
 {
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < AUDIO_FREQ_SIZE; i++) {
         float value = 0.0;
         uint32_t index = 0;
 
@@ -118,15 +124,13 @@ static void draw_audio_frame(uint8_t *buffer, uint32_t width, uint32_t height, u
 {
     memset(buffer, 0, width*height*2);
 
-    for (int i = 0; i < 12; i++) {
-        draw_audio_rect(buffer, i*10, 10, results[i], width, height);
+    for (int i = 0; i < AUDIO_FREQ_SIZE; i++) {
+        draw_audio_rect(buffer, AUDIO_BAR_OFFSET+AUDIO_BAR_WIDTH*i, AUDIO_BAR_WIDTH, results[i], width, height);
     }
 }
 
 void audio_display_task(display_t *display)
 {
-    //return ;
-
     audio_display_obj_t *obj = (audio_display_obj_t*)display->data;
 
     if (!obj->enabled) return;
@@ -147,7 +151,6 @@ void audio_display_task(display_t *display)
         obj->screen->fill_rect(obj->screen, 0, 0, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
         obj->ticks = timer_read32();
     }
-
 }
 
 void audio_display_set_enable(display_t *display, bool enable)

@@ -21,8 +21,10 @@ static bool display_init(display_t *display, display_param_t *param)
     switch (param->type) {
     case ANIM_DISPLAY:
         return anim_display_create(display, param);
+#ifdef AUDIO_ENABLE
     case AUDIO_DISPLAY:
         return audio_display_create(display, param);
+#endif
     default:
         break;
     }
