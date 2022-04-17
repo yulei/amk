@@ -25,7 +25,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                  KC_LGUI,  KC_LALT,                 KC_FN1,                                          KC_RALT,  KC_RCTL),
     [1]=LAYOUT_default(
         _______,   KC_F1,   KC_F3,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,  KC_F10,  KC_F11,  KC_F12, _______, KC_PSCR,
-        KC_BTLD,  KC_FN2,  KC_FN3,  KC_FN5, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+        KC_BTLD,  KC_FN2,  KC_FN3,  KC_FN5, _______, _______, _______, _______, _______, _______, _______, _______, _______,  KC_DEL,
         KC_CAPS, KC_VOLU, KC_VOLD, KC_CALC, _______, _______, KC_LEFT, KC_DOWN,   KC_UP,KC_RIGHT, _______, _______,          _______,
         _______,  KC_F21,  KC_F22,  KC_F23,  KC_F24, _______, _______, _______, _______, _______, _______,          _______, _______,
                  _______, _______,                   _______,                                                       _______,_______),

@@ -10,11 +10,11 @@
 #include "ws2812.h"
 
 #ifndef PWM_TIM
-#define PWM_TIM htim1
+#error "pwm time must been defined"
 #endif
 
 #ifndef PWM_TIM_CHANNEL
-#define PWM_TIM_CHANNEL TIM_CHANNEL_3
+#error "pwm time channel been defined"
 #endif
 
 #ifndef PWM_TIM_PERIOD

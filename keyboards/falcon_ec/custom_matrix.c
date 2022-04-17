@@ -18,13 +18,15 @@
 #define custom_matrix_debug(...)
 #endif
 
+#define CLEANUP_DELAY   30
+
 #define COL_A_MASK  0x01
 #define COL_B_MASK  0x02
 #define COL_C_MASK  0x04
-#define L_MASK   0x08
-#define R_MASK  0x10
+#define L_MASK      0x08
+#define R_MASK      0x10
 
-static pin_t custom_row_pins[] = {ROW_1_PIN, ROW_2_PIN, ROW_3_PIN, ROW_4_PIN};
+static pin_t custom_row_pins[] = {ROW_1_PIN, ROW_3_PIN, ROW_2_PIN, ROW_4_PIN};
 static pin_t custom_col_pins[] = {L_MASK|3, L_MASK|0, L_MASK|1, L_MASK|2, L_MASK|4, L_MASK|6, L_MASK|7, L_MASK|5,
                                   R_MASK|3, R_MASK|0, R_MASK|1, R_MASK|2, R_MASK|4, R_MASK|6, R_MASK|7};
 
@@ -101,7 +103,7 @@ static bool sense_key(pin_t row)
 {
     bool key_down = false;
     gpio_write_pin(DISCHARGE_PIN, 0);
-    wait_us(1);
+    wait_us(2);
     gpio_write_pin(row, 1);
     uint32_t data = adc_read();
     if (data > SENSE_TH) {
@@ -114,7 +116,7 @@ static bool sense_key(pin_t row)
     // clean up
     gpio_write_pin(row, 0);
     gpio_write_pin(DISCHARGE_PIN, 1);
-    wait_us(30);
+    wait_us(CLEANUP_DELAY);
     return key_down;
 }
 

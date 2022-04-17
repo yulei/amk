@@ -39,9 +39,11 @@
 #define CAPS_LED_PIN    A8
 #define WS2812_LED_NUM  4
 #define WS2812_LED_PIN  B7
-#define PWM_TIM_PERIOD  119
-#define PWM_TIM         htim4
-#define PWM_TIM_CHANNEL TIM_CHANNEL_2
+
+#define USE_PWM_TIM4
+#define PWM_TIM_PERIOD      119
+#define PWM_TIM             htim4
+#define PWM_TIM_CHANNEL     TIM_CHANNEL_2
 
 #define RGB_LED_NUM     (4+12)
 #define RGB_DEVICE_NUM  2

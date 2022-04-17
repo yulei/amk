@@ -39,15 +39,18 @@
 
 #define WS2812_LED_NUM  4
 #define WS2812_LED_PIN  B7
-#define PWM_TIM_PERIOD  119
-#define PWM_TIM         htim4
-#define PWM_TIM_CHANNEL TIM_CHANNEL_2
+
+#define USE_PWM_TIM4
+#define PWM_TIM_PERIOD      119
+#define PWM_TIM             htim4
+#define PWM_TIM_CHANNEL     TIM_CHANNEL_2
+
 #define RGB_LED_NUM     4
 #define RGB_DEVICE_NUM  1
 #define RGB_SEGMENT_NUM 1
 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
-#define DEBOUNCE        0
+#define DEBOUNCE        5
 
 #define VECT_TAB_OFFSET 0x20000
 #define HSE_VALUE       16000000

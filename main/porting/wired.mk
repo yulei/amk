@@ -34,3 +34,7 @@ endif
 ifneq (,$(filter $(strip $(MCU)),$(ATSAMD_MCUS)))
 	include $(MAIN_DIR)/porting/wired/atsamd.mk
 endif
+
+ifneq (,$(filter $(strip $(MCU)),$(HC32_MCUS)))
+	include $(MAIN_DIR)/porting/wired/hc32.mk
+endif

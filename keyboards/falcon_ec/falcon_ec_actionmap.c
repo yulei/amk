@@ -20,7 +20,7 @@ const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS] = {
                  AC_LGUI,  AC_LALT,                 AC_FN1,                                          AC_RALT,  AC_RCTL),
     [1]=LAYOUT_default(
         _______,   AC_F1,   AC_F3,   AC_F3,   AC_F4,   AC_F5,   AC_F6,   AC_F7,   AC_F8,   AC_F9,  AC_F10,  AC_F11,  AC_F12, _______, AC_PSCR,
-        AC_BTLD,  AC_FN2,  AC_FN3,  AC_FN5, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+        AC_BTLD,  AC_FN2,  AC_FN3,  AC_FN5, _______, _______, _______, _______, _______, _______, _______, _______, _______,  AC_DEL,
         AC_CAPS, AC_VOLU, AC_VOLD, AC_CALC, _______, _______, AC_LEFT, AC_DOWN,   AC_UP,AC_RIGHT, _______, _______,          _______,
         _______,  AC_F21,  AC_F22,  AC_F23,  AC_F24, _______, _______, _______, _______, _______, _______,          _______, _______,
                  _______, _______,                   _______,                                                       _______,_______),

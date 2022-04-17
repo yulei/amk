@@ -41,9 +41,14 @@ DMA_HandleTypeDef hdma_usart1_tx;
 ADC_HandleTypeDef hadc1;
 #endif
 
-#ifdef PWM_TIM
+#ifdef USE_PWM_TIM4
 TIM_HandleTypeDef htim4;
 DMA_HandleTypeDef hdma_tim4_ch2;
+#endif
+
+#ifdef USE_PWM_TIM1
+TIM_HandleTypeDef htim1;
+DMA_HandleTypeDef hdma_tim1_ch1;
 #endif
 
 void OTG_FS_IRQHandler(void)
@@ -219,7 +224,7 @@ static void MX_USART1_UART_Init(void)
 #endif
 
 
-#ifdef PWM_TIM
+#ifdef USE_PWM_TIM4
 extern void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 static void MX_TIM4_Init(void)
 {
@@ -255,6 +260,62 @@ static void MX_TIM4_Init(void)
 }
 #endif
 
+#ifdef USE_PWM_TIM1
+extern void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+static void MX_TIM1_Init(void)
+{
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
+  TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
+
+  /* USER CODE BEGIN TIM1_Init 1 */
+
+  /* USER CODE END TIM1_Init 1 */
+  htim1.Instance = TIM1;
+  htim1.Init.Prescaler = 0;
+  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim1.Init.Period = 119;
+  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim1.Init.RepetitionCounter = 0;
+  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_PWM_Init(&htim1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
+  sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+  if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
+  sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
+  sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
+  sBreakDeadTimeConfig.DeadTime = 0;
+  sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
+  sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
+  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
+  if (HAL_TIMEx_ConfigBreakDeadTime(&htim1, &sBreakDeadTimeConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM1_Init 2 */
+
+  /* USER CODE END TIM1_Init 2 */
+  HAL_TIM_MspPostInit(&htim1);
+}
+#endif
 static void MX_DMA_Init(void)
 {
     /* DMA controller clock enable */
@@ -269,8 +330,14 @@ static void MX_DMA_Init(void)
     HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
     /* DMA1_Stream3_IRQn interrupt configuration */
+    #ifdef USE_PWM_TIM4
     HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+    #endif
+    #ifdef USE_PWM_TIM1
+    HAL_NVIC_SetPriority(DMA2_Stream1_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);
+    #endif
     /* DMA1_Stream4_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
@@ -363,8 +430,11 @@ void custom_board_init(void)
 #ifdef USE_UART1
     MX_USART1_UART_Init();
 #endif
-#ifdef PWM_TIM
+#ifdef USE_PWM_TIM4
     MX_TIM4_Init();
+#endif
+#ifdef USE_PWM_TIM1
+    MX_TIM1_Init();
 #endif
 #ifdef USE_ADC1
     MX_ADC1_Init();
