@@ -4,6 +4,7 @@
  */
 
 #include "render.h"
+#include "usb_common.h"
 #include "screen_driver.h"
 #include "screen.h"
 #include "display.h"
@@ -38,6 +39,8 @@ static void init_displays(void)
 
 void render_init(void)
 {
+    if (usb_setting & USB_MSC_BIT) return;
+
     init_screen_drivers();
     init_screens();
     init_displays();
@@ -45,6 +48,8 @@ void render_init(void)
 
 void render_task(void)
 {
+    if (usb_setting & USB_MSC_BIT) return;
+
     for (int i = 0; i < DISPLAY_NUM; i++) {
         displays[i]->task(displays[i]);
     }

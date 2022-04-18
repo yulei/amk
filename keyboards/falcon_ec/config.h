@@ -33,7 +33,7 @@
 #define KEY_IN_CHANNEL  ADC_CHANNEL_2
 #define KEY_IN_PIN      GPIO_PIN_2
 #define KEY_IN_PORT     GPIOA
-#define SENSE_TH        1124
+#define SENSE_TH        1128
 
 #define CAPS_LED_PIN    A6
 
@@ -51,6 +51,7 @@
 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
 #define DEBOUNCE        5
+//#define DWT_DELAY
 
 #define VECT_TAB_OFFSET 0x20000
 #define HSE_VALUE       16000000

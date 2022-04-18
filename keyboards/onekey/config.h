@@ -63,3 +63,6 @@
 //#define RGB_LED_NUM     24
 
 //#define VECT_TAB_OFFSET 0x20000
+
+#define XTAL_VALUE      16000000
+#define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
