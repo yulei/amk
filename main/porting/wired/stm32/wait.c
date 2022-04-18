@@ -21,8 +21,10 @@ void wait_ms(int ms)
 #ifdef DWT_DELAY
 void wait_us(int us)
 {
-    __IO int32_t ticks = DWT->CYCCNT + us * (SystemCoreClock/1000000);
-    while (DWT->CYCCNT <= ticks);
+    __IO uint32_t startTick = DWT->CYCCNT;
+    __IO uint32_t delayTicks = us * (SystemCoreClock/1000000);
+
+    while (DWT->CYCCNT - startTick < delayTicks);
 }
 #else
 void wait_us(int us)

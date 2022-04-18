@@ -5,26 +5,31 @@
 #include "generic_hal.h"
 #include "wait.h"
 
-static void DWT_Delay_Init(void);
-void system_init(void)
-{
-    HAL_Init();
-    DWT_Delay_Init();
-    //wait_ms(10000);
-#ifdef EECONFIG_FLASH 
-extern void fee_init(void);
-    fee_init();
+#ifdef DWT_DELAY
+#ifdef STM32L072xx
+#error "STM32L0 do not have DWT"
 #endif
-}
 
-static void DWT_Delay_Init(void)
+static void dwt_delay_init(void)
 {
-#ifndef STM32L072xx
     if (!(CoreDebug->DEMCR & CoreDebug_DEMCR_TRCENA_Msk)) {
         CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
         DWT->CYCCNT = 0;
         DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
     }
+}
+#endif
+
+void system_init(void)
+{
+    HAL_Init();
+#ifdef DWT_DELAY
+    dwt_delay_init();
+#endif
+    //wait_ms(10000);
+#ifdef EECONFIG_FLASH 
+extern void fee_init(void);
+    fee_init();
 #endif
 }
 

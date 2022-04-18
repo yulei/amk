@@ -18,7 +18,8 @@
 #define custom_matrix_debug(...)
 #endif
 
-#define CLEANUP_DELAY   25
+#define CLEANUP_DELAY  200
+#define ROW_WAIT       50
 
 #define COL_A_MASK  0x01
 #define COL_B_MASK  0x02
@@ -77,7 +78,7 @@ void matrix_init_custom(void)
     gpio_set_output_pushpull(OPA_EN_PIN);
     gpio_write_pin(OPA_EN_PIN, 1);
     gpio_set_output_pushpull(DISCHARGE_PIN);
-    gpio_write_pin(DISCHARGE_PIN, 0);
+    gpio_write_pin(DISCHARGE_PIN, 1);
 }
 
 extern ADC_HandleTypeDef hadc1;
@@ -105,6 +106,7 @@ static bool sense_key(pin_t row)
     gpio_write_pin(DISCHARGE_PIN, 0);
     wait_us(2);
     gpio_write_pin(row, 1);
+    wait_us(2);
     uint32_t data = adc_read();
     if (data > SENSE_TH) {
         key_down = true;
@@ -226,6 +228,7 @@ bool matrix_scan_custom(matrix_row_t* raw)
             gpio_write_pin(RIGHT_EN_PIN, 1);
         }
 
+        wait_us(ROW_WAIT);
         if (changed) {
             for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
                 custom_matrix_debug("row:%d-%x\n", row, matrix_get_row(row));
