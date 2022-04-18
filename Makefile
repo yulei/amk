@@ -4,7 +4,8 @@ NRF_MCUS := NRF52832 NRF52840
 STM32_MCUS := STM32F103 STM32F411 STM32F405 STM32F722 STM32L432 STM32L072 STM32F446
 ATSAMD_MCUS := ATSAMD21
 NUVOTON_MCUS := NUC126
-GD32_MCUS := GD32_E103 
+GD32_MCUS := GD32E103 
+HC32_MCUS := HC32F460
 
 # Source files
 SRCS += \
@@ -70,6 +71,9 @@ include sdk_nuvoton/nuvoton_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(GD32_MCUS)))
 VENDOR_DIR := libs/vendor/gigadevice
 include sdk_gd32/gd32_sdk.mk
+else ifneq (,$(filter $(strip $(MCU)),$(HC32_MCUS)))
+VENDOR_DIR := libs/vendor/hdsc
+include sdk_hc32/hc32_sdk.mk
 else
 $(error Unsupported MCU: $(MCU))
 endif
