@@ -3,11 +3,12 @@
  */
 
 #include "generic_hal.h"
+#include "gd32_util.h"
 #include "wait.h"
 
 void wait_ms(int ms)
 {
-    SysTick_Delay(ms);
+    systick_delay(ms);
 }
 
 void wait_us(int us)

@@ -38,3 +38,7 @@ endif
 ifneq (,$(filter $(strip $(MCU)),$(HC32_MCUS)))
 	include $(MAIN_DIR)/porting/wired/hc32.mk
 endif
+
+ifneq (,$(filter $(strip $(MCU)),$(GD32_MCUS)))
+	include $(MAIN_DIR)/porting/wired/gd32.mk
+endif
