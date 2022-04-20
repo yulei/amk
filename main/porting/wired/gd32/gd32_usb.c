@@ -8,13 +8,15 @@
 #include "generic_hal.h"
 #include "drv_usb_hw.h"
 #include "drv_usb_core.h"
-#include "usbh_hid_core.h"
 #include "amk_printf.h"
 
 #include "report.h"
 #include "wait.h"
 
-#if USB_HOST_ENABLE
+#ifdef USB_HOST_ENABLE
+#include "usbh_hid_core.h"
+#include "usbh_hid_mouse.h"
+
 usbh_host usb_host;
 static void usbh_user_init(void);
 static void usbh_user_deinit(void);
@@ -63,7 +65,7 @@ void amk_usb_init(void)
     usb_vbus_config();
 #ifdef USB_HOST_ENABLE
     usbh_class_register (&usb_host, &usbh_hid);
-    usbh_init (&usb_host, &usr_cb);
+    usbh_init (&usb_host, &user_cb);
     usb_intr_config ();
 #endif
 }
@@ -115,22 +117,27 @@ void usbh_user_init(void)
     if(0U == startup){
         startup = 1U;
     }
+    amk_printf("usbh_user_init:\n");
 }
 
 void usbh_user_device_connected(void)
 {
+    amk_printf("usbh_user_device_connected:\n");
 }
 
 void usbh_user_unrecovered_error (void)
 {
+    amk_printf("usbh_user_unrecovered_erro:\n");
 }
 
 void usbh_user_device_disconnected (void)
 {
+    amk_printf("usbh_user_device_disconnected:\n");
 }
 
 void usbh_user_device_reset(void)
 {
+    amk_printf("usbh_user_device_reset:\n");
 }
 
 void usbh_user_device_speed_detected(uint32_t device_speed)
@@ -140,15 +147,18 @@ void usbh_user_device_speed_detected(uint32_t device_speed)
     } else if(PORT_SPEED_LOW == device_speed) {
     } else {
     }
+    amk_printf("usbh_user_device_speed_detected:\n");
 }
 
 void usbh_user_device_desc_available(void *device_desc)
 {
-    usb_desc_dev *pDevStr = device_desc;
+    //usb_desc_dev *pDevStr = device_desc;
+    amk_printf("usbh_user_device_desc_available:\n");
 }
 
 void usbh_user_device_address_assigned(void)
 {
+    amk_printf("usbh_user_device_address_assigned:\n");
 }
 
 void usbh_user_configuration_descavailable(usb_desc_config *cfg_desc,
@@ -162,47 +172,75 @@ void usbh_user_configuration_descavailable(usb_desc_config *cfg_desc,
     } else if (0x03U == (*id).bInterfaceClass) {
 //        LCD_UsrLog("> HID device connected.\n");
     }
+    amk_printf("usbh_user_configuration_descavailable:\n");
 }
 
 void usbh_user_manufacturer_string(void *manufacturer_string)
 {
+    amk_printf("usbh_user_manufacturer_string:\n");
 }
 
 void usbh_user_product_string(void *product_string)
 {
+    amk_printf("usbh_user_product_string:\n");
 }
 
 void usbh_user_serialnum_string(void *serial_num_string)
 {
+    amk_printf("usbh_user_serialnum_string:\n");
 }
 
 void usbh_user_enumeration_finish(void)
 {
+    amk_printf("usbh_user_enumeration_finish:\n");
 }
 
 void usbh_user_device_not_supported(void)
 {
+    amk_printf("usbh_user_device_not_supported:\n");
 }
 
 usbh_user_status usbh_user_userinput(void)
 {
     usbh_user_status usbh_usr_status = USBH_USER_NO_RESP;
     
+    //amk_printf("usbh_user_userinput:\n");
     return usbh_usr_status;
 }
 
 void usbh_user_over_current_detected (void)
 {
+    amk_printf("usbh_user_over_current_detected:\n");
 }
 
 void usbh_user_deinit(void)
 {
-
+    amk_printf("usbh_user_over_deinit:\n");
 }
 
 int usbh_user_app(void)
 {
+    amk_printf("usbh_user_app:\n");
     return 0;
 }
 
+void USR_KEYBRD_Init (void)
+{
+    amk_printf("USR_KEYBRD_Init:\n");
+}
+
+void USR_KEYBRD_ProcessData (uint8_t data)
+{
+    amk_printf("USR_KEYBRD_ProcessData: %x\n", data);
+}
+
+void USR_MOUSE_Init (void)
+{
+    amk_printf("USR_MOUSE_Init:\n");
+}
+
+void USR_MOUSE_ProcessData (hid_mouse_info *data)
+{
+    amk_printf("USR_MOUSE_ProcessData:\n");
+}
 #endif

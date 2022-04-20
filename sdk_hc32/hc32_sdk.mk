@@ -63,10 +63,9 @@ include $(HC32SDK_DIR)/$(MCU_TYPE)_sdk.mk
 
 ifeq (yes, $(strip $(TINYUSB_ENABLE)))
 	include $(LIB_DIR)/tinyusb.mk
+	include $(HC32SDK_DIR)/dcd_usb.mk
 	APP_DEFS += -DTINYUSB_ENABLE
 endif
-
-include $(HC32SDK_DIR)/dcd_usb.mk
 
 LINKER_PATH	?= $(VENDOR_DIR)/$(HC32_DDL)/mcu/GCC/LinkerScript
 LINKER_SCRIPT := $(LINKER_PATH)/$(MCU_LD)_flash.ld
