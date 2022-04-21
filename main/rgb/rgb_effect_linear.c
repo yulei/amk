@@ -30,7 +30,7 @@
 #define DELAY_DEFAULT 15000
 
 #define RAINBOW_STEP_DEFAULT    32
-#define BREATH_STEP_DEFAULT     32
+#define BREATH_STEP_DEFAULT     0
 #define CIRCLE_STEP_DEFAULT     2
 
 typedef struct s_rgb_linear_state rgb_linear_state_t;
@@ -192,6 +192,7 @@ static void effects_mode_gradient(rgb_linear_state_t *state)
     for (int i = 0; i < state->led_num; i++) {
         effects_set_color(state, i, state->config->hue + i*step, state->config->sat, state->config->val);
     }
+
     //effects_state.config->hue += step;
 }
 
@@ -201,13 +202,19 @@ static void effects_mode_rainbow(rgb_linear_state_t *state)
     for (int i = 0; i < state->led_num; i++) {
         effects_set_color(state, i, state->config->hue + i*step, state->config->sat, state->config->val);
     }
-    state->config->hue += state->rainbow_step;
+
+    state->config->hue++;// += state->rainbow_step;
 }
 
+
+#include <math.h>
 static void effects_mode_breath(rgb_linear_state_t *state)
 {
-    uint8_t breath = VAL_MAX / state->breath_step;
+    uint8_t breath = (uint8_t)((exp(sin((state->breath_step / 255.0) * M_PI)) - 2 / M_E) * (255 / (M_E - 1 / M_E)));
+    effects_set_color_all(state, state->config->hue, state->config->sat, breath);
+    state->breath_step++;
 
+#if 0
     effects_set_color_all(state, state->config->hue, state->config->sat, state->config->val);
     uint8_t old_val = state->config->val;
     if (state->breath_dir) {
@@ -223,6 +230,7 @@ static void effects_mode_breath(rgb_linear_state_t *state)
             state->breath_dir = true;
         }
     }
+#endif
 }
 
 static void effects_mode_wipe(rgb_linear_state_t *state)
@@ -236,7 +244,7 @@ static void effects_mode_wipe(rgb_linear_state_t *state)
     if (state->counter == state->led_num) {
         state->counter = 0;
         state->wipe_on = !state->wipe_on;
-        state->config->hue += HUE_MAX/state->led_num;
+        state->config->hue++;// += HUE_MAX/state->led_num;
     }
 }
 
@@ -247,7 +255,7 @@ static void effects_mode_scan(rgb_linear_state_t *state)
     effects_set_color(state, state->counter, state->config->hue, state->config->sat, state->config->val);
     state->counter = (state->counter + 1) % state->led_num;
     if (state->counter == 0) {
-        state->config->hue += HUE_MAX/state->led_num;
+        state->config->hue++;// += HUE_MAX/state->led_num;
     }
 }
 
