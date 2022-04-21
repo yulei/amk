@@ -380,4 +380,9 @@ void hook_matrix_change(keyevent_t event)
     extern void hook_matrix_change_typing(keyevent_t event);
     hook_matrix_change_typing(event);
 #endif
+
+#ifdef SCREEN_ENABLE
+    extern void hook_matrix_change_screen(keyevent_t event);
+    hook_matrix_change_screen(event);
+#endif
 }

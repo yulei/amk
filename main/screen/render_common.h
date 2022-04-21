@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "keyboard.h"
 #include "amk_gpio.h"
 
 enum {
@@ -15,6 +16,7 @@ enum {
     SPI_LCD_ST7789,
     SPI_LCD_RM67160,
     SPI_LCD_SSD1357,
+    SPI_LCD_SSD1306,
 };
 
 enum {
@@ -27,7 +29,7 @@ enum {
     ANIM_DISPLAY,
     AUDIO_DISPLAY,
 //    INFO_DISPLAY,
-//    KEYBOARD_DISPLAY,
+    KEYBOARD_DISPLAY,
 };
 
 typedef struct {
@@ -83,6 +85,9 @@ typedef struct screen_s {
     uint8_t* (*get_buffer)(screen_t *screen);
     bool (*ready)(screen_t *screen);
     bool (*test)(screen_t *screen);
+    void (*draw_rect)(screen_t *screen, uint32_t x, uint32_t y, uint32_t width, uint32_t height);
+    void (*clear)(screen_t *screen);
+    void (*refresh)(screen_t *screen);
     void *data;
 } screen_t;
 
@@ -93,6 +98,7 @@ typedef struct display_s {
     void (*task)(display_t *display);
     void (*set_enable)(display_t *display, bool enable);
     bool (*is_enabled)(display_t *display);
+    void (*matrix_change)(display_t *display, keyevent_t event);
     void *data;
 } display_t;
 

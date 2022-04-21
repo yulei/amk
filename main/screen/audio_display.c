@@ -2,7 +2,8 @@
  *  @file audio_display.c
  */
 
-#ifdef AUDIO_ENABLE
+
+#if AUDIO_DISPLAY_NUM 
 
 #include <string.h>
 
@@ -12,6 +13,7 @@
 #include "ring_buffer.h"
 #include "timer.h"
 #include "amk_printf.h"
+
 
 #ifndef AUDIO_DEBUG
 #define AUDIO_DEBUG 1
@@ -188,10 +190,11 @@ bool audio_display_create(display_t *display, display_param_t *param)
         display->task = audio_display_task;
         display->set_enable = audio_display_set_enable;
         display->is_enabled = audio_display_is_enabled;
+        display->matrix_change = NULL;
         return true;
     }
 
     return false;
 }
 
-#endif // AUDIO_ENABLE
+#endif

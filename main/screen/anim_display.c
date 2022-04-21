@@ -2,6 +2,8 @@
  *  @file anim_display.c
  */
 
+#if ANIM_DISPLAY_NUM
+
 #include <string.h>
 
 #include "anim_display.h"
@@ -164,8 +166,11 @@ bool anim_display_create(display_t *display, display_param_t *param)
         display->task = anim_display_task;
         display->set_enable = anim_display_set_enable;
         display->is_enabled = anim_display_is_enabled;
+        display->matrix_change = NULL;
         return true;
     }
 
     return false;
 }
+
+#endif

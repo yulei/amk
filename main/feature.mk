@@ -29,8 +29,13 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 			APP_DEFS += -DSCREEN_DRIVER_ST7789
 			SRCS += $(MAIN_DIR)/drivers/st7789.c
 		else
-			APP_DEFS += -DSCREEN_DRIVER_ST7735
-			SRCS += $(MAIN_DIR)/drivers/st7735.c
+			ifeq (SSD1306, $(strip $(SCREEN_DRIVER)))
+				APP_DEFS += -DSCREEN_DRIVER_SSD1306
+				SRCS += $(MAIN_DIR)/drivers/ssd1306.c
+			else
+				APP_DEFS += -DSCREEN_DRIVER_ST7735
+				SRCS += $(MAIN_DIR)/drivers/st7735.c
+			endif
 		endif
 	endif
 	SRCS += $(MAIN_DIR)/screen/render.c
@@ -38,6 +43,7 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/display.c
 	SRCS += $(MAIN_DIR)/screen/anim_display.c
 	SRCS += $(MAIN_DIR)/screen/audio_display.c
+	SRCS += $(MAIN_DIR)/screen/keyboard_display.c
 endif
 
 ifeq (yes, $(strip $(RGB_LINEAR_ENABLE)))

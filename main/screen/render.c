@@ -76,3 +76,12 @@ uint8_t* render_buffer_allocate(uint32_t size)
 
     return p;
 }
+
+void hook_matrix_change_screen(keyevent_t event)
+{
+    for (int i = 0; i < DISPLAY_NUM; i++) {
+        if (displays[i]->matrix_change) {
+            displays[i]->matrix_change(displays[i], event);
+        }
+    }
+}
