@@ -41,8 +41,10 @@ static const uint8_t
     0x14, 0,
     0x20, 0,          // set page address mode
     0x02, 0,
-    0xA1, 0,          // set segment remap
-    0xC8, 0,          // COM scan direction
+    //0xA1, 0,          // set segment remap
+    0xA0, 0,          // set segment remap
+    //0xC8, 0,          // COM scan direction
+    0xC0, 0,          // COM scan direction
     0xDA, 0,          // set COM pins
     0x12, 0,
     0xAD, 0,          // internal IREF setting
@@ -95,11 +97,20 @@ static void write_data(ssd1306_t *driver, const uint8_t* buff, size_t buff_size)
     spi_send(driver->spi, buff, buff_size);
 }
 
-static void write_data_async(ssd1306_t *driver, const uint8_t* buff, size_t buff_size)
-{
-    gpio_write_pin(driver->param.dc, 1);
-    spi_send_async(driver->spi, buff, buff_size);
-}
+//static void write_data_async(ssd1306_t *driver, const uint8_t* buff, size_t buff_size)
+//{
+//    gpio_write_pin(driver->param.dc, 1);
+//    spi_send_async(driver->spi, buff, buff_size);
+//}
+
+//static void set_address_window(ssd1306_t *driver, uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
+//{
+    // column address set
+
+    // row address set
+
+    // write to RAM
+//}
 
 static void execute_commands(ssd1306_t *driver, const uint8_t *addr)
 {
@@ -126,15 +137,6 @@ static void execute_commands(ssd1306_t *driver, const uint8_t *addr)
             wait_ms(ms);
         }
     }
-}
-
-static void set_address_window(ssd1306_t *driver, uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
-{
-    // column address set
-
-    // row address set
-
-    // write to RAM
 }
 
 void ssd1306_config(screen_driver_t *driver, screen_driver_param_t *param)
@@ -196,9 +198,11 @@ void ssd1306_fill_rect(screen_driver_t *lcd, uint32_t x, uint32_t y, uint32_t w,
         write_command(driver, 0xb0+y);
         write_command(driver, 0x0c);
         write_command(driver, 0x11);
-        for (int x = 0; x < SSD1306_WIDTH; x++) {
-            write_data(driver, cur++, sizeof(*cur));
-        }
+        //for (int x = 0; x < SSD1306_WIDTH; x++) {
+        //    write_data(driver, cur++, sizeof(*cur));
+        //}
+        write_data(driver, cur, SSD1306_WIDTH);
+        cur += SSD1306_WIDTH;
     }
 
     ssd1306_unselect(driver);
@@ -206,11 +210,7 @@ void ssd1306_fill_rect(screen_driver_t *lcd, uint32_t x, uint32_t y, uint32_t w,
 
 void ssd1306_fill_rect_async(screen_driver_t *lcd, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const void *data, size_t size)
 {
-    return;
-    ssd1306_t *driver = (ssd1306_t*)lcd->data;
-    ssd1306_select(driver);
-    set_address_window(driver, x, y, x+w-1, y+h-1);
-    write_data_async(driver, data, size);
+    ssd1306_fill_rect(lcd, x, y, w, h, data, size);
 }
 
 bool ssd1306_fill_ready(screen_driver_t *lcd)

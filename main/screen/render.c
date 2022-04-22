@@ -55,6 +55,14 @@ void render_task(void)
     }
 }
 
+void render_toggle_display(uint8_t display)
+{
+    if (display < DISPLAY_NUM) {
+        bool enabled = displays[display]->is_enabled(displays[display]);
+        render_enable_display(display, !enabled);
+    }
+}
+
 void render_enable_display(uint8_t display, bool enable)
 {
     if (display < DISPLAY_NUM) {

@@ -15,4 +15,6 @@ void render_init(void);
 
 void render_task(void);
 
+void render_toggle_display(uint8_t display);
+
 void render_enable_display(uint8_t display, bool enable);

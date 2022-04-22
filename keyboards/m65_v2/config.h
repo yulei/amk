@@ -38,9 +38,9 @@
 #define SCREEN_DRIVER_NUM   1
 #define SCREEN_NUM          1
 #define DISPLAY_NUM         1
-//#define ANIM_DISPLAY_NUM    1
+#define ANIM_DISPLAY_NUM    1
 //#define AUDIO_DISPLAY_NUM   1
-#define KEYBOARD_DISPLAY_NUM 1
+//#define KEYBOARD_DISPLAY_NUM 1
 #define KEYBOARD_KEY_COUNT  66
 
 #define RENDER_BUFFER_SIZE  (72*40*2)

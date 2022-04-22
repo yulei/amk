@@ -4,9 +4,15 @@
  */
 
 #include "display.h"
+#if ANIM_DISPLAY_NUM
 #include "anim_display.h"
+#endif
+#if AUDIO_DISPLAY_NUM
 #include "audio_display.h"
+#endif
+#if KEYBOARD_DISPLAY_NUM
 #include "keyboard_display.h"
+#endif
 
 typedef struct {
     screen_t        *screen;

@@ -80,12 +80,14 @@ screen_driver_param_t screen_driver_params[SCREEN_DRIVER_NUM] = {
 
 screen_param_t screen_params[SCREEN_NUM] = {
     {0, 0, 72, 40, 0},
+//    {0, 0, 40, 40, 0},
 };
 
 display_param_t display_params[DISPLAY_NUM] = {
     // type, screen, width, height, file_type, audio_format, enable
-    {KEYBOARD_DISPLAY, 0, 72, 40, 0, 0, 1},
-//    {ANIM_DISPLAY, 0, 60, 60, ANM_FILE, 0, 1},
+//    {KEYBOARD_DISPLAY, 0, 72, 40, 0, 0, 1},
+    {ANIM_DISPLAY, 0, 72, 40, ANM_FILE, 0, 1},
+//    {ANIM_DISPLAY, 0, 40, 40, ANM_FILE, 0, 1},
 //    {AUDIO_DISPLAY, 0, 60, 60, 0, 0, 1},
 };
 const keyboard_key_t keyboard_keys[KEYBOARD_KEY_COUNT] = {
