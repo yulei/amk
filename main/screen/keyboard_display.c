@@ -227,7 +227,7 @@ void keyboard_display_task(display_t *display)
         for (int i = 0; i < KEYBOARD_KEY_COUNT; i++) {
             matrix_row_t row = matrix_get_row(keyboard_keys[i].pos.row);
             if (!(row&(1<<keyboard_keys[i].pos.col))) {
-                obj->screen->draw_rect(obj->screen, keyboard_keys[i].x+5, keyboard_keys[i].y+20, keyboard_keys[i].w, keyboard_keys[i].h);
+                obj->screen->draw_rect(obj->screen, keyboard_keys[i].x, keyboard_keys[i].y, keyboard_keys[i].w, keyboard_keys[i].h);
             }
         }
 

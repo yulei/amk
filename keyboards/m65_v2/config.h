@@ -40,7 +40,7 @@
 #define DISPLAY_NUM         1
 #define ANIM_DISPLAY_NUM    1
 //#define AUDIO_DISPLAY_NUM   1
-//#define KEYBOARD_DISPLAY_NUM 1
+#define KEYBOARD_DISPLAY_NUM 1
 #define KEYBOARD_KEY_COUNT  66
 
 #define RENDER_BUFFER_SIZE  (72*40*2)
@@ -55,12 +55,12 @@
 #define VECT_TAB_OFFSET 0x20000
 
 #define USE_I2C1
-#define I2C1_SCL_PIN    B8
-#define I2C1_SDA_PIN    B9
+#define I2C1_SCL_PIN            B8
+#define I2C1_SDA_PIN            B9
 
-#define WS2812_LED_NUM  5
-#define WS2812_LED_PIN  A0
-#define PWM_TIM_PERIOD  104
+#define WS2812_LED_NUM          5
+#define WS2812_LED_PIN          A0
+#define PWM_TIM_PERIOD          104
 #define PWM_TIM htim2
 #define PWM_TIM_CHANNEL TIM_CHANNEL_1
 
