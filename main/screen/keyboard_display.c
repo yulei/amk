@@ -34,9 +34,9 @@
 #define FWK_POINT_COUNT         10
 #define FWK_ANIMATION_COUNT     40
 #define FWK_FRAME_SIZE          20
-#define POINT_SPEED_MAX         10
-#define POINT_SPEED_MIN         1
-#define POINT_ANGLE_STEP        16
+#define FWK_SPEED_MAX           10
+#define FWK_SPEED_MIN           1
+#define FWK_ANGLE_STEP          16
 
 #define ECG_FRAME_MAX           70
 #define ECG_FRAME_MIN           2
@@ -117,7 +117,7 @@ static keyboard_display_obj_t keyboard_display_objs[KEYBOARD_DISPLAY_NUM];
 static fwk_animation_t fwk_anim;
 static ecg_animation_t ecg_anim;
 
-static uint8_t keyhit_mode = KEYHIT_ECG;
+static uint8_t keyhit_mode = KEYHIT_FWK;
 
 static void draw_rect(screen_t *screen, uint32_t x, uint32_t y, uint32_t width, uint32_t height);
 static void draw_line(screen_t *screen, int32_t x0, int32_t y0, int32_t x1, int32_t y1);
@@ -184,9 +184,9 @@ static void keyhit_fwk_update(bool hit)
             fwk_point_t *pt = &fwk->points[i];
             pt->x = fwk->center_x;
             pt->y = fwk->center_y;
-            pt->speed = rand() % POINT_SPEED_MAX;
+            pt->speed = rand() % FWK_SPEED_MAX;
             if (pt->speed < 1.0f) pt->speed = 1.0f;
-            pt->angle = i*POINT_ANGLE_STEP;
+            pt->angle = i*FWK_ANGLE_STEP;
         }
         fwk_anim.current = (fwk_anim.current+1) % FWK_ANIMATION_COUNT;
     } else {
@@ -205,8 +205,8 @@ static void keyhit_fwk_update(bool hit)
                 for(int j = 0; j < FWK_POINT_COUNT; j++) {
                     fwk_point_t *pt = &fwk->points[j];
                     if (fwk_point_valid(pt, fwk->center_x, fwk->center_y)) {
-                        pt->x += pt->speed * sin((pt->angle/(POINT_ANGLE_STEP*(FWK_POINT_COUNT+1)*1.0)) * 2.0 * M_PI);
-                        pt->y += pt->speed * cos((pt->angle/(POINT_ANGLE_STEP*(FWK_POINT_COUNT+1)*1.0)) * 2.0 * M_PI);
+                        pt->x += pt->speed * sin((pt->angle/(FWK_ANGLE_STEP*(FWK_POINT_COUNT+1)*1.0)) * 2.0 * M_PI);
+                        pt->y += pt->speed * cos((pt->angle/(FWK_ANGLE_STEP*(FWK_POINT_COUNT+1)*1.0)) * 2.0 * M_PI);
                         done = false;
                     }
                 }
