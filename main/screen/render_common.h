@@ -70,7 +70,6 @@ typedef struct screen_driver_s {
     void (*clear)(screen_driver_t *driver, void *data);
     void (*fill)(screen_driver_t *driver, uint32_t x, uint32_t y, uint32_t width, uint32_t height, const void *data, size_t size);
     void (*fill_async)(screen_driver_t *driver, uint32_t x, uint32_t y, uint32_t width, uint32_t height, const void *data, size_t size);
-    void (*plot)(screen_driver_t *driver, uint32_t x, uint32_t y, uint16_t color);
     bool (*ready)(screen_driver_t *driver);
     void (*release)(screen_driver_t *driver);
     void *data;
@@ -85,7 +84,7 @@ typedef struct screen_s {
     uint8_t* (*get_buffer)(screen_t *screen);
     bool (*ready)(screen_t *screen);
     bool (*test)(screen_t *screen);
-    void (*draw_rect)(screen_t *screen, uint32_t x, uint32_t y, uint32_t width, uint32_t height);
+    void (*plot)(screen_t *driver, uint32_t x, uint32_t y, uint16_t color);
     void (*clear)(screen_t *screen);
     void (*refresh)(screen_t *screen);
     void *data;

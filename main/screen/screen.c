@@ -6,6 +6,7 @@
 #include <string.h>
 #include "render.h"
 #include "screen.h"
+#include "amk_printf.h"
 
 typedef struct {
     screen_driver_t*    driver;
@@ -37,18 +38,31 @@ static bool screen_init(screen_t *screen, screen_driver_t *driver)
 static void screen_uninit(screen_t *screen)
 {}
 
-static void plot(uint32_t x, uint32_t y, uint8_t *buffer)
+
+static void screen_plot(screen_t *screen, uint32_t x, uint32_t y, uint16_t color)
 {
+    //screen_obj_t *obj = (screen_obj_t*)screen->data;
+    if (x>72 || y>40) {
+        amk_printf("out of scope: x:%d, y:%d\n", x, y);
+        return;
+    }
+
 	uint32_t m = y / 8;
 	uint32_t n = y % 8;
-    buffer[72*m+x]  |= (1<<n);
+    mono_buffer[72*m+x] |= (1<<n);
+}
+
+static void screen_clear(screen_t *screen)
+{
+    //screen_obj_t *obj = (screen_obj_t*)screen->data;
+    memset(mono_buffer, 0, MONO_BUFFER_SIZE);
 }
 
 static void screen_fill_rect(screen_t *screen, uint32_t x, uint32_t y, uint32_t width, uint32_t height, const void *data, uint32_t size)
 {
     screen_obj_t *obj = (screen_obj_t*)screen->data;
     if (screen_driver_params[obj->param.driver].type == SPI_LCD_SSD1306) {
-        memset(mono_buffer, 0, MONO_BUFFER_SIZE);
+        screen_clear(screen);
         uint16_t *p = (uint16_t*)data;
         for (int j = y; j < y+height; j++) {
             for (int i = x; i < x+width; i++) {
@@ -59,7 +73,7 @@ static void screen_fill_rect(screen_t *screen, uint32_t x, uint32_t y, uint32_t 
                 if( (r>25) || (g>50) || (b>25)) {
                     //plot(i, j, &mono_buffer[0]);
                 } else {
-                    plot(i, j, &mono_buffer[0]);
+                    screen_plot(screen, i, j, 0xFFFF);
                 }
                 p++;
             }
@@ -110,22 +124,6 @@ static bool screen_test(screen_t *screen)
 }
 
 
-static void screen_draw_rect(screen_t *screen, uint32_t x, uint32_t y, uint32_t width, uint32_t height)
-{
-    //screen_obj_t *obj = (screen_obj_t*)screen->data;
-    for (uint32_t i = 0; i < width; i++) {
-        for (uint32_t j = 0; j < height; j++) {
-            plot(x+i, y+j, &mono_buffer[0]);
-        }
-    }
-}
-
-static void screen_clear(screen_t *screen)
-{
-    //screen_obj_t *obj = (screen_obj_t*)screen->data;
-    memset(mono_buffer, 0, MONO_BUFFER_SIZE);
-}
-
 static void screen_refresh(screen_t *screen)
 {
     screen_obj_t *obj = (screen_obj_t*)screen->data;
@@ -155,7 +153,7 @@ screen_t* screen_create(screen_param_t *param)
         obj->screen.get_buffer = screen_get_buffer;
         obj->screen.ready = screen_ready;
         obj->screen.test = screen_test;
-        obj->screen.draw_rect = screen_draw_rect;
+        obj->screen.plot = screen_plot;
         obj->screen.clear = screen_clear;
         obj->screen.refresh = screen_refresh;
 
