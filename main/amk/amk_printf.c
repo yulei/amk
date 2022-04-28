@@ -8,6 +8,7 @@
  * @file amk_printf.c
  */
 
+#include "printf.h"
 #include "amk_printf.h"
 
 int xprintf(char* fmt, ...)
@@ -53,4 +54,17 @@ int amk_printf_ts(const char* format, ...)
 
     return size;
 }
+#else
+
+int amk_printf_fl(const char* format, ...)
+{
+    int size = 0;
+
+    va_list va;
+    va_start(va, format);
+    size += printf_(format, va);
+    va_end(va);
+    return size;
+}
+
 #endif

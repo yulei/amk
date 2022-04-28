@@ -65,4 +65,5 @@
 //#define VECT_TAB_OFFSET 0x20000
 
 #define XTAL_VALUE      16000000
-#define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
+//#define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
+#define CFG_TUSB_CONFIG_FILE    "tusb_def_host.h"

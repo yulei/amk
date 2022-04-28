@@ -23,6 +23,16 @@
 #include "usbh_pipe.h"
 #include "amk_printf.h"
 
+#ifndef HCD_DEBUG
+#define HCD_DEBUG 0
+#endif
+
+#if HCD_DEBUG
+#define hcd_debug  amk_printf
+#else
+#define hcd_debug(...)
+#endif
+
 usb_core_driver usbh_core;
 
 // usbh interrupt callback
@@ -71,7 +81,8 @@ bool hcd_init(uint8_t rhport)
 
 void hcd_port_reset(uint8_t rhport)
 {
-    usb_port_reset(&usbh_core);
+    hcd_debug("GD32 hcd_port_reset\n");
+    //usb_port_reset(&usbh_core);
 }
 
 bool hcd_port_connect_status(uint8_t rhport)
@@ -101,13 +112,13 @@ tusb_speed_t hcd_port_speed_get(uint8_t rhport)
 void hcd_device_close(uint8_t rhport, uint8_t dev_addr)
 {   
     // clear all pipes
-    for (uint8_t i = 0U; i < USBFS_MAX_TX_FIFOS; i++) {
-        usbh_core.host.pipe[i].in_used = 0U;
-        usbh_core.host.pipe[i].err_count = 0U;
-        usbh_core.host.pipe[i].pp_status = PIPE_IDLE;
-        usbh_core.host.backup_xfercount[i] = 0U;
-    }
-    amk_printf("hcd device close\n");
+    //for (uint8_t i = 0U; i < USBFS_MAX_TX_FIFOS; i++) {
+    //    usbh_core.host.pipe[i].in_used = 0U;
+    //    usbh_core.host.pipe[i].err_count = 0U;
+    //    usbh_core.host.pipe[i].pp_status = PIPE_IDLE;
+    //    usbh_core.host.backup_xfercount[i] = 0U;
+    //}
+    hcd_debug("hcd device close\n");
 }
 
 uint32_t hcd_frame_number(uint8_t rhport)
@@ -153,7 +164,7 @@ static bool pipe_data_xfer(usb_core_driver *udev, uint8_t pp_num)
 
     uint32_t status = usb_pipe_xfer(udev, pp_num);
     if (status != USB_OK) {
-        amk_printf("GD32 USB HOST pipe xfer failed: %d\n", status);
+        hcd_debug("GD32 USB HOST pipe xfer failed: %x\n", status);
         return false;
     }
     return true;
@@ -234,29 +245,39 @@ bool hcd_edpt_open(uint8_t rhport, uint8_t dev_addr, tusb_desc_endpoint_t const 
 {
     uint8_t ep_dir = tu_edpt_dir(ep_desc->bEndpointAddress);
     uint8_t ep_num = tu_edpt_number(ep_desc->bEndpointAddress);
+    uint8_t pipe = get_pipe_by_ep_num(&usbh_core, ep_desc->bEndpointAddress);
+
     if (ep_num == 0) {
-        uint8_t pipe = get_pipe_by_ep_num(&usbh_core, ep_desc->bEndpointAddress);
         if (pipe == INVALID_PIPE) {
             pipe = usbh_pipe_allocate(&usbh_core, 0);
             usbh_pipe_create(&usbh_core, dev_addr, hcd_port_speed_get(0), pipe, ep_desc->bmAttributes.xfer, ep_desc->wMaxPacketSize);
             //usbh_pipe_toggle_set(&usbh_core, pipe, 0);
+            hcd_debug("hcd open control ep:%x, dir=%x, num=%x\n", ep_desc->bEndpointAddress, ep_dir, ep_num);
 
             pipe = usbh_pipe_allocate(&usbh_core, 0x80);
             usbh_pipe_create(&usbh_core, dev_addr, hcd_port_speed_get(0), pipe, ep_desc->bmAttributes.xfer, ep_desc->wMaxPacketSize);
             //usbh_pipe_toggle_set(&usbh_core, pipe, 0);
-            amk_printf("hcd open control ep: dir=%d, num=%d\n", ep_dir, ep_num);
+            hcd_debug("hcd open control ep:%x, dir=%x, num=%x\n", ep_desc->bEndpointAddress, ep_dir, ep_num);
         } else {
             pipe = get_pipe_by_ep_num(&usbh_core, 0x00);
             usbh_pipe_update (&usbh_core, pipe, dev_addr, hcd_port_speed_get(0), ep_desc->wMaxPacketSize);
+            hcd_debug("hcd update control ep:%x, dir=%x, num=%x\n", ep_desc->bEndpointAddress, ep_dir, ep_num);
+
             pipe = get_pipe_by_ep_num(&usbh_core, 0x80);
-            usbh_pipe_update (&usbh_core, pipe, dev_addr, hcd_port_speed_get(0), ep_desc->wMaxPacketSize);
-            amk_printf("hcd update control ep: dir=%d, num=%d\n", ep_dir, ep_num);
+            usbh_pipe_update(&usbh_core, pipe, dev_addr, hcd_port_speed_get(0), ep_desc->wMaxPacketSize);
+            hcd_debug("hcd update control ep:%x, dir=%x, num=%x\n", ep_desc->bEndpointAddress, ep_dir, ep_num);
         }
     } else {
-        uint8_t pipe = usbh_pipe_allocate(&usbh_core, tu_edpt_addr(ep_num, ep_dir));
-        usbh_pipe_create(&usbh_core, dev_addr, hcd_port_speed_get(0), pipe, ep_desc->bmAttributes.xfer, ep_desc->wMaxPacketSize);
-        usbh_pipe_toggle_set(&usbh_core, pipe, 0);
-        amk_printf("hcd open data ep: dir=%d, num=%d\n", ep_dir, ep_num);
+        if (pipe == INVALID_PIPE) {
+            pipe = usbh_pipe_allocate(&usbh_core, tu_edpt_addr(ep_num, ep_dir));
+            usbh_pipe_create(&usbh_core, dev_addr, hcd_port_speed_get(0), pipe, ep_desc->bmAttributes.xfer, ep_desc->wMaxPacketSize);
+            usbh_pipe_toggle_set(&usbh_core, pipe, 0);
+            hcd_debug("hcd open data ep:%x, dir=%x, num=%x\n", ep_desc->bEndpointAddress, ep_dir, ep_num);
+        } else {
+            pipe = get_pipe_by_ep_num(&usbh_core, tu_edpt_addr(ep_num, ep_dir));
+            usbh_pipe_update (&usbh_core, pipe, dev_addr, hcd_port_speed_get(0), ep_desc->wMaxPacketSize);
+            hcd_debug("hcd update control ep:%x, dir=%x, num=%x\n", ep_desc->bEndpointAddress, ep_dir, ep_num);
+        }
     }
     return true;
 }
@@ -274,7 +295,7 @@ bool hcd_edpt_xfer(uint8_t rhport, uint8_t dev_addr, uint8_t ep_addr, uint8_t * 
 
 bool hcd_setup_send(uint8_t rhport, uint8_t dev_addr, uint8_t const setup_packet[8])
 {
-    uint8_t pp_num = get_pipe_by_ep_num(&usbh_core, 0x00);
+    uint8_t pp_num = get_pipe_by_ep_num(&usbh_core, 0x0);
 
     usb_pipe *pp = &usbh_core.host.pipe[pp_num];
 
@@ -293,34 +314,33 @@ bool hcd_edpt_clear_stall(uint8_t dev_addr, uint8_t ep_addr)
 // hcd interrupt callback
 uint8_t hcd_connect_cb(void *uhost)
 {
-    amk_printf("GD32 HCD: connect callback\n");
-    hcd_port_reset(0);
+    hcd_debug("GD32 HCD: connect callback\n");
+    usb_port_reset(&usbh_core);
     return 0;
 }
 
 uint8_t hcd_disconnect_cb(void *uhost)
 {
-    amk_printf("GD32 HCD: disconnect callback\n");
+    hcd_debug("GD32 HCD: disconnect callback\n");
     hcd_event_device_remove(0, true);
     return 0;
 }
 
 uint8_t hcd_port_enabled_cb(void *uhost)
 {
-    amk_printf("GD32 HCD: PORT enable callback\n");
+    hcd_debug("GD32 HCD: PORT enable callback\n");
     hcd_event_device_attach(0, true);
     return 0;
 }
 
 uint8_t hcd_port_disabled_cb(void *uhost)
 {
-    amk_printf("GD32 HCD: PORT disable callback\n");
+    hcd_debug("GD32 HCD: PORT disable callback\n");
     return 0;
 }
 
 uint8_t hcd_sof_cb(void *uhost)
 {
-    //amk_printf("GD32 HCD: SOF callback\n");
     return 0;
 }
 
@@ -328,7 +348,8 @@ uint8_t hcd_xfer_complete_cb(void *uhost, uint32_t pp_num)
 {
     usb_pipe *pp = &usbh_core.host.pipe[pp_num];
 
-    hcd_event_xfer_complete(pp->dev_addr, tu_edpt_addr(pp->ep.num, pp->ep.dir), pp->xfer_len, XFER_RESULT_SUCCESS, true);
+    hcd_event_xfer_complete(pp->dev_addr, tu_edpt_addr(pp->ep.num, pp->ep.dir), pp->xfer_count, XFER_RESULT_SUCCESS, true);
 
+    hcd_debug("GD32 HCD: xfer complete: pp_num:%x, ep_dir:%x, ep_num:%x, count:%x\n", (uint8_t)pp_num, pp->ep.dir, pp->ep.num, pp->xfer_count);
     return 0;
 }

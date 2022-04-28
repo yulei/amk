@@ -70,7 +70,7 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_re
     amk_printf("HID device address = %d, instance = %d is mounted\r\n", dev_addr, instance);
     amk_printf("VID = %04x, PID = %04x\r\n", vid, pid);
 
-    //tuh_hid_receive_report(dev_addr, instance);
+    tuh_hid_receive_report(dev_addr, instance);
 }
 
 // Invoked when device with hid interface is un-mounted
@@ -82,6 +82,12 @@ void tuh_hid_umount_cb(uint8_t dev_addr, uint8_t instance)
 // Invoked when received report from device via interrupt endpoint
 void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* report, uint16_t len)
 {
-    //tuh_hid_receive_report(dev_addr, instance);
+    amk_printf("HID report received:\n");
+    for (int i = 0; i < len; i++) {
+        amk_printf("0x%x ", report[i]);
+    }
+    amk_printf("\n");
+
+    tuh_hid_receive_report(dev_addr, instance);
 }
 #endif

@@ -38,7 +38,6 @@ OF SUCH DAMAGE.
 #include "drv_usb_host.h"
 #include "drv_usbh_int.h"
 //#include "usbh_core.h"
-#include "amk_printf.h"
 
 #if defined   (__CC_ARM)        /*!< ARM compiler */
     #pragma O0
@@ -317,6 +316,7 @@ static uint32_t usbh_int_pipe_in (usb_core_driver *udev, uint32_t pp_num)
             usb_pp_halt (udev, (uint8_t)pp_num, HCHINTF_NAK, PIPE_XF);
 
             pp->data_toggle_in ^= 1U;
+            usbh_int_fop->xfer_complete(udev->host.data, pp_num);
             break;
 
         case USB_EPTYPE_INTR:
@@ -390,10 +390,6 @@ static uint32_t usbh_int_pipe_in (usb_core_driver *udev, uint32_t pp_num)
         pp_reg->HCHINTF = HCHINTF_NAK;
     } else {
         /* no operation */
-    }
-
-    if (pp->urb_state != URB_DONE) {
-        amk_printf("GD32 PIPE in urb:%d\n", pp->urb_state);
     }
 
     return 1U;
@@ -501,9 +497,6 @@ static uint32_t usbh_int_pipe_out (usb_core_driver *udev, uint32_t pp_num)
         /* no operation */
     }
 
-    if (pp->urb_state != URB_DONE) {
-        amk_printf("GD32 PIPE out urb:%d\n", pp->urb_state);
-    }
     return 1U;
 }
 
