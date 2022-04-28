@@ -18,7 +18,7 @@
 #include "amk_printf.h"
 
 #ifndef AMK_KEYMAP_DEBUG
-#define AMK_KEYMAP_DEBUG 1
+#define AMK_KEYMAP_DEBUG 0
 #endif
 
 #if AMK_KEYMAP_DEBUG

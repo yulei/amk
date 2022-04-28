@@ -86,9 +86,6 @@ void usb_gpio_config (void)
 {
 #ifdef USB_OTG_FS_LOW_PWR_MGMT_SUPPORT
     EXTI_InitPara EXTI_InitStructure;
-#endif
-
-#ifdef USB_OTG_FS_LOW_PWR_MGMT_SUPPORT
 
     EXTI_ClearIntBitState(EXTI_LINE18);
 

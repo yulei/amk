@@ -35,12 +35,12 @@ OF SUCH DAMAGE.
 
 #include "drv_usb_hw.h"
 #include "drv_usbh_int.h"
-#include "usbh_core.h"
+//#include "usbh_core.h"
 #include "gd32e10x_it.h"
 //#include "usbh_usr.h"
 #include "gd32_util.h"
 
-extern usbh_host usb_host;
+//extern usbh_host usb_host;
 extern usb_core_driver usbh_core;
 
 #if USB_LOW_POWER
@@ -195,6 +195,7 @@ void EXTI1_IRQHandler(void)
 */
 void USBFS_IRQHandler(void)
 {
+extern uint32_t usbh_isr (usb_core_driver *udev);
     usbh_isr(&usbh_core);
 }
 

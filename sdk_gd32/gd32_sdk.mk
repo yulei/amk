@@ -40,7 +40,8 @@ APP_DEFS += \
 include $(GD32SDK_DIR)/$(MCU_TYPE)_sdk.mk
 
 ifeq (yes, $(strip $(USB_HOST_ENABLE)))
-	include $(GD32SDK_DIR)/gd32_usbhost.mk
+#	include $(GD32SDK_DIR)/gd32_usbhost.mk
+	include $(GD32SDK_DIR)/gd32_tinyusb.mk
 	APP_DEFS += -DUSB_HOST_ENABLE
 endif
 

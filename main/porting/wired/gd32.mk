@@ -4,7 +4,9 @@ SRCS += \
 	$(PLATFORM_PORTING_DIR)/gpio_pin.c \
 	$(PLATFORM_PORTING_DIR)/wait.c \
 	$(PLATFORM_PORTING_DIR)/gd32.c \
-	$(PLATFORM_PORTING_DIR)/gd32_usb.c \
 
 INCS += \
 	$(PLATFORM_PORTING_DIR) \
+
+SRCS += $(PLATFORM_PORTING_DIR)/gd32_tinyusb.c
+#SRCS += $(PLATFORM_PORTING_DIR)/gd32_usb.c

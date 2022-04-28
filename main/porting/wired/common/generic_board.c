@@ -17,6 +17,7 @@
 #include "action_util.h"
 #include "mousekey.h"
 #include "wait.h"
+#include "amk_indicator.h"
 #include "amk_boot.h"
 
 #ifdef SCREEN_ENABLE
@@ -159,6 +160,7 @@ static void amk_init(void)
     amk_printf("rf_driver_init\n");
     rf_driver_init(true);
 #endif
+    amk_indicator_init();
 }
 
 // tmk integration

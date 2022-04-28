@@ -64,16 +64,16 @@ void amk_usb_init(void)
     usb_rcu_config();
     usb_vbus_config();
 #ifdef USB_HOST_ENABLE
-    usbh_class_register (&usb_host, &usbh_hid);
-    usbh_init (&usb_host, &user_cb);
-    usb_intr_config ();
+    usbh_class_register(&usb_host, &usbh_hid);
+    usbh_init(&usb_host, &user_cb);
+    usb_intr_config();
 #endif
 }
 
 void amk_usb_task(void)
 {
 #ifdef USB_HOST_ENABLE
-    usbh_core_task (&usb_host);
+    usbh_core_task(&usb_host);
 #endif
 }
 
@@ -177,7 +177,7 @@ void usbh_user_configuration_descavailable(usb_desc_config *cfg_desc,
 
 void usbh_user_manufacturer_string(void *manufacturer_string)
 {
-    amk_printf("usbh_user_manufacturer_string:\n");
+    amk_printf("usbh_user_manufacturer_string: %s\n", (char*)manufacturer_string);
 }
 
 void usbh_user_product_string(void *product_string)
@@ -202,7 +202,7 @@ void usbh_user_device_not_supported(void)
 
 usbh_user_status usbh_user_userinput(void)
 {
-    usbh_user_status usbh_usr_status = USBH_USER_NO_RESP;
+    usbh_user_status usbh_usr_status = USBH_USER_RESP_OK;
     
     //amk_printf("usbh_user_userinput:\n");
     return usbh_usr_status;
