@@ -313,17 +313,17 @@ static uint32_t usbh_int_pipe_in (usb_core_driver *udev, uint32_t pp_num)
         switch (ep_type) {
         case USB_EPTYPE_CTRL:
         case USB_EPTYPE_BULK:
+            usbh_int_fop->xfer_complete(udev->host.data, pp_num);
             usb_pp_halt (udev, (uint8_t)pp_num, HCHINTF_NAK, PIPE_XF);
 
             pp->data_toggle_in ^= 1U;
-            usbh_int_fop->xfer_complete(udev->host.data, pp_num);
             break;
 
         case USB_EPTYPE_INTR:
         case USB_EPTYPE_ISOC:
+            usbh_int_fop->xfer_complete(udev->host.data, pp_num);
             pp_reg->HCHCTL |= HCHCTL_ODDFRM;
             pp->urb_state = URB_DONE;
-            usbh_int_fop->xfer_complete(udev->host.data, pp_num);
             break;
 
         default:
@@ -335,7 +335,6 @@ static uint32_t usbh_int_pipe_in (usb_core_driver *udev, uint32_t pp_num)
         switch (pp->pp_status) {
         case PIPE_XF:
             pp->urb_state = URB_DONE;
-            usbh_int_fop->xfer_complete(udev->host.data, pp_num);
             break;
 
         case PIPE_STALL:
@@ -376,9 +375,11 @@ static uint32_t usbh_int_pipe_in (usb_core_driver *udev, uint32_t pp_num)
             break;
 
         case USB_EPTYPE_INTR:
-            pp_reg->HCHINTEN |= HCHINTEN_CHIE;
+            /* re-activate the channel */
+            pp_reg->HCHCTL = (pp_reg->HCHCTL | HCHCTL_CEN) & ~HCHCTL_CDIS;
+            //pp_reg->HCHINTEN |= HCHINTEN_CHIE;
 
-            (void)usb_pipe_halt(udev, (uint8_t)pp_num);
+            //(void)usb_pipe_halt(udev, (uint8_t)pp_num);
             break;
 
         default:
@@ -429,6 +430,7 @@ static uint32_t usbh_int_pipe_out (usb_core_driver *udev, uint32_t pp_num)
         usb_pp_halt (udev, (uint8_t)pp_num, HCHINTF_REQOVR, PIPE_REQOVR);
     } else if (intr_pp & HCHINTF_TF) {
         pp->err_count = 0U;
+        usbh_int_fop->xfer_complete(udev->host.data, pp_num);
         usb_pp_halt (udev, (uint8_t)pp_num, HCHINTF_TF, PIPE_XF);
     } else if (intr_pp & HCHINTF_NAK) {
         pp->err_count = 0U;
@@ -450,7 +452,6 @@ static uint32_t usbh_int_pipe_out (usb_core_driver *udev, uint32_t pp_num)
                 pp->data_toggle_out ^= 1U; 
             }
 
-            usbh_int_fop->xfer_complete(udev->host.data, pp_num);
             break;
 
         case PIPE_NAK:

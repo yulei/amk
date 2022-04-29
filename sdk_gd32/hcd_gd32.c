@@ -19,6 +19,7 @@
 #include "host/usbh.h"
 
 #include "drv_usb_host.h"
+#include "drv_usb_hw.h"
 #include "drv_usbh_int.h"
 #include "usbh_pipe.h"
 #include "amk_printf.h"
@@ -316,6 +317,7 @@ uint8_t hcd_connect_cb(void *uhost)
 {
     hcd_debug("GD32 HCD: connect callback\n");
     usb_port_reset(&usbh_core);
+    //usb_mdelay(100U);
     return 0;
 }
 
@@ -329,6 +331,7 @@ uint8_t hcd_disconnect_cb(void *uhost)
 uint8_t hcd_port_enabled_cb(void *uhost)
 {
     hcd_debug("GD32 HCD: PORT enable callback\n");
+    //usb_mdelay (50U);
     hcd_event_device_attach(0, true);
     return 0;
 }
@@ -350,6 +353,6 @@ uint8_t hcd_xfer_complete_cb(void *uhost, uint32_t pp_num)
 
     hcd_event_xfer_complete(pp->dev_addr, tu_edpt_addr(pp->ep.num, pp->ep.dir), pp->xfer_count, XFER_RESULT_SUCCESS, true);
 
-    hcd_debug("GD32 HCD: xfer complete: pp_num:%x, ep_dir:%x, ep_num:%x, count:%x\n", (uint8_t)pp_num, pp->ep.dir, pp->ep.num, pp->xfer_count);
+    hcd_debug("GD32 HCD: xfer complete: pp_num:%u, ep_dir:%u, ep_num:%u, count:%u\n", pp_num, pp->ep.dir, pp->ep.num, pp->xfer_count);
     return 0;
 }

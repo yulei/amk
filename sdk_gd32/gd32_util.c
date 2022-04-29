@@ -200,7 +200,7 @@ void usb_vbus_config (void)
     /* delay is need for stabilizing the VBUS low in reset condition,
      * when VBUS=1 and reset-button is pressed by user 
      */
-    usb_mdelay (200U);
+    //usb_mdelay (200U);
 }
 
 /*!

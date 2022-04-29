@@ -84,7 +84,8 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
 {
     amk_printf("HID report received:\n");
     for (int i = 0; i < len; i++) {
-        amk_printf("0x%x ", report[i]);
+        amk_printf("%02X", report[i]);
+        if( i!=len-1) amk_printf("-");
     }
     amk_printf("\n");
 
