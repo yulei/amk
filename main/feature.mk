@@ -48,6 +48,7 @@ endif
 
 ifeq (yes, $(strip $(RGB_LINEAR_ENABLE)))
 	SRCS += $(MAIN_DIR)/rgb/rgb_linear.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_effect_linear.c
 	APP_DEFS += -DRGB_LINEAR_ENABLE
 	RGB_ENABLE = yes
 endif
@@ -78,7 +79,6 @@ ifeq (yes, $(strip $(RGB_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_common.c
-	SRCS += $(MAIN_DIR)/rgb/rgb_effect_linear.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_led.c
 	APP_DEFS += -DRGB_ENABLE
 endif

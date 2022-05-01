@@ -6,4 +6,6 @@
 #   include "i2c_nrf52.c"
 #elif defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F722xx) || defined(STM32L072xx)
 #   include "i2c_stm32.c"
+#elif defined(HC32F460xE)
+#   include "i2c_hc32.c"
 #endif

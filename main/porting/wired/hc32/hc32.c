@@ -12,7 +12,7 @@
 static void dwt_delay_init(void);
 static void system_clock_init(void);
 static void system_usb_init(void);
-
+static void debug_port_init(void);
 
 void system_init(void)
 {
@@ -23,6 +23,8 @@ void system_init(void)
     SysTick_Init(1000);
 
     dwt_delay_init();
+
+    debug_port_init();
 
 #ifdef EECONFIG_FLASH 
 extern void fee_init(void);
@@ -38,6 +40,13 @@ static void dwt_delay_init(void)
         DWT->CYCCNT = 0;
         DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
     }
+}
+
+static void debug_port_init(void)
+{
+    PORT_DebugPortSetting(TDO_SWO|TDI|TRST, Disable);
+
+    PORT_DebugPortSetting(TCK_SWCLK|TMS_SWDIO, Enable);
 }
 
 uint32_t systick_get_tick(void)

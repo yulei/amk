@@ -183,7 +183,6 @@ void i2c_uninit(i2c_handle_t i2c)
 
 amk_error_t i2c_send_async(i2c_handle_t i2c, uint8_t addr, const void *data, size_t length)
 {
-    amk_error_t err = AMK_SUCCESS;
     i2c_instance_t *inst = (i2c_instance_t*)i2c;
     HAL_StatusTypeDef status = HAL_I2C_Master_Transmit_DMA(&inst->handle, addr, (void*)data, length);
     if (status == HAL_OK) {
@@ -194,6 +193,4 @@ amk_error_t i2c_send_async(i2c_handle_t i2c, uint8_t addr, const void *data, siz
     }
 
     return AMK_ERROR;
-
-    return err;
 }

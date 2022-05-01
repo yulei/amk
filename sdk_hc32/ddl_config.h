@@ -77,7 +77,7 @@ extern "C"
 #define DDL_EXINT_NMI_SWI_ENABLE                    (DDL_ON)
 #define DDL_GPIO_ENABLE                             (DDL_ON)
 #define DDL_HASH_ENABLE                             (DDL_OFF)
-#define DDL_I2C_ENABLE                              (DDL_OFF)
+#define DDL_I2C_ENABLE                              (DDL_ON)
 #define DDL_I2S_ENABLE                              (DDL_OFF)
 #define DDL_INTERRUPTS_ENABLE                       (DDL_ON)
 #define DDL_INTERRUPTS_SHARE_ENABLE                 (DDL_OFF)
