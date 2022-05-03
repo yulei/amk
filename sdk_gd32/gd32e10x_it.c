@@ -34,14 +34,18 @@ OF SUCH DAMAGE.
 */
 
 #include "drv_usb_hw.h"
-#include "drv_usbh_int.h"
-//#include "usbh_core.h"
 #include "gd32e10x_it.h"
-//#include "usbh_usr.h"
 #include "gd32_util.h"
 
-//extern usbh_host usb_host;
+#ifdef USB_HOST_ENABLE
+#include "drv_usbh_int.h"
 extern usb_core_driver usbh_core;
+#endif
+
+#ifdef USB_DEVICE_ENABLE
+#include "drv_usbd_int.h"
+extern usb_core_driver usbd_core;
+#endif
 
 #if USB_LOW_POWER
 /* local function prototypes ('static') */
@@ -195,8 +199,13 @@ void EXTI1_IRQHandler(void)
 */
 void USBFS_IRQHandler(void)
 {
-extern uint32_t usbh_isr (usb_core_driver *udev);
+#ifdef USB_HOST_ENABLE
     usbh_isr(&usbh_core);
+#endif
+
+#ifdef USB_DEVICE_ENABLE
+    usbd_isr(&usbd_core);
+#endif
 }
 
 #if USB_LOW_POWER

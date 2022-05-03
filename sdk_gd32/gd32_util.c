@@ -51,12 +51,13 @@ void systick_suspend(void)
 
  void systick_resume(void)
 {
-    SysTick->CTRL  |= SysTick_CTRL_TICKINT_Msk;
+    SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk;
 }
 
 void usb_delay_ms(uint32_t ms)
 {
-    systick_delay(ms);
+    //systick_delay(ms);
+    usb_delay_us(ms*1000);
 }
 
 // approximate us delay
@@ -148,7 +149,7 @@ void usb_intr_config (void)
 {
     nvic_priority_group_set(NVIC_PRIGROUP_PRE2_SUB2);
 
-    nvic_irq_enable((uint8_t)USBFS_IRQn, 2U, 0U);
+    nvic_irq_enable((uint8_t)USBFS_IRQn, 0U, 0U);
 
 #ifdef USB_LOW_POWER
 

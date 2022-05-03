@@ -16,10 +16,12 @@
 void amk_usb_init(void)
 {
     usb_rcu_config();
-    usb_vbus_config();
-#ifdef USB_HOST_ENABLE
+
+#if defined(USB_HOST_ENABLE) || defined(USB_DEVICE_ENABLE)
+    //usb_vbus_config();
     tusb_init();
 #endif
+
     usb_intr_config();
 }
 
@@ -27,6 +29,10 @@ void amk_usb_task(void)
 {
 #ifdef USB_HOST_ENABLE
     tuh_task();
+#endif
+
+#ifdef USB_DEVICE_ENABLE
+    tud_task();
 #endif
 }
 
@@ -92,3 +98,68 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
     tuh_hid_receive_report(dev_addr, instance);
 }
 #endif
+
+//=============================
+// tusb callback
+//=============================
+// Invoked when device is mounted
+void tud_mount_cb(void) { }
+
+// Invoked when device is unmounted
+void tud_umount_cb(void) { }
+
+// Invoked when usb bus is suspended
+// remote_wakeup_en : if host allow us to perform remote wakeup
+// Within 7ms, device must draw an average of current less than 2.5 mA from bus
+void tud_suspend_cb(bool remote_wakeup_en)
+{
+    (void) remote_wakeup_en;
+}
+
+// Invoked when usb bus is resumed
+void tud_resume_cb(void)
+{
+}
+
+// Invoked when received GET_REPORT control request
+// Application must fill buffer report's content and return its length.
+// Return zero will cause the stack to STALL request
+uint16_t tud_hid_get_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t report_type, uint8_t* buffer, uint16_t reqlen)
+{
+    // TODO not Implemented
+    (void) itf;
+    (void) report_id;
+    (void) report_type;
+    (void) buffer;
+    (void) reqlen;
+
+#ifdef VIAL_ENABLE
+    if (itf == ITF_NUM_VIAL) {
+        //amk_printf("Vial GetReport Data: size=%d\n", reqlen);
+        return 0;
+    }
+#endif
+    return 0;
+}
+
+// Invoked when received SET_REPORT control request or
+// received data on OUT endpoint ( Report ID = 0, Type = 0 )
+extern uint8_t amk_led_state;
+void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t report_type, uint8_t const *buffer, uint16_t bufsize)
+{
+    //amk_printf("Set Report: itf=%d, id=%d, type=%d\n", itf, report_id, report_type);
+    (void) report_id;
+    if (itf == ITF_NUM_HID_KBD && report_type == HID_REPORT_TYPE_OUTPUT) {
+        if (bufsize) {
+            amk_led_state = buffer[0];
+            //amk_printf("Set Report Data: size=%d, state=%x\n", bufsize, buffer[0]);
+        }
+    }
+
+#ifdef VIAL_ENABLE
+    if (itf == ITF_NUM_VIAL) {
+        //amk_printf("VIAL process data: size=%d\n", bufsize);
+        vial_process((uint8_t*)buffer, (uint8_t)bufsize);
+    }
+#endif
+}

@@ -30,7 +30,7 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
 #include "rgb_indicator.h"
 uint8_t g_rgb_indicator_index[RGB_INDICATOR_LED_NUM] = {0};
 #define CAPS_LED    0
-
+#if 0
 void led_set(uint8_t led)
 {
     if (led & (1 << USB_LED_CAPS_LOCK)) {
@@ -41,6 +41,7 @@ void led_set(uint8_t led)
         amk_printf("turn caps off\n");
     }
 }
+#endif
 #endif
 
 #ifdef MSC_ENABLE

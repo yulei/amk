@@ -1,4 +1,6 @@
 
+USB_DEVICE_ENABLE ?= yes
+
 SRCS += \
 	$(MAIN_DIR)/amk/amk_action.c \
 	$(MAIN_DIR)/amk/amk_keymap.c \
@@ -10,8 +12,6 @@ SRCS += \
 	$(MAIN_DIR)/amk/report_queue.c \
 	$(MAIN_DIR)/amk/ring_buffer.c \
 	$(MAIN_DIR)/usb/udd_desc_stub.c \
-
-#	$(MAIN_DIR)/usb/usb_descriptors.c \
 
 INCS += \
 	$(MAIN_DIR) \
@@ -43,4 +43,9 @@ ifeq (yes, $(strip $(RTOS_ENABLE)))
 	APP_DEFS += -DRTOS_ENABLE
 else
 	SRCS += $(MAIN_DIR)/amk/main.c
+endif
+
+ifeq (yes, $(strip $(USB_DEVICE_ENABLE)))
+	SRCS += $(MAIN_DIR)/usb/usb_descriptors.c
+	APP_DEFS += -DUSB_DEVICE_ENABLE
 endif
