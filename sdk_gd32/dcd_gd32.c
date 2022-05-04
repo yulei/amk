@@ -25,7 +25,7 @@
 #include "amk_printf.h"
 
 #ifndef DCD_DEBUG
-#define DCD_DEBUG 0
+#define DCD_DEBUG 1
 #endif
 
 #if DCD_DEBUG
@@ -56,6 +56,7 @@ usbd_int_cb usbd_int_op = {
 
 usbd_int_cb *usbd_int_fop = &usbd_int_op;
 
+#if 1
 static void dcd_open_ep0(usb_core_driver *udev)
 {
     // open ep0 out
@@ -82,6 +83,7 @@ static void dcd_open_ep0(usb_core_driver *udev)
 
     amk_printf("GD32 ep0 opened\n");
 }
+#endif
 
 void dcd_init(uint8_t rhport)
 {
@@ -104,6 +106,7 @@ void dcd_init(uint8_t rhport)
     usb_globalint_enable(&udev->regs);
 
     dcd_connect(0);
+    dcd_debug("dcd_init\n");
 }
 
 void dcd_int_handler(uint8_t rhport)
@@ -128,6 +131,7 @@ void dcd_set_address(uint8_t rhport, uint8_t dev_addr)
     usb_core_driver *udev = &usbd_core;
     usb_devaddr_set(udev, dev_addr);
     dcd_edpt_xfer(rhport, 0x80, NULL, 0);
+    dcd_debug("dcd_set_address\n");
 }
 
 void dcd_remote_wakeup(uint8_t rhport)
@@ -179,6 +183,7 @@ bool dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const * p_ep)
 
     usb_transc_active(udev, transc);
 
+    dcd_debug("dcd_edpt_open\n");
     return true;
 }
 
@@ -231,6 +236,7 @@ bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t t
         usb_transc_outxfer (udev, transc);
     }
 
+    dcd_debug("dcd_edpt_xfer\n");
     return true;
 }
 
@@ -240,6 +246,7 @@ static bool ff_valid = false;
 
 bool dcd_edpt_xfer_fifo(uint8_t rhport, uint8_t ep_addr, tu_fifo_t * ff, uint16_t total_bytes)
 {
+    dcd_debug("dcd_edpt_xfer_fifo\n");
     if (total_bytes > 1024) {
         amk_printf("XFER fifo oversize, ep:%d, size:%d\n", ep_addr, total_bytes);
         return false;
@@ -295,6 +302,7 @@ void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr)
 
 uint8_t usbd_bus_reset(void *udev)
 {
+    dcd_debug("usbd_bus_reset\n");
     dcd_open_ep0(udev);
     dcd_event_bus_signal(0, DCD_EVENT_BUS_RESET, true);
     return 0;
@@ -326,6 +334,8 @@ uint8_t usbd_sof(void *udev)
 
 uint8_t usbd_setup_received(void *udev)
 {
+    dcd_debug("setup_received\n");
+
     usb_core_driver *core = &usbd_core;
 
     dcd_event_setup_received(0, (uint8_t*)(&core->dev.control.req), true);
@@ -334,6 +344,8 @@ uint8_t usbd_setup_received(void *udev)
 
 uint8_t usbd_xfer_complete(void *udev, uint32_t ep_addr)
 {
+    dcd_debug("xfer_completed, ep_addr=%d\n", ep_addr);
+
     usb_core_driver *core = &usbd_core;
     uint8_t const ep_num = tu_edpt_number(ep_addr);
     uint8_t const ep_dir = tu_edpt_dir(ep_addr);

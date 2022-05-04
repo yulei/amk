@@ -15,11 +15,16 @@ volatile static uint32_t systick_counter = 0;
 void systick_init(void)
 {
     SysTick_Config(SystemCoreClock / (1000/SYSTICK_FREQ));
-    NVIC_SetPriority(SysTick_IRQn, 0x00U);
+    nvic_priority_group_set(NVIC_PRIGROUP_PRE2_SUB2);
+    nvic_irq_enable((uint8_t)SysTick_IRQn, 3U, 0U);
+    //NVIC_SetPriority(SysTick_IRQn, 0x00U);
 }
 
 void systick_delay(uint32_t ticks)
 {
+    //usb_delay_ms(ticks);
+    //return;
+
     uint32_t tick_start = systick_get_tick();
     uint32_t wait = ticks;
 
@@ -148,10 +153,9 @@ void usb_rcu_config(void)
 void usb_intr_config (void)
 {
     nvic_priority_group_set(NVIC_PRIGROUP_PRE2_SUB2);
+    nvic_irq_enable((uint8_t)USBFS_IRQn, 2U, 0U);
 
-    nvic_irq_enable((uint8_t)USBFS_IRQn, 0U, 0U);
-
-#ifdef USB_LOW_POWER
+#if USB_LOW_POWER
 
     /* enable the power module clock */
     rcu_periph_clock_enable(RCU_PMU);

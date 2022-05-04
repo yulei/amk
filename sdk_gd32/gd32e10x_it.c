@@ -53,68 +53,6 @@ static void resume_mcu_clk(void);
 #endif /* USB_LOW_POWER */
 
 /*!
-    \brief      this function handles NMI exception
-    \param[in]  none
-    \param[out] none
-    \retval     none
-*/
-void NMI_Handler(void)
-{
-}
-
-/*!
-    \brief      this function handles HardFault exception
-    \param[in]  none
-    \param[out] none
-    \retval     none
-*/
-void HardFault_Handler(void)
-{
-    /* Go to infinite loop when Hard Fault exception occurs */
-    while (1){
-    }
-}
-
-/*!
-    \brief      this function handles MemManage exception
-    \param[in]  none
-    \param[out] none
-    \retval     none
-*/
-void MemManage_Handler(void)
-{
-    /* Go to infinite loop when Memory Manage exception occurs */
-    while (1){
-    }
-}
-
-/*!
-    \brief      this function handles BusFault exception
-    \param[in]  none
-    \param[out] none
-    \retval     none
-*/
-void BusFault_Handler(void)
-{
-    /* Go to infinite loop when Bus Fault exception occurs */
-    while (1){
-    }
-}
-
-/*!
-    \brief      this function handles UsageFault exception
-    \param[in]  none
-    \param[out] none
-    \retval     none
-*/
-void UsageFault_Handler(void)
-{
-    /* Go to infinite loop when Usage Fault exception occurs */
-    while (1){
-    }
-}
-
-/*!
     \brief      this function handles SVC exception
     \param[in]  none
     \param[out] none
@@ -204,7 +142,9 @@ void USBFS_IRQHandler(void)
 #endif
 
 #ifdef USB_DEVICE_ENABLE
-    usbd_isr(&usbd_core);
+    //usbd_isr(&usbd_core);
+    extern void dcd_int_handler(uint8_t rhport);
+    dcd_int_handler(0);
 #endif
 }
 

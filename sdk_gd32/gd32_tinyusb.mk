@@ -39,6 +39,8 @@ ifeq (yes, $(strip $(USB_DEVICE_ENABLE)))
 	SRCS += ${GD32USB_DIR}/device/usbd.c
 	INCS += ${GD32USB_DIR}/device/hid 
 	INCS += ${GD32USB_DIR}/device
+#	SRCS += ${GD32SDK_DIR}/dwc2/dcd_dwc2.c
+#	INCS += ${GD32SDK_DIR}/dwc2
 	APP_DEFS += -DUSE_DEVICE_MODE
 	APP_DEFS += -DUSB_DEVICE_ENABLE
 endif

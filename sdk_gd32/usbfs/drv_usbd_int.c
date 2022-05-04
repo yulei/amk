@@ -59,6 +59,7 @@ static const uint8_t USB_SPEED[4] = {
     \param[out] none
     \retval     none
 */
+#include "amk_printf.h"
 void usbd_isr (usb_core_driver *udev)
 {
     if (HOST_MODE != (udev->regs.gr->GINTF & GINTF_COPM)) {
@@ -69,6 +70,7 @@ void usbd_isr (usb_core_driver *udev)
             return;
         }
 
+        //amk_printf("intr: 0x%x\n", intr);
         /* OUT endpoints interrupts */
         if (intr & GINTF_OEPIF) {
             (void)usbd_int_epout (udev);
@@ -97,13 +99,14 @@ void usbd_isr (usb_core_driver *udev)
 
         /* start of frame interrupt */
         if (intr & GINTF_SOF) {
-            if (udev->dev.class_core->SOF) {
-                (void)udev->dev.class_core->SOF(udev); 
-            }
+            //if (udev->dev.class_core->SOF) {
+            //    (void)udev->dev.class_core->SOF(udev); 
+            //}
+
+            usbd_int_fop->sof(udev);
 
             /* clear interrupt */
             udev->regs.gr->GINTF = GINTF_SOF;
-            usbd_int_fop->sof(udev);
         }
 
         /* receive FIFO not empty interrupt */
@@ -114,12 +117,12 @@ void usbd_isr (usb_core_driver *udev)
         /* USB reset interrupt */
         if (intr & GINTF_RST) {
             (void)usbd_int_reset (udev);
-            usbd_int_fop->bus_reset(udev);
         }
 
         /* enumeration has been done interrupt */
         if (intr & GINTF_ENUMFIF) {
             (void)usbd_int_enumfinish (udev);
+            usbd_int_fop->bus_reset(udev);
         }
 
         /* incomplete synchronization IN transfer interrupt*/
@@ -205,9 +208,8 @@ static uint32_t usbd_int_epout (usb_core_driver *udev)
             if (oepintr & DOEPINTF_STPF) {
                 /* inform the upper layer that a setup packet is available */
                 //(void)usbd_setup_transc (udev);
-                usbd_int_fop->setup_received(udev);
-
                 udev->regs.er_out[ep_num]->DOEPINTF = DOEPINTF_STPF;
+                usbd_int_fop->setup_received(udev);
             }
         }
     }
@@ -361,27 +363,18 @@ static uint32_t usbd_int_reset (usb_core_driver *udev)
 
     /* configure endpoint 0 to receive SETUP packets */
     //usb_ctlep_startout (udev);
+    /* set OUT endpoint 0 receive length to 24 bytes, 1 packet and 3 setup packets */
+    udev->regs.er_out[0]->DOEPLEN = DOEP0_TLEN(8U * 3U) | DOEP0_PCNT(1U) | DOEP0_STPCNT(3U);
+
+    if ((uint8_t)USB_USE_DMA == udev->bp.transfer_mode) {
+        udev->regs.er_out[0]->DOEPDMAADDR = (uint32_t)&udev->dev.control.req;
+
+        /* endpoint enable */
+        udev->regs.er_out[0]->DOEPCTL |= DEPCTL_EPACT | DEPCTL_EPEN;
+    }
 
     /* clear USB reset interrupt */
     udev->regs.gr->GINTF = GINTF_RST;
-
-    //udev->dev.transc_out[0] = (usb_transc) {
-    //    .ep_type = USB_EPTYPE_CTRL,
-    //    .max_len = USB_FS_EP0_MAX_LEN
-    //};
-
-    //(void)usb_transc_active (udev, &udev->dev.transc_out[0]);
-
-    //udev->dev.transc_in[0] = (usb_transc) {
-    //    .ep_addr = {
-    //        .dir = 1U
-    //    },
-
-    //    .ep_type = USB_EPTYPE_CTRL,
-    //    .max_len = USB_FS_EP0_MAX_LEN
-    //};
-
-    //(void)usb_transc_active (udev, &udev->dev.transc_in[0]);
 
     /* upon reset call user call back */
     udev->dev.cur_status = (uint8_t)USBD_DEFAULT;

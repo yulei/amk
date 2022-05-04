@@ -34,6 +34,7 @@ void amk_usb_task(void)
 #ifdef USB_DEVICE_ENABLE
     tud_task();
 #endif
+    //amk_printf("amk usb task\n");
 }
 
 bool amk_usb_itf_ready(uint32_t type)
@@ -99,6 +100,8 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
 }
 #endif
 
+#ifdef USB_DEVICE_ENABLE
+
 //=============================
 // tusb callback
 //=============================
@@ -163,3 +166,5 @@ void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t rep
     }
 #endif
 }
+
+#endif

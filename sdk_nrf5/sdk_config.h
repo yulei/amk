@@ -4797,64 +4797,6 @@
 #define PPI_ENABLED 0
 #endif
 
-// <e> SAADC_ENABLED - nrf_drv_saadc - SAADC peripheral driver - legacy layer
-//==========================================================
-#ifndef SAADC_ENABLED
-#define SAADC_ENABLED 1
-#endif
-// <o> SAADC_CONFIG_RESOLUTION  - Resolution
-
-// <0=> 8 bit
-// <1=> 10 bit
-// <2=> 12 bit
-// <3=> 14 bit
-
-#ifndef SAADC_CONFIG_RESOLUTION
-#define SAADC_CONFIG_RESOLUTION 1
-#endif
-
-// <o> SAADC_CONFIG_OVERSAMPLE  - Sample period
-
-// <0=> Disabled
-// <1=> 2x
-// <2=> 4x
-// <3=> 8x
-// <4=> 16x
-// <5=> 32x
-// <6=> 64x
-// <7=> 128x
-// <8=> 256x
-
-#ifndef SAADC_CONFIG_OVERSAMPLE
-#define SAADC_CONFIG_OVERSAMPLE 0
-#endif
-
-// <q> SAADC_CONFIG_LP_MODE  - Enabling low power mode
-
-
-#ifndef SAADC_CONFIG_LP_MODE
-#define SAADC_CONFIG_LP_MODE 1
-#endif
-
-// <o> SAADC_CONFIG_IRQ_PRIORITY  - Interrupt priority
-
-
-// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
-// <0=> 0 (highest)
-// <1=> 1
-// <2=> 2
-// <3=> 3
-// <4=> 4
-// <5=> 5
-// <6=> 6
-// <7=> 7
-
-#ifndef SAADC_CONFIG_IRQ_PRIORITY
-#define SAADC_CONFIG_IRQ_PRIORITY 6
-#endif
-
-// </e>
-
 // <e> PWM_ENABLED - nrf_drv_pwm - PWM peripheral driver - legacy layer
 //==========================================================
 #ifndef PWM_ENABLED
@@ -5334,6 +5276,63 @@
 // <o> NRF_MAXIMUM_LATENCY_US - Maximum possible time[us] in highest priority interrupt
 #ifndef NRF_MAXIMUM_LATENCY_US
 #define NRF_MAXIMUM_LATENCY_US 2000
+#endif
+
+// </e>
+// <e> SAADC_ENABLED - nrf_drv_saadc - SAADC peripheral driver - legacy layer
+//==========================================================
+#ifndef SAADC_ENABLED
+#define SAADC_ENABLED 1
+#endif
+// <o> SAADC_CONFIG_RESOLUTION  - Resolution
+ 
+// <0=> 8 bit 
+// <1=> 10 bit 
+// <2=> 12 bit 
+// <3=> 14 bit 
+
+#ifndef SAADC_CONFIG_RESOLUTION
+#define SAADC_CONFIG_RESOLUTION 1
+#endif
+
+// <o> SAADC_CONFIG_OVERSAMPLE  - Sample period
+ 
+// <0=> Disabled 
+// <1=> 2x 
+// <2=> 4x 
+// <3=> 8x 
+// <4=> 16x 
+// <5=> 32x 
+// <6=> 64x 
+// <7=> 128x 
+// <8=> 256x 
+
+#ifndef SAADC_CONFIG_OVERSAMPLE
+#define SAADC_CONFIG_OVERSAMPLE 0
+#endif
+
+// <q> SAADC_CONFIG_LP_MODE  - Enabling low power mode
+ 
+
+#ifndef SAADC_CONFIG_LP_MODE
+#define SAADC_CONFIG_LP_MODE 0
+#endif
+
+// <o> SAADC_CONFIG_IRQ_PRIORITY  - Interrupt priority
+ 
+
+// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
+// <0=> 0 (highest) 
+// <1=> 1 
+// <2=> 2 
+// <3=> 3 
+// <4=> 4 
+// <5=> 5 
+// <6=> 6 
+// <7=> 7 
+
+#ifndef SAADC_CONFIG_IRQ_PRIORITY
+#define SAADC_CONFIG_IRQ_PRIORITY 6
 #endif
 
 // </e>
@@ -9127,7 +9126,6 @@
 
 // <h> nrf_log in nRF_Libraries
 
-
 //==========================================================
 // <e> APP_BUTTON_CONFIG_LOG_ENABLED - Enables logging in the module.
 //==========================================================
@@ -11635,48 +11633,6 @@
 
 #ifndef BSP_BTN_BLE_OBSERVER_PRIO
 #define BSP_BTN_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
-#endif
-
-// <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-// <i> Priority with which BLE events are dispatched to the NFC pairing library.
-
-#ifndef NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO
-#define NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO 1
 #endif
 
 // <o> NFC_BLE_PAIR_LIB_BLE_OBSERVER_PRIO

@@ -16,8 +16,8 @@
 #define MATRIX_ROWS 1
 #define MATRIX_COLS 1
 
-#define MATRIX_ROW_PINS { C0}
-#define MATRIX_COL_PINS { B0}
+#define MATRIX_ROW_PINS { B0}
+#define MATRIX_COL_PINS { B1}
 
 #define SCREEN_NUM      2
 
