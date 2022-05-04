@@ -25,6 +25,10 @@ void amk_usb_init(void)
 void amk_usb_task(void)
 {
     tud_task();
+#ifdef CDC_ENABLE
+    void cdc_task(void);
+    cdc_task();
+#endif
 }
 
 bool amk_usb_itf_ready(uint32_t type)
@@ -33,10 +37,12 @@ bool amk_usb_itf_ready(uint32_t type)
     case HID_REPORT_ID_KEYBOARD:
     case HID_REPORT_ID_MACRO:
         return tud_hid_n_ready(ITF_NUM_HID_KBD);
+    #ifdef HID_OTHER_ENABLE
     case HID_REPORT_ID_MOUSE:
     case HID_REPORT_ID_SYSTEM:
     case HID_REPORT_ID_CONSUMER:
         return tud_hid_n_ready(ITF_NUM_HID_OTHER);
+    #endif
     default:
         break;
     }
@@ -52,6 +58,7 @@ bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t si
             return false;
         }
         break;
+    #ifdef HID_OTHER_ENABLE
     case HID_REPORT_ID_MOUSE:
         if (!tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_MOUSE, data, (uint8_t)size)) {
             amk_printf("failed to sent mouse report\n");
@@ -70,6 +77,7 @@ bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t si
             return false;
         }
         break;
+    #endif
     default:
         amk_printf("unknonw report type: %d\n", report_type);
         return false;
@@ -165,3 +173,46 @@ void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t rep
     }
 #endif
 }
+
+#ifdef CDC_ENABLE
+void cdc_output(const char* buf, uint32_t size)
+{
+    tud_cdc_write(buf, size);
+    tud_cdc_write_flush();
+}
+
+void cdc_task(void)
+{
+    if ( tud_cdc_available() )
+    {
+      // read datas
+        static char buf[256];
+        uint32_t count = tud_cdc_read(buf, sizeof(buf));
+        (void) count;
+
+        amk_printf("%s\n", buf);
+    }
+}
+
+// Invoked when cdc when line state changed e.g connected/disconnected
+void tud_cdc_line_state_cb(uint8_t itf, bool dtr, bool rts)
+{
+    (void) itf;
+    (void) rts;
+    // TODO set some indicator
+    if ( dtr )
+    {
+        // Terminal connected
+    }else
+    {
+        // Terminal disconnected
+    }
+}
+
+// Invoked when CDC interface received data from host
+void tud_cdc_rx_cb(uint8_t itf)
+{
+    (void) itf;
+}
+
+#endif

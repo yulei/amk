@@ -1,4 +1,17 @@
 
+USB_DEVICE_ENABLE ?= yes
+HID_OTHER_ENABLE ?= yes
+
+ifeq (yes, $(strip $(HID_OTHER_ENABLE)))
+	MOUSEKEY_ENABLE = yes
+	EXTRAKEY_ENABLE = yes
+	APP_DEFS += -DHID_OTHER_ENABLE
+endif
+
+ifeq (yes, $(strip $(CDC_ENABLE)))
+	APP_DEFS += -DCDC_ENABLE
+endif
+
 SRCS += \
 	$(MAIN_DIR)/amk/amk_action.c \
 	$(MAIN_DIR)/amk/amk_keymap.c \
@@ -10,7 +23,6 @@ SRCS += \
 	$(MAIN_DIR)/amk/report_queue.c \
 	$(MAIN_DIR)/amk/ring_buffer.c \
 	$(MAIN_DIR)/usb/udd_desc_stub.c \
-	$(MAIN_DIR)/usb/usb_descriptors.c \
 
 INCS += \
 	$(MAIN_DIR) \
@@ -42,4 +54,9 @@ ifeq (yes, $(strip $(RTOS_ENABLE)))
 	APP_DEFS += -DRTOS_ENABLE
 else
 	SRCS += $(MAIN_DIR)/amk/main.c
+endif
+
+ifeq (yes, $(strip $(USB_DEVICE_ENABLE)))
+	SRCS += $(MAIN_DIR)/usb/usb_descriptors.c
+	APP_DEFS += -DUSB_DEVICE_ENABLE
 endif

@@ -16,8 +16,8 @@
 #define MATRIX_ROWS 1
 #define MATRIX_COLS 1
 
-#define MATRIX_ROW_PINS { C0}
-#define MATRIX_COL_PINS { B0}
+#define MATRIX_ROW_PINS { B0}
+#define MATRIX_COL_PINS { B1}
 
 #define SCREEN_NUM      2
 
@@ -65,5 +65,5 @@
 //#define VECT_TAB_OFFSET 0x20000
 
 #define XTAL_VALUE      16000000
-//#define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
-#define CFG_TUSB_CONFIG_FILE    "tusb_def_host.h"
+#define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
+//#define CFG_TUSB_CONFIG_FILE    "tusb_def_host.h"

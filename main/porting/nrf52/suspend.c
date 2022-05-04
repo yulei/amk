@@ -39,11 +39,9 @@ void suspend_wakeup_init(void)
     clear_mods();
     clear_weak_mods();
     clear_keys();
-#ifdef MOUSEKEY_ENABLE
+#ifdef HID_OTHER_ENABLE 
     mousekey_clear();
-#endif /* MOUSEKEY_ENABLE */
-#ifdef EXTRAKEY_ENABLE
     host_system_send(0);
     host_consumer_send(0);
-#endif /* EXTRAKEY_ENABLE */
+#endif
 }

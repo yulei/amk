@@ -19,7 +19,9 @@ extern uint32_t usb_setting;
 // Interface number
 enum {
     ITF_NUM_HID_KBD,
+#ifdef HID_OTHER_ENABLE
     ITF_NUM_HID_OTHER,
+#endif
 #if defined(VIAL_ENABLE) || defined(MSC_ENABLE) || defined(AUDIO_ENABLE)
     ITF_NUM_DUMMY,
     #define ITF_NUM_VIAL            ITF_NUM_DUMMY
@@ -35,7 +37,9 @@ enum {
 // Endpoint number
 enum {
     EPNUM_HID_KBD       = 0x01,
+#ifdef HID_OTHER_ENABLE
     EPNUM_HID_OTHER,
+#endif
 #if defined(VIAL_ENABLE) || defined(MSC_ENABLE) || defined(AUDIO_ENABLE)
     EPNUM_DUMMY,
     #define EPNUM_VIAL_OUT      EPNUM_DUMMY
@@ -51,7 +55,13 @@ enum {
 // Interface number
 enum {
     ITF_NUM_HID_KBD,
+#ifdef HID_OTHER_ENABLE
     ITF_NUM_HID_OTHER,
+#endif
+#ifdef CDC_ENABLE
+    ITF_NUM_CDC,
+    ITF_NUM_CDC_DATA,
+#endif
 #ifdef VIAL_ENABLE
     ITF_NUM_VIAL,
 #endif
@@ -67,7 +77,14 @@ enum {
 
 enum {
     EPNUM_HID_KBD       = 0x01,
+#ifdef HID_OTHER_ENABLE
     EPNUM_HID_OTHER     = 0x02,
+#endif
+#ifdef CDC_ENABLE
+    EPNUM_CDC_NOTIF     = 0x02,
+    EPNUM_CDC_DATAOUT   = 0x03,
+    #define EPNUM_CDC_DATAIN    EPNUM_CDC_DATAOUT
+#endif
 #ifdef VIAL_ENABLE
     EPNUM_VIAL_OUT      = 0x03,
     #if defined(STM32F103xB) || defined(NRF52840_XXAA)
@@ -103,6 +120,7 @@ enum {
     HID_REPORT_ID_VIAL,
     HID_REPORT_ID_MACRO,
     HID_REPORT_ID_DELAY,
+    HID_REPORT_ID_CDC,
     HID_REPORT_ID_UNKNOWN,
 };
 

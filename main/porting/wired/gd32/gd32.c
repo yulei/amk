@@ -49,7 +49,8 @@ void custom_board_init(void)
 void custom_board_task(void)
 {}
 
-#if 0
+#define FAULT_BREAK
+#if 1
 static void fault_handler(void) 
 {
     #ifdef FAULT_BREAK

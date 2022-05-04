@@ -36,7 +36,7 @@ OF SUCH DAMAGE.
 #ifndef __USBH_PIPE_H
 #define __USBH_PIPE_H
 
-#include "usbh_conf.h"
+//#include "usbh_conf.h"
 #include "drv_usb_host.h"
 
 #define HC_MAX                  8U

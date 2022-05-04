@@ -1,7 +1,4 @@
 
-#always enabled tmk feature
-MOUSEKEY_ENABLE = yes
-EXTRAKEY_ENABLE = yes
 
 ifeq (yes, $(strip $(MATRIX_USE_TCA6424)))
 	APP_DEFS += -DMATRIX_I2C_PINS

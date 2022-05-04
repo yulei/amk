@@ -167,7 +167,7 @@ tusb_desc_device_t const desc_device =
     .bLength            = sizeof(tusb_desc_device_t),
     .bDescriptorType    = TUSB_DESC_DEVICE,
     .bcdUSB             = 0x0200,
-#ifdef AUDIO_ENABLE
+#if defined(AUDIO_ENABLE) || defined(CDC_ENABLE)
     .bDeviceClass       = TUSB_CLASS_MISC,
     .bDeviceSubClass    = MISC_SUBCLASS_COMMON,
     .bDeviceProtocol    = MISC_PROTOCOL_IAD,
@@ -286,10 +286,22 @@ uint32_t tud_descriptor_hid_report_vial_size(void)
 #endif
 
 // Configuration Descriptor
+#ifdef HID_OTHER_ENABLE
+#define HID_OTHER_DESC_LEN TUD_HID_DESC_LEN 
+#else
+#define HID_OTHER_DESC_LEN 0 
+#endif
+
 #ifdef VIAL_ENABLE
 #define VIAL_DESC_LEN TUD_HID_INOUT_DESC_LEN 
 #else
 #define VIAL_DESC_LEN 0 
+#endif
+
+#ifdef CDC_ENABLE
+#define CDC_DESC_LEN TUD_CDC_DESC_LEN 
+#else
+#define CDC_DESC_LEN 0 
 #endif
 
 #ifdef MSC_ENABLE 
@@ -304,7 +316,7 @@ uint32_t tud_descriptor_hid_report_vial_size(void)
 #define AUDIOUSB_DESC_LEN   0
 #endif
 
-#define CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + VIAL_DESC_LEN + MSCUSB_DESC_LEN + AUDIOUSB_DESC_LEN)
+#define CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + HID_OTHER_DESC_LEN + VIAL_DESC_LEN + MSCUSB_DESC_LEN + AUDIOUSB_DESC_LEN + CDC_DESC_LEN)
 
 #define CONFIG_LEN_MSC (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + MSCUSB_DESC_LEN)
 
@@ -317,7 +329,15 @@ static uint8_t desc_configuration[] = {
     TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
     // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_ITF_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+
+#ifdef HID_OTHER_ENABLE
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#endif
+
+#ifdef CDC_ENABLE
+  // Interface number, string index, EP notification address and size, EP data address (out, in) and size.
+  TUD_CDC_DESCRIPTOR(ITF_NUM_CDC, 0, EPNUM_CDC_NOTIF, 8, EPNUM_CDC_DATAOUT, 0x80 | EPNUM_CDC_DATAIN, 64),
+#endif
 
 #ifdef VIAL_ENABLE
     TUD_HID_INOUT_DESCRIPTOR(ITF_NUM_VIAL, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_vial), EPNUM_VIAL_OUT, 0x80 | EPNUM_VIAL_IN, VIAL_EPSIZE, CFG_TUD_HID_POLL_INTERVAL),
@@ -432,9 +452,12 @@ uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf)
 {
     if (itf == ITF_NUM_HID_KBD) {
         return tud_descriptor_hid_report_kbd_cb();
-    } else if (itf == ITF_NUM_HID_OTHER) {
+    } 
+    #ifdef HID_OTHER_ENABLE
+    else if (itf == ITF_NUM_HID_OTHER) {
         return tud_descriptor_hid_report_other_cb();
     }
+    #endif
     #ifdef VIAL_ENABLE
     else if (itf == ITF_NUM_VIAL) {
         return tud_descriptor_hid_report_vial_cb();
@@ -447,9 +470,12 @@ uint32_t tud_hid_descriptor_report_size(uint8_t itf)
 {
     if (itf == ITF_NUM_HID_KBD) {
         return tud_descriptor_hid_report_kbd_size();
-    } else if (itf == ITF_NUM_HID_OTHER) {
+    } 
+    #ifdef HID_OTHER_ENABLE
+    else if (itf == ITF_NUM_HID_OTHER) {
         return tud_descriptor_hid_report_other_size();
     }
+    #endif
     #ifdef VIAL_ENABLE
     else if (itf == ITF_NUM_VIAL) {
         return tud_descriptor_hid_report_vial_size();
@@ -467,9 +493,12 @@ uint8_t const* tud_hid_descriptor_interface_cb(uint8_t itf)
 {
     if (itf == ITF_NUM_HID_KBD) {
         return tud_descriptor_hid_interface_kbd_cb();
-    } else if (itf == ITF_NUM_HID_OTHER) {
+    }
+    #ifdef HID_OTHER_ENABLE
+    else if (itf == ITF_NUM_HID_OTHER) {
         return tud_descriptor_hid_interface_other_cb();
     }
+    #endif
     #ifdef VIAL_ENABLE
     else if (itf == ITF_NUM_VIAL) {
         return tud_descriptor_hid_interface_vial_cb();
@@ -482,9 +511,12 @@ uint32_t tud_hid_descriptor_interface_size(uint8_t itf)
 {
     if (itf == ITF_NUM_HID_KBD) {
         return tud_descriptor_hid_interface_kbd_size();
-    } else if (itf == ITF_NUM_HID_OTHER) {
+    } 
+    #ifdef HID_OTHER_ENABLE
+    else if (itf == ITF_NUM_HID_OTHER) {
         return tud_descriptor_hid_interface_other_size();
     }
+    #endif
     #ifdef VIAL_ENABLE
     else if (itf == ITF_NUM_VIAL) {
         return tud_descriptor_hid_interface_vial_size();
@@ -504,6 +536,7 @@ uint32_t tud_descriptor_hid_interface_kbd_size(void)
     return sizeof(desc_hid_kbd);
 }
 
+#ifdef HID_OTHER_ENABLE
 static uint8_t desc_hid_other[] = {
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
 };
@@ -518,6 +551,7 @@ uint32_t tud_descriptor_hid_interface_other_size(void)
 {
     return sizeof(desc_hid_other);
 }
+#endif
 
 #ifdef VIAL_ENABLE
 static uint8_t desc_hid_vial[] = {

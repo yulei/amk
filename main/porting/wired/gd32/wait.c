@@ -13,6 +13,8 @@ void wait_ms(int ms)
 
 void wait_us(int us)
 {
+//    __IO uint32_t ticks = us * (SystemCoreClock/1000000);
+//    while( ticks--) ;
     __IO uint32_t startTick = DWT->CYCCNT;
     __IO uint32_t delayTicks = us * (SystemCoreClock/1000000);
 

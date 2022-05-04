@@ -34,81 +34,23 @@ OF SUCH DAMAGE.
 */
 
 #include "drv_usb_hw.h"
-#include "drv_usbh_int.h"
-//#include "usbh_core.h"
 #include "gd32e10x_it.h"
-//#include "usbh_usr.h"
 #include "gd32_util.h"
 
-//extern usbh_host usb_host;
+#ifdef USB_HOST_ENABLE
+#include "drv_usbh_int.h"
 extern usb_core_driver usbh_core;
+#endif
+
+#ifdef USB_DEVICE_ENABLE
+#include "drv_usbd_int.h"
+extern usb_core_driver usbd_core;
+#endif
 
 #if USB_LOW_POWER
 /* local function prototypes ('static') */
 static void resume_mcu_clk(void);
 #endif /* USB_LOW_POWER */
-
-/*!
-    \brief      this function handles NMI exception
-    \param[in]  none
-    \param[out] none
-    \retval     none
-*/
-void NMI_Handler(void)
-{
-}
-
-/*!
-    \brief      this function handles HardFault exception
-    \param[in]  none
-    \param[out] none
-    \retval     none
-*/
-void HardFault_Handler(void)
-{
-    /* Go to infinite loop when Hard Fault exception occurs */
-    while (1){
-    }
-}
-
-/*!
-    \brief      this function handles MemManage exception
-    \param[in]  none
-    \param[out] none
-    \retval     none
-*/
-void MemManage_Handler(void)
-{
-    /* Go to infinite loop when Memory Manage exception occurs */
-    while (1){
-    }
-}
-
-/*!
-    \brief      this function handles BusFault exception
-    \param[in]  none
-    \param[out] none
-    \retval     none
-*/
-void BusFault_Handler(void)
-{
-    /* Go to infinite loop when Bus Fault exception occurs */
-    while (1){
-    }
-}
-
-/*!
-    \brief      this function handles UsageFault exception
-    \param[in]  none
-    \param[out] none
-    \retval     none
-*/
-void UsageFault_Handler(void)
-{
-    /* Go to infinite loop when Usage Fault exception occurs */
-    while (1){
-    }
-}
 
 /*!
     \brief      this function handles SVC exception
@@ -195,8 +137,15 @@ void EXTI1_IRQHandler(void)
 */
 void USBFS_IRQHandler(void)
 {
-extern uint32_t usbh_isr (usb_core_driver *udev);
+#ifdef USB_HOST_ENABLE
     usbh_isr(&usbh_core);
+#endif
+
+#ifdef USB_DEVICE_ENABLE
+    //usbd_isr(&usbd_core);
+    extern void dcd_int_handler(uint8_t rhport);
+    dcd_int_handler(0);
+#endif
 }
 
 #if USB_LOW_POWER

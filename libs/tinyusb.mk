@@ -5,6 +5,7 @@ SRCS += \
 	$(TINYUSB_DIR)/class/hid/hid_device.c \
 	$(TINYUSB_DIR)/class/audio/audio_device.c \
 	$(TINYUSB_DIR)/class/msc/msc_device.c \
+	$(TINYUSB_DIR)/class/cdc/cdc_device.c \
 	$(TINYUSB_DIR)/class/vendor/vendor_device.c \
 	$(TINYUSB_DIR)/common/tusb_fifo.c \
 	$(TINYUSB_DIR)/device/usbd.c \

@@ -224,5 +224,7 @@ void remote_wakeup(void)
     suspend_wakeup_init();
     // cleanup the host keyboard state
     send_keyboard_report();
+    #ifdef HID_OTHER_ENABLE
     mousekey_send();
+    #endif
 }
