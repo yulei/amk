@@ -24,7 +24,9 @@ typedef struct {
 } hid_report_t;
 
 // maximum size of the queue
-#define HID_REPORT_QUEUE_SIZE      32
+#ifndef HID_REPORT_QUEUE_SIZE
+#define HID_REPORT_QUEUE_SIZE      128
+#endif
 
 typedef struct {
     hid_report_t    items[HID_REPORT_QUEUE_SIZE];
