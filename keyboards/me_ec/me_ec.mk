@@ -1,12 +1,19 @@
 
-SRCS += $(wildcard $(KEYBOARD_DIR)/*.c)
+SRCS += \
+	$(KEYBOARD_DIR)/me_ec.c \
+	$(KEYBOARD_DIR)/me_ec_keymap.c \
+
 
 MCU = STM32F411
 TINYUSB_ENABLE = yes
 TINYUSB_USE_HAL = yes
 RGB_LINEAR_ENABLE = yes
+MATRIX_EC_ENABLE = yes
 
 LINKER_PATH = $(KEYBOARD_DIR)
 
 UF2_ENABLE = yes
 UF2_FAMILY = STM32F4
+
+#HID_OTHER_ENABLE = no
+#CDC_ENABLE = yes
