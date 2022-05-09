@@ -1,14 +1,11 @@
 /**
- * Copyright 2021 astro. All rights reserved.
- * Use of this source code is governed by a BSD-style
- * license that can be found in the LICENSE file.
- */
-
-/**
  * @file matrix_scan.h
- * @brief keyboard matrix scanning interface 
+ * @author astro
+ * @brief 
+ * 
+ * @copyright Copyright (c) 2022
+ * 
  */
-
 #include "matrix.h"
 
 void matrix_init_custom(void);

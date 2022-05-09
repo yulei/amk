@@ -150,3 +150,8 @@ ifeq (yes, $(strip $(INA219_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/ina219.c
 	APP_DEFS += -DINA219_ENABLE
 endif
+
+ifeq (yes, $(strip $(MATRIX_EC_ENABLE)))
+	SRCS += $(MAIN_DIR)/amk/ec_matrix.c
+	APP_DEFS += -DMATRIX_EC
+endif

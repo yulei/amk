@@ -18,6 +18,10 @@
 #include "amk_gpio.h"
 #include "amk_printf.h"
 
+#ifdef MATRIX_EC
+#include "ec_matrix.h"
+#endif
+
 #ifndef MATRIX_SCAN_DEBUG
 #define MATRIX_SCAN_DEBUG 0
 #endif
@@ -88,6 +92,33 @@ void matrix_init_custom(void)
 {
 #ifdef MATRIX_I2C_PINS
     matrix_i2c_init();
+#elif defined(MATRIX_EC)
+    ec_matrix_init(&ec_matrix);
+
+    for (int row = 0; row < MATRIX_ROWS; row++) {
+        gpio_set_output_pushpull(row_pins[row]);
+        gpio_write_pin(row_pins[row], 0);
+    }
+    #ifdef LEFT_EN_PIN
+    gpio_set_output_pushpull(LEFT_EN_PIN);
+    gpio_write_pin(LEFT_EN_PIN, 1);
+    #endif
+    #ifdef RIGHT_EN_PIN
+    gpio_set_output_pushpull(RIGHT_EN_PIN);
+    gpio_write_pin(RIGHT_EN_PIN, 1);
+    #endif
+    #ifdef COL_A_PIN 
+    gpio_set_output_pushpull(COL_A_PIN);
+    gpio_write_pin(COL_A_PIN, 0);
+    #endif
+    #ifdef COL_B_PIN 
+    gpio_set_output_pushpull(COL_B_PIN);
+    gpio_write_pin(COL_B_PIN, 0);
+    #endif
+    #ifdef COL_C_PIN 
+    gpio_set_output_pushpull(COL_C_PIN);
+    gpio_write_pin(COL_C_PIN, 0);
+    #endif
 #else
     #ifndef MATRIX_DIRECT_PINS
         for (int col = 0; col < MATRIX_COLS; col++) {
@@ -124,7 +155,61 @@ bool matrix_scan_custom(matrix_row_t* raw)
 #ifdef MATRIX_I2C_PINS
     changed = matrix_i2c_scan(raw);
 #else
-    #ifndef MATRIX_DIRECT_PINS
+    #ifdef MATRIX_DIRECT_PINS
+        for (int col = 0; col < MATRIX_COLS; col++) {
+            for(uint8_t row = 0; row < MATRIX_ROWS; row++) {
+                matrix_row_t last_row_value    = matrix_debouncing[row];
+                matrix_row_t current_row_value = last_row_value;
+
+                if ( gpio_read_pin(direct_pins[MATRIX_COLS*row+col])) {
+                    current_row_value &= ~(1 << col);
+                } else {
+                    current_row_value |= (1 << col);
+                }
+
+                if (last_row_value != current_row_value) {
+                    matrix_debouncing[row] = current_row_value;
+                    changed = true;
+                }
+            }
+        }
+    #elif defined(MATRIX_EC)
+        for (int col = 0; col < MATRIX_COLS; col++) {
+            gpio_write_pin(COL_A_PIN, (col_pins[col]&COL_A_MASK) ? 1 : 0);
+            gpio_write_pin(COL_B_PIN, (col_pins[col]&COL_B_MASK) ? 1 : 0);
+            gpio_write_pin(COL_C_PIN, (col_pins[col]&COL_C_MASK) ? 1 : 0);
+
+            if (col_pins[col]&L_MASK) {
+                gpio_write_pin(LEFT_EN_PIN,  0);
+            }
+            #ifdef RIGHT_EN_PIN
+            if (col_pins[col]&R_MASK) {
+                gpio_write_pin(RIGHT_EN_PIN, 0);
+            }
+            #endif
+
+            for (int row = 0; row < MATRIX_ROWS; row++) {
+                matrix_row_t last_row_value    = raw[row];
+                matrix_row_t current_row_value = last_row_value;
+
+                if (ec_matrix_sense(row_pins[row], row, col)) {
+                    current_row_value |= (1 << col);
+                } else {
+                    current_row_value &= ~(1 << col);
+                }
+
+                if (last_row_value != current_row_value) {
+                    raw[row] = current_row_value;
+                    changed = true;
+                    ec_matrix_dump_row(&ec_matrix, row);
+                }
+            }
+            gpio_write_pin(LEFT_EN_PIN,  1);
+            #ifdef RIGHT_EN_PIN
+            gpio_write_pin(RIGHT_EN_PIN, 1);
+            #endif
+        }
+    #else
         for (int col = 0; col < MATRIX_COLS; col++) {
             gpio_write_pin(col_pins[col], 1);
             wait_us(10);
@@ -146,24 +231,6 @@ bool matrix_scan_custom(matrix_row_t* raw)
             }
             gpio_write_pin(col_pins[col], 0);
         }
-    #else
-        for (int col = 0; col < MATRIX_COLS; col++) {
-            for(uint8_t row = 0; row < MATRIX_ROWS; row++) {
-                matrix_row_t last_row_value    = matrix_debouncing[row];
-                matrix_row_t current_row_value = last_row_value;
-
-                if ( gpio_read_pin(direct_pins[MATRIX_COLS*row+col])) {
-                    current_row_value &= ~(1 << col);
-                } else {
-                    current_row_value |= (1 << col);
-                }
-
-                if (last_row_value != current_row_value) {
-                    matrix_debouncing[row] = current_row_value;
-                    changed = true;
-                }
-            }
-        }
     #endif
 #endif
     if (changed) {
@@ -174,10 +241,18 @@ bool matrix_scan_custom(matrix_row_t* raw)
     return changed;
 }
 
+__attribute__((weak))
+bool matrix_scan_post(matrix_row_t *raw)
+{
+    return false;
+}
+
 uint8_t matrix_scan(void)
 {
     matrix_scan_debug("matrix scan start\n");
     bool changed = matrix_scan_custom(&matrix_debouncing[0]);
+    
+    changed |= matrix_scan_post(&matrix_debouncing[0]);
 
     if (changed && !debouncing) {
         debouncing = true;

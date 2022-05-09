@@ -5,6 +5,7 @@ TINYUSB_USE_HAL = yes
 RGB_LINEAR_ENABLE = yes
 EECONFIG_FLASH = yes
 VIAL_ENABLE = yes
+MATRIX_EC_ENABLE = yes
 
 LINKER_PATH = $(KEYBOARD_DIR)
 
@@ -15,7 +16,6 @@ UF2_FAMILY = STM32F4
 #CDC_ENABLE = yes
 
 SRCS += \
-	$(KEYBOARD_DIR)/custom_matrix.c \
 	$(KEYBOARD_DIR)/imp_ec.c \
 
 ifeq (yes, $(strip $(VIAL_ENABLE)))
