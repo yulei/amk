@@ -53,6 +53,7 @@ static bool ec_matrix_update(ec_matrix_t *matrix, uint8_t row, uint8_t col, uint
 
     if (key->max_auto < value) {
         if (value > EC_SENSE_MAX) {
+            // drop it
             key->max_auto = EC_SENSE_MAX;
             ec_matrix_debug("MAX hit row:%d,col:%d, value:%d\n", row, col, value);
         } else {
@@ -144,7 +145,9 @@ bool ec_matrix_sense(pin_t row_pin, uint8_t row, uint8_t col)
     gpio_write_pin(DISCHARGE_PIN, DISCHARGE_DISABLE);
     wait_us(DISCHARGE_DELAY);
     gpio_write_pin(row_pin, 1);
-    //wait_us(2);
+    #ifdef CHARGE_WAIT
+    wait_us(CHARGE_WAIT);
+    #endif
     
     uint32_t data = adc_read();
 
