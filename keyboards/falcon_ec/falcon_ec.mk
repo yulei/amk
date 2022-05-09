@@ -22,4 +22,4 @@ SRCS += $(KEYBOARD_DIR)/falcon_ec_keymap.c
 
 #SRCS += $(KEYBOARD_DIR)/matrix_ec.c
 #HID_OTHER_ENABLE = no
-CDC_ENABLE = yes
+#CDC_ENABLE = yes

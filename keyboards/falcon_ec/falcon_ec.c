@@ -79,8 +79,8 @@ ec_matrix_t ec_matrix = {
             {79,1580,EC_AUTO_MIN, EC_AUTO_MAX, 0, STROKE_DEFAULT},
         },
     },
-    EC_DEFAULT_MODE,
-    //EC_AUTO_MODE,
+    //EC_DEFAULT_MODE,
+    EC_AUTO_MODE,
     //EC_CALIBRATE_MODE,
 };
 
