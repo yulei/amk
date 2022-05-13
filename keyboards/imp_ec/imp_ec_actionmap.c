@@ -12,7 +12,7 @@
 #define AC_FN5	ACTION_LAYER_MOMENTARY(1)
 
 const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS] = {
-	[0]=LAYOUT_default(
+	[0]=LAYOUT_all(
 		AC_FN2,
 
 		AC_ESC, AC_F1, AC_F2, AC_F3, AC_F4, AC_F5, AC_F6, AC_F7, AC_F8, AC_F9, AC_F10, AC_F11, AC_F12, AC_F13,  AC_PSCR, AC_NLCK, AC_FN0,
@@ -23,7 +23,7 @@ const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS] = {
 		AC_LSFT, AC_LSFT, AC_LGUI, AC_Z, AC_X, AC_C, AC_V, AC_B, AC_N, AC_M, AC_COMM, AC_DOT, AC_SLSH,      AC_RSFT,            AC_UP,
 		AC_LCTL, AC_LGUI, AC_LALT,             AC_SPC,     AC_FN1,               AC_RALT,     AC_RALT,AC_RGUI,AC_RCTL,  AC_LEFT, AC_DOWN, AC_RGHT),
 
-	[1]=LAYOUT_default(
+	[1]=LAYOUT_all(
 		_______,
 
 		AC_MUTE, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, _______,
