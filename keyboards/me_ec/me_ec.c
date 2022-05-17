@@ -124,7 +124,9 @@ ec_matrix_t ec_matrix = {
 
 void matrix_init_kb(void)
 {
+#ifdef MATRIX_EC_ENABLE
     ec_matrix_init(&ec_matrix);
+#endif
 
     #ifdef RGB_EN_PIN
     gpio_set_output_pushpull(RGB_EN_PIN);

@@ -2,13 +2,14 @@
 SRCS += \
 	$(KEYBOARD_DIR)/me_ec.c \
 	$(KEYBOARD_DIR)/me_ec_keymap.c \
+	$(KEYBOARD_DIR)/custom_matrix.c \
 
 
 MCU = STM32F411
 TINYUSB_ENABLE = yes
 TINYUSB_USE_HAL = yes
 RGB_LINEAR_ENABLE = yes
-MATRIX_EC_ENABLE = yes
+#MATRIX_EC_ENABLE = yes
 
 LINKER_PATH = $(KEYBOARD_DIR)
 
