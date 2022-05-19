@@ -145,6 +145,7 @@ void ssd1306_config(screen_driver_t *driver, screen_driver_param_t *param)
     ssd1306_driver.spi = spi_init(SSD1306_SPI_ID);
 
     driver->data        = &ssd1306_driver;
+    driver->type        = ssd1306_type;
     driver->init        = ssd1306_init;
     driver->uninit      = ssd1306_uninit;
     driver->fill        = ssd1306_fill_rect;
@@ -232,3 +233,8 @@ void ssd1306_fill(screen_driver_t *lcd, const void* data)
 
 void ssd1306_uninit(screen_driver_t *lcd)
 {}
+
+uint8_t ssd1306_type(screen_driver_t *driver)
+{
+    return SPI_LCD_SSD1306;
+}

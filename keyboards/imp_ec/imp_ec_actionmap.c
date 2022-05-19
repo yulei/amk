@@ -21,7 +21,7 @@ const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS] = {
 		AC_TAB, AC_Q, AC_W, AC_E, AC_R, AC_T, AC_Y, AC_U, AC_I, AC_O, AC_P, AC_LBRC, AC_RBRC, AC_BSLS,   AC_DEL, AC_END, AC_PGDN,
 		AC_FN4,   AC_A, AC_S, AC_D, AC_F, AC_G, AC_H, AC_J, AC_K, AC_L, AC_SCLN, AC_QUOT, AC_BSLS, AC_ENT, AC_ENT,
 		AC_LSFT, AC_LSFT, AC_LGUI, AC_Z, AC_X, AC_C, AC_V, AC_B, AC_N, AC_M, AC_COMM, AC_DOT, AC_SLSH,      AC_RSFT,            AC_UP,
-		AC_LCTL, AC_LGUI, AC_LALT,             AC_SPC,     AC_FN1,               AC_RALT,     AC_RALT,AC_RGUI,AC_RCTL,  AC_LEFT, AC_DOWN, AC_RGHT),
+		AC_LGUI, AC_LGUI, AC_LALT,             AC_SPC,     AC_FN1,               AC_RALT,     AC_RALT,AC_RGUI,AC_RCTL,  AC_LEFT, AC_DOWN, AC_RGHT),
 
 	[1]=LAYOUT_all(
 		_______,

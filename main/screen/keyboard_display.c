@@ -100,6 +100,12 @@ typedef struct {
 } fwk_animation_t;
 
 typedef struct {
+    uint32_t count;
+    uint32_t time;
+} keyhit_counter_t;
+
+
+typedef struct {
     screen_t        *screen;
     display_t       *display;
     display_param_t param;
@@ -119,8 +125,14 @@ static ecg_animation_t ecg_anim;
 
 static uint8_t keyhit_mode = KEYHIT_FWK;
 
-static void draw_rect(screen_t *screen, uint32_t x, uint32_t y, uint32_t width, uint32_t height);
-static void draw_line(screen_t *screen, int32_t x0, int32_t y0, int32_t x1, int32_t y1);
+static keyhit_counter_t keyhit_matrix[MATRIX_ROWS][MATRIX_COLS];
+
+static void keyhit_counter_reset(void);
+static void keyhit_counter_update(uint8_t row, uint8_t col);
+static uint16_t keyhit_counter_color(uint8_t row, uint8_t col);
+
+static void draw_rect(screen_t *screen, uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint16_t color);
+static void draw_line(screen_t *screen, int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint16_t color);
 
 static bool fwk_point_valid(fwk_point_t *point, uint8_t center_x, uint8_t center_y)
 {
@@ -229,13 +241,13 @@ static void keyhit_fwk_render(screen_t *screen)
         fwk_t *fwk = &fwk_anim.fwks[i];
         switch(fwk->state) {
         case FWK_RISE:
-            draw_rect(screen, fwk->center_x, fwk->current_y, 1, 1);
+            draw_rect(screen, fwk->center_x, fwk->current_y, 1, 1, 0xFFFF);
             break;
         case FWK_BOOM:
             for(int j = 0; j < FWK_POINT_COUNT; j++) {
                 fwk_point_t *pt = &fwk->points[j];
                 if (fwk_point_valid(pt, fwk->center_x, fwk->center_y)) {
-                    draw_rect(screen, (uint8_t)pt->x, (uint8_t)pt->y, 1, 1);
+                    draw_rect(screen, (uint8_t)pt->x, (uint8_t)pt->y, 1, 1, 0xFFFF);
                 }
             }
             break;
@@ -303,7 +315,7 @@ static void keyhit_ecg_render(screen_t *screen)
             int32_t x1 = ecg->points[j+1].x+ecg->current_x;
             int32_t y1 = ecg->points[j+1].y;
 
-            draw_line(screen, x0, y0, x1, y1);
+            draw_line(screen, x0, y0, x1, y1, 0xFFFF);
         }
     }
 
@@ -315,6 +327,8 @@ static void keyhit_init(void)
     srand(timer_read32());
     keyhit_fwk_init();
     keyhit_ecg_init();
+
+    keyhit_counter_reset();
 }
 
 static void keyhit_update(bool hit)
@@ -347,28 +361,30 @@ void keyboard_display_uninit(display_t *display)
 {
 }
 
-static void draw_rect(screen_t *screen, uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+static void draw_rect(screen_t *screen, uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint16_t color)
 {
     for (uint32_t i = 0; i < width; i++) {
         for (uint32_t j = 0; j < height; j++) {
-            screen->plot(screen, x+i, y+j, 0xFFFF);
+            screen->plot(screen, x+i, y+j, color);
         }
     }
 }
 
-static bool dot_valid(int32_t x0, int32_t y0)
-{
-    if ((x0 < ECG_FRAME_MIN) || (x0 > ECG_FRAME_MAX)) return false;
+//static bool dot_valid(int32_t x, int32_t y, uint32_t width, uint32_t height)
+//{
+    //if ((x0 < ECG_FRAME_MIN) || (x0 > ECG_FRAME_MAX)) return false;
+//    if ((x < 0) || (x > width)) return false;
+//    if ((y < 0) || (y > height)) return false;
 
-    return true;
-}
+//    return true;
+//}
 
-static void draw_line(screen_t *screen, int32_t x0, int32_t y0, int32_t x1, int32_t y1)
+static void draw_line(screen_t *screen, int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint16_t color)
 {
     if ((x0==x1) && (y0==y1)) {
-        if (dot_valid(x0, y0)) {
-            screen->plot(screen, x0, y0, 0xFFFF);
-        }
+        //if (dot_valid(x0, y0, )) {
+            screen->plot(screen, x0, y0, color); 
+        //}
         return;
     }
 
@@ -390,9 +406,9 @@ static void draw_line(screen_t *screen, int32_t x0, int32_t y0, int32_t x1, int3
     float y = y0;
     uint32_t i = 0;
     do {
-        if (dot_valid((int32_t)(x+0.5), (int32_t)(y+0.5))) {
-            screen->plot(screen, (int32_t)(x+0.5), (int32_t)(y+0.5), 0xFFFF);
-        }
+        //if (dot_valid((int32_t)(x+0.5), (int32_t)(y+0.5))) {
+            screen->plot(screen, (int32_t)(x+0.5), (int32_t)(y+0.5), color); 
+        //}
         ++i;
         x += step_x;
         y += step_y;
@@ -415,7 +431,10 @@ void keyboard_display_task(display_t *display)
         for (int i = 0; i < KEYBOARD_KEY_COUNT; i++) {
             matrix_row_t row = matrix_get_row(keyboard_keys[i].pos.row);
             if (!(row&(1<<keyboard_keys[i].pos.col))) {
-                draw_rect(obj->screen, keyboard_keys[i].x, keyboard_keys[i].y, keyboard_keys[i].w, keyboard_keys[i].h);
+                uint16_t color = keyhit_counter_color(keyboard_keys[i].pos.row, keyboard_keys[i].pos.col);
+                draw_rect(obj->screen, keyboard_keys[i].x, keyboard_keys[i].y, keyboard_keys[i].w, keyboard_keys[i].h, color);
+            } else {
+                amk_printf("row:%d, col:%d, skipped\n", keyboard_keys[i].pos.row, keyboard_keys[i].pos.col);
             }
         }
 
@@ -430,6 +449,12 @@ void keyboard_display_task(display_t *display)
             obj->ticks = timer_read32();
         }
 
+        if (obj->param.flags & DISPLAY_FLAGS_FRAME) {
+            draw_line(obj->screen, 0, 0, obj->param.width-1, 0, 0xFFFF);
+            draw_line(obj->screen, obj->param.width-1, 0, obj->param.width-1, obj->param.height-1, 0xFFFF);
+            draw_line(obj->screen, obj->param.width-1, obj->param.height-1, 0, obj->param.height-1, 0xFFFF);
+            draw_line(obj->screen, 0, obj->param.height-1, 0, 0, 0xFFFF);
+        }
         obj->screen->refresh(obj->screen);
         obj->dirty = false;
         //obj->ticks = timer_read32();
@@ -458,6 +483,8 @@ void keyboard_display_matrix_change(display_t *display, keyevent_t event)
     if (IS_PRESSED(event)) {
         keyhit_update(true);
         kbddisp_debug("keyhit: col=%d, row=%d, pressed=%d, time=%d\n", event.key.col, event.key.row, event.pressed, event.time);
+
+        keyhit_counter_update(event.key.row, event.key.col);
     }
 }
 
@@ -488,6 +515,35 @@ bool keyboard_display_create(display_t *display, display_param_t *param)
     }
 
     return false;
+}
+
+static void keyhit_counter_reset(void)
+{
+    for (int i = 0; i < MATRIX_ROWS; i++) {
+        for (int j = 0; j < MATRIX_COLS; j++) {
+            keyhit_matrix[i][j].count = 0;
+            keyhit_matrix[i][j].time = 0;
+        }
+    }
+}
+
+static void keyhit_counter_update(uint8_t row, uint8_t col)
+{
+    keyhit_matrix[row][col].count ++;
+    keyhit_matrix[row][col].time = timer_read32();
+}
+
+static uint16_t keyhit_counter_color(uint8_t row, uint8_t col)
+{
+    uint32_t count = keyhit_matrix[row][col].count;
+
+    uint8_t r = count &0xFF;
+    uint8_t g = (count >> 8)&0xFF;
+    uint8_t b = (count >> 16)&0xFF;
+
+    uint16_t color = ((r >> 3) << 11) | ((g>>2) << 5) | (b >> 3);
+
+    return color;
 }
 
 #endif

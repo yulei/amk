@@ -258,6 +258,7 @@ void st7735_config(screen_driver_t *driver, screen_driver_param_t *param)
     st7735_driver.spi = spi_init(ST7735_SPI_ID);
 
     driver->data        = &st7735_driver;
+    driver->type        = st7735_type;
     driver->init        = st7735_init;
     driver->uninit      = st7735_uninit;
     driver->fill        = st7735_fill_rect;
@@ -323,3 +324,8 @@ void st7735_fill(screen_driver_t *lcd, const void* data)
 
 void st7735_uninit(screen_driver_t *lcd)
 {}
+
+uint8_t st7735_type(screen_driver_t *lcd)
+{
+    return SPI_LCD_ST7735;
+}

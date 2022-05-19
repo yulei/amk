@@ -245,6 +245,7 @@ void st7789_config(screen_driver_t *driver, screen_driver_param_t *param)
     st7789_driver.spi = spi_init(ST7789_SPI_ID);
 
     driver->data        = &st7789_driver;
+    driver->type        = st7789_type;
     driver->init        = st7789_init;
     driver->uninit      = st7789_uninit;
     driver->fill        = st7789_fill_rect;
@@ -309,3 +310,8 @@ void st7789_fill(screen_driver_t*lcd, const void* data)
 
 void st7789_uninit(screen_driver_t *lcd)
 {}
+
+uint8_t st7789_type(screen_driver_t *driver)
+{
+    return SPI_LCD_ST7789;
+}

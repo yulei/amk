@@ -52,6 +52,8 @@ typedef struct {
     uint8_t     driver; // driver index
 } screen_param_t;
 
+#define DISPLAY_FLAGS_FRAME     0x01
+
 typedef struct {
     uint8_t     type;
     uint8_t     screen; // screen index
@@ -60,11 +62,13 @@ typedef struct {
     uint8_t     file_type;
     uint8_t     audio_format;
     uint8_t     enabled;
+    uint8_t     flags;
 } display_param_t;
 
 typedef struct screen_driver_s screen_driver_t;
 
 typedef struct screen_driver_s {
+    uint8_t (*type)(screen_driver_t *driver);
     void (*init)(screen_driver_t *driver);
     void (*uninit)(screen_driver_t *driver);
     void (*clear)(screen_driver_t *driver, void *data);

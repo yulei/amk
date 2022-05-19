@@ -13,6 +13,7 @@
 #include "nrf_gpio.h"
 #include "rf_power.h"
 #include "amk_printf.h"
+#include "timer.h"
 
 #ifndef NRF52_I2C_DEBUG
 #define NRF52_I2C_DEBUG 1
@@ -58,12 +59,18 @@ static void set_done(i2c_instance_t *inst, bool state)
     }
 }
 
-static void wait_done(i2c_instance_t *inst)
+static bool wait_done(i2c_instance_t *inst)
 {
+    uint32_t ticks = timer_read32();
     if (inst->id == I2C_INSTANCE_1) {
         while( !done1) {
+            if (timer_elapsed32(ticks) > 100) {
+                return false;
+            }
         };
     }
+
+    return true;
 }
 
 static void i2c_event_handler(nrfx_twi_evt_t const *p_event, void *p_context);
@@ -157,7 +164,10 @@ amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void *data, size_t le
         return AMK_I2C_ERROR;
     }
 
-    wait_done(inst);
+    if (!wait_done(inst)) {
+        set_done(inst, true);
+        return AMK_I2C_ERROR;
+    }
 
     return inst->error;
 }
@@ -174,7 +184,10 @@ amk_error_t i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, 
         return AMK_I2C_ERROR;
     }
 
-    wait_done(inst);
+    if (!wait_done(inst)) {
+        set_done(inst, true);
+        return AMK_I2C_ERROR;
+    }
 
     return inst->error;
 }
@@ -201,7 +214,11 @@ amk_error_t i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data
         return AMK_I2C_ERROR;
     }
 
-    wait_done(inst);
+    if (!wait_done(inst)) {
+        set_done(inst, true);
+        return AMK_I2C_ERROR;
+    }
+
 
     return inst->error;
 }
