@@ -192,7 +192,9 @@ bool matrix_scan_custom(matrix_row_t* raw)
                 matrix_row_t last_row_value    = raw[row];
                 matrix_row_t current_row_value = last_row_value;
 
-                if (ec_matrix_sense(row_pins[row], row, col)) {
+                bool on = (last_row_value&(1<<col)) ? true : false;
+
+                if (ec_matrix_sense(row_pins[row], row, col, on)) {
                     current_row_value |= (1 << col);
                 } else {
                     current_row_value &= ~(1 << col);

@@ -25,23 +25,45 @@ void ec_matrix_init(ec_matrix_t *matrix)
 
 }
 
-static bool ec_auto_check(ec_key_t *key, uint16_t value) 
+static bool ec_key_down(uint16_t value, bool on, uint16_t release, uint16_t press)
+{
+    if (on) {
+        // press to release
+        if (value > release) {
+            return true;
+        }
+    } else {
+        // release to press
+        if (value > press) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool ec_auto_check(ec_key_t *key, uint16_t value, bool on) 
 {
     bool key_down = false;
 
-    if (key->max_auto > SENSE_TH) {
-        if (value > ((key->min_auto+key->max_auto)*key->stroke)/STROKE_MAX) {
-            key_down = true;
-        }
+    if (key->max_auto > EC_TH_HIGH) {
+        key_down = ec_key_down(value, on, ((key->min_auto+key->max_auto)*key->release)/STROKE_MAX,
+                                            ((key->min_auto+key->max_auto)*key->press)/STROKE_MAX);
     } else {
-        if (value > SENSE_TH) {
-            key_down = true;
-        }
+        key_down = ec_key_down(value, on, EC_TH_LOW, EC_TH_HIGH);
     }
     return key_down;
 }
 
-static bool ec_matrix_update(ec_matrix_t *matrix, uint8_t row, uint8_t col, uint16_t value)
+static bool ec_default_check(ec_key_t *key, uint16_t value, bool on) 
+{
+    bool key_down = false;
+
+    key_down = ec_key_down(value, on, ((key->min_def+key->max_def)*key->release)/STROKE_MAX,
+                                            ((key->min_def+key->max_def)*key->press)/STROKE_MAX);
+    return key_down;
+}
+
+static bool ec_matrix_update(ec_matrix_t *matrix, bool on, uint8_t row, uint8_t col, uint16_t value)
 {
     ec_key_t *key = &matrix->keys[row][col];
 
@@ -65,16 +87,14 @@ static bool ec_matrix_update(ec_matrix_t *matrix, uint8_t row, uint8_t col, uint
     switch (matrix->mode) {
     case EC_DEFAULT_MODE:
         if (key->max_def == EC_INVALID_MAX) {
-            key_down = ec_auto_check(key, value);
+            key_down = ec_auto_check(key, value, on);
         } else {
-            if (value > ((key->min_def+key->max_def)*key->stroke)/STROKE_MAX) {
-                key_down = true;
-            }
+            key_down = ec_default_check(key, value, on);
         }
         break;
     case EC_AUTO_MODE:
     case EC_CALIBRATE_MODE:
-        key_down = ec_auto_check(key, value);
+        key_down = ec_auto_check(key, value, on);
         break;
     default:
         break;
@@ -89,7 +109,7 @@ static void ec_dump_key(ec_key_t *key, uint8_t row, uint8_t col)
     void cdc_output(const char* buf, uint32_t size);
     static char buf[128];
 #if 1   // dump for code
-    int count = sprintf(buf, "row:%d,col:%d, {%d,%d,EC_AUTO_MIN, EC_AUTO_MAX, 0, STROKE_DEFAULT},\n",
+    int count = sprintf(buf, "row:%d,col:%d, {%d,%d,EC_AUTO_MIN, EC_AUTO_MAX, 0, STROKE_PRESS, STOKE_RELEASE},\n",
                             row, col, key->min_auto, key->max_auto);
 #else
     int count = sprintf(buf, "row:%d,col:%d, min:%d, max:%d, value:%d, stoke:%d\n",
@@ -137,7 +157,7 @@ static uint32_t adc_read(void)
     return data;
 }
 
-bool ec_matrix_sense(pin_t row_pin, uint8_t row, uint8_t col)
+bool ec_matrix_sense(pin_t row_pin, uint8_t row, uint8_t col, bool on)
 {
     bool key_down = false;
     gpio_write_pin(DISCHARGE_PIN, DISCHARGE_ENABLE);
@@ -151,7 +171,7 @@ bool ec_matrix_sense(pin_t row_pin, uint8_t row, uint8_t col)
     
     uint32_t data = adc_read();
 
-    key_down = ec_matrix_update(&ec_matrix, row, col, data);
+    key_down = ec_matrix_update(&ec_matrix, on, row, col, data);
 
     gpio_write_pin(row_pin, 0);
     gpio_write_pin(DISCHARGE_PIN, DISCHARGE_ENABLE);

@@ -78,9 +78,9 @@ static void system_clock_init(void)
     stcSysClkCfg.enExclkDiv = ClkSysclkDiv4;
     stcSysClkCfg.enPclk0Div = ClkSysclkDiv2;
     stcSysClkCfg.enPclk1Div = ClkSysclkDiv4;
-    stcSysClkCfg.enPclk2Div = ClkSysclkDiv8;
+    stcSysClkCfg.enPclk2Div = ClkSysclkDiv8;//ClkSysclkDiv8;
     stcSysClkCfg.enPclk3Div = ClkSysclkDiv8;
-    stcSysClkCfg.enPclk4Div = ClkSysclkDiv4;
+    stcSysClkCfg.enPclk4Div = ClkSysclkDiv4;////ClkSysclkDiv4;
     CLK_SysClkConfig(&stcSysClkCfg);
 
     /* Config Xtal and Enable Xtal */

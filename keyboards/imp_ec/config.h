@@ -18,8 +18,8 @@
 #define MATRIX_ROW_PINS {ROW_6_PIN, ROW_1_PIN, ROW_2_PIN, ROW_3_PIN, ROW_4_PIN, ROW_5_PIN}
 #define MATRIX_COL_PINS {L_MASK|3, L_MASK|0, L_MASK|1, L_MASK|2, L_MASK|4, L_MASK|6, L_MASK|7, L_MASK|5, R_MASK|3, R_MASK|0, R_MASK|1, R_MASK|2, R_MASK|4, R_MASK|6, R_MASK|7, R_MASK|5}
 
-//#define DISCHARGE_WAIT_PRE  5
-//#define DISCHARGE_WAIT_POST 35
+#define DISCHARGE_WAIT_PRE  50
+#define DISCHARGE_WAIT_POST 50
 
 #define DIRECT_KEY_PIN  A10
 #define DIRECT_KEY_ROW  5
@@ -46,7 +46,9 @@
 #define KEY_IN_CHANNEL  ADC_CHANNEL_2
 #define KEY_IN_PIN      GPIO_PIN_2
 #define KEY_IN_PORT     GPIOA
-#define SENSE_TH        1192
+#define EC_TH_LOW       1024
+#define EC_TH_HIGH      1192
+#define SENSE_TH        EC_TH_HIGH
 
 #define CAPS_LED_PIN    A8
 #define NUM_LED_PIN     B3
@@ -64,7 +66,7 @@
 #define RGB_SEGMENT_NUM 2
 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
-#define DEBOUNCE        5
+#define DEBOUNCE        10
 
 #define VECT_TAB_OFFSET 0x20000
 #define HSE_VALUE       16000000

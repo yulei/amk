@@ -58,9 +58,6 @@
 
 /* External variables --------------------------------------------------------*/
 extern PCD_HandleTypeDef hpcd_USB_FS;
-extern DMA_HandleTypeDef hdma_usart1_rx;
-extern DMA_HandleTypeDef hdma_usart1_tx;
-extern UART_HandleTypeDef huart1;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -117,6 +114,9 @@ void PendSV_Handler(void)
 /******************************************************************************/
 
 #ifdef USE_UART1
+extern DMA_HandleTypeDef hdma_usart1_rx;
+extern DMA_HandleTypeDef hdma_usart1_tx;
+extern UART_HandleTypeDef huart1;
 __attribute__((weak)) void uart_recv_char(uint8_t c){}
 
 void uart_error_process(UART_HandleTypeDef * huart, uint32_t isr)

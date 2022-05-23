@@ -55,6 +55,7 @@ INCS += \
 	$(VENDOR_DIR)/$(HC32_DDL)/mcu/common \
 	$(VENDOR_DIR)/$(HC32_DDL)/mcu/GCC/CMSIS/Core/Include \
 	$(VENDOR_DIR)/$(HC32_DDL)/driver/inc \
+	$(HC32SDK_DIR) \
 
 APP_DEFS += \
 	-DUSE_DEVICE_DRIVER_LIB \

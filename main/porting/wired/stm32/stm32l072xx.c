@@ -10,6 +10,7 @@
 #endif
 
 RTC_HandleTypeDef hrtc;
+
 #ifdef USE_UART1
 UART_HandleTypeDef huart1;
 #endif
@@ -17,12 +18,18 @@ UART_HandleTypeDef huart1;
 ADC_HandleTypeDef hadc1;
 #endif
 
-#ifdef PWM_TIM
+#ifdef USE_PWM_TIM3
 TIM_HandleTypeDef htim3;
 DMA_HandleTypeDef hdma_tim3_ch1;
 #endif
 
+#ifdef WAIT_TIM
 TIM_HandleTypeDef htim2;
+#endif
+
+#ifdef USE_I2C1
+I2C_HandleTypeDef hi2c1;
+#endif
 
 void USB_IRQHandler(void)
 {
@@ -240,6 +247,32 @@ static void MX_ADC_Init(void)
 }
 #endif
 
+#ifdef USE_I2C1
+static void MX_I2C1_Init(void)
+{
+    #if 0
+    hi2c1.Instance = I2C1;
+    hi2c1.Init.Timing = 0x00707CBB;
+    hi2c1.Init.OwnAddress1 = 0;
+    hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+    hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+    hi2c1.Init.OwnAddress2 = 0;
+    hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+    hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+    hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+    if (HAL_I2C_Init(&hi2c1) != HAL_OK) {
+        Error_Handler();
+    }
+    if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK) {
+        Error_Handler();
+    }
+
+    if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK) {
+        Error_Handler();
+    }
+    #endif
+}
+#endif
 /**
   * Enable DMA controller clock
   */
@@ -252,7 +285,7 @@ static void MX_DMA_Init(void)
     /* DMA1_Channel1_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
-    #ifdef PWM_TIM
+    #ifdef USE_PWM_TIM3
       /* DMA1_Channel4_5_6_7_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(DMA1_Channel4_5_6_7_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Channel4_5_6_7_IRQn);
@@ -288,7 +321,7 @@ static void MX_TIM2_Init(void)
 }
 #endif
 
-#ifdef PWM_TIM
+#ifdef USE_PWM_TIM3
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 static void MX_TIM3_Init(void)
@@ -341,12 +374,15 @@ void custom_board_init(void)
 #ifdef WAIT_TIM
     MX_TIM2_Init();
 #endif
-#ifdef PWM_TIM
+#ifdef USE_PWM_TIM3
     MX_TIM3_Init();
 #endif
     MX_USB_DEVICE_Init();
 #ifdef USE_UART1
     MX_USART1_UART_Init();
+#endif
+#ifdef USE_I2C1
+    MX_I2C1_Init();
 #endif
 }
 

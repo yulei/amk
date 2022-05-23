@@ -26,6 +26,14 @@
 #define STROKE_DEFAULT  14
 #endif
 
+#ifndef STROKE_PRESS
+#define STROKE_PRESS    16
+#endif
+
+#ifndef STROKE_RELEASE
+#define STROKE_RELEASE  10
+#endif
+
 #ifndef DISCHARGE_WAIT_PRE
 #define DISCHARGE_WAIT_PRE  25
 #endif
@@ -62,7 +70,8 @@ typedef struct {
     uint16_t        min_auto;       // auto update min value
     uint16_t        max_auto;       // auto update max value
     uint16_t        real;           // current value
-    uint16_t        stroke;         // current stoke
+    uint8_t         press;          // press stoke
+    uint8_t         release;        // release stoke
 } ec_key_t;
 
 typedef struct {
@@ -73,5 +82,5 @@ typedef struct {
 extern ec_matrix_t ec_matrix;
 
 void ec_matrix_init(ec_matrix_t *matrix);
-bool ec_matrix_sense(pin_t row_pin, uint8_t row, uint8_t col);
+bool ec_matrix_sense(pin_t row_pin, uint8_t row, uint8_t col, bool on);
 void ec_matrix_dump_row(ec_matrix_t *matrix, uint8_t row);

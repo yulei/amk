@@ -535,6 +535,8 @@ static void keyhit_counter_update(uint8_t row, uint8_t col)
 
 static uint16_t keyhit_counter_color(uint8_t row, uint8_t col)
 {
+    return 0xFFFF;
+
     uint32_t count = keyhit_matrix[row][col].count;
 
     uint8_t r = count &0xFF;

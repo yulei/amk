@@ -87,7 +87,7 @@ enum {
 #endif
 #ifdef VIAL_ENABLE
     EPNUM_VIAL_OUT      = 0x03,
-    #if defined(STM32F103xB) || defined(NRF52840_XXAA)
+    #if defined(STM32F103xB) || defined(NRF52840_XXAA) || defined(STM32L072xx)
     EPNUM_VIAL_IN       = 0x04,
     #else
         #define EPNUM_VIAL_IN EPNUM_VIAL_OUT
@@ -95,7 +95,7 @@ enum {
 #endif
 #ifdef MSC_ENABLE
     EPNUM_MSC_OUT       = 0x03,
-    #if defined(STM32F103xB) || defined(NRF52840_XXAA)
+    #if defined(STM32F103xB) || defined(NRF52840_XXAA) || defined(STM32L072xx)
     EPNUM_MSC_IN        = 0x04,
     #else
         #define EPNUM_MSC_IN    EPNUM_MSC_OUT

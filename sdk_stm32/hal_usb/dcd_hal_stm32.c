@@ -89,9 +89,9 @@ void dcd_init(uint8_t rhport)
     HAL_PCDEx_PMAConfig(&dcd_usb, 0x80, PCD_SNG_BUF, 0x80);
     
     HAL_PCDEx_PMAConfig(&dcd_usb, 0x81, PCD_SNG_BUF, 0xC0);
-    HAL_PCDEx_PMAConfig(&dcd_usb, 0x82, PCD_SNG_BUF, 0x140);
-    HAL_PCDEx_PMAConfig(&dcd_usb, 0x83, PCD_SNG_BUF, 0x180);
-    HAL_PCDEx_PMAConfig(&dcd_usb, 0x03, PCD_SNG_BUF, 0x1C0);
+    HAL_PCDEx_PMAConfig(&dcd_usb, 0x82, PCD_SNG_BUF, 0x100);
+    HAL_PCDEx_PMAConfig(&dcd_usb, 0x03, PCD_SNG_BUF, 0x140);
+    HAL_PCDEx_PMAConfig(&dcd_usb, 0x84, PCD_SNG_BUF, 0x180);
 #endif
 
 #ifdef RTOS_ENABLE
