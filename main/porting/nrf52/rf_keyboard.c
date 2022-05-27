@@ -26,6 +26,7 @@
 #include "amk_boot.h"
 #include "amk_eeprom.h"
 #include "amk_keymap.h"
+#include "amk_indicator.h"
 
 static rf_send_report_t rf_send_report = NULL;
 static rf_prepare_sleep_t rf_prepare_sleep = NULL;
@@ -101,6 +102,7 @@ void rf_keyboard_init(rf_send_report_t send_report, rf_prepare_sleep_t prepare_s
     keyboard_timer_init();
     amk_keymap_init();
     NRF_LOG_INFO("rf keyboard inited");
+    amk_indicator_init();
 }
 
 void rf_keyboard_start()
