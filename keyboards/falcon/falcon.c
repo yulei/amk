@@ -62,4 +62,5 @@ void keyboard_prepare_sleep(void)
     #if RGB_ENABLE
     rgb_led_prepare_sleep();
     #endif
+    gpio_write_pin(CAPS_LED_PIN, 0);
 }
