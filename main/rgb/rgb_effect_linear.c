@@ -210,7 +210,7 @@ static void effects_mode_rainbow(rgb_linear_state_t *state)
 #include <math.h>
 static void effects_mode_breath(rgb_linear_state_t *state)
 {
-    uint8_t breath = (uint8_t)((exp(sin((state->breath_step / 255.0) * M_PI)) - 2 / M_E) * (255 / (M_E - 1 / M_E)));
+    uint8_t breath = (uint8_t)((expf(sinf((state->breath_step / 255.0) * M_PI)) - 2 / M_E) * (255 / (M_E - 1 / M_E)));
     effects_set_color_all(state, state->config->hue, state->config->sat, breath);
     state->breath_step++;
 

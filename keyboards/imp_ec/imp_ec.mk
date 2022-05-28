@@ -17,6 +17,7 @@ UF2_FAMILY = STM32F4
 
 SRCS += \
 	$(KEYBOARD_DIR)/imp_ec.c \
+#	$(KEYBOARD_DIR)/custom_matrix.c \
 
 ifeq (yes, $(strip $(VIAL_ENABLE)))
 	SRCS += $(KEYBOARD_DIR)/imp_ec_actionmap.c

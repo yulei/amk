@@ -81,6 +81,9 @@ CFLAGS += -fno-strict-aliasing
 CFLAGS += -fno-builtin
 CFLAGS += -fshort-enums
 CFLAGS += -fms-extensions
+# do not use double
+CFLAGS += -fsingle-precision-constant
+CFLAGS += -Wdouble-promotion
 # C++ flags common to all targets
 CXXFLAGS += $(COMMON_FLAGS)
 

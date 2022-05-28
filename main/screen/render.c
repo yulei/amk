@@ -8,10 +8,12 @@
 #include "screen_driver.h"
 #include "screen.h"
 #include "display.h"
+#include "wait.h"
 
 screen_driver_t* screen_drivers[SCREEN_DRIVER_NUM];
 screen_t* screens[SCREEN_NUM];
 display_t* displays[DISPLAY_NUM];
+static bool all_off;
 
 static void init_screen_drivers(void)
 {
@@ -44,6 +46,7 @@ void render_init(void)
     init_screen_drivers();
     init_screens();
     init_displays();
+    all_off = false;
 }
 
 void render_task(void)
@@ -60,6 +63,37 @@ void render_toggle_display(uint8_t display)
     if (display < DISPLAY_NUM) {
         bool enabled = displays[display]->is_enabled(displays[display]);
         render_enable_display(display, !enabled);
+    }
+    bool on = false;
+    for (int i = 0; i < DISPLAY_NUM; i++) {
+        if (displays[i]->is_enabled(displays[i])) {
+            on = true;
+            break;
+        }
+    }
+
+    // current on support one screen
+    if (all_off) {
+        // check if need to turn on
+        if (on) {
+            // power on
+            gpio_set_output_pushpull(SCREEN_0_PWR);
+            gpio_write_pin(SCREEN_0_PWR, SCREEN_0_PWR_EN);
+            wait_ms(1);
+            for (int i = 0; i < SCREEN_DRIVER_NUM; i++) {
+                screen_drivers[i]->init(screen_drivers[i]);
+            }
+            all_off = false;
+        }
+    } else {
+        // check if need to turn off
+        if (!on) {
+            // power off
+            gpio_set_output_pushpull(SCREEN_0_PWR);
+            gpio_write_pin(SCREEN_0_PWR, !SCREEN_0_PWR_EN);
+            wait_ms(1);
+            all_off = true;
+        }
     }
 }
 

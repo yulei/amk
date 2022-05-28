@@ -128,7 +128,9 @@ ec_matrix_t ec_matrix = {
 
 void matrix_init_kb(void)
 {
+    #ifdef MATRIX_EC_ENABLE
     ec_matrix_init(&ec_matrix);
+    #endif
 
     #ifdef DIRECT_KEY_PIN
     gpio_set_input_pullup(DIRECT_KEY_PIN);
