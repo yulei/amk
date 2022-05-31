@@ -245,7 +245,7 @@ bool hook_process_action_main(keyrecord_t *record)
     }
 
     switch(action.key.code) {
-    #if DISPLAY_NUM
+    #ifdef SCREEN_ENABLE
         case KC_F16:
             render_toggle_display(0);
             return true;
