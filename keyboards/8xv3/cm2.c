@@ -32,7 +32,9 @@ void matrix_init_custom(void)
 {
     // initialize row pins
     for (int i = 0; i < MATRIX_ROWS; i++) {
-        gpio_set_input_pulldown(custom_row_pins[i]);
+        //gpio_set_input_pulldown(custom_row_pins[i]);
+        gpio_set_output_pushpull(custom_row_pins[i]);
+        gpio_write_pin(custom_row_pins[i], 1);
     }
 
     // initialize col pins
@@ -48,8 +50,10 @@ void matrix_init_custom(void)
     gpio_set_output_pushpull(COL_C_PIN);
     gpio_write_pin(COL_C_PIN, 0);
 
-    gpio_set_output_pushpull(KEY_PIN);
-    gpio_write_pin(KEY_PIN, 0);
+    //gpio_set_output_pushpull(KEY_PIN);
+    //gpio_write_pin(KEY_PIN, 0);
+    gpio_set_input_pullup(KEY_PIN);
+    //gpio_write_pin(KEY_PIN, 0);
 }
 
 bool matrix_scan_custom(matrix_row_t* raw)
@@ -65,14 +69,17 @@ bool matrix_scan_custom(matrix_row_t* raw)
         gpio_write_pin(COL_C_PIN, (custom_col_pins[col]&COL_C_MASK) ? 1 : 0);
         gpio_write_pin(LEFT_EN_PIN, (custom_col_pins[col]&LEFT_MASK) ? 0 : 1);
         gpio_write_pin(RIGHT_EN_PIN, (custom_col_pins[col]&RIGHT_MASK) ? 0 : 1);
-        gpio_write_pin(KEY_PIN, 1);
-        wait_us(20);
+        //gpio_write_pin(KEY_PIN, 1);
+        //wait_us(20);
         for (int row = 0; row < MATRIX_ROWS; row++) {
-            if (row==2) continue;
+            //if (row==2) continue;
             matrix_row_t last_row_value    = raw[row];
             matrix_row_t current_row_value = last_row_value;
+            gpio_write_pin(custom_row_pins[row], 0);
+            wait_us(10);
 
-            if (gpio_read_pin(custom_row_pins[row])) {
+            //if (gpio_read_pin(custom_row_pins[row])) {
+            if (gpio_read_pin(KEY_PIN)==0) {
                 current_row_value |= (1 << col);
             } else {
                 current_row_value &= ~(1 << col);
@@ -82,8 +89,10 @@ bool matrix_scan_custom(matrix_row_t* raw)
                 raw[row] = current_row_value;
                 changed = true;
             }
+            gpio_write_pin(custom_row_pins[row], 1);
+            //wait_us(10);
         }
-        gpio_write_pin(KEY_PIN, 0);
+        //gpio_write_pin(KEY_PIN, 0);
     }
 
     return changed;

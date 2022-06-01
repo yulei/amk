@@ -183,6 +183,7 @@ led_config_t g_led_config = {
     },
 };
 
+#if 0
 #ifdef MSC_ENABLE
 #include "usb_common.h"
 #include "usb_interface.h"
@@ -206,7 +207,10 @@ void msc_init_kb(void)
     if (usb_setting & USB_MSC_BIT) return;
     
 #ifdef DYNAMIC_CONFIGURATION
-    if (!anim_mount(true) ) reset_to_msc(true);
+    if (!anim_mount(true) ){
+        amk_printf("mounted to reset msc\n");
+        reset_to_msc(true);
+    }
 #endif
 }
 #endif // MSC_ENABLE
@@ -252,7 +256,10 @@ bool hook_process_action_main(keyrecord_t *record)
     #endif
     #ifdef DYNAMIC_CONFIGURATION
         case KC_F24: 
-            reset_to_msc((usb_setting & USB_MSC_BIT) ? false : true);
+            if(record->event.pressed) {
+                amk_printf("pressed to reset to msc\n");
+                reset_to_msc((usb_setting & USB_MSC_BIT) ? false : true);
+            }
             return true;
     #endif
         default:
@@ -261,3 +268,12 @@ bool hook_process_action_main(keyrecord_t *record)
 
     return false;
 }
+
+void matrix_init_kb(void)
+{
+#ifdef MSC_ENABLE
+    gpio_set_output_pushpull(FLASH_CS);
+    gpio_write_pin(FLASH_CS, 1);
+#endif
+}
+#endif
