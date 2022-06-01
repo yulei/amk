@@ -43,7 +43,7 @@ ADC_HandleTypeDef hadc1;
 
 #ifdef USE_PWM_TIM4
 TIM_HandleTypeDef htim4;
-DMA_HandleTypeDef hdma_tim4_ch2;
+DMA_HandleTypeDef hdma_tim4_ch1;
 #endif
 
 #ifdef USE_PWM_TIM1
@@ -150,6 +150,7 @@ static void MX_ADC1_Init(void)
 #ifdef USE_I2C1 
 static void MX_I2C1_Init(void)
 {
+    return;
     hi2c1.Instance = I2C1;
     hi2c1.Init.ClockSpeed = 400000;
     hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
@@ -235,7 +236,7 @@ static void MX_TIM4_Init(void)
     htim4.Instance = TIM4;
     htim4.Init.Prescaler = 0;
     htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim4.Init.Period = 119;
+    htim4.Init.Period = PWM_TIM_PERIOD;
     htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
     if (HAL_TIM_PWM_Init(&htim4) != HAL_OK)
@@ -252,7 +253,7 @@ static void MX_TIM4_Init(void)
     sConfigOC.Pulse = 0;
     sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
     sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-    if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+    if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, PWM_TIM_CHANNEL) != HAL_OK)
     {
         Error_Handler();
     }
@@ -324,12 +325,37 @@ static void MX_DMA_Init(void)
     __HAL_RCC_DMA2_CLK_ENABLE();
 
     /* DMA interrupt init */
+    HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+    /* DMA1_Stream1_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
+    /* DMA1_Stream3_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+    /* DMA1_Stream4_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
+    /* DMA1_Stream5_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
+    /* DMA2_Stream0_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
+    /* DMA2_Stream2_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
+#if 0
     /* DMA1_Stream0_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
     /* DMA1_Stream1_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
+
+    /* DMA1_Stream5_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
     /* DMA1_Stream3_IRQn interrupt configuration */
     #ifdef USE_PWM_TIM4
     HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 0);
@@ -354,6 +380,7 @@ static void MX_DMA_Init(void)
     /* DMA2_Stream7_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(DMA2_Stream7_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
+#endif
 }
 
 static void MX_RTC_Init(void)

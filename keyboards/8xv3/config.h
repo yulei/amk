@@ -38,12 +38,12 @@
 #define I2C2_SDA_PIN        B9
 
 #define WS2812_LED_NUM      7
-#define WS2812_LED_PIN      B7
+#define WS2812_LED_PIN      B6
 
 #define USE_PWM_TIM4
 #define PWM_TIM_PERIOD      119
 #define PWM_TIM             htim4
-#define PWM_TIM_CHANNEL     TIM_CHANNEL_2
+#define PWM_TIM_CHANNEL     TIM_CHANNEL_1
 
 #define RGB_MATRIX_LED_NUM  97
 #define RGB_LED_NUM         (WS2812_LED_NUM+RGB_MATRIX_LED_NUM)

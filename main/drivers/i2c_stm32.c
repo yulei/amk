@@ -194,3 +194,9 @@ amk_error_t i2c_send_async(i2c_handle_t i2c, uint8_t addr, const void *data, siz
 
     return AMK_ERROR;
 }
+
+bool i2c_async_finished(i2c_handle_t i2c)
+{
+    i2c_instance_t *inst = (i2c_instance_t*)i2c;
+    return inst->handle.State == HAL_I2C_STATE_READY;
+}
