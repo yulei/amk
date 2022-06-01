@@ -90,25 +90,25 @@ static void gpio_set_mode(pin_t pin, uint32_t mode, uint32_t speed, uint32_t pul
 
 void gpio_set_output_pushpull(pin_t pin)
 {
-    gpio_set_mode(pin, GPIO_MODE_OUTPUT_PP, GPIO_SPEED_FREQ_LOW, GPIO_NOPULL);
+    gpio_set_mode(pin, GPIO_MODE_OUTPUT_PP, GPIO_SPEED_FREQ_HIGH, GPIO_NOPULL);
 }
 
 void gpio_set_output_opendrain(pin_t pin)
 {
-    gpio_set_mode(pin, GPIO_MODE_OUTPUT_OD, GPIO_SPEED_FREQ_LOW, GPIO_NOPULL);
+    gpio_set_mode(pin, GPIO_MODE_OUTPUT_OD, GPIO_SPEED_FREQ_HIGH, GPIO_NOPULL);
 }
 
 void gpio_set_input_floating(pin_t pin)
 {
-    gpio_set_mode(pin, GPIO_MODE_INPUT, GPIO_SPEED_FREQ_LOW, GPIO_NOPULL);
+    gpio_set_mode(pin, GPIO_MODE_INPUT, GPIO_SPEED_FREQ_HIGH, GPIO_NOPULL);
 }
 
 void gpio_set_input_pullup(pin_t pin)
 {
-    gpio_set_mode(pin, GPIO_MODE_INPUT, GPIO_SPEED_FREQ_LOW, GPIO_PULLUP);
+    gpio_set_mode(pin, GPIO_MODE_INPUT, GPIO_SPEED_FREQ_HIGH, GPIO_PULLUP);
 }
 
 void gpio_set_input_pulldown(pin_t pin)
 {
-    gpio_set_mode(pin, GPIO_MODE_INPUT, GPIO_SPEED_FREQ_LOW, GPIO_PULLDOWN);
+    gpio_set_mode(pin, GPIO_MODE_INPUT, GPIO_SPEED_FREQ_HIGH, GPIO_PULLDOWN);
 }

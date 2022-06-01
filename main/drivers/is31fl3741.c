@@ -175,10 +175,11 @@ void is31fl3741_set_color(i2c_led_t *driver, uint8_t index, uint8_t red, uint8_t
     } else {
         is31->pwm_buffer[led->b+1] = blue;
     }
-    #endif
+#else
     is31->pwm_buffer[led->r] = red;
     is31->pwm_buffer[led->g] = green;
     is31->pwm_buffer[led->b] = blue;
+#endif
     is31->pwm_dirty = true;
 }
 
@@ -194,43 +195,58 @@ static void is31fl3741_update_pwm_buffers(i2c_led_t *driver)
     uint32_t status = AMK_SUCCESS;
     is31fl3741_driver_t *is31 = (is31fl3741_driver_t*)(driver->data);
     uint8_t data = 0;
-    uint8_t pwm_buf[20];
 
     if (!is31->pwm_dirty) return;
-    // select pwm page 0
-    data = UNLOCK_COMMAND;
-    i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
-    data = PWM_PAGE0;
-    i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
 
-    for (int i = 0; i < 342; i += 18) {
-        if (i == 180) {
+#if 1
+    static uint8_t current = 0;
+    uint8_t pwm_buf[200];
+    pwm_buf[0] = 0;
+    if (current == 0) {
+        // select pwm page 0
+        data = UNLOCK_COMMAND;
+        i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
+        data = PWM_PAGE0;
+        i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
+
+        memcpy(&pwm_buf[1], &is31->pwm_buffer[0], 180);
+        status = i2c_send(i2c_inst, driver->addr, pwm_buf, 181, TIMEOUT);
+        if (status != AMK_SUCCESS) {
+            fl3741_debug("IS31FL3741: failed to update pwm page0: addr=%d, status=%d\n", driver->addr, status);
+        }
+        current++;
+        return;
+    } else {
         // select pwm page 1
         data = UNLOCK_COMMAND;
         i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
         data = PWM_PAGE1;
         i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
-        }
 
-        pwm_buf[0] = i % 180;
-        memcpy(&pwm_buf[1], &is31->pwm_buffer[i], 18);
-        status = i2c_send(i2c_inst, driver->addr, pwm_buf, 19, TIMEOUT);
-
+        memcpy(&pwm_buf[1], &is31->pwm_buffer[180], 171);
+        status = i2c_send(i2c_inst, driver->addr, pwm_buf, 172, TIMEOUT);
         if (status != AMK_SUCCESS) {
             fl3741_debug("IS31FL3741: failed to update pwm page0: addr=%d, status=%d\n", driver->addr, status);
         }
-
+        current = 0;
     }
 
-    // transfer the left cause the total number is 351
-    pwm_buf[0] = 162;
-    memcpy(&pwm_buf[1], &is31->pwm_buffer[342], 9);
-
-    status = i2c_send(i2c_inst, driver->addr, pwm_buf, 10, TIMEOUT);
-
+#else
+    status = i2c_send(i2c_inst, driver->addr, &is31->pwm_buffer[0] , 181, TIMEOUT);
     if (status != AMK_SUCCESS) {
         fl3741_debug("IS31FL3741: failed to update pwm page0: addr=%d, status=%d\n", driver->addr, status);
     }
+    // select pwm page 1
+    data = UNLOCK_COMMAND;
+    i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
+    data = PWM_PAGE1;
+    i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
+    status = i2c_send(i2c_inst, driver->addr, &is31->pwm_buffer[181] , 172, TIMEOUT);
+    if (status != AMK_SUCCESS) {
+        fl3741_debug("IS31FL3741: failed to update pwm page0: addr=%d, status=%d\n", driver->addr, status);
+    }
+#endif
+
 
     is31->pwm_dirty = false;
     #if 0
