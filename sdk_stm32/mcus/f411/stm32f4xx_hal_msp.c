@@ -668,7 +668,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
 #if defined(USE_PWM_TIM4) || defined(USE_PWM_TIM1)
 
 #ifdef USE_PWM_TIM4
-extern DMA_HandleTypeDef hdma_tim4_ch1;
+extern DMA_HandleTypeDef hdma_tim4_ch;
 #endif
 #ifdef USE_PWM_TIM1
 extern DMA_HandleTypeDef hdma_tim1_ch1;
@@ -692,22 +692,22 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
 
     /* TIM4 DMA Init */
     /* TIM4_CH2 Init */
-    hdma_tim4_ch1.Instance = DMA1_Stream0;
-    hdma_tim4_ch1.Init.Channel = DMA_CHANNEL_2;
-    hdma_tim4_ch1.Init.Direction = DMA_MEMORY_TO_PERIPH;
-    hdma_tim4_ch1.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_tim4_ch1.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_tim4_ch1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
-    hdma_tim4_ch1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
-    hdma_tim4_ch1.Init.Mode = DMA_NORMAL;
-    hdma_tim4_ch1.Init.Priority = DMA_PRIORITY_LOW;
-    hdma_tim4_ch1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    if (HAL_DMA_Init(&hdma_tim4_ch1) != HAL_OK)
+    hdma_tim4_ch.Instance = PWM_DMA_INSTANCE;
+    hdma_tim4_ch.Init.Channel = PWM_DMA_CHANNEL;
+    hdma_tim4_ch.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    hdma_tim4_ch.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_tim4_ch.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_tim4_ch.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_tim4_ch.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_tim4_ch.Init.Mode = DMA_NORMAL;
+    hdma_tim4_ch.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_tim4_ch.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_tim4_ch) != HAL_OK)
     {
       Error_Handler();
     }
 
-    __HAL_LINKDMA(htim_pwm,hdma[TIM_DMA_ID_CC1],hdma_tim4_ch1);
+    __HAL_LINKDMA(htim_pwm,hdma[PWM_TIM_DMA_ID],hdma_tim4_ch);
 
   /* USER CODE BEGIN TIM4_MspInit 1 */
 
@@ -817,7 +817,7 @@ void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef* htim_pwm)
     __HAL_RCC_TIM4_CLK_DISABLE();
 
     /* TIM4 DMA DeInit */
-    HAL_DMA_DeInit(htim_pwm->hdma[TIM_DMA_ID_CC1]);
+    HAL_DMA_DeInit(htim_pwm->hdma[PWM_TIM_DMA_ID]);
   /* USER CODE BEGIN TIM4_MspDeInit 1 */
 
   /* USER CODE END TIM4_MspDeInit 1 */

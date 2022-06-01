@@ -43,7 +43,7 @@ ADC_HandleTypeDef hadc1;
 
 #ifdef USE_PWM_TIM4
 TIM_HandleTypeDef htim4;
-DMA_HandleTypeDef hdma_tim4_ch1;
+DMA_HandleTypeDef hdma_tim4_ch;
 #endif
 
 #ifdef USE_PWM_TIM1
