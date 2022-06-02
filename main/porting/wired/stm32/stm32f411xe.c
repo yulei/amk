@@ -91,8 +91,8 @@ void SystemClock_Config(void)
     RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
     RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-    //RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
-    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
+    //RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK) {
         Error_Handler();
@@ -108,9 +108,9 @@ static void MX_GPIO_Init(void)
 {
     /* GPIO Ports Clock Enable */
     __HAL_RCC_GPIOH_CLK_ENABLE();
-    __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
 }
 
 #ifdef USE_ADC1
@@ -150,7 +150,6 @@ static void MX_ADC1_Init(void)
 #ifdef USE_I2C1 
 static void MX_I2C1_Init(void)
 {
-    return;
     hi2c1.Instance = I2C1;
     hi2c1.Init.ClockSpeed = 400000;
     hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
@@ -331,8 +330,8 @@ static void MX_DMA_Init(void)
     HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
     /* DMA1_Stream3_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+    //HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 0);
+    //HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
     /* DMA1_Stream4_IRQn interrupt configuration */
     HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);

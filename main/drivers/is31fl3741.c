@@ -199,10 +199,10 @@ static void is31fl3741_update_pwm_buffers(i2c_led_t *driver)
     if (!is31->pwm_dirty) return;
 
     static uint8_t current = 0;
-    uint8_t pwm_buf[200];
+    static uint8_t pwm_buf[200];
     pwm_buf[0] = 0;
     if (current == 0) {
-        if (!i2c_async_finished(i2c_inst)) return;
+        if (!i2c_ready(i2c_inst)) return;
 
         // select pwm page 0
         data = UNLOCK_COMMAND;
@@ -213,13 +213,14 @@ static void is31fl3741_update_pwm_buffers(i2c_led_t *driver)
         memcpy(&pwm_buf[1], &is31->pwm_buffer[0], 180);
         status = i2c_send(i2c_inst, driver->addr, pwm_buf, 181, TIMEOUT);
         //status = i2c_send_async(i2c_inst, driver->addr, pwm_buf, 181);
+
         if (status != AMK_SUCCESS) {
             fl3741_debug("IS31FL3741: failed to update pwm page0: addr=%d, status=%d\n", driver->addr, status);
         }
         current++;
         return;
     } else {
-        if (!i2c_async_finished(i2c_inst)) return;
+        if (!i2c_ready(i2c_inst)) return;
 
         // select pwm page 1
         data = UNLOCK_COMMAND;
