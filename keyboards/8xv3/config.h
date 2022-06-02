@@ -56,8 +56,8 @@
 #define RGB_SEGMENT_NUM     1
 #define RGB_MATRIX_NUM      1
 
-#define DEBOUNCE            10
-//#define DWT_DELAY
+#define DEBOUNCE            5
+#define DWT_DELAY
 #define VECT_TAB_OFFSET     0x20000
 #define FAULT_BREAK
 
