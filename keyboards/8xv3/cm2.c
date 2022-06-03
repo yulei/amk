@@ -76,7 +76,7 @@ bool matrix_scan_custom(matrix_row_t* raw)
             matrix_row_t last_row_value    = raw[row];
             matrix_row_t current_row_value = last_row_value;
             gpio_write_pin(custom_row_pins[row], 0);
-            wait_us(5);
+            wait_us(10);
 
             //if (gpio_read_pin(custom_row_pins[row])) {
             if (gpio_read_pin(KEY_PIN)==0) {
