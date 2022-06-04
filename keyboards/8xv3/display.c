@@ -229,8 +229,8 @@ void render_task(render_t* render)
                 //render->anim = NULL;
             }
         }
-        st7735_fill_rect_async(&st7735_driver, render->x, render->y, render->width, render->height, render->buf, render->buf_size);
-        //st7735_fill_rect(&st7735_driver, render->x, render->y, render->width, render->height, render->buf, render->buf_size);
+        //st7735_fill_rect_async(&st7735_driver, render->x, render->y, render->width, render->height, render->buf, render->buf_size);
+        st7735_fill_rect(&st7735_driver, render->x, render->y, render->width, render->height, render->buf, render->buf_size);
         filling = true;
         render->ticks = timer_read32();
     }

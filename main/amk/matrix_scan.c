@@ -121,13 +121,23 @@ void matrix_init_custom(void)
     #endif
 #else
     #ifndef MATRIX_DIRECT_PINS
-        for (int col = 0; col < MATRIX_COLS; col++) {
-            gpio_set_output_pushpull(col_pins[col]);
-            gpio_write_pin(col_pins[col], 0);
-        }
-        for (int row = 0; row < MATRIX_ROWS; row++) {
-            gpio_set_input_pulldown(row_pins[row]);
-        }
+        #ifdef ROW2COL
+            for (int col = 0; col < MATRIX_COLS; col++) {
+                gpio_set_input_pulldown(col_pins[col]);
+            }
+            for (int row = 0; row < MATRIX_ROWS; row++) {
+                gpio_set_output_pushpull(row_pins[row]);
+                gpio_write_pin(row_pins[row], 0);
+            }
+        #else
+            for (int col = 0; col < MATRIX_COLS; col++) {
+                gpio_set_output_pushpull(col_pins[col]);
+                gpio_write_pin(col_pins[col], 0);
+            }
+            for (int row = 0; row < MATRIX_ROWS; row++) {
+                gpio_set_input_pulldown(row_pins[row]);
+            }
+        #endif
     #else
         for (int pin = 0; pin < sizeof(direct_pins)/sizeof(pin_t); pin++) {
             gpio_set_input_pullup(direct_pins[pin]);
@@ -212,27 +222,51 @@ bool matrix_scan_custom(matrix_row_t* raw)
             #endif
         }
     #else
-        for (int col = 0; col < MATRIX_COLS; col++) {
-            gpio_write_pin(col_pins[col], 1);
-            wait_us(10);
+        #ifdef ROW2COL
+            for (int row = 0; row < MATRIX_ROWS; row++) {
+                gpio_write_pin(row_pins[row], 1);
+                wait_us(10);
 
-            for(uint8_t row = 0; row < MATRIX_ROWS; row++) {
-                matrix_row_t last_row_value    = raw[row];
-                matrix_row_t current_row_value = last_row_value;
+                for(uint8_t col = 0; col < MATRIX_COLS; col++) {
+                    matrix_row_t last_row_value    = raw[row];
+                    matrix_row_t current_row_value = last_row_value;
 
-                if (gpio_read_pin(row_pins[row])) {
-                    current_row_value |= (1 << col);
-                } else {
-                    current_row_value &= ~(1 << col);
+                    if (gpio_read_pin(col_pins[col])) {
+                        current_row_value |= (1 << col);
+                    } else {
+                        current_row_value &= ~(1 << col);
+                    }
+
+                    if (last_row_value != current_row_value) {
+                        raw[row] = current_row_value;
+                        changed = true;
+                    }
                 }
-
-                if (last_row_value != current_row_value) {
-                    raw[row] = current_row_value;
-                    changed = true;
-                }
+                gpio_write_pin(row_pins[row], 0);
             }
-            gpio_write_pin(col_pins[col], 0);
-        }
+        #else
+            for (int col = 0; col < MATRIX_COLS; col++) {
+                gpio_write_pin(col_pins[col], 1);
+                wait_us(10);
+
+                for(uint8_t row = 0; row < MATRIX_ROWS; row++) {
+                    matrix_row_t last_row_value    = raw[row];
+                    matrix_row_t current_row_value = last_row_value;
+
+                    if (gpio_read_pin(row_pins[row])) {
+                        current_row_value |= (1 << col);
+                    } else {
+                        current_row_value &= ~(1 << col);
+                    }
+
+                    if (last_row_value != current_row_value) {
+                        raw[row] = current_row_value;
+                        changed = true;
+                    }
+                }
+                gpio_write_pin(col_pins[col], 0);
+            }
+        #endif
     #endif
 #endif
     if (changed) {

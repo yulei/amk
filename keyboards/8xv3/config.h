@@ -34,8 +34,8 @@
 
 #define USE_I2C1
 #define IS31FL3741_I2C_ID   I2C_INSTANCE_1
-#define I2C2_SCL_PIN        B8
-#define I2C2_SDA_PIN        B9
+//#define I2C1_SCL_PIN        B8
+//#define I2C1_SDA_PIN        B9
 
 #define WS2812_LED_NUM      7
 #define WS2812_LED_PIN      B6

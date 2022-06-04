@@ -68,7 +68,7 @@ bool matrix_scan_custom(matrix_row_t* raw)
         gpio_write_pin(KEY_PIN, 1);
         wait_us(20);
         for (int row = 0; row < MATRIX_ROWS; row++) {
-            if (row==2) continue;
+            //if (row==2) continue;
             matrix_row_t last_row_value    = raw[row];
             matrix_row_t current_row_value = last_row_value;
 

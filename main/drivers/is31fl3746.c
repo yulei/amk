@@ -189,8 +189,8 @@ static void is31fl3746_update_pwm_buffers(i2c_led_t *driver)
     i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
 
     is31->pwm_buffer[0] = 1;
-    //status = i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE+1, TIMEOUT);
-    status = i2c_send_async(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE+1);
+    status = i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE+1, TIMEOUT);
+    //status = i2c_send_async(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE+1);
 
     if (status != AMK_SUCCESS) {
         fl3746_debug("IS31FL3746: failed to update pwm page0: addr=%d, status=%d\n", driver->addr, status);
@@ -254,7 +254,7 @@ void init_driver(is31fl3746_driver_t *driver)
     status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, CONFIG_REG, &data, 1, TIMEOUT);
 
     // set global current
-    data = IS31FL3746_GLOBAL_CURRENT;
+    data = 0x80;//IS31FL3746_GLOBAL_CURRENT;
     status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, GLOBAL_CURRENT_REG, &data, 1, TIMEOUT);
 
     // set pulldown and pullup
