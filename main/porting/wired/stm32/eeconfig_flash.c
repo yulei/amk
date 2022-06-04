@@ -18,7 +18,7 @@
 //#define FLASH_INVALID_DATA      0xFFFFFFFF
 //#define FLASH_INVALID_ADDRESS   0xFFFFFFFF
 //#define FLASH_PAGE_NUM          1
-#elif defined(STM32F411xE) || defined(STM32F722xx) || defined(STM32F405xx) || defined(STM32F446xx)
+#elif defined(STM32F411xE) || defined(STM32F722xx) || defined(STM32F405xx) || defined(STM32F446xx) || defined(STM32F401xC)
 #define FLASH_BASE_ADDRESS      0x8010000
 #define FLASH_TOTAL_SIZE        0x10000
 #define FLASH_INVALID_DATA      0xFFFFFFFF
@@ -290,7 +290,7 @@ void flash_erase_pages(void)
     erase.Banks = FLASH_BANK_1;
     erase.PageAddress = FLASH_BASE_ADDRESS;
     erase.NbPages = FLASH_PAGE_NUM;
-#elif defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F446xx)
+#elif defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F446xx) || defined(STM32F401xC)
     erase.TypeErase = FLASH_TYPEERASE_SECTORS;
     erase.Banks = FLASH_BANK_1;
     erase.Sector = FLASH_SECTOR_ID;

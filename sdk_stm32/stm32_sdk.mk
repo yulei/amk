@@ -1,5 +1,11 @@
 STM32SDK_DIR := sdk_stm32
 
+ifeq (STM32F401, $(strip $(MCU)))
+MCU_SERIES := f4
+MCU_FAMILY := stm32f4xx
+MCU_TYPE := f401
+endif
+
 ifeq (STM32F411, $(strip $(MCU)))
 MCU_SERIES := f4
 MCU_FAMILY := stm32f4xx

@@ -16,6 +16,7 @@
 #include "is31fl3236.h"
 #include "is31fl3733.h"
 #include "is31fl3741.h"
+#include "is31fl3746.h"
 
 #ifndef RGB_DRIVER_DEBUG
 #define RGB_DRIVER_DEBUG 1
@@ -387,6 +388,51 @@ static void rd_3741_flush(rgb_driver_t *driver)
     is31fl3741_update_buffers(is31);
 }
 
+static void rd_3746_init(rgb_driver_t *driver)
+{
+    driver->data = is31fl3746_init(driver->device->addr, driver->device->index, driver->device->led_start, driver->device->led_num);
+}
+
+static void rd_3746_uninit(rgb_driver_t *driver)
+{
+    i2c_led_t *is31 = (i2c_led_t *)driver->data;
+    is31fl3746_uninit(is31);
+}
+
+static void rd_3746_set_color_rgb(rgb_driver_t *driver, uint32_t index, uint8_t red, uint8_t green, uint8_t blue)
+{
+    i2c_led_t *is31 = (i2c_led_t *)driver->data;
+    is31fl3746_set_color(is31, index, red, green, blue);
+}
+
+static void rd_3746_set_color(rgb_driver_t *driver, uint32_t index, uint8_t hue, uint8_t sat, uint8_t val)
+{
+    hsv_t hsv = {hue, sat, val};
+    rgb_t rgb = hsv_to_rgb(hsv);
+    i2c_led_t *is31 = (i2c_led_t *)driver->data;
+    is31fl3746_set_color(is31, index, rgb.r, rgb.g, rgb.b);
+}
+
+static void rd_3746_set_color_all_rgb(rgb_driver_t *driver, uint8_t red, uint8_t green, uint8_t blue)
+{
+    i2c_led_t *is31 = (i2c_led_t *)driver->data;
+    is31fl3746_set_color_all(is31, red, green, blue);
+}
+
+static void rd_3746_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t sat, uint8_t val)
+{
+    hsv_t hsv = {hue, sat, val};
+    rgb_t rgb = hsv_to_rgb(hsv);
+    i2c_led_t *is31 = (i2c_led_t *)driver->data;
+    is31fl3746_set_color_all(is31, rgb.r, rgb.g, rgb.b);
+}
+
+static void rd_3746_flush(rgb_driver_t *driver)
+{
+    i2c_led_t *is31 = (i2c_led_t *)driver->data;
+    is31fl3746_update_buffers(is31);
+}
+
 bool rgb_driver_available(rgb_driver_type_t type)
 {
     switch(type) {
@@ -403,6 +449,8 @@ bool rgb_driver_available(rgb_driver_type_t type)
         case RGB_DRIVER_IS31FL3236:
             return true;    // TODO
         case RGB_DRIVER_IS31FL3741:
+            return true;    // TODO
+        case RGB_DRIVER_IS31FL3746:
             return true;    // TODO
         default:
             break;
@@ -478,6 +526,15 @@ rgb_driver_t* rgb_driver_create(rgb_device_t *device, uint8_t index)
             driver->set_color_all_rgb = rd_3741_set_color_all_rgb;
             driver->flush = rd_3741_flush;
             driver->uninit = rd_3741_uninit;
+            break;
+        case RGB_DRIVER_IS31FL3746:
+            driver->init = rd_3746_init;
+            driver->set_color = rd_3746_set_color;
+            driver->set_color_all = rd_3746_set_color_all;
+            driver->set_color_rgb = rd_3746_set_color_rgb;
+            driver->set_color_all_rgb = rd_3746_set_color_all_rgb;
+            driver->flush = rd_3746_flush;
+            driver->uninit = rd_3746_uninit;
             break;
         default:
             return NULL;

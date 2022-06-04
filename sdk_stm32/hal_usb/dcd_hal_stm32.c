@@ -9,7 +9,7 @@
     #define DCD_MAX_EP_NUM      8
     #define DCD_USB_INSTANCE    USB
     #define DCD_USB_IRQn        USB_LP_CAN1_RX0_IRQn
-#elif defined(STM32F411xE) || defined(STM32F405xx)
+#elif defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F401xC)
     #define DCD_MAX_EP_NUM      4
     #define DCD_USB_INSTANCE    USB_OTG_FS
     #define DCD_USB_IRQn        OTG_FS_IRQn
@@ -65,7 +65,7 @@ void dcd_init(uint8_t rhport)
 #if defined(STM32F103xB)
     dcd_usb.Init.ep0_mps = CFG_TUD_ENDPOINT0_SIZE;
 #else
-    #if defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F722xx)
+    #if defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F722xx) || defined(STM32F401xC) 
     dcd_usb.Init.dma_enable = DISABLE;
     dcd_usb.Init.vbus_sensing_enable = DISABLE;
     dcd_usb.Init.use_dedicated_ep1 = DISABLE;
@@ -78,7 +78,7 @@ void dcd_init(uint8_t rhport)
     if (HAL_PCD_Init(&dcd_usb) != HAL_OK) {
         amk_printf("Failed to initialize HAL PCD\n");
     }
-#if defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F722xx)
+#if defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F722xx) || defined(STM32F401xC)
     HAL_PCDEx_SetRxFiFo(&dcd_usb, 0x80);            // shared rx buffer
     HAL_PCDEx_SetTxFiFo(&dcd_usb, 0, 0x20);         // ep0 tx buffer
     HAL_PCDEx_SetTxFiFo(&dcd_usb, 1, 0x10);         // ep1 (keyboard) tx buffer

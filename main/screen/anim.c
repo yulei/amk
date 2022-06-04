@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
+#include "generic_hal.h"
 #include "anim.h"
 #include "ff.h"
 #include "timer.h"
@@ -160,12 +161,15 @@ uint32_t anim_step(anim_t *anim, uint32_t *delay, void *buf, uint32_t size)
         return 0;
     }
 
+    //__disable_irq();
     UINT readed = 0;
     if (FR_OK != f_read(&anim->obj.file, buf, size, &readed)) {
         amk_printf("ANIM failed to read new frame data, size=%d\n", size);
         safe_close(&anim->obj.file);
+    //    __enable_irq();
         return 0;
     }
+    //__enable_irq();
 
     if (size != readed) {
         amk_printf("ANIM read file size mismatch, should=%d, actually=%d\n", size, readed);
@@ -209,18 +213,24 @@ void anim_close(anim_t *anim)
 
 static bool anim_init(anim_t *anim)
 {
+   // __disable_irq();
     FRESULT ret = safe_open(&(anim->obj.file), anim->files[anim->current], FA_READ);
     if (ret != FR_OK) {
+    //    __enable_irq();
         return false;
     } 
+    //__enable_irq();
 
     memset(&anim->obj.header, 0, sizeof(anim_header_t));
     anim->obj.frame = 0;
     UINT readed = 0;
+    //__disable_irq();
     if (FR_OK != f_read(&anim->obj.file, &anim->obj.header, sizeof(anim_header_t)-FRAME_MAX*2, &readed)) {
         f_close(&anim->obj.file);
+    //    __enable_irq();
         return false;
     }
+    //__enable_irq();
     
     if (FR_OK != f_read(&anim->obj.file, &anim->obj.header.delays[0], anim->obj.header.frames*2, &readed)) {
         f_close(&anim->obj.file);
