@@ -178,7 +178,8 @@ bool matrix_scan_post(matrix_row_t* raw)
 #ifdef RGB_ENABLE
 #include "rgb_driver.h"
 #include "rgb_linear.h"
-#include "is31fl3236.h"
+//#include "is31fl3236.h"
+#include "is31fl3731.h"
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {0, 0, 0, 0},
     {0, 1, 1, 1},
@@ -196,6 +197,7 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {0,13,13,13},
     {0,14,14,14},
     {0,15,15,15},
+#if 0
     {1, OUT_34, OUT_35, OUT_36},
     {1, OUT_31, OUT_32, OUT_33},
     {1, OUT_28, OUT_29, OUT_30},
@@ -208,16 +210,32 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {1, OUT_7, OUT_8, OUT_9},
     {1, OUT_4, OUT_5, OUT_6},
     {1, OUT_1, OUT_2, OUT_3},
+#endif
+    {1, C1_9,   C3_10,  C4_10},
+    {1, C1_10,  C2_10,  C4_11},
+    {1, C1_11,  C2_11,  C3_11},
+    {1, C1_12,  C2_12,  C3_12},
+    {1, C1_13,  C2_13,  C3_13},
+    {1, C1_14,  C2_14,  C3_14},
+    {1, C1_15,  C2_15,  C3_15},
+    {1, C1_16,  C2_16,  C3_16},
+
+    {1, C9_9,   C8_9,   C7_9},
+    {1, C9_10,  C8_10,  C7_10},
+    {1, C9_11,  C8_11,  C7_11},
+    {1, C9_12,  C8_12,  C7_12},
+    {1, C9_13,  C8_13,  C7_13},
 };
 
 
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
     {RGB_DRIVER_WS2812, 0, 0, 0, 16},
-    {RGB_DRIVER_IS31FL3236, 0x78, 0, 16, 12},
+    //{RGB_DRIVER_IS31FL3236, 0x78, 0, 16, 12},
+    {RGB_DRIVER_IS31FL3731, 0xE8, 0, 16, 13},
 };
 
 rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
     {0, 0, 16},
-    {1,16, 12},
+    {1,16, 13},
 };
 #endif

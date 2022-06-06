@@ -62,8 +62,12 @@
 #define PWM_TIM_PERIOD      119
 #define PWM_TIM             htim4
 #define PWM_TIM_CHANNEL     TIM_CHANNEL_2
+#define PWM_TIM_DMA_ID      TIM_DMA_ID_CC2
+#define PWM_DMA_INSTANCE    DMA1_Stream3
+#define PWM_DMA_CHANNEL     DMA_CHANNEL_2
+#define PWM_DMA_IRQHnadler  DMA1_Stream3_IRQHandler
 
-#define RGB_LED_NUM     (WS2812_LED_NUM+12)
+#define RGB_LED_NUM     (WS2812_LED_NUM+13)
 #define RGB_DEVICE_NUM  2
 #define RGB_SEGMENT_NUM 2
 
@@ -74,6 +78,7 @@
 #define HSE_VALUE       16000000
 
 #define USE_I2C1
+#define IS31FL3731_I2C_ID   I2C_INSTANCE_1
 
 #define DWT_DELAY
 //#define WS2812_USE_GPIO
