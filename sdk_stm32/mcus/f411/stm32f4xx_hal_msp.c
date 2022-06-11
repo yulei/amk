@@ -603,13 +603,16 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
 
 #endif
 
-#if defined(USE_PWM_TIM4) || defined(USE_PWM_TIM1)
+#if defined(USE_PWM_TIM4) || defined(USE_PWM_TIM1) || defined(USE_PWM_TIM2)
 
 #ifdef USE_PWM_TIM4
 extern DMA_HandleTypeDef hdma_tim4_ch;
 #endif
 #ifdef USE_PWM_TIM1
 extern DMA_HandleTypeDef hdma_tim1_ch1;
+#endif
+#ifdef USE_PWM_TIM2
+extern DMA_HandleTypeDef PWM_DMA_TIM_CH;
 #endif
 /**
 * @brief TIM_PWM MSP Initialization
@@ -646,6 +649,37 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     }
 
     __HAL_LINKDMA(htim_pwm,hdma[PWM_TIM_DMA_ID],hdma_tim4_ch);
+
+  /* USER CODE BEGIN TIM4_MspInit 1 */
+
+  /* USER CODE END TIM4_MspInit 1 */
+  } 
+  #endif
+  #ifdef USE_PWM_TIM2
+  if(htim_pwm->Instance==TIM2)
+  {
+  /* USER CODE BEGIN TIM4_MspInit 0 */
+
+  /* USER CODE END TIM4_MspInit 0 */
+    /* Peripheral clock enable */
+    __HAL_RCC_TIM2_CLK_ENABLE();
+
+    PWM_DMA_TIM_CH.Instance = PWM_DMA_INSTANCE;
+    PWM_DMA_TIM_CH.Init.Channel = PWM_DMA_CHANNEL;
+    PWM_DMA_TIM_CH.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    PWM_DMA_TIM_CH.Init.PeriphInc = DMA_PINC_DISABLE;
+    PWM_DMA_TIM_CH.Init.MemInc = DMA_MINC_ENABLE;
+    PWM_DMA_TIM_CH.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    PWM_DMA_TIM_CH.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    PWM_DMA_TIM_CH.Init.Mode = DMA_NORMAL;
+    PWM_DMA_TIM_CH.Init.Priority = DMA_PRIORITY_LOW;
+    PWM_DMA_TIM_CH.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&PWM_DMA_TIM_CH) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    __HAL_LINKDMA(htim_pwm,hdma[PWM_TIM_DMA_ID],PWM_DMA_TIM_CH);
 
   /* USER CODE BEGIN TIM4_MspInit 1 */
 
@@ -713,6 +747,29 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
   /* USER CODE END TIM4_MspPostInit 1 */
   }
   #endif
+  #ifdef USE_PWM_TIM2
+  if(htim->Instance==TIM2)
+  {
+  /* USER CODE BEGIN TIM4_MspPostInit 0 */
+
+  /* USER CODE END TIM4_MspPostInit 0 */
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    /**TIM2 GPIO Configuration
+    PA0     ------> TIM2_CH1
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_0;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /* USER CODE BEGIN TIM2_MspPostInit 1 */
+
+  /* USER CODE END TIM2_MspPostInit 1 */
+  }
+  #endif
   #ifdef USE_PWM_TIM1
   if(htim->Instance==TIM1)
   {
@@ -762,6 +819,15 @@ void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef* htim_pwm)
   }
   #endif
 
+  #ifdef USE_PWM_TIM2
+
+  if(htim_pwm->Instance==TIM2)
+  {
+    __HAL_RCC_TIM2_CLK_DISABLE();
+
+    HAL_DMA_DeInit(htim_pwm->hdma[TIM_DMA_ID_CC1]);
+  }
+  #endif
   #ifdef USE_PWM_TIM1
   if(htim_pwm->Instance==TIM1)
   {

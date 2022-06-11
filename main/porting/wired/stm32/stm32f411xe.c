@@ -51,6 +51,11 @@ TIM_HandleTypeDef htim1;
 DMA_HandleTypeDef hdma_tim1_ch1;
 #endif
 
+#ifdef USE_PWM_TIM2
+TIM_HandleTypeDef PWM_TIM;
+DMA_HandleTypeDef PWM_DMA_TIM_CH;
+#endif
+
 void OTG_FS_IRQHandler(void)
 {
     tud_int_handler(0);
@@ -258,6 +263,42 @@ static void MX_TIM4_Init(void)
     }
 
     HAL_TIM_MspPostInit(&htim4);
+}
+#endif
+
+#ifdef USE_PWM_TIM2
+extern void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+static void MX_TIM2_Init(void)
+{
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
+    TIM_OC_InitTypeDef sConfigOC = {0};
+
+    PWM_TIM.Instance = TIM2;
+    PWM_TIM.Init.Prescaler = 0;
+    PWM_TIM.Init.CounterMode = TIM_COUNTERMODE_UP;
+    PWM_TIM.Init.Period = PWM_TIM_PERIOD;
+    PWM_TIM.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    PWM_TIM.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    if (HAL_TIM_PWM_Init(&PWM_TIM) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    if (HAL_TIMEx_MasterConfigSynchronization(&PWM_TIM, &sMasterConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    sConfigOC.OCMode = TIM_OCMODE_PWM1;
+    sConfigOC.Pulse = 0;
+    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+    if (HAL_TIM_PWM_ConfigChannel(&PWM_TIM, &sConfigOC, PWM_TIM_CHANNEL) != HAL_OK)
+    {
+        Error_Handler();
+    }
+
+    HAL_TIM_MspPostInit(&PWM_TIM);
 }
 #endif
 
@@ -475,6 +516,9 @@ void custom_board_init(void)
 #endif
 #ifdef USE_PWM_TIM1
     MX_TIM1_Init();
+#endif
+#ifdef USE_PWM_TIM2
+    MX_TIM2_Init();
 #endif
 #ifdef USE_ADC1
     MX_ADC1_Init();

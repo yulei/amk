@@ -21,6 +21,8 @@
 #include "amk_gpio.h"
 #include "amk_printf.h"
 
+#include "qmk/lib8tion/lib8tion.h"
+
 #ifndef RGB_LED_DEBUG
 #define RGB_LED_DEBUG 1
 #endif
@@ -280,19 +282,19 @@ void rgb_led_config_inc_param(uint8_t param)
             rgb_led_config_set_param(RGB_EFFECT_MODE, value);
             break;
         case RGB_EFFECT_SPEED:
-            value = (g_rgb_configs[rgb_config_cur].speed+SPEED_STEP) % SPEED_MAX;
+            value = qadd8(g_rgb_configs[rgb_config_cur].speed, SPEED_STEP);
             rgb_led_config_set_param(RGB_EFFECT_SPEED, value);
             break;
         case RGB_EFFECT_HUE:
-            value = (g_rgb_configs[rgb_config_cur].hue+HUE_STEP) % HUE_MAX;
+            value = g_rgb_configs[rgb_config_cur].hue + HUE_STEP;
             rgb_led_config_set_param(RGB_EFFECT_HUE, value);
             break;
         case RGB_EFFECT_SAT:
-            value = (g_rgb_configs[rgb_config_cur].sat+SAT_STEP) % SAT_MAX;
+            value = qadd8(g_rgb_configs[rgb_config_cur].sat, SAT_STEP);
             rgb_led_config_set_param(RGB_EFFECT_SAT, value);
             break;
         case RGB_EFFECT_VAL:
-            value = (g_rgb_configs[rgb_config_cur].val+VAL_STEP) % VAL_MAX;
+            value = qadd8(g_rgb_configs[rgb_config_cur].val, VAL_STEP);
             rgb_led_config_set_param(RGB_EFFECT_VAL, value);
             break;
         default:
@@ -309,19 +311,22 @@ void rgb_led_config_dec_param(uint8_t param)
             rgb_led_config_set_param(RGB_EFFECT_MODE, value);
             break;
         case RGB_EFFECT_SPEED:
-            value = g_rgb_configs[rgb_config_cur].speed > SPEED_STEP ? g_rgb_configs[rgb_config_cur].speed - SPEED_STEP : SPEED_MIN;
+            value = qsub8(g_rgb_configs[rgb_config_cur].speed, SPEED_STEP);
+            if (value < SPEED_MIN) value = SPEED_MIN;
             rgb_led_config_set_param(RGB_EFFECT_SPEED, value);
             break;
         case RGB_EFFECT_HUE:
-            value = g_rgb_configs[rgb_config_cur].hue > HUE_STEP ? g_rgb_configs[rgb_config_cur].hue - HUE_STEP : HUE_MIN;
+            value = g_rgb_configs[rgb_config_cur].hue - HUE_STEP;
             rgb_led_config_set_param(RGB_EFFECT_HUE, value);
             break;
         case RGB_EFFECT_SAT:
-            value = g_rgb_configs[rgb_config_cur].sat > SAT_STEP ? g_rgb_configs[rgb_config_cur].sat - SAT_STEP : SAT_MIN;
+            value = qsub8(g_rgb_configs[rgb_config_cur].sat, SAT_STEP);
+            if(value < SAT_MIN) value = SAT_MIN;
             rgb_led_config_set_param(RGB_EFFECT_SAT, value);
             break;
         case RGB_EFFECT_VAL:
-            value = g_rgb_configs[rgb_config_cur].val > VAL_STEP ? g_rgb_configs[rgb_config_cur].val - VAL_STEP : VAL_MIN;
+            value = qsub8(g_rgb_configs[rgb_config_cur].val, VAL_STEP);
+            if(value < VAL_MIN) value = VAL_MIN;
             rgb_led_config_set_param(RGB_EFFECT_VAL, value);
             break;
         default:
