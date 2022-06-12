@@ -5,20 +5,27 @@
  */
 
 #include "mscusb.h"
+
+#ifndef QSPI_ENABLE
 #include "w25qxx.h"
+#else
+#include "qspi.h"
+#endif
 
 #ifndef DISK_COUNT
 #define DISK_COUNT          1
 #endif
 #ifndef DISK_TOTAL_SIZE
-#define DISK_TOTAL_SIZE     16*1024*1024        //W25Q128, 16M Bytes
+#define DISK_TOTAL_SIZE     (16*1024*1024)        //W25Q128, 16M Bytes
 #endif
 
 #define DISK_BLOCK_SIZE     (4*1024)
 #define DISK_BLOCK_NUM      DISK_TOTAL_SIZE/DISK_BLOCK_SIZE
 
+#ifndef QSPI_ENABLE
 static w25qxx_config_t w25qxx_config;
 static w25qxx_t *w25qxx;
+#endif
 
 __attribute__((weak))
 void msc_init_kb(void) {}
@@ -29,16 +36,24 @@ void wdt_refresh(void);
 
 void msc_init(void)
 {
+    #ifndef QSPI_ENABLE
     w25qxx_config.cs = FLASH_CS;
     w25qxx_config.spi = spi_init(W25QXX_SPI_ID);
     w25qxx = w25qxx_init(&w25qxx_config);
+    #else
+    qspi_init(0);
+    #endif
 
     msc_init_kb();
 }
 
 void msc_erase(void)
 {
+#ifndef QSPI_ENABLE
     w25qxx_erase_chip(w25qxx);
+#else
+    qspi_erase_chip();
+#endif
 }
 
 __attribute__((weak))
@@ -66,7 +81,7 @@ void tud_msc_inquiry_cb(uint8_t lun, uint8_t vendor_id[8], uint8_t product_id[16
     (void) lun; // use same ID for both LUNs
 
     const char vid[] = "Matrix";
-    const char pid[] = "Vita";
+    const char pid[] = "Screen";
     const char rev[] = "1.0";
 
     memcpy(vendor_id  , vid, strlen(vid));
@@ -119,7 +134,11 @@ int32_t tud_msc_read10_cb(uint8_t lun, uint32_t lba, uint32_t offset, void* buff
 #ifdef WDT_ENABLE
     wdt_refresh();
 #endif
+#ifndef QSPI_ENABLE
     w25qxx_read_sector(w25qxx, lba*DISK_BLOCK_SIZE, buffer, bufsize);
+#else
+    qspi_read_sector(lba*DISK_BLOCK_SIZE, buffer, bufsize);
+#endif
     return bufsize;
 }
 
@@ -130,7 +149,11 @@ int32_t tud_msc_write10_cb(uint8_t lun, uint32_t lba, uint32_t offset, uint8_t* 
 #ifdef WDT_ENABLE
     wdt_refresh();
 #endif
+#ifndef QSPI_ENABLE
     w25qxx_write_sector(w25qxx, lba*DISK_BLOCK_SIZE, buffer, bufsize);
+#else
+    qspi_write_sector(lba*DISK_BLOCK_SIZE, buffer, bufsize);
+#endif
     return bufsize;
 }
 
@@ -142,30 +165,14 @@ int32_t tud_msc_scsi_cb (uint8_t lun, uint8_t const scsi_cmd[16], void* buffer, 
     // read10 & write10 has their own callback and MUST not be handled here
 
     void const* response = NULL;
-    uint16_t resplen = 0;
+    int32_t resplen = 0;
 
     // most scsi handled is input
     bool in_xfer = true;
 
-    switch (scsi_cmd[0]) {
-    case SCSI_CMD_PREVENT_ALLOW_MEDIUM_REMOVAL:
-        // Host is about to read/write etc ... better not to disconnect disk
-        resplen = 0;
-        break;
-
-    case SCSI_CMD_START_STOP_UNIT:
-        // Host try to eject/safe remove/poweroff us. We could safely disconnect with disk storage, or go into lower power
-        /* scsi_start_stop_unit_t const * start_stop = (scsi_start_stop_unit_t const *) scsi_cmd;
-            // Start bit = 0 : low power mode, if load_eject = 1 : unmount disk storage as well
-            // Start bit = 1 : Ready mode, if load_eject = 1 : mount disk storage
-            start_stop->start;
-            start_stop->load_eject;
-        */
-        resplen = 0;
-        break;
-
-
-    default:
+    switch (scsi_cmd[0])
+    {
+        default:
         // Set Sense = Invalid Command Operation
         tud_msc_set_sense(lun, SCSI_SENSE_ILLEGAL_REQUEST, 0x20, 0x00);
 
@@ -175,12 +182,15 @@ int32_t tud_msc_scsi_cb (uint8_t lun, uint8_t const scsi_cmd[16], void* buffer, 
     }
 
     // return resplen must not larger than bufsize
-    if (resplen > bufsize) resplen = bufsize;
+    if ( resplen > bufsize ) resplen = bufsize;
 
-    if (response && (resplen > 0)) {
-        if(in_xfer) {
-            memcpy(buffer, response, resplen);
-        }else {
+    if ( response && (resplen > 0) )
+    {
+        if(in_xfer)
+        {
+        memcpy(buffer, response, resplen);
+        }else
+        {
         // SCSI output
         }
     }
@@ -205,7 +215,7 @@ const int8_t inquiry_data[] = {/* 36 */
   0x00,
   0x00,
   'M', 'A', 'T', 'R', 'I', 'X', ' ', ' ', /* Manufacturer : 8 bytes */
-  'V', 'I', 'T', 'A', ' ', ' ', ' ', ' ', /* Product      : 16 Bytes */
+  'S', 'c', 'r', 'e', 'e', 'n', ' ', ' ', /* Product      : 16 Bytes */
   ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
   '1', '.', '0' ,'1'                      /* Version      : 4 Bytes */
 };

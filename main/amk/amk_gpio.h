@@ -419,6 +419,7 @@
 #elif defined(HC32F460xE)
     #include "generic_hal.h"
 
+    #define INVALID_PIN 0xFFFFFFFF
     typedef uint32_t pin_t;
 
     #define MAKE_PIN(port, pin)     ((uint32_t) (((port)<<16)|((pin)&0xFFFF)))

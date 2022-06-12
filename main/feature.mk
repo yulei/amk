@@ -83,8 +83,13 @@ endif
 
 ifeq (yes, $(strip $(MSC_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/anim.c
-	SRCS += $(MAIN_DIR)/drivers/w25qxx.c
-	SRCS += $(MAIN_DIR)/drivers/spi.c
+	ifeq (yes, $(strip $(QSPI_ENABLE)))
+		SRCS += $(MAIN_DIR)/drivers/qspi.c
+		APP_DEFS += -DQSPI_ENABLE
+	else
+		SRCS += $(MAIN_DIR)/drivers/w25qxx.c
+		SRCS += $(MAIN_DIR)/drivers/spi.c
+	endif
 	ifeq (yes, $(strip $(RTOS_ENABLE)))
 		SRCS += $(MAIN_DIR)/rtos/usbx_msc.c
 	else

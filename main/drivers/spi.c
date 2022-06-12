@@ -6,4 +6,6 @@
 #   include "spi_nrf52.c"
 #elif defined(STM32F411xE) || defined(STM32F722xx) || defined(STM32F405xx)
 #   include "spi_stm32.c"
+#elif defined(HC32F460)
+#   include "spi_hc32.c"
 #endif
