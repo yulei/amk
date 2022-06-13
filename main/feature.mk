@@ -45,7 +45,8 @@ endif
 
 ifeq (yes, $(strip $(RGB_LINEAR_ENABLE)))
 	SRCS += $(MAIN_DIR)/rgb/rgb_linear.c
-	SRCS += $(MAIN_DIR)/rgb/rgb_effect_linear.c
+#	SRCS += $(MAIN_DIR)/rgb/rgb_effect_linear.c
+	SRCS += $(MAIN_DIR)/rgb/rgb_effect_linear_qmk.c
 	APP_DEFS += -DRGB_LINEAR_ENABLE
 	RGB_ENABLE = yes
 endif

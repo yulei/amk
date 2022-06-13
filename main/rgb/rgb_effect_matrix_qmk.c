@@ -108,14 +108,14 @@ uint8_t rgb_matrix_map_row_column_to_led(uint8_t row, uint8_t column, uint8_t *l
     return led_count;
 }
 // Generic effect runners
-#include "qmk/runners/rgb_matrix_runners.inc"
+#include "qmk/rgb_matrix/runners/rgb_matrix_runners.inc"
 
 // ------------------------------------------
 // -----Begin rgb effect includes macros-----
 #define RGB_MATRIX_EFFECT(name)
 #define RGB_MATRIX_CUSTOM_EFFECT_IMPLS
 
-#include "qmk/rgb_matrix_effects.inc"
+#include "qmk/rgb_matrix/rgb_matrix_effects.inc"
 #ifdef RGB_MATRIX_CUSTOM_KB
 #    include "rgb_matrix_kb.inc"
 #endif
@@ -443,7 +443,7 @@ static void rgb_task_render(rgb_matrix_state_t *state, uint8_t effect) {
     case RGB_MATRIX_##name:                   \
         rendering = name(state); \
         break;
-#include "qmk/rgb_matrix_effects.inc"
+#include "qmk/rgb_matrix/rgb_matrix_effects.inc"
 #undef RGB_MATRIX_EFFECT
 
 #if defined(RGB_MATRIX_CUSTOM_KB) || defined(RGB_MATRIX_CUSTOM_USER)

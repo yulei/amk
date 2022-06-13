@@ -113,3 +113,5 @@ uint8_t pick_hue(void);
 
 #define HSV hsv_t
 #define RGB rgb_t
+
+extern const uint8_t CIE1931_CURVE[];
