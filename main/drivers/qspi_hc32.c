@@ -10,6 +10,16 @@
 #include "generic_hal.h"
 #include "amk_printf.h"
 
+#ifndef QSPI_DEBUG
+#define QSPI_DEBUG 1
+#endif
+
+#if QSPI_DEBUG
+#define qspi_debug  amk_printf
+#else
+#define qspi_debug(...)
+#endif
+
 /* QSPCK Port/Pin definition */
 #define QSPCK_PORT                      (PortB)
 #define QSPCK_PIN                       (Pin14)
@@ -35,12 +45,12 @@
 #define QSIO3_PIN                       (Pin02)
 
 /* QSPI memory bus address definition */
-#define QSPI_BUS_ADDRESS                (0x98000000ul)
+#define QSPI_BUS_ADDRESS                (0x98000000u)
 
 /* FLASH parameters definition */
 #define FLASH_PAGE_SIZE                 (0x100u)
 #define FLASH_SECTOR_SIZE               (0x1000u)
-#define FLASH_MAX_ADDR                  (0x1000000ul)
+#define FLASH_MAX_ADDR                  (0x1000000u)
 #define FLASH_DUMMY_BYTE_VALUE          (0xffu)
 #define FLASH_BUSY_BIT_MASK             (0x01u)
 
@@ -149,14 +159,16 @@ bool qspi_init(uint32_t map_addr)
 
     return true;
 }
+
 amk_error_t qspi_read_sector(uint32_t address, uint8_t *buffer, size_t length)
 {
     if (length != FLASH_SECTOR_SIZE) {
-        amk_printf("QSPI: read_sector: invalid size:%d\n", length);
+        qspi_debug("QSPI: read_sector: invalid size:%d\n", length);
         return AMK_QSPI_INVALID_PARAM;
     }
 
-    uint8_t *src = (uint8_t *)((uint32_t)QSPI_BUS_ADDRESS + address);
+    uint8_t *src = (uint8_t *)(QSPI_BUS_ADDRESS + address);
+    //qspi_debug("QSPI: source addr: %p\n", src);
     memcpy(buffer, src, length);
     return AMK_SUCCESS;
 }
@@ -164,13 +176,13 @@ amk_error_t qspi_read_sector(uint32_t address, uint8_t *buffer, size_t length)
 amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t length)
 {
     if (length != FLASH_SECTOR_SIZE) {
-        amk_printf("QSPI: write_sector: invalid size:%u\n", length);
+        qspi_debug("QSPI: write_sector: invalid size:%u\n", length);
         return AMK_QSPI_INVALID_PARAM;
     }
 
     // erase sector first
     if (address >= FLASH_MAX_ADDR) {
-        amk_printf("QSPI: write_sector: invalid address:%u\n", address);
+        qspi_debug("QSPI: write_sector: invalid address:%u\n", address);
         return AMK_QSPI_INVALID_PARAM;
     } else {
         QspiFlash_WriteEnable();
@@ -184,7 +196,7 @@ amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t le
         /* Wait for flash idle */
         en_result_t ret = QspiFlash_WaitForWriteEnd();
         if (ret != Ok) {
-            amk_printf("QSPI: write_sector: erase failed:%d\n", ret);
+            qspi_debug("QSPI: write_sector: erase failed:%d\n", ret);
             return AMK_QSPI_ERROR;
         }
     }
@@ -201,8 +213,7 @@ amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t le
         QSPI_WriteDirectCommValue((uint8_t)((addr & 0xFF00u) >> 8));
         QSPI_WriteDirectCommValue((uint8_t)( addr & 0xFFu));
         uint32_t len = FLASH_PAGE_SIZE;
-        while (len--)
-        {
+        while (len--) {
            QSPI_WriteDirectCommValue(*cur++);
         }
         QSPI_ExitDirectCommMode();
@@ -210,8 +221,11 @@ amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t le
         /* Wait for flash idle */
         en_result_t ret = QspiFlash_WaitForWriteEnd();
         if (ret != Ok) {
-            amk_printf("QSPI: write_sector: program failed:%d\n", ret);
+            qspi_debug("QSPI: write_sector: program failed:%d\n", ret);
             return AMK_QSPI_ERROR;
+        } else {
+            addr += FLASH_PAGE_SIZE;
+            //qspi_debug("QSPI: write_sector: addr=0x%x\n", addr);
         }
     }
 
