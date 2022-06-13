@@ -51,7 +51,11 @@
     #define RGB_MATRIX_CONFIG_NUM       0
 #endif
 
+#ifndef RGB_CONFIG_NUM
 #define RGB_LED_CONFIG_NUM              (RGB_LINEAR_CONFIG_NUM+RGB_INDICATOR_CONFIG_NUM+RGB_MATRIX_CONFIG_NUM)
+#else
+#define RGB_LED_CONFIG_NUM              RGB_CONFIG_NUM
+#endif
 
 rgb_config_t g_rgb_configs[RGB_LED_CONFIG_NUM];
 static uint8_t rgb_config_cur;

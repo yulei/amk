@@ -250,7 +250,6 @@ static void MX_ADC_Init(void)
 #ifdef USE_I2C1
 static void MX_I2C1_Init(void)
 {
-    #if 0
     hi2c1.Instance = I2C1;
     hi2c1.Init.Timing = 0x00707CBB;
     hi2c1.Init.OwnAddress1 = 0;
@@ -270,7 +269,6 @@ static void MX_I2C1_Init(void)
     if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK) {
         Error_Handler();
     }
-    #endif
 }
 #endif
 /**
