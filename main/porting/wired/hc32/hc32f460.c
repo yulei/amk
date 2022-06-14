@@ -7,6 +7,8 @@
  */
 
 #include "generic_hal.h"
+#include "usb_common.h"
+#include "amk_printf.h"
 
 #ifdef USE_SPI1
 
@@ -70,9 +72,24 @@ void screen_spi_init(void)
 }
 #endif
 
+// put on retention memory
+uint32_t BKP_DR0 __attribute__((section(".ret_ram_data")));     // for reboot to bootloader 
+uint32_t BKP_DR1 __attribute__((section(".ret_ram_data")));     // for special reboot 
+
 void custom_board_init(void)
 {
 #ifdef USE_SPI1
     screen_spi_init();
+#endif
+#ifdef DYNAMIC_CONFIGURATION
+    uint32_t magic = BKP_DR1;
+    //if (magic == 0) {
+    if (magic > 0) {
+        usb_setting |= USB_MSC_BIT;
+    } else {
+        usb_setting = 0;
+    }
+    amk_printf("usb_setting: %d\n", usb_setting);
+    BKP_DR1 = 0;
 #endif
 }
