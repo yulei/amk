@@ -390,9 +390,9 @@ static void rgb_task_start(rgb_matrix_state_t *state) {
 }
 
 static bool rgb_matrix_none(rgb_matrix_state_t *state) {
-    if (!state->rgb_effect_params.init) {
-        return false;
-    }
+    //if (!state->rgb_effect_params.init) {
+    //    return false;
+    //}
 
     effect_set_color_all(state, 0, 0, 0);
     return false;

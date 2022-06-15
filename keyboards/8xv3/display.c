@@ -29,8 +29,10 @@ static void reset_to_msc(bool msc);
 #include "screen.h"
 #include "mscusb.h"
 #include "anim.h"
+#include "amk_eeprom.h"
 #include "amk_printf.h"
 #include "ff.h"
+
 //////////////////////
 // adaptive layer
 ///////////////////
@@ -79,12 +81,17 @@ typedef struct {
 
 #define BYTE_PER_PIXEL  2
 #define ANIM_X_START    100
+#define ANIM_X_MIN      90
+#define ANIM_X_MAX      100
 #define ANIM_Y_START    10
+#define ANIM_Y_MIN      0
+#define ANIM_Y_MAX      20
 #define ANIM_WIDTH      60
 #define ANIM_HEIGHT     60
 static uint16_t anim_buf[ANIM_WIDTH*ANIM_HEIGHT];
 
 static bool screen_enable = true;
+static bool screen_adjust = false;
 static bool filling = false;
 static render_t renders[] = {
     {
@@ -101,6 +108,18 @@ static render_t renders[] = {
         .ticks = 0,
     },
 };
+
+static uint32_t decrease_min(uint32_t data, uint32_t MIN)
+{
+    if(data > MIN) return (--data);
+    else return data;
+}
+
+static uint32_t increase_max(uint32_t data, uint32_t MAX)
+{
+    if(data < MAX) return (++data); 
+    else return data;
+}
 
 #ifdef  TYPING_SPEED
 #define TYPING_INTERVAL     100
@@ -184,6 +203,30 @@ void matrix_init_kb(void)
 
     set_screen_state(screen_enable);
     last_ticks = timer_read32();
+
+    uint32_t kbd = eeconfig_read_kb(); 
+    uint8_t x = kbd&0xFF;
+    uint8_t y = (kbd>>8)&0xFF;
+    bool update = false;
+    if ((x>=ANIM_X_MIN)&&(x<=ANIM_X_MAX)) {
+        renders[0].x = x;
+    } else {
+        x = renders[0].x;
+        update = true;
+    }
+
+    if ((y>=ANIM_Y_MIN)&&(y<=ANIM_Y_MAX)) {
+        renders[0].y = y;
+    } else {
+        y = renders[0].y;
+        update = true;
+    }
+
+    if (update) {
+        kbd = (y<<8) | x;
+        eeconfig_write_kb(kbd);
+        disp_debug("eeconfig: update display, X=%d, Y=%d\n", x, y);
+    }
 }
 
 void render_task(render_t* render)
@@ -292,10 +335,36 @@ bool hook_process_action_main(keyrecord_t *record)
             disp_debug("typing enabled: %d\n", typing_enable);
             return true;
 #endif
+        case KC_F15:
+            screen_adjust = !screen_adjust;
+            disp_debug("screen adjust enabled: %d\n", screen_adjust);
+            if (!screen_adjust) {
+                // save to eeprom
+                uint32_t kbd = (renders[0].y<<8) | renders[0].x;
+                eeconfig_write_kb(kbd);
+                disp_debug("screen adjust saved: 0x%x\n", kbd);
+            }
+            break;
         case KC_F16:
             screen_enable = !screen_enable;
             set_screen_state(screen_enable);
             disp_debug("screen enabled: %d\n", screen_enable);
+            return true;
+        case KC_LEFT:
+            if (!screen_adjust) return false;
+            renders[0].x = decrease_min(renders[0].x, ANIM_X_MIN);
+            return true;
+        case KC_RIGHT:
+            if (!screen_adjust) return false;
+            renders[0].x = increase_max(renders[0].x, ANIM_X_MAX);
+            return true;
+        case KC_UP:
+            if (!screen_adjust) return false;
+            renders[0].y = decrease_min(renders[0].y, ANIM_Y_MIN);
+            return true;
+        case KC_DOWN:
+            if (!screen_adjust) return false;
+            renders[0].y = increase_max(renders[0].y, ANIM_Y_MAX);
             return true;
         case KC_F21: {
             render_t *render = NULL;
