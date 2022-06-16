@@ -30,8 +30,13 @@ ifeq (yes, $(strip $(SCREEN_ENABLE)))
 				APP_DEFS += -DSCREEN_DRIVER_SSD1306
 				SRCS += $(MAIN_DIR)/drivers/ssd1306.c
 			else
-				APP_DEFS += -DSCREEN_DRIVER_ST7735
-				SRCS += $(MAIN_DIR)/drivers/st7735.c
+				ifeq (GC9107, $(strip $(SCREEN_DRIVER)))
+					APP_DEFS += -DSCREEN_DRIVER_GC9107
+					SRCS += $(MAIN_DIR)/drivers/gc9107.c
+				else
+					APP_DEFS += -DSCREEN_DRIVER_ST7735
+					SRCS += $(MAIN_DIR)/drivers/st7735.c
+				endif
 			endif
 		endif
 	endif

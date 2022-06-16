@@ -64,6 +64,10 @@
   #error "Incorrect RHPort configuration"
 #endif
 
+#if (CFG_TUSB_MCU == OPT_MCU_HC32F460)
+#define DCD_ATTR_ENDPOINT_MAX 6
+#endif
+
 // This example doesn't use an RTOS
 #define CFG_TUSB_OS                 OPT_OS_NONE
 

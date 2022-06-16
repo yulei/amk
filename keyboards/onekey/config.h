@@ -16,18 +16,18 @@
 #define MATRIX_ROWS 1
 #define MATRIX_COLS 1
 
-#define MATRIX_ROW_PINS { B0}
-#define MATRIX_COL_PINS { B1}
+#define MATRIX_ROW_PINS { C0}
+#define MATRIX_COL_PINS { C1}
 
-#define SCREEN_NUM      2
-
-#define SCREEN_0_RESET  A0
-#define SCREEN_0_CS     A1
-#define SCREEN_0_DC     A2
-
-#define SCREEN_1_RESET  B0
-#define SCREEN_1_CS     B1
-#define SCREEN_1_DC     B2
+// screen configuration
+#define USE_SPI1
+#define GC9107_SPI_ID       SPI_INSTANCE_1
+#define SCREEN_NUM          1
+#define SCREEN_0_PWR        C5
+#define SCREEN_0_PWR_EN     0
+#define SCREEN_0_CS         A4
+#define SCREEN_0_RESET      C4
+#define SCREEN_0_DC         A3
 
 #if 0
 #define WS2812_LED_NUM  4
@@ -35,7 +35,6 @@
 #define PWM_TIM_PERIOD  134
 #define PWM_TIM htim2
 #define PWM_TIM_CHANNEL TIM_CHANNEL_1
-#endif
 
 #define WS2812_LED_NUM  4
 #define WS2812_LED_PIN  A6
@@ -47,6 +46,7 @@
 
 
 //#define WAIT_TIM      htim2
+#endif
 
 #define RGB_DEVICE_NUM  1
 #define RGB_SEGMENT_NUM 1
@@ -64,6 +64,7 @@
 
 //#define VECT_TAB_OFFSET 0x20000
 
-#define XTAL_VALUE      16000000
+//#define XTAL_VALUE      16000000
+#define HSE_VALUE      12000000
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 //#define CFG_TUSB_CONFIG_FILE    "tusb_def_host.h"

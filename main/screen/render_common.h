@@ -17,6 +17,7 @@ enum {
     SPI_LCD_RM67160,
     SPI_LCD_SSD1357,
     SPI_LCD_SSD1306,
+    SPI_LCD_GC9107,
 };
 
 enum {

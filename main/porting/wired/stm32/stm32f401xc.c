@@ -20,8 +20,14 @@ DMA_HandleTypeDef hdma_i2c1_rx;
 DMA_HandleTypeDef hdma_i2c1_tx;
 TIM_HandleTypeDef htim4;
 DMA_HandleTypeDef hdma_tim4_ch2;
+#ifdef USE_SPI1
+SPI_HandleTypeDef hspi1;
+DMA_HandleTypeDef hdma_spi1_rx;
+DMA_HandleTypeDef hdma_spi1_tx;
+#endif
 
 RTC_HandleTypeDef hrtc;
+
 
 void OTG_FS_IRQHandler(void)
 {
@@ -85,6 +91,8 @@ static void MX_GPIO_Init(void)
 static void MX_DMA_Init(void)
 {
     __HAL_RCC_DMA1_CLK_ENABLE();
+    __HAL_RCC_DMA2_CLK_ENABLE();
+
 
     HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
@@ -93,6 +101,11 @@ static void MX_DMA_Init(void)
 
     HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+
+    HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
+    HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 }
 
 static void MX_I2C1_Init(void)
@@ -197,6 +210,27 @@ void usb_port_init(void)
     USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBUSASEN;
 }
 
+#ifdef USE_SPI1
+static void MX_SPI1_Init(void)
+{
+    hspi1.Instance = SPI1;
+    hspi1.Init.Mode = SPI_MODE_MASTER;
+    hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+    hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+    hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+    hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+    hspi1.Init.NSS = SPI_NSS_SOFT;
+    hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+    hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+    hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+    hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+    hspi1.Init.CRCPolynomial = 10;
+    if (HAL_SPI_Init(&hspi1) != HAL_OK) {
+        Error_Handler();
+    }
+}
+#endif
+
 void custom_board_init(void)
 {
     SystemClock_Config();
@@ -220,6 +254,9 @@ void custom_board_init(void)
 
     MX_I2C1_Init();
     MX_TIM4_Init();
+#ifdef USE_SPI1
+    MX_SPI1_Init();
+#endif
 
     usb_port_init();
 }
