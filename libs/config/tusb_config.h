@@ -64,6 +64,10 @@
   #error "Incorrect RHPort configuration"
 #endif
 
+#if (CFG_TUSB_MCU == OPT_MCU_HC32F460)
+#define DCD_ATTR_ENDPOINT_MAX 6
+#endif
+
 // This example doesn't use an RTOS
 #define CFG_TUSB_OS                 OPT_OS_NONE
 
@@ -102,7 +106,12 @@
 #define CFG_TUD_CDC               0
 #endif
 
+#ifdef MSC_ENABLE
+#define CFG_TUD_MSC               1
+#else
 #define CFG_TUD_MSC               0
+#endif
+
 #define CFG_TUD_MIDI              0
 
 #ifdef WEBUSB_ENABLE
@@ -125,6 +134,10 @@
 
 // CDC Endpoint transfer buffer size, more is faster
 #define CFG_TUD_CDC_EP_BUFSIZE      1024
+
+// MSC definitions
+#define CFG_TUD_MSC_EPSIZE          64
+#define CFG_TUD_MSC_EP_BUFSIZE      4096
 
 #ifdef __cplusplus
  }

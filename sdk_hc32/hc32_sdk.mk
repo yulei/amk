@@ -64,7 +64,8 @@ include $(HC32SDK_DIR)/$(MCU_TYPE)_sdk.mk
 
 ifeq (yes, $(strip $(TINYUSB_ENABLE)))
 	include $(LIB_DIR)/tinyusb.mk
-	include $(HC32SDK_DIR)/dcd_usb.mk
+#include $(HC32SDK_DIR)/dcd_usb_ddl.mk
+	include $(HC32SDK_DIR)/dcd_usb_dwc2.mk
 	APP_DEFS += -DTINYUSB_ENABLE
 endif
 

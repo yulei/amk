@@ -9,6 +9,16 @@
 #include "ddl_dcd_int.h"
 #include "usb_bsp.h"
 
+#ifndef DCD_DEBUG
+#define DCD_DEBUG 1
+#endif
+
+#if DCD_DEBUG
+#define dcd_debug  amk_printf
+#else
+#define dcd_debug(...)
+#endif
+
 static void hd_usb_setup_process(usb_core_instance *pdev);
 static void hd_usb_dataout_process(usb_core_instance *pdev, uint8_t epnum);
 static void hd_usb_datain_process(usb_core_instance *pdev , uint8_t epnum);
@@ -112,6 +122,8 @@ void dcd_init(uint8_t rhport)
     // force VBUS ON
     HD_USB_WRREG32(&pdev->regs.GREGS->GOTGCTL, 1<<7);
     HD_USB_WRREG32(&pdev->regs.GREGS->GOTGCTL, (1<<7) | (1<<6));
+
+    dcd_debug("dcd initialized\n");
 }
 
 void dcd_int_handler(uint8_t rhport)
@@ -137,7 +149,7 @@ void dcd_set_address(uint8_t rhport, uint8_t dev_addr)
     dcd_edpt_xfer(0, 0x80u, pdev->dev.setup_pkt_buf, 0u);
     pdev->dev.device_cur_status  = USB_DEV_ADDRESSED;
 
-    amk_printf("\n USB set address: %d\n", dev_addr);
+    dcd_debug("\n USB set address: %d\n", dev_addr);
 }
 
 void dcd_remote_wakeup(uint8_t rhport)
@@ -223,6 +235,8 @@ bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t t
     } else {
         hd_usb_epntransbegin(pdev, ep);
     }
+
+    dcd_debug("dcd_xfer: ep=0x%x, size=%d\n", ep_addr, total_bytes);
 
     return true;
 }
