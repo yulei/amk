@@ -32,7 +32,7 @@
 #define AUXI_SIG    "AUXI"
 #define ANIM_SIG    "ANIM"
 #define AMFT_SIG    "AMFT"
-#define FRAME_MAX   656
+#define FRAME_MAX   1024
 typedef struct __attribute__((packed)) {
     char signature[4];  //"ANIM" or "AUXI"
     uint16_t size;      // size of the header
@@ -232,7 +232,8 @@ static bool anim_init(anim_t *anim)
     }
     //__enable_irq();
     
-    if (FR_OK != f_read(&anim->obj.file, &anim->obj.header.delays[0], anim->obj.header.frames*2, &readed)) {
+    uint32_t frames = anim->obj.header.frames > FRAME_MAX ? FRAME_MAX : anim->obj.header.frames;
+    if (FR_OK != f_read(&anim->obj.file, &anim->obj.header.delays[0], frames*2, &readed)) {
         f_close(&anim->obj.file);
         return false;
     }
