@@ -15,15 +15,32 @@
 #include "usb_descriptors.h"
 #include "amk_printf.h"
 
+#ifdef USE_I2C1
 I2C_HandleTypeDef hi2c1;
 DMA_HandleTypeDef hdma_i2c1_rx;
 DMA_HandleTypeDef hdma_i2c1_tx;
+#endif
+
+#ifdef USE_PWM_TIM4
 TIM_HandleTypeDef htim4;
 DMA_HandleTypeDef hdma_tim4_ch2;
+#endif
+
+#ifdef USE_PWM_TIM2
+TIM_HandleTypeDef htim2;
+DMA_HandleTypeDef hdma_tim2_ch1;
+#endif
+
 #ifdef USE_SPI1
 SPI_HandleTypeDef hspi1;
 DMA_HandleTypeDef hdma_spi1_rx;
 DMA_HandleTypeDef hdma_spi1_tx;
+#endif
+
+#ifdef USE_UART1
+UART_HandleTypeDef huart1;
+DMA_HandleTypeDef hdma_usart1_rx;
+DMA_HandleTypeDef hdma_usart1_tx;
 #endif
 
 RTC_HandleTypeDef hrtc;
@@ -45,13 +62,13 @@ void SystemClock_Config(void)
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
     /** Configure the main internal regulator output voltage
-    */
+     */
     __HAL_RCC_PWR_CLK_ENABLE();
     __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
 
     /** Initializes the RCC Oscillators according to the specified parameters
-    * in the RCC_OscInitTypeDef structure.
-    */
+     * in the RCC_OscInitTypeDef structure.
+     */
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
     RCC_OscInitStruct.HSEState = RCC_HSE_ON;
     RCC_OscInitStruct.LSIState = RCC_LSI_ON;
@@ -66,7 +83,7 @@ void SystemClock_Config(void)
     }
 
     /** Initializes the CPU, AHB and APB buses clocks
-    */
+     */
     RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                                 |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
     RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
@@ -96,6 +113,10 @@ static void MX_DMA_Init(void)
 
     HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+
+    HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
+
     HAL_NVIC_SetPriority(DMA1_Stream7_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream7_IRQn);
 
@@ -106,6 +127,11 @@ static void MX_DMA_Init(void)
     HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
     HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
+
+    HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
+    HAL_NVIC_SetPriority(DMA2_Stream7_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
 }
 
 static void MX_I2C1_Init(void)
@@ -138,7 +164,10 @@ static void MX_RTC_Init(void)
     }
 }
 
+
 extern void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+
+#ifdef USE_PWM_TIM4
 static void MX_TIM4_Init(void)
 {
     TIM_MasterConfigTypeDef sMasterConfig = {0};
@@ -170,7 +199,41 @@ static void MX_TIM4_Init(void)
 
     HAL_TIM_MspPostInit(&htim4);
 }
+#endif
 
+#ifdef USE_PWM_TIM2
+static void MX_TIM2_Init(void)
+{
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
+    TIM_OC_InitTypeDef sConfigOC = {0};
+
+    htim2.Instance = TIM2;
+    htim2.Init.Prescaler = 0;
+    htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim2.Init.Period = 104;
+    htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    if (HAL_TIM_PWM_Init(&htim2) != HAL_OK) {
+        Error_Handler();
+    }
+
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK) {
+        Error_Handler();
+    }
+
+    sConfigOC.OCMode = TIM_OCMODE_PWM1;
+    sConfigOC.Pulse = 0;
+    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+    if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK) {
+        Error_Handler();
+    }
+
+    HAL_TIM_MspPostInit(&htim2);
+}
+#endif
 void usb_port_init(void)
 {
     GPIO_InitTypeDef  GPIO_InitStruct;
@@ -231,6 +294,35 @@ static void MX_SPI1_Init(void)
 }
 #endif
 
+#ifdef USE_UART1
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+#endif
 void custom_board_init(void)
 {
     SystemClock_Config();
@@ -252,10 +344,24 @@ void custom_board_init(void)
     HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0);
 #endif
 
+#ifdef USE_I2C1
     MX_I2C1_Init();
+#endif
+
+#ifdef USE_PWM_TIM4
     MX_TIM4_Init();
+#endif
+
+#ifdef USE_PWM_TIM2
+    MX_TIM2_Init();
+#endif
+
 #ifdef USE_SPI1
     MX_SPI1_Init();
+#endif
+
+#ifdef USE_UART1
+    MX_USART1_UART_Init();
 #endif
 
     usb_port_init();

@@ -13,15 +13,16 @@ UF2_MAGIC_START1 = 0x9E5D5157 # Randomly selected
 UF2_MAGIC_END    = 0x0AB16F30 # Ditto
 
 families = {
-    'SAMD21': 0x68ed2b88,
-    'SAML21': 0x1851780a,
-    'SAMD51': 0x55114460,
-    'NRF52': 0x1b57745f,
-    'STM32F1': 0x5ee21072,
-    'STM32F4': 0x57755a57,
-    'ATMEGA32': 0x16573617,
-    'MIMXRT10XX': 0x4FB2D5BD,
-    'STM32L0': 0x202e3a91
+    'SAMD21':       0x68ed2b88,
+    'SAML21':       0x1851780a,
+    'SAMD51':       0x55114460,
+    'NRF52':        0x1b57745f,
+    'STM32F1':      0x5ee21072,
+    'STM32F4':      0x57755a57,
+    'ATMEGA32':     0x16573617,
+    'MIMXRT10XX':   0x4fb2d5bd,
+    'STM32L0':      0x202e3a91,
+    'HC32F4':       0x48434633    # HCF4
 }
 
 INFO_FILE = "/INFO_UF2.TXT"

@@ -12,6 +12,7 @@
 
 #ifdef USE_SPI1
 
+#if 0
 #define SPI_UNIT                        (M4_SPI1)
 #define SPI_UNIT_CLOCK                  (PWC_FCG1_PERIPH_SPI1)
 
@@ -27,8 +28,25 @@
 #define SPI_MOSI_PORT                   (PortA)
 #define SPI_MOSI_PIN                    (Pin05)
 #define SPI_MOSI_FUNC                   (Func_Spi1_Mosi)
+#else
+#define SPI_UNIT                        (M4_SPI3)
+#define SPI_UNIT_CLOCK                  (PWC_FCG1_PERIPH_SPI3)
 
-M4_SPI_TypeDef* hspi1 = M4_SPI1;
+#define SPI_NSS_PORT                    (PortB)
+#define SPI_NSS_PIN                     (Pin05)
+#define SPI_NSS_HIGH()                  (PORT_SetBits(SPI_NSS_PORT, SPI_NSS_PIN))
+#define SPI_NSS_LOW()                   (PORT_ResetBits(SPI_NSS_PORT, SPI_NSS_PIN))
+
+#define SPI_SCK_PORT                    (PortB)
+#define SPI_SCK_PIN                     (Pin04)
+#define SPI_SCK_FUNC                    (Func_Spi3_Sck)
+
+#define SPI_MOSI_PORT                   (PortB)
+#define SPI_MOSI_PIN                    (Pin03)
+#define SPI_MOSI_FUNC                   (Func_Spi3_Mosi)
+#endif
+
+M4_SPI_TypeDef* hspi1 = SPI_UNIT;
 
 void screen_spi_init(void)
 {
@@ -45,7 +63,7 @@ void screen_spi_init(void)
     PORT_SetFunc(SPI_MOSI_PORT, SPI_MOSI_PIN, SPI_MOSI_FUNC, Disable);
 
     /* Configuration SPI structure */
-    stcSpiInit.enClkDiv = SpiClkDiv8;  //pclk1 = 50, 50/8 = 6.25
+    stcSpiInit.enClkDiv = SpiClkDiv4;  //pclk1 = 50, 50/8 = 6.25
     stcSpiInit.enFrameNumber = SpiFrameNumber1;
     stcSpiInit.enDataLength = SpiDataLengthBit8;
     stcSpiInit.enFirstBitPosition = SpiFirstBitPositionMSB;

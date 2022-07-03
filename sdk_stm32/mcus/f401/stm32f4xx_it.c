@@ -20,6 +20,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "generic_hal.h"
 #include "stm32f4xx_it.h"
+#include "amk_printf.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -59,7 +61,6 @@ extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
 extern I2C_HandleTypeDef hi2c1;
 extern DMA_HandleTypeDef hdma_i2c1_rx;
 extern DMA_HandleTypeDef hdma_i2c1_tx;
-extern DMA_HandleTypeDef hdma_tim4_ch2;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -204,6 +205,7 @@ void SysTick_Handler(void)
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
 
+#ifdef USE_I2C1
 /**
   * @brief This function handles DMA1 stream0 global interrupt.
   */
@@ -245,7 +247,10 @@ void I2C1_EV_IRQHandler(void)
 
   /* USER CODE END I2C1_EV_IRQn 1 */
 }
+#endif
 
+#ifdef USE_PWM_TIM4
+extern DMA_HandleTypeDef hdma_tim4_ch2;
 /**
   * @brief This function handles DMA1 stream3 global interrupt.
   */
@@ -259,6 +264,24 @@ void DMA1_Stream3_IRQHandler(void)
 
   /* USER CODE END DMA1_Stream3_IRQn 1 */
 }
+#endif
+
+#ifdef USE_PWM_TIM2
+extern DMA_HandleTypeDef hdma_tim2_ch1;
+/**
+  * @brief This function handles DMA1 stream5 global interrupt.
+  */
+ void DMA1_Stream5_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Stream5_IRQn 0 */
+
+  /* USER CODE END DMA1_Stream5_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_tim2_ch1);
+  /* USER CODE BEGIN DMA1_Stream5_IRQn 1 */
+
+  /* USER CODE END DMA1_Stream5_IRQn 1 */
+}
+#endif
 
 #ifdef USE_SPI1
 extern DMA_HandleTypeDef hdma_spi1_rx;
@@ -290,6 +313,82 @@ void DMA2_Stream3_IRQHandler(void)
   /* USER CODE END DMA2_Stream3_IRQn 1 */
 }
 #endif
+
+#ifdef USE_UART1
+
+extern DMA_HandleTypeDef hdma_usart1_rx;
+extern DMA_HandleTypeDef hdma_usart1_tx;
+extern UART_HandleTypeDef huart1;
+
+void DMA2_Stream2_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA2_Stream2_IRQn 0 */
+
+  /* USER CODE END DMA2_Stream2_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart1_rx);
+  /* USER CODE BEGIN DMA2_Stream2_IRQn 1 */
+
+  /* USER CODE END DMA2_Stream2_IRQn 1 */
+}
+
+void DMA2_Stream7_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA2_Stream7_IRQn 0 */
+
+  /* USER CODE END DMA2_Stream7_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart1_tx);
+  /* USER CODE BEGIN DMA2_Stream7_IRQn 1 */
+
+  /* USER CODE END DMA2_Stream7_IRQn 1 */
+}
+
+/* USER CODE BEGIN 1 */
+__attribute__((weak)) void uart_recv_char(uint8_t c){}
+
+void uart_error_process(UART_HandleTypeDef * huart, uint32_t sr)
+{
+    amk_printf("UART ERROR: 0x%x\n", sr);
+    /* UART frame error interrupt occurred --------------------------------------*/
+    if ((sr & USART_SR_FE) != 0U) {
+        __HAL_UART_CLEAR_FLAG(huart, UART_FLAG_FE);
+    }
+
+    /* UART noise error interrupt occurred --------------------------------------*/
+    if ((sr & USART_SR_NE) != 0U) {
+        __HAL_UART_CLEAR_FLAG(huart, UART_FLAG_NE);
+    }
+
+    /* UART Over-Run interrupt occurred -----------------------------------------*/
+    if ((sr & USART_SR_ORE) != 0U) {
+        __HAL_UART_CLEAR_FLAG(huart, UART_FLAG_ORE);
+    }
+}
+
+void USART1_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART1_IRQn 0 */
+  uint32_t sr = huart1.Instance->SR;
+  uint32_t cr1 = huart1.Instance->CR1;
+  if (((sr & USART_SR_RXNE) != 0) && ((cr1 & USART_CR1_RXNEIE) != 0))
+  {// received one char
+    uint8_t d = huart1.Instance->DR & 0x000000FF;
+    uart_recv_char(d);
+  }
+
+  if (sr & (uint32_t)( USART_SR_FE | USART_SR_ORE | USART_SR_NE )) {
+    uart_error_process(&huart1, sr);
+  }
+  /* USER CODE END USART1_IRQn 0 */
+
+  //HAL_UART_IRQHandler(&huart1);
+
+  /* USER CODE BEGIN USART1_IRQn 1 */
+
+  /* USER CODE END USART1_IRQn 1 */
+}
+
+#endif
+
 /**
   * @brief This function handles USB On The Go FS global interrupt.
   */
