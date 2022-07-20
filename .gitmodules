@@ -29,3 +29,6 @@
 [submodule "libs/lvgl"]
 	path = libs/lvgl
 	url = https://github.com/yulei/lvgl
+[submodule "libs/arm2d"]
+	path = libs/arm2d
+	url = https://github.com/ARM-software/Arm-2D.git
