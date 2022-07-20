@@ -82,7 +82,8 @@
     #define P1_30 NRF_GPIO_PIN_MAP(1,30)
     #define P1_31 NRF_GPIO_PIN_MAP(1,31)
 
-#elif defined(STM32F401xC) || defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F722xx) || defined(STM32F103xB) || defined(STM32L432xx) || defined(STM32L072xx) || defined(STM32F446xx)
+#elif defined(STM32F401xC) || defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F722xx) || defined(STM32F103xB) || defined(STM32L432xx) || defined(STM32L072xx) || defined(STM32F446xx) || defined(STM32G431xx)
+
     #include "generic_hal.h"
 
     #define INVALID_PIN 0xFFFFFFFF

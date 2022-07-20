@@ -20,8 +20,10 @@ SRCS += \
 	$(MAIN_DIR)/amk/amk_eeprom.c \
 	$(MAIN_DIR)/amk/amk_boot.c \
 	$(MAIN_DIR)/amk/amk_indicator.c \
+	$(MAIN_DIR)/amk/amk_cmd.c \
 	$(MAIN_DIR)/amk/report_queue.c \
 	$(MAIN_DIR)/amk/ring_buffer.c \
+	$(MAIN_DIR)/amk/linear_buffer.c \
 	$(MAIN_DIR)/usb/udd_desc_stub.c \
 
 INCS += \

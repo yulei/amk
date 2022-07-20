@@ -10,6 +10,7 @@
 #define USB_OUTPUT_RF       (1u << 3)
 #define USB_AUDIO_BIT       (1u << 4)
 #define USB_VIAL_BIT        (1u << 5)
+#define USB_SWITCH_BIT      (1u << 6)
 
 extern uint32_t usb_setting;
 

@@ -134,6 +134,21 @@ static void MX_DMA_Init(void)
     HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
 }
 
+static void MX_RTC_Init(void)
+{
+    hrtc.Instance = RTC;
+    hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+    hrtc.Init.AsynchPrediv = 127;
+    hrtc.Init.SynchPrediv = 255;
+    hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+    hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+    hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+    if (HAL_RTC_Init(&hrtc) != HAL_OK) {
+      Error_Handler();
+    }
+}
+
+#ifdef USE_I2C1
 static void MX_I2C1_Init(void)
 {
     hi2c1.Instance = I2C1;
@@ -149,20 +164,7 @@ static void MX_I2C1_Init(void)
       Error_Handler();
     }
 }
-
-static void MX_RTC_Init(void)
-{
-    hrtc.Instance = RTC;
-    hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
-    hrtc.Init.AsynchPrediv = 127;
-    hrtc.Init.SynchPrediv = 255;
-    hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
-    hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
-    hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
-    if (HAL_RTC_Init(&hrtc) != HAL_OK) {
-      Error_Handler();
-    }
-}
+#endif
 
 
 extern void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
@@ -234,6 +236,7 @@ static void MX_TIM2_Init(void)
     HAL_TIM_MspPostInit(&htim2);
 }
 #endif
+
 void usb_port_init(void)
 {
     GPIO_InitTypeDef  GPIO_InitStruct;

@@ -30,11 +30,11 @@
 
 /* QSIO0 Port/Pin definition */
 #define QSIO0_PORT                      (PortB)
-#define QSIO0_PIN                       (Pin12)
+#define QSIO0_PIN                       (Pin13)
 
 /* QSIO1 Port/Pin definition */
 #define QSIO1_PORT                      (PortB)
-#define QSIO1_PIN                       (Pin13)
+#define QSIO1_PIN                       (Pin12)
 
 /* QSIO2 Port/Pin definition */
 #define QSIO2_PORT                      (PortB)
@@ -134,6 +134,8 @@ bool qspi_init(uint32_t map_addr)
     PORT_SetFunc(QSNSS_PORT, QSNSS_PIN, Func_Qspi, Disable);
     PORT_SetFunc(QSIO0_PORT, QSIO0_PIN, Func_Qspi, Disable);
     PORT_SetFunc(QSIO1_PORT, QSIO1_PIN, Func_Qspi, Disable);
+    //PORT_SetFunc(QSIO2_PORT, QSIO2_PIN, Func_Qspi, Disable);
+    //PORT_SetFunc(QSIO3_PORT, QSIO3_PIN, Func_Qspi, Disable);
 
     /* Configuration QSPI structure */
     stcQspiInit.enClkDiv = QspiHclkDiv4;
@@ -168,13 +170,17 @@ amk_error_t qspi_read_sector(uint32_t address, uint8_t *buffer, size_t length)
     }
 
     uint8_t *src = (uint8_t *)(QSPI_BUS_ADDRESS + address);
-    //qspi_debug("QSPI: source addr: %p\n", src);
+    qspi_debug("QSPI: read_sector: addr=%p, size=%d\n", src, length);
     memcpy(buffer, src, length);
+    //for(int i = 0; i < FLASH_PAGE_SIZE; i++) {
+    //    qspi_debug("%x", buffer[i]);
+    //}
     return AMK_SUCCESS;
 }
 
 amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t length)
 {
+    //qspi_debug("QSPI WRITE: addr=%d, size=%d\n", address, length);
     if (length != FLASH_SECTOR_SIZE) {
         qspi_debug("QSPI: write_sector: invalid size:%u\n", length);
         return AMK_QSPI_INVALID_PARAM;
@@ -224,8 +230,8 @@ amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t le
             qspi_debug("QSPI: write_sector: program failed:%d\n", ret);
             return AMK_QSPI_ERROR;
         } else {
+            qspi_debug("QSPI: write_sector: addr=0x%x, size=%d\n", addr, FLASH_PAGE_SIZE);
             addr += FLASH_PAGE_SIZE;
-            //qspi_debug("QSPI: write_sector: addr=0x%x\n", addr);
         }
     }
 

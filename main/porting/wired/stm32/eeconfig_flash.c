@@ -18,6 +18,13 @@
 //#define FLASH_INVALID_DATA      0xFFFFFFFF
 //#define FLASH_INVALID_ADDRESS   0xFFFFFFFF
 //#define FLASH_PAGE_NUM          1
+#elif defined(STM32G431xx)
+#define FLASH_BASE_ADDRESS      0x800A000
+#define FLASH_TOTAL_SIZE        0x6000
+#define FLASH_INVALID_DATA      0xFFFFFFFF
+#define FLASH_INVALID_ADDRESS   0xFFFFFFFF
+#define FLASH_RW_SIZE           8
+
 #elif defined(STM32F411xE) || defined(STM32F722xx) || defined(STM32F405xx) || defined(STM32F446xx) || defined(STM32F401xC)
 #define FLASH_BASE_ADDRESS      0x8010000
 #define FLASH_TOTAL_SIZE        0x10000
@@ -25,6 +32,7 @@
 #define FLASH_INVALID_ADDRESS   0xFFFFFFFF
 #define FLASH_SECTOR_ID         FLASH_SECTOR_4
 #define FLASH_SECTOR_NUM        1
+#define FLASH_RW_SIZE           4
 #else
 #error "eeconfig flash: unsupported mcu"
 #endif
@@ -174,7 +182,7 @@ static void fee_backup(void)
             // we reached the end of valid data
             break;
         }
-        begin += 4;
+        begin += FLASH_RW_SIZE;
     }
 }
 
@@ -184,7 +192,7 @@ static void fee_restore(void)
     for (uint8_t i = 0; i < EEPROM_SIZE; i++) {
         if (buffer[i] != EEPROM_EMPTY_VALUE) {
             flash_write(cur, i, buffer[i]);
-            cur += 4;
+            cur += FLASH_RW_SIZE;
         }
     }
 }
@@ -200,7 +208,7 @@ static uint32_t fee_find_valid_address(void)
         if (addr == EEPROM_INVALID_ADDRESS) {
             return begin;
         }
-        begin += 4;
+        begin += FLASH_RW_SIZE;
     }
     return FLASH_INVALID_ADDRESS;
 }
@@ -249,6 +257,9 @@ uint8_t fee_read(uintptr_t address)
 void flash_unlock(void)
 {
     HAL_FLASH_Unlock();
+#ifdef STM32G431xx
+    __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_OPTVERR);
+#endif
 }
 
 void flash_lock(void)
@@ -258,7 +269,12 @@ void flash_lock(void)
 
 void flash_read(uint32_t address, uint16_t* offset, uint16_t* data)
 {
+#ifdef STM32G431xx
+    uint64_t d = *((__IO uint64_t*)(address));
+    uint32_t value = (uint32_t)(d&0x00000000FFFFFFFF);
+#else
     uint32_t value = *((__IO uint32_t*)(address));
+#endif
     *offset = (value >> 16) & 0xFFFF;
     uint16_t tmp = value & 0xFFFF;
     *data = ~tmp;
@@ -270,7 +286,12 @@ bool flash_write(uint32_t address, uint16_t offset, uint16_t data)
     data = ~data;
     uint32_t value = (offset << 16) | data;
     flash_unlock();
+#if defined(STM32G431xx)
+    uint64_t d = (((uint64_t)value)<<32) | value;
+    HAL_StatusTypeDef status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, address, d);
+#else
     HAL_StatusTypeDef status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, address, value);
+#endif
     if (status != HAL_OK) {
         amk_printf("Failed to programe word: addr=%x, data=%x, error=%d\n", address, value, HAL_FLASH_GetError());
         ret = false;
@@ -301,6 +322,10 @@ void flash_erase_pages(void)
     erase.Sector = FLASH_SECTOR_ID;
     erase.NbSectors = FLASH_SECTOR_NUM;
     erase.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+#elif defined(STM32G431xx)
+    erase.TypeErase = FLASH_TYPEERASE_PAGES;
+    erase.Page = (FLASH_BASE_ADDRESS - FLASH_BASE) / FLASH_PAGE_SIZE;;
+    erase.NbPages = (FLASH_TOTAL_SIZE) / FLASH_PAGE_SIZE;
 #else
     #error "Flash Erase: unsupported mcu"
 #endif

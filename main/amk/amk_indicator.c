@@ -27,6 +27,11 @@ void amk_indicator_init(void)
 #endif
 }
 
+__attribute__((weak))
+void led_set_kb(uint8_t led)
+{
+}
+
 void led_set(uint8_t led)
 {
 #ifdef CAPS_LED_PIN
@@ -52,4 +57,5 @@ void led_set(uint8_t led)
         gpio_write_pin(SCROLL_LED_PIN, !SCROLL_LED_ON);
     }
 #endif
+    led_set_kb(led);
 }

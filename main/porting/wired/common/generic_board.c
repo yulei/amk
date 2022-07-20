@@ -95,7 +95,9 @@ void board_task(void)
     usb_task();
 #endif
 
-    if (usb_suspended()) {
+    keyboard_task();
+
+    if (usb_suspended() && (!(usb_setting&USB_SWITCH_BIT))) {
         if (suspend_wakeup_condition()) {
             // wake up remote
             remote_wakeup();
@@ -105,7 +107,7 @@ void board_task(void)
         }
     } else {
         //if (usb_ready()) {
-            keyboard_task();
+//            keyboard_task();
         //}
     }
 
@@ -177,7 +179,9 @@ void send_keyboard(report_keyboard_t *report)
     } else 
 #endif
     {
-        usb_send_report(HID_REPORT_ID_KEYBOARD, report, sizeof(report_keyboard_t));
+        if (!usb_suspended()) {
+            usb_send_report(HID_REPORT_ID_KEYBOARD, report, sizeof(report_keyboard_t));
+        }
     }
 }
 
@@ -189,7 +193,9 @@ void send_mouse(report_mouse_t *report)
     } else 
 #endif
     {
-        usb_send_report(HID_REPORT_ID_MOUSE, report, sizeof(report_mouse_t));
+        if (!usb_suspended()) {
+            usb_send_report(HID_REPORT_ID_MOUSE, report, sizeof(report_mouse_t));
+        }
     }
 }
 
@@ -201,7 +207,9 @@ void send_system(uint16_t data)
     } else 
 #endif
     {
-        usb_send_report(HID_REPORT_ID_SYSTEM, &data, sizeof(data));
+        if (!usb_suspended()) {
+            usb_send_report(HID_REPORT_ID_SYSTEM, &data, sizeof(data));
+        }
     }
 }
 
@@ -213,7 +221,9 @@ void send_consumer(uint16_t data)
     } else 
 #endif
     {
-        usb_send_report(HID_REPORT_ID_CONSUMER, &data, sizeof(data));
+        if (!usb_suspended()) {
+            usb_send_report(HID_REPORT_ID_CONSUMER, &data, sizeof(data));
+        }
     }
 }
 

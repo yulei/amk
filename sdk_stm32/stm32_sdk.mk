@@ -53,6 +53,12 @@ MCU_FAMILY := stm32l0xx
 MCU_TYPE := l072
 endif
 
+ifeq (STM32G431, $(strip $(MCU)))
+MCU_SERIES := g4
+MCU_FAMILY := stm32g4xx
+MCU_TYPE := g431
+endif
+
 SRCS += \
 	$(STM32SDK_DIR)/mcus/$(MCU_TYPE)/system_$(MCU_FAMILY).c \
 	$(STM32SDK_DIR)/mcus/$(MCU_TYPE)/$(MCU_FAMILY)_hal_msp.c \
