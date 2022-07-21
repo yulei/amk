@@ -1,31 +1,18 @@
 /**
  * @file eeconfig_flash.c
- * @author astro
- * 
- * @copyright Copyright (c) 2022
- * 
+ *  eeprom emulation on flash
+ *
  */
 
 #include <stddef.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <string.h>
+#include "flash.h"
 #include "eeconfig.h"
 #include "amk_eeprom.h"
 #include "amk_printf.h"
 
-#if defined(HC32F460xE)
-// 64x8K sector, sector63 has reseved area
-// use sector 56-62, 7x8K bytes
-#define FLASH_BASE_ADDRESS      0x8070000
-#define FLASH_TOTAL_SIZE        0xE000
 #define FLASH_INVALID_DATA      0xFFFFFFFF
 #define FLASH_INVALID_ADDRESS   0xFFFFFFFF
-#define FLASH_SECTOR_SIZE       0x2000
-#define FLASH_SECTOR_NUM        7
-#else
-#error "eeconfig flash: unsupported mcu"
-#endif
 
 #define EEPROM_INVALID_ADDRESS  0xFFFF
 #define EEPROM_EMPTY_VALUE      0x00
@@ -40,12 +27,6 @@ static void fee_restore(void);
 static uint32_t fee_find_valid_address(void);
 static bool fee_write(uintptr_t address, uint8_t data);
 static uint8_t fee_read(uintptr_t address);
-
-static void flash_unlock(void);
-static void flash_lock(void);
-static bool flash_write(uint32_t address, uint16_t offset, uint16_t data);
-static void flash_read(uint32_t address, uint16_t *offset, uint16_t *data);
-static void flash_erase_pages(void);
 
 uint8_t eeprom_read_byte(const uint8_t *addr)
 {
@@ -143,7 +124,6 @@ void fee_init(void)
     fee_backup();
 }
 
-
 static void fee_erase(void)
 {
     // erase all flash pages
@@ -156,8 +136,8 @@ static void fee_erase(void)
 
 static void fee_backup(void)
 {
-    uint32_t begin = FLASH_BASE_ADDRESS;
-    uint32_t end = begin + FLASH_TOTAL_SIZE;
+    uint32_t begin = flash_base_address;
+    uint32_t end = begin + flash_total_size;
     //memset(&buffer[0], FLASH_EMPTY_VALUE, sizeof(buffer));
     memset(&buffer[0], EEPROM_EMPTY_VALUE, sizeof(buffer));
     while (begin < end) {
@@ -170,25 +150,25 @@ static void fee_backup(void)
             // we reached the end of valid data
             break;
         }
-        begin += 4;
+        begin += flash_unit_size;
     }
 }
 
 static void fee_restore(void)
 {
-    uint32_t cur = FLASH_BASE_ADDRESS;
+    uint32_t cur = flash_base_address;
     for (uint8_t i = 0; i < EEPROM_SIZE; i++) {
         if (buffer[i] != EEPROM_EMPTY_VALUE) {
             flash_write(cur, i, buffer[i]);
-            cur += 4;
+            cur += flash_unit_size;
         }
     }
 }
 
 static uint32_t fee_find_valid_address(void)
 {
-    uint32_t begin = FLASH_BASE_ADDRESS;
-    uint32_t end = begin + FLASH_TOTAL_SIZE;
+    uint32_t begin = flash_base_address;
+    uint32_t end = begin + flash_total_size;
     while( begin < end) {
         uint16_t addr = 0;
         uint16_t data = 0;
@@ -196,7 +176,7 @@ static uint32_t fee_find_valid_address(void)
         if (addr == EEPROM_INVALID_ADDRESS) {
             return begin;
         }
-        begin += 4;
+        begin += flash_unit_size;
     }
     return FLASH_INVALID_ADDRESS;
 }
@@ -236,59 +216,4 @@ uint8_t fee_read(uintptr_t address)
 #pragma GCC diagnostic ignored "-Warray-bounds"
     return buffer[address];
 #pragma GCC diagnostic pop
-}
-
-//==============================================
-// flash hardware operation
-//==============================================
-#include "generic_hal.h"
-void flash_unlock(void)
-{
-    EFM_Unlock();
-    EFM_FlashCmd(Enable);
-    while(Set != EFM_GetFlagStatus(EFM_FLAG_RDY)) {
-        ;
-    }
-}
-
-void flash_lock(void)
-{
-    EFM_Lock();
-}
-
-void flash_read(uint32_t address, uint16_t* offset, uint16_t* data)
-{
-    uint32_t value = *((__IO uint32_t*)(address));
-    *offset = (value >> 16) & 0xFFFF;
-    uint16_t tmp = value & 0xFFFF;
-    *data = ~tmp;
-}
-
-bool flash_write(uint32_t address, uint16_t offset, uint16_t data)
-{
-    bool ret = true;
-    data = ~data;
-    uint32_t value = (offset << 16) | data;
-
-    flash_unlock();
-    en_result_t result = EFM_SingleProgram(address, value);
-    if (result != Ok) {
-        amk_printf("Failed to programe word: addr=%x, data=%x, error=%d\n", address, value, result);
-        ret = false;
-    }
-    flash_lock();
-    return ret;
-}
-
-void flash_erase_pages(void)
-{
-    flash_unlock();
-    uint32_t addr = FLASH_BASE_ADDRESS; 
-    for (int i = 0; i < FLASH_SECTOR_NUM; i++) {
-        en_result_t res = EFM_SectorErase(addr+i*FLASH_SECTOR_SIZE);
-        if (res != Ok) {
-            amk_printf("Flash erase page: address=0x%x, error=%d\n", addr+i*FLASH_SECTOR_SIZE, res);
-        }
-    }
-    flash_lock();
 }

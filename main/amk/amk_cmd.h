@@ -19,6 +19,8 @@ enum {
     CMD_SYSTEM,
     CMD_CONSUMER,
     CMD_SCREEN,
+    CMD_LED,
+    CMD_KEYHIT,
     CMD_STATUS,
     CMD_TYPE_MAX,
 };
@@ -36,13 +38,18 @@ static const char CMD_CONSUMER_STR[] = "CSR";
 static const char CMD_SCREEN_STR[] = "SCR";
 static const char CMD_STATUS_STR[] = "STS";
 static const char CMD_LED_STR[] = "LED";
-static const char CMD_KEYHIT_STR[] = "KEY";
+static const char CMD_KEYHIT_STR[] = "KH";
 
 static const char CMD_PARAM_OK[] = "OK";
 static const char CMD_PARAM_FAIL[] = "FAIL";
 static const char CMD_PARAM_ON[] = "ON";
 static const char CMD_PARAM_OFF[] = "OFF";
+static const char CMD_PARAM_YES[] = "YES";
+static const char CMD_PARAM_NO[] = "NO";
 
+static const char KEYHIT_PARAM_ROW[] = "ROW";
+static const char KEYHIT_PARAM_COL[] = "COL";
+static const char KEYHIT_PARAM_PRESSED[] = "PRESSED";
 static const char SCREEN_PARAM_POWER[] = "PWR";
 static const char SCREEN_PARAM_MSC[] = "MSC";
 
@@ -68,6 +75,12 @@ typedef struct {
         uint16_t system;
         uint16_t consumer;
         uint8_t status;
+        uint8_t led;
+        struct {
+            uint8_t row;
+            uint8_t col;
+            uint8_t pressed;
+        }keyhit;
     } param;
 } cmd_t;
 

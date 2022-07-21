@@ -6,6 +6,7 @@
  * 
  */
 #include <string.h>
+#include <stdlib.h>
 
 #include "amk_cmd.h"
 #include "amk_printf.h"
@@ -26,21 +27,23 @@ static cmd_str_t cmd_strs[] = {
     {CMD_SYSTEM, CMD_SYSTEM_STR},
     {CMD_CONSUMER, CMD_CONSUMER_STR},
     {CMD_SCREEN, CMD_SCREEN_STR},
+    {CMD_LED, CMD_LED_STR},
+    {CMD_KEYHIT, CMD_KEYHIT_STR},
     {CMD_STATUS, CMD_STATUS_STR},
     {CMD_TYPE_MAX, NULL},
 };
 
 static int32_t cmd_parse_type(const void *data, uint32_t size, uint8_t *type);
-static int32_t cmd_parse_param(const void *data, uint32_t size, uint8_t type, cmd_t* cmd);
+static int32_t cmd_parse_param(const void *data, uint32_t size, cmd_t* cmd);
 
 int32_t cmd_parse(const void* data, uint32_t size, cmd_t* cmd)
 {
     const uint8_t *cur = (const uint8_t*)data;
-    uint8_t cmd_type = CMD_TYPE_MAX;
-    int32_t cmd_parsed = cmd_parse_type(cur, size, &cmd_type);
+    cmd->type = CMD_TYPE_MAX;
+    int32_t cmd_parsed = cmd_parse_type(cur, size, &cmd->type);
 
     if (cmd_parsed > 0) {
-        int32_t param_parsed = cmd_parse_param(cur+cmd_parsed, size-cmd_parsed, cmd_type, cmd); 
+        int32_t param_parsed = cmd_parse_param(cur+cmd_parsed, size-cmd_parsed, cmd); 
         if (param_parsed > 0) {
             return cmd_parsed+param_parsed;
         }
@@ -60,6 +63,8 @@ static int32_t cmd_parse_type(const void *data, uint32_t size, uint8_t *type)
         if(cur[index] == CMD_DELI) {
             buf[index] = '\0';
             for (int i = 0; i < CMD_TYPE_MAX; i++) {
+                if (!cmd_strs[i].str) break;
+
                 if (strcmp(buf, cmd_strs[i].str) == 0) {
                     *type = cmd_strs[i].type;
                     return index+1;
@@ -97,29 +102,45 @@ static int32_t cmd_parse_param_token(const void* data, uint32_t size, char* name
     return (endl-cur+1);
 }
 
-static int32_t cmd_parse_keyboard(void)
+static int32_t cmd_process_keyboard_param(void)
 {
     return -1;
 }
 
-static int32_t cmd_parse_mouse(void)
+static int32_t cmd_process_mouse_param(void)
 {
     return -1;
 }
 
-static int32_t cmd_parse_nkro(void)
+static int32_t cmd_process_nkro_param(void)
 {
     return -1;
 }
 
-static int32_t cmd_parse_system(void)
+static int32_t cmd_process_system_param(void)
 {
     return -1;
 }
 
-static int32_t cmd_parse_consumer(void)
+static int32_t cmd_process_consumer_param(void)
 {
     return -1;
+}
+
+static void cmd_process_led_param(const char *name, const char *value, cmd_t *cmd)
+{
+    cmd->param.led = strtol(name, NULL, 10);
+}
+
+static void cmd_process_keyhit_param(const char *name, const char *value, cmd_t *cmd)
+{
+    if (strcmp(name, KEYHIT_PARAM_ROW) == 0) {
+        cmd->param.keyhit.row = strtol(value, NULL, 10);
+    } else if (strcmp(name, KEYHIT_PARAM_COL) == 0) {
+        cmd->param.keyhit.col = strtol(value, NULL, 10);
+    } else if (strcmp(name, KEYHIT_PARAM_PRESSED) == 0) {
+        cmd->param.keyhit.pressed = strtol(value, NULL, 10);
+    }
 }
 
 static void cmd_process_screen_param(const char *name, const char *value, cmd_t *cmd)
@@ -141,25 +162,6 @@ static void cmd_process_screen_param(const char *name, const char *value, cmd_t 
     }
 }
 
-static int32_t cmd_parse_screen(const void *data, uint32_t size, cmd_t *cmd)
-{
-    char name[NAME_MAX];
-    char value[VALUE_MAX];
-    uint32_t parsed = 0;
-    while( parsed < size) {
-        int32_t result = cmd_parse_param_token(data, size, name, value);
-        if (result < 0) {
-            break;
-        } else {
-            parsed += result;
-            cmd_process_screen_param(name, value, cmd);
-        }
-    }
-    
-    if (parsed) return parsed;
-    return -1;
-}
-
 static void cmd_process_status_param(const char *name, const char *value, cmd_t *cmd)
 {
     if (strcmp(name, CMD_PARAM_OK) == 0) {
@@ -169,55 +171,56 @@ static void cmd_process_status_param(const char *name, const char *value, cmd_t 
     }
 }
 
-static int32_t cmd_parse_status(const void *data, uint32_t size, cmd_t *cmd)
+static int32_t cmd_parse_param(const void *data, uint32_t size, cmd_t* cmd)
 {
     char name[NAME_MAX];
     char value[VALUE_MAX];
     uint32_t parsed = 0;
+    const char* cur = (const char*)data;
     while( parsed < size) {
-        int32_t result = cmd_parse_param_token(data, size, name, value);
+        int32_t result = cmd_parse_param_token(cur, size, name, value);
         if (result < 0) {
             break;
         } else {
             parsed += result;
-            cmd_process_status_param(name, value, cmd);
+            cur += result;
+            switch(cmd->type) {
+            case CMD_KEYBOARD:
+                cmd_process_keyboard_param();
+                break;
+            case CMD_MOUSE:
+                cmd_process_mouse_param();
+                break;
+            case CMD_NKRO:
+                cmd_process_nkro_param();
+                break;
+            case CMD_SYSTEM:
+                cmd_process_system_param();
+                break;
+            case CMD_CONSUMER:
+                cmd_process_consumer_param();
+                break;
+            case CMD_SCREEN:
+                cmd_process_screen_param(name, value, cmd);
+                break;
+            case CMD_LED:
+                cmd_process_led_param(name, value, cmd);
+                break;
+            case CMD_KEYHIT:
+                cmd_process_keyhit_param(name, value, cmd);
+                break;
+            case CMD_STATUS:
+                cmd_process_status_param(name, value, cmd);
+                break;
+            default:
+                break;
+            }
         }
     }
     
     if (parsed) return parsed;
+
     return -1;
-}
-
-static int32_t cmd_parse_param(const void *data, uint32_t size, uint8_t type, cmd_t* cmd)
-{
-    int32_t result = -1;
-    switch(type) {
-    case CMD_KEYBOARD:
-        result = cmd_parse_keyboard();
-        break;
-    case CMD_MOUSE:
-        result = cmd_parse_mouse();
-        break;
-    case CMD_NKRO:
-        result = cmd_parse_nkro();
-        break;
-    case CMD_SYSTEM:
-        result = cmd_parse_system();
-        break;
-    case CMD_CONSUMER:
-        result = cmd_parse_consumer();
-        break;
-    case CMD_SCREEN:
-        result = cmd_parse_screen(data, size, cmd);
-        break;
-    case CMD_STATUS:
-        result = cmd_parse_status(data, size, cmd);
-        break;
-    default:
-        break;
-    }
-
-    return result;
 }
 
 static int32_t cmd_compose_screen(const cmd_t *cmd, void *buf, uint32_t size)
@@ -234,6 +237,29 @@ static int32_t cmd_compose_screen(const cmd_t *cmd, void *buf, uint32_t size)
                     SCREEN_PARAM_MSC,
                     cmd->param.screen.state ? CMD_PARAM_ON:CMD_PARAM_OFF);
     }
+
+    return result;
+}
+
+static int32_t cmd_compose_led(const cmd_t *cmd, void *buf, uint32_t size)
+{
+    int32_t result = snprintf(buf, size, "%s:%d;\n", 
+                    CMD_LED_STR, 
+                    cmd->param.led);
+
+    return result;
+}
+
+static int32_t cmd_compose_keyhit(const cmd_t *cmd, void *buf, uint32_t size)
+{
+    int32_t result = snprintf(buf, size, "%s:%s=%d;%s=%d;%s=%d;\n", 
+                    CMD_KEYHIT_STR, 
+                    KEYHIT_PARAM_ROW,
+                    cmd->param.keyhit.row,
+                    KEYHIT_PARAM_COL,
+                    cmd->param.keyhit.col,
+                    KEYHIT_PARAM_PRESSED,
+                    cmd->param.keyhit.pressed);
 
     return result;
 }
@@ -263,6 +289,12 @@ int32_t cmd_compose(const cmd_t *cmd, void* buf, uint32_t size)
         break;
     case CMD_SCREEN:
         result = cmd_compose_screen(cmd, buf, size);
+        break;
+    case CMD_LED:
+        result = cmd_compose_led(cmd, buf, size);
+        break;
+    case CMD_KEYHIT:
+        result = cmd_compose_keyhit(cmd, buf, size);
         break;
     case CMD_STATUS:
         result = cmd_compose_status(cmd, buf, size);

@@ -11,7 +11,7 @@
 #include "amk_printf.h"
 
 #ifndef QSPI_DEBUG
-#define QSPI_DEBUG 1
+#define QSPI_DEBUG 0
 #endif
 
 #if QSPI_DEBUG

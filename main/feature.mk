@@ -131,7 +131,8 @@ ifeq (yes, $(EECONFIG_FRAM))
 	APP_DEFS += -DEECONFIG_FRAM
 else
 	ifeq (yes, $(EECONFIG_FLASH))
-		SRCS += $(PLATFORM_PORTING_DIR)/eeconfig_flash.c
+		SRCS += $(MAIN_DIR)/amk/eeconfig_flash.c
+		SRCS += $(MAIN_DIR)/drivers/flash.c
 		APP_DEFS += -DEECONFIG_FLASH
 	else
 		SRCS += $(MAIN_DIR)/amk/eeconfig_mem.c

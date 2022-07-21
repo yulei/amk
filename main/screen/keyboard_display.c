@@ -104,6 +104,10 @@ typedef struct {
     uint32_t time;
 } keyhit_counter_t;
 
+typedef struct {
+    keyhit_counter_t counter_matrix[MATRIX_ROWS][MATRIX_COLS];
+    matrix_row_t    state_matrix[MATRIX_ROWS];
+} keyhit_matrix_t;
 
 typedef struct {
     screen_t        *screen;
@@ -125,11 +129,13 @@ static ecg_animation_t ecg_anim;
 
 static uint8_t keyhit_mode = KEYHIT_FWK;
 
-static keyhit_counter_t keyhit_matrix[MATRIX_ROWS][MATRIX_COLS];
 
-static void keyhit_counter_reset(void);
-static void keyhit_counter_update(uint8_t row, uint8_t col);
-static uint16_t keyhit_counter_color(uint8_t row, uint8_t col);
+static keyhit_matrix_t keyhit_matrix;
+
+static void keyhit_matrix_reset(void);
+static void keyhit_matrix_update(uint8_t row, uint8_t col, bool pressed);
+static uint16_t keyhit_matrix_color(uint8_t row, uint8_t col);
+static bool keyhit_matrix_pressed(uint8_t row, uint8_t col);
 
 static void draw_rect(screen_t *screen, uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint16_t color);
 static void draw_line(screen_t *screen, int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint16_t color);
@@ -217,8 +223,8 @@ static void keyhit_fwk_update(bool hit)
                 for(int j = 0; j < FWK_POINT_COUNT; j++) {
                     fwk_point_t *pt = &fwk->points[j];
                     if (fwk_point_valid(pt, fwk->center_x, fwk->center_y)) {
-                        pt->x += pt->speed * sin((pt->angle/(FWK_ANGLE_STEP*(FWK_POINT_COUNT+1)*1.0)) * 2.0 * M_PI);
-                        pt->y += pt->speed * cos((pt->angle/(FWK_ANGLE_STEP*(FWK_POINT_COUNT+1)*1.0)) * 2.0 * M_PI);
+                        pt->x += pt->speed * sinf((pt->angle/(FWK_ANGLE_STEP*(FWK_POINT_COUNT+1)*1.0)) * 2.0 * M_PI);
+                        pt->y += pt->speed * cosf((pt->angle/(FWK_ANGLE_STEP*(FWK_POINT_COUNT+1)*1.0)) * 2.0 * M_PI);
                         done = false;
                     }
                 }
@@ -328,7 +334,7 @@ static void keyhit_init(void)
     keyhit_fwk_init();
     keyhit_ecg_init();
 
-    keyhit_counter_reset();
+    keyhit_matrix_reset();
 }
 
 static void keyhit_update(bool hit)
@@ -392,14 +398,14 @@ static void draw_line(screen_t *screen, int32_t x0, int32_t y0, int32_t x1, int3
     float delta_y = y1-y0;
     float step_x, step_y;
     uint32_t total;
-    if (fabs(delta_x) > fabs(delta_y)) {
+    if (fabsf(delta_x) > fabsf(delta_y)) {
         step_x = delta_x > 0 ? 1.0 : -1.0;
-        step_y = delta_y/fabs(delta_x);
+        step_y = delta_y/fabsf(delta_x);
         total = fabs(delta_x);
     } else {
-        step_x = delta_x/fabs(delta_y);
+        step_x = delta_x/fabsf(delta_y);
         step_y = delta_y > 0 ? 1.0 : -1.0;
-        total = fabs(delta_y);
+        total = fabsf(delta_y);
     }
 
     float x = x0;
@@ -429,9 +435,10 @@ void keyboard_display_task(display_t *display)
 
         //obj->screen->draw_rect(obj->screen, 0, 0, 10, 10);
         for (int i = 0; i < KEYBOARD_KEY_COUNT; i++) {
-            matrix_row_t row = matrix_get_row(keyboard_keys[i].pos.row);
-            if (!(row&(1<<keyboard_keys[i].pos.col))) {
-                uint16_t color = keyhit_counter_color(keyboard_keys[i].pos.row, keyboard_keys[i].pos.col);
+            //matrix_row_t row = matrix_get_row(keyboard_keys[i].pos.row);
+            //if (!(row&(1<<keyboard_keys[i].pos.col))) {
+            if (!keyhit_matrix_pressed(keyboard_keys[i].pos.row, keyboard_keys[i].pos.col)) {
+                uint16_t color = keyhit_matrix_color(keyboard_keys[i].pos.row, keyboard_keys[i].pos.col);
                 draw_rect(obj->screen, keyboard_keys[i].x, keyboard_keys[i].y, keyboard_keys[i].w, keyboard_keys[i].h, color);
             } else {
                 amk_printf("row:%d, col:%d, skipped\n", keyboard_keys[i].pos.row, keyboard_keys[i].pos.col);
@@ -484,7 +491,9 @@ void keyboard_display_matrix_change(display_t *display, keyevent_t event)
         keyhit_update(true);
         kbddisp_debug("keyhit: col=%d, row=%d, pressed=%d, time=%d\n", event.key.col, event.key.row, event.pressed, event.time);
 
-        keyhit_counter_update(event.key.row, event.key.col);
+        keyhit_matrix_update(event.key.row, event.key.col, true);
+    } else {
+        keyhit_matrix_update(event.key.row, event.key.col, false);
     }
 }
 
@@ -517,27 +526,39 @@ bool keyboard_display_create(display_t *display, display_param_t *param)
     return false;
 }
 
-static void keyhit_counter_reset(void)
+static void keyhit_matrix_reset(void)
 {
     for (int i = 0; i < MATRIX_ROWS; i++) {
         for (int j = 0; j < MATRIX_COLS; j++) {
-            keyhit_matrix[i][j].count = 0;
-            keyhit_matrix[i][j].time = 0;
+            keyhit_matrix.counter_matrix[i][j].count = 0;
+            keyhit_matrix.counter_matrix[i][j].time = 0;
         }
+
+        keyhit_matrix.state_matrix[i] = 0;
     }
 }
 
-static void keyhit_counter_update(uint8_t row, uint8_t col)
+static void keyhit_matrix_update(uint8_t row, uint8_t col, bool pressed)
 {
-    keyhit_matrix[row][col].count ++;
-    keyhit_matrix[row][col].time = timer_read32();
+    if (pressed) {
+        keyhit_matrix.counter_matrix[row][col].count ++;
+        keyhit_matrix.counter_matrix[row][col].time = timer_read32();
+        keyhit_matrix.state_matrix[row] |= 1 << col;
+    } else {
+        keyhit_matrix.state_matrix[row] &= ~(1 << col);
+    }
 }
 
-static uint16_t keyhit_counter_color(uint8_t row, uint8_t col)
+static bool keyhit_matrix_pressed(uint8_t row, uint8_t col)
+{
+    return (keyhit_matrix.state_matrix[row] &= (1 << col)) ? true : false;
+}
+
+static uint16_t keyhit_matrix_color(uint8_t row, uint8_t col)
 {
     return 0xFFFF;
 
-    uint32_t count = keyhit_matrix[row][col].count;
+    uint32_t count = keyhit_matrix.counter_matrix[row][col].count;
 
     uint8_t r = count &0xFF;
     uint8_t g = (count >> 8)&0xFF;

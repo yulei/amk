@@ -363,6 +363,11 @@ bool hook_process_action(keyrecord_t *record)
     return hook_process_action_main(record);
 }
 
+__attribute__((weak))
+void hook_matrix_change_kb(keyevent_t event)
+{
+}
+
 void hook_matrix_change(keyevent_t event)
 {
 #if defined(NRF52) || defined(NRF52840_XXAA)
@@ -385,4 +390,6 @@ void hook_matrix_change(keyevent_t event)
     extern void hook_matrix_change_screen(keyevent_t event);
     hook_matrix_change_screen(event);
 #endif
+
+    hook_matrix_change_kb(event);
 }
