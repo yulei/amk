@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "amk_config.h"
+#include "amk_keycode.h"
 
 #define LAYOUT_default( \
     k00, k01, k02, k03, \
