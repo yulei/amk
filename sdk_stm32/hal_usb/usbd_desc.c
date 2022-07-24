@@ -27,8 +27,10 @@
 #define USBD_CONFIGURATION_STRING_FS "HID Config"
 #define USBD_INTERFACE_STRING_FS "HID Interface"
 
+#ifndef VIAL_ENABLE
 static void Get_SerialNum(void);
 static void IntToUnicode(uint32_t value, uint8_t *pbuf, uint8_t len);
+#endif
 
 static uint8_t *USBD_FS_DeviceDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
 static uint8_t *USBD_FS_LangIDStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length);
@@ -111,11 +113,15 @@ uint8_t *USBD_FS_ManufacturerStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *le
 uint8_t *USBD_FS_SerialStrDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
 {
   UNUSED(speed);
+  #ifdef VIAL_ENABLE
+  return (uint8_t*)get_descriptor_str(DESC_STR_SERIAL, length);
+  #else
   *length = USB_SIZ_STRING_SERIAL;
 
   /* Update the serial number string descriptor with the data from the unique ID */
   Get_SerialNum();
   return (uint8_t *)USBD_StringSerial;
+  #endif
 }
 
 /**
@@ -151,6 +157,7 @@ uint8_t *USBD_FS_BOSDescriptor(USBD_SpeedTypeDef speed, uint16_t *length)
   return NULL;
 }
 
+#ifndef VIAL_ENABLE
 /**
   * @brief  Create the serial number string descriptor
   * @param  None
@@ -200,5 +207,5 @@ static void IntToUnicode(uint32_t value, uint8_t *pbuf, uint8_t len)
     pbuf[2 * idx + 1] = 0;
   }
 }
-
+#endif
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

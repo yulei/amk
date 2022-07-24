@@ -88,3 +88,25 @@ uint16_t const* udd_descriptor_string(uint8_t index, uint16_t langid)
 {
     return tud_descriptor_string_cb(index, langid);
 }
+
+#ifdef VIAL_ENABLE
+uint8_t const* udd_descriptor_hid_report_vial(void)
+{
+    return tud_descriptor_hid_report_vial_cb();
+}
+
+uint32_t udd_descriptor_hid_report_vial_size(void)
+{
+    return tud_descriptor_hid_report_vial_size();
+}
+
+uint8_t const* udd_descriptor_hid_interface_vial(void)
+{
+    return tud_descriptor_hid_interface_vial_cb();
+}
+
+uint32_t udd_descriptor_hid_interface_vial_size(void)
+{
+    return tud_descriptor_hid_interface_vial_size();
+}
+#endif

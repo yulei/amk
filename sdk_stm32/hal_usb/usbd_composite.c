@@ -10,6 +10,10 @@
 #include "usb_led.h"
 #include "amk_printf.h"
 
+#ifdef VIAL_ENABLE
+#include "vial_porting.h"
+#endif
+
 bool usb_led_event = false;
 
 #define HID_REQ_SET_PROTOCOL                       0x0BU
@@ -54,13 +58,28 @@ typedef struct {
 #define USBD_HID_OTHER_EPOUT_SIZE       0
 #define USBD_HID_OTHER_EPOUT_TYPE       0
 
+#define USBD_HID_VIAL_EPIN             (0x80|EPNUM_VIAL_IN)
+#define USBD_HID_VIAL_EPIN_SIZE        UDD_HID_EP_SIZE
+#define USBD_HID_VIAL_EPIN_TYPE        USBD_EP_TYPE_INTR 
+#define USBD_HID_VIAL_EPOUT            EPNUM_VIAL_OUT
+#define USBD_HID_VIAL_EPOUT_SIZE       UDD_HID_EP_SIZE
+#define USBD_HID_VIAL_EPOUT_TYPE       EPNUM_VIAL_IN
+
+enum {
+    HID_HANDLE_TYPE_KEYBOARD,
+    HID_HANDLE_TYPE_OTHER,
+    HID_HANDLE_TYPE_VIAL,
+};
 
 typedef struct {
-    ITF_StateTypeDef     state;
-    uint32_t             protocol;
-    uint32_t             idle;
-    uint32_t             alt;
-    uint32_t             keyboard;
+    ITF_StateTypeDef    state;
+    uint32_t            protocol;
+    uint32_t            idle;
+    uint32_t            alt;
+    uint32_t            type;
+#ifdef VIAL_ENABLE
+    uint8_t             report[USBD_HID_VIAL_EPOUT_SIZE];
+#endif
 } HID_HandleTypeDef;
 
 static uint8_t hid_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, void* user);
@@ -181,10 +200,12 @@ static usbd_interface_t* find_interface_by_epnum(uint32_t epnum);
 static usbd_interface_t* find_interface_by_type(uint32_t type);
 static void hid_kbd_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
 static void hid_other_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
+static void hid_vial_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
 static void hid_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
 
 static HID_HandleTypeDef USBD_HID_DATA_KBD;
 static HID_HandleTypeDef USBD_HID_DATA_OTHER;
+static HID_HandleTypeDef USBD_HID_DATA_VIAL;
 
 #ifdef MSC_ENABLE
 static void msc_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface);
@@ -217,7 +238,19 @@ static usbd_composite_t usbd_composite = {
         .init = hid_other_init,
         .uninit = hid_uninit,
         .data = &USBD_HID_DATA_OTHER},
-
+#ifdef VIAL_ENABLE
+        {.index = ITF_NUM_VIAL,
+        .epin = USBD_HID_VIAL_EPIN,
+        .epin_size = USBD_HID_VIAL_EPIN_SIZE,
+        .epin_type = USBD_HID_VIAL_EPIN_TYPE,
+        .epout = USBD_HID_VIAL_EPOUT,
+        .epout_size = USBD_HID_VIAL_EPOUT_SIZE,
+        .epout_type = USBD_HID_VIAL_EPOUT_TYPE,
+        .instance = &USBD_HID,
+        .init = hid_vial_init,
+        .uninit = hid_uninit,
+        .data = &USBD_HID_DATA_VIAL},
+#endif
 #ifdef MSC_ENABLE
         {.index = ITF_NUM_MSC,
         .epin = USBD_MSC_EPIN,
@@ -356,13 +389,18 @@ uint8_t usbd_comp_send(USBD_HandleTypeDef *pdev, uint8_t type, uint8_t *report, 
     usbd_interface_t* interface = find_interface_by_type(type);
     static uint8_t send_buf[16];
     uint16_t send_len = len;
-    if (type != 0) {
+    switch(type) {
+    case HID_REPORT_ID_KEYBOARD:
+    case HID_REPORT_ID_VIAL: 
+        memcpy(&send_buf[0], report, len);
+        break;
+    default:
         send_len++;
         send_buf[0] = type;
         memcpy(&send_buf[1], report, len);
-    } else {
-        memcpy(&send_buf[0], report, len);
+        break;
     }
+
     if (interface && interface->instance->write) {
         //return interface->instance->write(pdev, interface->epin, report, len, interface->data);
         return interface->instance->write(pdev, interface->epin, send_buf, send_len, interface->data);
@@ -390,6 +428,8 @@ usbd_interface_t* find_interface_by_type(uint32_t type)
 {
     if (type == HID_REPORT_ID_KEYBOARD) {
         return &usbd_composite.interfaces[ITF_NUM_HID_KBD];
+    } else if (type == HID_REPORT_ID_VIAL) {
+        return &usbd_composite.interfaces[ITF_NUM_VIAL];
     } else {
         return &usbd_composite.interfaces[ITF_NUM_HID_OTHER];
     }
@@ -402,13 +442,7 @@ void hid_kbd_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
     amk_printf("HID KBD init, Open epin=%d, status=%d\n", interface->epin, ret);
     pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
     ((HID_HandleTypeDef *)interface->data)->state = ITF_IDLE;
-    ((HID_HandleTypeDef *)interface->data)->keyboard = 1;
-}
-
-void hid_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
-{
-    USBD_LL_CloseEP(pdev, interface->epin);
-    pdev->ep_in[interface->epin & 0xFU].is_used = 0U;
+    ((HID_HandleTypeDef *)interface->data)->type = HID_HANDLE_TYPE_KEYBOARD;
 }
 
 void hid_other_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
@@ -418,7 +452,31 @@ void hid_other_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
     amk_printf("HID OTHER init, Open epin=%d, status=%d\n", interface->epin, ret);
     pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
     ((HID_HandleTypeDef *)interface->data)->state = ITF_IDLE;
-    ((HID_HandleTypeDef *)interface->data)->keyboard = 0;
+    ((HID_HandleTypeDef *)interface->data)->type = HID_HANDLE_TYPE_OTHER;
+}
+
+void hid_vial_init(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
+{
+    USBD_StatusTypeDef ret = USBD_OK;
+    ret = USBD_LL_OpenEP(pdev, interface->epin, interface->epin_type, interface->epin_size);
+    amk_printf("HID VIAL init, Open epin=%d, status=%d\n", interface->epin, ret);
+    pdev->ep_in[interface->epin & 0xFU].is_used = 1U;
+
+    ret = USBD_LL_OpenEP(pdev, interface->epout, interface->epout_type, interface->epout_size);
+    amk_printf("HID VIAL init, Open epout=%d, status=%d\n", interface->epout, ret);
+    pdev->ep_out[interface->epout & 0xFU].is_used = 1U;
+    ((HID_HandleTypeDef *)interface->data)->state = ITF_IDLE;
+    ((HID_HandleTypeDef *)interface->data)->type = HID_HANDLE_TYPE_VIAL;
+
+
+    ret = USBD_LL_PrepareReceive(pdev, interface->epout, ((HID_HandleTypeDef *)interface->data)->report, interface->epout_size);
+    amk_printf("HID VIAL prepare receive, status=%d\n", ret);
+}
+
+void hid_uninit(USBD_HandleTypeDef* pdev, usbd_interface_t* interface)
+{
+    USBD_LL_CloseEP(pdev, interface->epin);
+    pdev->ep_in[interface->epin & 0xFU].is_used = 0U;
 }
 
 // ================================================================================
@@ -471,22 +529,33 @@ static uint8_t  hid_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, v
                     } break;
                 case USB_REQ_GET_DESCRIPTOR:
                     if (req->wValue >> 8 == UDD_HID_DESC_TYPE_REPORT) {
-                        if (hhid->keyboard) {
-                        len = udd_descriptor_hid_report_kbd_size();
-                        amk_printf("keyboard report desc size: %d\n", len);
-                        pbuf = (uint8_t*)udd_descriptor_hid_report_kbd();
+                        if (hhid->type == HID_HANDLE_TYPE_KEYBOARD) {
+                            len = udd_descriptor_hid_report_kbd_size();
+                            amk_printf("keyboard report desc size: %d\n", len);
+                            pbuf = (uint8_t*)udd_descriptor_hid_report_kbd();
+                        } else if (hhid->type == HID_HANDLE_TYPE_OTHER) {
+                            len = udd_descriptor_hid_report_other_size();
+                            amk_printf("other report desc size: %d\n", len);
+                            pbuf = (uint8_t*)udd_descriptor_hid_report_other();
                         } else {
-                        len = udd_descriptor_hid_report_other_size();
-                        amk_printf("other report desc size: %d\n", len);
-                        pbuf = (uint8_t*)udd_descriptor_hid_report_other();
+                        #ifdef VIAL_ENABLE
+                            len = udd_descriptor_hid_report_vial_size();
+                            amk_printf("vial report desc size: %d\n", len);
+                            pbuf = (uint8_t*)udd_descriptor_hid_report_vial();
+                        #endif
                         }
                     } else if (req->wValue >> 8 == UDD_HID_DESC_TYPE_HID) {
-                        if (hhid->keyboard) {
+                        if (hhid->type == HID_HANDLE_TYPE_KEYBOARD) {
                             len = udd_descriptor_hid_interface_kbd_size();
                             pbuf = (uint8_t*)udd_descriptor_hid_interface_kbd();
-                        } else {
+                        } else if (hhid->type == HID_HANDLE_TYPE_OTHER) {
                             len = udd_descriptor_hid_interface_other_size();
                             pbuf = (uint8_t*)udd_descriptor_hid_interface_other();
+                        } else {
+                            len = udd_descriptor_hid_interface_vial_size();
+                            pbuf = (uint8_t*)udd_descriptor_hid_interface_vial();
+                        #ifdef VIAL_ENABLE
+                        #endif
                         }
                     } else {
                         USBD_CtlError(pdev, req);
@@ -528,21 +597,38 @@ static uint8_t  hid_setup(USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req, v
     return ret;
 }
 
-static uint8_t  hid_datain(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user)
+static uint8_t hid_datain(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user)
 {
-    ((HID_HandleTypeDef *)user)->state = ITF_IDLE;
+    HID_HandleTypeDef * handle= (HID_HandleTypeDef *)user;
+    handle->state = ITF_IDLE;
+
+#ifdef VIAL_ENABLE
+    if (handle->type == HID_HANDLE_TYPE_VIAL) {
+        USBD_StatusTypeDef ret = USBD_OK;
+        usbd_interface_t* intf = find_interface_by_epnum(epnum);
+        ret = USBD_LL_PrepareReceive(pdev, intf->epout, handle->report, USBD_HID_VIAL_EPOUT_SIZE);
+        amk_printf("HID VIAL prepare receive, status=%d\n", ret);
+    }
+#endif
     return USBD_OK;
 }
 
 static uint8_t  hid_dataout(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user)
 {
+    HID_HandleTypeDef *handle = (HID_HandleTypeDef *)user;
+#ifdef VIAL_ENABLE
+    if (handle->type == HID_HANDLE_TYPE_VIAL) {
+        amk_printf("USBD HID dataout: \n");
+        vial_process(handle->report, USBD_HID_VIAL_EPOUT_SIZE);
+    }
+#endif
     return USBD_OK;
 }
 
 static uint8_t  hid_write(USBD_HandleTypeDef *pdev, uint8_t epnum, uint8_t* data, uint16_t size, void* user)
 {
     HID_HandleTypeDef* hhid = (HID_HandleTypeDef*)user;
-    amk_printf("USBD HID Write: state=%d, size=%d\n", hhid->state, size);
+    amk_printf("USBD HID Write: state=%d, epnum=%d, size=%d\n", hhid->state, epnum, size);
     if (hhid->state == ITF_IDLE) {
         hhid->state = ITF_BUSY;
         return USBD_LL_Transmit(pdev, epnum, data, size);

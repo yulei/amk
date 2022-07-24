@@ -425,6 +425,23 @@ skip:
     vial_send(data, length);
 }
 
+#ifndef TINYUSB_ENABLE
+#include "generic_hal.h"
+#include "usb_device.h"
+#include "usbd_composite.h"
+
+extern USBD_HandleTypeDef hUsbDeviceFS;
+
+static void vial_send(uint8_t *data, uint8_t length)
+{
+    if (usbd_comp_itf_ready(&hUsbDeviceFS, ITF_NUM_VIAL)) {
+        usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_VIAL, data, length);
+    } else {
+        // save to queue
+        vial_debug("vial send busy\n");
+    }
+}
+#else
 static void vial_send(uint8_t *data, uint8_t length)
 {
     if (tud_hid_n_ready(ITF_NUM_VIAL)) {
@@ -434,6 +451,7 @@ static void vial_send(uint8_t *data, uint8_t length)
         vial_debug("vial send busy\n");
     }
 }
+#endif
 
 void vial_task(void)
 {
