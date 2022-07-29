@@ -2,7 +2,7 @@
 SRCS += \
 	$(KEYBOARD_DIR)/me_ec.c \
 	$(KEYBOARD_DIR)/me_ec_keymap.c \
-	$(KEYBOARD_DIR)/custom_matrix.c \
+	$(KEYBOARD_DIR)/ec_matrix.c
 
 
 MCU = STM32F411
@@ -16,5 +16,6 @@ LINKER_PATH = $(KEYBOARD_DIR)
 UF2_ENABLE = yes
 UF2_FAMILY = STM32F4
 
+#SRC += $(KEYBOARD_DIR)/custom_matrix.c
 #HID_OTHER_ENABLE = no
 #CDC_ENABLE = yes

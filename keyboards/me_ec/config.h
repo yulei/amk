@@ -20,6 +20,8 @@
 #define DISCHARGE_WAIT_PRE  30
 #define DISCHARGE_WAIT_POST 30
 #define CHARGE_WAIT     2
+#define EC_TH_LOW       800
+#define EC_TH_HIGH      1192
 
 #define ROW_6_PIN       B6
 #define ROW_1_PIN       B5
@@ -52,13 +54,17 @@
 #define PWM_TIM_PERIOD      119
 #define PWM_TIM             htim4
 #define PWM_TIM_CHANNEL     TIM_CHANNEL_2
+#define PWM_TIM_DMA_ID      TIM_DMA_ID_CC2
+#define PWM_DMA_INSTANCE    DMA1_Stream3
+#define PWM_DMA_CHANNEL     DMA_CHANNEL_2
+#define PWM_DMA_IRQHnadler  DMA1_Stream3_IRQHandler
 
 #define RGB_LED_NUM     (4+12)
 #define RGB_DEVICE_NUM  2
 #define RGB_SEGMENT_NUM 2
 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
-#define DEBOUNCE        0
+#define DEBOUNCE        5
 
 #define VECT_TAB_OFFSET 0x20000
 #define USE_I2C1
