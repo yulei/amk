@@ -20,8 +20,8 @@
 #define DISCHARGE_WAIT_PRE  30
 #define DISCHARGE_WAIT_POST 30
 #define CHARGE_WAIT     2
-#define EC_TH_LOW       800
-#define EC_TH_HIGH      1192
+#define EC_TH_LOW       1024
+#define EC_TH_HIGH      1684
 
 #define ROW_6_PIN       B6
 #define ROW_1_PIN       B5
@@ -64,7 +64,7 @@
 #define RGB_SEGMENT_NUM 2
 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
-#define DEBOUNCE        5
+#define DEBOUNCE        10
 
 #define VECT_TAB_OFFSET 0x20000
 #define USE_I2C1
