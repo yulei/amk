@@ -140,6 +140,33 @@ static bool keyhit_matrix_pressed(uint8_t row, uint8_t col);
 static void draw_rect(screen_t *screen, uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint16_t color);
 static void draw_line(screen_t *screen, int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint16_t color);
 
+static void add_frame(uint32_t width, uint32_t height, uint8_t *buffer, uint16_t color, uint8_t flag)
+{
+    uint16_t *p = (uint16_t*)buffer;
+    if (flag & DISPLAY_FLAGS_EDGE_TOP) {
+        for (int x = 0; x < width; x++) {
+            p[x] = color;
+        }
+    }
+
+    if (flag & DISPLAY_FLAGS_EDGE_BOTTOM) {
+        for (int x = 0; x < width; x++) {
+            p[(height-1)*width + x] = color;
+        }
+    }
+
+    if (flag & DISPLAY_FLAGS_EDGE_LEFT) {
+        for (int y = 0; y < height; y++) {
+            p[y*width] = color;
+        }
+    }
+    if (flag & DISPLAY_FLAGS_EDGE_RIGHT) {
+        for (int y = 0; y < height; y++) {
+            p[y*width+(width-1)] = color;
+        }
+    }
+}
+
 static bool fwk_point_valid(fwk_point_t *point, uint8_t center_x, uint8_t center_y)
 {
     if (!(point->x < FRAME_WIDTH) || !(point->x > 0.0)) return false;
@@ -421,6 +448,10 @@ static void draw_line(screen_t *screen, int32_t x0, int32_t y0, int32_t x1, int3
     } while (i < total);
 }
 
+__attribute__((weak))
+void keyboard_display_post_process(void* buff, size_t size)
+{}
+
 void keyboard_display_task(display_t *display)
 {
     keyboard_display_obj_t *obj = (keyboard_display_obj_t*)display->data;
@@ -433,7 +464,6 @@ void keyboard_display_task(display_t *display)
     if (obj->dirty || pt_update) {
         obj->screen->clear(obj->screen);
 
-        //obj->screen->draw_rect(obj->screen, 0, 0, 10, 10);
         for (int i = 0; i < KEYBOARD_KEY_COUNT; i++) {
             //matrix_row_t row = matrix_get_row(keyboard_keys[i].pos.row);
             //if (!(row&(1<<keyboard_keys[i].pos.col))) {
@@ -441,7 +471,7 @@ void keyboard_display_task(display_t *display)
                 uint16_t color = keyhit_matrix_color(keyboard_keys[i].pos.row, keyboard_keys[i].pos.col);
                 draw_rect(obj->screen, keyboard_keys[i].x, keyboard_keys[i].y, keyboard_keys[i].w, keyboard_keys[i].h, color);
             } else {
-                amk_printf("row:%d, col:%d, skipped\n", keyboard_keys[i].pos.row, keyboard_keys[i].pos.col);
+                //amk_printf("row:%d, col:%d, skipped\n", keyboard_keys[i].pos.row, keyboard_keys[i].pos.col);
             }
         }
 
@@ -456,12 +486,12 @@ void keyboard_display_task(display_t *display)
             obj->ticks = timer_read32();
         }
 
-        if (obj->param.flags & DISPLAY_FLAGS_FRAME) {
-            draw_line(obj->screen, 0, 0, obj->param.width-1, 0, 0xFFFF);
-            draw_line(obj->screen, obj->param.width-1, 0, obj->param.width-1, obj->param.height-1, 0xFFFF);
-            draw_line(obj->screen, obj->param.width-1, obj->param.height-1, 0, obj->param.height-1, 0xFFFF);
-            draw_line(obj->screen, 0, obj->param.height-1, 0, 0, 0xFFFF);
+        if (obj->param.flags) {
+            add_frame(obj->param.width, obj->param.height, obj->buffer, 0xFFFF, obj->param.flags);
         }
+
+        keyboard_display_post_process(obj->buffer, obj->buffer_size);
+
         obj->screen->refresh(obj->screen);
         obj->dirty = false;
         //obj->ticks = timer_read32();
@@ -551,7 +581,7 @@ static void keyhit_matrix_update(uint8_t row, uint8_t col, bool pressed)
 
 static bool keyhit_matrix_pressed(uint8_t row, uint8_t col)
 {
-    return (keyhit_matrix.state_matrix[row] &= (1 << col)) ? true : false;
+    return (keyhit_matrix.state_matrix[row] & (1 << col)) ? true : false;
 }
 
 static uint16_t keyhit_matrix_color(uint8_t row, uint8_t col)

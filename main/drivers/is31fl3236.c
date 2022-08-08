@@ -153,7 +153,7 @@ void init_driver(is31fl3236_driver_t *driver)
     memset(driver->pwm_buffer, 0, PWM_BUFFER_SIZE + 1);
     driver->pwm_buffer[0]       = PWM_REG;
     driver->pwm_dirty           = false;
-    memset(driver->control_buffer, 1, CONTROL_BUFFER_SIZE + 1);
+    memset(driver->control_buffer, 7, CONTROL_BUFFER_SIZE + 1);
     driver->control_buffer[0]   = CONTROL_REG;
     driver->control_dirty       = false;
 

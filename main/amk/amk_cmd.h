@@ -20,6 +20,7 @@ enum {
     CMD_CONSUMER,
     CMD_SCREEN,
     CMD_LED,
+    CMD_LAYER,
     CMD_KEYHIT,
     CMD_STATUS,
     CMD_TYPE_MAX,
@@ -38,6 +39,7 @@ static const char CMD_CONSUMER_STR[] = "CSR";
 static const char CMD_SCREEN_STR[] = "SCR";
 static const char CMD_STATUS_STR[] = "STS";
 static const char CMD_LED_STR[] = "LED";
+static const char CMD_LAYER_STR[] = "LYR";
 static const char CMD_KEYHIT_STR[] = "KH";
 
 static const char CMD_PARAM_OK[] = "OK";
@@ -52,13 +54,14 @@ static const char KEYHIT_PARAM_COL[] = "COL";
 static const char KEYHIT_PARAM_PRESSED[] = "PRESSED";
 static const char SCREEN_PARAM_POWER[] = "PWR";
 static const char SCREEN_PARAM_MSC[] = "MSC";
+static const char KEYBOARD_PARAM_MODS[] = "M";
 
 enum {
     CMD_SCREEN_POWER,
     CMD_SCREEN_MSC,
 };
 
-#define KEYBOARD_PARAM_SIZE     8
+#define KEYBOARD_KEY_SIZE       6
 #define MOUSE_PARAM_SIZE        6
 #define NKRO_PARAM_SIZE         32
 
@@ -69,18 +72,22 @@ typedef struct {
             uint8_t action;
             uint8_t state;
         } screen;
-        uint8_t keyboard[KEYBOARD_PARAM_SIZE];
+        struct {
+            uint8_t mods;
+            uint8_t keys[KEYBOARD_KEY_SIZE];
+        } keyboard;
         uint8_t mouse[MOUSE_PARAM_SIZE];
         uint8_t nkro[NKRO_PARAM_SIZE];
         uint16_t system;
         uint16_t consumer;
         uint8_t status;
         uint8_t led;
+        uint8_t layer;
         struct {
             uint8_t row;
             uint8_t col;
             uint8_t pressed;
-        }keyhit;
+        } keyhit;
     } param;
 } cmd_t;
 

@@ -11,6 +11,16 @@
 #include "amk_cmd.h"
 #include "amk_printf.h"
 
+#ifndef CMD_DEBUG
+#define CMD_DEBUG 1
+#endif
+
+#if CMD_DEBUG
+#define cmd_debug  amk_printf
+#else
+#define cmd_debug(...)
+#endif
+
 #define BUF_SIZE    16
 #define NAME_MAX    16
 #define VALUE_MAX   96
@@ -28,6 +38,7 @@ static cmd_str_t cmd_strs[] = {
     {CMD_CONSUMER, CMD_CONSUMER_STR},
     {CMD_SCREEN, CMD_SCREEN_STR},
     {CMD_LED, CMD_LED_STR},
+    {CMD_LAYER, CMD_LAYER_STR},
     {CMD_KEYHIT, CMD_KEYHIT_STR},
     {CMD_STATUS, CMD_STATUS_STR},
     {CMD_TYPE_MAX, NULL},
@@ -39,6 +50,8 @@ static int32_t cmd_parse_param(const void *data, uint32_t size, cmd_t* cmd);
 int32_t cmd_parse(const void* data, uint32_t size, cmd_t* cmd)
 {
     const uint8_t *cur = (const uint8_t*)data;
+    //cmd_debug("%s\n", cur);
+
     cmd->type = CMD_TYPE_MAX;
     int32_t cmd_parsed = cmd_parse_type(cur, size, &cmd->type);
 
@@ -102,9 +115,22 @@ static int32_t cmd_parse_param_token(const void* data, uint32_t size, char* name
     return (endl-cur+1);
 }
 
-static int32_t cmd_process_keyboard_param(void)
+static void cmd_process_keyboard_param(const char *name, const char *value, cmd_t *cmd)
 {
-    return -1;
+    if (strcmp(name, KEYBOARD_PARAM_MODS) == 0) {
+        int d = strtol(value, NULL, 16);
+        cmd->param.keyboard.mods = d;
+    } else {
+        int d = strtol(name, NULL, 16);
+        if (d != 0) {
+            for (int i = 0; i < KEYBOARD_KEY_SIZE; i++) {
+                if (cmd->param.keyboard.keys[i] == 0) {
+                    cmd->param.keyboard.keys[i] = d;
+                    break;
+                }
+            }
+        }
+    }
 }
 
 static int32_t cmd_process_mouse_param(void)
@@ -125,6 +151,11 @@ static int32_t cmd_process_system_param(void)
 static int32_t cmd_process_consumer_param(void)
 {
     return -1;
+}
+
+static void cmd_process_layer_param(const char *name, const char *value, cmd_t *cmd)
+{
+    cmd->param.layer = strtol(name, NULL, 10);
 }
 
 static void cmd_process_led_param(const char *name, const char *value, cmd_t *cmd)
@@ -186,7 +217,7 @@ static int32_t cmd_parse_param(const void *data, uint32_t size, cmd_t* cmd)
             cur += result;
             switch(cmd->type) {
             case CMD_KEYBOARD:
-                cmd_process_keyboard_param();
+                cmd_process_keyboard_param(name, value, cmd);
                 break;
             case CMD_MOUSE:
                 cmd_process_mouse_param();
@@ -206,6 +237,9 @@ static int32_t cmd_parse_param(const void *data, uint32_t size, cmd_t* cmd)
             case CMD_LED:
                 cmd_process_led_param(name, value, cmd);
                 break;
+            case CMD_LAYER:
+                cmd_process_layer_param(name, value, cmd);
+                break;
             case CMD_KEYHIT:
                 cmd_process_keyhit_param(name, value, cmd);
                 break;
@@ -221,6 +255,37 @@ static int32_t cmd_parse_param(const void *data, uint32_t size, cmd_t* cmd)
     if (parsed) return parsed;
 
     return -1;
+}
+
+static int32_t cmd_compose_keyboard(const cmd_t *cmd, void *buf, uint32_t size)
+{
+    int32_t valid = 0;
+    char *p = (char *)buf;
+    // put modifiers always
+    int32_t result = snprintf(p, size, "%s:%s=%x;",
+                        CMD_KEYBOARD_STR,
+                        KEYBOARD_PARAM_MODS,
+                        cmd->param.keyboard.mods);
+
+    if (result < 0) return result;
+    valid += result;
+    p += result;
+    size -= result;
+    for(int i = 1; i < KEYBOARD_KEY_SIZE; i++) {
+        if (cmd->param.keyboard.keys[i]) {
+            result = snprintf(p, size, "%x;", cmd->param.keyboard.keys[i]);
+            if (result < 0) return result;
+
+            valid += result;
+            p += result;
+            size -= result;
+        }
+    }
+
+    result = snprintf(p, size, "\n");
+    if (result < 0) return result;
+
+    return result+valid;
 }
 
 static int32_t cmd_compose_screen(const cmd_t *cmd, void *buf, uint32_t size)
@@ -250,6 +315,14 @@ static int32_t cmd_compose_led(const cmd_t *cmd, void *buf, uint32_t size)
     return result;
 }
 
+static int32_t cmd_compose_layer(const cmd_t *cmd, void *buf, uint32_t size)
+{
+    int32_t result = snprintf(buf, size, "%s:%d;\n", 
+                    CMD_LAYER_STR, 
+                    cmd->param.layer);
+
+    return result;
+}
 static int32_t cmd_compose_keyhit(const cmd_t *cmd, void *buf, uint32_t size)
 {
     int32_t result = snprintf(buf, size, "%s:%s=%d;%s=%d;%s=%d;\n", 
@@ -278,6 +351,7 @@ int32_t cmd_compose(const cmd_t *cmd, void* buf, uint32_t size)
     int32_t result = -1;
     switch(cmd->type) {
     case CMD_KEYBOARD:
+        result = cmd_compose_keyboard(cmd, buf, size);
         break;
     case CMD_MOUSE:
         break;
@@ -292,6 +366,9 @@ int32_t cmd_compose(const cmd_t *cmd, void* buf, uint32_t size)
         break;
     case CMD_LED:
         result = cmd_compose_led(cmd, buf, size);
+        break;
+    case CMD_LAYER:
+        result = cmd_compose_layer(cmd, buf, size);
         break;
     case CMD_KEYHIT:
         result = cmd_compose_keyhit(cmd, buf, size);

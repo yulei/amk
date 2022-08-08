@@ -8,7 +8,7 @@
  */
 #pragma once
 
-#include "render_common.h"
+#include "render_def.h"
 #include "keyboard.h"
 
 typedef struct {

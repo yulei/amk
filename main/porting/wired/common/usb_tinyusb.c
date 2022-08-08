@@ -49,8 +49,15 @@ bool amk_usb_itf_ready(uint32_t type)
     return false;
 }
 
+__attribute__((weak))
+void hook_send_report(uint32_t type, const void* data)
+{
+}
+
 bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t size)
 {
+    hook_send_report(report_type, data);
+
     switch(report_type) {
     case HID_REPORT_ID_KEYBOARD:
         if (!tud_hid_n_report(ITF_NUM_HID_KBD, HID_REPORT_ID_KEYBOARD, data, (uint8_t)size)) {

@@ -100,10 +100,10 @@ amk_error_t spi_send(spi_handle_t spi, const void *data, size_t length)
     M4_SPI_TypeDef* hspi = (M4_SPI_TypeDef *)spi;
     uint8_t* p = (uint8_t* )data;
     for (int i = 0; i < length; i++) {
-        SPI_SendData8(hspi, p[i]);
         while (Reset == SPI_GetFlag(hspi, SpiFlagSpiIdle))
         {
         }
+        SPI_SendData8(hspi, p[i]);
     }
 
     return AMK_SUCCESS;

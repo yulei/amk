@@ -393,3 +393,13 @@ void hook_matrix_change(keyevent_t event)
 
     hook_matrix_change_kb(event);
 }
+
+__attribute__((weak))
+void hook_layer_change_kb(uint32_t layer_state)
+{
+}
+
+void hook_layer_change(uint32_t layer_state)
+{
+    hook_layer_change_kb(layer_state);
+}

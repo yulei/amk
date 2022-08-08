@@ -72,6 +72,7 @@ endif
 COMMON_FLAGS := $(OPT) $(APP_DEFS) $(SDK_DEFS)
 # C flags common to all targets
 CFLAGS += $(COMMON_FLAGS)
+CFLAGS += -std=gnu11
 CFLAGS += -Wall
 CFLAGS += -Werror
 # keep every function in a separate section, this allows linker to discard unused ones

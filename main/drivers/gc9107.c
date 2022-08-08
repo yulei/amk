@@ -80,7 +80,7 @@
 #define GC9107_INT_REG_ENABLE1  0xFE
 #define GC9107_INT_REG_ENABLE2  0xFE
 
-#if 1
+#if 0
 static const uint8_t init_cmds[] = {
     23,
     GC9107_INT_REG_ENABLE1, 0,

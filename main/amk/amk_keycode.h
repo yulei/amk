@@ -831,4 +831,38 @@
 #define GC_SFTENT               KC_SFTENT
 #define GC_CTME                 KC_CTME
 #define GC_KEYMAPS              const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS]
+
+/* FN */
+#define GC_FN0                  KC_FN0
+#define GC_FN1                  KC_FN1
+#define GC_FN2                  KC_FN2
+#define GC_FN3                  KC_FN3
+#define GC_FN4                  KC_FN4
+#define GC_FN5                  KC_FN5
+#define GC_FN6                  KC_FN6
+#define GC_FN7                  KC_FN7
+#define GC_FN8                  KC_FN8
+#define GC_FN9                  KC_FN9
+#define GC_FN10                 KC_FN10
+#define GC_FN11                 KC_FN11
+#define GC_FN12                 KC_FN12
+#define GC_FN13                 KC_FN13
+#define GC_FN14                 KC_FN14
+#define GC_FN15                 KC_FN15
+#define GC_FN16                 KC_FN16
+#define GC_FN17                 KC_FN17
+#define GC_FN18                 KC_FN18
+#define GC_FN19                 KC_FN19
+#define GC_FN20                 KC_FN20
+#define GC_FN21                 KC_FN21
+#define GC_FN22                 KC_FN22
+#define GC_FN23                 KC_FN23
+#define GC_FN24                 KC_FN24
+#define GC_FN25                 KC_FN25
+#define GC_FN26                 KC_FN26
+#define GC_FN27                 KC_FN27
+#define GC_FN28                 KC_FN28
+#define GC_FN29                 KC_FN29
+#define GC_FN30                 KC_FN30
+#define GC_FN31                 KC_FN31
 #endif

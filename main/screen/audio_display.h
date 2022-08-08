@@ -4,6 +4,6 @@
 
 #pragma once
 
-#include "render_common.h"
+#include "render_def.h"
 
 bool audio_display_create(display_t *display, display_param_t *param);

@@ -13,7 +13,9 @@
 #if KEYBOARD_DISPLAY_NUM
 #include "keyboard_display.h"
 #endif
-
+#if INFO_DISPLAY_NUM
+#include "info_display.h"
+#endif
 typedef struct {
     screen_t        *screen;
     display_param_t param;
@@ -37,6 +39,10 @@ static bool display_init(display_t *display, display_param_t *param)
 #if KEYBOARD_DISPLAY_NUM
     case KEYBOARD_DISPLAY:
         return keyboard_display_create(display, param);
+#endif
+#if INFO_DISPLAY_NUM
+    case INFO_DISPLAY:
+        return info_display_create(display, param);
 #endif
     default:
         break;

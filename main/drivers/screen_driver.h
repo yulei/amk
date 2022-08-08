@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "render_common.h"
+#include "render_def.h"
 
 screen_driver_t* screen_driver_create(screen_driver_param_t *param);
 void screen_driver_destroy(screen_driver_t *driver);

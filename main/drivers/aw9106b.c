@@ -12,7 +12,7 @@
 #include "amk_printf.h"
 
 #ifndef AW9106B_DEBUG
-#define AW9106B_DEBUG 0
+#define AW9106B_DEBUG 1
 #endif
 
 #if AW9106B_DEBUG

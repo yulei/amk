@@ -84,19 +84,36 @@ void anim_display_uninit(display_t *display)
 {
 }
 
-static void add_frame(uint32_t width, uint32_t height, uint8_t *buffer, uint16_t color)
+static void add_frame(uint32_t width, uint32_t height, uint8_t *buffer, uint16_t color, uint8_t flag)
 {
     uint16_t *p = (uint16_t*)buffer;
-    for (int x = 0; x < width; x++) {
-        p[x] = color;
-        p[(height-1)*width + x] = color;
+    if (flag & DISPLAY_FLAGS_EDGE_TOP) {
+        for (int x = 0; x < width; x++) {
+            p[x] = color;
+        }
     }
 
-    for (int y = 0; y < height; y++) {
-        p[y*width] = color;
-        p[y*width+(width-1)] = color;
+    if (flag & DISPLAY_FLAGS_EDGE_BOTTOM) {
+        for (int x = 0; x < width; x++) {
+            p[(height-1)*width + x] = color;
+        }
+    }
+
+    if (flag & DISPLAY_FLAGS_EDGE_LEFT) {
+        for (int y = 0; y < height; y++) {
+            p[y*width] = color;
+        }
+    }
+    if (flag & DISPLAY_FLAGS_EDGE_RIGHT) {
+        for (int y = 0; y < height; y++) {
+            p[y*width+(width-1)] = color;
+        }
     }
 }
+
+__attribute__((weak))
+void anim_display_post_process(void* buff, size_t size)
+{}
 
 void anim_display_task(display_t *display)
 {
@@ -138,11 +155,13 @@ void anim_display_task(display_t *display)
                 //render->anim = NULL;
             }
         }
-        if (obj->param.flags&DISPLAY_FLAGS_FRAME) {
-            add_frame(obj->param.width, obj->param.height, obj->buffer, 0xFFFF);
+
+        if (obj->param.flags) {
+            add_frame(obj->param.width, obj->param.height, obj->buffer, 0xFFFF, obj->param.flags);
         }
 
         //obj->screen->fill_rect_async(obj->screen, 0, 0, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
+        anim_display_post_process(obj->buffer, obj->param.screen);
         obj->screen->fill_rect(obj->screen, 0, 0, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
 
         obj->ticks = timer_read32();

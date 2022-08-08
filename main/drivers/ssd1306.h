@@ -9,8 +9,7 @@
 
 #pragma once
 
-#include "render_common.h"
-
+#include "render_def.h"
 
 void ssd1306_config(screen_driver_t *driver, screen_driver_param_t *param);
 

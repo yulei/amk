@@ -32,6 +32,8 @@
 #define AUXI_SIG    "AUXI"
 #define ANIM_SIG    "ANIM"
 #define AMFT_SIG    "AMFT"
+#define AMGH_SIG    "AMGH"
+
 #define FRAME_MAX   1024
 typedef struct __attribute__((packed)) {
     char signature[4];  //"ANIM" or "AUXI"
@@ -140,6 +142,15 @@ uint32_t anim_get_frames(anim_t* anim)
     return anim->obj.header.frames;
 }
 
+uint16_t anim_get_delay(anim_t* anim, uint16_t index)
+{
+    if (index < anim_get_frames(anim)) {
+        return anim->obj.header.delays[index];
+    }
+    
+    return 0;
+}
+
 uint32_t anim_step(anim_t *anim, uint32_t *delay, void *buf, uint32_t size)
 {
     if (anim->obj.frame >= anim->obj.header.frames || anim->obj.frame >= FRAME_MAX) {
@@ -179,6 +190,11 @@ uint32_t anim_step(anim_t *anim, uint32_t *delay, void *buf, uint32_t size)
 
     anim->obj.frame++;
     return readed;
+}
+
+uint32_t anim_total(anim_t* anim)
+{
+    return anim->total;
 }
 
 bool anim_next(anim_t *anim)
@@ -257,6 +273,12 @@ static bool anim_init(anim_t *anim)
                 return false;
             }
             break;
+        case ANIM_TYPE_GLYPH:
+            if (memcmp(AMGH_SIG, anim->obj.header.signature, 4) != 0) {
+                f_close(&anim->obj.file);
+                return false;
+            }
+            break;
         default:
             f_close(&anim->obj.file);
             return false;
@@ -285,6 +307,9 @@ static void anim_scan(anim_t *anim)
                 }
                 if (anim->type == ANIM_TYPE_FONT) {
                     sig = AMFT_SIG;
+                }
+                if (anim->type == ANIM_TYPE_GLYPH) {
+                    sig = AMGH_SIG;
                 }
                 if (anim_check_file(fno.fname, sig)) {
                     memcpy(&anim->files[anim->total][0], fno.fname, ANIM_FILE_NAME_MAX);
@@ -374,4 +399,39 @@ static FRESULT safe_open(FIL* fp, const TCHAR* path, BYTE mode)
         amk_printf("ANIM: invalid file to open\n");
     }
     return f_open(fp, path, mode);
+}
+
+static uint32_t text_key_offset(anim_t *anim, uint16_t key)
+{
+    for (int i = 0; i < anim->obj.header.frames; i++) {
+        if (key == anim->obj.header.delays[i]) {
+            // find key
+            uint32_t text_size = (anim->obj.header.width*anim->obj.header.height)/8;
+            return (anim->obj.header.offset+i*text_size);
+        }
+    }
+
+    return 0;
+}
+
+bool anim_get_glyph_bitmap(anim_t *anim, uint16_t key, void *buf, uint32_t size)
+{
+    if (!anim) return false;
+    uint32_t offset = text_key_offset(anim, key);
+    if (!offset) return false;
+
+    if (FR_OK != f_lseek(&anim->obj.file, offset) ) {
+        amk_printf("TEXT failed to seek key position, pos=%d\n", offset);
+        safe_close(&anim->obj.file);
+        return false;
+    }
+
+    UINT readed = 0;
+    if (FR_OK != f_read(&anim->obj.file, buf, size, &readed)) {
+        amk_printf("TEXT failed to read key data, size=%d\n", size);
+        safe_close(&anim->obj.file);
+        return false;
+    }
+
+    return true;
 }

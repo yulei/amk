@@ -1,5 +1,5 @@
 /**
- * @file render_common.h
+ * @file render_def.h
  * 
  */
 
@@ -29,7 +29,7 @@ enum {
 enum {
     ANIM_DISPLAY,
     AUDIO_DISPLAY,
-//    INFO_DISPLAY,
+    INFO_DISPLAY,
     KEYBOARD_DISPLAY,
 };
 
@@ -53,7 +53,10 @@ typedef struct {
     uint8_t     driver; // driver index
 } screen_param_t;
 
-#define DISPLAY_FLAGS_FRAME     0x01
+#define DISPLAY_FLAGS_EDGE_LEFT     (1<<0)
+#define DISPLAY_FLAGS_EDGE_TOP      (1<<1)
+#define DISPLAY_FLAGS_EDGE_RIGHT    (1<<2)
+#define DISPLAY_FLAGS_EDGE_BOTTOM   (1<<3)
 
 typedef struct {
     uint8_t     type;

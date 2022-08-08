@@ -176,6 +176,7 @@ static st7735_t st7735_driver;
 static void st7735_select(st7735_t *driver)
 {
     gpio_write_pin(driver->param.cs, 0);
+    //wait_ms(1);
 }
 
 static void st7735_unselect(st7735_t *driver)

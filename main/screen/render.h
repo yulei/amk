@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "render_common.h"
+#include "render_def.h"
 
 extern screen_driver_param_t screen_driver_params[SCREEN_DRIVER_NUM];
 extern screen_param_t screen_params[SCREEN_NUM];
