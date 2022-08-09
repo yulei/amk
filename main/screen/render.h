@@ -18,3 +18,5 @@ void render_task(void);
 void render_toggle_display(uint8_t display);
 
 void render_enable_display(uint8_t display, bool enable);
+
+void render_uninit(void);

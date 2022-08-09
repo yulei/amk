@@ -96,4 +96,10 @@ screen_driver_t* screen_driver_create(screen_driver_param_t *param)
 
 void screen_driver_destroy(screen_driver_t *driver)
 {
+    screen_driver_obj_t *obj = (screen_driver_obj_t *)driver->data;
+    if (obj->param.power != INVALID_PIN) {
+        //gpio_set_output_pushpull(param->power);
+        gpio_write_pin(obj->param.power, !obj->param.power_on);
+    }
+    memset(obj, 0, sizeof(screen_driver_obj_t));
 }

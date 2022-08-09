@@ -109,4 +109,5 @@ typedef struct display_s {
     void *data;
 } display_t;
 
+void render_buffer_init(void);
 uint8_t* render_buffer_allocate(uint32_t size);

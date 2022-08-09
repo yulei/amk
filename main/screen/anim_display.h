@@ -7,3 +7,4 @@
 #include "render_def.h"
 
 bool anim_display_create(display_t *display, display_param_t *param);
+void anim_display_destroy(display_t *display);

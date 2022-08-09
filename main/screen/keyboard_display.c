@@ -18,7 +18,7 @@
 #include "amk_printf.h"
 
 #ifndef KBDDISP_DEBUG
-#define KBDDISP_DEBUG 1
+#define KBDDISP_DEBUG 0
 #endif
 
 #if KBDDISP_DEBUG
@@ -392,6 +392,7 @@ static bool keyboard_display_init(display_t *display, screen_t *screen)
 
 void keyboard_display_uninit(display_t *display)
 {
+    //keyboard_display_obj_t *obj = (keyboard_display_obj_t*)display->data;
 }
 
 static void draw_rect(screen_t *screen, uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint16_t color)
@@ -556,6 +557,13 @@ bool keyboard_display_create(display_t *display, display_param_t *param)
     return false;
 }
 
+void keyboard_display_destroy(display_t *display)
+{
+    keyboard_display_obj_t *obj = (keyboard_display_obj_t*)display->data;
+    memset(obj, 0, sizeof(keyboard_display_obj_t));
+}
+
+/////// keyhit
 static void keyhit_matrix_reset(void)
 {
     for (int i = 0; i < MATRIX_ROWS; i++) {

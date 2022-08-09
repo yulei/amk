@@ -50,7 +50,7 @@ static int32_t cmd_parse_param(const void *data, uint32_t size, cmd_t* cmd);
 int32_t cmd_parse(const void* data, uint32_t size, cmd_t* cmd)
 {
     const uint8_t *cur = (const uint8_t*)data;
-    //cmd_debug("%s\n", cur);
+    cmd_debug("%s\n", cur);
 
     cmd->type = CMD_TYPE_MAX;
     int32_t cmd_parsed = cmd_parse_type(cur, size, &cmd->type);
@@ -178,14 +178,14 @@ static void cmd_process_screen_param(const char *name, const char *value, cmd_t 
 {
     if (strcmp(name, SCREEN_PARAM_POWER) == 0) {
         cmd->param.screen.action = CMD_SCREEN_POWER;
-        if (strcmp(value, CMD_PARAM_ON)) {
+        if (strcmp(value, CMD_PARAM_ON) == 0) {
             cmd->param.screen.state = 1;
         } else {
             cmd->param.screen.state = 0;
         }
-    } else if (strcmp(name, SCREEN_PARAM_MSC)) {
+    } else if (strcmp(name, SCREEN_PARAM_MSC) == 0) {
         cmd->param.screen.action = CMD_SCREEN_MSC;
-        if (strcmp(value, CMD_PARAM_ON)) {
+        if (strcmp(value, CMD_PARAM_ON) == 0) {
             cmd->param.screen.state = 1;
         } else {
             cmd->param.screen.state = 0;

@@ -13,13 +13,22 @@
 screen_driver_t* screen_drivers[SCREEN_DRIVER_NUM];
 screen_t* screens[SCREEN_NUM];
 display_t* displays[DISPLAY_NUM];
-static bool all_off;
+
+static bool render_inited = false;
 
 static void init_screen_drivers(void)
 {
     for (int i = 0; i < SCREEN_DRIVER_NUM; i++) {
         screen_drivers[i] = screen_driver_create(&screen_driver_params[i]);
         screen_drivers[i]->init(screen_drivers[i]);
+    }
+}
+
+static void uninit_screen_drivers(void)
+{
+    for (int i = 0; i < SCREEN_DRIVER_NUM; i++) {
+        screen_drivers[i]->uninit(screen_drivers[i]);
+        screen_driver_destroy(screen_drivers[i]);
     }
 }
 
@@ -31,6 +40,14 @@ static void init_screens(void)
     }
 }
 
+static void uninit_screens(void)
+{
+    for (int i = 0; i < SCREEN_NUM; i++) {
+        screens[i]->uninit(screens[i]);
+        screen_destroy(screens[i]);
+    }
+}
+
 static void init_displays(void)
 {
     for (int i = 0; i < DISPLAY_NUM; i++) {
@@ -39,19 +56,45 @@ static void init_displays(void)
     }
 }
 
+static void uninit_displays(void)
+{
+    for (int i = 0; i < DISPLAY_NUM; i++) {
+        displays[i]->uninit(displays[i]);
+        display_destroy(displays[i]);
+    }
+}
+
 void render_init(void)
 {
     if (usb_setting & USB_MSC_BIT) return;
 
+    render_buffer_init();
+
     init_screen_drivers();
     init_screens();
     init_displays();
-    all_off = false;
+
+    render_inited = true;
+}
+
+void render_uninit(void)
+{
+    if (!render_inited) return;
+
+    uninit_displays();
+    uninit_screens();
+    uninit_screen_drivers();
+
+    render_buffer_init();
+
+    render_inited = false;
 }
 
 void render_task(void)
 {
     if (usb_setting & USB_MSC_BIT) return;
+
+    if (!render_inited) return;
 
     for (int i = 0; i < DISPLAY_NUM; i++) {
         displays[i]->task(displays[i]);
@@ -63,37 +106,6 @@ void render_toggle_display(uint8_t display)
     if (display < DISPLAY_NUM) {
         bool enabled = displays[display]->is_enabled(displays[display]);
         render_enable_display(display, !enabled);
-    }
-    bool on = false;
-    for (int i = 0; i < DISPLAY_NUM; i++) {
-        if (displays[i]->is_enabled(displays[i])) {
-            on = true;
-            break;
-        }
-    }
-
-    // current on support one screen
-    if (all_off) {
-        // check if need to turn on
-        if (on) {
-            // power on
-            gpio_set_output_pushpull(SCREEN_0_PWR);
-            gpio_write_pin(SCREEN_0_PWR, SCREEN_0_PWR_EN);
-            wait_ms(1);
-            for (int i = 0; i < SCREEN_DRIVER_NUM; i++) {
-                screen_drivers[i]->init(screen_drivers[i]);
-            }
-            all_off = false;
-        }
-    } else {
-        // check if need to turn off
-        if (!on) {
-            // power off
-            gpio_set_output_pushpull(SCREEN_0_PWR);
-            gpio_write_pin(SCREEN_0_PWR, !SCREEN_0_PWR_EN);
-            wait_ms(1);
-            all_off = true;
-        }
     }
 }
 
@@ -110,6 +122,12 @@ void render_enable_display(uint8_t display, bool enable)
 static uint32_t render_buffer[RENDER_BUFFER_SIZE/4];
 static uint32_t render_buffer_offset = 0;
 
+void render_buffer_init(void)
+{
+    memset(render_buffer, 0, sizeof(render_buffer));
+    render_buffer_offset = 0;
+}
+
 uint8_t* render_buffer_allocate(uint32_t size)
 {
     uint32_t aligned = (size+3) / 4;
@@ -119,6 +137,7 @@ uint8_t* render_buffer_allocate(uint32_t size)
     return p;
 }
 
+//------------------matrix change process
 void hook_matrix_change_screen(keyevent_t event)
 {
     for (int i = 0; i < DISPLAY_NUM; i++) {

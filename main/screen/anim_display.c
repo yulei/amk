@@ -82,6 +82,11 @@ static bool anim_display_init(display_t *display, screen_t *screen)
 
 void anim_display_uninit(display_t *display)
 {
+    anim_display_obj_t *obj = (anim_display_obj_t*)display->data;
+
+    if (obj->anim) {
+        anim_close(obj->anim);
+    }
 }
 
 static void add_frame(uint32_t width, uint32_t height, uint8_t *buffer, uint16_t color, uint8_t flag)
@@ -209,6 +214,12 @@ bool anim_display_create(display_t *display, display_param_t *param)
     }
 
     return false;
+}
+
+void anim_display_destroy(display_t *display)
+{
+    anim_display_obj_t *obj = (anim_display_obj_t*)display->data;
+    memset(obj, 0, sizeof(anim_display_obj_t));
 }
 
 #endif

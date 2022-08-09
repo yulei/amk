@@ -22,3 +22,4 @@ typedef struct {
 extern const keyboard_key_t keyboard_keys[KEYBOARD_KEY_COUNT];
 
 bool keyboard_display_create(display_t *display, display_param_t *param);
+void keyboard_display_destroy(display_t *display);

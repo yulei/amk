@@ -39,7 +39,8 @@ static bool screen_init(screen_t *screen, screen_driver_t *driver)
 }
 
 static void screen_uninit(screen_t *screen)
-{}
+{
+}
 
 
 static void screen_plot(screen_t *screen, uint32_t x, uint32_t y, uint16_t color)
@@ -179,5 +180,6 @@ screen_t* screen_create(screen_param_t *param)
 
 void screen_destroy(screen_t *screen)
 {
+    screen_obj_t *obj = (screen_obj_t*)screen->data;
+    memset(obj, 0, sizeof(screen_obj_t));
 }
-
