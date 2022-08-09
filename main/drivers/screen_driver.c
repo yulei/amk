@@ -9,6 +9,7 @@
 #include "st7735.h"
 #include "st7789.h"
 #include "rm67160.h"
+#include "gc9107.h"
 #include "ssd1306.h"
 
 typedef struct {
@@ -65,6 +66,11 @@ static bool driver_init(screen_driver_t *driver, screen_driver_param_t *param)
 #ifdef SCREEN_DRIVER_RM67160
     case SPI_LCD_RM67160:
         rm67160_config(driver, param);
+        return true;
+#endif
+#ifdef SCREEN_DRIVER_GC9107
+    case SPI_LCD_GC9107:
+        gc9107_config(driver, param);
         return true;
 #endif
     default:

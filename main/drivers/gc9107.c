@@ -19,6 +19,11 @@
 #define SCREEN_ROTATION 0
 #endif
 
+#define DELAY               0x80
+
+#define GC9107_INT_REG_ENABLE1  0xFE
+#define GC9107_INT_REG_ENABLE2  0xEF
+
 #define GC9107_PIXEL_12BITS     0x01
 #define GC9107_PIXEL_16BITS     0x05
 #define GC9107_PIXEL_18BITS     0x06
@@ -75,10 +80,6 @@
 #define GC9107_ROTATION (GC9107_MADCTL_MY | GC9107_MADCTL_MV | GC9107_MADCTL_BGR)
 #endif
 
-#define DELAY               0x80
-
-#define GC9107_INT_REG_ENABLE1  0xFE
-#define GC9107_INT_REG_ENABLE2  0xFE
 
 #if 0
 static const uint8_t init_cmds[] = {
