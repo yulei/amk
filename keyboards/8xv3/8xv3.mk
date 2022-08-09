@@ -20,6 +20,9 @@ SRCS += $(KEYBOARD_DIR)/8xv3.c
 #SRCS += $(KEYBOARD_DIR)/8xv3_keymap.c
 SRCS += $(KEYBOARD_DIR)/cm2.c
 SRCS += $(KEYBOARD_DIR)/8xv3_gcmap.c
-SRCS += $(KEYBOARD_DIR)/display.c
 
+SRCS += $(KEYBOARD_DIR)/display.c
 SRCS += $(MAIN_DIR)/drivers/st7735.c
+
+#SRCS += $(KEYBOARD_DIR)/ds2.c
+#SRCS += $(MAIN_DIR)/drivers/gc9107.c
