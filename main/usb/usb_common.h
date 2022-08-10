@@ -14,7 +14,11 @@
 
 extern uint32_t usb_setting;
 
-#define NKRO_KEYCODE_SIZE   32
+// HID ep size was 32
+// id for 1
+// mods for 1
+// keys for 30
+#define AMK_NKRO_TOTAL_SIZE  32
 
 #ifdef DYNAMIC_CONFIGURATION
 // Interface number

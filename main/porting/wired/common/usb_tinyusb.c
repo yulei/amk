@@ -41,6 +41,7 @@ bool amk_usb_itf_ready(uint32_t type)
     case HID_REPORT_ID_MOUSE:
     case HID_REPORT_ID_SYSTEM:
     case HID_REPORT_ID_CONSUMER:
+    case HID_REPORT_ID_NKRO:
         return tud_hid_n_ready(ITF_NUM_HID_OTHER);
     #endif
     default:
@@ -81,6 +82,12 @@ bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t si
     case HID_REPORT_ID_CONSUMER:
         if (!tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_CONSUMER, data, (uint8_t)size)) {
             amk_printf("failed to sent consumer report\n");
+            return false;
+        }
+        break;
+    case HID_REPORT_ID_NKRO:
+        if (!tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_NKRO, data, (uint8_t)size)) {
+            amk_printf("failed to sent nkro report\n");
             return false;
         }
         break;

@@ -170,3 +170,8 @@ ifeq (yes, $(strip $(MATRIX_EC_ENABLE)))
 	SRCS += $(MAIN_DIR)/amk/ec_matrix.c
 	APP_DEFS += -DMATRIX_EC
 endif
+
+ifeq (yes,$(strip $(NKRO_AUTO_ENABLE)))
+	SRCS += $(MAIN_DIR)/amk/amk_action_util.c
+	APP_DEFS += -DNKRO_AUTO_ENABLE
+endif

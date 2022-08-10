@@ -40,6 +40,20 @@
 #include "rf_driver.h"
 #endif
 
+#ifdef NKRO_AUTO_ENABLE
+#include "amk_action_util.h"
+#endif
+
+#ifndef GENERIC_BOARD_DEBUG
+#define GENERIC_BOARD_DEBUG 1
+#endif
+
+#if GENERIC_BOARD_DEBUG
+#define gb_debug  amk_printf
+#else
+#define gb_debug(...)
+#endif
+
 uint32_t usb_setting = 0;
 
 extern void system_init(void);
@@ -180,7 +194,16 @@ void send_keyboard(report_keyboard_t *report)
 #endif
     {
         if (!usb_suspended()) {
+#ifdef NKRO_AUTO_ENABLE
+            amk_report_t *arp = (amk_report_t *)report;
+            if (arp->nkro_mode) {
+                usb_send_report(HID_REPORT_ID_NKRO, &arp->nkro.raw[0], sizeof(amk_nkro_t));
+            } else {
+                usb_send_report(HID_REPORT_ID_KEYBOARD, &arp->std.raw[0], sizeof(report_keyboard_t));
+            }
+#else
             usb_send_report(HID_REPORT_ID_KEYBOARD, report, sizeof(report_keyboard_t));
+#endif
         }
     }
 }

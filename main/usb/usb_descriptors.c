@@ -58,10 +58,10 @@
         HID_INPUT        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE )  ,\
     HID_USAGE_PAGE ( HID_USAGE_PAGE_KEYBOARD ) ,\
         HID_USAGE_MIN    ( 0                                   )  ,\
-        HID_USAGE_MAX    ( (NKRO_KEYCODE_SIZE-1)*8             )  ,\
+        HID_USAGE_MAX    ( (AMK_NKRO_TOTAL_SIZE-2)*8             )  ,\
         HID_LOGICAL_MIN  ( 0                                   )  ,\
         HID_LOGICAL_MAX  ( 1                                   )  ,\
-        HID_REPORT_COUNT ( (NKRO_KEYCODE_SIZE-1)*8             )  ,\
+        HID_REPORT_COUNT ( (AMK_NKRO_TOTAL_SIZE-2)*8             )  ,\
         HID_REPORT_SIZE  ( 1                                   )  ,\
         HID_INPUT        ( HID_DATA | HID_ARRAY | HID_ABSOLUTE )  ,\
     /* 5-bit LED Indicator Kana | Compose | ScrollLock | CapsLock | NumLock */ \
@@ -243,7 +243,9 @@ static uint8_t desc_hid_report_other[] =
 {
     TUD_HID_REPORT_DESC_MOUSE( HID_REPORT_ID(HID_REPORT_ID_MOUSE) ),
     TUD_HID_REPORT_DESC_EXTRA( HID_REPORT_ID_SYSTEM, HID_REPORT_ID_CONSUMER ),
-    //TUD_HID_REPORT_DESC_NKRO( HID_REPORT_ID(HID_REPORT_ID_NKRO) )          
+#ifdef NKRO_AUTO_ENABLE
+    TUD_HID_REPORT_DESC_NKRO( HID_REPORT_ID(HID_REPORT_ID_NKRO) )          
+#endif
 };
 
 // Invoked when received GET HID REPORT DESCRIPTOR
