@@ -70,7 +70,7 @@ extern "C"
 #define DDL_CMP_ENABLE                              (DDL_OFF)
 #define DDL_CRC_ENABLE                              (DDL_OFF)
 #define DDL_DCU_ENABLE                              (DDL_OFF)
-#define DDL_DMAC_ENABLE                             (DDL_OFF)
+#define DDL_DMAC_ENABLE                             (DDL_ON)
 #define DDL_EFM_ENABLE                              (DDL_ON)
 #define DDL_EMB_ENABLE                              (DDL_OFF)
 #define DDL_EVENT_PORT_ENABLE                       (DDL_OFF)

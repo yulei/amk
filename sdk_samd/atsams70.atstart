@@ -1,0 +1,1118 @@
+format_version: '2'
+name: My Project
+versions:
+  api: '1.0'
+  backend: 1.8.580
+  commit: f3d8d96e294de8dee688333bbbe8d8458a4f6b4c
+  content: unknown
+  content_pack_name: unknown
+  format: '2'
+  frontend: 1.8.580
+  packs_version_avr8: 1.0.1463
+  packs_version_qtouch: unknown
+  packs_version_sam: 1.0.1726
+  version_backend: 1.8.580
+  version_frontend: ''
+board:
+  identifier: CustomBoard
+  device: ATSAMS70J19A-AN
+details: null
+application: null
+middlewares:
+  SPI_NOR_FLASH_0:
+    user_label: SPI_NOR_FLASH_0
+    configuration:
+      conf_quad_mode: Disable
+    definition: Atmel:Generic_SPI_NOR_Flash:0.0.1::N25Q256A
+    functionality: SPI_NOR_Flash
+    api: Flash:SPI-NOR-Flash:N25Q256A
+    dependencies:
+      QSPI instance: QUAD_SPI_0
+  USB_CHAPTER_9:
+    user_label: USB_CHAPTER_9
+    configuration: {}
+    definition: Atmel:USB:0.0.1::USB_Chapter_9
+    functionality: USB_Chapter_9
+    api: USB:Protocol:Core
+    dependencies: {}
+  USB_CLASS_HUB:
+    user_label: USB_CLASS_HUB
+    configuration: {}
+    definition: Atmel:USB:0.0.1::USB_Class_HUB
+    functionality: USB_Class_HUB
+    api: USB:Protocol:HUB
+    dependencies:
+      USB Chapter 9: USB_CHAPTER_9
+  USB_CLASS_HID:
+    user_label: USB_CLASS_HID
+    configuration: {}
+    definition: Atmel:USB:0.0.1::USB_Class_HID
+    functionality: USB_Class_HID
+    api: USB:Protocol:HID
+    dependencies:
+      USB Chapter 9: USB_CHAPTER_9
+  USB_CLASS_CDC:
+    user_label: USB_CLASS_CDC
+    configuration: {}
+    definition: Atmel:USB:0.0.1::USB_Class_CDC
+    functionality: USB_Class_CDC
+    api: USB:Protocol:CDC
+    dependencies:
+      USB Chapter 9: USB_CHAPTER_9
+  USB_CLASS_MSC:
+    user_label: USB_CLASS_MSC
+    configuration: {}
+    definition: Atmel:USB:0.0.1::USB_Class_MSC
+    functionality: USB_Class_Mass_Storage_(MSC)
+    api: USB:Protocol:MSC
+    dependencies:
+      USB Chapter 9: USB_CHAPTER_9
+  USB_CLASS_VENDOR:
+    user_label: USB_CLASS_VENDOR
+    configuration: {}
+    definition: Atmel:USB:0.0.1::USB_Class_VENDOR
+    functionality: USB_Class_VENDOR
+    api: USB:Protocol:VENDOR
+    dependencies:
+      USB Chapter 9: USB_CHAPTER_9
+  USB_DEVICE_STACK_CORE_INSTANCE:
+    user_label: USB_DEVICE_STACK_CORE_INSTANCE
+    configuration:
+      usbd_hs_sp: false
+    definition: Atmel:USB:0.0.1::USB_Device_Core
+    functionality: USB_Device_Core
+    api: USB:Device:Core
+    dependencies:
+      USB Chapter 9: USB_CHAPTER_9
+      USB Device instance: USB_0
+  USB_DEVICE_COMPOSITE_0:
+    user_label: USB_DEVICE_COMPOSITE_0
+    configuration:
+      conf_usb_composite_cdc_echo_demo: false
+      conf_usb_composite_hid_keyboard_demo: false
+      conf_usb_composite_hid_mouse_demo: false
+      conf_usb_msc_lun0_capacity: 22
+      conf_usb_msc_lun0_enable: true
+      conf_usb_msc_lun0_rmb: true
+      conf_usb_msc_lun1_enable: false
+      conf_usb_msc_lun1_rmb: true
+      conf_usb_msc_lun2_capacity: 22
+      conf_usb_msc_lun2_enable: false
+      conf_usb_msc_lun2_rmb: true
+      conf_usb_msc_lun3_capacity: 22
+      conf_usb_msc_lun3_enable: false
+      conf_usb_msc_lun3_rmb: true
+      conf_usb_msc_lun_buf_sectors: 4
+      usb_composite_bcddevice: 256
+      usb_composite_bcdusb: USB 2.0 version
+      usb_composite_bconfigval: 1
+      usb_composite_bmattri: Bus power supply, not support for remote wakeup
+      usb_composite_bmaxpksz0: 64 bytes
+      usb_composite_bmaxpower: 50
+      usb_composite_bnumconfig: 1
+      usb_composite_cdc_acm_comm_int_maxpksz: 64 bytes
+      usb_composite_cdc_acm_data_buckout_maxpksz: 64 bytes
+      usb_composite_cdc_acm_data_buckout_maxpksz_hs: 512 bytes
+      usb_composite_cdc_acm_data_builin_maxpksz: 64 bytes
+      usb_composite_cdc_acm_data_builin_maxpksz_hs: 512 bytes
+      usb_composite_cdc_acm_data_bulkin_epaddr: EndpointAddress = 0x81
+      usb_composite_cdc_acm_data_bulkout_epaddr: EndpointAddress = 0x01
+      usb_composite_cdc_acm_epaddr: EndpointAddress = 0x82
+      usb_composite_cdc_acm_support: false
+      usb_composite_hid_generic_intin_epaddr: EndpointAddress = 0x85
+      usb_composite_hid_generic_intin_maxpksz: 64 bytes
+      usb_composite_hid_generic_intout_epaddr: EndpointAddress = 0x03
+      usb_composite_hid_generic_intout_maxpksz: 64 bytes
+      usb_composite_hid_generic_support: false
+      usb_composite_hid_keyboard_intin_epaddr: EndpointAddress = 0x84
+      usb_composite_hid_keyboard_intin_maxpksz: 8 bytes
+      usb_composite_hid_keyboard_intout_epaddr: EndpointAddress = 0x02
+      usb_composite_hid_keyboard_intout_maxpksz: 8 bytes
+      usb_composite_hid_keyboard_support: false
+      usb_composite_hid_mouse_intin_epaddr: EndpointAddress = 0x83
+      usb_composite_hid_mouse_intin_maxpksz: 8 bytes
+      usb_composite_hid_mouse_support: false
+      usb_composite_iconfig_en: false
+      usb_composite_iconfig_str: ''
+      usb_composite_idproduct: 9249
+      usb_composite_idvender: 1003
+      usb_composite_imanufact_en: false
+      usb_composite_imanufact_str: Atmel
+      usb_composite_iproduct_en: false
+      usb_composite_iproduct_str: Composite Demo
+      usb_composite_iserialnum_en: false
+      usb_composite_iserialnum_str: 123456789ABCDEF
+      usb_composite_langid: '0x0409'
+      usb_composite_msc_bulk_maxpksz: 64 bytes
+      usb_composite_msc_bulk_maxpksz_hs: 512 bytes
+      usb_composite_msc_bulkin_epaddr: EndpointAddress = 0x86
+      usb_composite_msc_bulkout_epaddr: EndpointAddress = 0x04
+      usb_composite_msc_demo_en: true
+      usb_composite_msc_support: false
+      usb_composite_str_en: false
+    definition: Atmel:USB:0.0.1::USB_Device_Composite
+    functionality: USB_Device_COMPOSITE
+    api: USB:Device:COMPOSITE
+    dependencies:
+      USB Class MSC: USB_CLASS_MSC
+      USB Class CDC: USB_CLASS_CDC
+      USB Device Stack Core Instance: USB_DEVICE_STACK_CORE_INSTANCE
+      USB Class VENDOR: USB_CLASS_VENDOR
+      USB Class HID: USB_CLASS_HID
+      USB Class HUB: USB_CLASS_HUB
+drivers:
+  ADC_0:
+    user_label: ADC_0
+    definition: Atmel:SAMS70_Drivers:0.0.1::ATSAMS70J19A-AN::AFEC0::driver_config_definition::ADC::HAL:Driver:ADC.Sync
+    functionality: ADC
+    api: HAL:Driver:ADC_Sync
+    configuration:
+      afec_advanced_settings: false
+      afec_channel0_enable: false
+      afec_channel10_enable: false
+      afec_channel11_enable: false
+      afec_channel1_enable: false
+      afec_channel2_enable: false
+      afec_channel3_enable: false
+      afec_channel4_enable: false
+      afec_channel5_enable: false
+      afec_channel6_enable: false
+      afec_channel7_enable: false
+      afec_channel8_enable: false
+      afec_channel9_enable: false
+      afec_channel_diff0: false
+      afec_channel_diff1: false
+      afec_channel_diff10: false
+      afec_channel_diff11: false
+      afec_channel_diff2: false
+      afec_channel_diff3: false
+      afec_channel_diff4: false
+      afec_channel_diff5: false
+      afec_channel_diff6: false
+      afec_channel_diff7: false
+      afec_channel_diff8: false
+      afec_channel_diff9: false
+      afec_channel_dual0: false
+      afec_channel_dual1: false
+      afec_channel_dual10: false
+      afec_channel_dual11: false
+      afec_channel_dual2: false
+      afec_channel_dual3: false
+      afec_channel_dual4: false
+      afec_channel_dual5: false
+      afec_channel_dual6: false
+      afec_channel_dual7: false
+      afec_channel_dual8: false
+      afec_channel_dual9: false
+      afec_channel_ecorr0: false
+      afec_channel_ecorr1: false
+      afec_channel_ecorr10: false
+      afec_channel_ecorr11: false
+      afec_channel_ecorr2: false
+      afec_channel_ecorr3: false
+      afec_channel_ecorr4: false
+      afec_channel_ecorr5: false
+      afec_channel_ecorr6: false
+      afec_channel_ecorr7: false
+      afec_channel_ecorr8: false
+      afec_channel_ecorr9: false
+      afec_channel_gain0: '1'
+      afec_channel_gain1: '1'
+      afec_channel_gain10: '1'
+      afec_channel_gain11: '1'
+      afec_channel_gain2: '1'
+      afec_channel_gain3: '1'
+      afec_channel_gain4: '1'
+      afec_channel_gain5: '1'
+      afec_channel_gain6: '1'
+      afec_channel_gain7: '1'
+      afec_channel_gain8: '1'
+      afec_channel_gain9: '1'
+      afec_channel_offset0: 512
+      afec_channel_offset1: 512
+      afec_channel_offset10: 512
+      afec_channel_offset11: 512
+      afec_channel_offset2: 512
+      afec_channel_offset3: 512
+      afec_channel_offset4: 512
+      afec_channel_offset5: 512
+      afec_channel_offset6: 512
+      afec_channel_offset7: 512
+      afec_channel_offset8: 512
+      afec_channel_offset9: 512
+      afec_cmpmode: The converted data is lower than the low threshold of the window.
+      afec_cmpsel: Channel 0
+      afec_compare_all_channels: false
+      afec_comparison_settings: false
+      afec_cosr_csel: false
+      afec_fast_wakeup_mode: false
+      afec_freerunning_mode: false
+      afec_gaincorr: 0
+      afec_highthres: 0
+      afec_ibctl: 1
+      afec_lowthres: 0
+      afec_offsetcorr: 0
+      afec_prescaler: 49
+      afec_resolution: 12-bit
+      afec_sign_mode: 'Single-Ended channels: Unsigned. Differential channels: Signed.'
+      afec_sleep_mode: false
+      afec_startup_time: 64 periods of AFE clock
+      afec_stm: true
+      afec_tag: true
+      afec_tracktim: 15
+      afec_transfer: 2
+      afec_trigger_enable: false
+      afec_trigger_selection: AFE0_ADTRG for AFEC0 / AFE1_ADTRG for AFEC1
+      afec_usch0: None
+      afec_usch1: None
+      afec_usch10: None
+      afec_usch11: None
+      afec_usch2: None
+      afec_usch3: None
+      afec_usch4: None
+      afec_usch5: None
+      afec_usch6: None
+      afec_usch7: None
+      afec_usch8: None
+      afec_usch9: None
+      afec_useq: false
+    optional_signals: []
+    variant: null
+    clocks:
+      domain_group:
+        nodes:
+        - name: AFEC
+          input: Master Clock (MCK)
+          external: false
+          external_frequency: 0
+        configuration:
+          afec_clock_source: Master Clock (MCK)
+  FLASH_0:
+    user_label: FLASH_0
+    definition: Atmel:SAMS70_Drivers:0.0.1::ATSAMS70J19A-AN::EFC::driver_config_definition::Flash::HAL:Driver:FLASH
+    functionality: Flash
+    api: HAL:Driver:FLASH
+    configuration:
+      conf_flash_erasing_blk_size: 8K bytes
+      conf_flash_op_buf_loc: STATIC
+      conf_flash_page_size: 512 bytes
+      conf_flash_rewr_unalign_op: true
+      conf_flash_rewrite_enable: true
+      conf_flash_unalign_append_enable: true
+      conf_flash_unalign_erase_enable: true
+    optional_signals: []
+    variant: null
+    clocks:
+      domain_group: null
+  PMC:
+    user_label: PMC
+    definition: Atmel:SAMS70_Drivers:0.0.1::ATSAMS70J19A-AN::PMC::driver_config_definition::PMC::HAL:HPL:PMC
+    functionality: System
+    api: HAL:HPL:PMC
+    configuration:
+      $input: 12000000
+      $input_id: Main Clock (MAINCK)
+      RESERVED_InputFreq: 12000000
+      RESERVED_InputFreq_id: Main Clock (MAINCK)
+      _$freq_output_32kHz External Crystal Oscillator (XOSC32K): 0
+      _$freq_output_32kHz High Accuracy Internal Oscillator (OSC32K): 32000
+      _$freq_output_Embedded 4/8/12MHz RC Oscillator (OSC12M): '12000000'
+      _$freq_output_External 3-20MHz Oscillator (XOSC20M): '12000000'
+      _$freq_output_External Clock: 1
+      _$freq_output_Generic Clock 0 (GCLK0) for I2SC0: 75000000
+      _$freq_output_Generic Clock 1 (GCLK1) for I2SC1: 100000000
+      _$freq_output_MCK / 8 for USART: 18750000
+      _$freq_output_Master Clock (MCK): 150000000
+      _$freq_output_Master Clock Controller (PMC_MCKR): 300000000
+      _$freq_output_PLLA Clock (PLLACK): 300000000
+      _$freq_output_Programmable Clock Controller 0 (PMC_PCK0): 12000000
+      _$freq_output_Programmable Clock Controller 1 (PMC_PCK1): 12000000
+      _$freq_output_Programmable Clock Controller 2 (PMC_PCK2): 12000000
+      _$freq_output_Programmable Clock Controller 3 (PMC_PCK3): 12000000
+      _$freq_output_Programmable Clock Controller 4 (PMC_PCK4): 12000000
+      _$freq_output_Programmable Clock Controller 5 (PMC_PCK5): 12000000
+      _$freq_output_Programmable Clock Controller 6 (PMC_PCK6): 12000000
+      _$freq_output_SysTick External Clock: 37500000
+      _$freq_output_UDPLL with Divider (MCKR UPLLDIV2): 240000000
+      _$freq_output_USB 480M Clock (UPLLCK): 480000000
+      _$freq_output_USB Clock Controller (USB_48M): 300000000
+      clk_gen_cfden_enable: false
+      clk_gen_fclk_oscillator: Master Clock Controller (PMC_MCKR)
+      clk_gen_gclk0_arch_enable: true
+      clk_gen_gclk0_oscillator: Master Clock (MCK)
+      clk_gen_gclk1_arch_enable: true
+      clk_gen_gclk1_oscillator: PLLA Clock (PLLACK)
+      clk_gen_mainck_arch_enable: true
+      clk_gen_mainck_oscillator: External 3-20MHz Oscillator (XOSC20M)
+      clk_gen_mck_oscillator: Master Clock Controller (PMC_MCKR)
+      clk_gen_mckr_arch_enable: true
+      clk_gen_mckr_oscillator: PLLA Clock (PLLACK)
+      clk_gen_pck0_arch_enable: false
+      clk_gen_pck0_oscillator: Main Clock (MAINCK)
+      clk_gen_pck1_arch_enable: false
+      clk_gen_pck1_oscillator: Main Clock (MAINCK)
+      clk_gen_pck2_arch_enable: false
+      clk_gen_pck2_oscillator: Main Clock (MAINCK)
+      clk_gen_pck3_arch_enable: false
+      clk_gen_pck3_oscillator: Main Clock (MAINCK)
+      clk_gen_pck4_arch_enable: false
+      clk_gen_pck4_oscillator: Main Clock (MAINCK)
+      clk_gen_pck5_arch_enable: false
+      clk_gen_pck5_oscillator: Main Clock (MAINCK)
+      clk_gen_pck6_arch_enable: false
+      clk_gen_pck6_oscillator: Main Clock (MAINCK)
+      clk_gen_slck2_oscillator: Slow Clock (SLCK)
+      clk_gen_slck_arch_enable: true
+      clk_gen_slck_oscillator: 32kHz High Accuracy Internal Oscillator (OSC32K)
+      clk_gen_systick_oscillator: Master Clock Controller (PMC_MCKR)
+      clk_gen_usb_480m_oscillator: USB 480M Clock (UPLLCK)
+      clk_gen_usb_48m_arch_enable: false
+      clk_gen_usb_48m_oscillator: PLLA Clock (PLLACK)
+      dummy_ext_clk_src: External Clock Input
+      dummy_ext_src: Specific clock input from specific pin
+      efc_fws: 7 cycles
+      enable_clk_gen_fclk: true
+      enable_clk_gen_gclk0: true
+      enable_clk_gen_gclk1: true
+      enable_clk_gen_mainck: true
+      enable_clk_gen_mck: true
+      enable_clk_gen_mckr: true
+      enable_clk_gen_pck0: true
+      enable_clk_gen_pck1: true
+      enable_clk_gen_pck2: true
+      enable_clk_gen_pck3: true
+      enable_clk_gen_pck4: true
+      enable_clk_gen_pck5: true
+      enable_clk_gen_pck6: true
+      enable_clk_gen_slck: true
+      enable_clk_gen_slck2: true
+      enable_clk_gen_systick: true
+      enable_clk_gen_usb_480m: true
+      enable_clk_gen_usb_48m: true
+      enable_dummy_ext: true
+      enable_dummy_ext_clk: true
+      enable_hclk_clock: true
+      enable_mck_div_8: false
+      enable_osc12m: false
+      enable_osc32k: true
+      enable_pllack: true
+      enable_systick_clk_clock: true
+      enable_upllck: true
+      enable_upllckdiv: true
+      enable_xosc20m: true
+      enable_xosc32k: false
+      gclk0_div: 2
+      gclk0_gclken_enable: false
+      gclk1_div: 3
+      gclk1_gclken_enable: false
+      hclk_clock_source: Master Clock Controller (PMC_MCKR)
+      mck_div: '2'
+      mck_div_8_src: Master Clock (MCK)
+      mckr_presc: '1'
+      osc12m_arch_enable: false
+      osc12m_selector: '12000000'
+      osc32k_arch_enable: true
+      pck0_presc: 1
+      pck1_presc: 1
+      pck2_presc: 1
+      pck3_presc: 1
+      pck4_presc: 1
+      pck5_presc: 1
+      pck6_presc: 1
+      pllack_arch_enable: true
+      pllack_div: 1
+      pllack_mul: 25
+      pllack_ref_clock: Main Clock (MAINCK)
+      systick_clk_clock_div: '8'
+      systick_clk_clock_source: Master Clock Controller (PMC_MCKR)
+      systick_clock_div: '8'
+      upllck_arch_enable: true
+      upllck_ref_clock: External 3-20MHz Oscillator (XOSC20M)
+      upllckdiv_div: '2'
+      upllckdiv_ref_clock: USB 480M Clock (UPLLCK)
+      usb_48m_div: 1
+      xosc20m_arch_enable: true
+      xosc20m_bypass: The external crystal oscillator is not bypassed.
+      xosc20m_selector: 12000000
+      xosc20m_startup_time: 62
+      xosc32k_arch_enable: false
+      xosc32k_bypass: The 32kHz crystal oscillator is not bypassed.
+    optional_signals: []
+    variant: null
+    clocks:
+      domain_group:
+        nodes:
+        - name: CPU
+          input: CPU
+          external: false
+          external_frequency: 0
+        configuration: {}
+  PWM_0:
+    user_label: PWM_0
+    definition: Atmel:SAMS70_Drivers:0.0.1::ATSAMS70J19A-AN::PWM0::driver_config_definition::PWM::HAL:Driver:PWM
+    functionality: PWM
+    api: HAL:Driver:PWM
+    configuration:
+      channel0_settings: true
+      channel1_settings: true
+      channel2_settings: true
+      channel3_settings: true
+      pwm_channel0_CDTY: 512
+      pwm_channel0_CPRD: 1024
+      pwm_channel0_alignment: The period is left-aligned
+      pwm_channel0_clk_src: Peripheral clock
+      pwm_channel0_disabled_polarity_inverted: false
+      pwm_channel0_fault_config: false
+      pwm_channel0_output_polarity: The OCx output waveform starts at a low level
+      pwm_channel1_CDTY: 512
+      pwm_channel1_CPRD: 1024
+      pwm_channel1_alignment: The period is left-aligned
+      pwm_channel1_clk_src: Peripheral clock
+      pwm_channel1_disabled_polarity_inverted: false
+      pwm_channel1_fault_config: false
+      pwm_channel1_output_polarity: The OCx output waveform starts at a low level
+      pwm_channel1_rfen: false
+      pwm_channel1_trgedge: Falling edge or level 0
+      pwm_channel1_trgfilt: false
+      pwm_channel1_trgmode: External trigger is not enabled.
+      pwm_channel1_trgsrc: By the PWMTRG input
+      pwm_channel1_trigger_enable: false
+      pwm_channel2_CDTY: 512
+      pwm_channel2_CPRD: 1024
+      pwm_channel2_alignment: The period is left-aligned
+      pwm_channel2_clk_src: Peripheral clock
+      pwm_channel2_disabled_polarity_inverted: false
+      pwm_channel2_fault_config: false
+      pwm_channel2_output_polarity: The OCx output waveform starts at a low level
+      pwm_channel2_rfen: false
+      pwm_channel2_trgedge: Falling edge or level 0
+      pwm_channel2_trgfilt: false
+      pwm_channel2_trgmode: External trigger is not enabled.
+      pwm_channel2_trgsrc: By the PWMTRG input
+      pwm_channel2_trigger_enable: false
+      pwm_channel3_CDTY: 512
+      pwm_channel3_CPRD: 1024
+      pwm_channel3_alignment: The period is left-aligned
+      pwm_channel3_clk_src: Peripheral clock
+      pwm_channel3_disabled_polarity_inverted: false
+      pwm_channel3_fault_config: false
+      pwm_channel3_output_polarity: The OCx output waveform starts at a low level
+      pwm_comp_enable0: false
+      pwm_comp_enable1: false
+      pwm_comp_enable2: false
+      pwm_comp_enable3: false
+      pwm_comp_enable4: false
+      pwm_comp_enable5: false
+      pwm_comp_enable6: false
+      pwm_comp_enable7: false
+      pwm_cpr0: 0
+      pwm_cpr1: 0
+      pwm_cpr2: 0
+      pwm_cpr3: 0
+      pwm_cpr4: 0
+      pwm_cpr5: 0
+      pwm_cpr6: 0
+      pwm_cpr7: 0
+      pwm_ctr0: 0
+      pwm_ctr1: 0
+      pwm_ctr2: 0
+      pwm_ctr3: 0
+      pwm_ctr4: 0
+      pwm_ctr5: 0
+      pwm_ctr6: 0
+      pwm_ctr7: 0
+      pwm_cupr0: 0
+      pwm_cupr1: 0
+      pwm_cupr2: 0
+      pwm_cupr3: 0
+      pwm_cupr4: 0
+      pwm_cupr5: 0
+      pwm_cupr6: 0
+      pwm_cupr7: 0
+      pwm_cv0: 0
+      pwm_cv1: 0
+      pwm_cv2: 0
+      pwm_cv3: 0
+      pwm_cv4: 0
+      pwm_cv5: 0
+      pwm_cv6: 0
+      pwm_cv7: 0
+      pwm_cvm0: The comparison value is performed when this counter is incrementing.
+      pwm_cvm1: The comparison value is performed when this counter is incrementing.
+      pwm_cvm2: The comparison value is performed when this counter is incrementing.
+      pwm_cvm3: The comparison value is performed when this counter is incrementing.
+      pwm_cvm4: The comparison value is performed when this counter is incrementing.
+      pwm_cvm5: The comparison value is performed when this counter is incrementing.
+      pwm_cvm6: The comparison value is performed when this counter is incrementing.
+      pwm_cvm7: The comparison value is performed when this counter is incrementing.
+      pwm_diva: 1
+      pwm_divb: 1
+      pwm_elmr0_csel0_enable: false
+      pwm_elmr0_csel1_enable: false
+      pwm_elmr0_csel2_enable: false
+      pwm_elmr0_csel3_enable: false
+      pwm_elmr0_csel4_enable: false
+      pwm_elmr0_csel5_enable: false
+      pwm_elmr0_csel6_enable: false
+      pwm_elmr0_csel7_enable: false
+      pwm_elmr1_csel0_enable: false
+      pwm_elmr1_csel1_enable: false
+      pwm_elmr1_csel2_enable: false
+      pwm_elmr1_csel3_enable: false
+      pwm_elmr1_csel4_enable: false
+      pwm_elmr1_csel5_enable: false
+      pwm_elmr1_csel6_enable: false
+      pwm_elmr1_csel7_enable: false
+      pwm_fault0_enable: false
+      pwm_fault1_enable: false
+      pwm_fault2_enable: false
+      pwm_fault3_enable: false
+      pwm_fault4_enable: false
+      pwm_fault5_enable: false
+      pwm_fault6_enable: false
+      pwm_fault7_enable: false
+      pwm_fmr_ffil_fault0: false
+      pwm_fmr_ffil_fault1: false
+      pwm_fmr_ffil_fault2: false
+      pwm_fmr_ffil_fault3: false
+      pwm_fmr_ffil_fault4: false
+      pwm_fmr_ffil_fault5: false
+      pwm_fmr_ffil_fault6: false
+      pwm_fmr_ffil_fault7: false
+      pwm_fmr_fmod_fault0: The fault 0 is active until the fault condition is removed
+        at the peripheral level.
+      pwm_fmr_fmod_fault1: The fault 1 is active until the fault condition is removed
+        at the peripheral level.
+      pwm_fmr_fmod_fault2: The fault 2 is active until the fault condition is removed
+        at the peripheral level.
+      pwm_fmr_fmod_fault3: The fault 3 is active until the fault condition is removed
+        at the peripheral level.
+      pwm_fmr_fmod_fault4: The fault 4 is active until the fault condition is removed
+        at the peripheral level.
+      pwm_fmr_fmod_fault5: The fault 5 is active until the fault condition is removed
+        at the peripheral level.
+      pwm_fmr_fmod_fault6: The fault 6 is active until the fault condition is removed
+        at the peripheral level.
+      pwm_fmr_fmod_fault7: The fault 7 is active until the fault condition is removed
+        at the peripheral level.
+      pwm_fmr_fpol_fault0: true
+      pwm_fmr_fpol_fault1: true
+      pwm_fmr_fpol_fault2: true
+      pwm_fmr_fpol_fault3: true
+      pwm_fmr_fpol_fault4: true
+      pwm_fmr_fpol_fault5: true
+      pwm_fmr_fpol_fault6: true
+      pwm_fmr_fpol_fault7: true
+      pwm_fpe_fpe0_fault0_enable: false
+      pwm_fpe_fpe0_fault1_enable: false
+      pwm_fpe_fpe0_fault2_enable: false
+      pwm_fpe_fpe0_fault3_enable: false
+      pwm_fpe_fpe0_fault4_enable: false
+      pwm_fpe_fpe0_fault5_enable: false
+      pwm_fpe_fpe0_fault6_enable: false
+      pwm_fpe_fpe0_fault7_enable: false
+      pwm_fpe_fpe1_fault0_enable: false
+      pwm_fpe_fpe1_fault1_enable: false
+      pwm_fpe_fpe1_fault2_enable: false
+      pwm_fpe_fpe1_fault3_enable: false
+      pwm_fpe_fpe1_fault4_enable: false
+      pwm_fpe_fpe1_fault5_enable: false
+      pwm_fpe_fpe1_fault6_enable: false
+      pwm_fpe_fpe1_fault7_enable: false
+      pwm_fpe_fpe2_fault0_enable: false
+      pwm_fpe_fpe2_fault1_enable: false
+      pwm_fpe_fpe2_fault2_enable: false
+      pwm_fpe_fpe2_fault3_enable: false
+      pwm_fpe_fpe2_fault4_enable: false
+      pwm_fpe_fpe2_fault5_enable: false
+      pwm_fpe_fpe2_fault6_enable: false
+      pwm_fpe_fpe2_fault7_enable: false
+      pwm_fpe_fpe3_fault0_enable: false
+      pwm_fpe_fpe3_fault1_enable: false
+      pwm_fpe_fpe3_fault2_enable: false
+      pwm_fpe_fpe3_fault3_enable: false
+      pwm_fpe_fpe3_fault4_enable: false
+      pwm_fpe_fpe3_fault5_enable: false
+      pwm_fpe_fpe3_fault6_enable: false
+      pwm_fpe_fpe3_fault7_enable: false
+      pwm_fpv1_fpvh0: Be is forced to high-impedance state
+      pwm_fpv1_fpvh1: Be is forced to high-impedance state
+      pwm_fpv1_fpvh2: Be is forced to high-impedance state
+      pwm_fpv1_fpvh3: Be is forced to high-impedance state
+      pwm_fpv1_fpvl0: Be is forced to high-impedance state
+      pwm_fpv1_fpvl1: Be is forced to high-impedance state
+      pwm_fpv1_fpvl2: Be is forced to high-impedance state
+      pwm_fpv1_fpvl3: Be is forced to high-impedance state
+      pwm_prea: Peripheral clock
+      pwm_preb: Peripheral clock
+    optional_signals: []
+    variant: null
+    clocks:
+      domain_group:
+        nodes:
+        - name: PWM
+          input: Master Clock (MCK)
+          external: false
+          external_frequency: 0
+        configuration:
+          pwm_clock_source: Master Clock (MCK)
+  QUAD_SPI_0:
+    user_label: QUAD_SPI_0
+    definition: Atmel:SAMS70_Drivers:0.0.1::ATSAMS70J19A-AN::QSPI::driver_config_definition::QSPI.Master::HAL:Driver:QSPI.Sync
+    functionality: Quad_SPI
+    api: HAL:Driver:QSPI_Sync
+    configuration:
+      qspi_advanced: false
+      qspi_baud_rate: 50000000
+      qspi_cpha: Data is changed on the leading edge of SPCK and captured on the following
+        edge of SPCK.
+      qspi_cpol: The inactive state value of SPCK is logic level zero.
+      qspi_dlybs: 0
+      qspi_dlycs: 0
+    optional_signals: []
+    variant: null
+    clocks:
+      domain_group:
+        nodes:
+        - name: QSPI
+          input: Master Clock (MCK)
+          external: false
+          external_frequency: 0
+        configuration:
+          qspi_clock_source: Master Clock (MCK)
+  TIMER_0:
+    user_label: TIMER_0
+    definition: Atmel:SAMS70_Drivers:0.0.1::ATSAMS70J19A-AN::TC0::driver_config_definition::Timer::HAL:Driver:Timer
+    functionality: Timer
+    api: HAL:Driver:Timer
+    configuration:
+      timer_abetrg: TIOB is used as an external trigger
+      timer_div_clock: true
+      timer_etrgedg: The clock is not gated by an external signal
+      timer_event_output_wave: false
+      timer_external_trigger_enable: false
+      timer_fault_chan0_enable: false
+      timer_fault_chan1_enable: false
+      timer_fault_control: false
+      timer_prescaler: TIMER_CLOCK2 (MCK/8)
+      timer_ra_tick: 500
+      timer_tick: 1000
+    optional_signals: []
+    variant: null
+    clocks:
+      domain_group:
+        nodes:
+        - name: TC
+          input: Master Clock (MCK)
+          external: false
+          external_frequency: 0
+        configuration:
+          tc_clock_source: Master Clock (MCK)
+  I2C_0:
+    user_label: I2C_0
+    definition: Atmel:SAMS70_Drivers:0.0.1::ATSAMS70J19A-AN::TWIHS0::driver_config_definition::I2C.Master.Standard~2FFast-mode::HAL:Driver:I2C.Master.Sync
+    functionality: I2C
+    api: HAL:Driver:I2C_Master_Sync
+    configuration:
+      i2c_master_advanced: false
+      i2c_master_baud_rate: 100000
+      i2c_master_digital_filter_enable: false
+      i2c_master_filter_threshold: Disabled
+      i2c_master_packet_error_check: false
+      i2c_master_pad_filter_enable: false
+      i2c_master_smbus_clock_prescaler: Divide by 2
+      i2c_master_smbus_enable: false
+      i2c_master_thigh_max: 0
+      i2c_master_tlow_mext: 0
+      i2c_master_tlow_sext: 0
+    optional_signals: []
+    variant: null
+    clocks:
+      domain_group:
+        nodes:
+        - name: TWIHS
+          input: Master Clock (MCK)
+          external: false
+          external_frequency: 0
+        configuration:
+          twihs_clock_source: Master Clock (MCK)
+  DELAY_0:
+    user_label: DELAY_0
+    definition: Atmel:SAMS70_Drivers:0.0.1::ATSAMS70J19A-AN::SysTick::driver_config_definition::Delay::HAL:Driver:Delay
+    functionality: Delay
+    api: HAL:Driver:Delay
+    configuration:
+      systick_arch_tickint: false
+    optional_signals: []
+    variant: null
+    clocks:
+      domain_group: null
+  USART_0:
+    user_label: USART_0
+    definition: Atmel:SAMS70_Drivers:0.0.1::ATSAMS70J19A-AN::UART0::driver_config_definition::UART::HAL:Driver:USART.Sync
+    functionality: USART
+    api: HAL:Driver:USART_Sync
+    configuration:
+      uart_advanced: false
+      uart_baud_rate: 38400
+      uart_channel_mode: Normal Mode
+      uart_parity: No parity
+      uart_receive_filter_enable: false
+      uart_usclks: Peripheral clock is selected
+    optional_signals: []
+    variant: null
+    clocks:
+      domain_group:
+        nodes:
+        - name: UART
+          input: Master Clock (MCK)
+          external: false
+          external_frequency: 0
+        configuration:
+          uart_clock_source: Master Clock (MCK)
+  SPI_0:
+    user_label: SPI_0
+    definition: Atmel:SAMS70_Drivers:0.0.1::ATSAMS70J19A-AN::USART0::driver_config_definition::SPI.Master::HAL:Driver:SPI.Master.Sync
+    functionality: SPI
+    api: HAL:Driver:SPI_Master_Sync
+    configuration:
+      usart_advanced: false
+      usart_arch_cpha: Data is changed on the leading edge of SPCK and captured on
+        the following edge of SPCK
+      usart_arch_cpol: The inactive state value of SPCK is logic level zero
+      usart_baud_rate: 1000000
+      usart_character_size: 8 bits
+      usart_wrdbt: The character transmission starts if RXRDY flag is cleared
+    optional_signals: []
+    variant: null
+    clocks:
+      domain_group:
+        nodes:
+        - name: USART
+          input: Master Clock (MCK)
+          external: false
+          external_frequency: 0
+        configuration:
+          usart_clock_source: Master Clock (MCK)
+  SPI_1:
+    user_label: SPI_1
+    definition: Atmel:SAMS70_Drivers:0.0.1::ATSAMS70J19A-AN::USART1::driver_config_definition::SPI.Master::HAL:Driver:SPI.Master.Sync
+    functionality: SPI
+    api: HAL:Driver:SPI_Master_Sync
+    configuration:
+      usart_advanced: false
+      usart_arch_cpha: Data is changed on the leading edge of SPCK and captured on
+        the following edge of SPCK
+      usart_arch_cpol: The inactive state value of SPCK is logic level zero
+      usart_baud_rate: 1000000
+      usart_character_size: 8 bits
+      usart_wrdbt: The character transmission starts if RXRDY flag is cleared
+    optional_signals: []
+    variant: null
+    clocks:
+      domain_group:
+        nodes:
+        - name: USART
+          input: Master Clock (MCK)
+          external: false
+          external_frequency: 0
+        configuration:
+          usart_clock_source: Master Clock (MCK)
+  USB_0:
+    user_label: USB_0
+    definition: Atmel:SAMS70_Drivers:0.0.1::ATSAMS70J19A-AN::USBHS::driver_config_definition::USB.Device::HAL:Driver:USB.Device
+    functionality: USB
+    api: HAL:Driver:USB_Device
+    configuration:
+      usbd_arch_max_ep_n: 3 (EP03/EP83)
+      usbd_arch_speed: Full speed
+      usbd_dma_enable: true
+      usbd_num_ep_sp: 4 (EP0 + 3 endpoints)
+    optional_signals: []
+    variant: null
+    clocks:
+      domain_group:
+        nodes:
+        - name: FSLS_USB
+          input: USB Clock Controller (USB_48M)
+          external: false
+          external_frequency: 0
+        - name: USB
+          input: USB High Speed Clock (USB_480M)
+          external: false
+          external_frequency: 0
+        configuration:
+          usb_clock_source: USB High Speed Clock (USB_480M)
+          usb_fsls_clock_source: USB Clock Controller (USB_48M)
+  WDT_0:
+    user_label: WDT_0
+    definition: Atmel:SAMS70_Drivers:0.0.1::ATSAMS70J19A-AN::WDT::driver_config_definition::WDT::HAL:Driver:WDT
+    functionality: WDT
+    api: HAL:Driver:WDT
+    configuration:
+      wdt_advanced: false
+      wdt_counter_value: 4095
+      wdt_debug_halt_enable: true
+      wdt_delta_value: 4095
+      wdt_disable: false
+      wdt_fault_interrupt_enable: false
+      wdt_fault_reset_enable: true
+      wdt_idle_halt_enable: true
+    optional_signals: []
+    variant: null
+    clocks:
+      domain_group: null
+  XDMAC:
+    user_label: XDMAC
+    definition: Atmel:SAMS70_Drivers:0.0.1::ATSAMS70J19A-AN::XDMAC::driver_config_definition::DMAC::HAL:HPL:DMAC
+    functionality: System
+    api: HAL:HPL:DMAC
+    configuration:
+      dma_des_interface_0: AHB_IF0
+      dma_des_interface_1: AHB_IF0
+      dma_des_interface_10: AHB_IF0
+      dma_des_interface_11: AHB_IF0
+      dma_des_interface_12: AHB_IF0
+      dma_des_interface_13: AHB_IF0
+      dma_des_interface_14: AHB_IF0
+      dma_des_interface_15: AHB_IF0
+      dma_des_interface_16: AHB_IF0
+      dma_des_interface_17: AHB_IF0
+      dma_des_interface_18: AHB_IF0
+      dma_des_interface_19: AHB_IF0
+      dma_des_interface_2: AHB_IF0
+      dma_des_interface_20: AHB_IF0
+      dma_des_interface_21: AHB_IF0
+      dma_des_interface_22: AHB_IF0
+      dma_des_interface_23: AHB_IF0
+      dma_des_interface_3: AHB_IF0
+      dma_des_interface_4: AHB_IF0
+      dma_des_interface_5: AHB_IF0
+      dma_des_interface_6: AHB_IF0
+      dma_des_interface_7: AHB_IF0
+      dma_des_interface_8: AHB_IF0
+      dma_des_interface_9: AHB_IF0
+      dma_src_interface_0: AHB_IF0
+      dma_src_interface_1: AHB_IF0
+      dma_src_interface_10: AHB_IF0
+      dma_src_interface_11: AHB_IF0
+      dma_src_interface_12: AHB_IF0
+      dma_src_interface_13: AHB_IF0
+      dma_src_interface_14: AHB_IF0
+      dma_src_interface_15: AHB_IF0
+      dma_src_interface_16: AHB_IF0
+      dma_src_interface_17: AHB_IF0
+      dma_src_interface_18: AHB_IF0
+      dma_src_interface_19: AHB_IF0
+      dma_src_interface_2: AHB_IF0
+      dma_src_interface_20: AHB_IF0
+      dma_src_interface_21: AHB_IF0
+      dma_src_interface_22: AHB_IF0
+      dma_src_interface_23: AHB_IF0
+      dma_src_interface_3: AHB_IF0
+      dma_src_interface_4: AHB_IF0
+      dma_src_interface_5: AHB_IF0
+      dma_src_interface_6: AHB_IF0
+      dma_src_interface_7: AHB_IF0
+      dma_src_interface_8: AHB_IF0
+      dma_src_interface_9: AHB_IF0
+      dma_trans_type_0: Memory to Memory Transfer
+      dma_trans_type_1: Memory to Memory Transfer
+      dma_trans_type_10: Memory to Memory Transfer
+      dma_trans_type_11: Memory to Memory Transfer
+      dma_trans_type_12: Memory to Memory Transfer
+      dma_trans_type_13: Memory to Memory Transfer
+      dma_trans_type_14: Memory to Memory Transfer
+      dma_trans_type_15: Memory to Memory Transfer
+      dma_trans_type_16: Memory to Memory Transfer
+      dma_trans_type_17: Memory to Memory Transfer
+      dma_trans_type_18: Memory to Memory Transfer
+      dma_trans_type_19: Memory to Memory Transfer
+      dma_trans_type_2: Memory to Memory Transfer
+      dma_trans_type_20: Memory to Memory Transfer
+      dma_trans_type_21: Memory to Memory Transfer
+      dma_trans_type_22: Memory to Memory Transfer
+      dma_trans_type_23: Memory to Memory Transfer
+      dma_trans_type_3: Memory to Memory Transfer
+      dma_trans_type_4: Memory to Memory Transfer
+      dma_trans_type_5: Memory to Memory Transfer
+      dma_trans_type_6: Memory to Memory Transfer
+      dma_trans_type_7: Memory to Memory Transfer
+      dma_trans_type_8: Memory to Memory Transfer
+      dma_trans_type_9: Memory to Memory Transfer
+      dmac_beatsize_0: 8-bit bus transfer
+      dmac_beatsize_1: 8-bit bus transfer
+      dmac_beatsize_10: 8-bit bus transfer
+      dmac_beatsize_11: 8-bit bus transfer
+      dmac_beatsize_12: 8-bit bus transfer
+      dmac_beatsize_13: 8-bit bus transfer
+      dmac_beatsize_14: 8-bit bus transfer
+      dmac_beatsize_15: 8-bit bus transfer
+      dmac_beatsize_16: 8-bit bus transfer
+      dmac_beatsize_17: 8-bit bus transfer
+      dmac_beatsize_18: 8-bit bus transfer
+      dmac_beatsize_19: 8-bit bus transfer
+      dmac_beatsize_2: 8-bit bus transfer
+      dmac_beatsize_20: 8-bit bus transfer
+      dmac_beatsize_21: 8-bit bus transfer
+      dmac_beatsize_22: 8-bit bus transfer
+      dmac_beatsize_23: 8-bit bus transfer
+      dmac_beatsize_3: 8-bit bus transfer
+      dmac_beatsize_4: 8-bit bus transfer
+      dmac_beatsize_5: 8-bit bus transfer
+      dmac_beatsize_6: 8-bit bus transfer
+      dmac_beatsize_7: 8-bit bus transfer
+      dmac_beatsize_8: 8-bit bus transfer
+      dmac_beatsize_9: 8-bit bus transfer
+      dmac_burstsize_0: 1 burst size
+      dmac_burstsize_1: 1 burst size
+      dmac_burstsize_10: 1 burst size
+      dmac_burstsize_11: 1 burst size
+      dmac_burstsize_12: 1 burst size
+      dmac_burstsize_13: 1 burst size
+      dmac_burstsize_14: 1 burst size
+      dmac_burstsize_15: 1 burst size
+      dmac_burstsize_16: 1 burst size
+      dmac_burstsize_17: 1 burst size
+      dmac_burstsize_18: 1 burst size
+      dmac_burstsize_19: 1 burst size
+      dmac_burstsize_2: 1 burst size
+      dmac_burstsize_20: 1 burst size
+      dmac_burstsize_21: 1 burst size
+      dmac_burstsize_22: 1 burst size
+      dmac_burstsize_23: 1 burst size
+      dmac_burstsize_3: 1 burst size
+      dmac_burstsize_4: 1 burst size
+      dmac_burstsize_5: 1 burst size
+      dmac_burstsize_6: 1 burst size
+      dmac_burstsize_7: 1 burst size
+      dmac_burstsize_8: 1 burst size
+      dmac_burstsize_9: 1 burst size
+      dmac_channel_0_settings: false
+      dmac_channel_10_settings: false
+      dmac_channel_11_settings: false
+      dmac_channel_12_settings: false
+      dmac_channel_13_settings: false
+      dmac_channel_14_settings: false
+      dmac_channel_15_settings: false
+      dmac_channel_16_settings: false
+      dmac_channel_17_settings: false
+      dmac_channel_18_settings: false
+      dmac_channel_19_settings: false
+      dmac_channel_1_settings: false
+      dmac_channel_20_settings: false
+      dmac_channel_21_settings: false
+      dmac_channel_22_settings: false
+      dmac_channel_23_settings: false
+      dmac_channel_2_settings: false
+      dmac_channel_3_settings: false
+      dmac_channel_4_settings: false
+      dmac_channel_5_settings: false
+      dmac_channel_6_settings: false
+      dmac_channel_7_settings: false
+      dmac_channel_8_settings: false
+      dmac_channel_9_settings: false
+      dmac_chunksize_0: 1 data transferred
+      dmac_chunksize_1: 1 data transferred
+      dmac_chunksize_10: 1 data transferred
+      dmac_chunksize_11: 1 data transferred
+      dmac_chunksize_12: 1 data transferred
+      dmac_chunksize_13: 1 data transferred
+      dmac_chunksize_14: 1 data transferred
+      dmac_chunksize_15: 1 data transferred
+      dmac_chunksize_16: 1 data transferred
+      dmac_chunksize_17: 1 data transferred
+      dmac_chunksize_18: 1 data transferred
+      dmac_chunksize_19: 1 data transferred
+      dmac_chunksize_2: 1 data transferred
+      dmac_chunksize_20: 1 data transferred
+      dmac_chunksize_21: 1 data transferred
+      dmac_chunksize_22: 1 data transferred
+      dmac_chunksize_23: 1 data transferred
+      dmac_chunksize_3: 1 data transferred
+      dmac_chunksize_4: 1 data transferred
+      dmac_chunksize_5: 1 data transferred
+      dmac_chunksize_6: 1 data transferred
+      dmac_chunksize_7: 1 data transferred
+      dmac_chunksize_8: 1 data transferred
+      dmac_chunksize_9: 1 data transferred
+      dmac_dstinc_0: false
+      dmac_dstinc_1: false
+      dmac_dstinc_10: false
+      dmac_dstinc_11: false
+      dmac_dstinc_12: false
+      dmac_dstinc_13: false
+      dmac_dstinc_14: false
+      dmac_dstinc_15: false
+      dmac_dstinc_16: false
+      dmac_dstinc_17: false
+      dmac_dstinc_18: false
+      dmac_dstinc_19: false
+      dmac_dstinc_2: false
+      dmac_dstinc_20: false
+      dmac_dstinc_21: false
+      dmac_dstinc_22: false
+      dmac_dstinc_23: false
+      dmac_dstinc_3: false
+      dmac_dstinc_4: false
+      dmac_dstinc_5: false
+      dmac_dstinc_6: false
+      dmac_dstinc_7: false
+      dmac_dstinc_8: false
+      dmac_dstinc_9: false
+      dmac_srcinc_0: false
+      dmac_srcinc_1: false
+      dmac_srcinc_10: false
+      dmac_srcinc_11: false
+      dmac_srcinc_12: false
+      dmac_srcinc_13: false
+      dmac_srcinc_14: false
+      dmac_srcinc_15: false
+      dmac_srcinc_16: false
+      dmac_srcinc_17: false
+      dmac_srcinc_18: false
+      dmac_srcinc_19: false
+      dmac_srcinc_2: false
+      dmac_srcinc_20: false
+      dmac_srcinc_21: false
+      dmac_srcinc_22: false
+      dmac_srcinc_23: false
+      dmac_srcinc_3: false
+      dmac_srcinc_4: false
+      dmac_srcinc_5: false
+      dmac_srcinc_6: false
+      dmac_srcinc_7: false
+      dmac_srcinc_8: false
+      dmac_srcinc_9: false
+      dmac_trifsrc_0: Software Trigger
+      dmac_trifsrc_1: Software Trigger
+      dmac_trifsrc_10: Software Trigger
+      dmac_trifsrc_11: Software Trigger
+      dmac_trifsrc_12: Software Trigger
+      dmac_trifsrc_13: Software Trigger
+      dmac_trifsrc_14: Software Trigger
+      dmac_trifsrc_15: Software Trigger
+      dmac_trifsrc_16: Software Trigger
+      dmac_trifsrc_17: Software Trigger
+      dmac_trifsrc_18: Software Trigger
+      dmac_trifsrc_19: Software Trigger
+      dmac_trifsrc_2: Software Trigger
+      dmac_trifsrc_20: Software Trigger
+      dmac_trifsrc_21: Software Trigger
+      dmac_trifsrc_22: Software Trigger
+      dmac_trifsrc_23: Software Trigger
+      dmac_trifsrc_3: Software Trigger
+      dmac_trifsrc_4: Software Trigger
+      dmac_trifsrc_5: Software Trigger
+      dmac_trifsrc_6: Software Trigger
+      dmac_trifsrc_7: Software Trigger
+      dmac_trifsrc_8: Software Trigger
+      dmac_trifsrc_9: Software Trigger
+      xdmac_enable: false
+    optional_signals: []
+    variant: null
+    clocks:
+      domain_group: null
+pads: {}
+toolchain_options: []
+static_files: []

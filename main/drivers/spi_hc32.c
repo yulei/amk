@@ -40,23 +40,31 @@ bool spi_ready(spi_handle_t spi)
     return SPI_GetFlag(hspi, SpiFlagSpiIdle) == Set;
 }
 
+#include "wait.h"
 amk_error_t spi_send_async(spi_handle_t spi, const void *data, size_t length)
 {
-    #if 0
+    amk_error_t ae = AMK_SUCCESS;
     M4_SPI_TypeDef* hspi = (M4_SPI_TypeDef *)spi;
+
     if (spi_ready(spi)) {
-        HAL_StatusTypeDef status = HAL_SPI_Transmit_DMA(hspi, (uint8_t *)data, length);
-        if (status != HAL_OK) {
-            spi_debug("Failed async spi transmit, error=%d\n", status);
-            return AMK_SPI_ERROR;
+
+        DMA_SetSrcAddress(M4_DMA1, DmaCh1, (uint32_t)(data));
+        DMA_SetTransferCnt(M4_DMA1, DmaCh1, length);
+        DMA_ChannelCmd(M4_DMA1, DmaCh1, Enable);
+        SPI_Cmd(hspi, Enable);
+
+        while (Reset == DMA_GetIrqFlag(M4_DMA1, DmaCh1, TrnCpltIrq))
+        {
         }
-        return AMK_SUCCESS;
+        DMA_ClearIrqFlag(M4_DMA1, DmaCh1, TrnCpltIrq);
+        DMA_ChannelCmd(M4_DMA1, DmaCh1, Disable);
+        SPI_Cmd(hspi, Disable);
+
+        ae = AMK_SUCCESS;
     } else {
-        return AMK_SPI_BUSY;
+        ae = AMK_SPI_BUSY;
     }
-    #else
-        return AMK_SPI_ERROR;
-    #endif
+    return ae;
 }
 
 amk_error_t spi_recv_async(spi_handle_t spi, void* data, size_t length)
@@ -98,6 +106,7 @@ amk_error_t spi_xfer_async(spi_handle_t spi, const void *tx_buffer, void *rx_buf
 amk_error_t spi_send(spi_handle_t spi, const void *data, size_t length)
 {
     M4_SPI_TypeDef* hspi = (M4_SPI_TypeDef *)spi;
+    SPI_Cmd(hspi, Enable);
     uint8_t* p = (uint8_t* )data;
     for (int i = 0; i < length; i++) {
         while (Reset == SPI_GetFlag(hspi, SpiFlagSpiIdle))
@@ -105,6 +114,7 @@ amk_error_t spi_send(spi_handle_t spi, const void *data, size_t length)
         }
         SPI_SendData8(hspi, p[i]);
     }
+    SPI_Cmd(hspi, Disable);
 
     return AMK_SUCCESS;
 }

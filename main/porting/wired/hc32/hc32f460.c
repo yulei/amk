@@ -44,7 +44,54 @@
 #define SPI_MOSI_PORT                   (PortB)
 #define SPI_MOSI_PIN                    (Pin03)
 #define SPI_MOSI_FUNC                   (Func_Spi3_Mosi)
+
+#define SPI_DMA_UNIT                    (M4_DMA1)
+#define SPI_DMA_CLOCK_UNIT              (PWC_FCG0_PERIPH_DMA1)
+#define SPI_DMA_TX_CHANNEL              (DmaCh1)
+//#define SPI_DMA_RX_CHANNEL              (DmaCh0)
+#define SPI_DMA_TX_TRIG_SOURCE          (EVT_SPI3_SPTI)
+//#define SPI_DMA_RX_TRIG_SOURCE          (EVT_SPI3_SPRI)
 #endif
+
+void screen_spi_dma_init(void)
+{
+    stc_dma_config_t stcDmaCfg;
+
+    /* configuration structure initialization */
+    MEM_ZERO_STRUCT(stcDmaCfg);
+
+    /* Configuration peripheral clock */
+    PWC_Fcg0PeriphClockCmd(SPI_DMA_CLOCK_UNIT, Enable);
+    PWC_Fcg0PeriphClockCmd(PWC_FCG0_PERIPH_AOS, Enable);
+
+    /* Configure TX DMA */
+    stcDmaCfg.u16BlockSize = 1u;
+    stcDmaCfg.u16TransferCnt = 0;//u16BufferLen;
+    stcDmaCfg.u32SrcAddr = 0;//(uint32_t)(&u8TxBuffer[0]);
+    stcDmaCfg.u32DesAddr = (uint32_t)(&SPI_UNIT->DR);
+    stcDmaCfg.stcDmaChCfg.enSrcInc = AddressIncrease;
+    stcDmaCfg.stcDmaChCfg.enDesInc = AddressFix;
+    stcDmaCfg.stcDmaChCfg.enTrnWidth = Dma8Bit;
+    stcDmaCfg.stcDmaChCfg.enIntEn = Disable;
+    DMA_InitChannel(SPI_DMA_UNIT, SPI_DMA_TX_CHANNEL, &stcDmaCfg);
+
+    /* Configure RX DMA */
+    //stcDmaCfg.u16BlockSize = 1u;
+    //stcDmaCfg.u16TransferCnt = u16BufferLen;
+    //stcDmaCfg.u32SrcAddr = (uint32_t)(&SPI_UNIT->DR);
+    //stcDmaCfg.u32DesAddr = (uint32_t)(&u8RxBuffer[0]);
+    //stcDmaCfg.stcDmaChCfg.enSrcInc = AddressFix;
+    //stcDmaCfg.stcDmaChCfg.enDesInc = AddressIncrease;
+    //stcDmaCfg.stcDmaChCfg.enTrnWidth = Dma8Bit;
+    //stcDmaCfg.stcDmaChCfg.enIntEn = Disable;
+    //DMA_InitChannel(SPI_DMA_UNIT, SPI_DMA_RX_CHANNEL, &stcDmaCfg);
+
+    DMA_SetTriggerSrc(SPI_DMA_UNIT, SPI_DMA_TX_CHANNEL, SPI_DMA_TX_TRIG_SOURCE);
+    //DMA_SetTriggerSrc(SPI_DMA_UNIT, SPI_DMA_RX_CHANNEL, SPI_DMA_RX_TRIG_SOURCE);
+
+    /* Enable DMA. */
+    DMA_Cmd(SPI_DMA_UNIT, Enable);
+}
 
 M4_SPI_TypeDef* hspi1 = SPI_UNIT;
 
@@ -86,7 +133,8 @@ void screen_spi_init(void)
     stcSpiInit.stcDelayConfig.enSsIntervalTime = SpiSsIntervalSck6PlusPck2;
 
     SPI_Init(SPI_UNIT, &stcSpiInit);
-    SPI_Cmd(SPI_UNIT, Enable);
+    //SPI_Cmd(SPI_UNIT, Enable);
+    screen_spi_dma_init();
 }
 #endif
 
