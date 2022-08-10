@@ -242,6 +242,7 @@ static inline void del_key_bit(uint8_t code)
         dprintf("del_key_bit: can't del: %02X\n", code);
     }
     if (has_anykey() == 0) {
+        host_keyboard_send((report_keyboard_t*)&amk_report);
         switch_to_nkro(false);
     }
 }
