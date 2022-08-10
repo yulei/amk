@@ -77,6 +77,109 @@ static uint16_t map_keycode(uint16_t keycode, bool amk)
     return 0;
 }
 
+typedef struct {
+    uint8_t amk;
+    uint8_t vial;
+} consumer_map_t;
+
+#if 0
+// vial consumer
+_Static_assert(KC_MUTE                == 0x00A8, "");
+_Static_assert(KC_VOLU                == 0x00A9, "");
+_Static_assert(KC_VOLD                == 0x00AA, "");
+_Static_assert(KC_MNXT                == 0x00AB, "");
+_Static_assert(KC_MPRV                == 0x00AC, "");
+_Static_assert(KC_MSTP                == 0x00AD, "");
+_Static_assert(KC_MPLY                == 0x00AE, "");
+_Static_assert(KC_MSEL                == 0x00AF, "");
+_Static_assert(KC_EJCT                == 0x00B0, "");
+_Static_assert(KC_MAIL                == 0x00B1, "");
+_Static_assert(KC_CALC                == 0x00B2, "");
+_Static_assert(KC_MYCM                == 0x00B3, "");
+_Static_assert(KC_WSCH                == 0x00B4, "");
+_Static_assert(KC_WHOM                == 0x00B5, "");
+_Static_assert(KC_WBAK                == 0x00B6, "");
+_Static_assert(KC_WFWD                == 0x00B7, "");
+_Static_assert(KC_WSTP                == 0x00B8, "");
+_Static_assert(KC_WREF                == 0x00B9, "");
+_Static_assert(KC_WFAV                == 0x00BA, "");
+_Static_assert(KC_MFFD                == 0x00BB, "");
+_Static_assert(KC_MRWD                == 0x00BC, "");
+_Static_assert(KC_BRIU                == 0x00BD, "");
+_Static_assert(KC_BRID                == 0x00BE, "");
+
+// amk consumer
+    KC_AUDIO_MUTE,          // A8
+    KC_AUDIO_VOL_UP,        // A9
+    KC_AUDIO_VOL_DOWN,      // AA
+    KC_MEDIA_NEXT_TRACK,    // AB
+    KC_MEDIA_PREV_TRACK,    // AC
+    KC_MEDIA_FAST_FORWARD,  // AD
+    KC_MEDIA_REWIND,        // AE
+    KC_MEDIA_STOP,          // AF
+    KC_MEDIA_PLAY_PAUSE,    // B0
+    KC_MEDIA_EJECT,         // B1
+    KC_MEDIA_SELECT,        // B2
+    KC_MAIL,                // B3
+    KC_CALCULATOR,          // B4
+    KC_MY_COMPUTER,         // B5
+    KC_WWW_SEARCH,          // B6
+    KC_WWW_HOME,            // B7
+    KC_WWW_BACK,            // B8
+    KC_WWW_FORWARD,         // B9
+    KC_WWW_STOP,            // BA
+    KC_WWW_REFRESH,         // BB
+    KC_WWW_FAVORITES,       // BC
+    KC_BRIGHTNESS_INC,      // BD
+    KC_BRIGHTNESS_DEC,      // BE
+#endif
+
+static const consumer_map_t consumer_map[] = {
+    {KC_AUDIO_MUTE, KC_AUDIO_MUTE},
+    {KC_AUDIO_VOL_UP, KC_AUDIO_VOL_UP},
+    {KC_MEDIA_NEXT_TRACK, KC_MEDIA_NEXT_TRACK},
+    {KC_MEDIA_PREV_TRACK, KC_MEDIA_PREV_TRACK},
+    {KC_MEDIA_STOP, 0xAD},
+    {KC_MEDIA_PLAY_PAUSE, 0xAE},
+    {KC_MEDIA_SELECT, 0xAF},
+    {KC_MEDIA_EJECT, 0xB0},
+    {KC_MAIL, 0xB1},
+    {KC_CALCULATOR, 0xB2},
+    {KC_MY_COMPUTER, 0xB3},
+    {KC_WWW_SEARCH, 0xB4},
+    {KC_WWW_HOME, 0xB5},
+    {KC_WWW_BACK, 0xB6},
+    {KC_WWW_FORWARD, 0xB7},
+    {KC_WWW_STOP, 0xB8},
+    {KC_WWW_REFRESH, 0xB9},
+    {KC_WWW_FAVORITES, 0xBA},
+    {KC_MEDIA_FAST_FORWARD, 0xBB},
+    {KC_MEDIA_REWIND, 0xBC},
+    {KC_BRIGHTNESS_INC, 0xBD},
+    {KC_BRIGHTNESS_DEC, 0xBE},
+};
+
+static uint8_t amk_consumer(uint16_t keycode)
+{
+    for (int i = 0; i < sizeof(consumer_map)/sizeof(consumer_map_t); i++) {
+        if (keycode == consumer_map[i].vial) {
+            return consumer_map[i].amk;
+        }
+    }
+
+    return (uint8_t)keycode;
+}
+
+static uint16_t vial_consumer(uint8_t keycode)
+{
+    for (int i = 0; i < sizeof(consumer_map)/sizeof(consumer_map_t); i++) {
+        if (keycode == consumer_map[i].amk) {
+            return consumer_map[i].vial;
+        }
+    }
+    return keycode;
+}
+
 /* keycode to system usage */
 static uint8_t usage_to_keycode(uint16_t usage) 
 {
@@ -178,7 +281,7 @@ uint16_t amk_to_vial(uint16_t keycode)
             }
             break;
         case ACT_USAGE:
-            vial_kc = usage_to_keycode(action.usage.code);
+            vial_kc = usage_to_keycode(vial_consumer(action.usage.code));
             break;
         case ACT_MOUSEKEY:
             vial_kc = action.key.code;
@@ -257,7 +360,7 @@ static action_t convert_basic(uint16_t keycode)
             ac = (action_t)ACTION_USAGE_SYSTEM(KEYCODE2SYSTEM(keycode));
             break;
         case KC_AUDIO_MUTE ... KC_BRIGHTNESS_DEC:
-            ac = (action_t)ACTION_USAGE_CONSUMER(KEYCODE2CONSUMER(keycode));
+            ac = (action_t)ACTION_USAGE_CONSUMER(KEYCODE2CONSUMER(amk_consumer(keycode)));
             break;
         case KC_MS_UP ... KC_MS_ACCEL2:
             ac = (action_t)ACTION_MOUSEKEY(keycode);

@@ -7,14 +7,13 @@
  */
 
 #include "host.h"
-#include "report.h"
-#include "debug.h"
-#include "amk_action_util.h"
 #include "timer.h"
+#include "util.h"
+#include "amk_action_util.h"
 #include "amk_printf.h"
 
 #ifndef AMK_ACTION_DEBUG
-#define AMK_ACTION_DEBUG 1
+#define AMK_ACTION_DEBUG 0
 #endif
 
 #if AMK_ACTION_DEBUG
@@ -24,7 +23,7 @@
 #endif
 
 #if !defined(NKRO_AUTO_ENABLE)
-#error "audo nkro not defined"
+#error "auto nkro not defined"
 #endif
 
 static inline void add_key_byte(uint8_t code);
@@ -35,10 +34,7 @@ static inline void del_key_bit(uint8_t code);
 static uint8_t real_mods = 0;
 static uint8_t weak_mods = 0;
 
-// TODO: pointer variable is not needed
-//report_keyboard_t keyboard_report = {};
 amk_report_t amk_report = {.nkro_mode = false};
-//report_keyboard_t *keyboard_report = &(report_keyboard_t){};
 
 static int8_t oneshot_mods = 0;
 #if (defined(ONESHOT_TIMEOUT) && (ONESHOT_TIMEOUT > 0))
@@ -79,10 +75,8 @@ void add_key(uint8_t key)
 {
     if (amk_report.nkro_mode) {
         add_key_bit(key);
-        action_debug("add key bit: %d\n");
     } else {
         add_key_byte(key);
-        action_debug("add key byte: %d\n");
     }
 }
 
@@ -230,7 +224,7 @@ static inline void add_key_bit(uint8_t code)
     if ((code>>3) < AMK_NKRO_BITS_SIZE) {
         amk_report.nkro.bits[code>>3] |= 1<<(code&7);
     } else {
-        dprintf("add_key_bit: can't add: %02X\n", code);
+        action_debug("add_key_bit: can't add: %02X\n", code);
     }
 }
 
@@ -239,7 +233,7 @@ static inline void del_key_bit(uint8_t code)
     if ((code>>3) < AMK_NKRO_BITS_SIZE) {
         amk_report.nkro.bits[code>>3] &= ~(1<<(code&7));
     } else {
-        dprintf("del_key_bit: can't del: %02X\n", code);
+        action_debug("del_key_bit: can't del: %02X\n", code);
     }
     if (has_anykey() == 0) {
         host_keyboard_send((report_keyboard_t*)&amk_report);
