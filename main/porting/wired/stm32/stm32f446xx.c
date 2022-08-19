@@ -13,6 +13,18 @@ ADC_HandleTypeDef hadc1;
 I2C_HandleTypeDef hi2c1;
 #endif
 
+#ifdef USE_SPI1
+SPI_HandleTypeDef hspi1;
+DMA_HandleTypeDef hdma_spi1_rx;
+DMA_HandleTypeDef hdma_spi1_tx;
+#endif
+
+#ifdef USE_SPI2
+SPI_HandleTypeDef hspi2;
+DMA_HandleTypeDef hdma_spi2_rx;
+DMA_HandleTypeDef hdma_spi2_tx;
+#endif
+
 RTC_HandleTypeDef hrtc;
 
 void Error_Handler(void)
@@ -112,6 +124,7 @@ static void MX_RTC_Init(void)
         Error_Handler();
     }
 }
+
 #ifdef USE_ADC1
 static void MX_ADC1_Init(void)
 {
@@ -165,6 +178,48 @@ static void MX_I2C1_Init(void)
 }
 #endif
 
+#ifdef USE_SPI1
+static void MX_SPI1_Init(void)
+{
+    hspi1.Instance = SPI1;
+    hspi1.Init.Mode = SPI_MODE_MASTER;
+    hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+    hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+    hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
+    hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
+    hspi1.Init.NSS = SPI_NSS_SOFT;
+    hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
+    hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+    hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+    hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+    hspi1.Init.CRCPolynomial = 10;
+    if (HAL_SPI_Init(&hspi1) != HAL_OK) {
+      Error_Handler();
+    }
+}
+#endif
+
+#ifdef USE_SPI2
+static void MX_SPI2_Init(void)
+{
+    hspi2.Instance = SPI2;
+    hspi2.Init.Mode = SPI_MODE_MASTER;
+    hspi2.Init.Direction = SPI_DIRECTION_2LINES;
+    hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
+    hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
+    hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
+    hspi2.Init.NSS = SPI_NSS_SOFT;
+    hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+    hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
+    hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
+    hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+    hspi2.Init.CRCPolynomial = 10;
+    if (HAL_SPI_Init(&hspi2) != HAL_OK) {
+      Error_Handler();
+    }
+}
+#endif
+
 void custom_board_init(void)
 {
     SystemClock_Config();
@@ -178,6 +233,15 @@ void custom_board_init(void)
 #ifdef USE_I2C1
     MX_I2C1_Init();
 #endif
+
+#ifdef USE_SPI1
+    MX_SPI1_Init();
+#endif
+
+#ifdef USE_SPI2
+    MX_SPI1_Init();
+#endif
+
 }
 
 void custom_board_task(void)

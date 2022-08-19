@@ -1,0 +1,18 @@
+
+SRCS += \
+	$(GD32SDK_DIR)/$(MCU_TYPE)/startup_$(MCU_SERIES)_cl.s \
+	$(GD32SDK_DIR)/$(MCU_TYPE)/system_$(MCU_SERIES).c \
+
+APP_DEFS += \
+	-DUSE_STDPERIPH_DRIVER \
+    -DGD32E50X \
+	-DGD32E50X_CL \
+	-DGD32E505 \
+	-DHXTAL_VALUE=16000000 \
+	-DHXTAL_VALUE_16M=16000000 \
+	-DTUP_DCD_ENDPOINT_MAX=6 \
+    -DCFG_TUSB_MCU=OPT_MCU_GD32E505 \
+
+SDK_DEFS += -mthumb -mcpu=cortex-m33 -mfloat-abi=hard
+
+MCU_LD := gd32e505xb

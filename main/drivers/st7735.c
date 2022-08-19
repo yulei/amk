@@ -18,10 +18,17 @@
 
 // normal directory
 #if (SCREEN_ROTATION == 0)
+#ifdef GC9107_AS_ST7736
+#define ST7735_XSTART 2
+#define ST7735_YSTART 1
+#define ST7735_WIDTH  128
+#define ST7735_HEIGHT 128
+#else
 #define ST7735_XSTART 26
 #define ST7735_YSTART 1
 #define ST7735_WIDTH  80
 #define ST7735_HEIGHT 160 
+#endif
 #define ST7735_ROTATION (ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_BGR)
 #endif
 
@@ -143,10 +150,18 @@ static const uint8_t
     3,                        //  3 commands in list:
     ST7735_CASET  , 4      ,  //  1: Column addr set, 4 args, no delay:
       0x00, 0x00,             //     XSTART = 0
+      #ifdef GC9107_AS_ST7735
+      0x00, 0x7F,             //     XEND = 127
+      #else
       0x00, 0x4F,             //     XEND = 79
+      #endif
     ST7735_RASET  , 4      ,  //  2: Row addr set, 4 args, no delay:
       0x00, 0x00,             //     XSTART = 0
+      #ifdef GC9107_AS_ST7735
+      0x00, 0x7F ,            //     XEND = 127
+      #else
       0x00, 0x9F ,            //     XEND = 159
+      #endif
     ST7735_INVON, 0 },        //  3: Invert colors
 
   init_cmds3[] = {            // Init for 7735R, part 3 (red or green tab)

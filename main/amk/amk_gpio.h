@@ -341,7 +341,7 @@
     #define F5          MAKE_PIN(5, 5 ) /*!< Specify PF.5 Pin Data Input/Output */
     #define F6          MAKE_PIN(5, 6 ) /*!< Specify PF.6 Pin Data Input/Output */
     #define F7          MAKE_PIN(5, 7 ) /*!< Specify PF.7 Pin Data Input/Output */
-#elif defined(GD32E10X)
+#elif defined(GD32E10X) || defined(GD32E50X)
     #include "generic_hal.h"
 
     typedef uint32_t pin_t;

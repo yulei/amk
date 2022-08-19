@@ -135,28 +135,28 @@ _Static_assert(KC_BRID                == 0x00BE, "");
 #endif
 
 static const consumer_map_t consumer_map[] = {
-    {KC_AUDIO_MUTE, KC_AUDIO_MUTE},
-    {KC_AUDIO_VOL_UP, KC_AUDIO_VOL_UP},
-    {KC_MEDIA_NEXT_TRACK, KC_MEDIA_NEXT_TRACK},
-    {KC_MEDIA_PREV_TRACK, KC_MEDIA_PREV_TRACK},
-    {KC_MEDIA_STOP, 0xAD},
-    {KC_MEDIA_PLAY_PAUSE, 0xAE},
-    {KC_MEDIA_SELECT, 0xAF},
-    {KC_MEDIA_EJECT, 0xB0},
-    {KC_MAIL, 0xB1},
-    {KC_CALCULATOR, 0xB2},
-    {KC_MY_COMPUTER, 0xB3},
-    {KC_WWW_SEARCH, 0xB4},
-    {KC_WWW_HOME, 0xB5},
-    {KC_WWW_BACK, 0xB6},
-    {KC_WWW_FORWARD, 0xB7},
-    {KC_WWW_STOP, 0xB8},
-    {KC_WWW_REFRESH, 0xB9},
-    {KC_WWW_FAVORITES, 0xBA},
+    {KC_AUDIO_MUTE,         KC_AUDIO_MUTE},
+    {KC_AUDIO_VOL_UP,       KC_AUDIO_VOL_UP},
+    {KC_MEDIA_NEXT_TRACK,   KC_MEDIA_NEXT_TRACK},
+    {KC_MEDIA_PREV_TRACK,   KC_MEDIA_PREV_TRACK},
+    {KC_MEDIA_STOP,         0xAD},
+    {KC_MEDIA_PLAY_PAUSE,   0xAE},
+    {KC_MEDIA_SELECT,       0xAF},
+    {KC_MEDIA_EJECT,        0xB0},
+    {KC_MAIL,               0xB1},
+    {KC_CALCULATOR,         0xB2},
+    {KC_MY_COMPUTER,        0xB3},
+    {KC_WWW_SEARCH,         0xB4},
+    {KC_WWW_HOME,           0xB5},
+    {KC_WWW_BACK,           0xB6},
+    {KC_WWW_FORWARD,        0xB7},
+    {KC_WWW_STOP,           0xB8},
+    {KC_WWW_REFRESH,        0xB9},
+    {KC_WWW_FAVORITES,      0xBA},
     {KC_MEDIA_FAST_FORWARD, 0xBB},
-    {KC_MEDIA_REWIND, 0xBC},
-    {KC_BRIGHTNESS_INC, 0xBD},
-    {KC_BRIGHTNESS_DEC, 0xBE},
+    {KC_MEDIA_REWIND,       0xBC},
+    {KC_BRIGHTNESS_INC,     KC_BRIGHTNESS_INC},
+    {KC_BRIGHTNESS_DEC,     KC_BRIGHTNESS_DEC},
 };
 
 static uint8_t amk_consumer(uint16_t keycode)
@@ -166,7 +166,6 @@ static uint8_t amk_consumer(uint16_t keycode)
             return consumer_map[i].amk;
         }
     }
-
     return (uint8_t)keycode;
 }
 

@@ -11,7 +11,7 @@
 
 static uint32_t Bootloader_Magic=0x41544B42;
 
-#if defined (NUC126) || defined(__SAMD21G18A__) || defined(STM32L432xx) || defined(GD32E10X) || defined(HC32F460xE)
+#if defined (NUC126) || defined(__SAMD21G18A__) || defined(STM32L432xx) || defined(GD32E10X) || defined(HC32F460xE) ||defined(GD32E50X)
 static void magic_write(uint32_t magic)
 {}
 #else

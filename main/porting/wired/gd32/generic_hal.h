@@ -6,6 +6,8 @@
 
 #if defined(GD32E10X)
 #include "gd32e10x.h"
+#elif defined(GD32E50X)
+#include "gd32e50x.h"
 #else
     #error "GD32 MCU not defined"
 #endif

@@ -11,14 +11,11 @@
 #endif
 
 static void dwt_delay_init(void);
-//static void system_clock_init(void);
-static void system_usb_init(void);
+extern void system_clock_init(void);
 
 void system_init(void)
 {
-    //system_clock_init();
-
-    SystemCoreClockUpdate();
+    system_clock_init();
 
     systick_init();
 
@@ -28,7 +25,6 @@ void system_init(void)
 extern void fee_init(void);
     fee_init();
 #endif
-    system_usb_init();
 }
 
 static void dwt_delay_init(void)
@@ -39,15 +35,6 @@ static void dwt_delay_init(void)
         DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
     }
 }
-
-void system_usb_init(void)
-{}
-
-void custom_board_init(void)
-{}
-
-void custom_board_task(void)
-{}
 
 #define FAULT_BREAK
 #if 1
@@ -84,4 +71,17 @@ void UsageFault_Handler(void)
 {
     fault_handler();
 }
+
+void SVC_Handler(void)
+{
+}
+
+void DebugMon_Handler(void)
+{
+}
+
+void PendSV_Handler(void)
+{
+}
+
 #endif

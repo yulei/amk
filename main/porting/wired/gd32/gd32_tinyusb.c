@@ -15,14 +15,14 @@
 
 void amk_usb_init(void)
 {
-    usb_rcu_config();
+    //usb_rcu_config();
 
 #if defined(USB_HOST_ENABLE) || defined(USB_DEVICE_ENABLE)
     //usb_vbus_config();
     tusb_init();
 #endif
 
-    usb_intr_config();
+    //usb_intr_config();
 }
 
 void amk_usb_task(void)
