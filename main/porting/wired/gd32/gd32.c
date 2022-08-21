@@ -37,7 +37,6 @@ static void dwt_delay_init(void)
 }
 
 #define FAULT_BREAK
-#if 1
 static void fault_handler(void) 
 {
     #ifdef FAULT_BREAK
@@ -74,14 +73,15 @@ void UsageFault_Handler(void)
 
 void SVC_Handler(void)
 {
+    fault_handler();
 }
 
 void DebugMon_Handler(void)
 {
+    fault_handler();
 }
 
 void PendSV_Handler(void)
 {
+    fault_handler();
 }
-
-#endif

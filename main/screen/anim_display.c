@@ -24,6 +24,12 @@
 #endif
 
 enum {
+    ANIM_DISPLAY_NORMAL,        // normal animation
+    ANIM_DISPLAY_STATUS,        // display status
+    ANIM_DISPLAY_BACKGROUND,    // display background
+};
+
+enum {
     MODE_SINGLE,
     MODE_SEQUENCE,
     MODE_RANDOM,
@@ -45,6 +51,12 @@ typedef struct {
     uint32_t        delay;
 } anim_display_obj_t;
 
+extern const uint8_t background_bin[];
+extern const uint32_t background_bin_size[];
+
+extern const uint8_t status_bin[];
+extern const uint32_t status_bin_size[];
+
 static anim_display_obj_t anim_display_objs[ANIM_DISPLAY_NUM];
 
 static bool anim_display_init(display_t *display, screen_t *screen)
@@ -61,6 +73,10 @@ static bool anim_display_init(display_t *display, screen_t *screen)
         obj->anim_type = ANIM_TYPE_MAIN;
     } else if (obj->param.file_type == AUX_FILE) {
         obj->anim_type = ANIM_TYPE_AUX;
+    } else if (obj->param.file_type == AST_FILE) {
+        obj->anim_type = ANIM_TYPE_STATUS;
+    } else if (obj->param.file_type == ABG_FILE) {
+        obj->anim_type = ANIM_TYPE_BACKGROUND;
     } else {
         obj->anim_type = ANIM_TYPE_FONT;
     }
@@ -72,7 +88,7 @@ static bool anim_display_init(display_t *display, screen_t *screen)
         return false;
     }
 
-    obj->anim = anim_open(NULL, obj->anim_type);
+    obj->anim = anim_open_with_size(NULL, obj->anim_type, obj->param.width, obj->param.height);
     if (!obj->anim) {
         return false;
     }
@@ -117,7 +133,19 @@ static void add_frame(uint32_t width, uint32_t height, uint8_t *buffer, uint16_t
 }
 
 __attribute__((weak))
-void anim_display_post_process(void* buff, size_t size)
+bool anim_display_need_refresh(uint32_t index)
+{
+    return true;
+}
+
+__attribute__((weak))
+uint32_t anim_display_get_current(uint32_t index)
+{
+    return 0;
+}
+
+__attribute__((weak))
+void anim_display_post_process(void* buff, uint32_t index)
 {}
 
 void anim_display_task(display_t *display)
@@ -130,48 +158,57 @@ void anim_display_task(display_t *display)
 
     //if (!obj->screen->ready(obj->screen)) return;
 
-    uint32_t elapsed = timer_elapsed32(obj->ticks);
-    if ( elapsed > obj->delay) {
-        if ( 0 == anim_step(obj->anim, &obj->delay, obj->buffer, obj->buffer_size)) {
-            bool play = false;
-            switch(obj->anim_mode) {
-                case MODE_SINGLE:
-                    if (anim_rewind(obj->anim)) {
-                        play = true;
-                    }
-                    break;
-                case MODE_SEQUENCE:
-                    if (anim_next(obj->anim)) {
-                        play = true;
-                    }
-                    break;
-                case MODE_RANDOM:
-                    if (anim_random(obj->anim)) {
-                        play = true;
-                    }
-                    break;
-                default:
-                    break;
-            }
-            if (play) {
-                anim_step(obj->anim, &obj->delay, obj->buffer, obj->buffer_size);
-            } else {
-                //anim_close(render->anim);
-                //render->anim = NULL;
-            }
+    if (obj->param.flags & DISPLAY_FLAGS_MODE_CUSTOM) {
+        if (anim_display_need_refresh(obj->param.screen)) {
+            uint32_t frame = anim_display_get_current(obj->param.screen);
+            anim_set_frame(obj->anim, frame);
+            anim_step(obj->anim, &obj->delay, obj->buffer, obj->buffer_size);
+            anim_display_post_process(obj->buffer, obj->param.screen);
+            obj->screen->fill_rect(obj->screen, 0, 0, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
         }
+    } else {
+        uint32_t elapsed = timer_elapsed32(obj->ticks);
+        if ( elapsed > obj->delay) {
+            if ( 0 == anim_step(obj->anim, &obj->delay, obj->buffer, obj->buffer_size)) {
+                bool play = false;
+                switch(obj->anim_mode) {
+                    case MODE_SINGLE:
+                        if (anim_rewind(obj->anim)) {
+                            play = true;
+                        }
+                        break;
+                    case MODE_SEQUENCE:
+                        if (anim_next(obj->anim)) {
+                            play = true;
+                        }
+                        break;
+                    case MODE_RANDOM:
+                        if (anim_random(obj->anim)) {
+                            play = true;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                if (play) {
+                    anim_step(obj->anim, &obj->delay, obj->buffer, obj->buffer_size);
+                } else {
+                    //anim_close(render->anim);
+                    //render->anim = NULL;
+                }
+            }
 
-        if (obj->param.flags) {
-            add_frame(obj->param.width, obj->param.height, obj->buffer, 0xFFFF, obj->param.flags);
+            if (obj->param.flags) {
+                add_frame(obj->param.width, obj->param.height, obj->buffer, 0xFFFF, obj->param.flags);
+            }
+
+            //obj->screen->fill_rect_async(obj->screen, 0, 0, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
+            anim_display_post_process(obj->buffer, obj->param.screen);
+            obj->screen->fill_rect(obj->screen, 0, 0, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
+
+            obj->ticks = timer_read32();
         }
-
-        //obj->screen->fill_rect_async(obj->screen, 0, 0, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
-        anim_display_post_process(obj->buffer, obj->param.screen);
-        obj->screen->fill_rect(obj->screen, 0, 0, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
-
-        obj->ticks = timer_read32();
     }
-
 }
 
 void anim_display_set_enable(display_t *display, bool enable)

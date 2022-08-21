@@ -54,11 +54,13 @@ static const char KEYHIT_PARAM_COL[] = "COL";
 static const char KEYHIT_PARAM_PRESSED[] = "PRESSED";
 static const char SCREEN_PARAM_POWER[] = "PWR";
 static const char SCREEN_PARAM_MSC[] = "MSC";
+static const char SCREEN_PARAM_MODE[] = "MODE";
 static const char KEYBOARD_PARAM_MODS[] = "M";
 
 enum {
     CMD_SCREEN_POWER,
     CMD_SCREEN_MSC,
+    CMD_SCREEN_MODE,
 };
 
 #define KEYBOARD_KEY_SIZE       6

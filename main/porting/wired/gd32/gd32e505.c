@@ -7,6 +7,10 @@
  */
 
 #include "generic_hal.h"
+#include "gd32_util.h"
+#include "wait.h"
+
+#include "tusb.h"
 
 void system_clock_init(void)
 {
@@ -44,7 +48,7 @@ void system_clock_init(void)
     RCU_CFG0 &= ~(RCU_CFG0_PLLMF | RCU_CFG0_PLLMF_4 | RCU_CFG0_PLLMF_5);
     RCU_CFG0 |= (RCU_PLLSRC_HXTAL_IRC48M | RCU_PLL_MUL42);
 
-    /* CK_PREDIV0 = (CK_HXTAL)/4 * 8 / 8= 4 MHz */ 
+    /* CK_PREDIV0 = (CK_HXTAL)/4 *8 /8 = 4 MHz */ 
     RCU_CFG1 &= ~(RCU_CFG1_PLLPRESEL | RCU_CFG1_PREDV0SEL | RCU_CFG1_PLL1MF | RCU_CFG1_PREDV1 | RCU_CFG1_PREDV0);
     RCU_CFG1 |= (RCU_PLLPRESRC_HXTAL | RCU_PREDV0SRC_CKPLL1 | RCU_PLL1_MUL8 | RCU_PREDV1_DIV4 | RCU_PREDV0_DIV8);
 
@@ -78,22 +82,47 @@ void system_clock_init(void)
     /* wait until PLL is selected as system clock */
     while(0U == (RCU_CFG0 & RCU_SCSS_PLL)){
     }
+
+    SystemCoreClockUpdate();
 }
+
+#define GD32_GCCFG          0x50000038UL
+#define GD32_GCCFG_PWRON    (0x1UL<<16)
 
 static void usb_custom_init(void)
 {
     rcu_usb_clock_config(RCU_CKUSB_CKPLL_DIV3_5);
 
     rcu_periph_clock_enable(RCU_USBHS);
+    
+#if 1
+
+    REG32(GD32_GCCFG) |= GD32_GCCFG_PWRON;
+
+    usb_delay_ms(20);
 
     rcu_pllusbpresel_config(RCU_PLLUSBPRESRC_HXTAL);
-    rcu_pllusbpredv_config(RCU_PLLUSBPREDVSRC_HXTAL_IRC48M, RCU_PLLUSBPREDV_DIV5);
-    rcu_pllusb_config(RCU_PLLUSB_MUL96);
+    rcu_pllusbpredv_config(RCU_PLLUSBPREDVSRC_HXTAL_IRC48M, RCU_PLLUSBPREDV_DIV2);
+    rcu_pllusb_config(RCU_PLLUSB_MUL60);
+
     RCU_ADDCTL |= RCU_ADDCTL_PLLUSBEN;
-    while((RCU_ADDCTL & RCU_ADDCTL_PLLUSBSTB) == 0U) {
-    }
+
+    while((RCU_ADDCTL & RCU_ADDCTL)==0) {
+
+    };
 
     NVIC_SetPriority(USBHS_IRQn, 0U);
+#endif
+}
+
+void usb_init_post(void)
+{
+//    rcu_pllusbpresel_config(RCU_PLLUSBPRESRC_HXTAL);
+//    rcu_pllusbpredv_config(RCU_PLLUSBPREDVSRC_HXTAL_IRC48M, RCU_PLLUSBPREDV_DIV2);
+//    rcu_pllusb_config(RCU_PLLUSB_MUL60);
+//    RCU_ADDCTL |= RCU_ADDCTL_PLLUSBEN;
+//    while((RCU_ADDCTL & RCU_ADDCTL_PLLUSBSTB) == 0U) {
+//    }
 }
 
 void custom_board_init(void)
@@ -103,3 +132,8 @@ void custom_board_init(void)
 
 void custom_board_task(void)
 {}
+
+void USBHS_IRQHandler (void)
+{
+    tud_int_handler(0);
+}

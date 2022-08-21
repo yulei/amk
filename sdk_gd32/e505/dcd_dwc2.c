@@ -365,7 +365,7 @@ static void reset_core(dwc2_regs_t * dwc2)
 static bool phy_hs_supported(dwc2_regs_t * dwc2)
 {
   // note: esp32 incorrect report its hs_phy_type as utmi
-  return TUD_OPT_HIGH_SPEED && dwc2->ghwcfg2_bm.hs_phy_type != HS_PHY_TYPE_NONE;
+  return TUD_OPT_HIGH_SPEED;// && dwc2->ghwcfg2_bm.hs_phy_type != HS_PHY_TYPE_NONE;
 }
 
 static void phy_fs_init(dwc2_regs_t * dwc2)
@@ -435,8 +435,8 @@ static bool check_dwc2(dwc2_regs_t * dwc2)
 
   // For some reasons: GD32VF103 snpsid and all hwcfg register are always zero (skip it)
 #if !TU_CHECK_MCU(OPT_MCU_GD32VF103)
-  uint32_t const gsnpsid = dwc2->gsnpsid & GSNPSID_ID_MASK;
-  TU_ASSERT(gsnpsid == DWC2_OTG_ID || gsnpsid == DWC2_FS_IOT_ID || gsnpsid == DWC2_HS_IOT_ID);
+//  uint32_t const gsnpsid = dwc2->gsnpsid & GSNPSID_ID_MASK;
+//  TU_ASSERT(gsnpsid == DWC2_OTG_ID || gsnpsid == DWC2_FS_IOT_ID || gsnpsid == DWC2_HS_IOT_ID);
 #endif
 
   return true;

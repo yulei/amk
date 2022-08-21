@@ -33,6 +33,8 @@
 #define ANIM_SIG    "ANIM"
 #define AMFT_SIG    "AMFT"
 #define AMGH_SIG    "AMGH"
+#define ASTS_SIG    "ASTS"
+#define ABKG_SIG    "ABKG"
 
 #define FRAME_MAX   1024
 typedef struct __attribute__((packed)) {
@@ -54,9 +56,13 @@ typedef struct {
     bool opened;
 } anim_file_t;
 
+#define ANIM_INVALID_WIDTH      0xFFFFFFFF
+#define ANIM_INVALID_HEIGHT     0xFFFFFFFF
+
 #define ANIM_FILE_NAME_MAX  13
 #define ANIM_FILE_MAX       32
 #define ANIM_ROOT_DIR       "/"
+
 struct anim_t {
     anim_file_t obj;
     anim_type_t type;
@@ -71,8 +77,8 @@ static FATFS flashfs;
 static bool flashfs_mounted = false;
 
 static bool anim_init(anim_t *anim);
-static void anim_scan(anim_t *anim);
-static bool anim_check_file(const char *path, const char *sig);
+static void anim_scan(anim_t *anim, uint32_t width, uint32_t height);
+static bool anim_check_file(const char *path, const char *sig, uint32_t width, uint32_t height);
 static FRESULT safe_open(FIL* fp, const TCHAR* path, BYTE mode);
 static void safe_close(FIL* f);
 
@@ -93,7 +99,7 @@ bool anim_mount(bool mount)
     return (res == FR_OK);
 }
 
-anim_t *anim_open(const char *path, anim_type_t type)
+anim_t *anim_open_with_size(const char *path, anim_type_t type, uint32_t width, uint32_t height)
 {
     if (!path || (strlen(path)==0)) {
         strcpy(&anim_inst[type].path[0], ANIM_ROOT_DIR);
@@ -107,7 +113,7 @@ anim_t *anim_open(const char *path, anim_type_t type)
 
     anim_inst[type].type = type;
 
-    anim_scan(&anim_inst[type]);
+    anim_scan(&anim_inst[type], width, height);
 
     if (anim_inst[type].total == 0) {
         return NULL;
@@ -120,6 +126,11 @@ anim_t *anim_open(const char *path, anim_type_t type)
     }
     
     return NULL;
+}
+
+anim_t *anim_open(const char *path, anim_type_t type)
+{
+    return anim_open_with_size(path, type, ANIM_INVALID_WIDTH, ANIM_INVALID_HEIGHT);
 }
 
 uint32_t anim_get_width(anim_t* anim)
@@ -149,6 +160,17 @@ uint16_t anim_get_delay(anim_t* anim, uint16_t index)
     }
     
     return 0;
+}
+
+bool anim_set_frame(anim_t* anim, uint32_t frame)
+{
+    if (frame >= anim->obj.header.frames) {
+        amk_printf("ANIM set frame at %d failed, max is %d\n", frame, anim->obj.header.frames);
+        return false;
+    }
+
+    anim->obj.frame = frame;
+    return true;
 }
 
 uint32_t anim_step(anim_t *anim, uint32_t *delay, void *buf, uint32_t size)
@@ -279,6 +301,18 @@ static bool anim_init(anim_t *anim)
                 return false;
             }
             break;
+        case ANIM_TYPE_STATUS:
+            if (memcmp(ASTS_SIG, anim->obj.header.signature, 4) != 0) {
+                f_close(&anim->obj.file);
+                return false;
+            }
+            break;
+        case ANIM_TYPE_BACKGROUND:
+            if (memcmp(ABKG_SIG, anim->obj.header.signature, 4) != 0) {
+                f_close(&anim->obj.file);
+                return false;
+            }
+            break;
         default:
             f_close(&anim->obj.file);
             return false;
@@ -288,7 +322,7 @@ static bool anim_init(anim_t *anim)
 }
 
 
-static void anim_scan(anim_t *anim)
+static void anim_scan(anim_t *anim, uint32_t width, uint32_t height)
 {
     anim->total = 0;
     anim->current = 0;
@@ -311,7 +345,14 @@ static void anim_scan(anim_t *anim)
                 if (anim->type == ANIM_TYPE_GLYPH) {
                     sig = AMGH_SIG;
                 }
-                if (anim_check_file(fno.fname, sig)) {
+                if (anim->type == ANIM_TYPE_STATUS) {
+                    sig = ASTS_SIG;
+                }
+                if (anim->type == ANIM_TYPE_BACKGROUND) {
+                    sig = ABKG_SIG;
+                }
+
+                if (anim_check_file(fno.fname, sig, width, height)) {
                     memcpy(&anim->files[anim->total][0], fno.fname, ANIM_FILE_NAME_MAX);
                     anim->total++;
                     if (anim->total >= ANIM_FILE_MAX) {
@@ -325,7 +366,7 @@ static void anim_scan(anim_t *anim)
     }
 }
 
-static bool anim_check_file(const char *path, const char* sig)
+static bool anim_check_file(const char *path, const char* sig, uint32_t width, uint32_t height)
 {
     FIL file;
     if (FR_OK != f_open(&file, path, FA_READ)) {
@@ -350,6 +391,14 @@ static bool anim_check_file(const char *path, const char* sig)
     if (memcmp(sig, header.signature, 4) != 0) {
         amk_printf("ANIM check: signature invalid: %x\n", &header.signature[0]);
         goto exit;
+    }
+
+    if ((width != ANIM_INVALID_WIDTH) && (height != ANIM_INVALID_HEIGHT)) {
+        if (header.width != width || header.height != height) {
+            amk_printf("ANIM check: invlid size: required (width=%d, height=%d), actually (width=%d, height=%d)\n", 
+                width, height, header.width, header.height);
+            goto exit;
+        }
     }
 
     if (f_size(&file) != header.total) {

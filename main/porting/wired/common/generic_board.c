@@ -86,6 +86,9 @@ host_driver_t amk_driver = {
 
 static void amk_init(void);
 
+__attribute__((weak))
+void usb_init_post(void)
+{}
 void board_init(void)
 {
     amk_printf("system_init\n");
@@ -95,6 +98,7 @@ void board_init(void)
 #ifndef RTOS_ENABLE
     amk_printf("usb_init\n");
     usb_init();
+    usb_init_post();
 #endif
     amk_printf("amk_init\n");
     amk_init();

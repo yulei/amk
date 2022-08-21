@@ -33,6 +33,7 @@
 #endif
 
 #include "generic_hal.h"
+#include "gd32_util.h"
 
 #define DWC2_REG_BASE       0x50000000UL
 #define DWC2_EP_MAX         6
@@ -58,8 +59,7 @@ static inline void dwc2_dcd_int_disable (uint8_t rhport)
 static inline void dwc2_remote_wakeup_delay(void)
 {
   // try to delay for 1 ms
-  uint32_t count = SystemCoreClock / 1000;
-  while ( count-- ) __asm volatile ("nop");
+  usb_delay_ms(1);
 }
 
 // MCU specific PHY init, called BEFORE core reset
@@ -77,7 +77,7 @@ static inline void dwc2_phy_update(dwc2_regs_t * dwc2, uint8_t hs_phy_type)
   (void) dwc2;
   (void) hs_phy_type;
   // power on 
-  dwc2->gd32_gccfg = 0;
+  //dwc2->gd32_gccfg = 0;
   dwc2->gd32_gccfg |= GD32_GCCFG_PWRON;
 
   // Set turn-around
@@ -87,9 +87,7 @@ static inline void dwc2_phy_update(dwc2_regs_t * dwc2, uint8_t hs_phy_type)
   gusbcfg |= 9u << GUSBCFG_TRDT_Pos;
   dwc2->gusbcfg = gusbcfg;
 
-  for (int i = 0; i < 20; i++) {
-    dwc2_remote_wakeup_delay(); 
-  }
+  usb_delay_ms(20);
 }
 
 #ifdef __cplusplus

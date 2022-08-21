@@ -12,7 +12,3 @@ INCS += \
 ifeq (GD32E505, $(strip $(MCU)))
 	SRCS += $(PLATFORM_PORTING_DIR)/gd32e505.c
 endif
-
-ifeq (YES, $(strip $(TINYUSB_ENABLE)))
-SRCS += $(PLATFORM_PORTING_DIR)/gd32_tinyusb.c
-endif

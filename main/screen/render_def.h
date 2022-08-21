@@ -24,6 +24,8 @@ enum {
     ANM_FILE,
     AUX_FILE,
     SML_FILE,
+    AST_FILE,
+    ABG_FILE,
 };
 
 enum {
@@ -53,10 +55,11 @@ typedef struct {
     uint8_t     driver; // driver index
 } screen_param_t;
 
-#define DISPLAY_FLAGS_EDGE_LEFT     (1<<0)
-#define DISPLAY_FLAGS_EDGE_TOP      (1<<1)
-#define DISPLAY_FLAGS_EDGE_RIGHT    (1<<2)
-#define DISPLAY_FLAGS_EDGE_BOTTOM   (1<<3)
+#define DISPLAY_FLAGS_EDGE_LEFT         (1<<0)
+#define DISPLAY_FLAGS_EDGE_TOP          (1<<1)
+#define DISPLAY_FLAGS_EDGE_RIGHT        (1<<2)
+#define DISPLAY_FLAGS_EDGE_BOTTOM       (1<<3)
+#define DISPLAY_FLAGS_MODE_CUSTOM       (1<<4)
 
 typedef struct {
     uint8_t     type;

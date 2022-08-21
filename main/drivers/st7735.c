@@ -18,7 +18,7 @@
 
 // normal directory
 #if (SCREEN_ROTATION == 0)
-#ifdef GC9107_AS_ST7736
+#ifdef GC9107_AS_ST7735
 #define ST7735_XSTART 2
 #define ST7735_YSTART 1
 #define ST7735_WIDTH  128
