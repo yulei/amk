@@ -9,23 +9,23 @@
 #ifdef STM32L072xx
 #error "STM32L0 do not have DWT"
 #endif
+#endif
 
 static void dwt_delay_init(void)
 {
-    if (!(CoreDebug->DEMCR & CoreDebug_DEMCR_TRCENA_Msk)) {
-        CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-        DWT->CYCCNT = 0;
-        DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-    }
-}
+#ifdef DWT_DELAY
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    DWT->CYCCNT = 0;
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 #endif
+}
 
 void system_init(void)
 {
     HAL_Init();
-#ifdef DWT_DELAY
+
     dwt_delay_init();
-#endif
+
     //wait_ms(10000);
 #ifdef EECONFIG_FLASH 
 extern void fee_init(void);

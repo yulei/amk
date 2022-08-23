@@ -19,6 +19,7 @@
 #include "wait.h"
 #include "amk_indicator.h"
 #include "amk_boot.h"
+#include "amk_profile.h"
 
 #ifdef SCREEN_ENABLE
 #include "render.h"
@@ -123,11 +124,14 @@ void board_task(void)
         //}
     }
 
+uint32_t region = AMK_PROFILE_BEGIN("board_task");
 #ifndef RTOS_ENABLE
     usb_task();
+    AMK_PROFILE_SAMPLE("usb_task", region);
 #endif
 
     keyboard_task();
+    AMK_PROFILE_SAMPLE("keyboard_task", region);
 
 #if defined(MSC_ENABLE) && !defined(RTOS_ENABLE)
     msc_task();
@@ -150,6 +154,8 @@ void board_task(void)
 #endif
 
     custom_board_task();
+    AMK_PROFILE_SAMPLE("custom_task", region);
+    AMK_PROFILE_END(region);
 }
 
 static void amk_init(void)
