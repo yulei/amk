@@ -124,6 +124,8 @@ endif
 
 ifneq (yes, $(strip $(CUSTOM_MATRIX)))
 	SRCS += $(MAIN_DIR)/amk/matrix_scan.c
+	SRCS += $(MAIN_DIR)/amk/debounce/debounce.c
+	INCS += $(MAIN_DIR)/amk/debounce
 endif
 
 ifeq (yes, $(EECONFIG_FRAM)) 

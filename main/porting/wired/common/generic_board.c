@@ -108,20 +108,14 @@ void board_init(void)
 
 void board_task(void)
 {
-
-#ifndef RTOS_ENABLE
-    usb_task();
-#endif
-
-    keyboard_task();
-
     if (usb_suspended() && (!(usb_setting&USB_SWITCH_BIT))) {
         if (suspend_wakeup_condition()) {
             // wake up remote
             remote_wakeup();
-            //usb_connect(false);
+            wait_ms(1000);
+            usb_connect(false);
             wait_ms(100);
-            //usb_connect(true);
+            usb_connect(true);
         }
     } else {
         //if (usb_ready()) {
@@ -129,6 +123,11 @@ void board_task(void)
         //}
     }
 
+#ifndef RTOS_ENABLE
+    usb_task();
+#endif
+
+    keyboard_task();
 
 #if defined(MSC_ENABLE) && !defined(RTOS_ENABLE)
     msc_task();

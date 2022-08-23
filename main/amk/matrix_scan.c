@@ -18,6 +18,8 @@
 #include "amk_gpio.h"
 #include "amk_printf.h"
 
+#include "debounce.h"
+
 #ifdef MATRIX_EC
 #include "ec_matrix.h"
 #endif
@@ -74,8 +76,8 @@ bool matrix_i2c_check_boot(void)
 #endif
 
 
-static bool debouncing = false;
-static uint16_t debouncing_time = 0;
+//static bool debouncing = false;
+//static uint16_t debouncing_time = 0;
 
 __attribute__((weak))
 void matrix_init_kb(void)
@@ -154,6 +156,8 @@ void matrix_init(void)
     // initialize matrix state: all keys off
     memset(&matrix[0], 0, sizeof(matrix));
     memset(&matrix_debouncing[0], 0, sizeof(matrix_debouncing));
+
+    debounce_init(MATRIX_ROWS);
 
     matrix_init_kb();
 }
@@ -290,6 +294,7 @@ uint8_t matrix_scan(void)
     
     changed |= matrix_scan_post(&matrix_debouncing[0]);
 
+#if 0
     if (changed && !debouncing) {
         debouncing = true;
         debouncing_time = timer_read();
@@ -301,6 +306,9 @@ uint8_t matrix_scan(void)
         }
         debouncing = false;
     }
+#else
+    debounce(&matrix_debouncing[0], &matrix[0], MATRIX_ROWS, changed);
+#endif
 
     matrix_scan_kb();
     return 1;

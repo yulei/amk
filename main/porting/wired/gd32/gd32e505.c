@@ -115,16 +115,6 @@ static void usb_custom_init(void)
 #endif
 }
 
-void usb_init_post(void)
-{
-//    rcu_pllusbpresel_config(RCU_PLLUSBPRESRC_HXTAL);
-//    rcu_pllusbpredv_config(RCU_PLLUSBPREDVSRC_HXTAL_IRC48M, RCU_PLLUSBPREDV_DIV2);
-//    rcu_pllusb_config(RCU_PLLUSB_MUL60);
-//    RCU_ADDCTL |= RCU_ADDCTL_PLLUSBEN;
-//    while((RCU_ADDCTL & RCU_ADDCTL_PLLUSBSTB) == 0U) {
-//    }
-}
-
 void custom_board_init(void)
 {
     usb_custom_init();
