@@ -6,13 +6,17 @@ target_sources(${KEYBOARD}
 	${CMAKE_CURRENT_LIST_DIR}/amk/amk_macro.c
 	${CMAKE_CURRENT_LIST_DIR}/amk/amk_printf.c
 	${CMAKE_CURRENT_LIST_DIR}/amk/amk_eeprom.c
+	${CMAKE_CURRENT_LIST_DIR}/amk/amk_indicator.c
+	${CMAKE_CURRENT_LIST_DIR}/amk/amk_profile.c
 	${CMAKE_CURRENT_LIST_DIR}/amk/amk_boot.c
 	${CMAKE_CURRENT_LIST_DIR}/amk/report_queue.c
+	${CMAKE_CURRENT_LIST_DIR}/amk/debounce/debounce.c
 )
 
 target_include_directories(${KEYBOARD}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/amk
+    ${CMAKE_CURRENT_LIST_DIR}/amk/debounce
     ${CMAKE_CURRENT_LIST_DIR}/porting
     ${CMAKE_CURRENT_LIST_DIR}/drivers
     ${CMAKE_CURRENT_LIST_DIR}/rgb
