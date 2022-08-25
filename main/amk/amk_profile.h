@@ -13,8 +13,8 @@
 
 #ifdef DWT_DELAY
 #pragma message "DWT was used for delay, thus can't use with PROFILE"
-#else
+#endif
+
 uint32_t AMK_PROFILE_BEGIN(const char* profile_region);
 void AMK_PROFILE_SAMPLE(const char* profile_sample, uint32_t region);
 void AMK_PROFILE_END(uint32_t region);
-#endif

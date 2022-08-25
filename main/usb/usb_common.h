@@ -19,6 +19,7 @@ extern uint32_t usb_setting;
 // mods for 1
 // keys for 30
 #define AMK_NKRO_TOTAL_SIZE  32
+#define NKRO_KEYCODE_SIZE   (AMK_NKRO_TOTAL_SIZE-1)
 
 #ifdef DYNAMIC_CONFIGURATION
 // Interface number

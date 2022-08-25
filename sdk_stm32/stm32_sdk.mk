@@ -1,18 +1,21 @@
 STM32SDK_DIR := sdk_stm32
 
 ifeq (STM32F401, $(strip $(MCU)))
+MCU_ARCH := CORTEX_M4
 MCU_SERIES := f4
 MCU_FAMILY := stm32f4xx
 MCU_TYPE := f401
 endif
 
 ifeq (STM32F411, $(strip $(MCU)))
+MCU_ARCH := CORTEX_M4
 MCU_SERIES := f4
 MCU_FAMILY := stm32f4xx
 MCU_TYPE := f411
 endif
 
 ifeq (STM32F405, $(strip $(MCU)))
+MCU_ARCH := CORTEX_M4
 MCU_SERIES := f4
 MCU_FAMILY := stm32f4xx
 ifeq (yes, $(strip $(USE_F405_V2)))
@@ -24,36 +27,42 @@ endif
 endif
 
 ifeq (STM32F446, $(strip $(MCU)))
+MCU_ARCH := CORTEX_M4
 MCU_SERIES := f4
 MCU_FAMILY := stm32f4xx
 MCU_TYPE := f446
 endif
 
 ifeq (STM32F722, $(strip $(MCU)))
+MCU_ARCH := CORTEX_M7
 MCU_SERIES := f7
 MCU_FAMILY := stm32f7xx
 MCU_TYPE := f722
 endif
 
 ifeq (STM32F103, $(strip $(MCU)))
+MCU_ARCH := CORTEX_M3
 MCU_SERIES := f1
 MCU_FAMILY := stm32f1xx
 MCU_TYPE := f103
 endif
 
 ifeq (STM32L432, $(strip $(MCU)))
+MCU_ARCH := CORTEX_M4
 MCU_SERIES := l4
 MCU_FAMILY := stm32l4xx
 MCU_TYPE := l432
 endif
 
 ifeq (STM32L072, $(strip $(MCU)))
+MCU_ARCH := CORTEX_M0
 MCU_SERIES := l0
 MCU_FAMILY := stm32l0xx
 MCU_TYPE := l072
 endif
 
 ifeq (STM32G431, $(strip $(MCU)))
+MCU_ARCH := CORTEX_M4
 MCU_SERIES := g4
 MCU_FAMILY := stm32g4xx
 MCU_TYPE := g431
@@ -84,7 +93,7 @@ INCS += \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Inc \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Inc/Legacy \
 	$(VENDOR_DIR)/device_$(MCU_SERIES)/Include \
-	$(VENDOR_DIR)/cmsis/Core/Include \
+	$(LIB_DIR)/cmsis_5/CMSIS/Core/Include
 
 ifeq (yes, $(strip $(AUDIO_ENABLE)))
 include $(LIB_DIR)/cmsis_dsp.mk

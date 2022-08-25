@@ -57,7 +57,7 @@ ifeq (yes, $(strip $(RTOS_ENABLE)))
 	include $(LIB_DIR)/usbx.mk
 	APP_DEFS += -DRTOS_ENABLE
 else
-	SRCS += $(MAIN_DIR)/amk/main.c
+	SRCS += $(MAIN_DIR)/amk/baremetal.c
 endif
 
 ifeq (yes, $(strip $(USB_DEVICE_ENABLE)))

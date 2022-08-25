@@ -15,7 +15,7 @@
 #include "amk_printf.h"
 #include "amk_timer.h"
 
-#ifdef AMK_PROFILING
+#if defined(AMK_PROFILING) && !defined(DWT_DELAY)
 
 #define AMK_SAMPLE_NUM  16
 #define AMK_REGION_NUM  32

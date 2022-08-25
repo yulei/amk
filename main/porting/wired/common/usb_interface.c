@@ -50,7 +50,12 @@ void usb_init(void)
 #endif
 }
 
-void usb_task(void)
+void usb_task_usb(void)
+{
+    amk_usb_task();
+}
+
+void usb_task_report(void)
 {
 #ifdef VIAL_ENABLE
     if (!hid_report_queue_empty(&macro_queue)) {
@@ -72,7 +77,12 @@ void usb_task(void)
 #ifdef VIAL_ENABLE
     vial_task();
 #endif
-    amk_usb_task();
+}
+
+void usb_task(void)
+{
+    usb_task_report();
+    usb_task_usb();
 }
 
 static void process_report_queue(hid_report_queue_t * queue)

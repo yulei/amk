@@ -1,6 +1,7 @@
 HC32SDK_DIR := sdk_hc32
 
 ifeq (HC32F460, $(strip $(MCU)))
+MCU_ARCH := CORTEX_M4
 MCU_SERIES := hc32 
 MCU_TYPE := f460
 HC32_DDL := hc32f460_ddl_Rev2.2.0
@@ -53,9 +54,11 @@ SRCS += \
 
 INCS += \
 	$(VENDOR_DIR)/$(HC32_DDL)/mcu/common \
-	$(VENDOR_DIR)/$(HC32_DDL)/mcu/GCC/CMSIS/Core/Include \
 	$(VENDOR_DIR)/$(HC32_DDL)/driver/inc \
 	$(HC32SDK_DIR) \
+	$(LIB_DIR)/cmsis_5/CMSIS/Core/Include
+
+
 
 APP_DEFS += \
 	-DUSE_DEVICE_DRIVER_LIB \

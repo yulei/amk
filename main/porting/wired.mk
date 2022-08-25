@@ -5,11 +5,10 @@ SRCS += \
 
 SRCS += \
 	$(COMMON_PORTING_DIR)/bootloader.c \
-	$(COMMON_PORTING_DIR)/generic_board.c \
+	$(COMMON_PORTING_DIR)/generic_baremetal.c \
+	$(COMMON_PORTING_DIR)/amk_driver.c \
 	$(COMMON_PORTING_DIR)/suspend.c \
 	$(COMMON_PORTING_DIR)/timer.c \
-
-
 
 INCS += \
 	$(COMMON_PORTING_DIR) \
