@@ -60,10 +60,12 @@ void systick_suspend(void)
     SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk;
 }
 
+#ifndef RTOS_ENABLE
 void SysTick_Handler(void)
 {
     systick_inc_tick();
 }
+#endif
 
 void usb_delay_ms(uint32_t ms)
 {

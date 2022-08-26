@@ -29,3 +29,6 @@
 [submodule "libs/arm2d"]
 	path = libs/arm2d
 	url = https://github.com/ARM-software/Arm-2D.git
+[submodule "libs/cmsis_freertos"]
+	path = libs/cmsis_freertos
+	url = https://github.com/ARM-software/CMSIS-FreeRTOS.git

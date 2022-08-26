@@ -49,15 +49,14 @@ else
 endif
 
 ifeq (yes, $(strip $(RTOS_ENABLE)))
-	SRCS += $(MAIN_DIR)/rtos/usbx_main.c
-	SRCS += $(MAIN_DIR)/rtos/tx_initialize_low_level.S
-	SRCS += $(MAIN_DIR)/rtos/usbx_usb.c
-	SRCS += $(MAIN_DIR)/rtos/usbx_desc.c
-	include $(LIB_DIR)/threadx.mk
-	include $(LIB_DIR)/usbx.mk
+	INCS += $(LIB_DIR)/cmsis_5/CMSIS/RTOS2/Include
+#	SRCS += $(MAIN_DIR)/rtos/freertos_main.c
+	SRCS += $(MAIN_DIR)/rtos/rtos_main.c
+#	include $(LIB_DIR)/cmsis_os.mk
+	include $(LIB_DIR)/cmsis_freertos.mk
 	APP_DEFS += -DRTOS_ENABLE
 else
-	SRCS += $(MAIN_DIR)/amk/baremetal.c
+	SRCS += $(MAIN_DIR)/amk/baremetal_main.c
 endif
 
 ifeq (yes, $(strip $(USB_DEVICE_ENABLE)))

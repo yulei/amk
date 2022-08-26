@@ -5,16 +5,16 @@ SRCS += \
 
 SRCS += \
 	$(COMMON_PORTING_DIR)/bootloader.c \
-	$(COMMON_PORTING_DIR)/generic_baremetal.c \
 	$(COMMON_PORTING_DIR)/amk_driver.c \
 	$(COMMON_PORTING_DIR)/suspend.c \
 	$(COMMON_PORTING_DIR)/timer.c \
+	$(COMMON_PORTING_DIR)/usb_interface.c \
 
 INCS += \
 	$(COMMON_PORTING_DIR) \
 
 ifneq (yes, $(strip $(RTOS_ENABLE)))
-	SRCS += $(COMMON_PORTING_DIR)/usb_interface.c
+	SRCS += $(COMMON_PORTING_DIR)/wired_board.c
 endif
 
 ifeq (yes, $(strip $(TINYUSB_ENABLE)))

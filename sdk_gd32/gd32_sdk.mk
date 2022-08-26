@@ -11,7 +11,7 @@ GD32_LIB_STD := $(MCU_PREFIX)_standard_peripheral
 endif
 
 ifeq (GD32E505, $(strip $(MCU)))
-MCU_ARCH := CORTEX_M4
+MCU_ARCH := CORTEX_M33
 MCU_PREFIX := GD32E50x
 MCU_SERIES := gd32e50x
 MCU_TYPE := e505

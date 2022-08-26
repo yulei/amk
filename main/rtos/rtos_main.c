@@ -1,11 +1,20 @@
 /**
- * @file cmos_main.c
+ * @file rtos_main.c
  */
 
 #include "cmsis_os2.h"
+#include "generic_hal.h"
 #include "board.h"
 #include "usb_interface.h"
 #include "amk_driver.h"
+#include "amk_utils.h"
+#include "amk_printf.h"
+
+#include "FreeRTOS.h"
+
+extern void system_init(void);
+extern void custom_board_init(void);
+extern void custom_board_task(void);
 
 // flags
 #define FLAGS_MAIN_1MS      (1<<0)
@@ -18,38 +27,53 @@
 #define MAIN_THREAD_PRIORITY    osPriorityNormal
 
 static osThreadId_t usb_thread_id;
-static uint32_t usb_thread_cb[WORDS(sizeof(osRtxThread_t))];
+const osThreadAttr_t usb_thread_attr = {
+    .name = "usb",
+    .priority = USB_THREAD_PRIORITY,
+};
+
+//static uint32_t usb_thread_cb[WORDS(sizeof(osRtxThread_t))];
+/*static uint32_t usb_thread_cb[WORDS(sizeof(StaticTask_t))];
 static uint64_t usb_thread_stack[USB_THREAD_STACK / sizeof(uint64_t)];
-static const osThreadAttr_t usb_thread_arrt = {
+static const osThreadAttr_t usb_thread_attr = {
     .name = "usb",
     .cb_mem = usb_thread_cb,
     .cb_size = sizeof(usb_thread_cb),
     .stack_mem = usb_thread_stack,
-    .stack_size = sizeof(s_main_task_stack),
+    .stack_size = sizeof(usb_thread_stack),
     .priority = USB_THREAD_PRIORITY,
-};
+};*/
 
 static osThreadId_t main_thread_id;
-static uint32_t main_thread_cb[WORDS(sizeof(osRtxThread_t))];
+const osThreadAttr_t main_thread_attr = {
+    .name = "main",
+    .priority = MAIN_THREAD_PRIORITY,
+};
+
+//static uint32_t main_thread_cb[WORDS(sizeof(osRtxThread_t))];
+/*static uint32_t main_thread_cb[WORDS(sizeof(StaticTask_t))];
 static uint64_t main_thread_stack[MAIN_THREAD_STACK / sizeof(uint64_t)];
 static const osThreadAttr_t main_thread_attr = {
     .name = "main",
     .cb_mem = main_thread_cb,
     .cb_size = sizeof(main_thread_cb),
-    .stack_mem = main_task_stack,
-    .stack_size = sizeof(main_task_stack),
+    .stack_mem = main_thread_stack,
+    .stack_size = sizeof(main_thread_stack),
     .priority = MAIN_THREAD_PRIORITY,
-};
+};*/
 
+#if 0
 static uint32_t timer_1ms_cb[WORDS(sizeof(osRtxTimer_t))];
 static const osTimerAttr_t timer_1ms_attr = {
     .name = "1ms",
     .cb_mem = timer_1ms_cb,
     .cb_size = sizeof(timer_1ms_cb),
 };
+#endif
 
-void usb_thread(void *arg);
-void main_thread(void *arg);
+static void usb_thread(void *arg);
+static void main_thread(void *arg);
+static void timer_task_1ms(void *arg);
 
 int main(int argc, char ** argv)
 {
@@ -63,12 +87,14 @@ int main(int argc, char ** argv)
     osKernelStart();
 
     // never reach here
-    for (;;);
+    for (;;) {}
+
     return 0;
 }
 
 void usb_thread(void *arg)
 {
+    usb_init();
     while (1) {
         usb_task_usb();
     }
@@ -77,7 +103,7 @@ void usb_thread(void *arg)
 void main_thread(void *arg)
 {
     uint32_t flags = 0;
-    osTimerId_t tmr_id = osTimerNew(timer_task_1ms, osTimerPeriodic, NULL, &timer_1ms_attr);
+    osTimerId_t tmr_id = osTimerNew(timer_task_1ms, osTimerPeriodic, NULL, NULL);
     osTimerStart(tmr_id, 1);
     
     while(1) {
@@ -119,6 +145,7 @@ void main_thread(void *arg)
     }
 }
 
+
 void board_init(void)
 {
     amk_printf("system_init\n");
@@ -126,16 +153,16 @@ void board_init(void)
     amk_printf("custom_board_init\n");
     custom_board_init();
 
-    amk_printf("usb_init\n");
-    usb_init();
-    usb_init_post();
+//    amk_printf("usb_init\n");
+//    usb_init();
+//    usb_init_post();
 
     amk_printf("amk_init\n");
     amk_driver_init();
     amk_printf("board_init end\n");
 }
 
-void timer_task_1mS(void *arg)
+void timer_task_1ms(void *arg)
 {
     static uint32_t i = 0;
     osThreadFlagsSet(main_thread_id, FLAGS_MAIN_1MS);

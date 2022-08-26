@@ -17,7 +17,9 @@ void system_init(void)
 {
     system_clock_init();
 
+#ifndef RTOS_ENABLE
     systick_init();
+#endif
 
     dwt_delay_init();
 
@@ -71,17 +73,7 @@ void UsageFault_Handler(void)
     fault_handler();
 }
 
-void SVC_Handler(void)
-{
-    fault_handler();
-}
-
 void DebugMon_Handler(void)
-{
-    fault_handler();
-}
-
-void PendSV_Handler(void)
 {
     fault_handler();
 }

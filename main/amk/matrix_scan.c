@@ -75,9 +75,12 @@ bool matrix_i2c_check_boot(void)
 
 #endif
 
+#define DEBOUNCE_GLOBAL 1
 
-//static bool debouncing = false;
-//static uint16_t debouncing_time = 0;
+#if DEBOUNCE_GLOBAL
+static bool debouncing = false;
+static uint16_t debouncing_time = 0;
+#endif
 
 __attribute__((weak))
 void matrix_init_kb(void)
@@ -294,7 +297,7 @@ uint8_t matrix_scan(void)
     
     changed |= matrix_scan_post(&matrix_debouncing[0]);
 
-#if 0
+#if DEBOUNCE_GLOBAL
     if (changed && !debouncing) {
         debouncing = true;
         debouncing_time = timer_read();

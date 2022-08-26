@@ -4,7 +4,6 @@
 
 #include "generic_hal.h"
 #include "board.h"
-#include "usb_descriptors.h"
 #include "usb_interface.h"
 
 #include "amk_driver.h"
@@ -50,9 +49,6 @@ extern void system_init(void);
 extern void custom_board_init(void);
 extern void custom_board_task(void);
 
-__attribute__((weak))
-void usb_init_post(void)
-{}
 void board_init(void)
 {
     gb_debug("system_init\n");
@@ -63,7 +59,6 @@ void board_init(void)
 
     gb_debug("usb_init\n");
     usb_init();
-    usb_init_post();
 
     gb_debug("amk_init\n");
     amk_driver_init();
