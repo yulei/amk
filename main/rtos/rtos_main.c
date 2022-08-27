@@ -6,6 +6,7 @@
 #include "generic_hal.h"
 #include "board.h"
 #include "usb_interface.h"
+#include "rgb_led.h"
 #include "amk_driver.h"
 #include "amk_utils.h"
 #include "amk_printf.h"

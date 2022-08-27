@@ -50,3 +50,13 @@ void gpio_set_input_pulldown(pin_t pin)
 {
     gpio_set_mode(pin, GPIO_MODE_IPD, GPIO_OSPEED_10MHZ);
 }
+
+uint32_t gpio_read_port(port_t port)
+{
+    return gpio_input_port_get(port);
+}
+
+void gpio_write_port(port_t port, uint32_t value)
+{
+    gpio_port_write(port, (uint16_t)value);
+}

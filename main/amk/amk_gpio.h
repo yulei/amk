@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #if defined(NRF52832_XXAA) || defined(NRF52840_XXAA)
     #include "nrf_gpio.h"
     typedef uint32_t pin_t;
@@ -345,10 +347,16 @@
     #include "generic_hal.h"
 
     typedef uint32_t pin_t;
+    typedef uint32_t port_t;
     #define PIN_P(x) (1<<(x))
     #define MAKE_PIN(port, pin) (((uint32_t)(port))|((pin)&0x0F))
     #define GET_PIN(port_pin) PIN_P(((port_pin)&0x0F))
     #define GET_PORT(port_pin) ((port_pin)&~0x0F)
+
+    #define PORT_A  GPIOA
+    #define PORT_B  GPIOB
+    #define PORT_C  GPIOC
+    #define PORT_D  GPIOD
 
     #define A0 MAKE_PIN(GPIOA, 0)
     #define A1 MAKE_PIN(GPIOA, 1)
@@ -535,6 +543,9 @@
 
 int gpio_read_pin(pin_t pin);
 void gpio_write_pin(pin_t pin, int value);
+
+uint32_t gpio_read_port(port_t port);
+void gpio_write_port(port_t port, uint32_t value);
 
 void gpio_set_output_pushpull(pin_t pin);
 void gpio_set_output_opendrain(pin_t pin);
