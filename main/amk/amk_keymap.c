@@ -9,6 +9,7 @@
  */
 
 #include <string.h>
+#include "generic_hal.h"
 
 #include "amk_keymap.h"
 #include "amk_eeprom.h"
@@ -46,7 +47,7 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
     return MACRO_NONE;
 }
 
-__attribute__((weak))
+__WEAK
 void amk_keymap_init(void)
 {
     if (!ee_keymap_is_valid()) {
@@ -60,7 +61,7 @@ void amk_keymap_init(void)
     keymap_debug("amk_keymap_init finished\n");
 }
 
-__attribute__((weak))
+__WEAK
 void amk_keymap_reset(void)
 {
     for(int layer = 0; layer < EEKEYMAP_MAX_LAYER; layer++) {
@@ -74,13 +75,13 @@ void amk_keymap_reset(void)
     keymap_debug("amk_keymap_reset finished\n");
 }
 
-__attribute__((weak))
+__WEAK
 uint8_t amk_keymap_get_layer_count(void)
 {
     return EEKEYMAP_MAX_LAYER;
 }
 
-__attribute__((weak))
+__WEAK
 void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
 {
     uint16_t amk_code = amk_keymap_get(layer, row, col);
@@ -91,7 +92,7 @@ void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode)
     ee_keymap_write_key(layer, row, col, keycode);
 }
 
-__attribute__((weak))
+__WEAK
 uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
 {
     uint16_t amk_code = ee_keymap_read_key(layer, row, col);
@@ -99,43 +100,43 @@ uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col)
     return amk_code;
 }
 
-__attribute__((weak))
+__WEAK
 void amk_keymap_get_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 {
     ee_keymap_read_buffer(offset, size, data);
 }
 
-__attribute__((weak))
+__WEAK
 void amk_keymap_set_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 {
     ee_keymap_write_buffer(offset, size, data);
 }
 
-__attribute__((weak))
+__WEAK
 uint8_t amk_keymap_macro_get_count(void)
 {
     return EEKEYMAP_MACRO_COUNT;
 }
 
-__attribute__((weak))
+__WEAK
 uint16_t amk_keymap_macro_get_buffer_size(void)
 {
     return EEKEYMAP_MACRO_SIZE;
 }
 
-__attribute__((weak))
+__WEAK
 void amk_keymap_macro_get_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 {
     ee_macro_read_buffer(offset, size, data);
 }
 
-__attribute__((weak))
+__WEAK
 void amk_keymap_macro_set_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 {
     ee_macro_write_buffer(offset, size, data);
 }
 
-__attribute__((weak))
+__WEAK
 void amk_keymap_macro_reset(void)
 {
     ee_macro_reset();
@@ -143,57 +144,58 @@ void amk_keymap_macro_reset(void)
     keymap_debug("amk_macro_reset finished\n");
 }
 
-
 #else
-__attribute__((weak))
+
+__WEAK
 void amk_keymap_init(void)
 {
     keymap_debug("amk_keymap_init in disabled mode\n");
 }
 
-__attribute__((weak))
+__WEAK
 void amk_keymap_reset(void)
 {
     keymap_debug("amk_keymap_reset in disabled mode\n");
 }
 
-__attribute__((weak))
+__WEAK
 uint8_t amk_keymap_get_layer_count(void) { return 0; }
 
-__attribute__((weak))
+__WEAK
 void amk_keymap_set(uint8_t layer, uint8_t row, uint8_t col, uint16_t keycode) {}
 
-__attribute__((weak))
+__WEAK
 uint16_t amk_keymap_get(uint8_t layer, uint8_t row, uint8_t col) { return 0; }
 
-__attribute__((weak))
+__WEAK
 void amk_keymap_get_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 {}
 
-__attribute__((weak))
+__WEAK
 void amk_keymap_set_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 {}
 
-__attribute__((weak))
+__WEAK
 uint8_t  amk_keymap_macro_get_count(void)
 {
     return 0;
 }
 
-__attribute__((weak))
+__WEAK
 uint16_t amk_keymap_macro_get_buffer_size(void)
 {
     return 0;
 }
 
-__attribute__((weak))
+__WEAK
 void     amk_keymap_macro_get_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 {}
-__attribute__((weak))
+
+__WEAK
 void     amk_keymap_macro_set_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 {}
 
-__attribute__((weak))
+__WEAK
 void     amk_keymap_macro_reset(void)
 {}
 

@@ -10,23 +10,25 @@
 #MCU = NUC126 
 #MCU = HC32F460
 #MCU = GD32E103
-MCU = STM32F401
+#MCU = STM32F401
+#MCU = STM32G431
+MCU = GD32E505
 #USB_HOST_ENABLE = yes
 #USB_DEVICE_ENABLE = no
 #EECONFIG_FLASH = yes
 TINYUSB_ENABLE = yes
-TINYUSB_USE_HAL = yes
+#TINYUSB_USE_HAL = yes
 #SCREEN_ENABLE = yes
 #RGB_LINEAR_ENABLE = yes
 #RGB_INDICATOR_ENABLE = yes
 
-#RTOS_ENABLE = yes
+RTOS_ENABLE = yes
 
 #LINKER_PATH = $(KEYBOARD_DIR)
 
 SRCS += $(KEYBOARD_DIR)/onekey.c
 SRCS += $(KEYBOARD_DIR)/onekey_keymap.c
 
-SRCS += $(KEYBOARD_DIR)/display.c
-SRCS += $(MAIN_DIR)/drivers/gc9107.c
-SRCS += $(MAIN_DIR)/drivers/spi.c
+#SRCS += $(KEYBOARD_DIR)/display.c
+#SRCS += $(MAIN_DIR)/drivers/gc9107.c
+#SRCS += $(MAIN_DIR)/drivers/spi.c

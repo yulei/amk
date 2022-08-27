@@ -27,7 +27,7 @@ void amk_indicator_init(void)
 #endif
 }
 
-__attribute__((weak))
+__WEAK
 void led_set_kb(uint8_t led)
 {
 }

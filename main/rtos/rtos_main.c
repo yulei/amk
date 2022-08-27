@@ -27,13 +27,7 @@ extern void custom_board_task(void);
 #define MAIN_THREAD_PRIORITY    osPriorityNormal
 
 static osThreadId_t usb_thread_id;
-const osThreadAttr_t usb_thread_attr = {
-    .name = "usb",
-    .priority = USB_THREAD_PRIORITY,
-};
-
-//static uint32_t usb_thread_cb[WORDS(sizeof(osRtxThread_t))];
-/*static uint32_t usb_thread_cb[WORDS(sizeof(StaticTask_t))];
+static uint32_t usb_thread_cb[WORDS(sizeof(StaticTask_t))];
 static uint64_t usb_thread_stack[USB_THREAD_STACK / sizeof(uint64_t)];
 static const osThreadAttr_t usb_thread_attr = {
     .name = "usb",
@@ -42,16 +36,10 @@ static const osThreadAttr_t usb_thread_attr = {
     .stack_mem = usb_thread_stack,
     .stack_size = sizeof(usb_thread_stack),
     .priority = USB_THREAD_PRIORITY,
-};*/
-
-static osThreadId_t main_thread_id;
-const osThreadAttr_t main_thread_attr = {
-    .name = "main",
-    .priority = MAIN_THREAD_PRIORITY,
 };
 
-//static uint32_t main_thread_cb[WORDS(sizeof(osRtxThread_t))];
-/*static uint32_t main_thread_cb[WORDS(sizeof(StaticTask_t))];
+static osThreadId_t main_thread_id;
+static uint32_t main_thread_cb[WORDS(sizeof(StaticTask_t))];
 static uint64_t main_thread_stack[MAIN_THREAD_STACK / sizeof(uint64_t)];
 static const osThreadAttr_t main_thread_attr = {
     .name = "main",
@@ -60,16 +48,14 @@ static const osThreadAttr_t main_thread_attr = {
     .stack_mem = main_thread_stack,
     .stack_size = sizeof(main_thread_stack),
     .priority = MAIN_THREAD_PRIORITY,
-};*/
+};
 
-#if 0
-static uint32_t timer_1ms_cb[WORDS(sizeof(osRtxTimer_t))];
+static uint32_t timer_1ms_cb[WORDS(sizeof(StaticTimer_t))];
 static const osTimerAttr_t timer_1ms_attr = {
     .name = "1ms",
     .cb_mem = timer_1ms_cb,
     .cb_size = sizeof(timer_1ms_cb),
 };
-#endif
 
 static void usb_thread(void *arg);
 static void main_thread(void *arg);
@@ -82,8 +68,8 @@ int main(int argc, char ** argv)
 
     osKernelInitialize();
 
-    usb_thread_id = osThreadNew(usb_thread, NULL, NULL);
-    main_thread_id = osThreadNew(main_thread, NULL, NULL);
+    usb_thread_id = osThreadNew(usb_thread, NULL, &usb_thread_attr);
+    main_thread_id = osThreadNew(main_thread, NULL, &main_thread_attr);
     osKernelStart();
 
     // never reach here
@@ -103,7 +89,7 @@ void usb_thread(void *arg)
 void main_thread(void *arg)
 {
     uint32_t flags = 0;
-    osTimerId_t tmr_id = osTimerNew(timer_task_1ms, osTimerPeriodic, NULL, NULL);
+    osTimerId_t tmr_id = osTimerNew(timer_task_1ms, osTimerPeriodic, NULL, &timer_1ms_attr);
     osTimerStart(tmr_id, 1);
     
     while(1) {

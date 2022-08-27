@@ -50,7 +50,9 @@ static void keyboard_timer_handler(void *p_context);
 
 /** the fllowing function can be overrided by the keyboard codes */
 extern void keyboard_set_rgb(bool on);
-__attribute__((weak)) void keyboard_prepare_sleep(void)
+
+__WEAK
+void keyboard_prepare_sleep(void)
 {
 #ifdef RGB_ENABLE
     rgb_led_prepare_sleep();
@@ -332,7 +334,7 @@ static void connect_target(uint8_t device)
 #endif
 }
 
-__attribute__((weak))
+__WEAK
 bool hook_process_action_kb(action_t *action)
 {
     return false;

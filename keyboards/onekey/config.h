@@ -20,7 +20,7 @@
 #define MATRIX_COL_PINS { C1}
 
 // screen configuration
-#define USE_SPI1
+//#define USE_SPI1
 #define GC9107_SPI_ID       SPI_INSTANCE_1
 #define SCREEN_NUM          1
 #define SCREEN_0_PWR        C5
@@ -64,7 +64,9 @@
 
 //#define VECT_TAB_OFFSET 0x20000
 
+#define AMK_PROFILING
 //#define XTAL_VALUE      16000000
-#define HSE_VALUE      12000000
+#define HXTAL_VALUE     16000000
+#define HSE_VALUE      HXTAL_VALUE //16000000
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 //#define CFG_TUSB_CONFIG_FILE    "tusb_def_host.h"

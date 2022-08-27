@@ -132,19 +132,19 @@ static void add_frame(uint32_t width, uint32_t height, uint8_t *buffer, uint16_t
     }
 }
 
-__attribute__((weak))
+__WEAK
 bool anim_display_need_refresh(uint32_t index)
 {
     return true;
 }
 
-__attribute__((weak))
+__WEAK
 uint32_t anim_display_get_current(uint32_t index)
 {
     return 0;
 }
 
-__attribute__((weak))
+__WEAK
 void anim_display_post_process(void* buff, uint32_t index)
 {}
 

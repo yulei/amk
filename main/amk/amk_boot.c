@@ -9,6 +9,7 @@
  */
 
 #include <stdbool.h>
+#include "generic_hal.h"
 #include "wait.h"
 #include "matrix.h"
 #include "bootloader.h"
@@ -59,7 +60,7 @@ static bool boot_scan_key(uint16_t code)
     return scan_key(code);
 }
 
-__attribute__((weak))
+__WEAK
 void pre_boot_init(void) {}
 
 void post_boot_init(void)

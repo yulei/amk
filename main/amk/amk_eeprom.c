@@ -8,6 +8,7 @@
  * @file amk_eeprom.c
  */
 
+#include "generic_hal.h"
 #include "amk_eeprom.h"
 #include "amk_keymap.h"
 #include "amk_printf.h"
@@ -216,7 +217,7 @@ void ee_macro_write_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 /*****************/
 
 // platform dependent preparation
-__attribute__((weak))
+__WEAK
 void eeconfig_init_prepare(void) {}
 
 void eeconfig_init(void)

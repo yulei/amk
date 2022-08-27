@@ -50,7 +50,7 @@ bool amk_usb_itf_ready(uint32_t type)
     return false;
 }
 
-__attribute__((weak))
+__WEAK
 void hook_send_report(uint32_t type, const void* data)
 {
 }

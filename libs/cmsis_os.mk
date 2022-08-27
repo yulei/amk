@@ -19,9 +19,8 @@ SRCS += \
 	$(CMSIS_OS_DIR)/RTX/Source/rtx_system.c \
 	$(CMSIS_OS_DIR)/RTX/Source/rtx_thread.c \
 	$(CMSIS_OS_DIR)/RTX/Source/rtx_timer.c \
+	$(CMSIS_OS_DIR)/RTX/Config/RTX_Config.c \
 	$(CMSIS_OS_DIR)/Source/os_systick.c \
-	$(CMSIS_OS_DIR)/Config/handlers.c \
-	$(CMSIS_OS_DIR)/Config/RTX_Config.c \
 
 ifeq (CORTEX_M4, $(strip $(MCU_ARCH)))
 	SRCS += $(CMSIS_OS_DIR)/RTX/Source/GCC/irq_armv7m.S
@@ -31,6 +30,6 @@ ifeq (CORTEX_M7, $(strip $(MCU_ARCH)))
 	SRCS += $(CMSIS_OS_DIR)/RTX/Source/GCC/irq_armv7m.S
 endif
 
-ifeq (CORTEX_M33, $(strip $(MCU_ARCH)))
-	SRCS += $(CMSIS_OS_DIR)/RTX/Source/GCC/irq_armv8mml.S
-endif
+#ifeq (CORTEX_M33, $(strip $(MCU_ARCH)))
+	SRCS += $(CMSIS_OS_DIR)/RTX/Source/GCC/irq_armv8mbl.S
+#endif

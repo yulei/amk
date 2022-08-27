@@ -52,22 +52,22 @@ static matrix_row_t matrix_debouncing[MATRIX_ROWS];
 #endif
 
 #ifdef MATRIX_I2C_PINS
-__attribute__((weak))
+__WEAK
 void matrix_i2c_init(void)
 {
 }
 
-__attribute__((weak))
+__WEAK
 bool matrix_i2c_scan(matrix_row_t* raw)
 {
     return false;
 }
 
-__attribute__((weak))
+__WEAK
 void matrix_i2c_prepare_sleep(void)
 {}
 
-__attribute__((weak))
+__WEAK
 bool matrix_i2c_check_boot(void)
 {
     return false;
@@ -82,17 +82,17 @@ static bool debouncing = false;
 static uint16_t debouncing_time = 0;
 #endif
 
-__attribute__((weak))
+__WEAK
 void matrix_init_kb(void)
 {
 }
 
-__attribute__((weak))
+__WEAK
 void matrix_scan_kb(void)
 {
 }
 
-__attribute__((weak))
+__WEAK
 void matrix_init_custom(void)
 {
 #ifdef MATRIX_I2C_PINS
@@ -165,7 +165,7 @@ void matrix_init(void)
     matrix_init_kb();
 }
 
-__attribute__((weak))
+__WEAK
 bool matrix_scan_custom(matrix_row_t* raw)
 {
     bool changed = false;
@@ -284,7 +284,7 @@ bool matrix_scan_custom(matrix_row_t* raw)
     return changed;
 }
 
-__attribute__((weak))
+__WEAK
 bool matrix_scan_post(matrix_row_t *raw)
 {
     return false;

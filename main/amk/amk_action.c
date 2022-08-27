@@ -9,6 +9,7 @@
  * @brief action function defintion for custom behavior
  */
 #include "amk_action.h"
+#include "generic_hal.h"
 #include "eeconfig.h"
 
 #include "action.h"
@@ -46,7 +47,7 @@
 #define action_debug(...)
 #endif
 
-__attribute__((weak))
+__WEAK
 void keyboard_set_rgb(bool on)
 {
 #ifdef RGB_ENABLE
@@ -224,8 +225,7 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
     }    
 }
 
-
-__attribute__((weak))
+__WEAK
 bool hook_process_action_main(keyrecord_t *record)
 {
     return false;
@@ -363,7 +363,7 @@ bool hook_process_action(keyrecord_t *record)
     return hook_process_action_main(record);
 }
 
-__attribute__((weak))
+__WEAK
 void hook_matrix_change_kb(keyevent_t event)
 {
 }
@@ -394,7 +394,7 @@ void hook_matrix_change(keyevent_t event)
     hook_matrix_change_kb(event);
 }
 
-__attribute__((weak))
+__WEAK
 void hook_layer_change_kb(uint32_t layer_state)
 {
 }
