@@ -16,6 +16,7 @@
 #if defined(NRF52832_XXAA) || defined(NRF52840_XXAA)
     #include "nrf_gpio.h"
     typedef uint32_t pin_t;
+    typedef uint32_t port_t;
     #define INVALID_PIN 0xFFFFFFFF
 
     #define P0_0 NRF_GPIO_PIN_MAP(0,0)
@@ -90,6 +91,7 @@
 
     #define INVALID_PIN 0xFFFFFFFF
     typedef uint32_t pin_t;
+    typedef uint32_t port_t;
 
     #define PIN_BIT(pin, pos) ((((pin)>>(pos))&1) == 1 ? (pos) : (pin))
     #define PIN_C(x) \
@@ -430,6 +432,7 @@
 
     #define INVALID_PIN 0xFFFFFFFF
     typedef uint32_t pin_t;
+    typedef uint32_t port_t;
 
     #define MAKE_PIN(port, pin)     ((uint32_t) (((port)<<16)|((pin)&0xFFFF)))
     #define GET_PIN(port_pin)       ((port_pin)&0xFFFF)

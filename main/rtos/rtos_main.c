@@ -13,6 +13,8 @@
 
 #include "FreeRTOS.h"
 
+bool osKernelInited = false;
+
 extern void system_init(void);
 extern void custom_board_init(void);
 extern void custom_board_task(void);
@@ -81,6 +83,7 @@ int main(int argc, char ** argv)
 
 void usb_thread(void *arg)
 {
+    osKernelInited = true;
     usb_init();
     while (1) {
         usb_task_usb();
@@ -153,7 +156,7 @@ void timer_task_1ms(void *arg)
 {
     static uint32_t i = 0;
     osThreadFlagsSet(main_thread_id, FLAGS_MAIN_1MS);
-    if (!(i++ % 10)) {
+    if (!(i++ % 100)) {
         osThreadFlagsSet(main_thread_id, FLAGS_MAIN_10MS);
     }
 }

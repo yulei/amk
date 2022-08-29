@@ -14,6 +14,7 @@
 extern void system_init(void);
 extern void custom_board_init(void);
 extern void custom_board_task(void);
+bool osKernelInited = false;
 
 // flags
 #define FLAGS_MAIN_1MS      (1<<0)
@@ -62,6 +63,8 @@ int main(int argc, char ** argv)
 
 void usb_thread(void *arg)
 {
+    osKernelInited = true;
+
     usb_init();
     while (1) {
         usb_task_usb();

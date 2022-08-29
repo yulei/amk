@@ -2,16 +2,21 @@
  * @file wait.c
  */
 
+#include <stdbool.h>
 #include "generic_hal.h"
 #include "gd32_util.h"
 #include "wait.h"
-//#include "cmsis_os2.h"
+#include "cmsis_os2.h"
 
+extern bool osKernelInited;
 void wait_ms(int ms)
 {
 #ifdef RTOS_ENABLE
-    //osDelay(ms);
-    usb_delay_ms(ms);
+    //if (osKernelInited) {
+    //    osDelay(ms);
+    //} else {
+        usb_delay_ms(ms);
+    //}
 #else
     systick_delay(ms);
 #endif
