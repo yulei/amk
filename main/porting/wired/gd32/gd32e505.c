@@ -118,6 +118,8 @@ static void usb_custom_init(void)
 void custom_board_init(void)
 {
     usb_custom_init();
+
+    gpio_pin_remap_config(GPIO_SWJ_SWDPENABLE_REMAP,ENABLE);
 }
 
 void custom_board_task(void)
