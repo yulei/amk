@@ -32,6 +32,3 @@
 [submodule "libs/cmsis_freertos"]
 	path = libs/cmsis_freertos
 	url = https://github.com/ARM-software/CMSIS-FreeRTOS.git
-[submodule "libs/rt_nano"]
-	path = libs/rt_nano
-	url = https://github.com/RT-Thread/rtthread-nano.git
