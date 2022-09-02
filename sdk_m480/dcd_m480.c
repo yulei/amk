@@ -116,20 +116,6 @@ static struct
 static volatile struct xfer_ctl_t *current_dma_xfer;
 
 
-/*
-  local helper functions
-*/
-
-static void usb_attach(void)
-{
-  HSUSBD->PHYCTL |= HSUSBD_PHYCTL_DPPUEN_Msk;
-}
-
-static void usb_detach(void)
-{
-  HSUSBD->PHYCTL &= ~HSUSBD_PHYCTL_DPPUEN_Msk;
-}
-
 static void usb_control_send_zlp(void)
 {
   HSUSBD->CEPINTSTS = HSUSBD_CEPINTSTS_STSDONEIF_Msk;
@@ -229,7 +215,7 @@ static void bus_reset(void)
   bufseg_addr = CFG_TUD_ENDPOINT0_SIZE;
 
   /* Reset USB device address */
-  HSUSBD->FADDR = 0;
+  HSUSBD_SET_ADDR(0);
 
   current_dma_xfer = NULL;
 }
@@ -324,8 +310,6 @@ void dcd_init(uint8_t rhport)
 
   HSUSBD->OPER = HSUSBD_OPER_HISPDEN_Msk;   /* high-speed */
   HSUSBD_CLR_SE0();
-
-  //usb_attach();
 }
 
 void dcd_int_enable(uint8_t rhport)
@@ -389,15 +373,25 @@ bool dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const * p_endpoint_desc)
   xfer->ep_addr = p_endpoint_desc->bEndpointAddress;
 
 
-  /* enable interrupt */
+  /* enable endpoint interrupt */
   HSUSBD->GINTEN |= (0x1UL << (HSUSBD_GINTEN_EPAIEN_Pos + (num - PERIPH_EPA)));
-  uint32_t ep_intr = HSUSBD_EPINTEN_TXPKIEN_Msk;
+
   if (dir == TUSB_DIR_OUT) {
-    ep_intr = HSUSBD_EPINTEN_RXPKIEN_Msk | HSUSBD_EPINTEN_SHORTRXIEN_Msk | HSUSBD_EPINTEN_BUFFULLIEN_Msk;
+    HSUSBD_ENABLE_EP_INT(num, HSUSBD_EPINTEN_RXPKIEN_Msk | HSUSBD_EPINTEN_SHORTRXIEN_Msk | HSUSBD_EPINTEN_BUFFULLIEN_Msk);
+  } else {
+    HSUSBD_ENABLE_EP_INT(num, HSUSBD_EPINTEN_TXPKIEN_Msk);
   }
 
-  HSUSBD_ENABLE_EP_INT(num, ep_intr);
   return true;
+}
+
+void dcd_edpt_close (uint8_t rhport, uint8_t ep_addr)
+{
+  uint8_t num = tu_edpt_number(ep_addr);
+  HSUSBD->EP[num].EPRSPCTL = (HSUSBD->EP[num].EPRSPCTL & HSUSBD_EP_RSPCTL_MODE_MASK) | HSUSBD_EPRSPCTL_FLUSH_Msk;
+
+  HSUSBD->GINTEN &= ~(0x1UL << (HSUSBD_GINTEN_EPAIEN_Pos + num - 1));
+  HSUSBD_ENABLE_EP_INT(num, 0);
 }
 
 void dcd_edpt_close_all (uint8_t rhport)
@@ -475,8 +469,8 @@ bool dcd_edpt_xfer_fifo (uint8_t rhport, uint8_t ep_addr, tu_fifo_t * ff, uint16
 
   /* mine the data for the information we need */
   tusb_dir_t dir = tu_edpt_dir(ep_addr);
-  USBD_EP_T *ep = ep_entry(ep_addr, false);
-  struct xfer_ctl_t *xfer = &xfer_table[ep - USBD->EP];
+  HSUSBD_EP_T *ep = ep_entry(ep_addr, false);
+  struct xfer_ctl_t *xfer = &xfer_table[ep - HSUSBD->EP];
 
   /* store away the information we'll needing now and later */
   xfer->data_ptr = NULL;      // Indicates a FIFO shall be used
@@ -486,12 +480,12 @@ bool dcd_edpt_xfer_fifo (uint8_t rhport, uint8_t ep_addr, tu_fifo_t * ff, uint16
 
   if (TUSB_DIR_IN == dir)
   {
-    ep->EPINTEN = USBD_EPINTEN_BUFEMPTYIEN_Msk;
+    ep->EPINTEN = HSUSBD_EPINTEN_BUFEMPTYIEN_Msk;
   }
   else
   {
     xfer->out_bytes_so_far = 0;
-    ep->EPINTEN = USBD_EPINTEN_RXPKIEN_Msk;
+    ep->EPINTEN = HSUSBD_EPINTEN_RXPKIEN_Msk;
   }
 
   return true;
@@ -510,7 +504,7 @@ void dcd_edpt_stall(uint8_t rhport, uint8_t ep_addr)
   }
   else
   {
-    HSUSBD->CEPCTL = HSUSBD_CEPCTL_STALLEN_Msk;
+    HSUSBD_SET_CEP_STATE(HSUSBD_CEPCTL_STALLEN_Msk);
   }
 }
 
@@ -526,7 +520,7 @@ void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr)
   } 
   else 
   {
-    HSUSBD->CEPCTL = HSUSBD_CEPCTL_STALLEN_Msk;
+    HSUSBD_SET_CEP_STATE(HSUSBD_CEPCTL_NAKCLR_Msk);
   }
 }
 
@@ -678,7 +672,7 @@ void dcd_int_handler(uint8_t rhport)
       /* given ACK from host has happened, we can now set the address (if not already done) */
       if((HSUSBD->FADDR != assigned_address) && (HSUSBD->FADDR == 0))
       {
-        HSUSBD->FADDR = assigned_address;
+        HSUSBD_SET_ADDR(assigned_address);
 
         for (enum ep_enum ep_index = PERIPH_EPA; ep_index < PERIPH_MAX_EP; ep_index++)
         {
@@ -760,13 +754,13 @@ void dcd_int_handler(uint8_t rhport)
 void dcd_disconnect(uint8_t rhport)
 {
   (void) rhport;
-  usb_detach();
+  HSUSBD_SET_SE0();
 }
 
 void dcd_connect(uint8_t rhport)
 {
   (void) rhport;
-  usb_attach();
+  HSUSBD_CLR_SE0();
 }
 
 #endif
