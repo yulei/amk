@@ -253,98 +253,159 @@
     #define B29 GPIO(GPIO_PORTB, 29)
     #define B30 GPIO(GPIO_PORTB, 30)
     #define B31 GPIO(GPIO_PORTB, 31)
-#elif   defined(NUC126)
+#elif   defined(M484)
     #include "generic_hal.h"
     typedef uint32_t pin_t;
-    #define MAKE_PIN(port, pin)     (((port)<<16) | (pin))
-    #define GET_PIN(port_pin)       ((port_pin) & 0xFF)
-    #define GET_PORT(port_pin)      (((port_pin)>>16) & 0xFF)
-    #define A0          MAKE_PIN(0, 0 ) /*!< Specify PA.0 Pin Data Input/Output */
-    #define A1          MAKE_PIN(0, 1 ) /*!< Specify PA.1 Pin Data Input/Output */
-    #define A2          MAKE_PIN(0, 2 ) /*!< Specify PA.2 Pin Data Input/Output */
-    #define A3          MAKE_PIN(0, 3 ) /*!< Specify PA.3 Pin Data Input/Output */
-    #define A4          MAKE_PIN(0, 4 ) /*!< Specify PA.4 Pin Data Input/Output */
-    #define A5          MAKE_PIN(0, 5 ) /*!< Specify PA.5 Pin Data Input/Output */
-    #define A6          MAKE_PIN(0, 6 ) /*!< Specify PA.6 Pin Data Input/Output */
-    #define A7          MAKE_PIN(0, 7 ) /*!< Specify PA.7 Pin Data Input/Output */
-    #define A8          MAKE_PIN(0, 8 ) /*!< Specify PA.8 Pin Data Input/Output */
-    #define A9          MAKE_PIN(0, 9 ) /*!< Specify PA.9 Pin Data Input/Output */
-    #define A10         MAKE_PIN(0, 10) /*!< Specify PA.10 Pin Data Input/Output */
-    #define A11         MAKE_PIN(0, 11) /*!< Specify PA.11 Pin Data Input/Output */
-    #define A12         MAKE_PIN(0, 12) /*!< Specify PA.12 Pin Data Input/Output */
-    #define A13         MAKE_PIN(0, 13) /*!< Specify PA.13 Pin Data Input/Output */
-    #define A14         MAKE_PIN(0, 14) /*!< Specify PA.14 Pin Data Input/Output */
-    #define A15         MAKE_PIN(0, 15) /*!< Specify PA.15 Pin Data Input/Output */
-    #define B0          MAKE_PIN(1, 0 ) /*!< Specify PB.0 Pin Data Input/Output */
-    #define B1          MAKE_PIN(1, 1 ) /*!< Specify PB.1 Pin Data Input/Output */
-    #define B2          MAKE_PIN(1, 2 ) /*!< Specify PB.2 Pin Data Input/Output */
-    #define B3          MAKE_PIN(1, 3 ) /*!< Specify PB.3 Pin Data Input/Output */
-    #define B4          MAKE_PIN(1, 4 ) /*!< Specify PB.4 Pin Data Input/Output */
-    #define B5          MAKE_PIN(1, 5 ) /*!< Specify PB.5 Pin Data Input/Output */
-    #define B6          MAKE_PIN(1, 6 ) /*!< Specify PB.6 Pin Data Input/Output */
-    #define B7          MAKE_PIN(1, 7 ) /*!< Specify PB.7 Pin Data Input/Output */
-    #define B8          MAKE_PIN(1, 8 ) /*!< Specify PB.8 Pin Data Input/Output */
-    #define B9          MAKE_PIN(1, 9 ) /*!< Specify PB.9 Pin Data Input/Output */
-    #define B10         MAKE_PIN(1, 10) /*!< Specify PB.10 Pin Data Input/Output */
-    #define B11         MAKE_PIN(1, 11) /*!< Specify PB.11 Pin Data Input/Output */
-    #define B12         MAKE_PIN(1, 12) /*!< Specify PB.12 Pin Data Input/Output */
-    #define B13         MAKE_PIN(1, 13) /*!< Specify PB.13 Pin Data Input/Output */
-    #define B14         MAKE_PIN(1, 14) /*!< Specify PB.14 Pin Data Input/Output */
-    #define B15         MAKE_PIN(1, 15) /*!< Specify PB.15 Pin Data Input/Output */
-    #define C0          MAKE_PIN(2, 0 ) /*!< Specify PC.0 Pin Data Input/Output */
-    #define C1          MAKE_PIN(2, 1 ) /*!< Specify PC.1 Pin Data Input/Output */
-    #define C2          MAKE_PIN(2, 2 ) /*!< Specify PC.2 Pin Data Input/Output */
-    #define C3          MAKE_PIN(2, 3 ) /*!< Specify PC.3 Pin Data Input/Output */
-    #define C4          MAKE_PIN(2, 4 ) /*!< Specify PC.4 Pin Data Input/Output */
-    #define C5          MAKE_PIN(2, 5 ) /*!< Specify PC.5 Pin Data Input/Output */
-    #define C6          MAKE_PIN(2, 6 ) /*!< Specify PC.6 Pin Data Input/Output */
-    #define C7          MAKE_PIN(2, 7 ) /*!< Specify PC.7 Pin Data Input/Output */
-    #define C8          MAKE_PIN(2, 8 ) /*!< Specify PC.8 Pin Data Input/Output */
-    #define C9          MAKE_PIN(2, 9 ) /*!< Specify PC.9 Pin Data Input/Output */
-    #define C10         MAKE_PIN(2, 10) /*!< Specify PC.10 Pin Data Input/Output */
-    #define C11         MAKE_PIN(2, 11) /*!< Specify PC.11 Pin Data Input/Output */
-    #define C12         MAKE_PIN(2, 12) /*!< Specify PC.12 Pin Data Input/Output */
-    #define C13         MAKE_PIN(2, 13) /*!< Specify PC.13 Pin Data Input/Output */
-    #define C14         MAKE_PIN(2, 14) /*!< Specify PC.14 Pin Data Input/Output */
-    #define C15         MAKE_PIN(2, 15) /*!< Specify PC.15 Pin Data Input/Output */
-    #define D0          MAKE_PIN(3, 0 ) /*!< Specify PD.0 Pin Data Input/Output */
-    #define D1          MAKE_PIN(3, 1 ) /*!< Specify PD.1 Pin Data Input/Output */
-    #define D2          MAKE_PIN(3, 2 ) /*!< Specify PD.2 Pin Data Input/Output */
-    #define D3          MAKE_PIN(3, 3 ) /*!< Specify PD.3 Pin Data Input/Output */
-    #define D4          MAKE_PIN(3, 4 ) /*!< Specify PD.4 Pin Data Input/Output */
-    #define D5          MAKE_PIN(3, 5 ) /*!< Specify PD.5 Pin Data Input/Output */
-    #define D6          MAKE_PIN(3, 6 ) /*!< Specify PD.6 Pin Data Input/Output */
-    #define D7          MAKE_PIN(3, 7 ) /*!< Specify PD.7 Pin Data Input/Output */
-    #define D8          MAKE_PIN(3, 8 ) /*!< Specify PD.8 Pin Data Input/Output */
-    #define D9          MAKE_PIN(3, 9 ) /*!< Specify PD.9 Pin Data Input/Output */
-    #define D10         MAKE_PIN(3, 10) /*!< Specify PD.10 Pin Data Input/Output */
-    #define D11         MAKE_PIN(3, 11) /*!< Specify PD.11 Pin Data Input/Output */
-    #define D12         MAKE_PIN(3, 12) /*!< Specify PD.12 Pin Data Input/Output */
-    #define D13         MAKE_PIN(3, 13) /*!< Specify PD.13 Pin Data Input/Output */
-    #define D14         MAKE_PIN(3, 14) /*!< Specify PD.14 Pin Data Input/Output */
-    #define D15         MAKE_PIN(3, 15) /*!< Specify PD.15 Pin Data Input/Output */
-    #define E0          MAKE_PIN(4, 0 ) /*!< Specify PE.0 Pin Data Input/Output */
-    #define E1          MAKE_PIN(4, 1 ) /*!< Specify PE.1 Pin Data Input/Output */
-    #define E2          MAKE_PIN(4, 2 ) /*!< Specify PE.2 Pin Data Input/Output */
-    #define E3          MAKE_PIN(4, 3 ) /*!< Specify PE.3 Pin Data Input/Output */
-    #define E4          MAKE_PIN(4, 4 ) /*!< Specify PE.4 Pin Data Input/Output */
-    #define E5          MAKE_PIN(4, 5 ) /*!< Specify PE.5 Pin Data Input/Output */
-    #define E6          MAKE_PIN(4, 6 ) /*!< Specify PE.6 Pin Data Input/Output */
-    #define E7          MAKE_PIN(4, 7 ) /*!< Specify PE.7 Pin Data Input/Output */
-    #define E8          MAKE_PIN(4, 8 ) /*!< Specify PE.8 Pin Data Input/Output */
-    #define E9          MAKE_PIN(4, 9 ) /*!< Specify PE.9 Pin Data Input/Output */
-    #define E10         MAKE_PIN(4, 10) /*!< Specify PE.10 Pin Data Input/Output */
-    #define E11         MAKE_PIN(4, 11) /*!< Specify PE.11 Pin Data Input/Output */
-    #define E12         MAKE_PIN(4, 12) /*!< Specify PE.12 Pin Data Input/Output */
-    #define E13         MAKE_PIN(4, 13) /*!< Specify PE.13 Pin Data Input/Output */
-    #define F0          MAKE_PIN(5, 0 ) /*!< Specify PF.0 Pin Data Input/Output */
-    #define F1          MAKE_PIN(5, 1 ) /*!< Specify PF.1 Pin Data Input/Output */
-    #define F2          MAKE_PIN(5, 2 ) /*!< Specify PF.2 Pin Data Input/Output */
-    #define F3          MAKE_PIN(5, 3 ) /*!< Specify PF.3 Pin Data Input/Output */
-    #define F4          MAKE_PIN(5, 4 ) /*!< Specify PF.4 Pin Data Input/Output */
-    #define F5          MAKE_PIN(5, 5 ) /*!< Specify PF.5 Pin Data Input/Output */
-    #define F6          MAKE_PIN(5, 6 ) /*!< Specify PF.6 Pin Data Input/Output */
-    #define F7          MAKE_PIN(5, 7 ) /*!< Specify PF.7 Pin Data Input/Output */
+    typedef uint32_t port_t;
+
+    #define PIN_P(x) (1<<(x))
+    #define MAKE_PIN(port, pin) ((GPIO_PIN_DATA_BASE+(0x40*(port))) + ((pin)<<2))
+    #define GET_PIN(port_pin)   PIN_P((((port_pin)%0x40)>>2))
+
+    #define A0      MAKE_PIN(0,0)
+    #define A1      MAKE_PIN(0,1)
+    #define A2      MAKE_PIN(0,2)
+    #define A3      MAKE_PIN(0,3)
+    #define A4      MAKE_PIN(0,4)
+    #define A5      MAKE_PIN(0,5)
+    #define A6      MAKE_PIN(0,6)
+    #define A7      MAKE_PIN(0,7)
+    #define A8      MAKE_PIN(0,8)
+    #define A9      MAKE_PIN(0,9)
+    #define A10     MAKE_PIN(0,10)
+    #define A11     MAKE_PIN(0,11)
+    #define A12     MAKE_PIN(0,12)
+    #define A13     MAKE_PIN(0,13)
+    #define A14     MAKE_PIN(0,14)
+    #define A15     MAKE_PIN(0,15)
+    #define B0      MAKE_PIN(1,0)
+    #define B1      MAKE_PIN(1,1)
+    #define B2      MAKE_PIN(1,2)
+    #define B3      MAKE_PIN(1,3)
+    #define B4      MAKE_PIN(1,4)
+    #define B5      MAKE_PIN(1,5)
+    #define B6      MAKE_PIN(1,6)
+    #define B7      MAKE_PIN(1,7)
+    #define B8      MAKE_PIN(1,8)
+    #define B9      MAKE_PIN(1,9)
+    #define B10     MAKE_PIN(1,10)
+    #define B11     MAKE_PIN(1,11)
+    #define B12     MAKE_PIN(1,12)
+    #define B13     MAKE_PIN(1,13)
+    #define B14     MAKE_PIN(1,14)
+    #define B15     MAKE_PIN(1,15)
+    #define C0      MAKE_PIN(2,0)
+    #define C1      MAKE_PIN(2,1)
+    #define C2      MAKE_PIN(2,2)
+    #define C3      MAKE_PIN(2,3)
+    #define C4      MAKE_PIN(2,4)
+    #define C5      MAKE_PIN(2,5)
+    #define C6      MAKE_PIN(2,6)
+    #define C7      MAKE_PIN(2,7)
+    #define C8      MAKE_PIN(2,8)
+    #define C9      MAKE_PIN(2,9)
+    #define C10     MAKE_PIN(2,10)
+    #define C11     MAKE_PIN(2,11)
+    #define C12     MAKE_PIN(2,12)
+    #define C13     MAKE_PIN(2,13)
+    #define C14     MAKE_PIN(2,14)
+    #define C15     MAKE_PIN(2,15)
+    #define D0      MAKE_PIN(3,0)
+    #define D1      MAKE_PIN(3,1)
+    #define D2      MAKE_PIN(3,2)
+    #define D3      MAKE_PIN(3,3)
+    #define D4      MAKE_PIN(3,4)
+    #define D5      MAKE_PIN(3,5)
+    #define D6      MAKE_PIN(3,6)
+    #define D7      MAKE_PIN(3,7)
+    #define D8      MAKE_PIN(3,8)
+    #define D9      MAKE_PIN(3,9)
+    #define D10     MAKE_PIN(3,10)
+    #define D11     MAKE_PIN(3,11)
+    #define D12     MAKE_PIN(3,12)
+    #define D13     MAKE_PIN(3,13)
+    #define D14     MAKE_PIN(3,14)
+    #define D15     MAKE_PIN(3,15)
+    #define E0      MAKE_PIN(4,0)
+    #define E1      MAKE_PIN(4,1)
+    #define E2      MAKE_PIN(4,2)
+    #define E3      MAKE_PIN(4,3)
+    #define E4      MAKE_PIN(4,4)
+    #define E5      MAKE_PIN(4,5)
+    #define E6      MAKE_PIN(4,6)
+    #define E7      MAKE_PIN(4,7)
+    #define E8      MAKE_PIN(4,8)
+    #define E9      MAKE_PIN(4,9)
+    #define E10     MAKE_PIN(4,10)
+    #define E11     MAKE_PIN(4,11)
+    #define E12     MAKE_PIN(4,12)
+    #define E13     MAKE_PIN(4,13)
+    #define E14     MAKE_PIN(4,14)
+    #define E15     MAKE_PIN(4,15)
+    #define F0      MAKE_PIN(5,0)
+    #define F1      MAKE_PIN(5,1)
+    #define F2      MAKE_PIN(5,2)
+    #define F3      MAKE_PIN(5,3)
+    #define F4      MAKE_PIN(5,4)
+    #define F5      MAKE_PIN(5,5)
+    #define F6      MAKE_PIN(5,6)
+    #define F7      MAKE_PIN(5,7)
+    #define F8      MAKE_PIN(5,8)
+    #define F9      MAKE_PIN(5,9)
+    #define F10     MAKE_PIN(5,10)
+    #define F11     MAKE_PIN(5,11)
+    #define F12     MAKE_PIN(5,12)
+    #define F13     MAKE_PIN(5,13)
+    #define F14     MAKE_PIN(5,14)
+    #define F15     MAKE_PIN(5,15)
+    #define G0      MAKE_PIN(6,0)
+    #define G1      MAKE_PIN(6,1)
+    #define G2      MAKE_PIN(6,2)
+    #define G3      MAKE_PIN(6,3)
+    #define G4      MAKE_PIN(6,4)
+    #define G5      MAKE_PIN(6,5)
+    #define G6      MAKE_PIN(6,6)
+    #define G7      MAKE_PIN(6,7)
+    #define G8      MAKE_PIN(6,8)
+    #define G9      MAKE_PIN(6,9)
+    #define G10     MAKE_PIN(6,10)
+    #define G11     MAKE_PIN(6,11)
+    #define G12     MAKE_PIN(6,12)
+    #define G13     MAKE_PIN(6,13)
+    #define G14     MAKE_PIN(6,14)
+    #define G15     MAKE_PIN(6,15)
+    #define H0      MAKE_PIN(7,0)
+    #define H1      MAKE_PIN(7,1)
+    #define H2      MAKE_PIN(7,2)
+    #define H3      MAKE_PIN(7,3)
+    #define H4      MAKE_PIN(7,4)
+    #define H5      MAKE_PIN(7,5)
+    #define H6      MAKE_PIN(7,6)
+    #define H7      MAKE_PIN(7,7)
+    #define H8      MAKE_PIN(7,8)
+    #define H9      MAKE_PIN(7,9)
+    #define H10     MAKE_PIN(7,10)
+    #define H11     MAKE_PIN(7,11)
+    #define H12     MAKE_PIN(7,12)
+    #define H13     MAKE_PIN(7,13)
+    #define H14     MAKE_PIN(7,14)
+    #define H15     MAKE_PIN(7,15)
+    #define I0      MAKE_PIN(8,1)
+    #define I1      MAKE_PIN(8,1)
+    #define I2      MAKE_PIN(8,2)
+    #define I3      MAKE_PIN(8,3)
+    #define I4      MAKE_PIN(8,4)
+    #define I5      MAKE_PIN(8,5)
+    #define I6      MAKE_PIN(8,6)
+    #define I7      MAKE_PIN(8,7)
+    #define I8      MAKE_PIN(8,8)
+    #define I9      MAKE_PIN(8,9)
+    #define I10     MAKE_PIN(8,10)
+    #define I11     MAKE_PIN(8,11)
+    #define I12     MAKE_PIN(8,12)
+    #define I13     MAKE_PIN(8,13)
+    #define I14     MAKE_PIN(8,14)
+    #define I15     MAKE_PIN(8,15)
 #elif defined(GD32E10X) || defined(GD32E50X)
     #include "generic_hal.h"
 

@@ -6,28 +6,32 @@
 #include "rgb_common.h"
 #include "rgb_driver.h"
 #include "rgb_linear.h"
-//#include "is31fl3236.h"
-//#include "is31fl3731.h"
+#include "is31fl3236.h"
+#include "is31fl3731.h"
 
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
+#if 0
     {0,0,0,0},
     {0,1,1,1},
     {0,2,2,2},
     {0,3,3,3},
+#endif
 
+#if 1
+    {0, OUT_36, OUT_35, OUT_34},
+    {0, OUT_33, OUT_32, OUT_31},
+    {0, OUT_30, OUT_29, OUT_28},
+    {0, OUT_27, OUT_26, OUT_25},
+    {0, OUT_24, OUT_23, OUT_22},
+    {0, OUT_21, OUT_20, OUT_19},
+    {0, OUT_18, OUT_17, OUT_16},
+    {0, OUT_15, OUT_14, OUT_13},
+    {0, OUT_12, OUT_11, OUT_10},
+    {0, OUT_9, OUT_8, OUT_7},
+    {0, OUT_6, OUT_5, OUT_4},
+    {0, OUT_3, OUT_2, OUT_1},
+#endif
 #if 0
-    {1, OUT_36, OUT_35, OUT_34},
-    {1, OUT_33, OUT_32, OUT_31},
-    {1, OUT_30, OUT_29, OUT_28},
-    {1, OUT_27, OUT_26, OUT_25},
-    {1, OUT_24, OUT_23, OUT_22},
-    {1, OUT_21, OUT_20, OUT_19},
-    {1, OUT_18, OUT_17, OUT_16},
-    {1, OUT_15, OUT_14, OUT_13},
-    {1, OUT_12, OUT_11, OUT_10},
-    {1, OUT_9, OUT_8, OUT_7},
-    {1, OUT_6, OUT_5, OUT_4},
-
     {1, C1_1,   C3_2,   C4_2},
     {1, C1_2,   C2_2,   C4_3},
     {1, C1_3,   C2_3,   C3_3},
@@ -59,13 +63,13 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
 };
 
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
-    { RGB_DRIVER_WS2812, 0, 0, 0, 4},
+//    { RGB_DRIVER_WS2812, 0, 0, 0, 4},
+    { RGB_DRIVER_IS31FL3236, 0x78, 0, 0, 12},
 //    { RGB_DRIVER_IS31FL3731, 0xE8, 0, 4, 20},
-//    { RGB_DRIVER_IS31FL3236, 0x78, 0, 4, 11},
 };
 
 rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
-    {0, 0, 4},
-//    {1, 4, 11},
-//    {2, 20, 4},
+//    {0, 0, 4},
+    {0, 0, 12},
+//    {1, 4, 20},
 };

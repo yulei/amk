@@ -6,6 +6,7 @@ ATSAMD_MCUS := ATSAMD21
 NUVOTON_MCUS := NUC126
 GD32_MCUS := GD32E103 GD32E505
 HC32_MCUS := HC32F460
+M480_MCUS := M484
 
 # Source files
 SRCS += \
@@ -65,15 +66,15 @@ include sdk_stm32/stm32_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(ATSAMD_MCUS)))
 VENDOR_DIR := libs/vendor/microchip
 include sdk_samd/atsamd_sdk.mk
-else ifneq (,$(filter $(strip $(MCU)),$(NUVOTON_MCUS)))
-VENDOR_DIR := libs/vendor/nuvoton
-include sdk_nuvoton/nuvoton_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(GD32_MCUS)))
 VENDOR_DIR := libs/vendor/gigadevice
 include sdk_gd32/gd32_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(HC32_MCUS)))
 VENDOR_DIR := libs/vendor/hdsc
 include sdk_hc32/hc32_sdk.mk
+else ifneq (,$(filter $(strip $(MCU)),$(M480_MCUS)))
+VENDOR_DIR := libs/vendor/nuvoton
+include sdk_m480/m480_sdk.mk
 else
 $(error Unsupported MCU: $(MCU))
 endif

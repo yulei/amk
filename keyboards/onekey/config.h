@@ -29,13 +29,15 @@
 #define SCREEN_0_RESET      C4
 #define SCREEN_0_DC         A3
 
-#if 0
+#if 1
 #define WS2812_LED_NUM  4
-#define WS2812_LED_PIN  A0
-#define PWM_TIM_PERIOD  134
-#define PWM_TIM htim2
-#define PWM_TIM_CHANNEL TIM_CHANNEL_1
+#define WS2812_LED_PIN  B7
+#define PWM_TIM_PERIOD  209
+#define PWM_TIM TIMER3 
+#define PWM_TIM_CHANNEL TIMER_CH_1
+#endif
 
+#if 0
 #define WS2812_LED_NUM  4
 #define WS2812_LED_PIN  A6
 #define PWM_TIM_PERIOD  39
@@ -48,18 +50,21 @@
 //#define WAIT_TIM      htim2
 #endif
 
-#define RGB_DEVICE_NUM  1
-#define RGB_SEGMENT_NUM 1
-#define RGB_LED_NUM     4
+#define DWT_DELAY
+
+//#define RGB_LED_NUM     4
+//#define RGB_DEVICE_NUM  2
+//#define RGB_SEGMENT_NUM 2
 
 //#define RGB_DEVICE_NUM  2
-//#define USE_I2C1
-//#define I2C1_SCL_PIN    B8
-//#define I2C1_SDA_PIN    B9
+#define USE_I2C1
+#define I2C1_SCL_PIN    B8
+#define I2C1_SDA_PIN    B9
 
-//#define RGB_SEGMENT_NUM 2
-//#define RGB_LED_NUM     15
-//#define RGB_SEGMENT_NUM 3
+//#define RGB_LED_NUM     16
+#define RGB_LED_NUM     12
+#define RGB_SEGMENT_NUM 1
+#define RGB_DEVICE_NUM  1
 //#define RGB_LED_NUM     24
 
 //#define VECT_TAB_OFFSET 0x20000
