@@ -49,6 +49,21 @@ void SysTick_Handler(void)
 }
 #endif
 
+extern RTC_HandleTypeDef hrtc;
+
+void magic_write(uint32_t magic)
+{
+    HAL_PWR_EnableBkUpAccess();
+#ifdef STM32F103xB
+    uint16_t low = magic & 0xFFFF;
+    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, low);
+    uint16_t high = (magic & 0xFFFF0000) >> 16;
+    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR2, high);
+#else
+    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR0, magic);
+#endif
+}
+
 static void fault_handler(void) 
 {
     #ifdef FAULT_BREAK

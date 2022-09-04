@@ -48,6 +48,17 @@ static void fault_handler(void)
     #endif
 }
 
+void magic_write(uint32_t magic)
+{
+    rcu_periph_clock_enable(RCU_PMU);
+    rcu_periph_clock_enable(RCU_BKPI);
+    pmu_backup_write_enable();
+    uint16_t high = (uint16_t)((magic>>16)&0xFFFF);
+    bkp_write_data(BKP_DATA_1, high);
+    uint16_t low = (uint16_t)((magic)&0xFFFF);
+    bkp_write_data(BKP_DATA_0, low);
+}
+
 void NMI_Handler(void)
 {
     fault_handler();

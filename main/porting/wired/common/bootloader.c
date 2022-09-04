@@ -9,27 +9,9 @@
 #include "amk_keymap.h"
 #include "usb_interface.h"
 
-static uint32_t Bootloader_Magic=0x41544B42;
+const uint32_t Bootloader_Magic = 0x41544B42;
 
-#if defined (NUC126) || defined(__SAMD21G18A__) || defined(STM32L432xx) || defined(GD32E10X) || defined(HC32F460xE) || defined(GD32E50X) || defined(M484)
-static void magic_write(uint32_t magic)
-{}
-#else
-extern RTC_HandleTypeDef hrtc;
-
-static void magic_write(uint32_t magic)
-{
-    HAL_PWR_EnableBkUpAccess();
-#ifdef STM32F103xB
-    uint16_t low = magic & 0xFFFF;
-    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, low);
-    uint16_t high = (magic & 0xFFFF0000) >> 16;
-    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR2, high);
-#else
-    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR0, magic);
-#endif
-}
-#endif
+extern void magic_write(uint32_t magic);
 
 void bootloader_jump(void)
 {

@@ -42,6 +42,9 @@ static void dwt_delay_init(void)
 #endif
 }
 
+void magic_write(uint32_t magic)
+{}
+
 static void debug_port_init(void)
 {
     PORT_DebugPortSetting(TDO_SWO|TDI|TRST, Disable);

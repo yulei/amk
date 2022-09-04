@@ -5,7 +5,7 @@ CP := cp
 UF2 := python util/uf2conv.py
 
 # Build type
-NO_DEBUG ?= 1
+NO_DEBUG ?= 0
 LTO_ENABLE ?= 0
 
 # Echo suspend
