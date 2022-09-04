@@ -45,6 +45,7 @@ INCS += \
 	${VENDOR_DIR}/${GD32_LIB_DIR}/Firmware/CMSIS/GD/$(MCU_SERIES)/Include \
 	${VENDOR_DIR}/${GD32_LIB_DIR}/Firmware/$(GD32_LIB_STD)/Include \
 	${GD32SDK_DIR} \
+	${GD32SDK_DIR}/$(MCU_TYPE) \
 	$(LIB_DIR)/cmsis_5/CMSIS/Core/Include
 
 APP_DEFS += \

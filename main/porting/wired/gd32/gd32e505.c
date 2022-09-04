@@ -95,8 +95,6 @@ static void usb_custom_init(void)
 
     rcu_periph_clock_enable(RCU_USBHS);
     
-#if 1
-
     REG32(GD32_GCCFG) |= GD32_GCCFG_PWRON;
 
     usb_delay_ms(20);
@@ -112,12 +110,18 @@ static void usb_custom_init(void)
     };
 
     NVIC_SetPriority(USBHS_IRQn, 0U);
-#endif
 }
 
 void custom_board_init(void)
 {
+    rcu_periph_clock_enable(RCU_PMU);
+
     usb_custom_init();
+
+    rcu_periph_clock_enable(RCU_GPIOA);
+    rcu_periph_clock_enable(RCU_GPIOB);
+    rcu_periph_clock_enable(RCU_GPIOC);
+    rcu_periph_clock_enable(RCU_AF);
 
     gpio_pin_remap_config(GPIO_SWJ_SWDPENABLE_REMAP,ENABLE);
 }

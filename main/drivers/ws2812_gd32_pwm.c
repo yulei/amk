@@ -43,7 +43,8 @@ static bool ws2812_ready = false;
 static bool ws2812_dirty = false;
 static pin_t ws2812_pin;
 
-#define TIMER3_CH1CV  ((uint32_t)(0x40000838U))
+//#define TIMER3_CH1CV  ((uint32_t)(0x40000838U))
+#define TIMER3_CH2CV  ((uint32_t)(0x4000083CU))
 
 void gpio_config(void);
 void dma_config(void);
@@ -56,7 +57,8 @@ void gpio_config(void)
     //gpio_pin_remap_config(GPIO_TIMER3_REMAP, ENABLE);
 
     /*configure PB7(TIMER3 CH1) as alternate function*/
-    gpio_init(GPIOB,GPIO_MODE_AF_PP,GPIO_OSPEED_50MHZ,GPIO_PIN_7);
+    //gpio_init(GPIOB,GPIO_MODE_AF_PP,GPIO_OSPEED_50MHZ,GPIO_PIN_7);
+    gpio_init(GPIOB,GPIO_MODE_AF_PP,GPIO_OSPEED_50MHZ,GPIO_PIN_8);
 }
 
 void dma_config(void)
@@ -70,7 +72,7 @@ void dma_config(void)
     dma_deinit(DMA0,DMA_CH6);
 
     /* DMA channel5 initialize */
-    dma_init_struct.periph_addr = (uint32_t)TIMER3_CH1CV;
+    dma_init_struct.periph_addr = (uint32_t)TIMER3_CH2CV;
     dma_init_struct.periph_inc = DMA_PERIPH_INCREASE_DISABLE;
     dma_init_struct.memory_addr = (uint32_t)(ws2812_leds);
     dma_init_struct.memory_inc = DMA_MEMORY_INCREASE_ENABLE;
@@ -118,18 +120,18 @@ void timer_config(void)
     timer_ocintpara.ocidlestate  = TIMER_OC_IDLE_STATE_HIGH;
     timer_ocintpara.ocnidlestate = TIMER_OCN_IDLE_STATE_LOW;
 
-    timer_channel_output_config(TIMER3,TIMER_CH_1,&timer_ocintpara);
+    timer_channel_output_config(TIMER3,TIMER_CH_2,&timer_ocintpara);
 
-    timer_channel_output_pulse_value_config(TIMER3,TIMER_CH_1,0);
-    timer_channel_output_mode_config(TIMER3,TIMER_CH_1,TIMER_OC_MODE_PWM0);
-    timer_channel_output_shadow_config(TIMER3,TIMER_CH_1,TIMER_OC_SHADOW_ENABLE);
+    timer_channel_output_pulse_value_config(TIMER3,TIMER_CH_2,0);
+    timer_channel_output_mode_config(TIMER3,TIMER_CH_2,TIMER_OC_MODE_PWM0);
+    timer_channel_output_shadow_config(TIMER3,TIMER_CH_2,TIMER_OC_SHADOW_ENABLE);
 
     /* TIMER3 primary output enable */
     timer_primary_output_config(TIMER3,ENABLE);
     /* channel DMA request source selection */
     timer_channel_dma_request_source_select(TIMER3,TIMER_DMAREQUEST_UPDATEEVENT);
     /* configure the TIMER DMA transfer */ 
-    timer_dma_transfer_config(TIMER3,TIMER_DMACFG_DMATA_CH1CV,TIMER_DMACFG_DMATC_1TRANSFER);
+    timer_dma_transfer_config(TIMER3,TIMER_DMACFG_DMATA_CH2CV,TIMER_DMACFG_DMATC_1TRANSFER);
     /* TIMER3 update DMA request enable */
     timer_dma_enable(TIMER3, TIMER_DMA_UPD);
 

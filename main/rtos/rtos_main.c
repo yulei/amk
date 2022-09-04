@@ -96,6 +96,9 @@ void main_thread(void *arg)
     osTimerId_t tmr_id = osTimerNew(timer_task_1ms, osTimerPeriodic, NULL, &timer_1ms_attr);
     osTimerStart(tmr_id, 1);
     
+    amk_printf("amk_init\n");
+    amk_driver_init();
+    amk_printf("board_init end\n");
     while(1) {
         flags = osThreadFlagsWait(
                         FLAGS_MAIN_1MS          // 1ms tick
@@ -147,9 +150,9 @@ void board_init(void)
 //    usb_init();
 //    usb_init_post();
 
-    amk_printf("amk_init\n");
-    amk_driver_init();
-    amk_printf("board_init end\n");
+//    amk_printf("amk_init\n");
+//    amk_driver_init();
+//    amk_printf("board_init end\n");
 }
 
 void timer_task_1ms(void *arg)

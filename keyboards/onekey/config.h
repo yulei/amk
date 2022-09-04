@@ -13,11 +13,11 @@
 #define PRODUCT One Key
 
 // key matrix
-#define MATRIX_ROWS 1
-#define MATRIX_COLS 1
+#define MATRIX_ROWS 2
+#define MATRIX_COLS 3
 
-#define MATRIX_ROW_PINS { C0}
-#define MATRIX_COL_PINS { C1}
+#define MATRIX_ROW_PINS {A0,A1}
+#define MATRIX_COL_PINS {C4,C5,C3}
 
 // screen configuration
 //#define USE_SPI1
@@ -57,7 +57,7 @@
 //#define RGB_SEGMENT_NUM 2
 
 //#define RGB_DEVICE_NUM  2
-#define USE_I2C1
+//#define USE_I2C1
 #define I2C1_SCL_PIN    B8
 #define I2C1_SDA_PIN    B9
 
@@ -71,7 +71,8 @@
 
 #define AMK_PROFILING
 //#define XTAL_VALUE      16000000
-#define HXTAL_VALUE     16000000
-#define HSE_VALUE      HXTAL_VALUE //16000000
+//#define HXTAL_VALUE     16000000
+//#define HSE_VALUE      HXTAL_VALUE //16000000
+#define HSE_VALUE      12000000
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 //#define CFG_TUSB_CONFIG_FILE    "tusb_def_host.h"

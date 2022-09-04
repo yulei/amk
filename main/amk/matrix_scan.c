@@ -75,7 +75,9 @@ bool matrix_i2c_check_boot(void)
 
 #endif
 
-#define DEBOUNCE_GLOBAL 1
+#ifndef DEBOUNCE_GLOBAL
+#define DEBOUNCE_GLOBAL 0
+#endif
 
 #if DEBOUNCE_GLOBAL
 static bool debouncing = false;
@@ -160,7 +162,11 @@ void matrix_init(void)
     memset(&matrix[0], 0, sizeof(matrix));
     memset(&matrix_debouncing[0], 0, sizeof(matrix_debouncing));
 
+#if DEBOUNCE_GLOBAL
+
+#else
     debounce_init(MATRIX_ROWS);
+#endif
 
     matrix_init_kb();
 }

@@ -12,6 +12,8 @@
 #   include "flash_stm32.c"
 #elif defined(HC32F460xE)
 #   include "flash_hc32.c"
+#elif defined(GD32E505)
+#   include "flash_gd32.c"
 #else
 #   error "flash read/write not implemented"
 #endif

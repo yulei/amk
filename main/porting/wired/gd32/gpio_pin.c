@@ -23,7 +23,7 @@ void gpio_write_pin(pin_t pin, int value)
 
 static void gpio_set_mode(pin_t pin, uint32_t mode, uint32_t speed)
 {
-    gpio_init(GET_PORT(pin), mode, speed, GET_PORT(pin));
+    gpio_init(GET_PORT(pin), mode, speed, GET_PIN(pin));
 }
 
 void gpio_set_output_pushpull(pin_t pin)

@@ -24,6 +24,7 @@ families = {
     'STM32L0':      0x202e3a91,
     'STM32G4':      0x4c71240a,
     'HC32F4':       0x48434633,     # HCF4
+    'GD32E5':       0x47444535,     # GDE5
 }
 
 INFO_FILE = "/INFO_UF2.TXT"
