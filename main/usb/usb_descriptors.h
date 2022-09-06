@@ -40,6 +40,12 @@ uint8_t const* tud_descriptor_hid_interface_vial_cb(void);
 uint32_t tud_descriptor_hid_interface_vial_size(void);
 #endif
 
+uint8_t const* tud_descriptor_device_qualifier_cb(void);
+uint32_t tud_descriptor_device_qualifier_size(void);
+
+uint8_t const* tud_descriptor_other_speed_configuration_cb(uint8_t index);
+uint32_t tud_descriptor_other_speed_configuration_size(uint8_t index);
+
 uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid);
 
 uint8_t *get_descriptor_str(uint8_t index, uint16_t *length);

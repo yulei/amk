@@ -7,11 +7,14 @@
 #include "gd32_util.h"
 #include "wait.h"
 
-extern bool osKernelInited;
+#ifdef RTOS_ENABLE
+#include "cmsis_os2.h"
+#endif
+
 void wait_ms(int ms)
 {
 #ifdef RTOS_ENABLE
-    if (osKernelInited) {
+    if (osKernelGetState() == osKernelRunning) {
         osDelay(ms);
     } else {
         usb_delay_ms(ms);

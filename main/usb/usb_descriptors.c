@@ -572,6 +572,68 @@ uint32_t tud_descriptor_hid_interface_vial_size(void)
 
 #endif
 
+#ifdef TUD_OPT_HIGH_SPEED
+tusb_desc_device_qualifier_t const desc_device_qualifier =
+{
+  .bLength            = sizeof(tusb_desc_device_qualifier_t),
+  .bDescriptorType    = TUSB_DESC_DEVICE_QUALIFIER,
+  .bcdUSB             = 0x0200,
+
+  .bDeviceClass       = 0x00,
+  .bDeviceSubClass    = 0x00,
+  .bDeviceProtocol    = 0x00,
+
+  .bMaxPacketSize0    = CFG_TUD_ENDPOINT0_SIZE,
+  .bNumConfigurations = 0x01,
+  .bReserved          = 0x00
+};
+
+uint8_t const* tud_descriptor_device_qualifier_cb(void)
+{
+    return (uint8_t const*) &desc_device_qualifier;
+}
+
+uint32_t tud_descriptor_device_qualifier_size(void)
+{
+    return sizeof(desc_device_qualifier);
+}
+
+#define OTHER_CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + HID_OTHER_DESC_LEN + VIAL_DESC_LEN)
+#define TUD_OTHER_CONFIG_DESCRIPTOR(config_num, _itfcount, _stridx, _total_len, _attribute, _power_ma) \
+  9, TUSB_DESC_OTHER_SPEED_CONFIG, U16_TO_U8S_LE(_total_len), _itfcount, config_num, _stridx, TU_BIT(7) | _attribute, (_power_ma)/2
+
+#ifndef CFG_TUD_HID_HS_POLL_INTERVAL
+#define CFG_TUD_HID_HS_POLL_INTERVAL    CFG_TUD_HID_POLL_INTERVAL
+#endif
+
+static uint8_t desc_other_configuration[] = {
+    // Config number, interface count, string index, total length, attribute, power in mA
+    TUD_OTHER_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, OTHER_CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
+    // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_ITF_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_HS_POLL_INTERVAL),
+
+#ifdef HID_OTHER_ENABLE
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_HS_POLL_INTERVAL),
+#endif
+
+#ifdef VIAL_ENABLE
+    TUD_HID_INOUT_DESCRIPTOR(ITF_NUM_VIAL, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_vial), EPNUM_VIAL_OUT, 0x80 | EPNUM_VIAL_IN, VIAL_EPSIZE, CFG_TUD_HID_HS_POLL_INTERVAL),
+#endif
+
+};
+
+uint8_t const* tud_descriptor_other_speed_configuration_cb(uint8_t index)
+{
+    return (uint8_t const*) &desc_other_configuration;
+}
+
+uint32_t tud_descriptor_other_speed_configuration_size(uint8_t index)
+{
+    return sizeof(desc_other_configuration);
+}
+
+#endif
+
 // String Descriptors
 
 // array of pointer to string descriptors

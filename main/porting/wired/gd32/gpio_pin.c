@@ -28,27 +28,27 @@ static void gpio_set_mode(pin_t pin, uint32_t mode, uint32_t speed)
 
 void gpio_set_output_pushpull(pin_t pin)
 {
-    gpio_set_mode(pin, GPIO_MODE_OUT_PP, GPIO_OSPEED_10MHZ);
+    gpio_set_mode(pin, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ);
 }
 
 void gpio_set_output_opendrain(pin_t pin)
 {
-    gpio_set_mode(pin, GPIO_MODE_OUT_OD, GPIO_OSPEED_10MHZ);
+    gpio_set_mode(pin, GPIO_MODE_OUT_OD, GPIO_OSPEED_50MHZ);
 }
 
 void gpio_set_input_floating(pin_t pin)
 {
-    gpio_set_mode(pin, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_10MHZ);
+    gpio_set_mode(pin, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ);
 }
 
 void gpio_set_input_pullup(pin_t pin)
 {
-    gpio_set_mode(pin, GPIO_MODE_IPU, GPIO_OSPEED_10MHZ);
+    gpio_set_mode(pin, GPIO_MODE_IPU, GPIO_OSPEED_50MHZ);
 }
 
 void gpio_set_input_pulldown(pin_t pin)
 {
-    gpio_set_mode(pin, GPIO_MODE_IPD, GPIO_OSPEED_10MHZ);
+    gpio_set_mode(pin, GPIO_MODE_IPD, GPIO_OSPEED_50MHZ);
 }
 
 uint32_t gpio_read_port(port_t port)

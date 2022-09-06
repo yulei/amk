@@ -76,7 +76,10 @@ enum {
 };
 
 #define ENABLE_DEFAULT  1
+
+#ifndef MODE_DEFAULT
 #define MODE_DEFAULT    0
+#endif
 
 #define SPEED_MIN 1
 #define SPEED_MAX 255
