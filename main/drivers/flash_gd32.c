@@ -51,10 +51,9 @@ bool flash_write(uint32_t address, uint16_t offset, uint16_t data)
     flash_unlock();
     fmc_flag_clear(FLASH_FLAGS);
 
-    fmc_enum_state state = fmc_word_program(address, value);
-    HAL_StatusTypeDef status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, address, value);
+    fmc_state_enum state = fmc_word_program(address, value);
     if (state != FMC_READY) {
-        amk_printf("Failed to programe word: addr=%x, data=%x, error=%d\n", address, value, HAL_FLASH_GetError());
+        amk_printf("Failed to programe word: addr=%x, data=%x, error=%d\n", address, value, state);
         ret = false;
     }
     fmc_flag_clear(FLASH_FLAGS);
@@ -67,7 +66,7 @@ bool flash_write(uint32_t address, uint16_t offset, uint16_t data)
 
 void flash_erase_pages(void)
 {
-    uint32_t total = FLASH_TOTAL_SIZE/ FLASH_PAGE_SIZE;
+    uint32_t total = FLASH_TOTAL_SIZE / FLASH_PAGE_SIZE;
 
     fmc_unlock();
     fmc_flag_clear(FLASH_FLAGS);
@@ -77,7 +76,7 @@ void flash_erase_pages(void)
         fmc_state_enum state = fmc_page_erase(cur);
             
         if (state != FMC_READY) {
-            amk_printf("flash erase failed: error=%d\n", state);
+            amk_printf("flash erase failed: address=%d, error=%d\n", cur, state);
             break;
         } 
 
