@@ -55,6 +55,18 @@ static void i2c_bus_reset(void)
     /* connect PB6 to I2C0_SCL */
     /* connect PB7 to I2C0_SDA */
     gpio_init(GPIOB, GPIO_MODE_AF_OD, GPIO_OSPEED_50MHZ, GPIO_PIN_6 | GPIO_PIN_7);
+
+    // reconfiguration i2c
+    /* enable I2C clock */
+    rcu_periph_clock_enable(RCU_I2C0);
+    /* configure I2C clock */
+    i2c_clock_config(I2C0, 100000, I2C_DTCY_2);
+    /* configure I2C address */
+    i2c_mode_addr_config(I2C0, I2C_I2CMODE_ENABLE, I2C_ADDFORMAT_7BITS, 0x70);
+    /* enable I2C */
+    i2c_enable(I2C0);
+    /* enable acknowledge */
+    i2c_ack_config(I2C0, I2C_ACK_ENABLE);
 }
 
 bool i2c_ready(i2c_handle_t i2c)
@@ -116,6 +128,8 @@ i2c_handle_t i2c_init(I2C_ID id)
 amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t length, size_t timeout)
 {
     //i2c_instance_t *inst = (i2c_instance_t*)i2c;
+    //i2c_software_reset_config(I2C0, I2C_SRESET_SET);
+    //i2c_software_reset_config(I2C0, I2C_SRESET_RESET);
     uint32_t start = timer_read32();
 
     /* wait until I2C bus is idle */
@@ -123,7 +137,8 @@ amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t le
         if (timer_elapsed32(start) > timeout) {
             i2c_bus_reset();
             start = timer_read32();
-            break;
+            //break;
+            //return AMK_I2C_TIMEOUT;
         }
     }
 
@@ -178,6 +193,8 @@ amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t le
 amk_error_t i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, size_t timeout)
 {
     //i2c_instance_t *inst = (i2c_instance_t*)i2c;
+    //i2c_software_reset_config(I2C0, I2C_SRESET_SET);
+    //i2c_software_reset_config(I2C0, I2C_SRESET_RESET);
 
     uint32_t start = timer_read32();
     /* wait until I2C bus is idle */
@@ -185,7 +202,7 @@ amk_error_t i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, 
         if (timer_elapsed32(start) > timeout) {
             i2c_bus_reset();
             start = timer_read32();
-            break;
+            //return AMK_I2C_TIMEOUT;
         }
     }
 
@@ -276,6 +293,9 @@ amk_error_t i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, 
 amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
 {
     //i2c_instance_t *inst = (i2c_instance_t*)i2c;
+    //i2c_software_reset_config(I2C0, I2C_SRESET_SET);
+    //i2c_software_reset_config(I2C0, I2C_SRESET_RESET);
+
     uint32_t start = timer_read32();
 
     /* wait until I2C bus is idle */
@@ -283,7 +303,7 @@ amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const voi
         if (timer_elapsed32(start) > timeout) {
             i2c_bus_reset();
             start = timer_read32();
-            break;
+            //return AMK_I2C_TIMEOUT;
         }
     }
 
@@ -347,13 +367,16 @@ amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const voi
 amk_error_t i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
 {
     //i2c_instance_t *inst = (i2c_instance_t*)i2c;
+    //i2c_software_reset_config(I2C0, I2C_SRESET_SET);
+    //i2c_software_reset_config(I2C0, I2C_SRESET_RESET);
+
     uint32_t start = timer_read32();
     /* wait until I2C bus is idle */
     while(i2c_flag_get(I2C0, I2C_FLAG_I2CBSY)) {
         if (timer_elapsed32(start) > timeout) {
             i2c_bus_reset();
             start = timer_read32();
-            break;
+            //return AMK_I2C_TIMEOUT;
         }
     }
 
