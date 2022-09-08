@@ -23,6 +23,25 @@ typedef struct {
     static i2c_instance_t m_i2c1 = {
         .ready = false,
     };
+    static void i2c1_config(void)
+    {
+        rcu_periph_clock_enable(RCU_GPIOB);
+        rcu_periph_clock_enable(RCU_I2C0);
+        rcu_periph_clock_enable(RCU_AF);
+
+        i2c_deinit(I2C0);
+
+        gpio_init(GPIOB, GPIO_MODE_AF_OD, GPIO_OSPEED_50MHZ, GPIO_PIN_6 | GPIO_PIN_7);
+
+        i2c_clock_config(I2C0, 400000, I2C_DTCY_2);
+        /* I2C address configure */
+        i2c_mode_addr_config(I2C0, I2C_I2CMODE_ENABLE, I2C_ADDFORMAT_7BITS, 0x70);
+        /* enable I2C0 */
+        i2c_enable(I2C0);
+        /* enable acknowledge */
+        i2c_ack_config(I2C0, I2C_ACK_ENABLE);
+
+    }
 #endif
 
 #ifdef USE_I2C2 
@@ -52,21 +71,10 @@ static void i2c_bus_reset(void)
     __NOP();
     __NOP();
     GPIO_BOP(GPIOB) |= GPIO_PIN_7;
-    /* connect PB6 to I2C0_SCL */
-    /* connect PB7 to I2C0_SDA */
-    gpio_init(GPIOB, GPIO_MODE_AF_OD, GPIO_OSPEED_50MHZ, GPIO_PIN_6 | GPIO_PIN_7);
 
-    // reconfiguration i2c
-    /* enable I2C clock */
-    rcu_periph_clock_enable(RCU_I2C0);
-    /* configure I2C clock */
-    i2c_clock_config(I2C0, 100000, I2C_DTCY_2);
-    /* configure I2C address */
-    i2c_mode_addr_config(I2C0, I2C_I2CMODE_ENABLE, I2C_ADDFORMAT_7BITS, 0x70);
-    /* enable I2C */
-    i2c_enable(I2C0);
-    /* enable acknowledge */
-    i2c_ack_config(I2C0, I2C_ACK_ENABLE);
+#ifdef USE_I2C1
+    i2c1_config();
+#endif
 }
 
 bool i2c_ready(i2c_handle_t i2c)
@@ -81,25 +89,7 @@ void i2c_inst_init(i2c_instance_t *inst, uint32_t i2c)
         return;
 #ifdef USE_I2C1
     if (i2c == I2C1_ID) {
-        rcu_periph_clock_enable(RCU_GPIOB);
-        rcu_periph_clock_enable(RCU_I2C0);
-        rcu_periph_clock_enable(RCU_AF);
-
-        i2c_deinit(I2C0);
-        //gpio_pin_remap_config(GPIO_I2C0_REMAP, ENABLE);
-
-        //PB8, PB9 need remap
-        //gpio_init(GPIOB, GPIO_MODE_AF_OD, GPIO_OSPEED_50MHZ, GPIO_PIN_8 | GPIO_PIN_9);
-        gpio_init(GPIOB, GPIO_MODE_AF_OD, GPIO_OSPEED_50MHZ, GPIO_PIN_6 | GPIO_PIN_7);
-
-        i2c_clock_config(I2C0, 100000, I2C_DTCY_2);
-        /* I2C address configure */
-        i2c_mode_addr_config(I2C0, I2C_I2CMODE_ENABLE, I2C_ADDFORMAT_7BITS, 0x70);
-        /* enable I2C0 */
-        i2c_enable(I2C0);
-        /* enable acknowledge */
-        i2c_ack_config(I2C0, I2C_ACK_ENABLE);
-
+        i2c1_config();
         inst->handle = i2c;
         inst->ready = true;
     }

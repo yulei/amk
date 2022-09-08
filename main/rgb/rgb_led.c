@@ -179,12 +179,16 @@ void rgb_led_config_toggle(void)
     if (all_off) {
         // all off to on, need re-init driver and turn led power
         rgb_led_set_power(true);
+#ifdef  RGBLIGHT_EN_PIN
         rgb_driver_init();
+#endif
     }
 
     if (!rgb_led_is_on()) {
         // turn off all leds
+#ifdef  RGBLIGHT_EN_PIN
         rgb_driver_uninit();
+#endif
         rgb_led_set_power(false);
     }
 }
