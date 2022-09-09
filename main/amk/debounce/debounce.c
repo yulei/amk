@@ -1,6 +1,8 @@
 
 
+#ifndef AMK_DEBOUNCE
 #define AMK_DEBOUNCE    ASYM_EAGER_DEFER_PER_KEY
+#endif
 
 #define SYM_DEFER_PER_KEY           1
 #define SYM_DEFER_PER_ROW           2

@@ -33,21 +33,51 @@
 #endif
 
 #if (SCREEN_ROTATION == 1)
+#ifdef GC9107_AS_ST7735
+#define ST7735_XSTART 1
+#define ST7735_YSTART 2
+#define ST7735_WIDTH  128
+#define ST7735_HEIGHT 128
+#else
 // rotate left
 #define ST7735_XSTART       1
 #define ST7735_YSTART       26
 #define ST7735_WIDTH        160
 #define ST7735_HEIGHT       80
+#endif
 #define ST7735_ROTATION (ST7735_MADCTL_MX | ST7735_MADCTL_MV | ST7735_MADCTL_BGR)
 #endif
 
 #if (SCREEN_ROTATION == 2)
+#ifdef GC9107_AS_ST7735
+#define ST7735_XSTART 1
+#define ST7735_YSTART 2
+#define ST7735_WIDTH  128
+#define ST7735_HEIGHT 128
+#else
 // rotate right
 #define ST7735_XSTART 1
 #define ST7735_YSTART 26
 #define ST7735_WIDTH  160
 #define ST7735_HEIGHT 80
+#endif
 #define ST7735_ROTATION (ST7735_MADCTL_MY | ST7735_MADCTL_MV | ST7735_MADCTL_BGR)
+#endif
+
+#if (SCREEN_ROTATION == 3)
+#ifdef GC9107_AS_ST7735
+#define ST7735_XSTART 2
+#define ST7735_YSTART 1
+#define ST7735_WIDTH  128
+#define ST7735_HEIGHT 128
+#else
+// rotate right
+#define ST7735_XSTART 26
+#define ST7735_YSTART 1
+#define ST7735_WIDTH  80
+#define ST7735_HEIGHT 160
+#endif
+#define ST7735_ROTATION (ST7735_MADCTL_BGR)
 #endif
 
 #define DELAY               0x80
@@ -107,10 +137,18 @@
 #define ST7735_GMCTRP1      0xE0
 #define ST7735_GMCTRN1      0xE1
 
+static uint8_t rot_col_cmds[] = {
+    2,
+    ST7735_MADCTL , 1      ,  // 14: Memory access control (directions), 1 arg:
+      ST7735_ROTATION,        //     row addr/col addr, bottom to top refresh
+    ST7735_COLMOD , 1      ,  // 15: set color mode, 1 arg, no delay:
+      0x05                    //     16-bit color
+  };
+
 // based on Adafruit ST7735 library for Arduino
 static const uint8_t
   init_cmds1[] = {            // Init for 7735R, part 1 (red or green tab)
-    15,                       // 15 commands in list:
+    13,                       // 15 commands in list:
     ST7735_SWRESET,   DELAY,  //  1: Software reset, 0 args, w/delay
       150,                    //     150 ms delay
     ST7735_SLPOUT ,   DELAY,  //  2: Out of sleep mode, 0 args, w/delay
@@ -140,11 +178,12 @@ static const uint8_t
       0x8A, 0xEE,
     ST7735_VMCTR1 , 1      ,  // 12: Power control, 1 arg, no delay:
       0x0E,
-    ST7735_INVOFF , 0      ,  // 13: Don't invert display, no args, no delay
-    ST7735_MADCTL , 1      ,  // 14: Memory access control (directions), 1 arg:
-      ST7735_ROTATION,        //     row addr/col addr, bottom to top refresh
-    ST7735_COLMOD , 1      ,  // 15: set color mode, 1 arg, no delay:
-      0x05 },                 //     16-bit color
+    ST7735_INVOFF , 0      },  // 13: Don't invert display, no args, no delay
+//    ST7735_MADCTL , 1      ,  // 14: Memory access control (directions), 1 arg:
+//      ST7735_ROTATION,        //     row addr/col addr, bottom to top refresh
+//    ST7735_COLMOD , 1      ,  // 15: set color mode, 1 arg, no delay:
+//      0x05 },                 //     16-bit color
+
 
   init_cmds2[] = {            // Init for 7735S, part 2 (160x80 display)
     3,                        //  3 commands in list:
@@ -283,14 +322,45 @@ void st7735_config(screen_driver_t *driver, screen_driver_param_t *param)
     driver->release     = st7735_release;
 }
 
+#ifdef DYNAMICE_SCREEN_ROTATION
+extern uint8_t screen_rot;
+uint8_t screen_x_start = 0;
+uint8_t screen_y_start = 0;
+void update_screen_rotation(void)
+{
+  if (screen_rot == 0) {
+    screen_x_start = 26;
+    screen_y_start = 1;
+    rot_col_cmds[3] = (ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_BGR);
+  } elseif (screen_rot == 1) {
+    screen_x_start = 1;
+    screen_y_start = 26;
+    rot_col_cmds[3] = (ST7735_MADCTL_MX | ST7735_MADCTL_MV | ST7735_MADCTL_BGR);
+  } else if (screen_rot == 2) {
+    screen_x_start = 1;
+    screen_y_start = 26;
+    rot_col_cmds[3] = (ST7735_MADCTL_MY | ST7735_MADCTL_MV | ST7735_MADCTL_BGR);
+  } else if (screen_rot == 3) {
+    screen_x_start = 26;
+    screen_y_start = 1;
+    rot_col_cmds[3] = (ST7735_MADCTL_BGR);
+  }
+}
+#endif
+
 void st7735_init(screen_driver_t *lcd)
 {
     st7735_t *driver = (st7735_t*)lcd->data;
+#ifdef DYNAMICE_SCREEN_ROTATION
+    update_screen_rotation();
+#endif
+
     //st7735_driver.param = *param;
     //st7735_driver.spi = spi_init(ST7735_SPI_ID);
     st7735_select(driver);
     st7735_reset(driver);
     execute_commands(driver, init_cmds1);
+    execute_commands(driver, rot_col_cmds);
     execute_commands(driver, init_cmds2);
     execute_commands(driver, init_cmds3);
     set_address_window(driver, 0, 0, ST7735_WIDTH-1, ST7735_HEIGHT-1);
