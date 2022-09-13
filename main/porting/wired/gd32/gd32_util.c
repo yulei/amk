@@ -91,7 +91,7 @@ void systick_init(void)
     SysTick_Config(SystemCoreClock / (1000/SYSTICK_FREQ));
     //nvic_priority_group_set(NVIC_PRIGROUP_PRE2_SUB2);
     //nvic_irq_enable((uint8_t)SysTick_IRQn, 3U, 0U);
-    NVIC_SetPriority(SysTick_IRQn, 0x00U);
+    NVIC_SetPriority(SysTick_IRQn, 0x0FU);
 }
 
 void systick_delay(uint32_t ticks)

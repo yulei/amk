@@ -15,6 +15,8 @@ extern void system_clock_init(void);
 
 void system_init(void)
 {
+    NVIC_SetPriorityGrouping(NVIC_PRIGROUP_PRE4_SUB0);
+
     system_clock_init();
 
 #ifndef RTOS_ENABLE

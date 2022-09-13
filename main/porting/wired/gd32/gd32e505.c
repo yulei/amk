@@ -109,7 +109,7 @@ static void usb_custom_init(void)
 
     };
 
-    NVIC_SetPriority(USBHS_IRQn, 0U);
+    NVIC_SetPriority(USBHS_IRQn, 1U);
 }
 
 void custom_board_init(void)
