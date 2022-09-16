@@ -105,6 +105,7 @@ amk_error_t spi_xfer_async(spi_handle_t spi, const void *tx_buffer, void *rx_buf
 
 amk_error_t spi_send(spi_handle_t spi, const void *data, size_t length)
 {
+    #if 0
     M4_SPI_TypeDef* hspi = (M4_SPI_TypeDef *)spi;
     SPI_Cmd(hspi, Enable);
     uint8_t* p = (uint8_t* )data;
@@ -117,6 +118,11 @@ amk_error_t spi_send(spi_handle_t spi, const void *data, size_t length)
     SPI_Cmd(hspi, Disable);
 
     return AMK_SUCCESS;
+    #else
+    spi_send_async(spi, data, length);
+    //while(spi_ready(spi));
+    return AMK_SUCCESS;
+    #endif
 }
 
 amk_error_t spi_recv(spi_handle_t spi, void* data, size_t length)

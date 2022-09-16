@@ -3,24 +3,26 @@
  */
 
 #include "generic_hal.h"
+#include "cm_misc.h"
 #include "wait.h"
 
 #ifndef HSE_VALUE
 #define HSE_VALUE   XTAL_VALUE
 #endif
 
-static void dwt_delay_init(void);
 static void system_clock_init(void);
 static void system_usb_init(void);
 static void debug_port_init(void);
 
 void system_init(void)
 {
+    NVIC_SetPriorityGrouping(NVIC_PRIGROUP_PRE4_SUB0);
+
     system_clock_init();
 
-    SystemCoreClockUpdate();
-
-    SysTick_Init(1000);
+#ifndef RTOS_ENABLE
+    systick_init();
+#endif
 
     dwt_delay_init();
 
@@ -33,15 +35,6 @@ extern void fee_init(void);
     system_usb_init();
 }
 
-static void dwt_delay_init(void)
-{
-#ifdef DWT_DELAY
-    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-    DWT->CYCCNT = 0;
-    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-#endif
-}
-
 void magic_write(uint32_t magic)
 {}
 
@@ -50,16 +43,6 @@ static void debug_port_init(void)
     PORT_DebugPortSetting(TDO_SWO|TDI|TRST, Disable);
 
     PORT_DebugPortSetting(TCK_SWCLK|TMS_SWDIO, Enable);
-}
-
-uint32_t systick_get_tick(void)
-{
-    return SysTick_GetTick();
-}
-
-void SysTick_IrqHandler(void)
-{
-    SysTick_IncTick();
 }
 
 // set clock use MPLL@200MHz
@@ -123,6 +106,8 @@ static void system_clock_init(void)
     PWC_HS2HP();
     /* Switch system clock source to MPLL. */
     CLK_SetSysClkSource(CLKSysSrcMPLL);
+
+    SystemCoreClockUpdate();
 }
 
 void system_usb_init(void)

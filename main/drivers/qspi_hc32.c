@@ -134,11 +134,29 @@ bool qspi_init(uint32_t map_addr)
     PORT_SetFunc(QSNSS_PORT, QSNSS_PIN, Func_Qspi, Disable);
     PORT_SetFunc(QSIO0_PORT, QSIO0_PIN, Func_Qspi, Disable);
     PORT_SetFunc(QSIO1_PORT, QSIO1_PIN, Func_Qspi, Disable);
-    //PORT_SetFunc(QSIO2_PORT, QSIO2_PIN, Func_Qspi, Disable);
-    //PORT_SetFunc(QSIO3_PORT, QSIO3_PIN, Func_Qspi, Disable);
+    PORT_SetFunc(QSIO2_PORT, QSIO2_PIN, Func_Qspi, Disable);
+    PORT_SetFunc(QSIO3_PORT, QSIO3_PIN, Func_Qspi, Disable);
 
+#if 0
+    stcQspiInit.enClkDiv = QspiHclkDiv2;
+    stcQspiInit.enSpiMode = QspiSpiMode3;
+    stcQspiInit.enBusCommMode = QspiBusModeRomAccess;
+    stcQspiInit.enPrefetchMode = QspiPrefetchStopComplete;
+    stcQspiInit.enPrefetchFuncEn = Disable;
+    stcQspiInit.enQssnValidExtendTime = QspiQssnValidExtendSck32;
+    stcQspiInit.enQssnIntervalTime = QspiQssnIntervalQsck8;
+    stcQspiInit.enQsckDutyCorr = QspiQsckDutyCorrHalfHclk;
+    stcQspiInit.enVirtualPeriod = QspiVirtualPeriodQsck6;
+    stcQspiInit.enWpPinLevel = QspiWpPinOutputHigh;
+    stcQspiInit.enQssnSetupDelayTime = QspiQssnSetupDelay1Dot5Qsck;
+    stcQspiInit.enQssnHoldDelayTime = QspiQssnHoldDelay1Dot5Qsck;
+    stcQspiInit.enFourByteAddrReadEn = Disable;
+    stcQspiInit.enAddrWidth = QspiAddressByteThree;
+    stcQspiInit.stcCommProtocol.enReadMode = QspiReadModeFourWiresIO;
+    stcQspiInit.u8RomAccessInstr = QSPI_3BINSTR_FOUR_WIRES_IO_READ;
+#else
     /* Configuration QSPI structure */
-    stcQspiInit.enClkDiv = QspiHclkDiv4;
+    stcQspiInit.enClkDiv = QspiHclkDiv2;
     stcQspiInit.enSpiMode = QspiSpiMode0;
     stcQspiInit.enBusCommMode = QspiBusModeRomAccess;
     stcQspiInit.enPrefetchMode = QspiPrefetchStopComplete;
@@ -152,11 +170,20 @@ bool qspi_init(uint32_t map_addr)
     stcQspiInit.enQssnHoldDelayTime = QspiQssnHoldDelayHalfQsck;
     stcQspiInit.enFourByteAddrReadEn = Disable;
     stcQspiInit.enAddrWidth = QspiAddressByteThree;
-    stcQspiInit.stcCommProtocol.enReadMode = QspiReadModeStandard;
+
+    stcQspiInit.u8RomAccessInstr = QSPI_3BINSTR_FAST_READ;
+    stcQspiInit.u8RomAccessInstr = QSPI_3BINSTR_FAST_READ;
+
+    //stcQspiInit.u8RomAccessInstr = QSPI_3BINSTR_FOUR_WIRES_IO_READ;
+    //stcQspiInit.stcCommProtocol.enReadMode = QspiReadModeFourWiresIO;
+
+    //stcQspiInit.u8RomAccessInstr = QSPI_3BINSTR_STANDARD_READ;
+    //stcQspiInit.stcCommProtocol.enReadMode = QspiReadModeStandard;
+#endif
+
     stcQspiInit.stcCommProtocol.enTransInstrProtocol = QspiProtocolExtendSpi;
     stcQspiInit.stcCommProtocol.enTransAddrProtocol = QspiProtocolExtendSpi;
     stcQspiInit.stcCommProtocol.enReceProtocol = QspiProtocolExtendSpi;
-    stcQspiInit.u8RomAccessInstr = QSPI_3BINSTR_STANDARD_READ;
     QSPI_Init(&stcQspiInit);
 
     return true;

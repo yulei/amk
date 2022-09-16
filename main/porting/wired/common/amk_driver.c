@@ -6,6 +6,7 @@
  * 
  */
 
+#include "generic_hal.h"
 #include "amk_driver.h"
 
 #include "usb_descriptors.h"
@@ -101,19 +102,26 @@ void amk_driver_init(void)
 
 void amk_driver_task(void)
 {
-    if (usb_suspended() && (!(usb_setting&USB_SWITCH_BIT))) {
-        if (suspend_wakeup_condition()) {
-            // wake up remote
-            remote_wakeup();
-            wait_ms(1000);
-            usb_connect(false);
-            wait_ms(100);
-            usb_connect(true);
+    if (!(usb_setting&USB_SWITCH_BIT)) {
+        if (usb_suspended() ) {
+            if (suspend_wakeup_condition()) {
+                // wake up remote
+                amk_printf("suspend_wakeup, usb_setting=%x\n", usb_setting);
+                remote_wakeup();
+                wait_ms(1000);
+    #ifdef RTOS_ENABLE
+                NVIC_SystemReset();
+    #else
+                usb_connect(false);
+                wait_ms(100);
+                usb_connect(true);
+    #endif
+            }
+        } else {
+            //if (usb_ready()) {
+    //            keyboard_task();
+            //}
         }
-    } else {
-        //if (usb_ready()) {
-//            keyboard_task();
-        //}
     }
 
     keyboard_task();

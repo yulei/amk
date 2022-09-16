@@ -27,7 +27,7 @@ static w25qxx_config_t w25qxx_config;
 static w25qxx_t *w25qxx;
 #endif
 
-__WEAK
+__attribute__((weak))
 void msc_init_kb(void) {}
 
 #ifdef WDT_ENABLE
@@ -56,7 +56,7 @@ void msc_erase(void)
 #endif
 }
 
-__WEAK
+__attribute__((weak))
 void msc_task_kb(void) {}
 
 void msc_task(void)

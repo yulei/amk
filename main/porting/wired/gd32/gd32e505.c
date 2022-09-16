@@ -7,7 +7,7 @@
  */
 
 #include "generic_hal.h"
-#include "gd32_util.h"
+#include "cm_misc.h"
 #include "wait.h"
 
 #include "tusb.h"
@@ -97,7 +97,7 @@ static void usb_custom_init(void)
     
     REG32(GD32_GCCFG) |= GD32_GCCFG_PWRON;
 
-    usb_delay_ms(20);
+    busy_delay_ms(20);
 
     rcu_pllusbpresel_config(RCU_PLLUSBPRESRC_HXTAL);
     rcu_pllusbpredv_config(RCU_PLLUSBPREDVSRC_HXTAL_IRC48M, RCU_PLLUSBPREDV_DIV2);

@@ -193,6 +193,9 @@ static void cmd_process_screen_param(const char *name, const char *value, cmd_t 
     } else if (strcmp(name, SCREEN_PARAM_MODE) == 0)  {
         cmd->param.screen.action = CMD_SCREEN_MODE;
         cmd->param.screen.state = strtol(value, NULL, 10);
+    } else if (strcmp(name, SCREEN_PARAM_ADJUST) == 0) {
+        cmd->param.screen.action = CMD_SCREEN_ADJUST;
+        cmd->param.screen.state = strtol(value, NULL, 10);
     }
 }
 
@@ -308,6 +311,11 @@ static int32_t cmd_compose_screen(const cmd_t *cmd, void *buf, uint32_t size)
         result = snprintf(buf, size, "%s:%s=%d;\n", 
                     CMD_SCREEN_STR, 
                     SCREEN_PARAM_MSC,
+                    cmd->param.screen.state);
+    } else if (cmd->param.screen.action == CMD_SCREEN_ADJUST) {
+        result = snprintf(buf, size, "%s:%s=%d;\n", 
+                    CMD_SCREEN_STR, 
+                    SCREEN_PARAM_ADJUST,
                     cmd->param.screen.state);
     }
 

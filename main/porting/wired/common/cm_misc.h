@@ -1,5 +1,5 @@
 /**
- * @file gd32_util.h
+ * @file cm_misc.h
  * 
  */
 
@@ -14,5 +14,7 @@ uint32_t systick_get_tick(void);
 void systick_suspend(void);
 void systick_resume(void);
 
-void usb_delay_ms(uint32_t ms);
-void usb_delay_us(uint32_t us);
+void busy_delay_ms(uint32_t ms);
+void busy_delay_us(uint32_t us);
+
+void dwt_delay_init(void);

@@ -220,6 +220,9 @@ void ee_macro_write_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 __WEAK
 void eeconfig_init_prepare(void) {}
 
+__attribute__((weak))
+void eeconfig_init_kb(void) {}
+
 void eeconfig_init(void)
 {
     eeconfig_init_prepare();
@@ -233,6 +236,8 @@ void eeconfig_init(void)
 #ifdef RGB_ENABLE
     rgb_led_config_init();
 #endif
+
+    eeconfig_init_kb();
 
     eeprom_write_byte(EECONFIG_LAYOUT_OPTIONS, 0);
     eeprom_write_byte(EECONFIG_DEVICE, 0);

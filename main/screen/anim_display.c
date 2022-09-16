@@ -132,20 +132,24 @@ static void add_frame(uint32_t width, uint32_t height, uint8_t *buffer, uint16_t
     }
 }
 
-__WEAK
+__attribute__((weak))
 bool anim_display_need_refresh(uint32_t index)
 {
     return true;
 }
 
-__WEAK
+__attribute__((weak))
 uint32_t anim_display_get_current(uint32_t index)
 {
     return 0;
 }
 
-__WEAK
+__attribute__((weak))
 void anim_display_post_process(void* buff, uint32_t index)
+{}
+
+__attribute__((weak))
+void anim_display_get_offset(uint32_t index, uint32_t *x, uint32_t *y)
 {}
 
 void anim_display_task(display_t *display)
@@ -158,17 +162,25 @@ void anim_display_task(display_t *display)
 
     //if (!obj->screen->ready(obj->screen)) return;
 
+    if (!anim_display_need_refresh(obj->param.screen)) return;
+
+    uint32_t x = 0;
+    uint32_t y = 0;
+    anim_display_get_offset(obj->param.screen, &x, &y);
+
     if (obj->param.flags & DISPLAY_FLAGS_MODE_CUSTOM) {
-        if (anim_display_need_refresh(obj->param.screen)) {
-            uint32_t frame = anim_display_get_current(obj->param.screen);
-            anim_set_frame(obj->anim, frame);
-            anim_step(obj->anim, &obj->delay, obj->buffer, obj->buffer_size);
-            anim_display_post_process(obj->buffer, obj->param.screen);
-            obj->screen->fill_rect(obj->screen, 0, 0, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
-        }
+        uint32_t frame = anim_display_get_current(obj->param.screen);
+        anim_set_frame(obj->anim, frame);
+        anim_step(obj->anim, &obj->delay, obj->buffer, obj->buffer_size);
+        anim_display_post_process(obj->buffer, obj->param.screen);
+        obj->screen->fill_rect(obj->screen, x, y, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
     } else {
         uint32_t elapsed = timer_elapsed32(obj->ticks);
-        if ( elapsed > obj->delay) {
+        //if (obj->param.screen== 2) {
+        //    ad_debug("ANIM: elapsed=%d, delay=%d\n", elapsed, obj->delay);
+        //}
+
+        if ( false || elapsed > obj->delay) {
             if ( 0 == anim_step(obj->anim, &obj->delay, obj->buffer, obj->buffer_size)) {
                 bool play = false;
                 switch(obj->anim_mode) {
@@ -204,7 +216,7 @@ void anim_display_task(display_t *display)
 
             //obj->screen->fill_rect_async(obj->screen, 0, 0, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
             anim_display_post_process(obj->buffer, obj->param.screen);
-            obj->screen->fill_rect(obj->screen, 0, 0, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
+            obj->screen->fill_rect(obj->screen, x, y, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
 
             obj->ticks = timer_read32();
         }

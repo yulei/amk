@@ -2,9 +2,8 @@ PLATFORM_PORTING_DIR := $(MAIN_DIR)/porting/wired/gd32
 
 SRCS += \
 	$(PLATFORM_PORTING_DIR)/gpio_pin.c \
-	$(PLATFORM_PORTING_DIR)/wait.c \
 	$(PLATFORM_PORTING_DIR)/gd32.c \
-	$(PLATFORM_PORTING_DIR)/gd32_util.c \
+	$(MAIN_DIR)/porting/wired/common/cm_misc.c \
 
 INCS += \
 	$(PLATFORM_PORTING_DIR) \

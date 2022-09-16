@@ -64,10 +64,15 @@ static void uninit_displays(void)
     }
 }
 
+__attribute__((weak))
+void render_pre_init(void)
+{}
+
 void render_init(void)
 {
     if (usb_setting & USB_MSC_BIT) return;
 
+    render_pre_init();
     render_buffer_init();
 
     init_screen_drivers();
