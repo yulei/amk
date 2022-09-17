@@ -60,6 +60,7 @@ typedef struct {
 #define DISPLAY_FLAGS_EDGE_RIGHT        (1<<2)
 #define DISPLAY_FLAGS_EDGE_BOTTOM       (1<<3)
 #define DISPLAY_FLAGS_MODE_CUSTOM       (1<<4)
+#define DISPLAY_FLAGS_MODE_FRAME        (1<<5)
 
 typedef struct {
     uint8_t     type;

@@ -267,16 +267,16 @@ void DMA1_Stream3_IRQHandler(void)
 #endif
 
 #ifdef USE_PWM_TIM2
-extern DMA_HandleTypeDef hdma_tim2_ch1;
+extern DMA_HandleTypeDef hdma_tim2_ch4;
 /**
   * @brief This function handles DMA1 stream5 global interrupt.
   */
- void DMA1_Stream5_IRQHandler(void)
+ void DMA1_Stream6_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Stream5_IRQn 0 */
 
   /* USER CODE END DMA1_Stream5_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_tim2_ch1);
+  HAL_DMA_IRQHandler(&hdma_tim2_ch4);
   /* USER CODE BEGIN DMA1_Stream5_IRQn 1 */
 
   /* USER CODE END DMA1_Stream5_IRQn 1 */

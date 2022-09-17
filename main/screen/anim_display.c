@@ -156,7 +156,9 @@ void anim_display_task(display_t *display)
 {
     anim_display_obj_t *obj = (anim_display_obj_t*)display->data;
 
-    if (!obj->anim) return;
+    if (!obj->anim && !(obj->param.flags & DISPLAY_FLAGS_MODE_CUSTOM)) {
+        return;
+    }
 
     if (!obj->enabled) return;
 
@@ -169,9 +171,11 @@ void anim_display_task(display_t *display)
     anim_display_get_offset(obj->param.screen, &x, &y);
 
     if (obj->param.flags & DISPLAY_FLAGS_MODE_CUSTOM) {
-        uint32_t frame = anim_display_get_current(obj->param.screen);
-        anim_set_frame(obj->anim, frame);
-        anim_step(obj->anim, &obj->delay, obj->buffer, obj->buffer_size);
+        if (obj->anim) {
+            uint32_t frame = anim_display_get_current(obj->param.screen);
+            anim_set_frame(obj->anim, frame);
+            anim_step(obj->anim, &obj->delay, obj->buffer, obj->buffer_size);
+        }
         anim_display_post_process(obj->buffer, obj->param.screen);
         obj->screen->fill_rect(obj->screen, x, y, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
     } else {

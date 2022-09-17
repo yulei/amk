@@ -28,7 +28,7 @@ DMA_HandleTypeDef hdma_tim4_ch2;
 
 #ifdef USE_PWM_TIM2
 TIM_HandleTypeDef htim2;
-DMA_HandleTypeDef hdma_tim2_ch1;
+DMA_HandleTypeDef hdma_tim2_ch4;
 #endif
 
 #ifdef USE_SPI1
@@ -116,6 +116,9 @@ static void MX_DMA_Init(void)
 
     HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
+
+    HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
 
     HAL_NVIC_SetPriority(DMA1_Stream7_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream7_IRQn);
@@ -229,7 +232,7 @@ static void MX_TIM2_Init(void)
     sConfigOC.Pulse = 0;
     sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
     sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-    if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK) {
+    if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_4) != HAL_OK) {
         Error_Handler();
     }
 
