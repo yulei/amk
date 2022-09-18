@@ -28,7 +28,7 @@ DMA_HandleTypeDef hdma_tim4_ch2;
 
 #ifdef USE_PWM_TIM2
 TIM_HandleTypeDef htim2;
-DMA_HandleTypeDef hdma_tim2_ch4;
+DMA_HandleTypeDef PWM_DMA_TIM_CH;
 #endif
 
 #ifdef USE_SPI1
@@ -232,7 +232,7 @@ static void MX_TIM2_Init(void)
     sConfigOC.Pulse = 0;
     sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
     sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-    if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_4) != HAL_OK) {
+    if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, PWM_TIM_CHANNEL) != HAL_OK) {
         Error_Handler();
     }
 

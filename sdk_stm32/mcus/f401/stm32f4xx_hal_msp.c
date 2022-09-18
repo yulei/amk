@@ -28,7 +28,9 @@ extern DMA_HandleTypeDef hdma_i2c1_tx;
 
 extern DMA_HandleTypeDef hdma_tim4_ch2;
 
-extern DMA_HandleTypeDef hdma_tim2_ch4;
+#ifdef USE_PWM_TIM2
+extern DMA_HandleTypeDef PWM_DMA_TIM_CH;
+#endif
 
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern DMA_HandleTypeDef hdma_usart1_tx;
@@ -303,22 +305,22 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
 
     /* TIM2 DMA Init */
     /* TIM2_CH1 Init */
-    hdma_tim2_ch4.Instance = DMA1_Stream6;
-    hdma_tim2_ch4.Init.Channel = DMA_CHANNEL_3;
-    hdma_tim2_ch4.Init.Direction = DMA_MEMORY_TO_PERIPH;
-    hdma_tim2_ch4.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_tim2_ch4.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_tim2_ch4.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
-    hdma_tim2_ch4.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
-    hdma_tim2_ch4.Init.Mode = DMA_NORMAL;
-    hdma_tim2_ch4.Init.Priority = DMA_PRIORITY_LOW;
-    hdma_tim2_ch4.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    if (HAL_DMA_Init(&hdma_tim2_ch4) != HAL_OK)
+    PWM_DMA_TIM_CH.Instance = PWM_DMA_INSTANCE;
+    PWM_DMA_TIM_CH.Init.Channel = PWM_DMA_CHANNEL;
+    PWM_DMA_TIM_CH.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    PWM_DMA_TIM_CH.Init.PeriphInc = DMA_PINC_DISABLE;
+    PWM_DMA_TIM_CH.Init.MemInc = DMA_MINC_ENABLE;
+    PWM_DMA_TIM_CH.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    PWM_DMA_TIM_CH.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    PWM_DMA_TIM_CH.Init.Mode = DMA_NORMAL;
+    PWM_DMA_TIM_CH.Init.Priority = DMA_PRIORITY_LOW;
+    PWM_DMA_TIM_CH.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&PWM_DMA_TIM_CH) != HAL_OK)
     {
       Error_Handler();
     }
 
-    __HAL_LINKDMA(htim_pwm,hdma[TIM_DMA_ID_CC4],hdma_tim2_ch4);
+    __HAL_LINKDMA(htim_pwm,hdma[PWM_TIM_DMA_ID],PWM_DMA_TIM_CH);
 
   /* USER CODE BEGIN TIM2_MspInit 1 */
 
@@ -367,7 +369,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
     /**TIM2 GPIO Configuration
     PA0-WKUP     ------> TIM2_CH1
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_3;
+    GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_3;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -415,7 +417,7 @@ void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef* htim_pwm)
     __HAL_RCC_TIM2_CLK_DISABLE();
 
     /* TIM2 DMA DeInit */
-    HAL_DMA_DeInit(htim_pwm->hdma[TIM_DMA_ID_CC1]);
+    HAL_DMA_DeInit(htim_pwm->hdma[PWM_TIM_DMA_ID]);
   /* USER CODE BEGIN TIM2_MspDeInit 1 */
 
   /* USER CODE END TIM2_MspDeInit 1 */
