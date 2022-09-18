@@ -20,8 +20,8 @@
 #define DISCHARGE_WAIT_PRE  30
 #define DISCHARGE_WAIT_POST 30
 #define CHARGE_WAIT     2
-#define EC_TH_LOW       1024
-#define EC_TH_HIGH      1684
+#define EC_TH_LOW       780
+#define EC_TH_HIGH      1024
 
 #define ROW_6_PIN       B6
 #define ROW_1_PIN       B5

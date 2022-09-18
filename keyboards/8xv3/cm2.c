@@ -21,12 +21,9 @@
 #define COL_A_MASK  0x01
 #define COL_B_MASK  0x02
 #define COL_C_MASK  0x04
-#define LEFT_MASK   0x08
-#define RIGHT_MASK  0x10
 
-static pin_t custom_row_pins[] = {ROW_6_PIN, ROW_1_PIN, ROW_2_PIN, ROW_3_PIN, ROW_4_PIN, ROW_5_PIN};
-static pin_t custom_col_pins[] = {LEFT_MASK|5, LEFT_MASK|7, LEFT_MASK|6, LEFT_MASK|4, LEFT_MASK|2, LEFT_MASK|1, LEFT_MASK|0, LEFT_MASK|3,
-                                RIGHT_MASK|5, RIGHT_MASK|7, RIGHT_MASK|6, RIGHT_MASK|4, RIGHT_MASK|2, RIGHT_MASK|1, RIGHT_MASK|0, RIGHT_MASK|3};
+static pin_t custom_row_pins[] = MATRIX_ROW_PINS;
+static pin_t custom_col_pins[] = MATRIX_COL_PINS;
 
 void matrix_init_custom(void)
 {

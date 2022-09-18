@@ -14,15 +14,11 @@
 // key matrix
 #define MATRIX_ROWS         6
 #define MATRIX_COLS         16
-#define MATRIX_ROW_PINS     {}
-#define MATRIX_COL_PINS     {}
+#define MATRIX_ROW_PINS     {B10, A0, C15, C14, C13, B4}
 
-#define ROW_1_PIN           A0
-#define ROW_2_PIN           C15
-#define ROW_3_PIN           C14
-#define ROW_4_PIN           C13
-#define ROW_5_PIN           B4
-#define ROW_6_PIN           B10
+#define LEFT_MASK   0x08
+#define RIGHT_MASK  0x10
+#define MATRIX_COL_PINS     {LEFT_MASK|5, LEFT_MASK|7, LEFT_MASK|6, LEFT_MASK|4, LEFT_MASK|2, LEFT_MASK|1, LEFT_MASK|0, LEFT_MASK|3, RIGHT_MASK|5, RIGHT_MASK|7, RIGHT_MASK|6, RIGHT_MASK|4, RIGHT_MASK|2, RIGHT_MASK|1, RIGHT_MASK|0, RIGHT_MASK|3};
 
 #define LEFT_EN_PIN         B2
 #define RIGHT_EN_PIN        A2
@@ -34,6 +30,7 @@
 
 #define USE_I2C1
 #define IS31FL3741_I2C_ID   I2C_INSTANCE_1
+#define IS31FL3731_I2C_ID   I2C_INSTANCE_1
 //#define I2C1_SCL_PIN        B8
 //#define I2C1_SDA_PIN        B9
 
@@ -50,7 +47,7 @@
 #define PWM_DMA_IRQHnadler  DMA1_Stream0_IRQHandler
 
 #define RGB_MATRIX_LED_NUM  97
-#define RGB_LED_NUM         (WS2812_LED_NUM+RGB_MATRIX_LED_NUM)
+#define RGB_LED_NUM         (WS2812_LED_NUM+RGB_MATRIX_LED_NUM+16)
 
 #define RGB_DEVICE_NUM      2
 #define RGB_SEGMENT_NUM     1
