@@ -27,6 +27,21 @@
 #define ee_mgr_debug(...)
 #endif
 
+uint32_t eeconfig_read_frame(void)
+{
+    return eeprom_read_dword(EECONFIG_FRAME);
+}
+
+void eeconfig_write_frame(uint32_t data)
+{
+    eeprom_write_dword(EECONFIG_FRAME, data);
+}
+
+void eeconfig_update_frame(uint32_t data)
+{
+    eeprom_update_dword(EECONFIG_FRAME, data);
+}
+
 uint32_t eeconfig_read_kb(void)
 {
     return eeprom_read_dword(EECONFIG_KEYBOARD);

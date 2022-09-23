@@ -274,7 +274,7 @@ uint16_t amk_to_vial(uint16_t keycode)
                         // Todo
                         break;
                     default:
-                        vial_kc = QK_MOD_TAP | (mods << 8) | action.key.code;
+                        vial_kc = QK_MOD_TAP | ((mods&0x1F) << 8) | action.key.code;
                         break;
                 }
             }
@@ -394,7 +394,7 @@ uint16_t vial_to_amk(uint16_t keycode)
         // not handled
         break;
         case QK_LAYER_TAP ... QK_LAYER_TAP_MAX: {
-            amk_kc = (action_t)ACTION_LAYER_TAP_KEY((keycode >> 0x8) & 0xF, keycode & 0xFF);
+            amk_kc = (action_t)ACTION_LAYER_TAP_KEY((keycode >> 0x8) & 0x1F, keycode & 0xFF);
         }
         break;
         case QK_TO ... QK_TO_MAX: {
@@ -425,7 +425,7 @@ uint16_t vial_to_amk(uint16_t keycode)
             amk_kc = (action_t)ACTION_LAYER_MODS((keycode >> 4) & 0xF, keycode & 0xF);
         }break;
         case QK_MOD_TAP ... QK_MOD_TAP_MAX: {
-            amk_kc = (action_t)ACTION_MODS_TAP_KEY((keycode >> 0x8) & 0x1F, keycode & 0xFF);
+            amk_kc = (action_t)ACTION_MODS_TAP_KEY(keycode & 0x1F00, keycode & 0xFF);
         }break;
         case QK_RESET ... SAFE_RANGE: {
             amk_kc.code = map_keycode(keycode, false);
