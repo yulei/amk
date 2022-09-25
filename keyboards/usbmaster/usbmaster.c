@@ -420,7 +420,7 @@ void matrix_print(void)
     hhkb_matrix_debug("matrix_print\n");
 }
 
-void led_set(uint8_t usb_led)
+void led_set_kb(uint8_t usb_led)
 {
     send_set_leds(usb_led);
 }
