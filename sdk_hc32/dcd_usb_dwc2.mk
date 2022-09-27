@@ -6,4 +6,3 @@ INCS += \
 	$(HC32SDK_DIR) \
 
 APP_DEFS += \
-	-DTUP_DCD_ENDPOINT_MAX=6 \

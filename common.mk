@@ -60,9 +60,9 @@ $(LIB_OBJ_DIRS):
 #$(info $(APP_DEFS))
 
 ifeq (1,$(NO_DEBUG))
-OPT = -Os -ggdb
+OPT += -Os -ggdb
 else
-OPT = -Og -ggdb3 -DDEBUG
+OPT += -Og -ggdb3 -DDEBUG
 endif
 
 ifeq (1,$(LTO_ENABLE))

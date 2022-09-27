@@ -17,12 +17,16 @@
 [submodule "libs/tinyusb"]
 	path = libs/tinyusb
 	url = https://github.com/hathach/tinyusb.git
+	ignore = dirty
 [submodule "libs/cmsis_5"]
 	path = libs/cmsis_5
 	url = https://github.com/ARM-software/CMSIS_5.git
+	ignore = dirty
 [submodule "libs/arm2d"]
 	path = libs/arm2d
 	url = https://github.com/ARM-software/Arm-2D.git
+	ignore = dirty
 [submodule "libs/cmsis_freertos"]
 	path = libs/cmsis_freertos
 	url = https://github.com/ARM-software/CMSIS-FreeRTOS.git
+	ignore = dirty
