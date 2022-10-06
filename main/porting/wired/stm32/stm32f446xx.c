@@ -367,7 +367,7 @@ void custom_board_init(void)
 #endif
 
 #ifdef USE_SPI3
-    MX_SPI1_Init();
+    MX_SPI3_Init();
 #endif
 
 #ifdef USE_PWM_TIM4
