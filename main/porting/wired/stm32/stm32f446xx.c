@@ -4,6 +4,7 @@
 
 #include "generic_hal.h"
 #include "amk_printf.h"
+#include "usb_descriptors.h"
 
 #ifdef TINYUSB_ENABLE
 #include "tusb.h"
@@ -353,6 +354,18 @@ void custom_board_init(void)
     MX_GPIO_Init();
     MX_RTC_Init();
     MX_DMA_Init();
+#ifdef DYNAMIC_CONFIGURATION
+    HAL_PWR_EnableBkUpAccess();
+    uint32_t magic = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1);
+    //if (magic == 0) {
+    if (magic > 0) {
+        usb_setting |= USB_MSC_BIT;
+    } else {
+        usb_setting = 0;
+    }
+    amk_printf("usb_setting: %ld\n", usb_setting);
+    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0);
+#endif
 
 #ifdef USE_ADC1
     MX_ADC1_Init();
