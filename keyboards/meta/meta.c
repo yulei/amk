@@ -4,11 +4,12 @@
 
 #include "meta.h"
 #include "led.h"
+
+#ifdef RGB_ENABLE
 #include "rgb_common.h"
 #include "rgb_driver.h"
 #include "rgb_indicator.h"
 
-#ifdef RGB_ENABLE
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {0,0,0,0},
     // 16 leds
