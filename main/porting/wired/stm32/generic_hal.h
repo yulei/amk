@@ -23,6 +23,9 @@
 #elif defined(STM32G431xx) 
     #include "stm32g4xx.h"
     #include "stm32g4xx_hal.h"
+#elif defined(STM32L452xx) 
+    #include "stm32l4xx.h"
+    #include "stm32l4xx_hal.h"
 #else
     #error "HAL MCU not defined"
 #endif
