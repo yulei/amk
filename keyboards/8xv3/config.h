@@ -45,6 +45,7 @@
 #define PWM_DMA_INSTANCE    DMA1_Stream0
 #define PWM_DMA_CHANNEL     DMA_CHANNEL_2
 #define PWM_DMA_IRQHnadler  DMA1_Stream0_IRQHandler
+#define PWM_PIN             GPIO_PIN_6
 
 #define RGB_MATRIX_LED_NUM  97
 #define RGB_LED_NUM         (WS2812_LED_NUM+RGB_MATRIX_LED_NUM+16)

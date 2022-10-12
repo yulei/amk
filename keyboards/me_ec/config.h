@@ -43,6 +43,18 @@
 #define WS2812_LED_NUM  4
 #define WS2812_LED_PIN  B7
 
+
+#if 0
+#define USE_PWM_TIM4
+#define PWM_TIM_PERIOD      119
+#define PWM_TIM             htim4
+#define PWM_TIM_CHANNEL     TIM_CHANNEL_1
+#define PWM_TIM_DMA_ID      TIM_DMA_ID_CC1
+#define PWM_DMA_INSTANCE    DMA1_Stream0
+#define PWM_DMA_CHANNEL     DMA_CHANNEL_2
+#define PWM_DMA_IRQHnadler  DMA1_Stream0_IRQHandler
+#endif
+
 #define USE_PWM_TIM4
 #define PWM_TIM_PERIOD      119
 #define PWM_TIM             htim4
@@ -51,6 +63,7 @@
 #define PWM_DMA_INSTANCE    DMA1_Stream3
 #define PWM_DMA_CHANNEL     DMA_CHANNEL_2
 #define PWM_DMA_IRQHnadler  DMA1_Stream3_IRQHandler
+#define PWM_PIN             GPIO_PIN_7
 
 #define RGB_LED_NUM     (4+12)
 #define RGB_DEVICE_NUM  2
