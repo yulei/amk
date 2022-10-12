@@ -23,6 +23,7 @@ families = {
     'MIMXRT10XX':   0x4fb2d5bd,
     'STM32L0':      0x202e3a91,
     'STM32G4':      0x4c71240a,
+    'STM32L4':      0x00ff6919,
     'HC32F4':       0x48434633,     # HCF4
     'GD32E5':       0x47444535,     # GDE5
 }
