@@ -14,21 +14,14 @@
 #define MATRIX_COLS     16
 #define L_MASK          0x08
 #define R_MASK          0x10
-#define MATRIX_ROW_PINS {ROW_6_PIN, ROW_1_PIN, ROW_2_PIN, ROW_3_PIN, ROW_4_PIN, ROW_5_PIN}
+#define MATRIX_ROW_PINS {B6, B5, B4, A15, B15, B1}
 #define MATRIX_COL_PINS {L_MASK|3, L_MASK|0, L_MASK|1, L_MASK|2, L_MASK|4, L_MASK|6, L_MASK|7, L_MASK|5, R_MASK|3, R_MASK|0, R_MASK|1, R_MASK|2, R_MASK|4, R_MASK|6, R_MASK|7, R_MASK|5}
 
 #define DISCHARGE_WAIT_PRE  30
 #define DISCHARGE_WAIT_POST 30
 #define CHARGE_WAIT     2
-#define EC_TH_LOW       780
-#define EC_TH_HIGH      1024
-
-#define ROW_6_PIN       B6
-#define ROW_1_PIN       B5
-#define ROW_2_PIN       B4
-#define ROW_3_PIN       A15
-#define ROW_4_PIN       B15
-#define ROW_5_PIN       B1
+#define EC_TH_LOW       800
+#define EC_TH_HIGH      1280
 
 #define LEFT_EN_PIN     B10
 #define RIGHT_EN_PIN    B2

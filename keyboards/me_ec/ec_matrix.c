@@ -46,30 +46,10 @@ void matrix_init_custom(void)
 #endif
 
     // initialize row pins
-#ifdef ROW_1_PIN
-    gpio_set_output_pushpull(ROW_1_PIN);
-    gpio_write_pin(ROW_1_PIN, 0);
-#endif
-#ifdef ROW_2_PIN
-    gpio_set_output_pushpull(ROW_2_PIN);
-    gpio_write_pin(ROW_2_PIN, 0);
-#endif
-#ifdef ROW_3_PIN
-    gpio_set_output_pushpull(ROW_3_PIN);
-    gpio_write_pin(ROW_3_PIN, 0);
-#endif
-#ifdef ROW_4_PIN
-    gpio_set_output_pushpull(ROW_4_PIN);
-    gpio_write_pin(ROW_4_PIN, 0);
-#endif
-#ifdef ROW_5_PIN
-    gpio_set_output_pushpull(ROW_5_PIN);
-    gpio_write_pin(ROW_5_PIN, 0);
-#endif
-#ifdef ROW_6_PIN
-    gpio_set_output_pushpull(ROW_6_PIN);
-    gpio_write_pin(ROW_6_PIN, 0);
-#endif
+    for (int i = 0; i < MATRIX_ROWS; i++) {
+        gpio_set_output_pushpull(custom_row_pins[i]);
+        gpio_write_pin(custom_row_pins[i], 0);
+    }
 
     // initialize col pins
 #ifdef LEFT_EN_PIN

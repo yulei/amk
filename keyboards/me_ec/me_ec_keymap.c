@@ -1,11 +1,8 @@
 /**
- * @file me_ecoller_keymap.c
+ * @file me_ec_keymap.c
  */
 
 #include "me_ec.h"
-#include "keymap.h"
-
-//#define _______ KC_TRNS
 
 const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	[0]=LAYOUT_default(
