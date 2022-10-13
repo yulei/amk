@@ -20,7 +20,7 @@
 #define rf_driver_debug(...)
 #endif
 
-extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart_rf;
 
 #define QUEUE_ITEM_SIZE   16                        // maximum size of the queue item
 typedef struct {
@@ -155,7 +155,7 @@ static void process_report(report_item_t *item)
         command[5+i] = item->data[i];
     }
 
-    HAL_UART_Transmit(&huart1, command, item->size+5, 10);
+    HAL_UART_Transmit(&huart_rf, command, item->size+5, 10);
 
     rf_driver_debug("send report: type=%d, size=%d\n", item->type, item->size);
 }
@@ -177,15 +177,15 @@ static void rf_cmd_set_leds(uint8_t led)
 void rf_driver_init(bool use_rf)
 {
     // turn on rf power
+    #ifdef RF_POWER_PIN
     gpio_set_output_pushpull(RF_POWER_PIN);
     gpio_write_pin(RF_POWER_PIN, 1);
-
-    // enable rf module
-    gpio_set_output_pushpull(RF_WAKEUP_PIN);
-    gpio_write_pin(RF_WAKEUP_PIN, 1);
+    #endif
 
     // pin for checking rf state
-    gpio_set_input_pulldown(RF_READY_PIN);
+    #ifdef RF_STATE_PIN
+    gpio_set_input_pulldown(RF_STATE_PIN);
+    #endif
 
     report_queue_init(&report_queue);
 
@@ -193,7 +193,7 @@ void rf_driver_init(bool use_rf)
     command_buf_count = 0;
     rb_init(&ring_buffer, ring_buffer_data, 128);
 
-    __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
+    __HAL_UART_ENABLE_IT(&huart_rf, UART_IT_RXNE);
 
     if (use_rf && !(usb_setting&USB_OUTPUT_RF)) {
         rf_driver_toggle();
@@ -211,12 +211,12 @@ void rf_driver_task(void)
         process_data(c);
     }
 
-    if (gpio_read_pin(RF_READY_PIN)) {
+    //if (gpio_read_pin(RF_READY_PIN)) {
         report_item_t item;
         while (report_queue_get(&report_queue, &item)) {
             process_report(&item);
         }
-    }
+    //}
 }
 
 void rf_driver_put_report(uint32_t type, void* data, uint32_t size)

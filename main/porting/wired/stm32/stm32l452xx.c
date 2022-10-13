@@ -15,7 +15,7 @@
 RTC_HandleTypeDef hrtc;
 ADC_HandleTypeDef hadc1;
 
-UART_HandleTypeDef hlpuart1;
+UART_HandleTypeDef huart_rf;
 DMA_HandleTypeDef hdma_lpuart_rx;
 DMA_HandleTypeDef hdma_lpuart_tx;
 
@@ -127,16 +127,16 @@ static void MX_GPIO_Init(void)
 
 static void MX_LPUART1_UART_Init(void)
 {
-    hlpuart1.Instance = LPUART1;
-    hlpuart1.Init.BaudRate = 115200;
-    hlpuart1.Init.WordLength = UART_WORDLENGTH_8B;
-    hlpuart1.Init.StopBits = UART_STOPBITS_1;
-    hlpuart1.Init.Parity = UART_PARITY_NONE;
-    hlpuart1.Init.Mode = UART_MODE_TX_RX;
-    hlpuart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-    hlpuart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-    hlpuart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-    if (HAL_UART_Init(&hlpuart1) != HAL_OK)
+    huart_rf.Instance = LPUART1;
+    huart_rf.Init.BaudRate = 115200;
+    huart_rf.Init.WordLength = UART_WORDLENGTH_8B;
+    huart_rf.Init.StopBits = UART_STOPBITS_1;
+    huart_rf.Init.Parity = UART_PARITY_NONE;
+    huart_rf.Init.Mode = UART_MODE_TX_RX;
+    huart_rf.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+    huart_rf.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+    huart_rf.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+    if (HAL_UART_Init(&huart_rf) != HAL_OK)
     {
         Error_Handler();
     }
