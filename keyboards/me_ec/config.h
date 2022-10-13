@@ -21,7 +21,7 @@
 #define DISCHARGE_WAIT_POST 30
 #define CHARGE_WAIT     2
 #define EC_TH_LOW       800
-#define EC_TH_HIGH      1280
+#define EC_TH_HIGH      1192
 
 #define LEFT_EN_PIN     B10
 #define RIGHT_EN_PIN    B2
