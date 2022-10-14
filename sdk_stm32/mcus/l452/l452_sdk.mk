@@ -14,6 +14,6 @@ ifneq (yes, $(strip $(TINYUSB_USE_HAL)))
 	SRCS += $(STM32SDK_DIR)/mcus/$(MCU_TYPE)/dcd_stm32_fsdev.c
 endif
 
-SDK_DEFS += -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16
+SDK_DEFS += -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
 MCU_LD = STM32L452CEUx

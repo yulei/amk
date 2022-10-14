@@ -4,11 +4,16 @@ SRCS += \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_flash_ramfunc.c \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_dma_ex.c \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_pwr_ex.c \
+	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_adc.c \
 
 APP_DEFS += \
 	-DSTM32L432xx \
     -DCFG_TUSB_MCU=OPT_MCU_STM32L4 \
 
-SDK_DEFS += -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16
+ifneq (yes, $(strip $(TINYUSB_USE_HAL)))
+	SRCS += $(STM32SDK_DIR)/mcus/$(MCU_TYPE)/dcd_stm32_fsdev.c
+endif
+
+SDK_DEFS += -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
 MCU_LD = STM32L432KBUx

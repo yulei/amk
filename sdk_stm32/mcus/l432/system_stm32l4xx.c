@@ -66,13 +66,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under Apache License, Version 2.0,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/Apache-2.0
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -126,6 +125,7 @@
      remap of boot address selected */
 /* #define USER_VECT_TAB_ADDRESS */
 
+//#if defined(USER_VECT_TAB_ADDRESS)
 /*!< Uncomment the following line if you need to relocate your vector Table
      in Sram else user remap will be done in Flash. */
 /* #define VECT_TAB_SRAM */
@@ -143,6 +143,7 @@
                                                      This value must be a multiple of 0x200. */
 #endif
 #endif /* VECT_TAB_SRAM */
+//#endif /* USER_VECT_TAB_ADDRESS */
 
 /******************************************************************************/
 /**
@@ -197,7 +198,7 @@
 
 void SystemInit(void)
 {
-#if defined(USER_VECT_TAB_ADDRESS)
+#ifdef VECT_TAB_OFFSET
   /* Configure the Vector Table location -------------------------------------*/
   SCB->VTOR = VECT_TAB_BASE_ADDRESS | VECT_TAB_OFFSET;
 #endif
@@ -206,25 +207,6 @@ void SystemInit(void)
 #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
   SCB->CPACR |= ((3UL << 20U)|(3UL << 22U));  /* set CP10 and CP11 Full Access */
 #endif
-
-  /* Reset the RCC clock configuration to the default reset state ------------*/
-  /* Set MSION bit */
-  RCC->CR |= RCC_CR_MSION;
-
-  /* Reset CFGR register */
-  RCC->CFGR = 0x00000000U;
-
-  /* Reset HSEON, CSSON , HSION, and PLLON bits */
-  RCC->CR &= 0xEAF6FFFFU;
-
-  /* Reset PLLCFGR register */
-  RCC->PLLCFGR = 0x00001000U;
-
-  /* Reset HSEBYP bit */
-  RCC->CR &= 0xFFFBFFFFU;
-
-  /* Disable all interrupts */
-  RCC->CIER = 0x00000000U;
 }
 
 /**
