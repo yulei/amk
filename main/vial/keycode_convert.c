@@ -280,7 +280,7 @@ uint16_t amk_to_vial(uint16_t keycode)
             }
             break;
         case ACT_USAGE:
-            vial_kc = usage_to_keycode(vial_consumer(action.usage.code));
+            vial_kc = vial_consumer(usage_to_keycode(action.usage.code));
             break;
         case ACT_MOUSEKEY:
             vial_kc = action.key.code;
