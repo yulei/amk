@@ -75,10 +75,14 @@ MCU_FAMILY := stm32l4xx
 MCU_TYPE := l452
 endif
 
+ifeq (STM32F412, $(strip $(MCU)))
+MCU_ARCH := CORTEX_M4
+MCU_SERIES := f4
+MCU_FAMILY := stm32f4xx
+MCU_TYPE := f412
+endif
+
 SRCS += \
-	$(STM32SDK_DIR)/mcus/$(MCU_TYPE)/system_$(MCU_FAMILY).c \
-	$(STM32SDK_DIR)/mcus/$(MCU_TYPE)/$(MCU_FAMILY)_hal_msp.c \
-	$(STM32SDK_DIR)/mcus/$(MCU_TYPE)/$(MCU_FAMILY)_it.c \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_tim.c \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_tim_ex.c \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_rcc.c \
@@ -96,7 +100,6 @@ SRCS += \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_uart.c
 
 INCS += \
-	$(STM32SDK_DIR)/mcus/$(MCU_TYPE) \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Inc \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Inc/Legacy \
 	$(VENDOR_DIR)/device_$(MCU_SERIES)/Include \
@@ -108,7 +111,19 @@ endif
 
 APP_DEFS += -DUSE_HAL_DRIVER
 
+ifeq (,$(filter $(strip $(MCU)), STM32L432 STM32L452 STM32F412))
 include $(STM32SDK_DIR)/mcus/$(MCU_TYPE)/$(MCU_TYPE)_sdk.mk
+SRCS +=	$(STM32SDK_DIR)/mcus/$(MCU_TYPE)/system_$(MCU_FAMILY).c
+SRCS +=	$(STM32SDK_DIR)/mcus/$(MCU_TYPE)/$(MCU_FAMILY)_hal_msp.c
+SRCS +=	$(STM32SDK_DIR)/mcus/$(MCU_TYPE)/$(MCU_FAMILY)_it.c
+INCS +=	$(STM32SDK_DIR)/mcus/$(MCU_TYPE)
+else
+include $(STM32SDK_DIR)/mcus/$(MCU_SERIES)/$(MCU_TYPE)_sdk.mk
+SRCS +=	$(STM32SDK_DIR)/mcus/$(MCU_SERIES)/system_$(MCU_FAMILY).c
+SRCS +=	$(STM32SDK_DIR)/mcus/$(MCU_SERIES)/$(MCU_FAMILY)_hal_msp.c
+SRCS +=	$(STM32SDK_DIR)/mcus/$(MCU_SERIES)/$(MCU_FAMILY)_it.c
+INCS +=	$(STM32SDK_DIR)/mcus/$(MCU_SERIES)
+endif
 
 ifeq (yes, $(strip $(TINYUSB_ENABLE)))
 	include $(LIB_DIR)/tinyusb.mk

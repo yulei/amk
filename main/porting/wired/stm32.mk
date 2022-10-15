@@ -43,10 +43,6 @@ ifeq (STM32F103, $(strip $(MCU)))
 	SRCS += $(PLATFORM_PORTING_DIR)/stm32f103xb.c
 endif
 
-ifeq (STM32L432, $(strip $(MCU)))
-	SRCS += $(PLATFORM_PORTING_DIR)/stm32l432xx.c
-endif
-
 ifeq (STM32L072, $(strip $(MCU)))
 	SRCS += $(PLATFORM_PORTING_DIR)/stm32l072xx.c
 endif
@@ -55,6 +51,10 @@ ifeq (STM32G431, $(strip $(MCU)))
 	SRCS += $(PLATFORM_PORTING_DIR)/stm32g431xx.c
 endif
 
-ifeq (STM32L452, $(strip $(MCU)))
-	SRCS += $(PLATFORM_PORTING_DIR)/stm32l452xx.c
+ifneq (,$(findstring $(strip $(MCU)), STM32L432 STM32L452))
+	SRCS += $(PLATFORM_PORTING_DIR)/stm32l4xx.c
+endif
+
+ifneq (,$(findstring $(strip $(MCU)), STM32F412))
+	SRCS += $(PLATFORM_PORTING_DIR)/stm32f4xx.c
 endif

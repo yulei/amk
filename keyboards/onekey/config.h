@@ -16,8 +16,8 @@
 #define MATRIX_ROWS 2
 #define MATRIX_COLS 3
 
-#define MATRIX_ROW_PINS {A0,A1}
-#define MATRIX_COL_PINS {C4,C5,C3}
+#define MATRIX_ROW_PINS {A8,A9}
+#define MATRIX_COL_PINS {C6,C7,C8}
 
 // screen configuration
 //#define USE_SPI1
