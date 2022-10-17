@@ -128,19 +128,7 @@ static void MX_I2C1_Init(void)
 
 static void MX_QUADSPI_Init(void)
 {
-    hqspi.Instance = QUADSPI;
-    hqspi.Init.ClockPrescaler = 2;
-    hqspi.Init.FifoThreshold = 1;
-    hqspi.Init.SampleShifting = QSPI_SAMPLE_SHIFTING_NONE;
-    hqspi.Init.FlashSize = 1;
-    hqspi.Init.ChipSelectHighTime = QSPI_CS_HIGH_TIME_1_CYCLE;
-    hqspi.Init.ClockMode = QSPI_CLOCK_MODE_0;
-    hqspi.Init.FlashID = QSPI_FLASH_ID_2;
-    hqspi.Init.DualFlash = QSPI_DUALFLASH_DISABLE;
-    if (HAL_QSPI_Init(&hqspi) != HAL_OK)
-    {
-        Error_Handler();
-    }
+    
 }
 
 static void MX_SPI1_Init(void)
