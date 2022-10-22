@@ -1,5 +1,9 @@
 /**
- * stm32_f722xx.c
+ * @file stm32l4xx.c
+ * @author astro
+ * 
+ * @copyright Copyright (c) 2022
+ * 
  */
 
 #include "generic_hal.h"
@@ -200,23 +204,16 @@ static void MX_DMA_Init(void)
 
     /* DMA interrupt init */
     /* DMA2_Channel6_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA2_Channel6_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(DMA2_Channel6_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(DMA2_Channel6_IRQn);
     /* DMA2_Channel7_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA2_Channel7_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(DMA2_Channel7_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(DMA2_Channel7_IRQn);
 }
 
 void usb_port_init(void)
 {
     HAL_PWREx_EnableVddUSB();
-
-//    RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
-//    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
-//    PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_HSI48;
-//    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
-//      Error_Handler();
-//    }
 
     GPIO_InitTypeDef GPIO_InitStruct = {0};
 
@@ -236,7 +233,7 @@ void usb_port_init(void)
     __HAL_RCC_USB_CLK_ENABLE();
 
     /* Peripheral interrupt init */
-    HAL_NVIC_SetPriority(USB_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(USB_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(USB_IRQn);
 }
 

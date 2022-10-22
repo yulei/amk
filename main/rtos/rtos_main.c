@@ -11,6 +11,10 @@
 #include "amk_utils.h"
 #include "amk_printf.h"
 
+#ifdef RF_ENABLE
+#include "rf_driver.h"
+#endif
+
 #include "FreeRTOS.h"
 
 extern void system_init(void);
@@ -156,7 +160,7 @@ void timer_task_1ms(void *arg)
 {
     static uint32_t i = 0;
     osThreadFlagsSet(main_thread_id, FLAGS_MAIN_1MS);
-    if (!(i++ % 100)) {
+    if (!(i++ % 10)) {
         osThreadFlagsSet(main_thread_id, FLAGS_MAIN_10MS);
     }
 }

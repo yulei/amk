@@ -95,7 +95,7 @@ void amk_driver_init(void)
 
 #ifdef RF_ENABLE
     amk_printf("rf_driver_init\n");
-    rf_driver_init(true);
+    rf_driver_init(false);
 #endif
     amk_indicator_init();
 }

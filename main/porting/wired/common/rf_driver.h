@@ -7,11 +7,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define CMD_MAX_LEN 64
-#define SYNC_BYTE_1 0xAA
-#define SYNC_BYTE_2 0x55
-#define SYNC_PING   0xA5
-#define SYNC_PONG   0x5A
+#define CMD_MAX_LEN         64
+#define RING_BUF_MAX_LEN    128
+#define SYNC_BYTE_1         0xAA
+#define SYNC_BYTE_2         0x55
+#define SYNC_PING           0xA5
+#define SYNC_PONG           0x5A
 
 enum
 {
@@ -28,6 +29,8 @@ enum
     CMD_TOGGLE_SCREEN,
     CMD_TOGGLE_MSC,
     CMD_TOGGLE_DATETIME,
+    CMD_ERASE_BOND,
+    CMD_SELECT_PEER,
 };
 
 void rf_driver_init(bool use_rf);
@@ -35,5 +38,7 @@ void rf_driver_init(bool use_rf);
 void rf_driver_task(void);
 
 void rf_driver_toggle(void);
+void rf_driver_erase_bond(void);
+void rf_driver_select_peer(int peer);
 
 void rf_driver_put_report(uint32_t type, void* data, uint32_t size);

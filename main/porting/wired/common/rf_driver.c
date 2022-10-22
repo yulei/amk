@@ -22,6 +22,7 @@
 
 extern UART_HandleTypeDef huart_rf;
 
+
 #define QUEUE_ITEM_SIZE   16                        // maximum size of the queue item
 typedef struct {
     uint16_t    type;                               // type of the item
@@ -78,48 +79,49 @@ static void process_report(report_item_t *item);
 static uint8_t compute_checksum(uint8_t *data, uint32_t size);
 static void rf_cmd_set_leds(uint8_t led);
 
-static uint8_t command_buf[CMD_MAX_LEN];
-static uint32_t command_buf_count = 0;
+static uint8_t recv_buf[CMD_MAX_LEN];
+static uint32_t recv_buf_count = 0;
 
-static uint8_t ring_buffer_data[128];
+static uint8_t ring_buffer_data[RING_BUF_MAX_LEN];
 static ring_buffer_t ring_buffer;
+static uint8_t send_buf[CMD_MAX_LEN];
 
 static void process_data(uint8_t d)
 {
-    rf_driver_debug("uart received: %d, current count=%d\n", d, command_buf_count);
-    if (command_buf_count == 0 && d != SYNC_BYTE_1) {
+    rf_driver_debug("uart received: %d, current count=%d\n", d, recv_buf_count);
+    if (recv_buf_count == 0 && d != SYNC_BYTE_1) {
         rf_driver_debug("SYNC BYTE 1: %x\n", d);
         return;
-    } else if (command_buf_count == 1 && d != SYNC_BYTE_2) {
-        command_buf_count = 0;
-        memset(command_buf, 0, sizeof(command_buf));
+    } else if (recv_buf_count == 1 && d != SYNC_BYTE_2) {
+        recv_buf_count = 0;
+        memset(recv_buf, 0, sizeof(recv_buf));
         rf_driver_debug("SYNC BYTE 2: %x\n", d);
         return;
     }
 
-    if (command_buf_count >= CMD_MAX_LEN) {
+    if (recv_buf_count >= CMD_MAX_LEN) {
         rf_driver_debug("UART command oversize\n");
-        memset(command_buf, 0, sizeof(command_buf));
-        command_buf_count = 0;
+        memset(recv_buf, 0, sizeof(recv_buf));
+        recv_buf_count = 0;
         return;
     }
 
-    command_buf[command_buf_count] = d;
+    recv_buf[recv_buf_count] = d;
 
-    if (command_buf[2]+2 > CMD_MAX_LEN) {
-        rf_driver_debug("UART invalid command size: %d\n", command_buf[2]);
-        memset(command_buf, 0, sizeof(command_buf));
-        command_buf_count= 0;
+    if (recv_buf[2]+2 > CMD_MAX_LEN) {
+        rf_driver_debug("UART invalid command size: %d\n", recv_buf[2]);
+        memset(recv_buf, 0, sizeof(recv_buf));
+        recv_buf_count= 0;
         return;
     }
 
-    command_buf_count++;
-    if (command_buf_count > 2) {
-        if (command_buf_count == (command_buf[2] + 2)) {
+    recv_buf_count++;
+    if (recv_buf_count > 2) {
+        if (recv_buf_count == (recv_buf[2] + 2)) {
             // full packet received
-            enqueue_command(&command_buf[2]);
-            memset(command_buf, 0, sizeof(command_buf));
-            command_buf_count = 0;
+            enqueue_command(&recv_buf[2]);
+            memset(recv_buf, 0, sizeof(recv_buf));
+            recv_buf_count = 0;
         }
     }
 }
@@ -143,19 +145,18 @@ static void enqueue_command(uint8_t *cmd)
 
 static void process_report(report_item_t *item)
 {
-    static uint8_t command[128];
     uint8_t checksum = item->type;
     checksum += compute_checksum(&item->data[0], item->size);
-    command[0] = SYNC_BYTE_1;
-    command[1] = SYNC_BYTE_2;
-    command[2] = item->size+3;
-    command[3] = checksum;
-    command[4] = item->type;
+    send_buf[0] = SYNC_BYTE_1;
+    send_buf[1] = SYNC_BYTE_2;
+    send_buf[2] = item->size+3;
+    send_buf[3] = checksum;
+    send_buf[4] = item->type;
     for (uint32_t i = 0; i < item->size; i++) {
-        command[5+i] = item->data[i];
+        send_buf[5+i] = item->data[i];
     }
 
-    HAL_UART_Transmit(&huart_rf, command, item->size+5, 10);
+    HAL_UART_Transmit(&huart_rf, send_buf, item->size+5, 10);
 
     rf_driver_debug("send report: type=%d, size=%d\n", item->type, item->size);
 }
@@ -189,8 +190,8 @@ void rf_driver_init(bool use_rf)
 
     report_queue_init(&report_queue);
 
-    memset(command_buf, 0, sizeof(command_buf));
-    command_buf_count = 0;
+    memset(recv_buf, 0, sizeof(recv_buf));
+    recv_buf_count = 0;
     rb_init(&ring_buffer, ring_buffer_data, 128);
 
     __HAL_UART_ENABLE_IT(&huart_rf, UART_IT_RXNE);
@@ -238,6 +239,35 @@ void rf_driver_toggle(void)
         usb_setting |= USB_OUTPUT_RF;
         rf_driver_debug("enable rf output\n");
     }
+}
+
+void rf_driver_erase_bond(void)
+{
+    uint8_t checksum = CMD_ERASE_BOND;
+    send_buf[0] = SYNC_BYTE_1;
+    send_buf[1] = SYNC_BYTE_2;
+    send_buf[2] = 3;
+    send_buf[3] = checksum;
+    send_buf[4] = CMD_ERASE_BOND;
+
+    HAL_UART_Transmit(&huart_rf, send_buf, 5, 10);
+
+    rf_driver_debug("send erase bond\n");
+}
+
+void rf_driver_select_peer(int peer)
+{
+    uint8_t checksum = (uint8_t)(CMD_SELECT_PEER+peer);
+    send_buf[0] = SYNC_BYTE_1;
+    send_buf[1] = SYNC_BYTE_2;
+    send_buf[2] = 3;
+    send_buf[3] = checksum;
+    send_buf[4] = CMD_SELECT_PEER;
+    send_buf[5] = (uint8_t)peer;
+
+    HAL_UART_Transmit(&huart_rf, send_buf, 6, 10);
+
+    rf_driver_debug("send erase bond\n");
 }
 
 void uart_recv_char(uint8_t c)

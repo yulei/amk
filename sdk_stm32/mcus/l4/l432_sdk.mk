@@ -14,6 +14,10 @@ ifneq (yes, $(strip $(TINYUSB_USE_HAL)))
 	SRCS += $(STM32SDK_DIR)/mcus/$(MCU_SERIES)/dcd_stm32_fsdev.c
 endif
 
+ifeq (yes, $(strip $(RTOS_ENABLE)))
+	SRCS += $(STM32SDK_DIR)/mcus/$(MCU_SERIES)/stm32l4xx_hal_timebase_tim.c
+endif
+
 SDK_DEFS += -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
 MCU_LD = STM32L432KBUx
