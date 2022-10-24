@@ -16,8 +16,8 @@ SRCS += \
 	$(FREERTOS_DIR)/CMSIS/RTOS2/FreeRTOS/Source/freertos_evr.c \
 #	$(FREERTOS_DIR)/CMSIS/RTOS2/FreeRTOS/Source/os_systick.c \
 #	$(FREERTOS_DIR)/CMSIS/RTOS2/FreeRTOS/Source/handlers.c \
-	$(FREERTOS_DIR)/Source/croutine.c \
-	$(FREERTOS_DIR)/Source/stream_buffer.c \
+#	$(FREERTOS_DIR)/Source/croutine.c \
+#	$(FREERTOS_DIR)/Source/stream_buffer.c \
 
 ifeq (STM32F722, $(strip $(MCU)))
 	INCS += $(FREERTOS_DIR)/kernel/portable/GCC/ARM_CM7/r0p1

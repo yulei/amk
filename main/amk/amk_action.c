@@ -29,10 +29,6 @@
 #include "vial_macro.h"
 #endif
 
-#ifdef RF_ENABLE
-#include "rf_driver.h"
-#endif
-
 #if defined(NRF52) || defined(NRF52840_XXAA)
 #include "common_config.h"
 #endif
@@ -168,11 +164,6 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
             case AF_RGB_SPDD:
                 if (!record->event.pressed) return;
                 rgb_led_config_dec_param(RGB_EFFECT_SPEED);
-                break;
-    #endif
-    #ifdef RF_ENABLE
-            case AF_RF_TOG:
-                rf_driver_toggle();
                 break;
     #endif
 
