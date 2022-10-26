@@ -310,7 +310,7 @@ static int32_t cmd_compose_screen(const cmd_t *cmd, void *buf, uint32_t size)
     } else if (cmd->param.screen.action == CMD_SCREEN_MODE) {
         result = snprintf(buf, size, "%s:%s=%d;\n", 
                     CMD_SCREEN_STR, 
-                    SCREEN_PARAM_MSC,
+                    SCREEN_PARAM_MODE,
                     cmd->param.screen.state);
     } else if (cmd->param.screen.action == CMD_SCREEN_ADJUST) {
         result = snprintf(buf, size, "%s:%s=%d;\n", 

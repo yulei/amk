@@ -240,6 +240,12 @@ bool anim_display_is_enabled(display_t *display)
     return obj->enabled;
 }
 
+void anim_display_update_flags(display_t *display, uint8_t flags)
+{
+    anim_display_obj_t *obj = (anim_display_obj_t*)display->data;
+    obj->param.flags = flags;
+}
+
 bool anim_display_create(display_t *display, display_param_t *param)
 {
     anim_display_obj_t *obj = NULL;
@@ -262,6 +268,7 @@ bool anim_display_create(display_t *display, display_param_t *param)
         display->task = anim_display_task;
         display->set_enable = anim_display_set_enable;
         display->is_enabled = anim_display_is_enabled;
+        display->update_flags = anim_display_update_flags;
         display->matrix_change = NULL;
         return true;
     }

@@ -109,6 +109,7 @@ typedef struct display_s {
     void (*task)(display_t *display);
     void (*set_enable)(display_t *display, bool enable);
     bool (*is_enabled)(display_t *display);
+    void (*update_flags)(display_t *display, uint8_t flags);
     void (*matrix_change)(display_t *display, keyevent_t event);
     void *data;
 } display_t;

@@ -122,6 +122,12 @@ void render_enable_display(uint8_t display, bool enable)
 }
 
 
+void render_update_flags(uint8_t display, uint8_t flags)
+{
+    if (display < DISPLAY_NUM) {
+        displays[display]->update_flags(displays[display], flags);
+    }
+}
 //-----------------simple static buffer allocator
 
 static uint32_t render_buffer[RENDER_BUFFER_SIZE/4];

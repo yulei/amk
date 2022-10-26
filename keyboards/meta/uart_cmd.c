@@ -237,12 +237,17 @@ bool hook_process_action_main(keyrecord_t *record)
         }
         break;
     case KC_F16: {
-        screen_on = !screen_on;
+        cmd_t cmd = {0};
+        cmd.type = CMD_SCREEN;
+        cmd.param.screen.action = CMD_SCREEN_MODE;
+        uart_cmd_send(&cmd);
+        /*screen_on = !screen_on;
         cmd_t cmd = {0};
         cmd.type = CMD_SCREEN;
         cmd.param.screen.action = CMD_SCREEN_POWER;
         cmd.param.screen.state = screen_on ? 1 : 0;
         uart_cmd_send(&cmd);
+        */
     } return true;
     case KC_F17: {
         screen_on = !screen_on;
