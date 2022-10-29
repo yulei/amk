@@ -49,6 +49,10 @@
 #include "amk_action_util.h"
 #endif
 
+#ifndef SUSPEND_WAKEUP_DELAY
+#define SUSPEND_WAKEUP_DELAY    0
+#endif
+
 uint32_t usb_setting = 0;
 uint8_t amk_led_state = 0;
 uint8_t amk_macro_state = 0;
@@ -95,7 +99,7 @@ void amk_driver_init(void)
 
 #ifdef RF_ENABLE
     amk_printf("rf_driver_init\n");
-    rf_driver_init(false);
+    rf_driver_init(true);
 #endif
     amk_indicator_init();
 }
@@ -108,7 +112,7 @@ void amk_driver_task(void)
                 // wake up remote
                 amk_printf("suspend_wakeup, usb_setting=%x\n", usb_setting);
                 remote_wakeup();
-                wait_ms(1000);
+                wait_ms(SUSPEND_WAKEUP_DELAY);
     #ifdef RTOS_ENABLE
                 NVIC_SystemReset();
     #else

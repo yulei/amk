@@ -88,3 +88,5 @@
 
 // custom tusb definitions
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
+
+#define SUSPEND_RECONNECT

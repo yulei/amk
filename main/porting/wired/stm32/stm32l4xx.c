@@ -17,8 +17,6 @@ RTC_HandleTypeDef hrtc;
 ADC_HandleTypeDef hadc1;
 
 UART_HandleTypeDef huart_rf;
-DMA_HandleTypeDef hdma_lpuart_rx;
-DMA_HandleTypeDef hdma_lpuart_tx;
 
 void USB_IRQHandler(void)
 {
@@ -199,16 +197,6 @@ static void MX_RTC_Init(void)
   */
 static void MX_DMA_Init(void)
 {
-    /* DMA controller clock enable */
-    __HAL_RCC_DMA2_CLK_ENABLE();
-
-    /* DMA interrupt init */
-    /* DMA2_Channel6_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA2_Channel6_IRQn, 1, 0);
-    HAL_NVIC_EnableIRQ(DMA2_Channel6_IRQn);
-    /* DMA2_Channel7_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA2_Channel7_IRQn, 1, 0);
-    HAL_NVIC_EnableIRQ(DMA2_Channel7_IRQn);
 }
 
 void usb_port_init(void)

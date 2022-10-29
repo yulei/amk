@@ -9,6 +9,7 @@
 #include "amk_gpio.h"
 #include "ring_buffer.h"
 #include "usb_descriptors.h"
+#include "wait.h"
 
 #ifndef RF_DRIVER_DEBUG
 #define RF_DRIVER_DEBUG 1
@@ -181,7 +182,16 @@ void rf_driver_init(bool use_rf)
     #ifdef RF_POWER_PIN
     gpio_set_output_pushpull(RF_POWER_PIN);
     gpio_write_pin(RF_POWER_PIN, 1);
+    wait_ms(10);
     #endif
+
+    #ifdef RF_RESET_PIN
+    gpio_set_output_pushpull(RF_RESET_PIN);
+    gpio_write_pin(RF_RESET_PIN, 0);
+    wait_ms(1);
+    gpio_write_pin(RF_RESET_PIN, 1);
+    #endif
+
 
     // pin for checking rf state
     #ifdef RF_STATE_PIN
