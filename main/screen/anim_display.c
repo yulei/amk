@@ -173,8 +173,9 @@ void anim_display_task(display_t *display)
     if (obj->param.flags & DISPLAY_FLAGS_MODE_CUSTOM) {
         if (obj->anim) {
             uint32_t frame = anim_display_get_current(obj->param.screen);
-            anim_set_frame(obj->anim, frame);
-            anim_step(obj->anim, &obj->delay, obj->buffer, obj->buffer_size);
+            if (anim_set_frame(obj->anim, frame) ) {
+                anim_step(obj->anim, &obj->delay, obj->buffer, obj->buffer_size);
+            }
         }
         anim_display_post_process(obj->buffer, obj->param.screen);
         obj->screen->fill_rect(obj->screen, x, y, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
