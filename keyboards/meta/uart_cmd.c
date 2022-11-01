@@ -35,6 +35,7 @@ enum screen_adjust{
     SA_DEC_SAT,
     SA_INC_VAL,
     SA_DEC_VAL,
+    SA_CLR_RST,
 };
 
 extern UART_HandleTypeDef huart1;
@@ -222,6 +223,16 @@ bool hook_process_action_main(keyrecord_t *record)
             cmd.type = CMD_SCREEN;
             cmd.param.screen.action = CMD_SCREEN_ADJUST;
             cmd.param.screen.state = SA_DEC_VAL;
+            uart_cmd_send(&cmd);
+        }
+        return true;
+    case KC_ENT:
+        if (!screen_adjust) return false;
+        {
+            cmd_t cmd = {0};
+            cmd.type = CMD_SCREEN;
+            cmd.param.screen.action = CMD_SCREEN_ADJUST;
+            cmd.param.screen.state = SA_CLR_RST;
             uart_cmd_send(&cmd);
         }
         return true;
