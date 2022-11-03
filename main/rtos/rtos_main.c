@@ -22,8 +22,8 @@ extern void custom_board_init(void);
 extern void custom_board_task(void);
 
 // flags
-#define FLAGS_MAIN_1MS      (1<<0)
-#define FLAGS_MAIN_10MS     (1<<0)
+#define FLAGS_MAIN_KEYBOARD     (1<<0)
+#define FLAGS_MAIN_OTHER        (1<<1)
 
 // thread parameters
 #define USB_THREAD_STACK        512
@@ -55,16 +55,23 @@ static const osThreadAttr_t main_thread_attr = {
     .priority = MAIN_THREAD_PRIORITY,
 };
 
-static uint32_t timer_1ms_cb[WORDS(sizeof(StaticTimer_t))];
-static const osTimerAttr_t timer_1ms_attr = {
-    .name = "1ms",
-    .cb_mem = timer_1ms_cb,
-    .cb_size = sizeof(timer_1ms_cb),
+#ifndef USE_HARDWARE_TIMER
+static uint32_t main_timer_cb[WORDS(sizeof(StaticTimer_t))];
+static const osTimerAttr_t main_timer_attr = {
+    .name = "timer",
+    .cb_mem = main_timer_cb,
+    .cb_size = sizeof(main_timer_cb),
 };
+#else
+__attribute__((weak))
+void rtos_timer_init(void){
+}
+#endif
 
 static void usb_thread(void *arg);
 static void main_thread(void *arg);
-static void timer_task_1ms(void *arg);
+
+void rtos_timer_task(void *arg);
 
 int main(int argc, char ** argv)
 {
@@ -94,25 +101,29 @@ void usb_thread(void *arg)
 void main_thread(void *arg)
 {
     uint32_t flags = 0;
-    osTimerId_t tmr_id = osTimerNew(timer_task_1ms, osTimerPeriodic, NULL, &timer_1ms_attr);
+#ifndef USE_HARDWARE_TIMER
+    osTimerId_t tmr_id = osTimerNew(rtos_timer_task, osTimerPeriodic, NULL, &main_timer_attr);
     osTimerStart(tmr_id, 1);
+#else
+    rtos_timer_init();
+#endif
     
     amk_printf("amk_init\n");
     amk_driver_init();
     amk_printf("board_init end\n");
     while(1) {
         flags = osThreadFlagsWait(
-                        FLAGS_MAIN_1MS          // 1ms tick
-                       | FLAGS_MAIN_10MS        // 10ms tick
+                        FLAGS_MAIN_KEYBOARD     // keyboard flag 
+                       | FLAGS_MAIN_OTHER       // other flag 
                        , osFlagsWaitAny
                        , osWaitForever);
 
-        if (flags & FLAGS_MAIN_1MS) {
+        if (flags & FLAGS_MAIN_KEYBOARD) {
             usb_task_report();
             amk_driver_task();
         }
 
-        if (flags & FLAGS_MAIN_10MS) {
+        if (flags & FLAGS_MAIN_OTHER) {
             // other task handler
         #ifdef MSC_ENABLE
             msc_task();
@@ -146,21 +157,16 @@ void board_init(void)
     system_init();
     amk_printf("custom_board_init\n");
     custom_board_init();
-
-//    amk_printf("usb_init\n");
-//    usb_init();
-//    usb_init_post();
-
-//    amk_printf("amk_init\n");
-//    amk_driver_init();
-//    amk_printf("board_init end\n");
 }
 
-void timer_task_1ms(void *arg)
+#ifndef FLAGS_OTHER_COUNT
+#define FLAGS_OTHER_COUNT   10
+#endif
+void rtos_timer_task(void *arg)
 {
     static uint32_t i = 0;
-    osThreadFlagsSet(main_thread_id, FLAGS_MAIN_1MS);
-    if (!(i++ % 10)) {
-        osThreadFlagsSet(main_thread_id, FLAGS_MAIN_10MS);
+    osThreadFlagsSet(main_thread_id, FLAGS_MAIN_KEYBOARD);
+    if (!(i++ % FLAGS_OTHER_COUNT)) {
+        osThreadFlagsSet(main_thread_id, FLAGS_MAIN_OTHER);
     }
 }

@@ -64,9 +64,6 @@ void SysTick_Handler(void)
 #endif
 {
     systick_inc_tick();
-#ifdef HC32F460
-    systick_inc_tick();
-#endif
 }
 #endif
 
