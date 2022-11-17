@@ -376,7 +376,10 @@ void ssd1357_init(screen_driver_t *lcd)
     set_start_line(driver, 0x00);                   // Set Mapping RAM Display Start Line (0x00~0x7F)
 
 
-    set_remap_format(driver, 0x66);                 
+    set_remap_format(driver, 0x60);                 
+    //set_remap_format(driver, 0x62);                 
+    //set_remap_format(driver, 0x72);                 
+    //set_remap_format(driver, 0x66);                 
     //set_remap_format(driver, 0x76);                 // Set Horizontal Address Increment
                                                     // Column address 0 is mapped to SEG0
                                                     // Color sequence: A „³ B „³ C
