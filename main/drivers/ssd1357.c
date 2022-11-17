@@ -5,11 +5,13 @@
 #include "spi.h"
 #include "wait.h"
 
-#define BRIGHTNESS  0x0F
-#define COL_BEGIN   0x20
-#define COL_END     0x5f
-#define ROW_BEGIN   0x00
-#define ROW_END     0x3f
+#define BRIGHTNESS      0x0F
+#define COL_BEGIN       0x20
+#define COL_END         0x5f
+#define ROW_BEGIN       0x00
+#define ROW_END         0x3f
+#define SSD1357_WIDTH   64
+#define SSD1357_HEIGHT  64
 
 enum{
     CMD_SetColumnAddress = 0x15,
@@ -77,39 +79,77 @@ static const uint8_t gamma[] = {
     0x21, 0x23, 0x25, 0x27, 0x2A, 0x2D, 0xB4,
 };*/
 
-static spi_handle_t spi;
+typedef struct {
+    screen_driver_param_t param;
+    spi_handle_t          spi;
+} ssd1357_t;
+
+static ssd1357_t ssd1357_driver;
+
+
+static void ssd1357_select(ssd1357_t *driver)
+{
+    gpio_write_pin(driver->param.cs, 0);
+}
+
+static void ssd1357_unselect(ssd1357_t *driver)
+{
+    gpio_write_pin(driver->param.cs, 1);
+}
+
+static void ssd1357_set_command(ssd1357_t *driver)
+{
+    gpio_write_pin(driver->param.dc, 0);
+}
+
+static void ssd1357_set_data(ssd1357_t *driver)
+{
+    gpio_write_pin(driver->param.dc, 1);
+}
+
+static void ssd1357_reset(ssd1357_t *driver)
+{
+    gpio_write_pin(driver->param.reset, 0);
+    wait_ms(5);
+    gpio_write_pin(driver->param.reset, 1);
+    wait_ms(200);
+}
 
 static void write_command(ssd1357_t *driver, uint8_t command)
 {
-    gpio_write_pin(driver->cs, 0);
-    gpio_write_pin(driver->dc, 0);
+    ssd1357_set_command(driver);
+    ssd1357_select(driver);
 
-    spi_send(spi, &command, sizeof(command));
+    spi_send(driver->spi, &command, sizeof(command));
 
-    gpio_write_pin(driver->cs, 1);
-    gpio_write_pin(driver->dc, 1);
+    ssd1357_unselect(driver);
 }
 
 static void write_data(ssd1357_t *driver, uint8_t data)
 {
-    gpio_write_pin(driver->cs, 0);
-    gpio_write_pin(driver->dc, 1);
+    ssd1357_set_data(driver);
+    ssd1357_select(driver);
 
-    spi_send(spi, &data, sizeof(data));
+    spi_send(driver->spi, &data, sizeof(data));
 
-    gpio_write_pin(driver->cs, 1);
-    gpio_write_pin(driver->dc, 1);
+    ssd1357_unselect(driver);
 }
 
 static void write_data_buffer(ssd1357_t *driver, const void *data, size_t size)
 {
-    gpio_write_pin(driver->cs, 0);
-    gpio_write_pin(driver->dc, 1);
+    ssd1357_set_data(driver);
+    ssd1357_select(driver);
 
-    spi_send(spi, data, size);
+    spi_send(driver->spi, data, size);
 
-    gpio_write_pin(driver->cs, 1);
-    gpio_write_pin(driver->dc, 1);
+    ssd1357_unselect(driver);
+}
+
+static void write_data_buffer_async(ssd1357_t *driver, const void *data, size_t size)
+{
+    ssd1357_set_data(driver);
+    ssd1357_select(driver);
+    spi_send_async(driver->spi, data, size);
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -280,9 +320,6 @@ static void set_command_lock(ssd1357_t *driver, uint8_t lock)
                          // 0x16 => All Commands are locked except 0xFD.
 }
 
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//  Show Regular Pattern (Full Screen)
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 static void fill_screen(ssd1357_t *driver, uint16_t color)
 {
     set_column_address(driver, COL_BEGIN, COL_END);
@@ -295,6 +332,7 @@ static void fill_screen(ssd1357_t *driver, uint16_t color)
         }
     }
 }
+
 /*
 static void flush_screen(ssd1357_t *driver, const void *data, size_t size)
 {
@@ -308,22 +346,38 @@ static void flush_screen(ssd1357_t *driver, const void *data, size_t size)
 #define SSD1357_SPI_ID  SPI_INSTANCE_1
 #endif
 
-void ssd1357_init(ssd1357_t *driver)
+void ssd1357_config(screen_driver_t *driver, screen_driver_param_t *param)
 {
-    spi = spi_init(SSD1357_SPI_ID);
+    ssd1357_driver.param = *param;
+    ssd1357_driver.spi = spi_init(SSD1357_SPI_ID);
 
-    gpio_write_pin(driver->reset, 0);
-    wait_ms(5);
-    gpio_write_pin(driver->reset, 1);
-    wait_ms(200);
+    driver->data        = &ssd1357_driver;
+    driver->type        = ssd1357_type;
+    driver->init        = ssd1357_init;
+    driver->uninit      = ssd1357_uninit;
+    driver->fill        = ssd1357_fill_rect;
+    driver->fill_async  = ssd1357_fill_rect_async;
+    driver->ready       = ssd1357_fill_ready;
+    driver->release     = ssd1357_release;
+}
+
+void ssd1357_init(screen_driver_t *lcd)
+{
+    ssd1357_t *driver = (ssd1357_t*)lcd->data;
+
+    ssd1357_reset(driver);
 
     set_command_lock(driver, 0x12);                 // Unlock Basic Commands (0x12/0x16)
     set_display_on_off(driver, 0xAE);               // Display Off (0xAE/0xAF)
     set_display_clock(driver, 0xB0);                // Set Clock as 80 Frames/Sec
     set_multiplex_ratio(driver, 0x3F);              // 1/64 Duty (0x0F~0x3F)
-    set_display_offset(driver, 0x40);               // Shift Mapping RAM Counter (0x00~0x3F)
+    //set_display_offset(driver, 0x40);               // Shift Mapping RAM Counter (0x00~0x3F)
+    set_display_offset(driver, 0x00);               // Shift Mapping RAM Counter (0x00~0x3F)
     set_start_line(driver, 0x00);                   // Set Mapping RAM Display Start Line (0x00~0x7F)
-    set_remap_format(driver, 0x76);                 // Set Horizontal Address Increment
+
+
+    set_remap_format(driver, 0x66);                 
+    //set_remap_format(driver, 0x76);                 // Set Horizontal Address Increment
                                                     // Column address 0 is mapped to SEG0
                                                     // Color sequence: A „³ B „³ C
                                                     // Reserved
@@ -346,8 +400,9 @@ void ssd1357_init(ssd1357_t *driver)
      wait_ms(200);
 }
 
-void ssd1357_fill_rect(ssd1357_t* driver, uint32_t x, uint32_t y, uint32_t width, uint32_t height, const void *data, size_t size)
+void ssd1357_fill_rect(screen_driver_t *lcd, uint32_t x, uint32_t y, uint32_t width, uint32_t height, const void *data, size_t size)
 {
+    ssd1357_t *driver = (ssd1357_t*)lcd->data;
     set_column_address(driver, COL_BEGIN+y, COL_BEGIN+y+height-1);
     set_row_address(driver, ROW_BEGIN+x, ROW_BEGIN+x+width-1);
     set_write_ram(driver);
@@ -361,20 +416,37 @@ void ssd1357_fill_rect(ssd1357_t* driver, uint32_t x, uint32_t y, uint32_t width
     }*/
 }
 
-void ssd1357_fill(ssd1357_t* driver, const void* data)
+void ssd1357_fill_rect_async(screen_driver_t *lcd, uint32_t x, uint32_t y, uint32_t width, uint32_t height, const void *data, size_t size)
 {
-    uint16_t *color = (uint16_t*)data;
-    set_column_address(driver, COL_BEGIN, COL_END);
-    set_row_address(driver, ROW_BEGIN, ROW_END);
+    ssd1357_t *driver = (ssd1357_t*)lcd->data;
+    set_column_address(driver, COL_BEGIN+y, COL_BEGIN+y+height-1);
+    set_row_address(driver, ROW_BEGIN+x, ROW_BEGIN+x+width-1);
     set_write_ram(driver);
-
-    for (int i = 0; i < 64; i++) {
-        for (int j = 0; j < 64; j++) {
-            write_data_buffer(driver, color, sizeof(*color));
-            color++;
-        }
-    }
+    write_data_buffer_async(driver, data, size);
 }
-void ssd1331_uninit(void)
+
+bool ssd1357_fill_ready(screen_driver_t *lcd)
 {
+    ssd1357_t *driver = (ssd1357_t*)lcd->data;
+    return spi_ready(driver->spi);
+}
+
+void ssd1357_release(screen_driver_t *lcd)
+{
+    ssd1357_t *driver = (ssd1357_t*)lcd->data;
+    ssd1357_unselect(driver);
+}
+
+void ssd1357_fill(screen_driver_t *lcd, const void* data)
+{
+    ssd1357_fill_rect(lcd, 0, 0, SSD1357_WIDTH, SSD1357_HEIGHT, data, SSD1357_WIDTH*SSD1357_HEIGHT*2);
+}
+
+void ssd1357_uninit(screen_driver_t *lcd)
+{
+}
+
+uint8_t ssd1357_type(screen_driver_t *driver)
+{
+    return SPI_LCD_SSD1357;
 }

@@ -3,6 +3,7 @@ MK := mkdir -p
 RM := rm -rf
 CP := cp
 UF2 := python util/uf2conv.py
+VIAL := python util/vial_generate_definition.py
 
 # Build type
 NO_DEBUG ?= 1
@@ -161,6 +162,11 @@ $(TARGET): $(DEP_LIBS)
 
 $(OUTPUT_DIR):
 	+$(MK) $(OUTPUT_DIR)
+
+ifeq (yes, $(strip $(VIAL_ENABLE)))
+$(KEYBOARD_DIR)/vial_generated_keyboard_definition.h: $(KEYBOARD_DIR)/vial.json
+	$(NO_ECHO)$(VIAL) $^ $@
+endif
 
 # Create lib files
 %.a: $(LIB_OBJS) | $(OUTPUT_DIR)

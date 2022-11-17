@@ -4,22 +4,16 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "render_def.h"
 
-#include "amk_gpio.h"
 
-typedef struct {
-#ifdef SCREEN_POWER_PIN
-    pin_t power;
-#endif
-    pin_t reset;
-    pin_t cs;
-    pin_t dc;
-} ssd1357_t;
+void ssd1357_config(screen_driver_t *driver, screen_driver_param_t *param);
 
-void ssd1357_init(ssd1357_t* driver);
-void ssd1357_fill_rect(ssd1357_t* driver, uint32_t x, uint32_t y, uint32_t width, uint32_t height, const void *data, size_t size);
-void ssd1357_uninit(ssd1357_t* driver);
-
-void ssd1357_fill(ssd1357_t* driver, const void* data);
+uint8_t ssd1357_type(screen_driver_t *driver);
+void ssd1357_init(screen_driver_t *driver);
+void ssd1357_fill_rect(screen_driver_t *driver, uint32_t x, uint32_t y, uint32_t width, uint32_t height, const void *data, size_t size);
+void ssd1357_fill_rect_async(screen_driver_t *driver, uint32_t x, uint32_t y, uint32_t width, uint32_t height, const void *data, size_t size);
+bool ssd1357_fill_ready(screen_driver_t *driver);
+void ssd1357_release(screen_driver_t *driver);
+void ssd1357_fill(screen_driver_t *driver, const void* data);
+void ssd1357_uninit(screen_driver_t *driver);
