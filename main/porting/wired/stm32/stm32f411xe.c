@@ -33,8 +33,10 @@ DMA_HandleTypeDef hdma_spi2_tx;
 
 #ifdef USE_UART1
 UART_HandleTypeDef huart1;
-DMA_HandleTypeDef hdma_usart1_rx;
-DMA_HandleTypeDef hdma_usart1_tx;
+#endif
+
+#ifdef USE_UART2
+UART_HandleTypeDef huart2;
 #endif
 
 #ifdef USE_ADC1
@@ -231,6 +233,23 @@ static void MX_USART1_UART_Init(void)
 }
 #endif
 
+#ifdef USE_UART2
+static void MX_USART2_UART_Init(void)
+{
+    huart2.Instance = USART2;
+    huart2.Init.BaudRate = 115200;
+    huart2.Init.WordLength = UART_WORDLENGTH_8B;
+    huart2.Init.StopBits = UART_STOPBITS_1;
+    huart2.Init.Parity = UART_PARITY_NONE;
+    huart2.Init.Mode = UART_MODE_TX_RX;
+    huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+    huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+    if (HAL_UART_Init(&huart2) != HAL_OK) {
+        Error_Handler();
+    }
+}
+#endif
+
 
 #ifdef USE_PWM_TIM4
 extern void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
@@ -367,62 +386,23 @@ static void MX_DMA_Init(void)
     __HAL_RCC_DMA2_CLK_ENABLE();
 
     /* DMA interrupt init */
-    HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
     /* DMA1_Stream1_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
     /* DMA1_Stream3_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
     /* DMA1_Stream4_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
     /* DMA1_Stream5_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
     /* DMA2_Stream0_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
-    /* DMA2_Stream2_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
-#if 0
-    /* DMA1_Stream0_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
-    /* DMA1_Stream1_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
-
-    /* DMA1_Stream5_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
-    /* DMA1_Stream3_IRQn interrupt configuration */
-    #ifdef USE_PWM_TIM4
-    HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
-    #endif
-    #ifdef USE_PWM_TIM1
-    HAL_NVIC_SetPriority(DMA2_Stream1_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);
-    #endif
-    /* DMA1_Stream4_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
-    /* DMA2_Stream0_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
-    /* DMA2_Stream2_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
-    /* DMA2_Stream5_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA2_Stream5_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA2_Stream5_IRQn);
-    /* DMA2_Stream7_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA2_Stream7_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
-#endif
 }
 
 static void MX_RTC_Init(void)
@@ -513,6 +493,9 @@ void custom_board_init(void)
 #ifdef USE_UART1
     MX_USART1_UART_Init();
 #endif
+#ifdef USE_UART2
+    MX_USART2_UART_Init();
+#endif
 #ifdef USE_PWM_TIM4
     MX_TIM4_Init();
 #endif
@@ -525,7 +508,6 @@ void custom_board_init(void)
 #ifdef USE_ADC1
     MX_ADC1_Init();
 #endif
-
 
     usb_port_init();
 }

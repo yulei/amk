@@ -62,22 +62,22 @@ static const uint8_t gamma[] = {
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //  Gray Scale Pulse Width for Color A
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-/*static const uint8_t gamma_colorA[] = {
+static const uint8_t gamma_colorA[] = {
     0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
     0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11,
     0x12, 0x13, 0x15, 0x17, 0x19, 0x1B, 0x1D, 0x1F,
     0x21, 0x23, 0x25, 0x27, 0x2A, 0x2D, 0xB4,
-};*/
+};
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 //  Gray Scale Pulse Width for Color C
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-/*static const uint8_t gamma_colorC[] = {
+static const uint8_t gamma_colorC[] = {
     0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
     0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11,
     0x12, 0x13, 0x15, 0x17, 0x19, 0x1B, 0x1D, 0x1F,
     0x21, 0x23, 0x25, 0x27, 0x2A, 0x2D, 0xB4,
-};*/
+};
 
 typedef struct {
     screen_driver_param_t param;
@@ -245,7 +245,7 @@ static void set_precharge_period(ssd1357_t *driver, uint8_t period)
     write_data(driver, period);  // Default => 0x08 (8 Display Clocks)
 }
 
-static void set_gray_scale_table(ssd1357_t *driver)
+void set_gray_scale_table(ssd1357_t *driver)
 {
     write_command(driver, CMD_MLUTGrayscale); // Set Gray Scale Table
 
@@ -263,23 +263,23 @@ static void set_precharge_voltage(ssd1357_t *driver, unsigned char d)
     write_data(driver, d);       // Default => 0x1E (0.50*VCC)
 }
 
-/*
+
 static void set_gray_pulse_width_color(ssd1357_t *driver, uint8_t command, const void *data, size_t size)
 {
     write_command(driver, command);
     write_data_buffer(driver, data, size);
 }
 
-static void set_gray_scale_pulse_width_colora(ssd1357_t *driver, void)
+void set_gray_scale_pulse_width_colora(ssd1357_t *driver)
 {
     set_gray_pulse_width_color(driver, 0xBC, gamma_colorA, sizeof(gamma_colorA));
 }
 
-static void set_gray_scale_pulse_width_colorc(ssd1357_t *driver, void)
+void set_gray_scale_pulse_width_colorc(ssd1357_t *driver)
 {
     set_gray_pulse_width_color(driver, 0xBD, gamma_colorC, sizeof(gamma_colorC));
 }
-*/
+
 
 static void set_vcomh(ssd1357_t *driver, uint8_t level)
 {
@@ -392,6 +392,8 @@ void ssd1357_init(screen_driver_t *lcd)
     set_phase_length(driver, 0x32);                 // Set Phase 1 as 17 Clocks & Phase 2 as 14 Clocks
     set_precharge_period(driver, 0x01);             // Set Second Pre-Charge Period as 8 Clocks
     set_gray_scale_table(driver);                   // Set Pulse Width for Gray Scale Table
+    //set_gray_scale_pulse_width_colora(driver);
+    set_gray_scale_pulse_width_colorc(driver);
     set_precharge_voltage(driver, 0x17);            // Set Pre-Charge Voltage Level as 0.4069*VCC
     set_vcomh(driver, 0x05);                        // Set Common Pins Deselect Voltage Level as 0.86*VCC
     set_column_address(driver, COL_BEGIN, COL_END); // Set Column Address
@@ -449,7 +451,7 @@ void ssd1357_uninit(screen_driver_t *lcd)
 {
 }
 
-uint8_t ssd1357_type(screen_driver_t *driver)
+uint8_t ssd1357_type(screen_driver_t *lcd)
 {
     return SPI_LCD_SSD1357;
 }
