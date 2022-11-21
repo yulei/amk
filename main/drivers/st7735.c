@@ -203,6 +203,26 @@ static const uint8_t
       #endif
     ST7735_INVON, 0 },        //  3: Invert colors
 
+#ifdef GC9107_AS_ST7735
+  init_cmds3[] = {            // Init for 7735R, part 3 (red or green tab)
+    4,                        //  4 commands in list:
+    0xF0, 14      , //  1: gama table 1 no delay:
+    0x1F, 0x28, 0x04, 0x3E,
+    0x2A, 0x2E, 0x20, 0x00,
+    0x0C, 0x06, 0x00, 0x1C,
+    0x1F, 0x0f,
+
+    0xF1, 14      , //  2: gama table 2 no delay:
+    0X00, 0X2D, 0X2F, 0X3C,
+    0X6F, 0X1C, 0X0B, 0X00,
+    0X00, 0X00, 0X07, 0X0D,
+    0X11, 0X0f,
+
+    ST7735_NORON  ,    DELAY, //  3: Normal display on, no args, w/delay
+      10,                     //     10 ms delay
+    ST7735_DISPON ,    DELAY, //  4: Main screen turn on, no args w/delay
+      100 };                  //     100 ms delay
+#else
   init_cmds3[] = {            // Init for 7735R, part 3 (red or green tab)
     4,                        //  4 commands in list:
     ST7735_GMCTRP1, 16      , //  1: Magical unicorn dust, 16 args, no delay:
@@ -219,6 +239,7 @@ static const uint8_t
       10,                     //     10 ms delay
     ST7735_DISPON ,    DELAY, //  4: Main screen turn on, no args w/delay
       100 };                  //     100 ms delay
+#endif
 
 typedef struct {
     screen_driver_param_t param;
