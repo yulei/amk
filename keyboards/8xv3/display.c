@@ -80,6 +80,16 @@ typedef struct {
 } render_t;
 
 #define BYTE_PER_PIXEL  2
+#ifdef GC9107_AS_ST7735
+#define ANIM_X_START    0
+#define ANIM_X_MIN      0
+#define ANIM_X_MAX      0
+#define ANIM_Y_START    0
+#define ANIM_Y_MIN      0
+#define ANIM_Y_MAX      0
+#define ANIM_WIDTH      128
+#define ANIM_HEIGHT     128
+#else
 #define ANIM_X_START    100
 #define ANIM_X_MIN      90
 #define ANIM_X_MAX      100
@@ -88,6 +98,7 @@ typedef struct {
 #define ANIM_Y_MAX      20
 #define ANIM_WIDTH      60
 #define ANIM_HEIGHT     60
+#endif
 static uint16_t anim_buf[ANIM_WIDTH*ANIM_HEIGHT];
 
 static bool screen_enable = true;

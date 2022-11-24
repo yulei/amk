@@ -67,6 +67,7 @@
 #define USE_SPI2
 #define ST7735_SPI_ID       SPI_INSTANCE_2
 #define GC9107_SPI_ID       SPI_INSTANCE_2
+#define GC9107_AS_ST7735
 #define SCREEN_NUM          1
 #define SCREEN_0_PWR        A10
 #define SCREEN_0_PWR_EN     0
