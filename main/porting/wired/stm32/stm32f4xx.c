@@ -282,7 +282,7 @@ void custom_board_init(void)
     } else {
         usb_setting = 0;
     }
-    amk_printf("usb_setting: %d\n", usb_setting);
+    amk_printf("usb_setting: %ld\n", usb_setting);
     HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0);
 #endif
 

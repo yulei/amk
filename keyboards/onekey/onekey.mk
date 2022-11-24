@@ -21,7 +21,7 @@ MCU = STM32F412
 #USB_DEVICE_ENABLE = no
 #EECONFIG_FLASH = yes
 TINYUSB_ENABLE = yes
-#TINYUSB_USE_HAL = yes
+TINYUSB_USE_HAL = yes
 #SCREEN_ENABLE = yes
 #RGB_LINEAR_ENABLE = yes
 #RGB_INDICATOR_ENABLE = yes
@@ -30,9 +30,18 @@ TINYUSB_ENABLE = yes
 
 #LINKER_PATH = $(KEYBOARD_DIR)
 
+MSC_ENABLE = yes
+DYNAMIC_CONFIGURATION = yes
+QSPI_ENABLE = yes
+
 SRCS += $(KEYBOARD_DIR)/onekey.c
 SRCS += $(KEYBOARD_DIR)/onekey_keymap.c
 
 #SRCS += $(KEYBOARD_DIR)/display.c
 #SRCS += $(MAIN_DIR)/drivers/gc9107.c
-#SRCS += $(MAIN_DIR)/drivers/spi.c
+
+SRCS +=	$(KEYBOARD_DIR)/display_8xv3.c
+SRCS += $(MAIN_DIR)/drivers/st7735.c
+
+SRCS += $(MAIN_DIR)/drivers/spi.c
+SRCS += $(MAIN_DIR)/drivers/w25q_mem.c

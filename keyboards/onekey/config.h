@@ -20,6 +20,7 @@
 #define MATRIX_COL_PINS {C6,C7,C8}
 
 // screen configuration
+#if 0
 //#define USE_SPI1
 #define GC9107_SPI_ID       SPI_INSTANCE_1
 #define SCREEN_NUM          1
@@ -28,8 +29,17 @@
 #define SCREEN_0_CS         A4
 #define SCREEN_0_RESET      C4
 #define SCREEN_0_DC         A3
+#endif
 
-#if 1
+#define USE_SPI1
+#define ST7735_SPI_ID       SPI_INSTANCE_1
+#define SCREEN_NUM          1
+#define SCREEN_0_PWR        C12
+#define SCREEN_0_PWR_EN     0
+#define SCREEN_0_CS         D2
+#define SCREEN_0_RESET      B7
+#define SCREEN_0_DC         B6
+#if 0
 #define WS2812_LED_NUM  4
 #define WS2812_LED_PIN  B7
 #define PWM_TIM_PERIOD  209
@@ -69,10 +79,10 @@
 
 //#define VECT_TAB_OFFSET 0x20000
 
-#define AMK_PROFILING
+//#define AMK_PROFILING
 //#define XTAL_VALUE      16000000
 //#define HXTAL_VALUE     16000000
 //#define HSE_VALUE      HXTAL_VALUE //16000000
-#define HSE_VALUE      12000000
+//#define HSE_VALUE      12000000
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 //#define CFG_TUSB_CONFIG_FILE    "tusb_def_host.h"
