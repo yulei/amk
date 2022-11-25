@@ -9,7 +9,7 @@
 #if defined(HC32F460)
 #   include "qspi_hc32.c"
 #elif defined(STM32F412Rx)
-#   include "qspi_stm32_v2.c"
+#   include "qspi_stm32.c"
 #else
 #   error "qspi not available"
 #endif

@@ -21,7 +21,7 @@
 
 // screen configuration
 #if 0
-//#define USE_SPI1
+#define USE_SPI1
 #define GC9107_SPI_ID       SPI_INSTANCE_1
 #define SCREEN_NUM          1
 #define SCREEN_0_PWR        C5
@@ -39,6 +39,9 @@
 #define SCREEN_0_CS         D2
 #define SCREEN_0_RESET      B7
 #define SCREEN_0_DC         B6
+
+#define SCREEN_ROTATION     1
+
 #if 0
 #define WS2812_LED_NUM  4
 #define WS2812_LED_PIN  B7

@@ -44,4 +44,3 @@ SRCS +=	$(KEYBOARD_DIR)/display_8xv3.c
 SRCS += $(MAIN_DIR)/drivers/st7735.c
 
 SRCS += $(MAIN_DIR)/drivers/spi.c
-SRCS += $(MAIN_DIR)/drivers/w25q_mem.c
