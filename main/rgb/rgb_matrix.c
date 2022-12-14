@@ -38,3 +38,19 @@ void rgb_matrix_uninit(void)
 
 void rgb_matrix_prepare_sleep(void)
 {}
+
+bool rgb_matrix_enabled(uint8_t index)
+{
+    if (index < RGB_MATRIX_NUM) {
+        return rgb_effect_matrix_enabled(rgb_matrix.effects[index]);
+    }
+
+    return false;
+}
+
+void rgb_matrix_set_rgb(uint8_t index, uint8_t led, uint8_t r, uint8_t g, uint8_t b)
+{
+    if (index < RGB_MATRIX_NUM) {
+        rgb_effect_matrix_set_rgb(rgb_matrix.effects[index], led, r, g, b);
+    }
+}

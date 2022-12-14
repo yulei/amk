@@ -10,6 +10,10 @@ SRCS += \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_adc.c \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_adc_ex.c \
 
+ifeq (yes, $(strip $(RTOS_ENABLE)))
+	SRCS += $(STM32SDK_DIR)/mcus/$(MCU_TYPE)/$(MCU_FAMILY)_hal_timebase_tim.c
+endif
+
 APP_DEFS += \
 	-DSTM32F411xE \
     -DCFG_TUSB_MCU=OPT_MCU_STM32F4 \

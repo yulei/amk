@@ -81,6 +81,7 @@ ifeq (yes, $(strip $(RGB_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/is31fl3733.c
 	SRCS += $(MAIN_DIR)/drivers/is31fl3741.c
 	SRCS += $(MAIN_DIR)/drivers/is31fl3746.c
+	SRCS += $(MAIN_DIR)/drivers/is31fl3729.c
 	SRCS += $(MAIN_DIR)/drivers/ws2812.c
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	SRCS += $(MAIN_DIR)/drivers/rgb_driver.c

@@ -204,6 +204,25 @@ led_config_t g_led_config = {
     },
 };
 
+#include "host.h"
+#include "led.h"
+#include "rgb_matrix.h"
+
+#define CAPS_LED_INDEX 27
+
+void rgb_led_pre_flush(void)
+{
+    if (!rgb_matrix_enabled(0)) {
+        if (host_keyboard_leds() & (1 << USB_LED_CAPS_LOCK)) {
+            rgb_matrix_set_rgb(0, CAPS_LED_INDEX, 0xFF, 0xFF, 0xFF);
+        } else {
+            rgb_matrix_set_rgb(0, CAPS_LED_INDEX, 0, 0, 0);
+        }
+    }
+
+}
+
+
 #if 0
 #ifdef MSC_ENABLE
 #include "usb_common.h"

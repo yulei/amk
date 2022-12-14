@@ -108,6 +108,10 @@ void rgb_led_init(void)
 #endif
 }
 
+__attribute__((weak))
+void rgb_led_pre_flush(void)
+{}
+
 void rgb_led_task(void)
 {
 #ifdef RGB_LINEAR_ENABLE
@@ -125,6 +129,7 @@ void rgb_led_task(void)
 #ifdef RGBLIGHT_EN_PIN
     if (rgb_led_is_on()) {
 #endif
+        rgb_led_pre_flush();
         for (int i = 0; i < RGB_DEVICE_NUM; i++) {
             rgb_driver_t *driver = rgb_driver_get(i);
             driver->flush(driver);

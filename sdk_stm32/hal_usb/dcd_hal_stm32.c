@@ -94,11 +94,7 @@ void dcd_init(uint8_t rhport)
     HAL_PCDEx_PMAConfig(&dcd_usb, 0x84, PCD_SNG_BUF, 0x180);
 #endif
 
-#ifdef RTOS_ENABLE
-    HAL_NVIC_SetPriority(DCD_USB_IRQn, 5, 0);
-#else
-    HAL_NVIC_SetPriority(DCD_USB_IRQn, 0, 0);
-#endif
+    HAL_NVIC_SetPriority(DCD_USB_IRQn, 1, 0);
 
     if (HAL_PCD_Start(&dcd_usb) != HAL_OK) {
         amk_printf("Failed to start HAL PCD\n");

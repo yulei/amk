@@ -585,3 +585,9 @@ void hook_matrix_change_rgb(keyevent_t event)
 {
     process_rgb_matrix(&matrix_state, event.key.row, event.key.col, event.pressed);
 }
+
+void rgb_effect_matrix_set_rgb(rgb_effect_t effect, uint8_t led, uint8_t r, uint8_t g, uint8_t b)
+{
+    rgb_matrix_state_t *state = (rgb_matrix_state_t*)effect;
+    effect_set_color_rgb(state, led, r, g, b);
+}

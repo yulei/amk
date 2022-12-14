@@ -6,6 +6,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef struct {
     uint8_t r;

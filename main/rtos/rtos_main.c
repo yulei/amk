@@ -15,6 +15,10 @@
 #include "rf_driver.h"
 #endif
 
+#ifdef MSC_ENABLE
+#include "mscusb.h"
+#endif
+
 #include "FreeRTOS.h"
 
 extern void system_init(void);

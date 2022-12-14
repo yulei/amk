@@ -6,7 +6,7 @@ UF2 := python util/uf2conv.py
 VIAL := python util/vial_generate_definition.py
 
 # Build type
-NO_DEBUG ?= 0
+NO_DEBUG ?= 1
 LTO_ENABLE ?= 0
 
 # Echo suspend

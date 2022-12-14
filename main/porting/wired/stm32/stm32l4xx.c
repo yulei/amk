@@ -118,7 +118,7 @@ static void MX_GPIO_Init(void)
     __HAL_RCC_GPIOB_CLK_ENABLE();
 }
 
-
+#ifdef USE_LPUART1
 static void MX_LPUART1_UART_Init(void)
 {
     huart_rf.Instance = LPUART1;
@@ -135,6 +135,7 @@ static void MX_LPUART1_UART_Init(void)
         Error_Handler();
     }
 }
+#endif
 
 static void MX_ADC1_Init(void)
 {
@@ -229,7 +230,9 @@ void custom_board_init(void)
     MX_DMA_Init();
     MX_RTC_Init();
     MX_ADC1_Init();
+#ifdef USE_LPUART1
     MX_LPUART1_UART_Init();
+#endif
 
     usb_port_init();
 }

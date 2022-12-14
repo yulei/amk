@@ -215,3 +215,5 @@ bool rgb_effect_matrix_enabled(rgb_effect_t effect);
 void rgb_effect_matrix_toggle(rgb_effect_t effect);
 
 void rgb_effect_matrix_init_mode(rgb_effect_t effect);
+
+void rgb_effect_matrix_set_rgb(rgb_effect_t effect, uint8_t led, uint8_t r, uint8_t g, uint8_t b);
