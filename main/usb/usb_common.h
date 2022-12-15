@@ -24,9 +24,11 @@ extern uint32_t usb_setting;
 #ifdef DYNAMIC_CONFIGURATION
 // Interface number
 enum {
+#ifdef KEYBOARD_ENABLE
     ITF_NUM_HID_KBD,
-#ifdef HID_OTHER_ENABLE
+    #ifdef HID_OTHER_ENABLE
     ITF_NUM_HID_OTHER,
+    #endif
 #endif
 #if defined(VIAL_ENABLE) || defined(MSC_ENABLE) || defined(AUDIO_ENABLE)
     ITF_NUM_DUMMY,
@@ -42,9 +44,12 @@ enum {
 
 // Endpoint number
 enum {
-    EPNUM_HID_KBD       = 0x01,
-#ifdef HID_OTHER_ENABLE
+    EPNUM_SYSTEM = 0,
+#ifdef KEYBOARD_ENABLE
+    EPNUM_HID_KBD,
+    #ifdef HID_OTHER_ENABLE
     EPNUM_HID_OTHER,
+    #endif
 #endif
 #if defined(VIAL_ENABLE) || defined(MSC_ENABLE) || defined(AUDIO_ENABLE)
     EPNUM_DUMMY,
@@ -60,9 +65,11 @@ enum {
 #else
 // Interface number
 enum {
+#ifdef KEYBOARD_ENABLE
     ITF_NUM_HID_KBD,
-#ifdef HID_OTHER_ENABLE
+    #ifdef HID_OTHER_ENABLE
     ITF_NUM_HID_OTHER,
+    #endif
 #endif
 #ifdef CDC_ENABLE
     ITF_NUM_CDC,
@@ -82,33 +89,36 @@ enum {
 };
 
 enum {
-    EPNUM_HID_KBD       = 0x01,
-#ifdef HID_OTHER_ENABLE
-    EPNUM_HID_OTHER     = 0x02,
+    EPNUM_SYSTEM = 0,
+#ifdef KEYBOARD_ENABLE
+    EPNUM_HID_KBD,
+    #ifdef HID_OTHER_ENABLE
+    EPNUM_HID_OTHER,
+    #endif
 #endif
 #ifdef CDC_ENABLE
-    EPNUM_CDC_NOTIF     = 0x02,
-    EPNUM_CDC_DATAOUT   = 0x03,
+    EPNUM_CDC_NOTIF,
+    EPNUM_CDC_DATAOUT,
     #define EPNUM_CDC_DATAIN    EPNUM_CDC_DATAOUT
 #endif
 #ifdef VIAL_ENABLE
-    EPNUM_VIAL_OUT      = 0x03,
+    EPNUM_VIAL_OUT,
     #if defined(STM32F103xB) || defined(NRF52840_XXAA) || defined(STM32L072xx)
-    EPNUM_VIAL_IN       = 0x04,
+    EPNUM_VIAL_IN,
     #else
         #define EPNUM_VIAL_IN EPNUM_VIAL_OUT
     #endif
 #endif
 #ifdef MSC_ENABLE
-    EPNUM_MSC_OUT       = 0x03,
+    EPNUM_MSC_OUT,
     #if defined(STM32F103xB) || defined(NRF52840_XXAA) || defined(STM32L072xx)
-    EPNUM_MSC_IN        = 0x04,
+    EPNUM_MSC_IN,
     #else
         #define EPNUM_MSC_IN    EPNUM_MSC_OUT
     #endif
 #endif
 #ifdef AUDIO_ENABLE
-    EPNUM_AUDIO_OUT     = 0x03,
+    EPNUM_AUDIO_OUT,
     #define EPNUM_AUDIO_IN  EPNUM_AUDIO_IN
 #endif
     EPNUM_MAX

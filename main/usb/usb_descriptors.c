@@ -288,6 +288,12 @@ uint32_t tud_descriptor_hid_report_vial_size(void)
 #endif
 
 // Configuration Descriptor
+#ifdef KEYBOARD_ENABLE
+#define KEYBOARD_DESC_LEN TUD_HID_DESC_LEN
+#else
+#define KEYBOARD_DESC_LEN 0
+#endif
+
 #ifdef HID_OTHER_ENABLE
 #define HID_OTHER_DESC_LEN TUD_HID_DESC_LEN 
 #else
@@ -318,7 +324,7 @@ uint32_t tud_descriptor_hid_report_vial_size(void)
 #define AUDIOUSB_DESC_LEN   0
 #endif
 
-#define CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + HID_OTHER_DESC_LEN + VIAL_DESC_LEN + MSCUSB_DESC_LEN + AUDIOUSB_DESC_LEN + CDC_DESC_LEN)
+#define CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + KEYBOARD_DESC_LEN + HID_OTHER_DESC_LEN + VIAL_DESC_LEN + MSCUSB_DESC_LEN + AUDIOUSB_DESC_LEN + CDC_DESC_LEN)
 
 #define CONFIG_LEN_MSC (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + MSCUSB_DESC_LEN)
 
@@ -329,8 +335,10 @@ uint32_t tud_descriptor_hid_report_vial_size(void)
 static uint8_t desc_configuration[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
     TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
+#ifdef KEYBOARD_ENABLE
     // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_ITF_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#endif
 
 #ifdef HID_OTHER_ENABLE
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
@@ -367,8 +375,14 @@ static uint8_t desc_with_msc[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
     TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_MSC_TOTAL, 0, CONFIG_LEN_MSC, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
     // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
+#ifdef KEYBOARD_ENABLE
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_ITF_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#endif
+
+#ifdef HID_OTHER_ENABLE
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#endif
+
     // Interface number, string index, EP Out & EP In address, EP size
 #ifdef MSC_ENABLE
     TUD_MSC_DESCRIPTOR(ITF_NUM_MSC, 0, EPNUM_MSC_OUT, 0x80|EPNUM_MSC_IN, CFG_TUD_MSC_EPSIZE),
@@ -384,8 +398,14 @@ static uint8_t desc_with_vial[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
     TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_VIAL_TOTAL, 0, CONFIG_LEN_VIAL, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
     // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
+#ifdef KEYBOARD_ENABLE
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_ITF_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#endif
+
+#ifdef HID_OTHER_ENABLE
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#endif
+
 #ifdef VIAL_ENABLE
     TUD_HID_INOUT_DESCRIPTOR(ITF_NUM_VIAL, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_vial), EPNUM_VIAL_OUT, 0x80 | EPNUM_VIAL_IN, VIAL_EPSIZE, CFG_TUD_HID_POLL_INTERVAL),
 #endif
@@ -400,8 +420,14 @@ static uint8_t desc_with_audio[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
     TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_AUDIO_TOTAL, 0, CONFIG_LEN_AUDIO, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
     // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
+#ifdef KEYBOARD_ENABLE
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_ITF_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#endif
+
+#ifdef HID_OTHER_ENABLE
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#endif
+
 #ifdef AUDIO_ENABLE
     TUD_AUDIO_MONO_SPEAKER_DESCRIPTOR(ITF_NUM_AUDIO, 0, CFG_TUD_AUDIO_FUNC_1_N_BYTES_PER_SAMPLE_RX, CFG_TUD_AUDIO_FUNC_1_N_BITS_PER_SAMPLE_RX, EPNUM_AUDIO_OUT, CFG_TUD_AUDIO_EP_SZ_OUT, 0x80|EPNUM_AUDIO_IN),
 #endif
@@ -452,82 +478,99 @@ uint32_t tud_descriptor_configuration_size(uint8_t index)
 // Invoked when received GET HID REPORT DESCRIPTOR
 uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf)
 {
+#ifdef KEYBOARD_ENABLE
     if (itf == ITF_NUM_HID_KBD) {
         return tud_descriptor_hid_report_kbd_cb();
     } 
-    #ifdef HID_OTHER_ENABLE
-    else if (itf == ITF_NUM_HID_OTHER) {
+#endif
+
+#ifdef HID_OTHER_ENABLE
+    if (itf == ITF_NUM_HID_OTHER) {
         return tud_descriptor_hid_report_other_cb();
     }
-    #endif
-    #ifdef VIAL_ENABLE
-    else if (itf == ITF_NUM_VIAL) {
+#endif
+
+#ifdef VIAL_ENABLE
+    if (itf == ITF_NUM_VIAL) {
         return tud_descriptor_hid_report_vial_cb();
     }
-    #endif
+#endif
     return NULL;
 }
 
 uint32_t tud_hid_descriptor_report_size(uint8_t itf)
 {
+#ifdef KEYBOARD_ENABLE
     if (itf == ITF_NUM_HID_KBD) {
         return tud_descriptor_hid_report_kbd_size();
     } 
-    #ifdef HID_OTHER_ENABLE
-    else if (itf == ITF_NUM_HID_OTHER) {
+#endif
+
+#ifdef HID_OTHER_ENABLE
+    if (itf == ITF_NUM_HID_OTHER) {
         return tud_descriptor_hid_report_other_size();
     }
-    #endif
-    #ifdef VIAL_ENABLE
-    else if (itf == ITF_NUM_VIAL) {
+#endif
+
+#ifdef VIAL_ENABLE
+    if (itf == ITF_NUM_VIAL) {
         return tud_descriptor_hid_report_vial_size();
     }
-    #endif
+#endif
+
     return 0;
 }
 
-static uint8_t desc_hid_kbd[] = {
-    TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_ITF_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
-};
-
-
 uint8_t const* tud_hid_descriptor_interface_cb(uint8_t itf)
 {
+#ifdef KEYBOARD_ENABLE
     if (itf == ITF_NUM_HID_KBD) {
         return tud_descriptor_hid_interface_kbd_cb();
     }
-    #ifdef HID_OTHER_ENABLE
-    else if (itf == ITF_NUM_HID_OTHER) {
+#endif
+
+#ifdef HID_OTHER_ENABLE
+    if (itf == ITF_NUM_HID_OTHER) {
         return tud_descriptor_hid_interface_other_cb();
     }
-    #endif
-    #ifdef VIAL_ENABLE
-    else if (itf == ITF_NUM_VIAL) {
+#endif
+
+#ifdef VIAL_ENABLE
+    if (itf == ITF_NUM_VIAL) {
         return tud_descriptor_hid_interface_vial_cb();
     }
-    #endif
+#endif
+
     return NULL;
 }
 
 uint32_t tud_hid_descriptor_interface_size(uint8_t itf)
 {
+#ifdef KEYBOARD_ENABLE
     if (itf == ITF_NUM_HID_KBD) {
         return tud_descriptor_hid_interface_kbd_size();
     } 
-    #ifdef HID_OTHER_ENABLE
-    else if (itf == ITF_NUM_HID_OTHER) {
+#endif
+
+#ifdef HID_OTHER_ENABLE
+    if (itf == ITF_NUM_HID_OTHER) {
         return tud_descriptor_hid_interface_other_size();
     }
-    #endif
-    #ifdef VIAL_ENABLE
-    else if (itf == ITF_NUM_VIAL) {
+#endif
+
+#ifdef VIAL_ENABLE
+    if (itf == ITF_NUM_VIAL) {
         return tud_descriptor_hid_interface_vial_size();
     }
-    #endif
+#endif
+
     return 0;
 }
 
-// Invoded when received GET HID DESCRIPTOR
+#ifdef KEYBOARD_ENABLE
+static uint8_t desc_hid_kbd[] = {
+    TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_ITF_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_POLL_INTERVAL),
+};
 uint8_t const* tud_descriptor_hid_interface_kbd_cb(void)
 {
     return desc_hid_kbd;
@@ -537,6 +580,7 @@ uint32_t tud_descriptor_hid_interface_kbd_size(void)
 {
     return sizeof(desc_hid_kbd);
 }
+#endif
 
 #ifdef HID_OTHER_ENABLE
 static uint8_t desc_hid_other[] = {
@@ -610,7 +654,9 @@ static uint8_t desc_other_configuration[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
     TUD_OTHER_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, OTHER_CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500),
     // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
+#ifdef KEYBOARD_ENABLE
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_ITF_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_HS_POLL_INTERVAL),
+#endif
 
 #ifdef HID_OTHER_ENABLE
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_OTHER, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_other), 0x80|EPNUM_HID_OTHER, CFG_TUD_HID_EP_BUFSIZE, CFG_TUD_HID_HS_POLL_INTERVAL),

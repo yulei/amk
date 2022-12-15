@@ -20,9 +20,7 @@
 
 #define USE_UART1
 
-#ifndef META_HOTSWAP
-#define CAPS_LED_PIN        A3
-#else
+#if defined(META_HOTSWAP)
 #define USE_PWM_TIM2
 #define PWM_TIM             htim2
 #define PWM_TIM_PERIOD      104
@@ -40,6 +38,18 @@
 #define RGB_DEVICE_NUM      1
 #define RGB_INDICATOR_LED_NUM    1
 #define RGB_SEGMENT_NUM     1
+#else
+
+#define USE_I2C1
+#define IS31FL3729_I2C_ID   I2C_INSTANCE_1
+#define RGB_MATRIX_LED_NUM  90
+#define RGB_LED_NUM         (RGB_MATRIX_LED_NUM)
+
+#define RGB_DEVICE_NUM      2
+//#define RGB_SEGMENT_NUM     1
+#define RGB_MATRIX_NUM      1
+
+#define CAPS_LED_PIN        A3
 #endif
 
 

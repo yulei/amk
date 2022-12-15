@@ -34,16 +34,19 @@ void amk_usb_task(void)
 bool amk_usb_itf_ready(uint32_t type)
 {
     switch(type) {
+#ifdef KEYBOARD_ENABLE
     case HID_REPORT_ID_KEYBOARD:
     case HID_REPORT_ID_MACRO:
         return tud_hid_n_ready(ITF_NUM_HID_KBD);
-    #ifdef HID_OTHER_ENABLE
+#endif
+
+#ifdef HID_OTHER_ENABLE
     case HID_REPORT_ID_MOUSE:
     case HID_REPORT_ID_SYSTEM:
     case HID_REPORT_ID_CONSUMER:
     case HID_REPORT_ID_NKRO:
         return tud_hid_n_ready(ITF_NUM_HID_OTHER);
-    #endif
+#endif
     default:
         break;
     }
@@ -60,13 +63,16 @@ bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t si
     hook_send_report(report_type, data);
 
     switch(report_type) {
+#ifdef KEYBOARD_ENABLE
     case HID_REPORT_ID_KEYBOARD:
         if (!tud_hid_n_report(ITF_NUM_HID_KBD, HID_REPORT_ID_KEYBOARD, data, (uint8_t)size)) {
             amk_printf("failed to sent keyboard report\n");
             return false;
         }
         break;
-    #ifdef HID_OTHER_ENABLE
+#endif
+
+#ifdef HID_OTHER_ENABLE
     case HID_REPORT_ID_MOUSE:
         if (!tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_MOUSE, data, (uint8_t)size)) {
             amk_printf("failed to sent mouse report\n");
@@ -91,7 +97,7 @@ bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t si
             return false;
         }
         break;
-    #endif
+#endif
     default:
         amk_printf("unknonw report type: %d\n", report_type);
         return false;
@@ -173,12 +179,14 @@ void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t rep
 {
     //amk_printf("Set Report: itf=%d, id=%d, type=%d\n", itf, report_id, report_type);
     (void) report_id;
+#ifdef KEYBOARD_ENABLE
     if (itf == ITF_NUM_HID_KBD && report_type == HID_REPORT_TYPE_OUTPUT) {
         if (bufsize) {
             amk_led_state = buffer[0];
             //amk_printf("Set Report Data: size=%d, state=%x\n", bufsize, buffer[0]);
         }
     }
+#endif
 
 #ifdef VIAL_ENABLE
     if (itf == ITF_NUM_VIAL) {

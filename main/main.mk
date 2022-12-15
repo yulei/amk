@@ -2,10 +2,13 @@
 USB_DEVICE_ENABLE ?= yes
 HID_OTHER_ENABLE ?= yes
 
-ifeq (yes, $(strip $(HID_OTHER_ENABLE)))
-	MOUSEKEY_ENABLE = yes
-	EXTRAKEY_ENABLE = yes
-	APP_DEFS += -DHID_OTHER_ENABLE
+ifneq (no,$(strip $(KEYBOARD_ENABLE)))
+	APP_DEFS += -DKEYBOARD_ENABLE
+	ifeq (yes, $(strip $(HID_OTHER_ENABLE)))
+		MOUSEKEY_ENABLE = yes
+		EXTRAKEY_ENABLE = yes
+		APP_DEFS += -DHID_OTHER_ENABLE
+	endif
 endif
 
 ifeq (yes, $(strip $(CDC_ENABLE)))

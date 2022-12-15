@@ -64,7 +64,9 @@ static void send_mouse(report_mouse_t *report);
 static void send_system(uint16_t data);
 static void send_consumer(uint16_t data);
 
+#ifdef KEYBOARD_ENABLE
 static void remote_wakeup(void);
+#endif
 
 host_driver_t amk_driver = {
     keyboard_leds,
@@ -74,8 +76,18 @@ host_driver_t amk_driver = {
     send_consumer
 };
 
+__attribute__((weak))
+void amk_driver_pre_init(void)
+{}
+
+__attribute__((weak))
+void amk_driver_post_init(void)
+{}
+
 void amk_driver_init(void)
 {
+    amk_driver_pre_init();
+
 #ifdef MSC_ENABLE
     amk_printf("msc_init\n");
     msc_init();
@@ -91,21 +103,31 @@ void amk_driver_init(void)
     render_init();
 #endif
 
+#ifdef KEYBOARD_ENABLE
     amk_printf("keyboard_init\n");
     keyboard_init();
     boot_init();
     host_set_driver(&amk_driver);
     amk_keymap_init();
+#endif
 
 #ifdef RF_ENABLE
     amk_printf("rf_driver_init\n");
     rf_driver_init(false);
 #endif
+
     amk_indicator_init();
+
+    amk_driver_post_init();
 }
+
+__attribute__((weak))
+void amk_driver_task_kb(void)
+{}
 
 void amk_driver_task(void)
 {
+#ifdef KEYBOARD_ENABLE
     if (!(usb_setting&USB_SWITCH_BIT)) {
         if (usb_suspended() ) {
             if (suspend_wakeup_condition()) {
@@ -131,6 +153,9 @@ void amk_driver_task(void)
     }
 
     keyboard_task();
+#endif
+
+    amk_driver_task_kb();
 }
 
 // tmk integration
@@ -204,6 +229,7 @@ void send_consumer(uint16_t data)
     }
 }
 
+#ifdef KEYBOARD_ENABLE
 void remote_wakeup(void)
 {
     usb_remote_wakeup();
@@ -215,3 +241,4 @@ void remote_wakeup(void)
     mousekey_send();
     #endif
 }
+#endif
