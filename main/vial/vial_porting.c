@@ -57,7 +57,6 @@ static uint8_t vial_unlock_combo_cols[] = VIAL_UNLOCK_COMBO_COLS;
 #define VIAL_ENCODER_KEYCODE_DELAY 10
 #endif
 
-static void vial_send(uint8_t *data, uint8_t length);
 
 __attribute__((weak)) void vial_receive_kb(uint8_t *data, uint8_t length) {
     uint8_t *command_id = &(data[0]);
@@ -440,7 +439,7 @@ skip:
 
 extern USBD_HandleTypeDef hUsbDeviceFS;
 
-static void vial_send(uint8_t *data, uint8_t length)
+void vial_send(uint8_t *data, uint8_t length)
 {
     if (usbd_comp_itf_ready(&hUsbDeviceFS, ITF_NUM_VIAL)) {
         usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_VIAL, data, length);
@@ -450,7 +449,7 @@ static void vial_send(uint8_t *data, uint8_t length)
     }
 }
 #else
-static void vial_send(uint8_t *data, uint8_t length)
+void vial_send(uint8_t *data, uint8_t length)
 {
     if (tud_hid_n_ready(ITF_NUM_VIAL)) {
         tud_hid_n_report(ITF_NUM_VIAL, 0, data, length);
@@ -461,7 +460,10 @@ static void vial_send(uint8_t *data, uint8_t length)
 }
 #endif
 
+__attribute__((__weak__))
+void vial_task_kb(void) {}
+
 void vial_task(void)
 {
-    // send queued data
+    vial_task_kb();
 }

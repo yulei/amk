@@ -84,3 +84,5 @@ enum vial_command_id{
 
 void vial_process(uint8_t *data, uint8_t length);
 void vial_task(void);
+
+void vial_send(uint8_t *data, uint8_t length);
