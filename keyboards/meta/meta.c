@@ -8,9 +8,13 @@
 #ifdef RGB_LINEAR_ENABLE
 #include "rgb_common.h"
 #include "rgb_driver.h"
-#include "rgb_indicator.h"
+#include "is31fl3731.h"
+#include "is31fl3236.h"
+#include "is31fl3729.h"
+//#include "rgb_indicator.h"
 
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
+    #if 0
     {0,0,0,0},
     // 16 leds
     {0,1,1,1},
@@ -29,19 +33,167 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {0,14,14,14},
     {0,15,15,15},
     {0,16,16,16},
+    #endif
+    #if 1
+    // left
+    {0, CS8_SW1_29, CS7_SW1_29, CS9_SW1_29},
+    {0, CS8_SW2_29, CS7_SW2_29, CS9_SW2_29},
+    {0, CS8_SW3_29, CS7_SW3_29, CS9_SW3_29},
+    {0, CS8_SW4_29, CS7_SW4_29, CS9_SW4_29},
+    {0, CS8_SW5_29, CS7_SW5_29, CS9_SW5_29},
+    {0, CS8_SW6_29, CS7_SW6_29, CS9_SW6_29},
+    {0, CS8_SW7_29, CS7_SW7_29, CS9_SW7_29},
+    {0, CS8_SW8_29, CS7_SW8_29, CS9_SW8_29},
+    {0, CS8_SW9_29, CS7_SW9_29, CS9_SW9_29},
+
+    {0, CS11_SW1_29, CS10_SW1_29, CS12_SW1_29},
+    {0, CS11_SW2_29, CS10_SW2_29, CS12_SW2_29},
+    {0, CS11_SW3_29, CS10_SW3_29, CS12_SW3_29},
+    {0, CS11_SW4_29, CS10_SW4_29, CS12_SW4_29},
+    {0, CS11_SW5_29, CS10_SW5_29, CS12_SW5_29},
+    {0, CS11_SW6_29, CS10_SW6_29, CS12_SW6_29},
+    {0, CS11_SW7_29, CS10_SW7_29, CS12_SW7_29},
+    {0, CS11_SW8_29, CS10_SW8_29, CS12_SW8_29},
+    {0, CS11_SW9_29, CS10_SW9_29, CS12_SW9_29},
+
+    {0, CS14_SW1_29, CS13_SW1_29, CS15_SW1_29},
+    {0, CS14_SW2_29, CS13_SW2_29, CS15_SW2_29},
+    {0, CS14_SW3_29, CS13_SW3_29, CS15_SW3_29},
+    {0, CS14_SW4_29, CS13_SW4_29, CS15_SW4_29},
+    {0, CS14_SW5_29, CS13_SW5_29, CS15_SW5_29},
+    {0, CS14_SW6_29, CS13_SW6_29, CS15_SW6_29},
+    {0, CS14_SW7_29, CS13_SW7_29, CS15_SW7_29},
+    {0, CS14_SW8_29, CS13_SW8_29, CS15_SW8_29},
+    {0, CS14_SW9_29, CS13_SW9_29, CS15_SW9_29},
+
+    {0,  CS2_SW1_29,  CS1_SW1_29,  CS3_SW1_29},
+    {0,  CS2_SW2_29,  CS1_SW2_29,  CS3_SW2_29},
+    {0,  CS2_SW3_29,  CS1_SW3_29,  CS3_SW3_29},
+    {0,  CS2_SW4_29,  CS1_SW4_29,  CS3_SW4_29},
+    {0,  CS2_SW5_29,  CS1_SW5_29,  CS3_SW5_29},
+    {0,  CS2_SW6_29,  CS1_SW6_29,  CS3_SW6_29},
+    {0,  CS2_SW7_29,  CS1_SW7_29,  CS3_SW7_29},
+    {0,  CS2_SW8_29,  CS1_SW8_29,  CS3_SW8_29},
+    {0,  CS2_SW9_29,  CS1_SW9_29,  CS3_SW9_29},
+
+    {0,  CS5_SW1_29,  CS4_SW1_29,  CS6_SW1_29},
+    {0,  CS5_SW2_29,  CS4_SW2_29,  CS6_SW2_29},
+    {0,  CS5_SW3_29,  CS4_SW3_29,  CS6_SW3_29},
+    {0,  CS5_SW4_29,  CS4_SW4_29,  CS6_SW4_29},
+    {0,  CS5_SW5_29,  CS4_SW5_29,  CS6_SW5_29},
+    {0,  CS5_SW6_29,  CS4_SW6_29,  CS6_SW6_29},
+    {0,  CS5_SW7_29,  CS4_SW7_29,  CS6_SW7_29},
+    {0,  CS5_SW8_29,  CS4_SW8_29,  CS6_SW8_29},
+    {0,  CS5_SW9_29,  CS4_SW9_29,  CS6_SW9_29},
+    #endif
+
+    #if 0
+    // right
+    {1, CS14_SW1_29, CS13_SW1_29, CS15_SW1_29},
+    {1, CS14_SW2_29, CS13_SW2_29, CS15_SW2_29},
+    {1, CS14_SW3_29, CS13_SW3_29, CS15_SW3_29},
+    {1, CS14_SW4_29, CS13_SW4_29, CS15_SW4_29},
+    {1, CS14_SW5_29, CS13_SW5_29, CS15_SW5_29},
+    {1, CS14_SW6_29, CS13_SW6_29, CS15_SW6_29},
+    {1, CS14_SW7_29, CS13_SW7_29, CS15_SW7_29},
+    {1, CS14_SW8_29, CS13_SW8_29, CS15_SW8_29},
+    {1, CS14_SW9_29, CS13_SW9_29, CS15_SW9_29},
+
+    {1, CS11_SW1_29, CS10_SW1_29, CS12_SW1_29},
+    {1, CS11_SW2_29, CS10_SW2_29, CS12_SW2_29},
+    {1, CS11_SW3_29, CS10_SW3_29, CS12_SW3_29},
+    {1, CS11_SW4_29, CS10_SW4_29, CS12_SW4_29},
+    {1, CS11_SW5_29, CS10_SW5_29, CS12_SW5_29},
+    {1, CS11_SW6_29, CS10_SW6_29, CS12_SW6_29},
+    {1, CS11_SW7_29, CS10_SW7_29, CS12_SW7_29},
+    {1, CS11_SW8_29, CS10_SW8_29, CS12_SW8_29},
+    {1, CS11_SW9_29, CS10_SW9_29, CS12_SW9_29},
+
+    {1, CS8_SW1_29, CS7_SW1_29, CS9_SW1_29},
+    {1, CS8_SW2_29, CS7_SW2_29, CS9_SW2_29},
+    {1, CS8_SW3_29, CS7_SW3_29, CS9_SW3_29},
+    {1, CS8_SW4_29, CS7_SW4_29, CS9_SW4_29},
+    {1, CS8_SW5_29, CS7_SW5_29, CS9_SW5_29},
+    {1, CS8_SW6_29, CS7_SW6_29, CS9_SW6_29},
+    {1, CS8_SW7_29, CS7_SW7_29, CS9_SW7_29},
+    {1, CS8_SW8_29, CS7_SW8_29, CS9_SW8_29},
+    {1, CS8_SW9_29, CS7_SW9_29, CS9_SW9_29},
+
+    {1,  CS5_SW1_29,  CS4_SW1_29,  CS6_SW1_29},
+    {1,  CS5_SW2_29,  CS4_SW2_29,  CS6_SW2_29},
+    {1,  CS5_SW3_29,  CS4_SW3_29,  CS6_SW3_29},
+    {1,  CS5_SW4_29,  CS4_SW4_29,  CS6_SW4_29},
+    {1,  CS5_SW5_29,  CS4_SW5_29,  CS6_SW5_29},
+    {1,  CS5_SW6_29,  CS4_SW6_29,  CS6_SW6_29},
+    {1,  CS5_SW7_29,  CS4_SW7_29,  CS6_SW7_29},
+    {1,  CS5_SW8_29,  CS4_SW8_29,  CS6_SW8_29},
+    {1,  CS5_SW9_29,  CS4_SW9_29,  CS6_SW9_29},
+
+    {1,  CS2_SW1_29,  CS1_SW1_29,  CS3_SW1_29},
+    {1,  CS2_SW2_29,  CS1_SW2_29,  CS3_SW2_29},
+    {1,  CS2_SW3_29,  CS1_SW3_29,  CS3_SW3_29},
+    {1,  CS2_SW4_29,  CS1_SW4_29,  CS3_SW4_29},
+    {1,  CS2_SW5_29,  CS1_SW5_29,  CS3_SW5_29},
+    {1,  CS2_SW6_29,  CS1_SW6_29,  CS3_SW6_29},
+    {1,  CS2_SW7_29,  CS1_SW7_29,  CS3_SW7_29},
+    {1,  CS2_SW8_29,  CS1_SW8_29,  CS3_SW8_29},
+    {1,  CS2_SW9_29,  CS1_SW9_29,  CS3_SW9_29},
+    #endif
+
+    #if 0
+    {0,  OUT_3,   OUT_2,   OUT_1},
+    {0,  OUT_6,   OUT_5,   OUT_4},
+    {0,  OUT_9,   OUT_8,   OUT_7},
+    {0, OUT_12,  OUT_11,  OUT_10},
+    {0, OUT_15,  OUT_14,  OUT_13},
+    {0, OUT_18,  OUT_17,  OUT_16},
+    {0, OUT_21,  OUT_20,  OUT_19},
+    {0, OUT_24,  OUT_23,  OUT_22},
+    {0, OUT_27,  OUT_26,  OUT_25},
+    {0, OUT_30,  OUT_29,  OUT_28},
+    {0, OUT_33,  OUT_32,  OUT_31},
+    {0, OUT_36,  OUT_35,  OUT_34},
+    #endif
+    #if 0
+    {0, C1_1,   C3_2,   C4_2},
+    {0, C1_2,   C2_2,   C4_3},
+    {0, C1_3,   C2_3,   C3_3},
+    {0, C1_4,   C2_4,   C3_4},
+    {0, C1_5,   C2_5,   C3_5},
+    {0, C1_6,   C2_6,   C3_6},
+    {0, C1_7,   C2_7,   C3_7},
+    {0, C1_8,   C2_8,   C3_8},
+
+    {0, C9_1,   C8_1,   C7_1},
+    {0, C9_2,   C8_2,   C7_2},
+    {0, C9_3,   C8_3,   C7_3},
+    {0, C9_4,   C8_4,   C7_4},
+    {0, C9_5,   C8_5,   C7_5},
+    {0, C9_6,   C8_6,   C7_6},
+    {0, C9_7,   C8_7,   C6_6},
+    {0, C9_8,   C7_7,   C6_7},
+    #endif
 };
 
+
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
-    {RGB_DRIVER_WS2812,     0, 0, 0, 17},
+    //{RGB_DRIVER_WS2812,     0, 0, 0, 17},
+    //{RGB_DRIVER_IS31FL3731, 0xE8, 0, 0, 16},
+    //{RGB_DRIVER_IS31FL3236, 0x78, 0, 0, 12},
+    {RGB_DRIVER_IS31FL3729, 0x68, 0, 0, 45},
+    //{RGB_DRIVER_IS31FL3729, 0x6E, 1, 45, 45},
 };
 
 rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
-    {0,  1, 16},
+    {0,  0, 45},
+    //{1,  45, 45},
+    //{0,  0, 16},
+    //{0,  0, 12},
 };
 
-uint8_t g_rgb_indicator_index[RGB_INDICATOR_LED_NUM] = { 0};
+//uint8_t g_rgb_indicator_index[RGB_INDICATOR_LED_NUM] = { 0};
 
-#define CAPS_LED    0
+//#define CAPS_LED    0
 #endif
 
 void indicator_led_set(uint8_t led)
@@ -60,6 +212,7 @@ void indicator_led_set(uint8_t led)
 #ifdef RGB_MATRIX_ENABLE
 #include "rgb_common.h"
 #include "is31fl3729.h"
+#include "is31fl3731.h"
 #include "rgb_driver.h"
 
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
@@ -164,16 +317,42 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {1,  CS2_SW7_29,  CS1_SW7_29,  CS3_SW7_29},
     {1,  CS2_SW8_29,  CS1_SW8_29,  CS3_SW8_29},
     {1,  CS2_SW9_29,  CS1_SW9_29,  CS3_SW9_29},
+    
+    #if 0
+    // 16 leds
+    {2, C1_1,   C3_2,   C4_2},
+    {2, C1_2,   C2_2,   C4_3},
+    {2, C1_3,   C2_3,   C3_3},
+    {2, C1_4,   C2_4,   C3_4},
+    {2, C1_5,   C2_5,   C3_5},
+    {2, C1_6,   C2_6,   C3_6},
+    {2, C1_7,   C2_7,   C3_7},
+    {2, C1_8,   C2_8,   C3_8},
+
+    {2, C9_1,   C8_1,   C7_1},
+    {2, C9_2,   C8_2,   C7_2},
+    {2, C9_3,   C8_3,   C7_3},
+    {2, C9_4,   C8_4,   C7_4},
+    {2, C9_5,   C8_5,   C7_5},
+    {2, C9_6,   C8_6,   C7_6},
+    {2, C9_7,   C8_7,   C6_6},
+    {2, C9_8,   C7_7,   C6_7},
+    #endif
 };
 
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
     {RGB_DRIVER_IS31FL3729, 0x68, 0, 0, 45},
-    {RGB_DRIVER_IS31FL3729, 0x6E, 0, 45, 45},
+    {RGB_DRIVER_IS31FL3729, 0x6E, 1, 45, 45},
+    //{RGB_DRIVER_IS31FL3731, 0xE8, 0, 90, 16},
 };
 
 rgb_param_t g_rgb_matrix_params[RGB_MATRIX_NUM] = {
     {0, 0, 90},
 };
+
+//rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
+//    {1,  90, 16},
+//};
 
 #include "rgb_effect_matrix_qmk.h"
 
@@ -213,4 +392,37 @@ led_config_t g_led_config = {
         4, 4, 4, 4, 4, 1, 1, 1, 1,
     },
 };
+
+#include "host.h"
+#include "led.h"
+#include "rgb_matrix.h"
+
+#define CAPS_LED_INDEX 18
+
+void rgb_led_pre_flush(void)
+{
+    if (!rgb_matrix_enabled(0)) {
+        if (host_keyboard_leds() & (1 << USB_LED_CAPS_LOCK)) {
+            rgb_matrix_set_rgb(0, CAPS_LED_INDEX, 0xFF, 0xFF, 0xFF);
+        } else {
+            rgb_matrix_set_rgb(0, CAPS_LED_INDEX, 0, 0, 0);
+        }
+    }
+
+}
+
+#endif
+
+#if 0
+#include "matrix.h"
+
+void matrix_init_custom(void)
+{
+}
+
+bool matrix_scan_custom(matrix_row_t* raw)
+{
+    return false;
+}
+
 #endif

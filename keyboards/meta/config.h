@@ -17,6 +17,7 @@
 #define MATRIX_ROW_PINS     {C8,C7,C6,B15,B14,A2}
 #define MATRIX_COL_PINS     {A4,A15,A5,A6,A7,C4,C5,B0,B1,B2,B10,B12,B13,C13,C14,C15}
 #define USB_EN_Pin          A1
+#define SDB_EN_Pin          C11
 
 #define USE_UART1
 
@@ -42,11 +43,13 @@
 
 #define USE_I2C1
 #define IS31FL3729_I2C_ID   I2C_INSTANCE_1
+#define IS31FL3731_I2C_ID   I2C_INSTANCE_1
+#define IS31FL3729_NUM      2
 #define RGB_MATRIX_LED_NUM  90
-#define RGB_LED_NUM         (RGB_MATRIX_LED_NUM)
+#define RGB_LED_NUM         (RGB_MATRIX_LED_NUM+0)
 
 #define RGB_DEVICE_NUM      2
-//#define RGB_SEGMENT_NUM     1
+#define RGB_SEGMENT_NUM     1
 #define RGB_MATRIX_NUM      1
 
 #define CAPS_LED_PIN        A3
