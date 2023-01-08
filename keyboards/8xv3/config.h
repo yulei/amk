@@ -31,9 +31,20 @@
 #define USE_I2C1
 #define IS31FL3741_I2C_ID   I2C_INSTANCE_1
 #define IS31FL3731_I2C_ID   I2C_INSTANCE_1
-//#define I2C1_SCL_PIN        B8
-//#define I2C1_SDA_PIN        B9
+#define IS31FL3236_I2C_ID   I2C_INSTANCE_1
 
+#define RGB_MATRIX_LED_NUM  97
+#define RGB_MATRIX_NUM      1
+
+#define RABBIT_VER
+
+#ifdef RABBIT_VER
+#define IS31FL3236_LED_NUM  6
+
+#define RGB_LED_NUM         (IS31FL3236_LED_NUM+RGB_MATRIX_LED_NUM)
+#define RGB_DEVICE_NUM      2
+#define RGB_SEGMENT_NUM     2
+#else
 #define WS2812_LED_NUM      7
 #define WS2812_LED_PIN      B6
 
@@ -47,12 +58,10 @@
 #define PWM_DMA_IRQHnadler  DMA1_Stream0_IRQHandler
 #define PWM_PIN             GPIO_PIN_6
 
-#define RGB_MATRIX_LED_NUM  97
-#define RGB_LED_NUM         (WS2812_LED_NUM+RGB_MATRIX_LED_NUM+16)
-
+#define RGB_LED_NUM         (WS2812_LED_NUM+RGB_MATRIX_LED_NUM)
 #define RGB_DEVICE_NUM      2
 #define RGB_SEGMENT_NUM     1
-#define RGB_MATRIX_NUM      1
+#endif
 
 #define DEBOUNCE            5
 #define DWT_DELAY
