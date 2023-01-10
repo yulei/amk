@@ -79,6 +79,10 @@
     #define IS31FL3729_GLOBAL_CURRENT 0xFF
 #endif
 
+#ifndef IS31FL3729_SCALE_DEFAULT
+    #define IS31FL3729_SCALE_DEFAULT    0xFF
+#endif
+
 #define TIMEOUT             100
 
 #ifndef IS31FL3729_I2C_ID
@@ -138,7 +142,6 @@ void is31fl3729_uninit(i2c_led_t *driver)
 
 void is31fl3729_set_color(i2c_led_t *driver, uint8_t index, uint8_t red, uint8_t green, uint8_t blue)
 {
-    //return;
     rgb_led_t *led = &g_rgb_leds[index];
     is31fl3729_driver_t *is31 = (is31fl3729_driver_t*)(driver->data);
 
@@ -157,18 +160,14 @@ void is31fl3729_set_color_all(i2c_led_t *driver, uint8_t red, uint8_t green, uin
 
 static void is31fl3729_update_pwm_buffers(i2c_led_t *driver)
 {
-    //return;
     if (!is31fl3729_available(0)) return;
 
-    //uint32_t status = AMK_SUCCESS;
     is31fl3729_driver_t *is31 = (is31fl3729_driver_t*)(driver->data);
-    //uint8_t data = 0;
 
     if (!is31->pwm_dirty) return;
 
     // write from sw1 to sw9
 
-#if 1
     for (int i = 0; i < 9; i++) {
         uint32_t status = i2c_send(i2c_inst, driver->addr, &is31->pwm_buffer[i*0x10], 0x10, TIMEOUT);
         //i2c_write_reg(i2c_inst, driver->addr, is31->pwm_buffer[i*10], &is31->pwm_buffer[i*0x10+1], 15, TIMEOUT);
@@ -179,19 +178,13 @@ static void is31fl3729_update_pwm_buffers(i2c_led_t *driver)
             HAL_I2C_Init(&hi2c1);        
         }
     }
-#else
-    for (int i = 0; i < 9; i++) {
-        for (int j = 0; j < 15; j++) {
-            uint32_t status = i2c_write_reg(i2c_inst, driver->addr, i*0x10+1+j, &is31->pwm_buffer[i*0x10+j+1], 1, TIMEOUT);
-            if (status != AMK_SUCCESS) {
-                fl3729_debug("IS31FL3729: failed to set pwm buffer: %d\n", status);
-            }
-        }
-    }
-#endif
 
     is31->pwm_dirty = false;
 }
+
+#ifdef SDB_EN_PIN
+#include "amk_gpio.h"
+#endif
 
 void init_driver(is31fl3729_driver_t *driver)
 {
@@ -205,7 +198,6 @@ void init_driver(is31fl3729_driver_t *driver)
     wait_ms(1);
 #endif
 
-    //wait_ms(10000);
     // Reset 3729 to default state
     uint8_t data = RESET_COMMAND;
     status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, RESET_REG, &data, 1, TIMEOUT);
@@ -213,7 +205,7 @@ void init_driver(is31fl3729_driver_t *driver)
     if (status != AMK_SUCCESS) {
         fl3729_debug("IS31FL3729: failed to reset: %d\n", status);
         fl3729_available = false;
-//        return;
+        return;
     }
 
     wait_ms(10);
@@ -239,7 +231,7 @@ void init_driver(is31fl3729_driver_t *driver)
     //status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, PD_PU_REG, &data, 1, TIMEOUT);
 
     // set scale buffer
-    data = 0x4F;
+    data = IS31FL3729_SCALE_DEFAULT;
     for (int i = 0;i < 0x0F; i++) {
         status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, SCALE_BASE_REG+i, &data, 1, TIMEOUT);
         if (status != AMK_SUCCESS) {
@@ -248,7 +240,7 @@ void init_driver(is31fl3729_driver_t *driver)
     }
 
     // reset pwm
-    memset(driver->pwm_buffer, 0xff, PWM_BUFFER_SIZE);
+    memset(driver->pwm_buffer, 0, PWM_BUFFER_SIZE);
     // set swx first reg address
     for (int i = 0; i < 9; i++) {
         driver->pwm_buffer[i*0x10] = i*0x10+1;

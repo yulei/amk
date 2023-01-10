@@ -16,8 +16,8 @@
 #define MATRIX_COLS         16
 #define MATRIX_ROW_PINS     {C8,C7,C6,B15,B14,A2}
 #define MATRIX_COL_PINS     {A4,A15,A5,A6,A7,C4,C5,B0,B1,B2,B10,B12,B13,C13,C14,C15}
-#define USB_EN_Pin          A1
-#define SDB_EN_Pin          C11
+#define USB_EN_PIN          A1
+#define SDB_EN_PIN          C11
 
 #define USE_UART1
 
@@ -42,6 +42,7 @@
 #else
 
 #define USE_I2C1
+#define IS31FL3729_SCALE_DEFAULT    0x4F
 #define IS31FL3729_I2C_ID   I2C_INSTANCE_1
 #define IS31FL3731_I2C_ID   I2C_INSTANCE_1
 #define IS31FL3729_NUM      2

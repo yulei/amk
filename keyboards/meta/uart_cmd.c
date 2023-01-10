@@ -100,8 +100,8 @@ void uart_cmd_send(cmd_t* cmd)
 
 void matrix_init_kb(void)
 {
-    gpio_set_output_pushpull(USB_EN_Pin);
-    gpio_write_pin(USB_EN_Pin, 1);
+    gpio_set_output_pushpull(USB_EN_PIN);
+    gpio_write_pin(USB_EN_PIN, 1);
 
     uart_cmd_init();
 }
@@ -275,7 +275,7 @@ bool hook_process_action_main(keyrecord_t *record)
         cmd.param.screen.action = CMD_SCREEN_MSC;
         cmd.param.screen.state = msc_on ? 1 : 0;
         uart_cmd_send(&cmd);
-        gpio_write_pin(USB_EN_Pin, msc_on ? 0 : 1);
+        gpio_write_pin(USB_EN_PIN, msc_on ? 0 : 1);
         if (msc_on) {
             usb_setting |= USB_SWITCH_BIT;
         } else {
