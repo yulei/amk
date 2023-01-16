@@ -27,7 +27,7 @@
 #include "amk_keymap.h"
 #include "matrix.h"
 #include "usb_descriptors.h"
-#include "keycode_convert.h"
+//#include "keycode_convert.h"
 
 // This is changed only when the command IDs change,
 // so VIA Configurator can detect compatible firmware.
