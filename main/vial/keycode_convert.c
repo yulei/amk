@@ -297,7 +297,8 @@ uint16_t amk_to_vial(uint16_t keycode)
                     case OP_BIT_OR:
                         break;
                     case OP_BIT_XOR:
-                        vial_kc = QK_TOGGLE_LAYER | (layer & 0xF) | (action.layer_bitop.on << 4);
+                        //vial_kc = QK_TOGGLE_LAYER | (layer & 0xF) | (action.layer_bitop.on << 4);
+                        vial_kc = QK_TOGGLE_LAYER | (layer & 0xF);
                         break;
                     case OP_BIT_SET:
                         if (action.layer_bitop.on == 0) {
