@@ -28,7 +28,7 @@
  */
 
 #include "tusb_option.h"
-#include "device/dcd_attr.h"
+#include "device/dcd.h"
 
 #if TUSB_OPT_DEVICE_ENABLED && \
     ( defined(DCD_ATTR_DWC2_STM32) || \
