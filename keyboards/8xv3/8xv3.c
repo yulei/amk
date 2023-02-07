@@ -213,6 +213,7 @@ led_config_t g_led_config = {
 #include "rgb_matrix.h"
 
 #define CAPS_LED_INDEX 27
+#define SCROLL_LED_INDEX 59
 
 void rgb_led_pre_flush(void)
 {
@@ -221,6 +222,11 @@ void rgb_led_pre_flush(void)
             rgb_matrix_set_rgb(0, CAPS_LED_INDEX, 0xFF, 0xFF, 0xFF);
         } else {
             rgb_matrix_set_rgb(0, CAPS_LED_INDEX, 0, 0, 0);
+        }
+        if (host_keyboard_leds() & (1 << USB_LED_SCROLL_LOCK)) {
+            rgb_matrix_set_rgb(0, SCROLL_LED_INDEX, 0xFF, 0xFF, 0xFF);
+        } else {
+            rgb_matrix_set_rgb(0, SCROLL_LED_INDEX, 0, 0, 0);
         }
     }
 
