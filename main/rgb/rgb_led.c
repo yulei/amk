@@ -82,7 +82,7 @@ static void rgb_led_set_power(bool on)
     }
 }
 
-__WEAK
+__attribute__((weak))
 void rgb_led_init_pre(void)
 {}
 

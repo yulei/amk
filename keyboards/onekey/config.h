@@ -63,7 +63,7 @@
 //#define WAIT_TIM      htim2
 #endif
 
-#define DWT_DELAY
+//#define DWT_DELAY
 
 //#define RGB_LED_NUM     4
 //#define RGB_DEVICE_NUM  2

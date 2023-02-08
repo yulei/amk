@@ -183,7 +183,7 @@ static void via_set_layout_options(uint32_t value)
     eeconfig_write_layout_options((uint8_t) value);
 }
 
-__attribute__((__weak__))
+__attribute__((weak))
 bool vial_process_kb(uint8_t *data, uint8_t length)
 {
     return false;
@@ -466,7 +466,7 @@ void vial_send(uint8_t *data, uint8_t length)
 }
 #endif
 
-__attribute__((__weak__))
+__attribute__((weak))
 void vial_task_kb(void) {}
 
 void vial_task(void)

@@ -43,7 +43,7 @@
 #define action_debug(...)
 #endif
 
-__WEAK
+__attribute__((weak))
 void keyboard_set_rgb(bool on)
 {
 #ifdef RGB_ENABLE
@@ -216,7 +216,7 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
     }    
 }
 
-__WEAK
+__attribute__((weak))
 bool hook_process_action_main(keyrecord_t *record)
 {
     return false;
@@ -354,7 +354,7 @@ bool hook_process_action(keyrecord_t *record)
     return hook_process_action_main(record);
 }
 
-__WEAK
+__attribute__((weak))
 void hook_matrix_change_kb(keyevent_t event)
 {
 }
@@ -385,7 +385,7 @@ void hook_matrix_change(keyevent_t event)
     hook_matrix_change_kb(event);
 }
 
-__WEAK
+__attribute__((weak))
 void hook_layer_change_kb(uint32_t layer_state)
 {
 }

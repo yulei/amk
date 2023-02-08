@@ -22,7 +22,11 @@ int xprintf(char* fmt, ...)
 }
 
 #ifndef SEGGER_RTT_ENABLE
+#ifndef CH32V307
 #define SEGGER_RTT_ENABLE 1
+#else
+#define SEGGER_RTT_ENABLE 0
+#endif
 #endif
 
 #if SEGGER_RTT_ENABLE

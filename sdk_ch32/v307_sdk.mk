@@ -1,0 +1,14 @@
+
+SRCS += \
+	$(CH32SDK_DIR)/$(MCU_TYPE)/startup_$(MCU_SERIES)_D8C.s \
+	$(CH32SDK_DIR)/$(MCU_TYPE)/system_$(MCU_SERIES).c \
+
+APP_DEFS += \
+	-DCFG_TUSB_MCU=OPT_MCU_CH32V307 \
+	-DUSE_STDPERIPH_DRIVER \
+    -DCH32V307 \
+	-DBOARD_TUD_MAX_SPEED=OPT_MODE_HIGH_SPEED
+
+SDK_DEFS += -march=rv32imac -mabi=ilp32 -nostartfiles
+
+MCU_LD := ch32v307xc

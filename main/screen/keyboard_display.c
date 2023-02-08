@@ -449,7 +449,7 @@ static void draw_line(screen_t *screen, int32_t x0, int32_t y0, int32_t x1, int3
     } while (i < total);
 }
 
-__WEAK
+__attribute__((weak))
 void keyboard_display_post_process(void* buff, size_t size)
 {}
 

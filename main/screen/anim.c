@@ -181,13 +181,15 @@ uint32_t anim_step(anim_t *anim, uint32_t *delay, void *buf, uint32_t size)
     } 
 
     *delay = (anim->obj.header.frames==1) ? 1000 : anim->obj.header.delays[anim->obj.frame];
-    uint32_t frame_size = anim->obj.header.width*anim->obj.header.height*anim->obj.header.format;
+    uint32_t frame_size = anim->obj.header.width*anim->obj.header.height*2;//anim->obj.header.format;
     if (size < frame_size) {
         amk_printf("ANIM buffer size too small, size=%d, frame=%d\n", size, frame_size);
         safe_close(&anim->obj.file);
         return 0;
     }
 
+    //if (FR_OK != f_lseek(&anim->obj.file, anim->obj.header.size+frame_size*anim->obj.frame) ) {
+        //amk_printf("ANIM failed to seek new position, pos=%d\n", anim->obj.header.size+frame_size*anim->obj.frame);
     if (FR_OK != f_lseek(&anim->obj.file, anim->obj.header.offset+frame_size*anim->obj.frame) ) {
         amk_printf("ANIM failed to seek new position, pos=%d\n", anim->obj.header.offset+frame_size*anim->obj.frame);
         safe_close(&anim->obj.file);

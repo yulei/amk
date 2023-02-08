@@ -12,7 +12,13 @@ LTO_ENABLE ?= 0
 # Echo suspend
 NO_ECHO := @
 
+# Toolchain Architecture
+ifneq (,$(filter $(strip $(MCU)),$(CH32V_MCUS)))
+GNU_PREFIX := riscv-none-embed
+else
 GNU_PREFIX := arm-none-eabi
+endif
+
 
 # Toolchain commands
 CC      := $(GNU_INSTALL_ROOT)$(GNU_PREFIX)-gcc

@@ -45,3 +45,7 @@ endif
 ifneq (,$(filter $(strip $(MCU)),$(M480_MCUS)))
 	include $(MAIN_DIR)/porting/wired/m480.mk
 endif
+
+ifneq (,$(filter $(strip $(MCU)),$(CH32V_MCUS)))
+	include $(MAIN_DIR)/porting/wired/ch32.mk
+endif

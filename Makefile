@@ -7,6 +7,7 @@ NUVOTON_MCUS := NUC126
 GD32_MCUS := GD32E103 GD32E505
 HC32_MCUS := HC32F460
 M480_MCUS := M484
+CH32V_MCUS := CH32V307
 
 # Source files
 SRCS += \
@@ -75,6 +76,9 @@ include sdk_hc32/hc32_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(M480_MCUS)))
 VENDOR_DIR := libs/vendor/nuvoton
 include sdk_m480/m480_sdk.mk
+else ifneq (,$(filter $(strip $(MCU)),$(CH32V_MCUS)))
+VENDOR_DIR := libs/vendor/wch
+include sdk_ch32/ch32_sdk.mk
 else
 $(error Unsupported MCU: $(MCU))
 endif

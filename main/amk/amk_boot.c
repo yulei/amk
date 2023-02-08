@@ -60,7 +60,7 @@ static bool boot_scan_key(uint16_t code)
     return scan_key(code);
 }
 
-__WEAK
+__attribute__((weak))
 void pre_boot_init(void) {}
 
 void post_boot_init(void)

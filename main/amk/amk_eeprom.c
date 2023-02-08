@@ -232,7 +232,7 @@ void ee_macro_write_buffer(uint16_t offset, uint16_t size, uint8_t *data)
 /*****************/
 
 // platform dependent preparation
-__WEAK
+__attribute__((weak))
 void eeconfig_init_prepare(void) {}
 
 __attribute__((weak))

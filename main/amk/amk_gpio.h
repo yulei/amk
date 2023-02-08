@@ -175,6 +175,8 @@
     #include "gpio_gd32.h"
 #elif defined(HC32F460xE)
    #include "gpio_hc32.h" 
+#elif defined(CH32V307)
+   #include "gpio_ch32.h" 
 #else
     #error "MCU_TYPE not defined"
 #endif
