@@ -164,6 +164,39 @@ w25qxx_t *w25qxx_init(w25qxx_config_t *config)
     return device;
 }
 
+w25qxx_t *w25qxx_init_128(w25qxx_config_t *config)
+{
+    w25qxx_t *device = &w25qxxs[0];
+    device->config.spi = config->spi;
+    device->config.cs = config->cs;
+    gpio_set_output_pushpull(config->cs);
+    gpio_write_pin(config->cs, 0);
+    wait_ms(100);
+    uint32_t id = w25qxx_read_jedec(device);
+
+    switch(id&0xFFFF) {
+    case 0x4018:
+        // W25Q128
+        w25qxx_debug("W25Q128 device identified: %x\n", id);
+        break;;
+    default:
+        w25qxx_debug("Unknown W25QXX chip: %x\n", id);
+        device = NULL;
+        break;
+    }
+
+    if (device) {
+        device->page_size       = 256;
+        device->page_count      = 65536;
+        device->sector_size     = 4096;
+        device->sector_count    = 4096;
+        device->type = W25Q128; 
+        gpio_write_pin(config->cs, 1);
+    }
+
+    return device;
+}
+
 static amk_error_t w25qxx_erase_sector(w25qxx_t *w25qxx, uint32_t address)
 {
     w25qxx_wait(w25qxx, WQ_WRITE_TIMEOUT);

@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 #ifdef DWT_DELAY
-#pragma message "DWT was used for delay, thus can't use with PROFILE"
+//#pragma message "DWT was used for delay, thus can't use with PROFILE"
 #endif
 
 uint32_t AMK_PROFILE_BEGIN(const char* profile_region);
