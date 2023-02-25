@@ -98,7 +98,7 @@ static bool sense_key(pin_t row, bool on)
 {
     bool key_down = false;
     gpio_write_pin(DISCHARGE_PIN, 1);
-    wait_us(2);
+    wait_us(DISCHARGE_WAIT_PRE);
     gpio_write_pin(DISCHARGE_PIN, 0);
     //gpio_set_input_floating(DISCHARGE_PIN);
     gpio_write_pin(row, 1);
@@ -119,10 +119,9 @@ static bool sense_key(pin_t row, bool on)
     }
 
     // clean up
-    //gpio_set_output_pushpull(DISCHARGE_PIN);
-    gpio_write_pin(DISCHARGE_PIN, 1);
     gpio_write_pin(row, 0);
-    wait_us(20);
+    gpio_write_pin(DISCHARGE_PIN, 1);
+    wait_us(DISCHARGE_WAIT_POST);
 
     return key_down;
 }
@@ -133,6 +132,9 @@ bool matrix_scan_custom(matrix_row_t* raw)
 #if SCAN_ONE
     changed = scan_one(raw);
 #else
+    gpio_write_pin(DISCHARGE_PIN, 1);
+    wait_us(SCAN_DELAY);
+
     for (int col = 0; col < MATRIX_COLS; col++) {
 
         gpio_write_pin(COL_A_PIN, (custom_col_pins[col]&COL_A_MASK) ? 1 : 0);

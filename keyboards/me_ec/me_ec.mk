@@ -1,7 +1,7 @@
 
 SRCS += \
 	$(KEYBOARD_DIR)/me_ec.c \
-	$(KEYBOARD_DIR)/me_ec_keymap.c \
+	$(KEYBOARD_DIR)/me_ec_gcmap.c \
 	$(KEYBOARD_DIR)/ec_matrix.c
 
 
@@ -10,7 +10,7 @@ TINYUSB_ENABLE = yes
 TINYUSB_USE_HAL = yes
 RGB_LINEAR_ENABLE = yes
 #MATRIX_EC_ENABLE = yes
-#VIAL_ENABLE = yes
+VIAL_ENABLE = yes
 EECONFIG_FLASH = yes
 NKRO_AUTO_ENABLE = yes
 

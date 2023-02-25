@@ -17,11 +17,13 @@
 #define MATRIX_ROW_PINS {B6, B5, B4, A15, B15, B1}
 #define MATRIX_COL_PINS {L_MASK|3, L_MASK|0, L_MASK|1, L_MASK|2, L_MASK|4, L_MASK|6, L_MASK|7, L_MASK|5, R_MASK|3, R_MASK|0, R_MASK|1, R_MASK|2, R_MASK|4, R_MASK|6, R_MASK|7, R_MASK|5}
 
-#define DISCHARGE_WAIT_PRE  30
-#define DISCHARGE_WAIT_POST 30
+#define DISCHARGE_WAIT_PRE  10
+#define DISCHARGE_WAIT_POST 10
+#define SCAN_DELAY          100
+
 #define CHARGE_WAIT     2
-#define EC_TH_LOW       800
-#define EC_TH_HIGH      1192
+#define EC_TH_LOW       600
+#define EC_TH_HIGH      800
 
 #define LEFT_EN_PIN     B10
 #define RIGHT_EN_PIN    B2
@@ -69,11 +71,14 @@
 #define RGB_DEVICE_NUM  2
 #define RGB_SEGMENT_NUM 2
 
+#define USE_I2C1
+
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
-#define DEBOUNCE        10
+#define DEBOUNCE        5
 
 #define VECT_TAB_OFFSET 0x20000
-#define USE_I2C1
 #define DWT_DELAY
+#define SUSPEND_RECONNECT
 
-//#define WS2812_USE_GPIO
+#define VIAL_INSECURE
+#define VIAL_KEYBOARD_UID {0x64, 0x20, 0x09, 0xF6, 0x28, 0x2C, 0x68, 0xD5}
