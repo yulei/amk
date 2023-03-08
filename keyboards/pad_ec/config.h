@@ -15,13 +15,16 @@
 // key matrix
 #define MATRIX_ROWS     5
 #define MATRIX_COLS     5
-#define MATRIX_ROW_PINS {}
-#define MATRIX_COL_PINS {}
 
-#define ROW_1_PIN       B5
-#define ROW_2_PIN       C10
-#define ROW_3_PIN       A9
-#define ROW_4_PIN       A10
+#define LEFT_MASK       0x08
+#define RIGHT_MASK      0x10
+#define MATRIX_ROW_PINS {B5, C10, A9, A10, C0}
+#define MATRIX_COL_PINS {LEFT_MASK|2, LEFT_MASK|1, LEFT_MASK|0, LEFT_MASK|6, LEFT_MASK|4};
+
+#define DISCHARGE_WAIT_PRE  20
+#define DISCHARGE_WAIT_POST 20
+#define EC_TH_LOW           600
+#define EC_TH_HIGH          800
 
 #define LEFT_EN_PIN     B3
 #define COL_A_PIN       D2
@@ -34,7 +37,7 @@
 #define KEY_IN_CHANNEL  ADC_CHANNEL_0
 #define KEY_IN_PIN      GPIO_PIN_0
 #define KEY_IN_PORT     GPIOA
-#define SENSE_TH        1024
+#define SENSE_TH        896
 
 #define BUTTON_KEY      C9
 #define BUTTON_ROW      0

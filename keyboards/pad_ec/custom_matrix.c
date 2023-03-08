@@ -25,8 +25,8 @@
 #define LEFT_MASK   0x08
 #define RIGHT_MASK  0x10
 
-static pin_t custom_row_pins[] = {ROW_1_PIN, ROW_2_PIN, ROW_3_PIN, ROW_4_PIN};
-static pin_t custom_col_pins[] = {LEFT_MASK|2, LEFT_MASK|1, LEFT_MASK|0, LEFT_MASK|6, LEFT_MASK|4};
+static pin_t custom_row_pins[] = MATRIX_ROW_PINS;
+static pin_t custom_col_pins[] = MATRIX_COL_PINS
 
 void matrix_init_custom(void)
 {
@@ -35,7 +35,7 @@ void matrix_init_custom(void)
     #endif
 
     // initialize row pins
-    for (int i = 0; i < MATRIX_ROWS-1; i++) {
+    for (int i = 0; i < MATRIX_ROWS; i++) {
         gpio_set_output_pushpull(custom_row_pins[i]);
         gpio_write_pin(custom_row_pins[i], 0);
     }
@@ -56,7 +56,6 @@ void matrix_init_custom(void)
     gpio_write_pin(OPA_EN_PIN, 1);
     gpio_set_output_pushpull(DISCHARGE_PIN);
     gpio_write_pin(DISCHARGE_PIN, 0);
-
 }
 
 extern ADC_HandleTypeDef hadc1;
@@ -100,37 +99,7 @@ static bool sense_key(pin_t row)
     return key_down;
 }
 
-#define SCAN_ONE 0
-#if SCAN_ONE
-bool scan_one(matrix_row_t *raw)
-{
-    bool changed = false;
-    uint8_t col = 0;
-
-    gpio_write_pin(COL_C_PIN, 0);
-    gpio_write_pin(COL_B_PIN, 1);
-    gpio_write_pin(COL_A_PIN, 0);
-
-    for (int row = 0; row < 1 /*MATRIX_ROWS*/; row++) {
-        matrix_row_t last_row_value    = raw[row];
-        matrix_row_t current_row_value = last_row_value;
-
-        if (sense_key(custom_row_pins[row])) {
-            current_row_value |= (1 << col);
-        } else {
-            current_row_value &= ~(1 << col);
-        }
-
-        if (last_row_value != current_row_value) {
-            raw[row] = current_row_value;
-            changed = true;
-        }
-    }
-
-    return changed;
-}
-#else
-static bool scan_half(matrix_row_t *raw, bool right)
+static bool scan_matrix(matrix_row_t *raw)
 {
     bool changed = false;
 
@@ -159,7 +128,6 @@ static bool scan_half(matrix_row_t *raw, bool right)
 
     return changed;
 }
-#endif
 
 static bool scan_button_key(matrix_row_t* row)
 {
@@ -189,10 +157,10 @@ bool matrix_scan_custom(matrix_row_t* raw)
 #if SCAN_ONE
     changed = scan_one(raw);
 #else
-    changed = scan_half(&raw[1], false);
+    changed = scan_matrix(raw);
     gpio_write_pin(LEFT_EN_PIN, 1);
 
-    changed |= scan_button_key(&raw[BUTTON_ROW]);
+    changed |= scan_button_key(&raw[4]);
 
 #endif
 
