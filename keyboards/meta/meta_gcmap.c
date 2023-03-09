@@ -40,7 +40,7 @@ GC_KEYMAPS = {
 		GC_TAB, GC_Q, GC_W, GC_E, GC_R, GC_T, GC_Y, GC_U, GC_I, GC_O, GC_P, GC_LBRC, GC_RBRC, GC_BSLS,  GC_END, GC_PGDN,
 		GC_CAPS,   GC_A, GC_S, GC_D, GC_F, GC_G, GC_H, GC_J, GC_K, GC_L, GC_SCLN, GC_QUOT,      GC_ENT,  GC_INS, GC_DEL,
 		GC_LSFT, GC_LGUI,  GC_Z, GC_X, GC_C, GC_V, GC_B, GC_N, GC_M, GC_COMM, GC_DOT, GC_SLSH,GC_RSFT, GC_FN1,   GC_UP, GC_PSCR,
-		GC_LCTL, GC_LGUI, GC_FN5,                 GC_SPC,            GC_RALT,GC_RCTL,        GC_LEFT, GC_DOWN, GC_RGHT),
+		GC_LCTL, GC_LGUI, GC_LALT,                 GC_SPC,            GC_RALT,GC_RCTL,        GC_LEFT, GC_DOWN, GC_RGHT),
 
 	[1]=LAYOUT_default(
 		GC_MUTE,          _______, _______, _______, _______, _______, _______, _______, _______, GC_F15, GC_F16, GC_F17, GC_F24,          _______,
@@ -57,6 +57,6 @@ GC_KEYMAPS = {
 		_______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
 		_______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, _______,
 		_______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-		_______, _______,  GC_FN5,                            _______,                            GC_FN1, _______,          _______, _______, _______),
+		_______, _______, _______,                            _______,                            GC_FN1, _______,          _______, _______, _______),
 };
 #endif
