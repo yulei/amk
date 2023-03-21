@@ -8,7 +8,6 @@
  * @file amk_printf.c
  */
 
-#include "printf.h"
 #include "amk_printf.h"
 
 int xprintf(char* fmt, ...)
@@ -16,7 +15,7 @@ int xprintf(char* fmt, ...)
     int result = 0;
     va_list va;
     va_start(va, fmt);
-    result = vprintf_(fmt, va);
+    result = vprintf(fmt, va);
     va_end(va);
     return result;
 }
@@ -49,11 +48,11 @@ int amk_printf_ts(const char* format, ...)
     int size = 0;
 #ifndef STM32L072xx
     unsigned int ticks = DWT->CYCCNT / (SystemCoreClock/1000000);
-    size += printf_("[TS-%8u]: ", ticks);
+    size += printf("[TS-%8u]: ", ticks);
 #endif
     va_list va;
     va_start(va, format);
-    size += printf_(format, va);
+    size += printf(format, va);
     va_end(va);
 
     return size;
@@ -66,7 +65,7 @@ int amk_printf_fl(const char* format, ...)
 
     va_list va;
     va_start(va, format);
-    size += printf_(format, va);
+    size += printf(format, va);
     va_end(va);
     return size;
 }

@@ -5,13 +5,15 @@
 #include "generic_hal.h"
 #include "cm_misc.h"
 #include "wait.h"
+#include "Debug/debug.h"
 
 static void usb_clock_init(void);
 void system_init(void)
 {
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
-
     SystemCoreClockUpdate();
+    USART_Printf_Init(256000);
+
     usb_clock_init();
 
 #ifndef RTOS_ENABLE

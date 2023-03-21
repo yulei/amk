@@ -112,7 +112,10 @@ static void process_report_queue(hid_report_queue_t * queue)
             }
         }
         */
+    } else {
+        usbitf_debug("ITF not ready\n");
     }
+
 }
 
 #ifdef VIAL_ENABLE

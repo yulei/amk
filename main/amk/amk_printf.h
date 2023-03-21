@@ -10,21 +10,25 @@
 #pragma once
 
 #include <stdarg.h>
+#ifdef CH32V307
+#include <stdio.h>
+#else
 #include "printf.h"
+#endif
 
 #define AMK_DEBUG 1
 #define AMK_PRINT_TIMESTAMP 0
 
 #if AMK_DEBUG
-#if AMK_PRINT_TIMESTAMP
-int amk_printf_ts(const char* format, ...);
-#define amk_printf(fmt, ...) amk_printf_ts(fmt, ##__VA_ARGS__)
+    #if AMK_PRINT_TIMESTAMP
+        int amk_printf_ts(const char* format, ...);
+        #define amk_printf(fmt, ...) amk_printf_ts(fmt, ##__VA_ARGS__)
+    #else
+        int amk_printf_fl(const char* format, ...);
+        #define amk_printf printf
+    #endif
 #else
-int amk_printf_fl(const char* format, ...);
-#define amk_printf(fmt, ...) printf_(fmt, ##__VA_ARGS__)//amk_printf_fl(fmt, ##__VA_ARGS__)
-#endif
-#else
-#define amk_printf(fmt, ...)
+    #define amk_printf(fmt, ...)
 #endif
 
 #define AMK_CONCAT_(a, b) a##b

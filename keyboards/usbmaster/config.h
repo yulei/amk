@@ -76,3 +76,4 @@
 #define PROGMEM
 
 #define USE_UART1
+#define SUSPEND_RECONNECT

@@ -23,8 +23,8 @@ SRCS += \
 
 INCS += \
 	${VENDOR_DIR}/${CH32_LIB_DIR}/Core \
-	${VENDOR_DIR}/${CH32_LIB_DIR}/Debug \
 	${VENDOR_DIR}/${CH32_LIB_STD}/inc \
+	${VENDOR_DIR}/${CH32_LIB_DIR} \
 	${CH32SDK_DIR} \
 	${CH32SDK_DIR}/$(MCU_TYPE) \
 
@@ -35,8 +35,7 @@ include $(CH32SDK_DIR)/$(MCU_TYPE)_sdk.mk
 
 ifeq (yes, $(strip $(TINYUSB_ENABLE)))
 	include $(LIB_DIR)/tinyusb.mk
-	SRCS += $(TINYUSB_DIR)/portable/wch/ch32v307/dcd_usbhs.c
-	INCS += $(TINYUSB_DIR)/portable/wch/ch32v307
+	SRCS += $(CH32SDK_DIR)/$(MCU_TYPE)/dcd_usbhs.c
 	APP_DEFS += -DTINYUSB_ENABLE
 endif
 

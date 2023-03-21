@@ -12,7 +12,12 @@ int gpio_read_pin(pin_t pin)
 
 void gpio_write_pin(pin_t pin, int value)
 {
-    GPIO_WriteBit(GET_PORT(pin), GET_PIN(pin), value ? Bit_SET : Bit_RESET);
+    //GPIO_WriteBit(GET_PORT(pin), GET_PIN(pin), value ? Bit_SET : Bit_RESET);
+    if (value) {
+        GPIO_SetBits(GET_PORT(pin), GET_PIN(pin));
+    } else {
+        GPIO_ResetBits(GET_PORT(pin), GET_PIN(pin));
+    }
 }
 
 static void gpio_set_mode(pin_t pin, uint32_t mode, uint32_t speed)

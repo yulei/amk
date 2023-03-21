@@ -69,6 +69,10 @@ bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t si
             amk_printf("failed to sent keyboard report\n");
             return false;
         }
+        //{
+        //    uint8_t * p = (uint8_t*)data;
+        //    amk_printf("Key:%x-%x-%x-%x-%x-%x-%x-%x\n", p[0],p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
+        //}
         break;
 #endif
 
@@ -99,7 +103,7 @@ bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t si
         break;
 #endif
     default:
-        amk_printf("unknonw report type: %d\n", report_type);
+        amk_printf("unknonw report type: %ld\n", report_type);
         return false;
     }
     return true;

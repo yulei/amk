@@ -215,7 +215,7 @@ void indicator_led_set(uint8_t led)
 #include "is31fl3731.h"
 #include "rgb_driver.h"
 
-#define META_RGB_V1 0
+#define META_RGB_V1 1
 
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     // left
@@ -412,7 +412,7 @@ rgb_param_t g_rgb_matrix_params[RGB_MATRIX_NUM] = {
 #include "rgb_effect_matrix_qmk.h"
 
 led_config_t g_led_config = {
-#if META_RGB_V1
+#if 0
     {
         {45,  46, 47,    48,      49,     50, 51,    52,      53,     54,     55, 56,     57, NO_LED, NO_LED, 58},
         { 0,   1,  2,     3,       4,      5,  6,     7,       8,     59,     60, 61,     62,     77,     70, 71},

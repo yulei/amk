@@ -132,7 +132,7 @@ void amk_driver_task(void)
         if (usb_suspended() ) {
             if (suspend_wakeup_condition()) {
                 // wake up remote
-                amk_printf("suspend_wakeup, usb_setting=%x\n", usb_setting);
+                amk_printf("suspend_wakeup, usb_setting=%lx\n", usb_setting);
                 remote_wakeup();
                 wait_ms(SUSPEND_WAKEUP_DELAY);
     #ifdef RTOS_ENABLE

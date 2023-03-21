@@ -39,7 +39,7 @@
 #endif
 
 #if GENERIC_BOARD_DEBUG
-#define gb_debug  amk_printf
+#define gb_debug amk_printf 
 #else
 #define gb_debug(...)
 #endif
@@ -51,19 +51,18 @@ extern void custom_board_task(void);
 
 void board_init(void)
 {
-    gb_debug("system_init\n");
+
     system_init();
+    gb_debug("system_init\n");
 
-    gb_debug("custom_board_init\n");
     custom_board_init();
+    gb_debug("custom_board_init\n");
 
-    gb_debug("usb_init\n");
     usb_init();
+    gb_debug("usb_init\n");
 
-    gb_debug("amk_init\n");
     amk_driver_init();
-
-    amk_printf("board_init end\n");
+    gb_debug("amk_init\n");
 }
 
 
