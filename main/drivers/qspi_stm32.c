@@ -12,7 +12,7 @@
 #include "amk_printf.h"
 
 #ifndef QSPI_DEBUG
-#define QSPI_DEBUG 0
+#define QSPI_DEBUG 1
 #endif
 
 #if QSPI_DEBUG
@@ -168,6 +168,7 @@ amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t le
         return AMK_QSPI_INVALID_PARAM;
     } else {
         if (QSPI_EraseSector(&hqspi, address) != AMK_SUCCESS) {
+            qspi_debug("QSPI: write_sector: faled to erase sector:%u\n", address);
             return AMK_QSPI_ERROR;
         }
     }
@@ -217,6 +218,7 @@ amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t le
         cur += FLASH_PAGE_SIZE;
     }
     
+    qspi_debug("QSPI: write_sector:%u success\n", address);
     return AMK_SUCCESS;
 }
 
