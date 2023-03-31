@@ -23,25 +23,35 @@ void Error_Handler(void)
     __asm__("BKPT");
 }
 
+#ifdef USE_I2C1
 I2C_HandleTypeDef hi2c1;
 DMA_HandleTypeDef hdma_i2c1_rx;
 DMA_HandleTypeDef hdma_i2c1_tx;
+#endif
+
+#ifdef USE_ADC1
+ADC_HandleTypeDef hadc1;
+#endif
+
+RTC_HandleTypeDef hrtc;
 
 QSPI_HandleTypeDef hqspi;
 DMA_HandleTypeDef hdma_quadspi;
-
-RTC_HandleTypeDef hrtc;
 
 SPI_HandleTypeDef hspi1;
 DMA_HandleTypeDef hdma_spi1_tx;
 DMA_HandleTypeDef hdma_spi1_rx;
 
+#ifdef USE_PWM_TIM2
 TIM_HandleTypeDef htim2;
 DMA_HandleTypeDef hdma_tim2_ch1;
+#endif
 
+#ifdef USE_UART2
 UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
+#endif
 
 void SystemClock_Config(void)
 {
@@ -111,6 +121,8 @@ static void MX_RTC_Init(void)
     }
 }
 
+#ifdef USE_I2C1
+
 static void MX_I2C1_Init(void)
 {
     hi2c1.Instance = I2C1;
@@ -127,6 +139,7 @@ static void MX_I2C1_Init(void)
         Error_Handler();
     }
 }
+#endif
 
 static void MX_QUADSPI_Init(void)
 {
@@ -171,6 +184,7 @@ static void MX_SPI1_Init(void)
     #endif
 }
 
+#ifdef USE_PWM_TIM2
 extern void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim);
 
 static void MX_TIM2_Init(void)
@@ -181,7 +195,7 @@ static void MX_TIM2_Init(void)
     htim2.Instance = TIM2;
     htim2.Init.Prescaler = 0;
     htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim2.Init.Period = 4294967295;
+    htim2.Init.Period = PWM_TIM_PERIOD;
     htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
     if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
@@ -204,7 +218,9 @@ static void MX_TIM2_Init(void)
     }
     HAL_TIM_MspPostInit(&htim2);
 }
+#endif
 
+#ifdef USE_UART2
 static void MX_USART2_UART_Init(void)
 {
     huart2.Instance = USART2;
@@ -220,6 +236,7 @@ static void MX_USART2_UART_Init(void)
         Error_Handler();
     }
 }
+#endif
 
 static void MX_DMA_Init(void)
 {
@@ -280,17 +297,57 @@ void usb_port_init(void)
 
 }
 
+#ifdef USE_ADC1
+static void MX_ADC1_Init(void)
+{
+    ADC_ChannelConfTypeDef sConfig = {0};
+    /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
+     */
+    hadc1.Instance = ADC1;
+    hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
+    hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+    hadc1.Init.ScanConvMode = DISABLE;
+    hadc1.Init.ContinuousConvMode = DISABLE;
+    hadc1.Init.DiscontinuousConvMode = DISABLE;
+    hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+    hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+    hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+    hadc1.Init.NbrOfConversion = 1;
+    hadc1.Init.DMAContinuousRequests = DISABLE;
+    hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+    if (HAL_ADC_Init(&hadc1) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+     */
+    sConfig.Channel = ADC_CHANNEL_2;
+    sConfig.Rank = 1;
+    sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
+    if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+}
+#endif
+
 void custom_board_init(void)
 {
     SystemClock_Config();
 
     MX_GPIO_Init();
     MX_DMA_Init();
+#ifdef USE_I2C1
     MX_I2C1_Init();
+#endif
     MX_QUADSPI_Init();
     MX_SPI1_Init();
+#ifdef USE_PWM_TIM2
     MX_TIM2_Init();
+#endif
+#ifdef USE_UART2
     MX_USART2_UART_Init();
+#endif
     MX_RTC_Init();
 
 #ifdef DYNAMIC_CONFIGURATION
@@ -304,6 +361,10 @@ void custom_board_init(void)
     }
     amk_printf("usb_setting: %ld\n", usb_setting);
     HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0);
+#endif
+
+#ifdef USE_ADC1
+    MX_ADC1_Init();
 #endif
 
     usb_port_init();

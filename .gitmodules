@@ -30,3 +30,6 @@
 	path = libs/cmsis_freertos
 	url = https://github.com/ARM-software/CMSIS-FreeRTOS.git
 	ignore = dirty
+[submodule "libs/qmk"]
+	path = libs/qmk
+	url = https://github.com/yulei/qmk_lib.git

@@ -76,6 +76,7 @@ extern UART_HandleTypeDef huart2;
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
 
+#ifdef USE_I2C1
 /**
   * @brief This function handles DMA1 stream0 global interrupt.
   */
@@ -104,6 +105,8 @@ void DMA1_Stream1_IRQHandler(void)
   /* USER CODE END DMA1_Stream1_IRQn 1 */
 }
 
+#endif
+#ifdef USE_PWM_TIM2
 /**
   * @brief This function handles DMA1 stream5 global interrupt.
   */
@@ -117,7 +120,9 @@ void DMA1_Stream5_IRQHandler(void)
 
   /* USER CODE END DMA1_Stream5_IRQn 1 */
 }
+#endif
 
+#ifdef USE_UART2
 /**
   * @brief This function handles DMA1 stream6 global interrupt.
   */
@@ -145,6 +150,7 @@ void DMA1_Stream7_IRQHandler(void)
 
   /* USER CODE END DMA1_Stream7_IRQn 1 */
 }
+#endif
 
 /**
   * @brief This function handles DMA2 stream2 global interrupt.
@@ -192,6 +198,7 @@ void DMA2_Stream7_IRQHandler(void)
 
 /* USER CODE END 1 */
 
+#ifdef USE_UART2
 /**
   * @brief This function handles USART2 global interrupt.
   */
@@ -205,3 +212,4 @@ void USART2_IRQHandler(void)
 
   /* USER CODE END USART2_IRQn 1 */
 }
+#endif
