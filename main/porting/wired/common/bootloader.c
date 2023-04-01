@@ -16,12 +16,17 @@ extern void magic_write(uint32_t magic);
 void bootloader_jump(void)
 {
     magic_write(Bootloader_Magic);
-    amk_keymap_reset();
-    amk_keymap_macro_reset();
+    //amk_keymap_reset();
+    //amk_keymap_macro_reset();
 
 #if !defined(USB_HOST_ENABLE) && !defined(GD32E10X)
     usb_connect(0);
 #endif
     wait_ms(10);
+    NVIC_SystemReset();
+}
+
+void mcu_reset(void)
+{
     NVIC_SystemReset();
 }

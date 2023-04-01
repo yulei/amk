@@ -18,7 +18,9 @@
 
 #define MATRIX_ROW_PINS {A8,A9}
 #define MATRIX_COL_PINS {C6,C7,C8}
+#define DIODE_DIRECTION COL2ROW
 
+#if 0
 // screen configuration
 #if 0
 #define USE_SPI1
@@ -89,3 +91,4 @@
 //#define HSE_VALUE      12000000
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 //#define CFG_TUSB_CONFIG_FILE    "tusb_def_host.h"
+#endif

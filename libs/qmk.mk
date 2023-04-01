@@ -1,42 +1,62 @@
 
-QMK_PROTOCOL_DIR := $(LIB_DIR)/qmk/vial-qmk/tmk_core/protocol
-QMK_QUANTUM_DIR := $(LIB_DIR)/qmk/vial-qmk/quantum
+QMK_LIB_DIR := $(LIB_DIR)/qmk
+QMK_DIR := $(LIB_DIR)/qmk/vial-qmk
 
 SRCS += \
-	$(TMK_DIR)/common/host.c \
-	$(TMK_DIR)/common/keyboard.c \
-	$(TMK_DIR)/common/matrix.c \
-	$(TMK_DIR)/common/action.c \
-	$(TMK_DIR)/common/action_tapping.c  \
-	$(TMK_DIR)/common/action_macro.c \
-	$(TMK_DIR)/common/action_layer.c \
-	$(TMK_DIR)/common/debug.c \
-	$(TMK_DIR)/common/util.c  \
-	$(TMK_DIR)/common/hook.c \
+	$(QMK_LIB_DIR)/qmk_driver.c \
+    $(QMK_DIR)/quantum/quantum.c \
+    $(QMK_DIR)/quantum/bitwise.c \
+    $(QMK_DIR)/quantum/led.c \
+    $(QMK_DIR)/quantum/action.c \
+    $(QMK_DIR)/quantum/action_layer.c \
+    $(QMK_DIR)/quantum/action_tapping.c \
+    $(QMK_DIR)/quantum/action_util.c \
+    $(QMK_DIR)/quantum/eeconfig.c \
+    $(QMK_DIR)/quantum/keyboard.c \
+    $(QMK_DIR)/quantum/matrix_common.c \
+    $(QMK_DIR)/quantum/keymap_common.c \
+    $(QMK_DIR)/quantum/keycode_config.c \
+    $(QMK_DIR)/quantum/sync_timer.c \
+    $(QMK_DIR)/quantum/logging/debug.c \
+    $(QMK_DIR)/quantum/logging/print.c \
+    $(QMK_DIR)/quantum/logging/sendchar.c \
+    $(QMK_DIR)/quantum/bootmagic/bootmagic_lite.c \
+    $(QMK_DIR)/quantum/bootmagic/magic.c \
+    $(QMK_DIR)/quantum/debounce/sym_defer_g.c \
+
+SRCS += \
+    $(QMK_DIR)/tmk_core/protocol/host.c \
+    $(QMK_DIR)/tmk_core/protocol/report.c \
+
 
 INCS += \
-	$(TMK_DIR)/common \
+	$(QMK_DIR) \
+	$(QMK_DIR)/platforms \
+	$(QMK_DIR)/quantum \
+	$(QMK_DIR)/quantum/audio \
+	$(QMK_DIR)/quantum/bootmagic \
+	$(QMK_DIR)/quantum/logging \
+	$(QMK_DIR)/quantum/sequencer \
+	$(QMK_DIR)/tmk_core/protocol \
+	$(QMK_LIB_DIR) \
 
 APP_DEFS += \
 	-include config.h \
+	-DIGNORE_ATOMIC_BLOCK \
+    -DBOOTMAGIC_LITE \
+	-DEEPROM_CUSTOM \
+	-DEEPROM_SIZE=2048
 
 ifneq (yes,$(strip $(NKRO_AUTO_ENABLE)))
-	SRCS += $(TMK_DIR)/common/action_util.c
+	SRCS += $(QMK_DIR)/quantum/action_util.c
 endif
 
 ifeq (yes,$(strip $(MOUSEKEY_ENABLE)))
-    SRCS += $(TMK_DIR)/common/mousekey.c
+    SRCS += $(QMK_DIR)/quantum/mousekey.c
     APP_DEFS += -DMOUSEKEY_ENABLE
     APP_DEFS += -DMOUSE_ENABLE
 endif
 
 ifeq (yes,$(strip $(EXTRAKEY_ENABLE)))
     APP_DEFS += -DEXTRAKEY_ENABLE
-endif
-    
-ifeq (yes,$(strip $(ACTIONMAP_ENABLE)))
-	SRCS += $(TMK_DIR)/common/actionmap.c
-	APP_DEFS += -DACTIONMAP_ENABLE
-else
-	SRCS += $(TMK_DIR)/common/keymap.c
 endif

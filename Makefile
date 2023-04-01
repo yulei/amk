@@ -56,7 +56,8 @@ $(error Unsupported Target: $(GOALS))
 endif
 
 include $(MAIN_DIR)/main.mk
-include $(LIB_DIR)/tmk.mk
+#include $(LIB_DIR)/tmk.mk
+include $(LIB_DIR)/qmk.mk
 include $(LIB_DIR)/printf.mk
 ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
 VENDOR_DIR := libs/vendor/nordic

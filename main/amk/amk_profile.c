@@ -13,7 +13,7 @@
 #include "generic_hal.h"
 #include "amk_profile.h"
 #include "amk_printf.h"
-#include "amk_timer.h"
+//#include "amk_timer.h"
 
 #if defined(AMK_PROFILING) && !defined(DWT_DELAY)
 

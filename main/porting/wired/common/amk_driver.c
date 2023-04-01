@@ -12,18 +12,12 @@
 #include "usb_descriptors.h"
 #include "usb_interface.h"
 
-#include "report.h"
-#include "host.h"
-#include "keyboard.h"
-#include "suspend.h"
-#include "action_util.h"
-#include "mousekey.h"
-#include "wait.h"
 #include "amk_indicator.h"
 #include "amk_boot.h"
 #include "amk_profile.h"
 #include "amk_keymap.h"
 #include "amk_printf.h"
+#include "qmk_driver.h"
 
 #ifdef SCREEN_ENABLE
 #include "render.h"
@@ -105,10 +99,11 @@ void amk_driver_init(void)
 
 #ifdef KEYBOARD_ENABLE
     amk_printf("keyboard_init\n");
-    keyboard_init();
-    boot_init();
+    //keyboard_init();
+    //boot_init();
+    qmk_driver_init();
     host_set_driver(&amk_driver);
-    amk_keymap_init();
+    //amk_keymap_init();
 #endif
 
 #ifdef RF_ENABLE

@@ -3,6 +3,7 @@
  */
 
 #include "onekey.h"
+#if 0
 #include "rgb_common.h"
 #include "rgb_driver.h"
 #include "rgb_linear.h"
@@ -73,3 +74,4 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
     {0, 0, 12},
 //    {1, 4, 20},
 };
+#endif

@@ -115,7 +115,8 @@ LIBS += -lc -lnosys -lm
 # Compiler flags to generate dependency files.
 GENDEPFLAGS = -MMD 
 
-INC_FLAGS = $(addprefix -I,$(sort $(strip $(INCS))))
+#INC_FLAGS = $(addprefix -I,$(sort $(strip $(INCS))))
+INC_FLAGS = $(addprefix -I,$(strip $(INCS)))
 
 ALL_CFLAGS = -std=gnu99 $(CFLAGS) $(GENDEPFLAGS) $(INC_FLAGS)
 ALL_CPPFLAGS = -x c++ $(CPPFLAGS) $(GENDEPFLAGS) $(INC_FLAGS)

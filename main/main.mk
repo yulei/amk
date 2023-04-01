@@ -16,16 +16,11 @@ ifeq (yes, $(strip $(CDC_ENABLE)))
 endif
 
 SRCS += \
-	$(MAIN_DIR)/amk/amk_action.c \
-	$(MAIN_DIR)/amk/amk_keymap.c \
-	$(MAIN_DIR)/amk/amk_macro.c \
 	$(MAIN_DIR)/amk/amk_printf.c \
-	$(MAIN_DIR)/amk/amk_eeprom.c \
-	$(MAIN_DIR)/amk/amk_boot.c \
 	$(MAIN_DIR)/amk/amk_indicator.c \
 	$(MAIN_DIR)/amk/amk_cmd.c \
-	$(MAIN_DIR)/amk/amk_queue.c \
 	$(MAIN_DIR)/amk/amk_profile.c \
+	$(MAIN_DIR)/amk/amk_queue.c \
 	$(MAIN_DIR)/amk/report_queue.c \
 	$(MAIN_DIR)/amk/ring_buffer.c \
 	$(MAIN_DIR)/amk/linear_buffer.c \

@@ -16,7 +16,7 @@
 
 #include "eeconfig.h"
 
-#define EECONFIG_KEYBOARD           (uint32_t*)8
+//#define EECONFIG_KEYBOARD           (uint32_t*)8
 #define EECONFIG_KEYMAP_MAGIC       (uint16_t*)12
 #define EECONFIG_KEYMAP_MACRO_MAGIC (uint16_t*)14
 #define EECONFIG_RGB                (uint8_t*)16        // 7 * 6 bytes
@@ -24,7 +24,7 @@
 #define EECONFIG_LAYOUT_OPTIONS     (uint8_t*)62        // 1 bytes
 #define EECONFIG_DEVICE             (uint8_t*)63        // 1 bytes
 
-#define EECONFIG_SIZE               64
+//#define EECONFIG_SIZE               64
 #define EEPROM_SIZE                 2048
 
 // eeconfig setting
