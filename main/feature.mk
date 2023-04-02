@@ -110,20 +110,20 @@ ifeq (yes, $(strip $(AUDIO_ENABLE)))
 endif
 
 ifeq (yes, $(strip $(VIAL_ENABLE)))
-	INCS += $(MAIN_DIR)/vial
-	SRCS += $(MAIN_DIR)/vial/vial_porting.c
-	SRCS += $(MAIN_DIR)/vial/vial_macro.c
-	SRCS += $(MAIN_DIR)/vial/keycode_convert.c
-	SRCS += $(MAIN_DIR)/vial/send_string.c
-	APP_DEFS += -DVIAL_ENABLE
-	APP_DEFS += -DKEYMAP_CONFIG_ENABLE	
-	ACTIONMAP_ENABLE := yes
+#	INCS += $(MAIN_DIR)/vial
+#	SRCS += $(MAIN_DIR)/vial/vial_porting.c
+#	SRCS += $(MAIN_DIR)/vial/vial_macro.c
+#	SRCS += $(MAIN_DIR)/vial/keycode_convert.c
+#	SRCS += $(MAIN_DIR)/vial/send_string.c
+#	APP_DEFS += -DVIAL_ENABLE
+#	APP_DEFS += -DKEYMAP_CONFIG_ENABLE	
+#	ACTIONMAP_ENABLE := yes
 endif
 
 ifneq (yes, $(strip $(CUSTOM_MATRIX)))
-	#SRCS += $(MAIN_DIR)/amk/matrix_scan.c
-	#SRCS += $(MAIN_DIR)/amk/debounce/debounce.c
-	#INCS += $(MAIN_DIR)/amk/debounce
+#	SRCS += $(MAIN_DIR)/amk/matrix_scan.c
+#	SRCS += $(MAIN_DIR)/amk/debounce/debounce.c
+#	INCS += $(MAIN_DIR)/amk/debounce
 endif
 
 ifeq (yes, $(EECONFIG_FRAM)) 
