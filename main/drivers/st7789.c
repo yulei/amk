@@ -114,7 +114,7 @@
 
 // based on Adafruit ST7789 library for Arduino
 static const uint8_t init_cmds1[] = { // Init for 7789R, part 1 (red or green tab)
-    9,                          //  9 commands in list:
+    10,                          //  9 commands in list:
     ST7789_SWRESET, DELAY,      //  1: Software reset, no args, w/delay
     150,                        //     ~150 ms delay
     ST7789_SLPOUT,  DELAY,      //  2: Out of sleep mode, no args, w/delay
@@ -135,6 +135,8 @@ static const uint8_t init_cmds1[] = { // Init for 7789R, part 1 (red or green ta
     320>>8,
     320&0xFF, //     YEND = 320
     ST7789_INVON,   DELAY,      //  7: hack
+    10,
+    ST7789_SLPOUT,  DELAY,
     10,
     ST7789_NORON,   DELAY,      //  8: Normal display on, no args, w/delay
     10,                         //     10 ms delay
@@ -166,8 +168,9 @@ static void st7789_unselect(st7789_t *driver)
 static void st7789_reset(st7789_t *driver)
 {
     gpio_write_pin(driver->param.reset, 0);
-    wait_ms(5);
+    wait_ms(50);
     gpio_write_pin(driver->param.reset, 1);
+    wait_ms(50);
 }
 
 static void write_command(st7789_t *driver, uint8_t cmd)
@@ -264,7 +267,7 @@ void st7789_init(screen_driver_t *lcd)
     execute_commands(driver, init_cmds1);
     execute_commands(driver, init_cmds2);
     set_address_window(driver, 0, 0, ST7789_WIDTH-1, ST7789_HEIGHT-1);
-    uint16_t color = 0;
+    uint16_t color = 0x0;
     for (int x = 0; x < ST7789_WIDTH; x++) {
         for (int y = 0; y < ST7789_HEIGHT; y++) {
             write_data(driver, (uint8_t*)&color, sizeof(color));
