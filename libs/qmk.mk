@@ -4,6 +4,7 @@ QMK_DIR := $(LIB_DIR)/qmk/vial-qmk
 
 SRCS += \
 	$(QMK_LIB_DIR)/qmk_driver.c \
+	$(QMK_LIB_DIR)/matrix_scan.c \
 
 SRCS += \
     $(QMK_DIR)/quantum/quantum.c \
@@ -65,6 +66,8 @@ endif
 
 ifeq ($(strip $(VIAL_ENABLE)), yes)
     SRCS += $(QMK_DIR)/quantum/dynamic_keymap.c
+    SRCS += $(QMK_DIR)/quantum/keymap_introspection.c
+
     APP_DEFS += -DDYNAMIC_KEYMAP_ENABLE
     SRCS += $(QMK_DIR)/quantum/via.c
     APP_DEFS += -DVIA_ENABLE
@@ -84,6 +87,10 @@ ifeq ($(strip $(VIAL_ENABLE)), yes)
     APP_DEFS += -DSEND_STRING_ENABLE
     INCS += $(QMK_DIR)/quantum/send_string
     SRCS += $(QMK_DIR)/quantum/send_string/send_string.c
+endif
+
+ifeq ($(strip $(VIAL_INSECURE)), yes)
+    APP_DEFS += -DVIAL_INSECURE
 endif
 
 ifeq ($(strip $(VIALRGB_ENABLE)), yes)
@@ -106,4 +113,19 @@ ifeq ($(strip $(AUTO_SHIFT_ENABLE)), yes)
     ifeq ($(strip $(AUTO_SHIFT_MODIFIERS)), yes)
         APP_DEFS += -DAUTO_SHIFT_MODIFIERS
     endif
+endif
+
+ifeq (yes, $(strip $(VIAL_ENABLE)))
+$(QMK_DIR)/quantum/vial.c: $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h
+
+$(KEYBOARD_DIR)/vial_generated_keyboard_definition.h: $(KEYBOARD_DIR)/vial.json
+	python3 $(QMK_DIR)/util/vial_generate_definition.py $(KEYBOARD_DIR)/vial.json $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h
+
+$(QMK_DIR)/quantum/via.c: $(KEYBOARD_DIR)/version.h
+
+$(KEYBOARD_DIR)/version.h: FORCE
+	python3 $(QMK_LIB_DIR)/generate_version.py $(QMK_DIR) $(KEYBOARD_DIR)/version.h
+
+FORCE:
+
 endif

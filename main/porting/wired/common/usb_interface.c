@@ -16,8 +16,8 @@
 #include "amk_macro.h"
 
 #ifdef VIAL_ENABLE
-#include "vial_porting.h"
-#include "vial_macro.h"
+//#include "vial_porting.h"
+//#include "vial_macro.h"
 #endif
 
 #ifndef USBITF_DEBUG
@@ -75,7 +75,7 @@ void usb_task_report(void)
     }
 
 #ifdef VIAL_ENABLE
-    vial_task();
+    //vial_task();
 #endif
 }
 
@@ -121,6 +121,7 @@ static void process_report_queue(hid_report_queue_t * queue)
 #ifdef VIAL_ENABLE
 static void process_macro(hid_report_queue_t *queue)
 {
+    #if 0
     hid_report_t *item = hid_report_queue_peek(queue);
     amk_macro_t *macro = (amk_macro_t*)&(item->data[0]);
     amk_macro_state = 1;
@@ -129,6 +130,7 @@ static void process_macro(hid_report_queue_t *queue)
         hid_report_queue_pop(queue);
     }
     amk_macro_state = 0;
+    #endif
 }
 #endif
 
