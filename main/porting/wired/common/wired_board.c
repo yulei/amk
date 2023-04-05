@@ -30,10 +30,6 @@
 #include "rf_driver.h"
 #endif
 
-#ifdef NKRO_AUTO_ENABLE
-//#include "amk_action_util.h"
-#endif
-
 #ifndef GENERIC_BOARD_DEBUG
 #define GENERIC_BOARD_DEBUG 1
 #endif

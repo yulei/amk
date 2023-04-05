@@ -39,8 +39,8 @@
 #include "rf_driver.h"
 #endif
 
-#ifdef NKRO_AUTO_ENABLE
-//#include "amk_action_util.h"
+#ifdef NKRO_ENABLE
+#include "keycode_config.h"
 #endif
 
 #ifndef SUSPEND_WAKEUP_DELAY
@@ -163,7 +163,7 @@ void send_keyboard(report_keyboard_t *report)
 {
 #ifdef RF_ENABLE
     if(usb_setting & USB_OUTPUT_RF) {
-    #ifdef NKRO_AUTO_ENABLE
+    #ifdef NKRO_ENABLE
         if(keymap_config.nkro) {
             rf_driver_put_report(HID_REPORT_ID_NKRO, &report->nkro, sizeof(struct nkro_report));
             return;
@@ -174,7 +174,7 @@ void send_keyboard(report_keyboard_t *report)
 #endif
     {
         if (!usb_suspended()) {
-        #ifdef NKRO_AUTO_ENABLE
+        #ifdef NKRO_ENABLE
             if(keymap_config.nkro) {
                 usb_send_report(HID_REPORT_ID_NKRO, &report->nkro, sizeof(struct nkro_report));
                 amk_printf("NKRO report to queue\n");

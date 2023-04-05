@@ -171,7 +171,6 @@ ifeq (yes, $(strip $(MATRIX_EC_ENABLE)))
 	APP_DEFS += -DMATRIX_EC
 endif
 
-ifeq (yes,$(strip $(NKRO_AUTO_ENABLE)))
-	APP_DEFS += -DNKRO_AUTO_ENABLE
+ifeq (yes,$(strip $(NKRO_ENABLE)))
 	APP_DEFS += -DNKRO_ENABLE
 endif

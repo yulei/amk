@@ -96,7 +96,6 @@ bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t si
         }
         break;
     case HID_REPORT_ID_NKRO:
-        amk_printf("sent nkro report: %d\n", size);
         if (!tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_NKRO, data, (uint8_t)size)) {
             amk_printf("failed to sent nkro report\n");
             return false;

@@ -36,7 +36,7 @@
 #define RGB_MATRIX_LED_NUM  97
 #define RGB_MATRIX_NUM      1
 
-#define RABBIT_VER
+//#define RABBIT_VER
 
 #ifdef RABBIT_VER
 #define IS31FL3236_LED_NUM  6
