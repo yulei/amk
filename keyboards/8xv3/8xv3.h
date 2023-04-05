@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include "amk_keycode.h"
+#include "quantum.h"
+#define GC_NO KC_NO
 
 #define LAYOUT_default( \
     K601,       K602, K603, K604, K605, K606, K607, K608, K609, K610, K611, K612, K613,          K614, K615, K616, \

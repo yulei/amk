@@ -20,7 +20,9 @@ SRCS += \
 	$(MAIN_DIR)/amk/amk_indicator.c \
 	$(MAIN_DIR)/amk/amk_cmd.c \
 	$(MAIN_DIR)/amk/amk_profile.c \
+	$(MAIN_DIR)/amk/amk_process_keycode.c \
 	$(MAIN_DIR)/amk/amk_queue.c \
+	$(MAIN_DIR)/amk/amk_eeprom.c \
 	$(MAIN_DIR)/amk/report_queue.c \
 	$(MAIN_DIR)/amk/ring_buffer.c \
 	$(MAIN_DIR)/amk/linear_buffer.c \

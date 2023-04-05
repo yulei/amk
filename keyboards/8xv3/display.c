@@ -235,7 +235,7 @@ void matrix_init_kb(void)
 
     if (update) {
         kbd = (y<<8) | x;
-        eeconfig_write_kb(kbd);
+        eeconfig_update_kb(kbd);
         disp_debug("eeconfig: update display, X=%d, Y=%d\n", x, y);
     }
 }
@@ -324,27 +324,22 @@ void screen_task_kb(void)
 {
 }
 
-#include "action.h"
-#include "action_layer.h"
+#include "quantum.h"
 #include "usb_interface.h"
 
-bool hook_process_action_main(keyrecord_t *record)
+bool process_record_kb(uint16_t keycode, keyrecord_t *record)
 {
-    if (IS_NOEVENT(record->event) || !record->event.pressed) { 
-        return false;
-    }
-    action_t action = layer_switch_get_action(record->event);
-    if (action.kind.id != ACT_MODS) {
-        return false;
+    if (!record->event.pressed) {
+        return true;
     }
 
-    switch(action.key.code) {
+    switch(keycode) {
 #ifdef TYPING_SPEED
         case KC_F14:
             typing_enable = !typing_enable;
             if(typing_enable) update_speed();
             disp_debug("typing enabled: %d\n", typing_enable);
-            return true;
+            return false;
 #endif
         case KC_F15:
             screen_adjust = !screen_adjust;
@@ -352,48 +347,48 @@ bool hook_process_action_main(keyrecord_t *record)
             if (!screen_adjust) {
                 // save to eeprom
                 uint32_t kbd = (renders[0].y<<8) | renders[0].x;
-                eeconfig_write_kb(kbd);
+                eeconfig_update_kb(kbd);
                 disp_debug("screen adjust saved: 0x%x\n", kbd);
             }
-            break;
+            return false;
         case KC_F16:
             screen_enable = !screen_enable;
             set_screen_state(screen_enable);
             disp_debug("screen enabled: %d\n", screen_enable);
-            return true;
+            return false;
         case KC_LEFT:
             if (!screen_adjust) return false;
             renders[0].x = decrease_min(renders[0].x, ANIM_X_MIN);
-            return true;
+            return false;
         case KC_RIGHT:
             if (!screen_adjust) return false;
             renders[0].x = increase_max(renders[0].x, ANIM_X_MAX);
-            return true;
+            return false;
         case KC_UP:
             if (!screen_adjust) return false;
             renders[0].y = decrease_min(renders[0].y, ANIM_Y_MIN);
-            return true;
+            return false;
         case KC_DOWN:
             if (!screen_adjust) return false;
             renders[0].y = increase_max(renders[0].y, ANIM_Y_MAX);
-            return true;
+            return false;
         case KC_F21: {
             render_t *render = NULL;
             render = &renders[0];
             render->mode = (render->mode+1) % MODE_MAX;
-        } return true;
+        } return false;
         //case KC_F23:
         //    msc_erase();
         //    reset_to_msc(true);
-        //    return true;
+        //    return false;
         case KC_F24: 
             reset_to_msc((usb_setting & USB_MSC_BIT) ? false : true);
-            return true;
+            return false;
         default:
             break;
     }
 
-    return false;
+    return true;
 }
 
 static void reset_to_msc(bool msc)

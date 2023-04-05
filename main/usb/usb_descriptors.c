@@ -75,7 +75,7 @@
         HID_REPORT_COUNT ( 1                                       ) ,\
         HID_REPORT_SIZE  ( 3                                       ) ,\
         HID_OUTPUT       ( HID_CONSTANT                            ) ,\
-    HID_COLLECTION_END \
+    HID_COLLECTION_END
 
 #define VIAL_USAGE_PAGE     0xFF60
 #define VIAL_USAGE_ID       0x61

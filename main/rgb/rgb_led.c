@@ -11,7 +11,7 @@
 #ifdef RGB_INDICATOR_ENABLE
 #include "rgb_indicator.h"
 #endif
-#ifdef RGB_MATRIX_ENABLE
+#ifdef AMK_RGB_MATRIX_ENABLE
 #include "rgb_matrix.h"
 //#include "rgb_effect_matrix.h"
 #include "rgb_effect_matrix_qmk.h"
@@ -45,7 +45,7 @@
     #define RGB_INDICATOR_CONFIG_NUM    0
 #endif
 
-#ifdef RGB_MATRIX_ENABLE
+#ifdef AMK_RGB_MATRIX_ENABLE
     #define RGB_MATRIX_CONFIG_NUM       RGB_MATRIX_NUM
 #else
     #define RGB_MATRIX_CONFIG_NUM       0
@@ -103,7 +103,7 @@ void rgb_led_init(void)
     rgb_indicator_init();
 #endif
 
-#ifdef RGB_MATRIX_ENABLE
+#ifdef AMK_RGB_MATRIX_ENABLE
     rgb_matrix_init();
 #endif
 }
@@ -122,7 +122,7 @@ void rgb_led_task(void)
     rgb_indicator_task();
 #endif
 
-#ifdef RGB_MATRIX_ENABLE
+#ifdef AMK_RGB_MATRIX_ENABLE
     rgb_matrix_task();
 #endif
 
@@ -210,7 +210,7 @@ static void rgb_led_effect_init_mode(rgb_config_t *config)
         case RGB_EFFECT_INDICATOR:
         break;
 #endif
-#ifdef RGB_MATRIX_ENABLE
+#ifdef AMK_RGB_MATRIX_ENABLE
         case RGB_EFFECT_MATRIX:
             rgb_effect_matrix_init_mode(config->data);
         break;
@@ -231,7 +231,7 @@ static uint8_t rgb_led_effect_max(rgb_config_t *config)
         case RGB_EFFECT_INDICATOR:
         break;
 #endif
-#ifdef RGB_MATRIX_ENABLE
+#ifdef AMK_RGB_MATRIX_ENABLE
         case RGB_EFFECT_MATRIX:
             return RM_EFFECT_MAX;
 #endif
@@ -380,7 +380,7 @@ void rgb_led_prepare_sleep(void)
 #ifdef RGB_INDICATOR_ENABLE
     rgb_indicator_prepare_sleep();
 #endif
-#ifdef RGB_MATRIX_ENABLE
+#ifdef AMK_RGB_MATRIX_ENABLE
 #endif
 
     // shutdown drivers

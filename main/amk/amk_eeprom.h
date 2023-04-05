@@ -10,88 +10,15 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
-
 #include "eeconfig.h"
 
-//#define EECONFIG_KEYBOARD           (uint32_t*)8
-#define EECONFIG_KEYMAP_MAGIC       (uint16_t*)12
-#define EECONFIG_KEYMAP_MACRO_MAGIC (uint16_t*)14
-#define EECONFIG_RGB                (uint8_t*)16        // 7 * 6 bytes
-#define EECONFIG_FRAME              (uint32_t*)58       // 4 bytes
-#define EECONFIG_LAYOUT_OPTIONS     (uint8_t*)62        // 1 bytes
-#define EECONFIG_DEVICE             (uint8_t*)63        // 1 bytes
+#define EECONFIG_RGB_MAX_COUNT      8       // support rgb maximum as 8
+#define EECONFIG_RGB_SIZE           6       // one rgb need 6 bytes storage
+#define EECONFIG_RGB                (uint8_t*)(EEPROM_SIZE)
+#define AMK_EEPROM_SIZE             (EEPROM_SIZE+EECONFIG_RGB_MAX_COUNT*EECONFIG_RGB_SIZE)
 
-//#define EECONFIG_SIZE               64
-#define EEPROM_SIZE                 2048
-
-// eeconfig setting
-uint32_t eeconfig_read_frame(void);
-void eeconfig_write_frame(uint32_t data);
-void eeconfig_update_frame(uint32_t data);
-
-uint32_t eeconfig_read_kb(void);
-void eeconfig_write_kb(uint32_t data);
-void eeconfig_update_kb(uint32_t data);
-
+#ifdef RGB_ENABLE
 void eeconfig_read_rgb(void* rgb, uint8_t index);
 void eeconfig_write_rgb(const void* rgb, uint8_t index);
 void eeconfig_update_rgb(const void* rgb, uint8_t index);
-
-uint8_t eeconfig_read_layout_options(void);
-void eeconfig_write_layout_options(uint8_t);
-void eeconfig_update_layout_options(uint8_t);
-
-uint8_t eeconfig_read_device(void);
-void eeconfig_write_device(uint8_t);
-void eeconfig_update_device(uint8_t);
-
-// eeprom read/write functions
-uint8_t eeprom_read_byte(const uint8_t *Address);
-void eeprom_write_byte(uint8_t *Address, uint8_t Value);
-void eeprom_update_byte(uint8_t *Address, uint8_t Value);
-
-uint16_t eeprom_read_word(const uint16_t *Address);
-void eeprom_write_word(uint16_t *Address, uint16_t Value);
-void eeprom_update_word(uint16_t *Address, uint16_t Value);
-
-uint32_t eeprom_read_dword(const uint32_t *Address);
-void eeprom_write_dword(uint32_t *Address, uint32_t Value);
-void eeprom_update_dword(uint32_t *Address, uint32_t Value);
-
-void eeprom_read_block(void *buf, const void *addr, size_t len);
-void eeprom_write_block(const void *buf, void *addr, size_t len);
-void eeprom_update_block(const void *buf, void *addr, size_t len);
-
-
-//************************************
-// eeprom keymap
-//************************************
-#define EEKEYMAP_START_ADDR         EECONFIG_SIZE
-#ifndef EEKEYMAP_MAX_LAYER
-#define EEKEYMAP_MAX_LAYER          4
 #endif
-#define EEKEYMAP_SIZE               (MATRIX_COLS*MATRIX_ROWS*EEKEYMAP_MAX_LAYER)
-
-#define EEKEYMAP_MACRO_START_ADDR   (EECONFIG_SIZE+EEKEYMAP_SIZE)
-#define EEKEYMAP_MACRO_SIZE         (EEPROM_SIZE-EEKEYMAP_MACRO_START_ADDR)
-#ifndef EEKEYMAP_MACRO_COUNT
-#define EEKEYMAP_MACRO_COUNT        16
-#endif
-
-bool ee_keymap_is_valid(void);
-void ee_keymap_set_valid(bool valid);
-
-void ee_keymap_write_key(uint8_t layer, uint8_t row, uint8_t col, uint16_t key);
-uint16_t ee_keymap_read_key(uint8_t layer, uint8_t row, uint8_t col);
-void ee_keymap_write_buffer(uint16_t offset, uint16_t size, uint8_t *data);
-void ee_keymap_read_buffer(uint16_t offset, uint16_t size, uint8_t *data);
-
-bool ee_macro_is_valid(void);
-void ee_macro_set_valid(bool valid);
-
-void ee_macro_reset(void);
-void ee_macro_read_buffer(uint16_t offset, uint16_t size, uint8_t *data);
-void ee_macro_write_buffer(uint16_t offset, uint16_t size, uint8_t *data);

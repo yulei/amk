@@ -69,7 +69,7 @@ ifeq (yes, $(strip $(RGB_MATRIX_ENABLE)))
 	#SRCS += $(MAIN_DIR)/rgb/rgb_effect_matrix.c
 	SRCS += $(MAIN_DIR)/rgb/rgb_effect_matrix_qmk.c
 	SRCS += $(MAIN_DIR)/rgb/qmk/lib8tion/lib8tion.c
-	APP_DEFS += -DRGB_MATRIX_ENABLE
+	APP_DEFS += -DAMK_RGB_MATRIX_ENABLE
 	RGB_ENABLE = yes
 endif
 
@@ -172,6 +172,6 @@ ifeq (yes, $(strip $(MATRIX_EC_ENABLE)))
 endif
 
 ifeq (yes,$(strip $(NKRO_AUTO_ENABLE)))
-	SRCS += $(MAIN_DIR)/amk/amk_action_util.c
 	APP_DEFS += -DNKRO_AUTO_ENABLE
+	APP_DEFS += -DNKRO_ENABLE
 endif

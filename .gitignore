@@ -13,3 +13,4 @@ sdk_samd/d21/gcc/*
 *.hex
 *.elf
 *.uf2
+keyboards/**/version.h

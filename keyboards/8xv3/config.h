@@ -93,7 +93,6 @@
 #define RENDER_BUFFER_SIZE  (128*128*2)
 
 // vial 
-#define VIAL_INSECURE
 #define VIAL_KEYBOARD_UID {0xD0, 0xD0, 0x10, 0x8F, 0x9D, 0x7A, 0x29, 0x92}
 
 // custom tusb definitions

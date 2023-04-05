@@ -44,6 +44,8 @@ else
 $(error Invalid target: $(GOALS))
 endif
 
+APP_DEFS += -DKEYMAP_C=\"$(TARGET)_keymap.c\"
+
 KEYBOARDS := $(sort $(notdir $(wildcard $(BASE_DIR)/*)))
 KEYBOARD_DIR := $(BASE_DIR)/$(TARGET)
 INCS += $(KEYBOARD_DIR)

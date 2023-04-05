@@ -31,7 +31,7 @@
 #endif
 
 #ifdef NKRO_AUTO_ENABLE
-#include "amk_action_util.h"
+//#include "amk_action_util.h"
 #endif
 
 #ifndef GENERIC_BOARD_DEBUG

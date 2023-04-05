@@ -17,9 +17,9 @@
 #define EEPROM_INVALID_ADDRESS  0xFFFF
 #define EEPROM_EMPTY_VALUE      0x00
 #define FLASH_EMPTY_VALUE       0xFF
-#define IS_VALID_ADDR(x)        ((x) >= 0 && (x) < EEPROM_SIZE)
+#define IS_VALID_ADDR(x)        ((x) >= 0 && (x) < AMK_EEPROM_SIZE)
 
-static uint8_t buffer[EEPROM_SIZE];
+static uint8_t buffer[AMK_EEPROM_SIZE];
 
 static void fee_erase(void);
 static void fee_backup(void);
@@ -157,7 +157,7 @@ static void fee_backup(void)
 static void fee_restore(void)
 {
     uint32_t cur = flash_base_address;
-    for (uint8_t i = 0; i < EEPROM_SIZE; i++) {
+    for (uint8_t i = 0; i < AMK_EEPROM_SIZE; i++) {
         if (buffer[i] != EEPROM_EMPTY_VALUE) {
             flash_write(cur, i, buffer[i]);
             cur += flash_unit_size;

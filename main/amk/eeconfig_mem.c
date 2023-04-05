@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include "amk_eeprom.h"
 
-static uint8_t buffer[EEPROM_SIZE];
+static uint8_t buffer[AMK_EEPROM_SIZE];
 
 uint8_t eeprom_read_byte(const uint8_t *addr) {
     uintptr_t offset = (uintptr_t)addr;

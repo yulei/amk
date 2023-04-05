@@ -40,7 +40,7 @@
 #endif
 
 #ifdef NKRO_AUTO_ENABLE
-#include "amk_action_util.h"
+//#include "amk_action_util.h"
 #endif
 
 #ifndef SUSPEND_WAKEUP_DELAY
@@ -163,21 +163,26 @@ void send_keyboard(report_keyboard_t *report)
 {
 #ifdef RF_ENABLE
     if(usb_setting & USB_OUTPUT_RF) {
-        rf_driver_put_report(CMD_KEY_REPORT, report, sizeof(report_keyboard_t));
+    #ifdef NKRO_AUTO_ENABLE
+        if(keymap_config.nkro) {
+            rf_driver_put_report(HID_REPORT_ID_NKRO, &report->nkro, sizeof(struct nkro_report));
+            return;
+        }
+    #endif
+        rf_driver_put_report(CMD_KEY_REPORT, report, KEYBOARD_REPORT_SIZE);
     } else 
 #endif
     {
         if (!usb_suspended()) {
-#ifdef NKRO_AUTO_ENABLE
-            amk_report_t *arp = (amk_report_t *)report;
-            if (arp->nkro_mode) {
-                usb_send_report(HID_REPORT_ID_NKRO, &arp->nkro.raw[0], sizeof(amk_nkro_t));
-            } else {
-                usb_send_report(HID_REPORT_ID_KEYBOARD, &arp->std.raw[0], sizeof(report_keyboard_t));
+        #ifdef NKRO_AUTO_ENABLE
+            if(keymap_config.nkro) {
+                usb_send_report(HID_REPORT_ID_NKRO, &report->nkro, sizeof(struct nkro_report));
+                amk_printf("NKRO report to queue\n");
+                return;
             }
-#else
-            usb_send_report(HID_REPORT_ID_KEYBOARD, report, sizeof(report_keyboard_t));
-#endif
+        #endif
+            amk_printf("STD report to queue\n");
+            usb_send_report(HID_REPORT_ID_KEYBOARD, report, KEYBOARD_REPORT_SIZE);
         }
     }
 }

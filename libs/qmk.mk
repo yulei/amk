@@ -2,9 +2,18 @@
 QMK_LIB_DIR := $(LIB_DIR)/qmk
 QMK_DIR := $(LIB_DIR)/qmk/vial-qmk
 
+include $(QMK_LIB_DIR)/qmk_feature.mk
+
 SRCS += \
 	$(QMK_LIB_DIR)/qmk_driver.c \
-	$(QMK_LIB_DIR)/matrix_scan.c \
+
+ifneq (yes,$(strip $(AMK_CUSTOM_MATRIX)))
+	SRCS += $(QMK_LIB_DIR)/matrix_scan.c
+endif
+
+SRCS += \
+	$(QMK_LIB_DIR)/protocol/host.c \
+	$(QMK_LIB_DIR)/protocol/report.c \
 
 SRCS += \
     $(QMK_DIR)/quantum/quantum.c \
@@ -20,18 +29,12 @@ SRCS += \
     $(QMK_DIR)/quantum/keymap_common.c \
     $(QMK_DIR)/quantum/keycode_config.c \
     $(QMK_DIR)/quantum/sync_timer.c \
+    $(QMK_DIR)/quantum/bootmagic/bootmagic_lite.c \
+    $(QMK_DIR)/quantum/bootmagic/magic.c \
     $(QMK_DIR)/quantum/logging/debug.c \
     $(QMK_DIR)/quantum/logging/print.c \
     $(QMK_DIR)/quantum/logging/sendchar.c \
-    $(QMK_DIR)/quantum/bootmagic/bootmagic_lite.c \
-    $(QMK_DIR)/quantum/bootmagic/magic.c \
     $(QMK_DIR)/quantum/debounce/sym_defer_g.c \
-    $(QMK_DIR)/quantum/mousekey.c \
-
-SRCS += \
-    $(QMK_DIR)/tmk_core/protocol/host.c \
-    $(QMK_DIR)/tmk_core/protocol/report.c \
-
 
 INCS += \
 	$(QMK_DIR) \
@@ -41,15 +44,17 @@ INCS += \
 	$(QMK_DIR)/quantum/bootmagic \
 	$(QMK_DIR)/quantum/logging \
 	$(QMK_DIR)/quantum/sequencer \
-	$(QMK_DIR)/tmk_core/protocol \
+
+INCS += \
 	$(QMK_LIB_DIR) \
+	$(QMK_LIB_DIR)/protocol \
 
 APP_DEFS += \
 	-include config.h \
 	-DIGNORE_ATOMIC_BLOCK \
     -DBOOTMAGIC_LITE \
 	-DEEPROM_CUSTOM \
-	-DEEPROM_SIZE=2048
+	-DEEPROM_SIZE=2000
 
 MOUSEKEY_ENABLE := yes
 EXTRAKEY_ENABLE := yes
@@ -75,7 +80,6 @@ ifeq ($(strip $(VIAL_ENABLE)), yes)
 
     VIAL_INSECURE ?= yes
     QMK_SETTINGS ?= no
-    TAP_DANCE_ENABLE ?= no
     ifeq ($(strip $(TAP_DANCE_ENABLE)), yes)
         APP_DEFS += -DTAPPING_TERM_PER_KEY
     endif
@@ -119,12 +123,12 @@ ifeq (yes, $(strip $(VIAL_ENABLE)))
 $(QMK_DIR)/quantum/vial.c: $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h
 
 $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h: $(KEYBOARD_DIR)/vial.json
-	python3 $(QMK_DIR)/util/vial_generate_definition.py $(KEYBOARD_DIR)/vial.json $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h
+	@python3 $(QMK_DIR)/util/vial_generate_definition.py $(KEYBOARD_DIR)/vial.json $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h
 
 $(QMK_DIR)/quantum/via.c: $(KEYBOARD_DIR)/version.h
 
 $(KEYBOARD_DIR)/version.h: FORCE
-	python3 $(QMK_LIB_DIR)/generate_version.py $(QMK_DIR) $(KEYBOARD_DIR)/version.h
+	@python3 $(QMK_LIB_DIR)/generate_version.py $(QMK_DIR) $(KEYBOARD_DIR)/version.h
 
 FORCE:
 
