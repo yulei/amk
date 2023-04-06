@@ -25,6 +25,11 @@ uint8_t rb_read_byte(ring_buffer_t *ring)
     return byte;
 }
 
+uint8_t rb_peek_byte(ring_buffer_t *ring)
+{
+    return ring->data[ring->tail];
+}
+
 uint32_t rb_used_count(ring_buffer_t *ring)
 {
     if (ring->head >= ring->tail) {

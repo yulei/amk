@@ -106,6 +106,11 @@ void amk_driver_init(void)
     //amk_keymap_init();
 #endif
 
+#ifdef RGB_ENABLE
+    amk_printf("rgb_led_init\n");
+    rgb_led_init();
+#endif
+
 #ifdef RF_ENABLE
     amk_printf("rf_driver_init\n");
     rf_driver_init(false);

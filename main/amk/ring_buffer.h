@@ -16,6 +16,7 @@ typedef struct {
 void rb_init(ring_buffer_t *ring, uint8_t *data, uint32_t size);
 void rb_write_byte(ring_buffer_t *ring, uint8_t byte);
 uint8_t rb_read_byte(ring_buffer_t *ring);
+uint8_t rb_peek_byte(ring_buffer_t *ring);
 uint32_t rb_used_count(ring_buffer_t *ring);
 uint32_t rb_free_count(ring_buffer_t *ring);
 

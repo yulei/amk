@@ -34,7 +34,6 @@ SRCS += \
     $(QMK_DIR)/quantum/logging/debug.c \
     $(QMK_DIR)/quantum/logging/print.c \
     $(QMK_DIR)/quantum/logging/sendchar.c \
-    $(QMK_DIR)/quantum/debounce/sym_defer_g.c \
 
 INCS += \
 	$(QMK_DIR) \

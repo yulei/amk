@@ -357,19 +357,19 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record)
             disp_debug("screen enabled: %d\n", screen_enable);
             return false;
         case KC_LEFT:
-            if (!screen_adjust) return false;
+            if (!screen_adjust) return true;
             renders[0].x = decrease_min(renders[0].x, ANIM_X_MIN);
             return false;
         case KC_RIGHT:
-            if (!screen_adjust) return false;
+            if (!screen_adjust) return true;
             renders[0].x = increase_max(renders[0].x, ANIM_X_MAX);
             return false;
         case KC_UP:
-            if (!screen_adjust) return false;
+            if (!screen_adjust) return true;
             renders[0].y = decrease_min(renders[0].y, ANIM_Y_MIN);
             return false;
         case KC_DOWN:
-            if (!screen_adjust) return false;
+            if (!screen_adjust) return true;
             renders[0].y = increase_max(renders[0].y, ANIM_Y_MAX);
             return false;
         case KC_F21: {

@@ -7,7 +7,6 @@
 #include "amk_usb.h"
 #include "usb_descriptors.h"
 #include "generic_hal.h"
-#include "report_queue.h"
 #include "report.h"
 #include "wait.h"
 #include "amk_keymap.h"
@@ -178,6 +177,12 @@ uint16_t tud_hid_get_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t
 
 // Invoked when received SET_REPORT control request or
 // received data on OUT endpoint ( Report ID = 0, Type = 0 )
+__attribute__((weak))
+bool vial_process_kb(uint8_t *data, uint8_t length)
+{
+    return false;
+}
+
 extern uint8_t amk_led_state;
 void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t report_type, uint8_t const *buffer, uint16_t bufsize)
 {
@@ -195,7 +200,10 @@ void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t rep
 #ifdef VIAL_ENABLE
     if (itf == ITF_NUM_VIAL) {
         //amk_printf("VIAL process data: size=%d\n", bufsize);
-       // vial_process((uint8_t*)buffer, (uint8_t)bufsize);
+       if (vial_process_kb((uint8_t*)buffer, (uint8_t)bufsize)) {
+            return;
+       }
+
        raw_hid_receive((uint8_t*)buffer, (uint8_t)bufsize);
     }
 #endif
