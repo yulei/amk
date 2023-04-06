@@ -174,12 +174,11 @@ bool rgb_led_config_enabled(void)
     return g_rgb_configs[rgb_config_cur].enable;
 }
 
-void rgb_led_config_toggle(void)
+void rgb_led_config_toggle_temp(void)
 {
     bool all_off = !rgb_led_is_on();
 
     g_rgb_configs[rgb_config_cur].enable = !g_rgb_configs[rgb_config_cur].enable;
-    eeconfig_update_rgb(&g_rgb_configs[rgb_config_cur], rgb_config_cur);
 
     if (all_off) {
         // all off to on, need re-init driver and turn led power
@@ -196,6 +195,12 @@ void rgb_led_config_toggle(void)
 #endif
         rgb_led_set_power(false);
     }
+}
+
+void rgb_led_config_toggle(void)
+{
+    rgb_led_config_toggle_temp();
+    eeconfig_update_rgb(&g_rgb_configs[rgb_config_cur], rgb_config_cur);
 }
 
 static void rgb_led_effect_init_mode(rgb_config_t *config)
