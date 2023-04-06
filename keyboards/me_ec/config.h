@@ -19,11 +19,13 @@
 
 #define DISCHARGE_WAIT_PRE  10
 #define DISCHARGE_WAIT_POST 10
-#define SCAN_DELAY          100
+#define SCAN_DELAY          200
 
 #define CHARGE_WAIT     2
 #define EC_TH_LOW       600
 #define EC_TH_HIGH      800
+//#define EC_TH_LOW       986
+//#define EC_TH_HIGH      1280
 
 #define LEFT_EN_PIN     B10
 #define RIGHT_EN_PIN    B2
