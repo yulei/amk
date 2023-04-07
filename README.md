@@ -1,6 +1,6 @@
 # AMK 
 Keyboard firmware for NRF52 and STM32. 
-[TMK](https://github.com/tmk/tmk_keyboard.git) was used for key processing.
+~~[TMK](https://github.com/tmk/tmk_keyboard.git)~~ [QMK](https://github.com/qmk/qmk_firmware)was used for key processing.
 [tinyusb](https://github.com/hathach/tinyusb.git) was used for usb protocol handling.
 NRF5 SDK and STM32 HAL library were used for driving peripherals of the MCU.
 
