@@ -14,7 +14,7 @@
 //#include "rgb_indicator.h"
 
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
-    #if 0
+    #if 1
     {0,0,0,0},
     // 16 leds
     {0,1,1,1},
@@ -34,7 +34,7 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {0,15,15,15},
     {0,16,16,16},
     #endif
-    #if 1
+    #if 0
     // left
     {0, CS8_SW1_29, CS7_SW1_29, CS9_SW1_29},
     {0, CS8_SW2_29, CS7_SW2_29, CS9_SW2_29},
@@ -139,56 +139,19 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {1,  CS2_SW8_29,  CS1_SW8_29,  CS3_SW8_29},
     {1,  CS2_SW9_29,  CS1_SW9_29,  CS3_SW9_29},
     #endif
-
-    #if 0
-    {0,  OUT_3,   OUT_2,   OUT_1},
-    {0,  OUT_6,   OUT_5,   OUT_4},
-    {0,  OUT_9,   OUT_8,   OUT_7},
-    {0, OUT_12,  OUT_11,  OUT_10},
-    {0, OUT_15,  OUT_14,  OUT_13},
-    {0, OUT_18,  OUT_17,  OUT_16},
-    {0, OUT_21,  OUT_20,  OUT_19},
-    {0, OUT_24,  OUT_23,  OUT_22},
-    {0, OUT_27,  OUT_26,  OUT_25},
-    {0, OUT_30,  OUT_29,  OUT_28},
-    {0, OUT_33,  OUT_32,  OUT_31},
-    {0, OUT_36,  OUT_35,  OUT_34},
-    #endif
-    #if 0
-    {0, C1_1,   C3_2,   C4_2},
-    {0, C1_2,   C2_2,   C4_3},
-    {0, C1_3,   C2_3,   C3_3},
-    {0, C1_4,   C2_4,   C3_4},
-    {0, C1_5,   C2_5,   C3_5},
-    {0, C1_6,   C2_6,   C3_6},
-    {0, C1_7,   C2_7,   C3_7},
-    {0, C1_8,   C2_8,   C3_8},
-
-    {0, C9_1,   C8_1,   C7_1},
-    {0, C9_2,   C8_2,   C7_2},
-    {0, C9_3,   C8_3,   C7_3},
-    {0, C9_4,   C8_4,   C7_4},
-    {0, C9_5,   C8_5,   C7_5},
-    {0, C9_6,   C8_6,   C7_6},
-    {0, C9_7,   C8_7,   C6_6},
-    {0, C9_8,   C7_7,   C6_7},
-    #endif
 };
 
 
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
-    //{RGB_DRIVER_WS2812,     0, 0, 0, 17},
-    //{RGB_DRIVER_IS31FL3731, 0xE8, 0, 0, 16},
-    //{RGB_DRIVER_IS31FL3236, 0x78, 0, 0, 12},
-    {RGB_DRIVER_IS31FL3729, 0x68, 0, 0, 45},
+    {RGB_DRIVER_WS2812,     0, 0, 0, 17},
+    //{RGB_DRIVER_IS31FL3729, 0x68, 0, 0, 45},
     //{RGB_DRIVER_IS31FL3729, 0x6E, 1, 45, 45},
 };
 
 rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
-    {0,  0, 45},
+    {0,  0, 17},
+    //{0,  0, 45},
     //{1,  45, 45},
-    //{0,  0, 16},
-    //{0,  0, 12},
 };
 
 //uint8_t g_rgb_indicator_index[RGB_INDICATOR_LED_NUM] = { 0};
@@ -199,6 +162,7 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
 void indicator_led_set(uint8_t led)
 {
 #ifdef RGB_INDICATOR_ENABLE
+#define CAPS_LED    0
     if (led & (1 << USB_LED_CAPS_LOCK)) {
         rgb_indicator_set(CAPS_LED, 0xFF, 0xFF, 0xFF);
         amk_printf("turn caps on\n");

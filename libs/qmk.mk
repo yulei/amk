@@ -1,19 +1,19 @@
 
-QMK_LIB_DIR := $(LIB_DIR)/qmk
+QMK_PORT_DIR := $(LIB_DIR)/qmk/portable
 QMK_DIR := $(LIB_DIR)/qmk/vial-qmk
 
-include $(QMK_LIB_DIR)/qmk_feature.mk
+include $(LIB_DIR)/qmk/qmk_feature.mk
 
 SRCS += \
-	$(QMK_LIB_DIR)/qmk_driver.c \
+	$(QMK_PORT_DIR)/qmk_driver.c \
 
 ifneq (yes,$(strip $(AMK_CUSTOM_MATRIX)))
-	SRCS += $(QMK_LIB_DIR)/matrix_scan.c
+	SRCS += $(QMK_PORT_DIR)/matrix_scan.c
 endif
 
 SRCS += \
-	$(QMK_LIB_DIR)/protocol/host.c \
-	$(QMK_LIB_DIR)/protocol/report.c \
+	$(LIB_DIR)/qmk/protocol/host.c \
+	$(LIB_DIR)/qmk/protocol/report.c \
 
 SRCS += \
     $(QMK_DIR)/quantum/quantum.c \
@@ -45,8 +45,8 @@ INCS += \
 	$(QMK_DIR)/quantum/sequencer \
 
 INCS += \
-	$(QMK_LIB_DIR) \
-	$(QMK_LIB_DIR)/protocol \
+	$(QMK_PORT_DIR) \
+	$(LIB_DIR)/qmk/protocol \
 
 APP_DEFS += \
 	-include config.h \
@@ -127,7 +127,7 @@ $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h: $(KEYBOARD_DIR)/vial.json
 $(QMK_DIR)/quantum/via.c: $(KEYBOARD_DIR)/version.h
 
 $(KEYBOARD_DIR)/version.h: FORCE
-	@python3 $(QMK_LIB_DIR)/generate_version.py $(QMK_DIR) $(KEYBOARD_DIR)/version.h
+	@python3 $(LIB_DIR)/qmk/generate_version.py $(QMK_DIR) $(KEYBOARD_DIR)/version.h
 
 FORCE:
 

@@ -111,23 +111,18 @@ void matrix_scan_kb(void)
     uart_cmd_task();
 }
 
-#include "action.h"
-#include "action_layer.h"
+#include "quantum.h"
 #include "usb_interface.h"
 
-bool hook_process_action_main(keyrecord_t *record)
+bool process_record_kb(uint16_t keycode, keyrecord_t *record)
 {
-    if (IS_NOEVENT(record->event) || !record->event.pressed) { 
-        return false;
-    }
-    action_t action = layer_switch_get_action(record->event);
-    if (action.kind.id != ACT_MODS) {
-        return false;
+    if (!record->event.pressed) {
+        return true;
     }
 
-    switch(action.key.code) {
+    switch(keycode) {
     case KC_LEFT:
-        if (!screen_adjust) return false;
+        if (!screen_adjust) return true;
         {
             cmd_t cmd = {0};
             cmd.type = CMD_SCREEN;
@@ -135,9 +130,9 @@ bool hook_process_action_main(keyrecord_t *record)
             cmd.param.screen.state = SA_LEFT;
             uart_cmd_send(&cmd);
         }
-        return true;
+        return false;
     case KC_RIGHT:
-        if (!screen_adjust) return false;
+        if (!screen_adjust) return true;
         {
             cmd_t cmd = {0};
             cmd.type = CMD_SCREEN;
@@ -145,9 +140,9 @@ bool hook_process_action_main(keyrecord_t *record)
             cmd.param.screen.state = SA_RIGHT;
             uart_cmd_send(&cmd);
         }
-        return true;
+        return false;
     case KC_UP:
-        if (!screen_adjust) return false;
+        if (!screen_adjust) return true;
         {
             cmd_t cmd = {0};
             cmd.type = CMD_SCREEN;
@@ -155,9 +150,9 @@ bool hook_process_action_main(keyrecord_t *record)
             cmd.param.screen.state = SA_UP;
             uart_cmd_send(&cmd);
         }
-        return true;
+        return false;
     case KC_DOWN:
-        if (!screen_adjust) return false;
+        if (!screen_adjust) return true;
         {
             cmd_t cmd = {0};
             cmd.type = CMD_SCREEN;
@@ -165,9 +160,9 @@ bool hook_process_action_main(keyrecord_t *record)
             cmd.param.screen.state = SA_DOWN;
             uart_cmd_send(&cmd);
         }
-        return true;
+        return false;
     case KC_PGUP:
-        if (!screen_adjust) return false;
+        if (!screen_adjust) return true;
         {
             cmd_t cmd = {0};
             cmd.type = CMD_SCREEN;
@@ -175,9 +170,9 @@ bool hook_process_action_main(keyrecord_t *record)
             cmd.param.screen.state = SA_INC_HUE;
             uart_cmd_send(&cmd);
         }
-        return true;
+        return false;
     case KC_PGDN:
-        if (!screen_adjust) return false;
+        if (!screen_adjust) return true;
         {
             cmd_t cmd = {0};
             cmd.type = CMD_SCREEN;
@@ -185,9 +180,9 @@ bool hook_process_action_main(keyrecord_t *record)
             cmd.param.screen.state = SA_DEC_HUE;
             uart_cmd_send(&cmd);
         }
-        return true;
+        return false;
     case KC_HOME:
-        if (!screen_adjust) return false;
+        if (!screen_adjust) return true;
         {
             cmd_t cmd = {0};
             cmd.type = CMD_SCREEN;
@@ -195,9 +190,9 @@ bool hook_process_action_main(keyrecord_t *record)
             cmd.param.screen.state = SA_INC_SAT;
             uart_cmd_send(&cmd);
         }
-        return true;
+        return false;
     case KC_END:
-        if (!screen_adjust) return false;
+        if (!screen_adjust) return true;
         {
             cmd_t cmd = {0};
             cmd.type = CMD_SCREEN;
@@ -205,9 +200,9 @@ bool hook_process_action_main(keyrecord_t *record)
             cmd.param.screen.state = SA_DEC_SAT;
             uart_cmd_send(&cmd);
         }
-        return true;
+        return false;
     case KC_BSPC:
-        if (!screen_adjust) return false;
+        if (!screen_adjust) return true;
         {
             cmd_t cmd = {0};
             cmd.type = CMD_SCREEN;
@@ -215,9 +210,9 @@ bool hook_process_action_main(keyrecord_t *record)
             cmd.param.screen.state = SA_INC_VAL;
             uart_cmd_send(&cmd);
         }
-        return true;
+        return false;
     case KC_BSLS:
-        if (!screen_adjust) return false;
+        if (!screen_adjust) return true;
         {
             cmd_t cmd = {0};
             cmd.type = CMD_SCREEN;
@@ -225,9 +220,9 @@ bool hook_process_action_main(keyrecord_t *record)
             cmd.param.screen.state = SA_DEC_VAL;
             uart_cmd_send(&cmd);
         }
-        return true;
+        return false;
     case KC_ENT:
-        if (!screen_adjust) return false;
+        if (!screen_adjust) return true;
         {
             cmd_t cmd = {0};
             cmd.type = CMD_SCREEN;
@@ -235,7 +230,7 @@ bool hook_process_action_main(keyrecord_t *record)
             cmd.param.screen.state = SA_CLR_RST;
             uart_cmd_send(&cmd);
         }
-        return true;
+        return false;
     case KC_F15:
         screen_adjust = !screen_adjust;
         cmd_debug("screen adjust enabled: %d\n", screen_adjust);
@@ -246,48 +241,47 @@ bool hook_process_action_main(keyrecord_t *record)
             cmd.param.screen.state = SA_SAVE; // save to eeprom
             uart_cmd_send(&cmd);
         }
-        break;
-    case KC_F16: {
-        cmd_t cmd = {0};
-        cmd.type = CMD_SCREEN;
-        cmd.param.screen.action = CMD_SCREEN_MODE;
-        uart_cmd_send(&cmd);
-        /*screen_on = !screen_on;
-        cmd_t cmd = {0};
-        cmd.type = CMD_SCREEN;
-        cmd.param.screen.action = CMD_SCREEN_POWER;
-        cmd.param.screen.state = screen_on ? 1 : 0;
-        uart_cmd_send(&cmd);
-        */
-    } return true;
-    case KC_F17: {
-        screen_on = !screen_on;
-        cmd_t cmd = {0};
-        cmd.type = CMD_SCREEN;
-        cmd.param.screen.action = CMD_SCREEN_ADJUST;
-        cmd.param.screen.state = 0;
-        uart_cmd_send(&cmd);
-    } return true;
-    case KC_F24: {
-        msc_on = !msc_on;
-        cmd_t cmd = {0};
-        cmd.type = CMD_SCREEN;
-        cmd.param.screen.action = CMD_SCREEN_MSC;
-        cmd.param.screen.state = msc_on ? 1 : 0;
-        uart_cmd_send(&cmd);
-        gpio_write_pin(USB_EN_PIN, msc_on ? 0 : 1);
-        if (msc_on) {
-            usb_setting |= USB_SWITCH_BIT;
-        } else {
-            usb_setting &= ~(USB_SWITCH_BIT);
+        return false;
+    case KC_F16:
+        {
+            cmd_t cmd = {0};
+            cmd.type = CMD_SCREEN;
+            cmd.param.screen.action = CMD_SCREEN_MODE;
+            uart_cmd_send(&cmd);
         }
-        cmd_debug("F24 pressed, msc=%d, usb_seeting=%x\n", msc_on, usb_setting);
-    } return true;
+        return false;
+    case KC_F17:
+        {
+            screen_on = !screen_on;
+            cmd_t cmd = {0};
+            cmd.type = CMD_SCREEN;
+            cmd.param.screen.action = CMD_SCREEN_ADJUST;
+            cmd.param.screen.state = 0;
+            uart_cmd_send(&cmd);
+        }
+        return false;
+    case KC_F24:
+        {
+            msc_on = !msc_on;
+            cmd_t cmd = {0};
+            cmd.type = CMD_SCREEN;
+            cmd.param.screen.action = CMD_SCREEN_MSC;
+            cmd.param.screen.state = msc_on ? 1 : 0;
+            uart_cmd_send(&cmd);
+            gpio_write_pin(USB_EN_PIN, msc_on ? 0 : 1);
+            if (msc_on) {
+                usb_setting |= USB_SWITCH_BIT;
+            } else {
+                usb_setting &= ~(USB_SWITCH_BIT);
+            }
+            cmd_debug("F24 pressed, msc=%d, usb_seeting=%x\n", msc_on, usb_setting);
+        }
+        return false;
     default:
         break;
     }
 
-    return false;
+    return true;
 }
 
 extern void indicator_led_set(uint8_t led);
@@ -301,6 +295,7 @@ void led_set_kb(uint8_t led)
     indicator_led_set(led);
 }
 
+#if 0
 void hook_matrix_change_kb(keyevent_t event)
 {
     cmd_t cmd = {0};
@@ -310,8 +305,9 @@ void hook_matrix_change_kb(keyevent_t event)
     cmd.param.keyhit.pressed = event.pressed;
     uart_cmd_send(&cmd);
 }
+#endif
 
-void hook_layer_change_kb(uint32_t layer_state)
+layer_state_t layer_state_set_kb(layer_state_t state)
 {
     cmd_t cmd = {0};
     cmd.type = CMD_LAYER;
@@ -324,6 +320,7 @@ void hook_layer_change_kb(uint32_t layer_state)
         }
     }
     uart_cmd_send(&cmd);
+    return layer_state_set_user(state);
 }
 
 void hook_send_report(uint32_t type, const void* data)
