@@ -86,7 +86,7 @@
 #endif
 
 //------------- CLASS -------------//
-#if VIAL_ENABLE
+#ifdef VIAL_ENABLE
 #define CFG_TUD_HID               3
 #else
 #define CFG_TUD_HID               2
