@@ -83,6 +83,15 @@ static void effects_set_color(rgb_linear_state_t *state, uint8_t index, uint8_t 
     }
 }
 
+static void effects_set_color_rgb(rgb_linear_state_t *state, uint8_t index, uint8_t r, uint8_t g, uint8_t b)
+{
+    uint8_t g_index = index + state->led_start;
+    rgb_driver_t *driver = rgb_led_map(g_index);
+    if (driver) {
+        driver->set_color_rgb(driver, g_index, r, g, b);
+    }
+}
+
 static void effects_set_color_all(rgb_linear_state_t *state, uint8_t hue, uint8_t sat, uint8_t val)
 {
     for (uint8_t i = 0; i < state->led_num; i++) {
@@ -365,4 +374,10 @@ bool rgb_effect_linear_enabled(rgb_effect_t effect)
 {
     rgb_linear_state_t *state = (rgb_linear_state_t*)effect;
     return state->config->enable ? true :false;
+}
+
+void rgb_effect_linear_set_rgb(rgb_effect_t effect, uint8_t led, uint8_t r, uint8_t g, uint8_t b)
+{
+    rgb_linear_state_t *state = (rgb_linear_state_t*)effect;
+    effects_set_color_rgb(state, led, r, g, b);
 }

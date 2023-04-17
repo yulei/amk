@@ -29,3 +29,5 @@ bool rgb_effect_linear_enabled(rgb_effect_t effect);
 void rgb_effect_linear_toggle(rgb_effect_t effect);
 
 void rgb_effect_linear_init_mode(rgb_effect_t effect);
+
+void rgb_effect_linear_set_rgb(rgb_effect_t effect, uint8_t led, uint8_t r, uint8_t g, uint8_t b);

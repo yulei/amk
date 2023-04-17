@@ -38,3 +38,10 @@ void rgb_linear_uninit(void)
 
 void rgb_linear_prepare_sleep(void)
 {}
+
+void rgb_linear_set_rgb(uint8_t index, uint8_t led, uint8_t r, uint8_t g, uint8_t b)
+{
+    if (index < RGB_SEGMENT_NUM) {
+        rgb_effect_linear_set_rgb(rgb_linear.effects[index], led, r, g, b);
+    }
+}

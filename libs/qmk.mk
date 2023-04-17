@@ -82,7 +82,7 @@ ifeq ($(strip $(VIAL_ENABLE)), yes)
     ifeq ($(strip $(TAP_DANCE_ENABLE)), yes)
         APP_DEFS += -DTAPPING_TERM_PER_KEY
     endif
-    COMBO_ENABLE ?= no
+    COMBO_ENABLE ?= yes
     KEY_OVERRIDE_ENABLE ?= no
     SRCS += $(QMK_DIR)/quantum/vial.c
     APP_DEFS += -DVIAL_ENABLE

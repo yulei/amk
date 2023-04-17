@@ -21,7 +21,7 @@
 
 #define USE_UART1
 
-#define META_HOTSWAP
+//#define META_HOTSWAP
 #if defined(META_HOTSWAP)
 #define USE_PWM_TIM2
 #define PWM_TIM             htim2

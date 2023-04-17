@@ -13,3 +13,4 @@ void rgb_linear_init(void);
 void rgb_linear_task(void);
 void rgb_linear_uninit(void);
 void rgb_linear_prepare_sleep(void);
+void rgb_linear_set_rgb(uint8_t index, uint8_t led, uint8_t r, uint8_t g, uint8_t b);

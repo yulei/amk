@@ -284,15 +284,12 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record)
     return true;
 }
 
-extern void indicator_led_set(uint8_t led);
-
 void led_set_kb(uint8_t led)
 {
     cmd_t cmd = {0};
     cmd.type = CMD_LED;
     cmd.param.led = led;
     uart_cmd_send(&cmd);
-    indicator_led_set(led);
 }
 
 #if 0

@@ -4,14 +4,15 @@
 
 #include "meta.h"
 #include "led.h"
+#include "amk_printf.h"
 
 #ifdef RGB_LINEAR_ENABLE
 #include "rgb_common.h"
 #include "rgb_driver.h"
+#include "rgb_linear.h"
 #include "is31fl3731.h"
 #include "is31fl3236.h"
 #include "is31fl3729.h"
-//#include "rgb_indicator.h"
 
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     #if 1
@@ -154,23 +155,23 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
     //{1,  45, 45},
 };
 
-//uint8_t g_rgb_indicator_index[RGB_INDICATOR_LED_NUM] = { 0};
+#define CAPS_LED_INDEX    0
+void rgb_led_pre_flush(void)
+{
+    uint8_t led = host_keyboard_leds();
+    if (led & (1 << USB_LED_CAPS_LOCK)) {
+        rgb_linear_set_rgb(0, CAPS_LED_INDEX, 0xFF, 0xFF, 0xFF);
+        amk_printf("turn caps on\n");
+    } else {
+        rgb_linear_set_rgb(0, CAPS_LED_INDEX, 0, 0, 0);
+        amk_printf("turn caps off\n");
+    }
+}
 
-//#define CAPS_LED    0
 #endif
 
 void indicator_led_set(uint8_t led)
 {
-#ifdef RGB_INDICATOR_ENABLE
-#define CAPS_LED    0
-    if (led & (1 << USB_LED_CAPS_LOCK)) {
-        rgb_indicator_set(CAPS_LED, 0xFF, 0xFF, 0xFF);
-        amk_printf("turn caps on\n");
-    } else {
-        rgb_indicator_set(CAPS_LED, 0, 0, 0);
-        amk_printf("turn caps off\n");
-    }
-#endif
 }
 
 #ifdef RGB_MATRIX_ENABLE
