@@ -619,6 +619,8 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    HAL_NVIC_SetPriority(USART1_IRQn, 0, 1);
+    HAL_NVIC_EnableIRQ(USART1_IRQn);
 
     /* USART1 DMA Init */
     /* USART1_RX Init */
@@ -658,6 +660,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     __HAL_LINKDMA(huart,hdmatx,hdma_usart1_tx);
 
   /* USER CODE BEGIN USART1_MspInit 1 */
+
 
   /* USER CODE END USART1_MspInit 1 */
   }
