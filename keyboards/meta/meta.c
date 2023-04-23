@@ -174,7 +174,7 @@ void indicator_led_set(uint8_t led)
 {
 }
 
-#ifdef RGB_MATRIX_ENABLE
+#ifdef AMK_RGB_MATRIX_ENABLE
 #include "rgb_common.h"
 #include "is31fl3729.h"
 #include "is31fl3731.h"
