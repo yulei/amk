@@ -124,10 +124,11 @@ $(QMK_DIR)/quantum/vial.c: $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h
 $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h: $(KEYBOARD_DIR)/vial.json
 	@python3 $(QMK_DIR)/util/vial_generate_definition.py $(KEYBOARD_DIR)/vial.json $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h
 
-$(QMK_DIR)/quantum/via.c: $(KEYBOARD_DIR)/version.h
+$(QMK_DIR)/quantum/via.c: $(OUTPUT_DIR)/version.h
+INCS += $(OUTPUT_DIR)
 
-$(KEYBOARD_DIR)/version.h: FORCE
-	@python3 $(LIB_DIR)/qmk/generate_version.py $(QMK_DIR) $(KEYBOARD_DIR)/version.h
+$(OUTPUT_DIR)/version.h: FORCE
+	@python3 $(LIB_DIR)/qmk/generate_version.py $(QMK_DIR) $(OUTPUT_DIR)/version.h
 
 FORCE:
 
