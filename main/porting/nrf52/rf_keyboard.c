@@ -334,14 +334,7 @@ static void connect_target(uint8_t device)
 #endif
 }
 
-__attribute__((weak))
-bool hook_process_action_kb(action_t *action)
-{
-    return false;
-}
-
 // bluetooth control command
-// F13 : next rgb config
 // F15 : set device 0
 // F16 : set device 1
 // F17 : set device 2
@@ -352,49 +345,41 @@ bool hook_process_action_kb(action_t *action)
 // F22 : erase bond
 // F23 : enter bootloader mode
 // F24 : toggle ble/gazell mode
-#include "action.h"
-#include "action_layer.h"
-bool hook_process_action_main(keyrecord_t *record)
+
+#include "quantum.h"
+
+bool process_record_kb(uint16_t keycode, keyrecord_t *record)
 {
     if (IS_NOEVENT(record->event) || !record->event.pressed) { 
-        return false;
-    }
-    action_t action = layer_switch_get_action(record->event);
-    if (action.kind.id != ACT_MODS && action.kind.id != ACT_RMODS) {
-        return false;
+        return true;
     }
 
-    switch(action.key.code) {
-    //#ifdef RGB_ENABLE
-    //    case KC_F13:
-    //        rgb_led_config_next();
-    //        return true;
-    //#endif
+    switch(keycode) {
         case FN_CONNECT_TARGET_0:
             connect_target(BLE_PEER_DEVICE_0);
-            return true;
+            return false;
 #ifdef FN_CONNECT_TARGET_1
         case FN_CONNECT_TARGET_1:
             connect_target(BLE_PEER_DEVICE_1);
-            return true;
+            return false;
 #endif
 #ifdef FN_CONNECT_TARGET_2
         case FN_CONNECT_TARGET_2:
             connect_target(BLE_PEER_DEVICE_2);
-            return true;
+            return false;
 #endif
 #ifdef FN_CONNECT_TARGET_3
         case FN_CONNECT_TARGET_3:
             connect_target(BLE_PEER_DEVICE_3);
-            return true;
+            return false;
 #endif
         //case KC_F19:
             // reset keymap
         //    amk_keymap_reset();
-        //    return true;
+        //    return false;
         //case KC_F20: // disable sleep mode
         //    rf_driver.output_target &= ~SLEEP_ENABLED;
-        //    return true;
+        //    return false;
         case FN_SWITCH_BLE_USB: // toggle usb/ble output
             if (rf_driver.output_target & OUTPUT_RF) {
                 if (rf_driver.vbus_enabled) {
@@ -408,18 +393,18 @@ bool hook_process_action_main(keyrecord_t *record)
                 NRF_LOG_INFO("set output to RF");
                 rf_driver.output_target &= ~OUTPUT_USB;
                 rf_driver.output_target |= OUTPUT_RF;
-            } return true;
+            } return false;
 
         case FN_REBOND: // reset to erase bond mode
             NRF_LOG_INFO("reset to erase bond");
             sd_power_gpregret_set(RST_REGISTER, RST_ERASE_BOND);
             sd_nvic_SystemReset();
-            return true;
+            return false;
 
         case FN_BOOTLOADER: // usb mcu to bootloader mode
             NRF_LOG_INFO("send reboot command");
             nrf_usb_reboot();
-            return true;
+            return false;
 #ifdef FN_SWITCH_BLE_GZLL
         case FN_SWITCH_BLE_GZLL: // toggle BLE or GAZELL
             if (rf_driver.is_ble) {
@@ -433,12 +418,12 @@ bool hook_process_action_main(keyrecord_t *record)
                 NRF_LOG_INFO("switch to ble");
                 NRF_POWER->GPREGRET &= ~RST_USE_GZLL;
                 NVIC_SystemReset();
-            } return true;
+            } return false;
 #endif
         default:
             break;
     }
-    return hook_process_action_kb(&action);
+    return process_record_user(keycode, record);
 }
 
 #if WDT_ENABLE

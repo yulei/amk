@@ -1,0 +1,18 @@
+{
+    "name": "RFHost",
+    "vendorId": "0x4D58",
+    "productId": "0x5246",
+    "lighting": "none",
+    "matrix": {
+      "rows": 1,
+      "cols": 1
+    },
+    "layouts": {
+      "keymap":
+      [
+  [
+    "0,0"
+  ]
+]
+    }
+  }

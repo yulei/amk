@@ -15,28 +15,11 @@
 #define MATRIX_ROWS 1
 #define MATRIX_COLS 1
 
-#define MATRIX_ROW_PINS { 9}
-#define MATRIX_COL_PINS { 10}
+#define MATRIX_ROW_PINS {12}
+#define MATRIX_COL_PINS {14}
 
-// LEDS and BUTTON
-/*#define LED1_G         NRF_GPIO_PIN_MAP(0,6)
-#define LED2_R         NRF_GPIO_PIN_MAP(0,8)
-#define LED2_G         NRF_GPIO_PIN_MAP(1,9)
-#define LED2_B         NRF_GPIO_PIN_MAP(0,12)
-#define LED_1          LED1_G
-#define LED_2          LED2_R
-#define LED_3          LED2_G
-#define LED_4          LED2_B
-
-#define LEDS_ACTIVE_STATE 0
-
-#define BUTTON_1       NRF_GPIO_PIN_MAP(1,6)
-#define BUTTON_PULL    NRF_GPIO_PIN_PULLUP
-
-#define BUTTONS_ACTIVE_STATE 0
-*/
-//
 // rf host do not need sleep
 #define GZLL_IS_HOST 1
 #define DISABLE_SLEEP
 
+#define VIAL_KEYBOARD_UID {0x1C, 0xCD, 0x4E, 0xDE, 0x6B, 0x70, 0x00, 0xAE}

@@ -1,7 +1,12 @@
 
-SRCS += $(wildcard $(KEYBOARD_DIR)/*.c)
-
 MCU = NRF52840
-#CUSTOM_MATRIX = yes
+
+VIAL_ENABLE = yes
+NKRO_ENABLE = yes
+AMK_CUSTOM_MATRIX = yes
+
 UF2_ENABLE = yes
 UF2_FAMILY = 0xADA52840 
+
+SRCS += $(KEYBOARD_DIR)/rfhost.c
+SRCS += $(KEYBOARD_DIR)/rfhost_matrix.c
