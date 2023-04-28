@@ -9,6 +9,15 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+typedef enum 
+{
+    USB_STATE_IDLE,
+    USB_STATE_MOUNTED,
+    USB_STATE_UNMOUNTED,
+    USB_STATE_SUSPENDED,
+    USB_STATE_RESUMED,
+} usb_state_t;
+
 bool amk_usb_itf_ready(uint32_t type);
 bool amk_usb_itf_send_report(uint32_t type, const void* data, uint32_t size);
 void amk_usb_init(void);

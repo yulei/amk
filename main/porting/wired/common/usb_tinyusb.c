@@ -136,10 +136,19 @@ void amk_usb_connect(bool on)
 // tusb callback
 //=============================
 // Invoked when device is mounted
-void tud_mount_cb(void) { }
+__attribute__((weak))
+void usb_state_kb(uint8_t state) {}
+
+void tud_mount_cb(void)
+{
+    usb_state_kb(USB_STATE_MOUNTED);
+}
 
 // Invoked when device is unmounted
-void tud_umount_cb(void) { }
+void tud_umount_cb(void)
+{
+    usb_state_kb(USB_STATE_UNMOUNTED);
+}
 
 // Invoked when usb bus is suspended
 // remote_wakeup_en : if host allow us to perform remote wakeup
@@ -147,11 +156,13 @@ void tud_umount_cb(void) { }
 void tud_suspend_cb(bool remote_wakeup_en)
 {
     (void) remote_wakeup_en;
+    usb_state_kb(USB_STATE_SUSPENDED);
 }
 
 // Invoked when usb bus is resumed
 void tud_resume_cb(void)
 {
+    usb_state_kb(USB_STATE_RESUMED);
 }
 
 // Invoked when received GET_REPORT control request

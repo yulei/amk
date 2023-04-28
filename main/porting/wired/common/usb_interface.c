@@ -9,7 +9,6 @@
 #include "usb_interface.h"
 #include "amk_usb.h"
 #include "usb_descriptors.h"
-#include "usb_interface.h"
 #include "generic_hal.h"
 #include "report.h"
 #include "wait.h"
