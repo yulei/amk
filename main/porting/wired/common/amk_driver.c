@@ -13,9 +13,7 @@
 #include "usb_interface.h"
 
 #include "amk_indicator.h"
-#include "amk_boot.h"
 #include "amk_profile.h"
-#include "amk_keymap.h"
 #include "amk_printf.h"
 #include "qmk_driver.h"
 

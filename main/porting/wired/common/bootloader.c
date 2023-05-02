@@ -6,7 +6,6 @@
 #include "generic_hal.h"
 #include "bootloader.h"
 #include "wait.h"
-#include "amk_keymap.h"
 #include "usb_interface.h"
 
 const uint32_t Bootloader_Magic = 0x41544B42;

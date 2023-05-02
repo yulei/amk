@@ -9,7 +9,6 @@
 #include "generic_hal.h"
 #include "report.h"
 #include "wait.h"
-#include "amk_keymap.h"
 #include "amk_printf.h"
 
 #ifdef VIAL_ENABLE
