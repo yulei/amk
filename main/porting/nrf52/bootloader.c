@@ -10,3 +10,8 @@ void bootloader_jump(void)
 {
     nrf_usb_reboot();
 }
+
+void mcu_reset(void)
+{
+    nrf_usb_reboot();
+}

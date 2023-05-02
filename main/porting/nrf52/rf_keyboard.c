@@ -14,18 +14,11 @@
 #include "app_scheduler.h"
 #include "ble_adv_service.h"
 
-#include "report.h"
-#include "host.h"
-#include "keyboard.h"
-#include "action.h"
-#include "matrix_scan.h"
-#include "wait.h"
+#include "quantum.h"
 
 #include "rgb_led.h"
 #include "rf_power.h"
-#include "amk_boot.h"
 #include "amk_eeprom.h"
-#include "amk_keymap.h"
 #include "amk_indicator.h"
 
 static rf_send_report_t rf_send_report = NULL;
@@ -96,13 +89,13 @@ void rf_keyboard_init(rf_send_report_t send_report, rf_prepare_sleep_t prepare_s
     keyboard_setup();
     keyboard_init();
     nrf_usb_init(&usb_handler);
-    boot_init();
+    //boot_init();
     host_set_driver(&kbd_driver);
 #if WDT_ENABLE
     rf_wdt_init();
 #endif
     keyboard_timer_init();
-    amk_keymap_init();
+    //amk_keymap_init();
     NRF_LOG_INFO("rf keyboard inited");
     amk_indicator_init();
 }
@@ -123,7 +116,7 @@ void rf_keyboard_prepare_sleep(void)
     // rf stack sleep
     rf_prepare_sleep();
     // turn matrix to sense mode
-    matrix_prepare_sleep();
+    //matrix_prepare_sleep();
     // keyboard sleep
     keyboard_prepare_sleep();
     // usb backend to sleep

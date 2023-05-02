@@ -2,6 +2,7 @@
 PLATFORM_PORTING_DIR := $(MAIN_DIR)/porting/nrf52
 
 SRCS += \
+	$(MAIN_DIR)/amk/report_queue.c \
 	$(PLATFORM_PORTING_DIR)/generic_nrf52.c \
 	$(PLATFORM_PORTING_DIR)/timer.c \
 	$(PLATFORM_PORTING_DIR)/bootloader.c \
