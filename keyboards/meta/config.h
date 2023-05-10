@@ -19,6 +19,9 @@
 #define USB_EN_PIN          A1
 #define SDB_EN_PIN          C11
 
+#define USE_WS2812
+#define USE_3729
+
 #define USE_UART1
 
 //#define META_HOTSWAP

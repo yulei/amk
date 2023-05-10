@@ -28,6 +28,10 @@
 
 #define KEY_PIN             A1
 
+#define USE_WS2812
+#define USE_3741
+#define USE_3236
+
 #define USE_I2C1
 #define IS31FL3741_I2C_ID   I2C_INSTANCE_1
 #define IS31FL3731_I2C_ID   I2C_INSTANCE_1

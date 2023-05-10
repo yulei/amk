@@ -31,6 +31,9 @@ enum
     CMD_TOGGLE_DATETIME,
     CMD_ERASE_BOND,
     CMD_SELECT_PEER,
+    CMD_VIAL_REQUEST,
+    CMD_VIAL_RESPONSE,
+    CMD_NKRO_REPORT,
 };
 
 void rf_driver_init(bool use_rf);

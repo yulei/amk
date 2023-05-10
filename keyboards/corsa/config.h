@@ -29,6 +29,7 @@
 
 //#define KEY_PIN             A2
 
+#define USE_3236
 #define CAPS_LED_PIN        B7
 #define USE_I2C1
 //#define IS31FL3236          I2C_INSTANCE_1

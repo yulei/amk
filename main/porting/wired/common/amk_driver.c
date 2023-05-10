@@ -168,11 +168,12 @@ void send_keyboard(report_keyboard_t *report)
     if(usb_setting & USB_OUTPUT_RF) {
     #ifdef NKRO_ENABLE
         if(keymap_config.nkro) {
-            rf_driver_put_report(HID_REPORT_ID_NKRO, &report->nkro, sizeof(struct nkro_report));
-            return;
-        }
+            rf_driver_put_report(CMD_NKRO_REPORT, &report->nkro, sizeof(struct nkro_report));
+        } else 
     #endif
-        rf_driver_put_report(CMD_KEY_REPORT, report, KEYBOARD_REPORT_SIZE);
+        {
+            rf_driver_put_report(CMD_KEY_REPORT, report, KEYBOARD_REPORT_SIZE);
+        }
     } else 
 #endif
     {

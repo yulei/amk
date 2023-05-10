@@ -31,6 +31,7 @@
 
 rgb_driver_t rgb_drivers[RGB_DEVICE_NUM];
 
+#ifdef USE_WS2812
 static void rd_ws2812_init(rgb_driver_t *driver)
 {
 #ifdef RGBLIGHT_EN_PIN
@@ -95,7 +96,9 @@ static void rd_ws2812_flush(rgb_driver_t *driver)
     ws2812_update_buffers(p);
 #endif
 }
+#endif
 
+#ifdef USE_AW9523B
 static void rd_aw9523b_init(rgb_driver_t *driver)
 {
 #ifdef RGBLIGHT_EN_PIN
@@ -150,7 +153,9 @@ static void rd_aw9523b_flush(rgb_driver_t *driver)
     i2c_led_t *awinic = (i2c_led_t *)driver->data;
     aw9523b_update_buffers(awinic);
 }
+#endif
 
+#ifdef USE_AW9106B
 static void rd_aw9106b_init(rgb_driver_t *driver)
 {
 #ifdef RGBLIGHT_EN_PIN
@@ -207,7 +212,9 @@ static void rd_aw9106b_flush(rgb_driver_t *driver)
     i2c_led_t *awinic = (i2c_led_t *)driver->data;
     aw9106b_update_buffers(awinic);
 }
+#endif
 
+#ifdef USE_3731
 static void rd_3731_init(rgb_driver_t *driver)
 {
     driver->data = is31fl3731_init(driver->device->addr, driver->device->index, driver->device->led_start, driver->device->led_num);
@@ -253,7 +260,9 @@ static void rd_3731_flush(rgb_driver_t *driver)
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3731_update_buffers(is31);
 }
+#endif
 
+#ifdef USE_3733
 static void rd_3733_init(rgb_driver_t *driver)
 {
     driver->data = is31fl3733_init(driver->device->addr, driver->device->index, driver->device->led_start, driver->device->led_num);
@@ -298,7 +307,9 @@ static void rd_3733_flush(rgb_driver_t *driver)
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3733_update_buffers(is31);
 }
+#endif
 
+#ifdef USE_3236
 static void rd_3236_init(rgb_driver_t *driver)
 {
     driver->data = is31fl3236_init(driver->device->addr, driver->device->index, driver->device->led_start, driver->device->led_num);
@@ -343,7 +354,9 @@ static void rd_3236_flush(rgb_driver_t *driver)
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3236_update_buffers(is31);
 }
+#endif
 
+#ifdef USE_3741
 static void rd_3741_init(rgb_driver_t *driver)
 {
     driver->data = is31fl3741_init(driver->device->addr, driver->device->index, driver->device->led_start, driver->device->led_num);
@@ -388,7 +401,9 @@ static void rd_3741_flush(rgb_driver_t *driver)
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3741_update_buffers(is31);
 }
+#endif
 
+#ifdef USE_3746
 static void rd_3746_init(rgb_driver_t *driver)
 {
     driver->data = is31fl3746_init(driver->device->addr, driver->device->index, driver->device->led_start, driver->device->led_num);
@@ -433,7 +448,9 @@ static void rd_3746_flush(rgb_driver_t *driver)
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3746_update_buffers(is31);
 }
+#endif
 
+#ifdef USE_3729
 static void rd_3729_init(rgb_driver_t *driver)
 {
     driver->data = is31fl3729_init(driver->device->addr, driver->device->index, driver->device->led_start, driver->device->led_num);
@@ -478,14 +495,17 @@ static void rd_3729_flush(rgb_driver_t *driver)
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3729_update_buffers(is31);
 }
+#endif
 
 bool rgb_driver_available(rgb_driver_type_t type)
 {
     switch(type) {
         case RGB_DRIVER_WS2812:
             return true;    // always available
+#ifdef USE_AW9523B
         case RGB_DRIVER_AW9523B:
             return aw9523b_available(AW9523B_ADDR);
+#endif
         case RGB_DRIVER_AW9106B:
             return true;    // TODO
         case RGB_DRIVER_IS31FL3731:
@@ -512,6 +532,7 @@ rgb_driver_t* rgb_driver_create(rgb_device_t *device, uint8_t index)
     driver->device = device;
     driver->data = NULL;
     switch(device->type) {
+#ifdef USE_WS2812
         case RGB_DRIVER_WS2812:
             driver->init = rd_ws2812_init;
             driver->set_color = rd_ws2812_set_color;
@@ -521,6 +542,8 @@ rgb_driver_t* rgb_driver_create(rgb_device_t *device, uint8_t index)
             driver->flush = rd_ws2812_flush;
             driver->uninit = rd_ws2812_uninit;
             break;
+#endif
+#ifdef USE_AW9523B
         case RGB_DRIVER_AW9523B:
             driver->init = rd_aw9523b_init;
             driver->set_color = rd_aw9523b_set_color;
@@ -530,6 +553,8 @@ rgb_driver_t* rgb_driver_create(rgb_device_t *device, uint8_t index)
             driver->flush = rd_aw9523b_flush;
             driver->uninit = rd_aw9523b_uninit;
             break;
+#endif
+#ifdef USE_AW9106B
         case RGB_DRIVER_AW9106B:
             driver->init = rd_aw9106b_init;
             driver->set_color = rd_aw9106b_set_color;
@@ -539,6 +564,8 @@ rgb_driver_t* rgb_driver_create(rgb_device_t *device, uint8_t index)
             driver->flush = rd_aw9106b_flush;
             driver->uninit = rd_aw9106b_uninit;
             break;
+#endif
+#ifdef USE_3731
         case RGB_DRIVER_IS31FL3731:
             driver->init = rd_3731_init;
             driver->set_color = rd_3731_set_color;
@@ -548,6 +575,8 @@ rgb_driver_t* rgb_driver_create(rgb_device_t *device, uint8_t index)
             driver->flush = rd_3731_flush;
             driver->uninit = rd_3731_uninit;
             break;
+#endif
+#ifdef USE_3733
         case RGB_DRIVER_IS31FL3733:
             driver->init = rd_3733_init;
             driver->set_color = rd_3733_set_color;
@@ -557,6 +586,8 @@ rgb_driver_t* rgb_driver_create(rgb_device_t *device, uint8_t index)
             driver->flush = rd_3733_flush;
             driver->uninit = rd_3733_uninit;
             break;
+#endif
+#ifdef USE_3236
         case RGB_DRIVER_IS31FL3236:
             driver->init = rd_3236_init;
             driver->set_color = rd_3236_set_color;
@@ -566,6 +597,8 @@ rgb_driver_t* rgb_driver_create(rgb_device_t *device, uint8_t index)
             driver->flush = rd_3236_flush;
             driver->uninit = rd_3236_uninit;
             break;
+#endif
+#ifdef USE_3741
         case RGB_DRIVER_IS31FL3741:
             driver->init = rd_3741_init;
             driver->set_color = rd_3741_set_color;
@@ -575,6 +608,8 @@ rgb_driver_t* rgb_driver_create(rgb_device_t *device, uint8_t index)
             driver->flush = rd_3741_flush;
             driver->uninit = rd_3741_uninit;
             break;
+#endif
+#ifdef USE_3746
         case RGB_DRIVER_IS31FL3746:
             driver->init = rd_3746_init;
             driver->set_color = rd_3746_set_color;
@@ -584,6 +619,8 @@ rgb_driver_t* rgb_driver_create(rgb_device_t *device, uint8_t index)
             driver->flush = rd_3746_flush;
             driver->uninit = rd_3746_uninit;
             break;
+#endif
+#ifdef USE_3729
         case RGB_DRIVER_IS31FL3729:
             driver->init = rd_3729_init;
             driver->set_color = rd_3729_set_color;
@@ -593,6 +630,7 @@ rgb_driver_t* rgb_driver_create(rgb_device_t *device, uint8_t index)
             driver->flush = rd_3729_flush;
             driver->uninit = rd_3729_uninit;
             break;
+#endif
         default:
             return NULL;
     }
