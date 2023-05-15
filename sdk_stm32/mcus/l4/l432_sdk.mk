@@ -11,10 +11,6 @@ APP_DEFS += \
 	-DSTM32L432xx \
     -DCFG_TUSB_MCU=OPT_MCU_STM32L4 \
 
-ifneq (yes, $(strip $(TINYUSB_USE_HAL)))
-	SRCS += $(STM32SDK_DIR)/mcus/$(MCU_SERIES)/dcd_stm32_fsdev.c
-endif
-
 ifeq (yes, $(strip $(RTOS_ENABLE)))
 	SRCS += $(STM32SDK_DIR)/mcus/$(MCU_SERIES)/stm32l4xx_hal_timebase_tim.c
 endif

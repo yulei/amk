@@ -21,6 +21,10 @@ else
 	SRCS += $(TINYUSB_DIR)/portable/st/stm32_fsdev/dcd_stm32_fsdev.c
 	endif
 
+	ifeq (STM32L432, $(strip $(MCU)))
+	SRCS += $(TINYUSB_DIR)/portable/st/stm32_fsdev/dcd_stm32_fsdev.c
+	endif
+
 	ifeq (STM32G431, $(strip $(MCU)))
 	SRCS += $(TINYUSB_DIR)/portable/st/stm32_fsdev/dcd_stm32_fsdev.c
 	endif
