@@ -54,6 +54,9 @@ ifeq (yes, $(strip $(RTOS_ENABLE)))
 #	include $(LIB_DIR)/cmsis_os.mk
 	include $(LIB_DIR)/cmsis_freertos.mk
 	APP_DEFS += -DRTOS_ENABLE
+	ifeq (yes, $(strip $(LPM_ENABLE)))
+		APP_DEFS += -DLPM_ENABLE
+	endif
 else
 	SRCS += $(MAIN_DIR)/amk/baremetal_main.c
 endif

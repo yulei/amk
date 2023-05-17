@@ -52,7 +52,11 @@ ifeq (STM32G431, $(strip $(MCU)))
 endif
 
 ifneq (,$(findstring $(strip $(MCU)), STM32L432 STM32L452))
-	SRCS += $(PLATFORM_PORTING_DIR)/stm32l4xx.c
+	ifeq (yes, $(strip $(LPM_ENABLE)))
+		SRCS += $(PLATFORM_PORTING_DIR)/stm32l4xx_lpm.c
+	else
+		SRCS += $(PLATFORM_PORTING_DIR)/stm32l4xx.c
+	endif
 endif
 
 ifneq (,$(findstring $(strip $(MCU)), STM32F412))

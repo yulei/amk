@@ -149,21 +149,11 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
   if(huart->Instance==LPUART1)
   {
   /* USER CODE BEGIN LPUART1_MspInit 0 */
 
   /* USER CODE END LPUART1_MspInit 0 */
-
-  /** Initializes the peripherals clock
-  */
-    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_LPUART1;
-    PeriphClkInit.Lpuart1ClockSelection = RCC_LPUART1CLKSOURCE_PCLK1;
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-    {
-      Error_Handler();
-    }
 
     /* Peripheral clock enable */
     __HAL_RCC_LPUART1_CLK_ENABLE();
@@ -181,7 +171,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     /* LPUART1 interrupt Init */
-    HAL_NVIC_SetPriority(LPUART1_IRQn, 1, 0);
+    HAL_NVIC_SetPriority(LPUART1_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(LPUART1_IRQn);
   /* USER CODE BEGIN LPUART1_MspInit 1 */
 
@@ -249,7 +239,7 @@ void HAL_LPTIM_MspInit(LPTIM_HandleTypeDef* hlptim)
     /* Peripheral clock enable */
     __HAL_RCC_LPTIM1_CLK_ENABLE();
     /* LPTIM1 interrupt Init */
-    HAL_NVIC_SetPriority(LPTIM1_IRQn, 1, 0);
+    HAL_NVIC_SetPriority(LPTIM1_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(LPTIM1_IRQn);
   /* USER CODE BEGIN LPTIM1_MspInit 1 */
 
@@ -311,6 +301,10 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc)
     /* Peripheral clock enable */
     __HAL_RCC_RTC_ENABLE();
   /* USER CODE BEGIN RTC_MspInit 1 */
+  
+  /*##-3- Configure the NVIC for RTC Alarm ###################################*/
+  //HAL_NVIC_SetPriority(RTC_WKUP_IRQn, 0x0, 0);
+  //HAL_NVIC_EnableIRQ(RTC_WKUP_IRQn);
 
   /* USER CODE END RTC_MspInit 1 */
   }
