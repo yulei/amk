@@ -282,7 +282,6 @@ void HAL_LPTIM_MspDeInit(LPTIM_HandleTypeDef* hlptim)
 */
 void HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc)
 {
-  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
   if(hrtc->Instance==RTC)
   {
   /* USER CODE BEGIN RTC_MspInit 0 */
@@ -291,21 +290,9 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc)
 
   /** Initializes the peripherals clock
   */
-    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC;
-    PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
     /* Peripheral clock enable */
     __HAL_RCC_RTC_ENABLE();
   /* USER CODE BEGIN RTC_MspInit 1 */
-  
-  /*##-3- Configure the NVIC for RTC Alarm ###################################*/
-  //HAL_NVIC_SetPriority(RTC_WKUP_IRQn, 0x0, 0);
-  //HAL_NVIC_EnableIRQ(RTC_WKUP_IRQn);
-
   /* USER CODE END RTC_MspInit 1 */
   }
 

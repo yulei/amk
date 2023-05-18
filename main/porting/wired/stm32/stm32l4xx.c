@@ -34,9 +34,10 @@ static void PeriphCommonClock_Config(void)
 
     /** Initializes the peripherals clock
      */
-    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB|RCC_PERIPHCLK_ADC;
+    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB|RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_RTC;
     PeriphClkInit.AdcClockSelection = RCC_ADCCLKSOURCE_SYSCLK;
     PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_HSI48;
+    PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
     {
         Error_Handler();

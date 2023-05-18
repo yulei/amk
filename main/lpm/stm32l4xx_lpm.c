@@ -48,6 +48,16 @@ static void UARTClock_Config(void)
     }
 }
 
+static void RTCClock_Config(void)
+{
+    RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+    PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
+        Error_Handler();
+    }
+}
+
 static void USBClock_Config(void)
 {
     RCC_CRSInitTypeDef RCC_CRSInitStruct = {0};
@@ -72,6 +82,7 @@ static void USBClock_Config(void)
 
 static void PeriphCommonClock_Config(void)
 {
+    RTCClock_Config();
     ADCClock_Config();
     UARTClock_Config();
     USBClock_Config();
@@ -229,8 +240,8 @@ void usb_port_init(void)
     __HAL_RCC_USB_CLK_ENABLE();
 
     /* Peripheral interrupt init */
-    HAL_NVIC_SetPriority(USB_IRQn, 15, 0);
-    //HAL_NVIC_EnableIRQ(USB_IRQn);
+    HAL_NVIC_SetPriority(USB_IRQn, 1, 0);
+    HAL_NVIC_EnableIRQ(USB_IRQn);
 }
 
 void custom_board_init(void)
@@ -260,26 +271,3 @@ void RTC_WKUP_IRQHandler(void)
     HAL_RTCEx_WakeUpTimerIRQHandler(&hrtc);
 }
 #endif
-
-void PreSleepProcessing(uint32_t ulExpectedIdleTime)
-{
-    (void) ulExpectedIdleTime;
-
-    /* Suspend the HAL Tick */
-    HAL_SuspendTick();
-
-    /*Enter to sleep Mode using the HAL function HAL_PWR_EnterSLEEPMode with WFI instruction*/
-    HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);  
-}
-
-void PostSleepProcessing(uint32_t ulExpectedIdleTime)
-{
-    /* Called by the kernel when the MCU exits a sleep mode because
-    configPOST_SLEEP_PROCESSING is #defined to PostSleepProcessing(). */
-
-    /* Avoid compiler warnings about the unused parameter. */
-    (void) ulExpectedIdleTime;
-
-    /* resume the HAL tick */
-    HAL_ResumeTick();
-}
