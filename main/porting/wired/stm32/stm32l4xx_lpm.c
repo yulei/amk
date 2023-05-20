@@ -129,6 +129,21 @@ void SystemClock_Config(void)
         Error_Handler();
     }
 
+    RCC_CRSInitTypeDef RCC_CRSInitStruct = {0};
+    /** Enable the SYSCFG APB clock
+     */
+    __HAL_RCC_CRS_CLK_ENABLE();
+
+    /** Configures CRS
+     */
+    RCC_CRSInitStruct.Prescaler = RCC_CRS_SYNC_DIV1;
+    RCC_CRSInitStruct.Source = RCC_CRS_SYNC_SOURCE_USB;
+    RCC_CRSInitStruct.Polarity = RCC_CRS_SYNC_POLARITY_RISING;
+    RCC_CRSInitStruct.ReloadValue = __HAL_RCC_CRS_RELOADVALUE_CALCULATE(48000000,1000);
+    RCC_CRSInitStruct.ErrorLimitValue = 34;
+    RCC_CRSInitStruct.HSI48CalibrationValue = 32;
+
+    HAL_RCCEx_CRSConfig(&RCC_CRSInitStruct);
     PeriphCommonClock_Config();
 }
 

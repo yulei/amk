@@ -181,11 +181,11 @@ void send_keyboard(report_keyboard_t *report)
         #ifdef NKRO_ENABLE
             if(keymap_config.nkro) {
                 usb_send_report(HID_REPORT_ID_NKRO, &report->nkro, sizeof(struct nkro_report));
-                amk_printf("NKRO report to queue\n");
+                //amk_printf("NKRO report to queue\n");
                 return;
             }
         #endif
-            amk_printf("STD report to queue\n");
+            //amk_printf("STD report to queue\n");
             usb_send_report(HID_REPORT_ID_KEYBOARD, report, KEYBOARD_REPORT_SIZE);
         }
     }
