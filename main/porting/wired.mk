@@ -14,9 +14,7 @@ INCS += \
 	$(COMMON_PORTING_DIR) \
 
 ifneq (yes, $(strip $(RTOS_ENABLE)))
-	ifneq (yes, $(strip $(LPM_ENABLE)))
-		SRCS += $(COMMON_PORTING_DIR)/wired_board.c
-	endif
+	SRCS += $(COMMON_PORTING_DIR)/wired_board.c
 endif
 
 ifeq (yes, $(strip $(TINYUSB_ENABLE)))

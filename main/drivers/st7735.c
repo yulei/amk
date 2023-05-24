@@ -205,7 +205,7 @@ static const uint8_t
 
 #ifdef GC9107_AS_ST7735
   init_cmds3[] = {            // Init for 7735R, part 3 (red or green tab)
-    4,                        //  4 commands in list:
+    2,                        //  4 commands in list:
     0xF0, 14      , //  1: gama table 1 no delay:
     0x1F, 0x28, 0x04, 0x3E,
     0x2A, 0x2E, 0x20, 0x00,
@@ -216,15 +216,11 @@ static const uint8_t
     0X00, 0X2D, 0X2F, 0X3C,
     0X6F, 0X1C, 0X0B, 0X00,
     0X00, 0X00, 0X07, 0X0D,
-    0X11, 0X0f,
+    0X11, 0X0f},
 
-    ST7735_NORON  ,    DELAY, //  3: Normal display on, no args, w/delay
-      10,                     //     10 ms delay
-    ST7735_DISPON ,    DELAY, //  4: Main screen turn on, no args w/delay
-      100 };                  //     100 ms delay
 #else
   init_cmds3[] = {            // Init for 7735R, part 3 (red or green tab)
-    4,                        //  4 commands in list:
+    2,                        //  2 commands in list:
     ST7735_GMCTRP1, 16      , //  1: Magical unicorn dust, 16 args, no delay:
       0x02, 0x1c, 0x07, 0x12,
       0x37, 0x32, 0x29, 0x2d,
@@ -234,13 +230,15 @@ static const uint8_t
       0x03, 0x1d, 0x07, 0x06,
       0x2E, 0x2C, 0x29, 0x2D,
       0x2E, 0x2E, 0x37, 0x3F,
-      0x00, 0x00, 0x02, 0x10,
-    ST7735_NORON  ,    DELAY, //  3: Normal display on, no args, w/delay
-      10,                     //     10 ms delay
-    ST7735_DISPON ,    DELAY, //  4: Main screen turn on, no args w/delay
-      100 };                  //     100 ms delay
+      0x00, 0x00, 0x02, 0x10},
 #endif
 
+  init_cmds4[] = {            // Init for 7735R, part 4 (turn display on)
+    2,                        //  2 commands in list:
+    ST7735_NORON  ,    DELAY, //  1: Normal display on, no args, w/delay
+      10,                     //     10 ms delay
+    ST7735_DISPON ,    DELAY, //  2: Main screen turn on, no args w/delay
+      100 };                  //     100 ms delay
 typedef struct {
     screen_driver_param_t param;
     spi_handle_t          spi;
@@ -392,6 +390,7 @@ void st7735_init(screen_driver_t *lcd)
             write_data(driver, (uint8_t*)&color, sizeof(color));
         }
     }
+    execute_commands(driver, init_cmds4);
     st7735_unselect(driver);
 }
 

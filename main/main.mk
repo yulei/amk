@@ -54,14 +54,11 @@ ifeq (yes, $(strip $(RTOS_ENABLE)))
 #	include $(LIB_DIR)/cmsis_os.mk
 	include $(LIB_DIR)/cmsis_freertos.mk
 	APP_DEFS += -DRTOS_ENABLE
-else
 	ifeq (yes, $(strip $(LPM_ENABLE)))
-		SRCS += $(MAIN_DIR)/lpm/lpm_main.c
-		SRCS += $(MAIN_DIR)/lpm/stm32l4xx_lpm.c
 		APP_DEFS += -DLPM_ENABLE
-	else
-		SRCS += $(MAIN_DIR)/amk/baremetal_main.c
 	endif
+else
+	SRCS += $(MAIN_DIR)/amk/baremetal_main.c
 endif
 
 ifeq (yes, $(strip $(USB_DEVICE_ENABLE)))
