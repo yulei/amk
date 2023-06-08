@@ -124,17 +124,19 @@ static uint8_t i2c_sw_wait_ack(void)
 
 static uint8_t i2c_sw_write_byte(uint8_t byte)
 {
-    uint8_t i = 8;
-
-    while (i-- > 0) {
+    for (int i = 0; i < 8; i++) {
         i2c_sw_scl_out(I2C_SW_L);
         i2c_sw_delay();
+
         i2c_sw_sda_out((byte&0x80) ? I2C_SW_H:I2C_SW_L);
-        byte <<= 1;
         i2c_sw_delay();
+        byte <<= 1;
+
         i2c_sw_scl_out(I2C_SW_H);
         i2c_sw_delay();
+
     }
+
     i2c_sw_scl_out(I2C_SW_L);
 
     return i2c_sw_wait_ack();
@@ -142,20 +144,16 @@ static uint8_t i2c_sw_write_byte(uint8_t byte)
 
 static uint8_t i2c_sw_read_byte(uint8_t ack)
 {
-    uint8_t i = 8;
-    uint8_t read_byte = 0;
-
+    uint8_t byte = 0;
     i2c_sw_scl_out(I2C_SW_L);
     i2c_sw_sda_dir(I2C_SW_IN);
-    while (i-- > 0) {
-        read_byte <<= 1;
+    for (int i = 0; i < 8; i++) {
         i2c_sw_scl_out(I2C_SW_L);
         i2c_sw_delay();
         i2c_sw_scl_out(I2C_SW_H);
         i2c_sw_delay();
-        if (i2c_sw_sda_in()) {
-            read_byte |= 0x01;
-        }
+        byte |= i2c_sw_sda_in();
+        byte <<= 1;
     }
 
     i2c_sw_scl_out(I2C_SW_L);
@@ -166,7 +164,8 @@ static uint8_t i2c_sw_read_byte(uint8_t ack)
     } else {
         i2c_sw_ack();
     }
-    return read_byte;
+
+    return byte;
 }
 
 typedef struct {
