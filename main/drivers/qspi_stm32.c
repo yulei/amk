@@ -167,7 +167,7 @@ amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t le
         qspi_debug("QSPI: write_sector: invalid address:%u\n", address);
         return AMK_QSPI_INVALID_PARAM;
     } else {
-        if (QSPI_EraseSector(&hqspi, address) != AMK_SUCCESS) {
+        if ( QSPI_EraseSector(&hqspi, address) != AMK_SUCCESS) {
             qspi_debug("QSPI: write_sector: faled to erase sector:%u\n", address);
             return AMK_QSPI_ERROR;
         }
