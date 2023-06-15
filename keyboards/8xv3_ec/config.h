@@ -60,10 +60,14 @@
 //#define AUDIO_DISPLAY_NUM   1
 #define RENDER_BUFFER_SIZE  (60*60*2)
 
-#if 0
 #define CAPS_LED_PIN    A8
-#define WS2812_LED_NUM  4
-#define WS2812_LED_PIN  B7
+
+#if 1
+#define USE_WS2812
+#define USE_3236
+
+#define WS2812_LED_NUM      7
+#define WS2812_LED_PIN      B7
 
 #define USE_PWM_TIM4
 #define PWM_TIM_PERIOD      119
@@ -75,13 +79,14 @@
 #define PWM_DMA_IRQHnadler  DMA1_Stream3_IRQHandler
 
 #define USE_I2C1
-#define RGB_LED_NUM     (4+12)
-#define RGB_DEVICE_NUM  2
-#define RGB_SEGMENT_NUM 2
+#define RGB_LED_NUM         (WS2812_LED_NUM+6)
+#define RGB_DEVICE_NUM      2
+#define RGB_SEGMENT_NUM     3
+
 #endif
 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
-#define DEBOUNCE        8
+#define DEBOUNCE        5
 #define HSE_VALUE       16000000
 #define VECT_TAB_OFFSET 0x20000
 #define DWT_DELAY
@@ -89,5 +94,5 @@
 
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 
-#define VIAL_INSECURE
 #define VIAL_KEYBOARD_UID {0x46, 0x52, 0xB3, 0xFD, 0xD6, 0x01, 0xD1, 0x3B}
+

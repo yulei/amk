@@ -2,8 +2,8 @@
 MCU = STM32F446
 TINYUSB_ENABLE = yes
 TINYUSB_USE_HAL = yes
-#RGB_LINEAR_ENABLE = yes
-#MATRIX_EC_ENABLE = yes
+RGB_LINEAR_ENABLE = yes
+AMK_CUSTOM_MATRIX = yes
 EECONFIG_FLASH = yes
 VIAL_ENABLE = yes
 MSC_ENABLE = yes
@@ -17,7 +17,6 @@ UF2_FAMILY = STM32F4
 
 SRCS += \
 	$(KEYBOARD_DIR)/8xv3_ec.c \
-	$(KEYBOARD_DIR)/8xv3_ec_gcmap.c \
 	$(KEYBOARD_DIR)/ec_matrix.c \
 	$(KEYBOARD_DIR)/display.c \
 	$(MAIN_DIR)/drivers/st7735.c

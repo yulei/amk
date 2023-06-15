@@ -2,9 +2,7 @@
  * @file ec_matrix.c
  */
 
-#include "matrix.h"
-#include "wait.h"
-#include "led.h"
+#include "quantum.h"
 
 #include "amk_gpio.h"
 #include "amk_utils.h"
@@ -23,16 +21,39 @@
 #define COL_A_MASK  0x01
 #define COL_B_MASK  0x02
 #define COL_C_MASK  0x04
+
 /*
 #define L_MASK      0x08
 #define R_MASK      0x10
 */
 
+struct ec_mode_t{
+    uint32_t low;
+    uint32_t high;
+};
+
+#define EC_MODE_MAX 3
+struct ec_mode_t ec_modes[EC_MODE_MAX] = {
+    {1024, 1280},
+    {864, 1024},
+    {1280, 1444},
+};
+
+static uint32_t ec_mode_current = 0;
+
+void ec_mode_iter(void)
+{
+    ec_mode_current = (ec_mode_current+1) % EC_MODE_MAX;
+    custom_matrix_debug("ec mode changed to:%d\n", ec_mode_current);
+    eeconfig_update_kb(ec_mode_current);
+}
 static pin_t custom_row_pins[] = MATRIX_ROW_PINS;
 static pin_t custom_col_pins[] = MATRIX_COL_PINS;
 
 void matrix_init_custom(void)
 {
+    ec_mode_current = eeconfig_read_kb();
+
 #ifdef RGB_EN_PIN
     gpio_set_output_pushpull(RGB_EN_PIN);
     gpio_write_pin(RGB_EN_PIN, 1);
@@ -101,19 +122,16 @@ static uint32_t adc_read(void)
 static bool sense_key(pin_t row, bool on)
 {
     bool key_down = false;
-    //gpio_write_pin(DISCHARGE_PIN, 0);
-    //wait_us(15);
-    //gpio_write_pin(DISCHARGE_PIN, 0);
     gpio_set_input_floating(DISCHARGE_PIN);
     gpio_write_pin(row, 1);
     uint32_t data = adc_read();
     // press to release
     if (on) {
-        if (data > EC_TH_LOW) {
+        if (data > ec_modes[ec_mode_current].low) {
             key_down = true;
         }
     } else {
-        if (data > EC_TH_HIGH) {
+        if (data > ec_modes[ec_mode_current].high) {
             key_down = true;
         }
     }
