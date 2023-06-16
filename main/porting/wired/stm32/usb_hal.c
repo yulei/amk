@@ -43,6 +43,8 @@ bool amk_usb_itf_ready(uint32_t type)
     case HID_REPORT_ID_SYSTEM:
     case HID_REPORT_ID_CONSUMER:
         return usbd_comp_itf_ready(&hUsbDeviceFS, ITF_NUM_HID_OTHER);
+    case HID_REPORT_ID_VIAL:
+        return usbd_comp_itf_ready(&hUsbDeviceFS, ITF_NUM_VIAL);
     default:
         break;
     }
@@ -63,6 +65,9 @@ bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t si
         break;
     case HID_REPORT_ID_CONSUMER:
         usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_CONSUMER, (uint8_t*)data, size);
+        break;
+    case HID_REPORT_ID_VIAL:
+        usbd_comp_send(&hUsbDeviceFS, HID_REPORT_ID_VIAL, (uint8_t*)data, size);
         break;
     }
     return true;

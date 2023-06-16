@@ -34,6 +34,10 @@ enum
     CMD_VIAL_REQUEST,
     CMD_VIAL_RESPONSE,
     CMD_NKRO_REPORT,
+    CMD_RGB_LED,
+    CMD_USB_STATE,
+    CMD_PING,
+    CMD_PONG,
 };
 
 void rf_driver_init(bool use_rf);

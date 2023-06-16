@@ -142,6 +142,7 @@ else
 	SRCS += $(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_pcd_ex.c
 	SRCS += $(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_ll_usb.c 
 	APP_DEFS += -DHAL_PCD_MODULE_ENABLED
+	APP_DEFS += -DHALUSB_ENABLE
 endif #TINYUSB_ENABLE
 
 LINKER_PATH	?= $(STM32SDK_DIR)/mcus/linker

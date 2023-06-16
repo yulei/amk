@@ -11,7 +11,7 @@
 #include "amk_printf.h"
 
 #ifdef VIAL_ENABLE
-#include "vial_porting.h"
+#include "raw_hid.h"
 #endif
 
 bool usb_led_event = false;
@@ -619,7 +619,8 @@ static uint8_t  hid_dataout(USBD_HandleTypeDef *pdev, uint8_t epnum, void* user)
 #ifdef VIAL_ENABLE
     if (handle->type == HID_HANDLE_TYPE_VIAL) {
         amk_printf("USBD HID dataout: \n");
-        vial_process(handle->report, USBD_HID_VIAL_EPOUT_SIZE);
+        //vial_process(handle->report, USBD_HID_VIAL_EPOUT_SIZE);
+        raw_hid_receive(handle->report, USBD_HID_VIAL_EPOUT_SIZE);
     }
 #endif
     return USBD_OK;

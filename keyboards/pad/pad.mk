@@ -1,14 +1,14 @@
 
-
 MCU = STM32F405
 USB_HOST_ENABLE = yes
 EECONFIG_FLASH = yes
 RGB_MATRIX_ENABLE = yes
 RGB_LINEAR_ENABLE = yes
 VIAL_ENABLE = yes
+NKRO_ENABLE = yes
+AMK_CUSTOM_MATRIX = yes
 
 LINKER_PATH = $(KEYBOARD_DIR)
 
 SRCS += $(KEYBOARD_DIR)/pad.c
-SRCS += $(KEYBOARD_DIR)/pad_gcmap.c
-#SRCS += $(KEYBOARD_DIR)/pad_hs_keymap.c
+SRCS += $(KEYBOARD_DIR)/direct_pins.c

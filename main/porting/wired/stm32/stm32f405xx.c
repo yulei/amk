@@ -111,6 +111,7 @@ static void MX_GPIO_Init(void)
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
     __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOD_CLK_ENABLE();
 }
 
 static void MX_DMA_Init(void)
@@ -261,8 +262,6 @@ static void MX_I2C1_Init(void)
   */
 static void MX_I2C2_Init(void)
 {
-    return;
-
   /* USER CODE BEGIN I2C2_Init 0 */
 
   /* USER CODE END I2C2_Init 0 */

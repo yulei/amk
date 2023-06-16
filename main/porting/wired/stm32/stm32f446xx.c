@@ -268,6 +268,8 @@ static void MX_SPI3_Init(void)
 #endif
 
 #ifdef USE_PWM_TIM4
+extern void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim);
+
 static void MX_TIM4_Init(void)
 {
     TIM_MasterConfigTypeDef sMasterConfig = {0};
