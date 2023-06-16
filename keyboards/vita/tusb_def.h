@@ -109,7 +109,7 @@
 
 // interface configuration
 #define CFG_TUD_HID_EP_BUFSIZE      32
-#define CFG_TUD_HID_POLL_INTERVAL   10
+#define CFG_TUD_HID_POLL_INTERVAL   1
 #define CFG_TUD_ENDPOINT0_SIZE      64
 #define CFG_TUD_VENDOR_EPSIZE       64
 #define CFG_TUD_VENDOR_RX_BUFSIZE   CFG_TUD_VENDOR_EPSIZE

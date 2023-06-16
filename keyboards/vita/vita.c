@@ -1,10 +1,13 @@
-/*
- * m65.c
- */
+/**
+ * @file vita.c
+ * @author astro
+ * 
+ * @copyright Copyright (c) 2023
+*/
 
 #include <string.h>
 
-#include "m65.h"
+#include "vita.h"
 #include "timer.h"
 #include "led.h"
 #include "amk_gpio.h"
@@ -26,11 +29,6 @@ extern RTC_HandleTypeDef hrtc;
 static void reset_to_msc(bool msc);
 #endif
 
-#ifdef SCREEN_ENABLE
-#include "screen.h"
-#endif
-
-
 #ifdef MSC_ENABLE
 #include "mscusb.h"
 #include "anim.h"
@@ -38,6 +36,26 @@ static void reset_to_msc(bool msc);
 #include "rtc_driver.h"
 #include "def_font.h"
 #include "ff.h"
+
+#include "st7735.h"
+static screen_driver_t st7735_driver;
+static screen_driver_param_t st7735_driver_params = {
+    INVALID_PIN,
+    SCREEN_0_PWR,
+    0,
+    SCREEN_0_RESET,
+    SCREEN_0_CS,
+    SCREEN_0_DC,
+    INVALID_PIN,
+    INVALID_PIN,
+    SPI_LCD_ST7735,
+};
+
+static void screen_st7735_init(void)
+{
+    st7735_config(&st7735_driver, &st7735_driver_params);
+    st7735_init(&st7735_driver);
+}
 
 enum {
     MODE_SINGLE,
@@ -344,26 +362,25 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
 
 static uint32_t last_ticks = 0;
 
-#ifdef SCREEN_ENABLE
 static void set_screen_state(bool enable)
 {
     if (enable) {
         gpio_set_output_pushpull(SCREEN_0_PWR);
         gpio_write_pin(SCREEN_0_PWR, SCREEN_0_PWR_EN);
         wait_ms(1);
-        screen_init();
+        //screen_init();
+        screen_st7735_init();
     } else {
         gpio_set_output_pushpull(SCREEN_0_PWR);
         gpio_write_pin(SCREEN_0_PWR, !SCREEN_0_PWR_EN);
         wait_ms(1);
     }
 }
-#endif
 
 //#if defined(DYNAMIC_CONFIGURATION) || defined(MSC_ENABLE)
 void matrix_init_kb(void)
 {
-#if defined(SCREEN_ENABLE) && !defined(RTOS_ENABLE)
+#if !defined(RTOS_ENABLE)
     set_screen_state(screen_enable);
 #endif
 
@@ -384,7 +401,7 @@ void render_datetime(render_t *render)
     }
 
     if (filling) {
-        if (screen_fill_ready()) {
+        if (st7735_fill_ready(&st7735_driver)) {
             filling = false;
         } else {
             return;
@@ -403,7 +420,7 @@ void render_datetime(render_t *render)
         }
     }
 
-    screen_fill_rect_async(render->x, render->y, render->width, render->height, render->buf, render->buf_size);
+    st7735_fill_rect_async(&st7735_driver,render->x, render->y, render->width, render->height, render->buf, render->buf_size);
     filling = true;
     rtc_datetime_dirty = false;
 }
@@ -422,7 +439,7 @@ void render_task(render_t* render)
     }*/
 
     if (filling) {
-        if (screen_fill_ready()) {
+        if (st7735_fill_ready(&st7735_driver)) {
             filling = false;
         } else {
             return;
@@ -461,7 +478,7 @@ void render_task(render_t* render)
                 //render->anim = NULL;
             }
         }
-        screen_fill_rect_async(render->x, render->y, render->width, render->height, render->buf, render->buf_size);
+        st7735_fill_rect_async(&st7735_driver,render->x, render->y, render->width, render->height, render->buf, render->buf_size);
         filling = true;
         render->ticks = timer_read32();
     }
@@ -508,64 +525,42 @@ void msc_task_kb(void)
 }
 #endif
 
-#ifdef SCREEN_ENABLE
-void screen_task_kb(void)
-{
-}
-#endif
-
-void led_set(uint8_t led)
-{
-    if (led & (1 << USB_LED_CAPS_LOCK)) {
-        m65_debug("turn caps on\n");
-        gpio_write_pin(CAPS_LED_PIN, 0);
-    } else {
-        m65_debug("turn caps off\n");
-        gpio_write_pin(CAPS_LED_PIN, 1);
-    }
-}
-
 #ifdef DYNAMIC_CONFIGURATION
-#include "action.h"
-#include "action_layer.h"
+#include "quantum.h"
 #include "usb_interface.h"
 
-bool hook_process_action_main(keyrecord_t *record)
+bool process_record_kb(uint16_t keycode, keyrecord_t *record)
 {
-    if (IS_NOEVENT(record->event) || !record->event.pressed) { 
-        return false;
-    }
-    action_t action = layer_switch_get_action(record->event);
-    if (action.kind.id != ACT_MODS) {
-        return false;
+    if (!record->event.pressed) {
+        return true;
     }
 
-    switch(action.key.code) {
+    switch(keycode) {
          case KC_F14:
             typing_enable = !typing_enable;
             if(typing_enable) update_speed();
             m65_debug("typing enabled: %d\n", typing_enable);
-            return true;
+            return false;
         case KC_F16:
             screen_enable = !screen_enable;
             set_screen_state(screen_enable);
             m65_debug("screen enabled: %d\n", screen_enable);
-            return true;
+            return false;
         case KC_F17:
             rtc_datetime_inc_second();
             m65_debug("datetime_mode: increase second\n");
-            return true;
+            return false;
         case KC_F18:
             rtc_datetime_dec_second();
             m65_debug("datetime_mode: decrease second\n");
-            return true;
+            return false;
         case KC_F19:
             rtc_datetime_mode = !rtc_datetime_mode;
             m65_debug("datetime_mode switch: %d\n", rtc_datetime_mode);
-            return true;
+            return false;
         case KC_F20:
             first_screen = !first_screen;
-            return true;
+            return false;
         case KC_F21: {
             render_t *render = NULL;
             if (first_screen) {
@@ -574,19 +569,19 @@ bool hook_process_action_main(keyrecord_t *record)
                 render = &renders[1];
             }
             render->mode = (render->mode+1) % MODE_MAX;
-        } return true;
+        } return false;
         //case KC_F23:
         //    msc_erase();
         //    reset_to_msc(true);
         //    return true;
         case KC_F24: 
             reset_to_msc((usb_setting & USB_MSC_BIT) ? false : true);
-            return true;
+            return false;
         default:
             break;
     }
 
-    return false;
+    return true;
 }
 
 
