@@ -269,50 +269,45 @@ void screen_task_kb(void)
 {
 }
 
-#include "action.h"
-#include "action_layer.h"
+#include "quantum.h"
 #include "usb_interface.h"
 
-bool hook_process_action_main(keyrecord_t *record)
+bool process_record_kb(uint16_t keycode, keyrecord_t *record)
 {
-    if (IS_NOEVENT(record->event) || !record->event.pressed) { 
-        return false;
-    }
-    action_t action = layer_switch_get_action(record->event);
-    if (action.kind.id != ACT_MODS) {
-        return false;
+    if (!record->event.pressed) {
+        return true;
     }
 
-    switch(action.key.code) {
+    switch(keycode) {
 #ifdef TYPING_SPEED
         case KC_F14:
             typing_enable = !typing_enable;
             if(typing_enable) update_speed();
             disp_debug("typing enabled: %d\n", typing_enable);
-            return true;
+            return false;
 #endif
         case KC_F16:
             screen_enable = !screen_enable;
             set_screen_state(screen_enable);
             disp_debug("screen enabled: %d\n", screen_enable);
-            return true;
+            return false;
         case KC_F21: {
             render_t *render = NULL;
             render = &renders[0];
             render->mode = (render->mode+1) % MODE_MAX;
-        } return true;
+        } return false;
         //case KC_F23:
         //    msc_erase();
         //    reset_to_msc(true);
-        //    return true;
+        //    return false;
         case KC_F24: 
             reset_to_msc((usb_setting & USB_MSC_BIT) ? false : true);
-            return true;
+            return false;
         default:
             break;
     }
 
-    return false;
+    return true;
 }
 
 static void reset_to_msc(bool msc)

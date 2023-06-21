@@ -1,8 +1,12 @@
-/*
- * m65.c
- */
+/**
+ * @file vita_c.c
+ * @author astro
+ * 
+ * @copyright Copyright(c) 2023
+*/
 
-#include "m65.h"
+#include "vita_c.h"
+
 #include "led.h"
 
 #ifdef RGB_ENABLE
@@ -24,24 +28,16 @@ rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
 rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
     {0, 1, 4},
 };
-#endif
 
-#ifdef RGB_INDICATOR_ENABLE
-#include "led.h"
-#include "rgb_indicator.h"
-uint8_t g_rgb_indicator_index[RGB_INDICATOR_LED_NUM] = {0};
-#define CAPS_LED    0
-#endif
+#define CAPS_LED_INDEX 0
 
-void indicator_led_set(uint8_t led)
+void rgb_led_pre_flush(void)
 {
-#ifdef RGB_INDICATOR_ENABLE
+    uint8_t led = host_keyboard_leds();
     if (led & (1 << USB_LED_CAPS_LOCK)) {
-        rgb_indicator_set(CAPS_LED, 0xFF, 0xFF, 0xFF);
-        amk_printf("turn caps on\n");
+        rgb_linear_set_rgb(0, CAPS_LED_INDEX, 0xFF, 0xFF, 0xFF);
     } else {
-        rgb_indicator_set(CAPS_LED, 0, 0, 0);
-        amk_printf("turn caps off\n");
+        rgb_linear_set_rgb(0, CAPS_LED_INDEX, 0, 0, 0);
     }
-#endif
 }
+#endif

@@ -19,8 +19,6 @@
 #define MATRIX_ROW_PINS { A1, A15, D2, C12, B1}
 #define MATRIX_COL_PINS { A8, A10, C9, C8, C7, C6, B7, B6, B5, B4, C10, B10, B11, B2, B0}
 
-//#define CAPS_LED_PIN    A10
-
 #define USE_SPI1
 #define SCREEN_ROTATION     1
 #define SCREEN_DRIVER_NUM   1
@@ -35,18 +33,16 @@
 #define SCREEN_0_RESET      A3
 #define SCREEN_0_DC         A4
 #define SSD1357_SPI_ID      SPI_INSTANCE_1
-//#define SPI1_PRESCALE       SPI_BAUDRATEPRESCALER_8
-//#define SPI1_POLARITY       SPI_POLARITY_LOW
-//#define SPI1_PHASE          SPI_PHASE_1EDGE 
 
 #define USE_SPI2
 #define FLASH_CS            B12
 #define W25QXX_SPI_ID       SPI_INSTANCE_2
 
-#define USE_I2C1
+//#define USE_I2C1
 #define I2C1_SCL_PIN            B8
 #define I2C1_SDA_PIN            B9
 
+#define USE_WS2812
 #define WS2812_LED_NUM          5
 #define WS2812_LED_PIN          A0
 #define PWM_TIM_PERIOD          104
@@ -56,9 +52,7 @@
 #define RGB_LED_NUM             5
 #define RGB_DEVICE_NUM          1
 #define RGB_SEGMENT_NUM         1
-#define RGB_INDICATOR_LED_NUM   1
 
-#define VIAL_INSECURE
 #define VIAL_KEYBOARD_UID {0xD6, 0x04, 0xE0, 0x1E, 0x8E, 0xC0, 0xA1, 0xE4}
 
 //#define WDT_ENABLE
