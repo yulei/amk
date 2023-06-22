@@ -26,11 +26,21 @@
 #define FLASH_RW_SIZE           8
 
 #elif defined(STM32F411xE) || defined(STM32F722xx) || defined(STM32F405xx) || defined(STM32F446xx) || defined(STM32F401xC) || defined(STM32F412Rx)
+#ifndef FLASH_BASE_ADDRESS
 #define FLASH_BASE_ADDRESS      0x8010000
+#endif
+#ifndef FLASH_TOTAL_SIZE
 #define FLASH_TOTAL_SIZE        0x10000
+#endif
+#ifndef FLASH_SECTOR_ID
 #define FLASH_SECTOR_ID         FLASH_SECTOR_4
+#endif
+#ifndef FLASH_SECTOR_NUM
 #define FLASH_SECTOR_NUM        1
+#endif
+#ifndef FLASH_RW_SIZE
 #define FLASH_RW_SIZE           4
+#endif
 #else
 #error "eeconfig flash: unsupported mcu"
 #endif
@@ -114,7 +124,7 @@ void flash_erase_pages(void)
 #else
     #error "Flash Erase: unsupported mcu"
 #endif
-    HAL_FLASHEx_Erase(&erase, &error);
+    HAL_StatusTypeDef status = HAL_FLASHEx_Erase(&erase, &error);
     flash_lock();
-    amk_printf("Flash erase page, error=%d\n", error);
+    amk_printf("Flash erase page, statuc = %d, error=%d\n", status, error);
 }
