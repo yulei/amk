@@ -73,5 +73,4 @@
 #define VECT_TAB_OFFSET 0x20000
 #define HSE_VALUE       16000000
 
-#define VIAL_INSECURE
 #define VIAL_KEYBOARD_UID {0x7D, 0xCE, 0x7A, 0x3A, 0xE0, 0xE5, 0xBC, 0xF0}

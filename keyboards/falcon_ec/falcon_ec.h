@@ -4,7 +4,7 @@
   */
 #pragma once
 
-#include "amk_keycode.h"
+#include "quantum.h"
 
 #define LAYOUT_default( \
     K101, K102, K103, K104, K105, K106, K107, K108, K109, K110, K111, K112, K113, K114, K115, \
