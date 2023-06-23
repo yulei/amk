@@ -1,8 +1,8 @@
 /**
- * @file falcon_ec.c
+ * @file des_60.c
  */
 
-#include "hhkb_des.h"
+#include "des_60.h"
 #include "amk_gpio.h"
 #include "amk_printf.h"
 #include "ec_matrix.h"
