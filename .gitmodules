@@ -25,3 +25,6 @@
 [submodule "libs/qmk"]
 	path = libs/qmk
 	url = https://github.com/yulei/qmk_lib.git
+[submodule "libs/nes"]
+	path = libs/nes
+	url = https://github.com/yulei/nofrendo_arcada.git
