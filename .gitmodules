@@ -25,6 +25,3 @@
 [submodule "libs/qmk"]
 	path = libs/qmk
 	url = https://github.com/yulei/qmk_lib.git
-[submodule "libs/nofrendo"]
-	path = libs/nofrendo
-	url = https://github.com/yulei/nofrendo_arcada.git
