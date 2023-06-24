@@ -80,5 +80,4 @@
 #define DWT_DELAY
 #define SUSPEND_RECONNECT
 
-#define VIAL_INSECURE
 #define VIAL_KEYBOARD_UID {0x64, 0x20, 0x09, 0xF6, 0x28, 0x2C, 0x68, 0xD5}
