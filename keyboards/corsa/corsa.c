@@ -120,12 +120,12 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
 };
 
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
-    {RGB_DRIVER_IS31FL3729, 0x68, 0, 0, 45},
-    {RGB_DRIVER_IS31FL3729, 0x6E, 1, 45, 45},
+    {RGB_DRIVER_IS31FL3729, 0x68, 0, 0, 41},
+    {RGB_DRIVER_IS31FL3729, 0x6E, 1, 41, 27},
 };
 
 rgb_param_t g_rgb_matrix_params[RGB_MATRIX_NUM] = {
-    {0, 0, 90},
+    {0, 0, 68},
 };
 
 #include "rgb_effect_matrix_qmk.h"
@@ -172,6 +172,7 @@ led_config_t g_led_config = {
 
 #define CAPS_LED_INDEX 18
 
+#if 1
 void rgb_led_pre_flush(void)
 {
     if (!rgb_matrix_enabled(0)) {
@@ -182,6 +183,7 @@ void rgb_led_pre_flush(void)
         }
     }
 }
+#endif
 
 #else
 
