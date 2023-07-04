@@ -121,8 +121,13 @@ static void MX_GPIO_Init(void)
 }
 
 #ifdef USE_ADC1
+__attribute__((weak))
+int adc_init_kb(void) { return 0;}
+
 static void MX_ADC1_Init(void)
 {
+    if (adc_init_kb()) return;
+
     ADC_ChannelConfTypeDef sConfig = {0};
     /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
      */
@@ -146,7 +151,7 @@ static void MX_ADC1_Init(void)
      */
     sConfig.Channel = ADC_CHANNEL_2;
     sConfig.Rank = 1;
-    sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
+    sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
     if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
     {
         Error_Handler();

@@ -89,6 +89,9 @@ void HAL_MspInit(void)
 }
 
 #ifdef USE_ADC1
+__attribute__((weak))
+int adc_msp_init_kb(void) { return 0;}
+
 /**
 * @brief ADC MSP Initialization
 * This function configures the hardware resources used in this example
@@ -97,6 +100,8 @@ void HAL_MspInit(void)
 */
 void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 {
+  if (adc_msp_init_kb()) return;
+
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(hadc->Instance==ADC1)
   {
@@ -110,6 +115,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     /**ADC1 GPIO Configuration
     PA2     ------> ADC1_IN2
     */
+    //GPIO_InitStruct.Pin = GPIO_PIN_1;
     GPIO_InitStruct.Pin = GPIO_PIN_2;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
