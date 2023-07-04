@@ -51,7 +51,7 @@
 
 #define RGB_LED_NUM             5
 #define RGB_DEVICE_NUM          1
-#define RGB_SEGMENT_NUM         1
+#define RGB_SEGMENT_NUM         2
 
 #define VIAL_KEYBOARD_UID {0xD6, 0x04, 0xE0, 0x1E, 0x8E, 0xC0, 0xA1, 0xE4}
 

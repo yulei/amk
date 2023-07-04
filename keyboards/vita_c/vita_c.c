@@ -22,11 +22,12 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
 
 
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
-    {RGB_DRIVER_WS2812, 0, 0, 1, 4},
+    {RGB_DRIVER_WS2812, 0, 0, 0, 5},
 };
 
 rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
     {0, 1, 4},
+    {1, 0, 1},
 };
 
 #define CAPS_LED_INDEX 0
@@ -35,9 +36,9 @@ void rgb_led_pre_flush(void)
 {
     uint8_t led = host_keyboard_leds();
     if (led & (1 << USB_LED_CAPS_LOCK)) {
-        rgb_linear_set_rgb(0, CAPS_LED_INDEX, 0xFF, 0xFF, 0xFF);
+        rgb_linear_set_rgb(1, CAPS_LED_INDEX, 0xFF, 0xFF, 0xFF);
     } else {
-        rgb_linear_set_rgb(0, CAPS_LED_INDEX, 0, 0, 0);
+        rgb_linear_set_rgb(1, CAPS_LED_INDEX, 0, 0, 0);
     }
 }
 #endif
