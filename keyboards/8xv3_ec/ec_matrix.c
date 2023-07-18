@@ -27,6 +27,7 @@
 #define R_MASK      0x10
 */
 
+#if 0
 struct ec_mode_t{
     uint32_t low;
     uint32_t high;
@@ -47,12 +48,14 @@ void ec_mode_iter(void)
     custom_matrix_debug("ec mode changed to:%d\n", ec_mode_current);
     eeconfig_update_kb(ec_mode_current);
 }
+#endif
+
 static pin_t custom_row_pins[] = MATRIX_ROW_PINS;
 static pin_t custom_col_pins[] = MATRIX_COL_PINS;
 
 void matrix_init_custom(void)
 {
-    ec_mode_current = eeconfig_read_kb();
+    //ec_mode_current = eeconfig_read_kb();
 
 #ifdef RGB_EN_PIN
     gpio_set_output_pushpull(RGB_EN_PIN);
@@ -127,11 +130,13 @@ static bool sense_key(pin_t row, bool on)
     uint32_t data = adc_read();
     // press to release
     if (on) {
-        if (data > ec_modes[ec_mode_current].low) {
+        if (data > EC_TH_LOW) {
+//        if (data > ec_modes[ec_mode_current].low) {
             key_down = true;
         }
     } else {
-        if (data > ec_modes[ec_mode_current].high) {
+        if (data > EC_TH_HIGH) {
+ //       if (data > ec_modes[ec_mode_current].high) {
             key_down = true;
         }
     }
