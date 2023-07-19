@@ -8,4 +8,8 @@
 #   include "spi_stm32.c"
 #elif defined(HC32F460)
 #   include "spi_hc32.c"
+#elif defined(GD32E50X)
+#   include "spi_gd32.c"
+#else
+#   error "spi not available"
 #endif
