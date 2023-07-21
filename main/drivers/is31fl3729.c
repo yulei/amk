@@ -174,9 +174,9 @@ static void is31fl3729_update_pwm_buffers(i2c_led_t *driver)
         if (status != AMK_SUCCESS) {
             fl3729_debug("IS31FL3729: failed to set pwm buffer: %d\n", status);
             #if defined(USE_I2C1) && !defined(GD32E50X)
-            extern I2C_HandleTypeDef hi2c1;
-            HAL_I2C_DeInit(&hi2c1);
-            HAL_I2C_Init(&hi2c1);        
+            //extern I2C_HandleTypeDef hi2c1;
+            //HAL_I2C_DeInit(&hi2c1);
+            //HAL_I2C_Init(&hi2c1);        
             #endif
         }
     }

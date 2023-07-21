@@ -4,7 +4,6 @@
  */
 
 #include "usb_interface.h"
-#include "amk_keymap.h"
 #include "app_uart.h"
 #include "nrf_gpio.h"
 #include "nrf_uart.h"
@@ -328,6 +327,7 @@ static void uart_process_cmd(const uint8_t* cmd, uint32_t size)
             NRF_LOG_INFO("Led setting from usb master: %x", cmd[1]);
             usb_config.event.leds_cb(cmd[1]);
         } break;
+        #if 0
         case CMD_KEYMAP_SET: {
             uint16_t key = (cmd[4] << 8) | (cmd[5]);
             #if PRINT_AMK_KEYMAP_SETGET
@@ -349,6 +349,7 @@ static void uart_process_cmd(const uint8_t* cmd, uint32_t size)
             buf[4] = keycode & 0xFF;
             uart_send_cmd(CMD_KEYMAP_GET_ACK, buf, 5);
         } break;
+        #endif
         default: {
             // invalid command
             NRF_LOG_WARNING("Invalid command from usb master: %x", cmd[0]);
