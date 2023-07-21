@@ -2,11 +2,12 @@
  * usb_tinyusb.c
  */
 
+#include "generic_hal.h"
+
 #include "tusb.h"
 
 #include "amk_usb.h"
 #include "usb_descriptors.h"
-#include "generic_hal.h"
 #include "report.h"
 #include "wait.h"
 #include "amk_printf.h"

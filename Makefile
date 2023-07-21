@@ -8,6 +8,7 @@ GD32_MCUS := GD32E103 GD32E505
 HC32_MCUS := HC32F460
 M480_MCUS := M484
 CH32V_MCUS := CH32V307
+APM32_MCUS := APM32F407
 
 # Source files
 SRCS += \
@@ -82,6 +83,9 @@ include sdk_m480/m480_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(CH32V_MCUS)))
 VENDOR_DIR := libs/vendor/wch
 include sdk_ch32/ch32_sdk.mk
+else ifneq (,$(filter $(strip $(MCU)),$(APM32_MCUS)))
+VENDOR_DIR := libs/vendor/geehy
+include sdk_apm32/apm32_sdk.mk
 else
 $(error Unsupported MCU: $(MCU))
 endif
