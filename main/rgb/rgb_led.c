@@ -130,6 +130,7 @@ void rgb_led_task(void)
     if (rgb_led_is_on()) {
 #endif
         rgb_led_pre_flush();
+        //for (int i = 0; i < 1; i++) {
         for (int i = 0; i < RGB_DEVICE_NUM; i++) {
             rgb_driver_t *driver = rgb_driver_get(i);
             driver->flush(driver);
@@ -313,6 +314,7 @@ void rgb_led_config_inc_param(uint8_t param)
             break;
         case RGB_EFFECT_VAL:
             value = qadd8(g_rgb_configs[rgb_config_cur].val, VAL_STEP);
+            if (value > VAL_MAX) value = VAL_MAX;
             rgb_led_config_set_param(RGB_EFFECT_VAL, value);
             break;
         default:
@@ -344,7 +346,7 @@ void rgb_led_config_dec_param(uint8_t param)
             break;
         case RGB_EFFECT_VAL:
             value = qsub8(g_rgb_configs[rgb_config_cur].val, VAL_STEP);
-            if(value < VAL_MIN) value = VAL_MIN;
+            if (value > VAL_MAX) value = VAL_MAX;
             rgb_led_config_set_param(RGB_EFFECT_VAL, value);
             break;
         default:

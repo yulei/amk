@@ -45,7 +45,7 @@
 
 #define CAPS_LED_PIN        A10
 
-#define DEBOUNCE            5
+#define DEBOUNCE            2
 #define DWT_DELAY
 #define VECT_TAB_OFFSET     0x20000
 #define HSE_VALUE           16000000U

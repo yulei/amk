@@ -98,7 +98,11 @@ enum {
 #define SAT_STEP 8
 
 #define VAL_MIN 0
+#ifndef RGB_VAL_MAX
 #define VAL_MAX 255
+#else
+#define VAL_MAX RGB_VAL_MAX
+#endif
 #define VAL_DEFAULT VAL_MAX
 #define VAL_STEP 8
 

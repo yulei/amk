@@ -161,7 +161,7 @@ void init_driver(is31fl3236_driver_t *driver)
     uint8_t data = 0;
     status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, RESET_REG, &data, 1, TIMEOUT);
     if (status != AMK_SUCCESS) {
-        fl3236_debug("IS31FL3236: failed to reset: %d\n", status);
+        fl3236_debug("IS31FL3236: failed to reset: addr:0x%x, status:%d\n", driver->i2c_led.addr, status);
         fl3236_available = false;
         return;
     }
