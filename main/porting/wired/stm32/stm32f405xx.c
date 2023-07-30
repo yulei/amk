@@ -225,8 +225,6 @@ static void MX_RTC_Init(void)
   */
 static void MX_I2C1_Init(void)
 {
-    return;
-
   /* USER CODE BEGIN I2C1_Init 0 */
 
   /* USER CODE END I2C1_Init 0 */

@@ -21,7 +21,11 @@ MCU_FAMILY := stm32f4xx
 ifeq (yes, $(strip $(USE_F405_V2)))
 MCU_TYPE := f405_v2
 else
-MCU_TYPE := f405
+	ifeq (yes, $(strip $(USE_F405_APM)))
+	MCU_TYPE := f405_apm
+	else
+	MCU_TYPE := f405
+	endif
 endif
 #TINYUSB_ENABLE := no
 endif
