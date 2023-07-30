@@ -110,6 +110,7 @@ amk_error_t spi_send(spi_handle_t spi, const void *data, size_t length)
 
 amk_error_t spi_recv(spi_handle_t spi, void* data, size_t length)
 {
+    #if 1
     SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)spi;
     if (spi_ready(spi)) {
         HAL_StatusTypeDef status = HAL_SPI_Receive_DMA(hspi, (uint8_t *)data, length);
@@ -122,8 +123,8 @@ amk_error_t spi_recv(spi_handle_t spi, void* data, size_t length)
     } else {
         return AMK_SPI_BUSY;
     }
-    #if 0
-    //SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)spi;
+    #else
+    SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)spi;
     HAL_StatusTypeDef status = HAL_SPI_Receive(hspi, (uint8_t*)data, length, TIMEOUT_DEFAULT);
 
     if (status != HAL_OK) {
