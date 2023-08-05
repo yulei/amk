@@ -11,6 +11,10 @@
 #include "tusb.h"
 #endif
 
+#ifdef USE_ADC1
+ADC_HandleTypeDef hadc1;
+#endif
+
 #ifdef USE_I2C1
 I2C_HandleTypeDef hi2c1;
 #endif
@@ -133,6 +137,45 @@ static void MX_RTC_Init(void)
         Error_Handler();
     }
 }
+
+#ifdef USE_ADC1
+__attribute__((weak))
+int adc_init_kb(void) { return 0;}
+
+static void MX_ADC1_Init(void)
+{
+    if (adc_init_kb()) return;
+
+    ADC_ChannelConfTypeDef sConfig = {0};
+    /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
+     */
+    hadc1.Instance = ADC1;
+    hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+    hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+    hadc1.Init.ScanConvMode = DISABLE;
+    hadc1.Init.ContinuousConvMode = DISABLE;
+    hadc1.Init.DiscontinuousConvMode = DISABLE;
+    hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+    hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+    hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+    hadc1.Init.NbrOfConversion = 1;
+    hadc1.Init.DMAContinuousRequests = DISABLE;
+    hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+    if (HAL_ADC_Init(&hadc1) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+     */
+    sConfig.Channel = ADC_CHANNEL_2;
+    sConfig.Rank = 1;
+    sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
+    if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+}
+#endif
 
 #ifdef USE_I2C1
 static void MX_I2C1_Init(void)
@@ -257,6 +300,10 @@ void custom_board_init(void)
 #endif
 
     MX_RTC_Init();
+
+#ifdef USE_ADC1
+    MX_ADC1_Init();
+#endif
 
 #ifdef USE_I2C1
     MX_I2C1_Init();
