@@ -86,8 +86,22 @@ __attribute__((weak))
 void rgb_led_init_pre(void)
 {}
 
+
+#ifdef RGB_INIT_DELAY
+#include "timer.h"
+static bool delay_init = true;
+static bool inited= false;
+static uint32_t last_ticks = 0;
+#endif
+
 void rgb_led_init(void)
 { 
+#ifdef RGB_INIT_DELAY
+    if (delay_init) {
+        last_ticks = timer_read32();
+        return;
+    }
+#endif
     rgb_led_init_pre();
 
     rgb_config_cur = 0;
@@ -114,6 +128,17 @@ void rgb_led_pre_flush(void)
 
 void rgb_led_task(void)
 {
+#ifdef RGB_INIT_DELAY
+    if (!inited) {
+        if (timer_elapsed32(last_ticks) > RGB_INIT_DELAY) {
+            delay_init = false;
+            rgb_led_init();
+            inited = true;
+        }
+        return;
+    } 
+#endif
+
 #ifdef RGB_LINEAR_ENABLE
     rgb_linear_task();
 #endif

@@ -11,7 +11,7 @@
 #include "amk_printf.h"
 
 #ifndef FL3236_DEBUG
-#define FL3236_DEBUG 0
+#define FL3236_DEBUG 1
 #endif
 
 #if FL3236_DEBUG
@@ -41,7 +41,6 @@
 #endif
 
 static i2c_handle_t i2c_inst;
-static bool fl3236_available = true;
 
 typedef struct {
     i2c_led_t       i2c_led;
@@ -53,13 +52,14 @@ typedef struct {
 } is31fl3236_driver_t;
 
 static is31fl3236_driver_t is31_drivers[IS31FL3236_NUM] = {0};
+static bool fl3236_available[IS31FL3236_NUM] = {false};
 
-static void init_driver(is31fl3236_driver_t *driver);
+static bool init_driver(is31fl3236_driver_t *driver);
 static void uninit_driver(i2c_led_t *driver);
 
-bool is31fl3236_available(uint8_t addr)
+bool is31fl3236_available(uint8_t index)
 {
-    return fl3236_available;
+    return fl3236_available[index];
 }
 
 i2c_led_t *is31fl3236_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t led_num)
@@ -73,16 +73,15 @@ i2c_led_t *is31fl3236_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8
     driver->i2c_led.led_num     = led_num;
     driver->i2c_led.data        = driver;
 
-    init_driver(driver);
+    driver->ready = init_driver(driver);
 
-    driver->ready = true;
-    fl3236_debug("IS31FL3236: initialized\n");
+    fl3236_debug("IS31FL3236: initialized: addr=0x%x, ready=%d\n", addr, driver->ready);
     return &driver->i2c_led;
 }
 
 void is31fl3236_uninit(i2c_led_t *driver)
 {   
-    if (!is31fl3236_available(0)) return;
+    if (!is31fl3236_available(driver->index)) return;
 
     // turn chip off
     uninit_driver(driver);
@@ -112,7 +111,7 @@ void is31fl3236_set_color_all(i2c_led_t *driver, uint8_t red, uint8_t green, uin
 
 void is31fl3236_update_buffers(i2c_led_t *driver)
 {
-    if (!is31fl3236_available(0)) return;
+    if (!is31fl3236_available(driver->index)) return;
    
     uint32_t status = AMK_SUCCESS;
     is31fl3236_driver_t *is31 = (is31fl3236_driver_t*)(driver->data);
@@ -143,7 +142,7 @@ void is31fl3236_update_buffers(i2c_led_t *driver)
 }
 
 
-void init_driver(is31fl3236_driver_t *driver)
+bool init_driver(is31fl3236_driver_t *driver)
 {
     uint32_t status = AMK_SUCCESS;
     if (!i2c_inst) {
@@ -162,10 +161,9 @@ void init_driver(is31fl3236_driver_t *driver)
     status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, RESET_REG, &data, 1, TIMEOUT);
     if (status != AMK_SUCCESS) {
         fl3236_debug("IS31FL3236: failed to reset: addr:0x%x, status:%d\n", driver->i2c_led.addr, status);
-        fl3236_available = false;
-        return;
+        fl3236_available[driver->i2c_led.index] = false;
+        return false;
     }
-
 
     wait_ms(10);
 
@@ -174,18 +172,24 @@ void init_driver(is31fl3236_driver_t *driver)
     status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, SHUTDOWN_REG, &data, 1, TIMEOUT);
     if (status != AMK_SUCCESS) {
         fl3236_debug("IS31FL3236: failed to turn on chip: %d\n", status);
+        fl3236_available[driver->i2c_led.index] = false;
+        return false;
     }
 
     // Turn on all leds
     status = i2c_send(i2c_inst, driver->i2c_led.addr, driver->control_buffer, CONTROL_BUFFER_SIZE+1, TIMEOUT);
     if (status != AMK_SUCCESS) {
         fl3236_debug("IS31FL3236: failed to turn on leds: %d\n", status);
+        fl3236_available[driver->i2c_led.index] = false;
+        return false;
     }
 
     // Clear pwm
     status = i2c_send(i2c_inst, driver->i2c_led.addr, driver->pwm_buffer, PWM_BUFFER_SIZE+1, TIMEOUT);
     if (status != AMK_SUCCESS) {
         fl3236_debug("IS31FL3236: failed to clear pwm: %d\n", status);
+        fl3236_available[driver->i2c_led.index] = false;
+        return false;
     }
 
     // update PWM and control values
@@ -193,7 +197,11 @@ void init_driver(is31fl3236_driver_t *driver)
     status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, UPDATE_REG, &data, 1, TIMEOUT);
     if (status != AMK_SUCCESS) {
         fl3236_debug("IS31FL3236: failed to update pwm&control: %d\n", status);
+        fl3236_available[driver->i2c_led.index] = false;
+        return false;
     }
+    fl3236_available[driver->i2c_led.index] = true;
+    return true;
 }
 
 void uninit_driver(i2c_led_t *driver)
