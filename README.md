@@ -9,8 +9,7 @@ NRF5 SDK and STM32 HAL library were used for driving peripherals of the MCU.
 ```
 git clone https://github.com/yulei/amk.git
 cd amk
-git submodule init
-git submodule update
+git submodule update --init --recursive
 make onekey
 ```
 
