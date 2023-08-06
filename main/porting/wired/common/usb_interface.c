@@ -70,6 +70,9 @@ void usb_task_report(void)
                 size = sizeof(struct nkro_report);
             break;
             #endif
+            case HID_REPORT_ID_DELAY:
+                size = sizeof(uint16_t);
+            break;
             default:
                 amk_printf("usb task report: can't be here, drop all data\n");
                 rb_init(&report_queue, report_queue_buf, REPORT_QUEUE_SIZE);

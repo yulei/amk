@@ -46,6 +46,8 @@ bool amk_usb_itf_ready(uint32_t type)
     case HID_REPORT_ID_NKRO:
         return tud_hid_n_ready(ITF_NUM_HID_OTHER);
 #endif
+    case HID_REPORT_ID_DELAY:
+        return true;
     default:
         break;
     }
@@ -101,6 +103,15 @@ bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t si
         }
         break;
 #endif
+    case HID_REPORT_ID_DELAY:
+        {
+            uint16_t delay = *((uint16_t*)data);
+            amk_printf("Delay report: duration=%d\n", delay);
+            while(delay--) {
+                wait_ms(1);
+            }
+        }
+        break;
     default:
         amk_printf("unknonw report type: %ld\n", report_type);
         return false;
