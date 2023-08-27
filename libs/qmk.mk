@@ -14,6 +14,7 @@ endif
 SRCS += \
 	$(LIB_DIR)/qmk/protocol/host.c \
 	$(LIB_DIR)/qmk/protocol/report.c \
+	$(LIB_DIR)/qmk/protocol/keyboard.c \
 
 SRCS += \
     $(QMK_DIR)/quantum/quantum.c \
@@ -24,7 +25,6 @@ SRCS += \
     $(QMK_DIR)/quantum/action_tapping.c \
     $(QMK_DIR)/quantum/action_util.c \
     $(QMK_DIR)/quantum/eeconfig.c \
-    $(QMK_DIR)/quantum/keyboard.c \
     $(QMK_DIR)/quantum/matrix_common.c \
     $(QMK_DIR)/quantum/keymap_common.c \
     $(QMK_DIR)/quantum/keycode_config.c \

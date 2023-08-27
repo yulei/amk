@@ -535,7 +535,7 @@ void rgb_effect_matrix_init_mode(rgb_effect_t effect)
     //effect_mode_init(state);
 }
 
-static void process_rgb_matrix(rgb_matrix_state_t *state, uint8_t row, uint8_t col, bool pressed) {
+void process_rgb_matrix(rgb_matrix_state_t *state, uint8_t row, uint8_t col, bool pressed) {
 #ifndef RGB_MATRIX_SPLIT
     //if (!is_keyboard_master()) return;
 #endif
@@ -581,9 +581,10 @@ static void process_rgb_matrix(rgb_matrix_state_t *state, uint8_t row, uint8_t c
 #endif  // defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS) && defined(ENABLE_RGB_MATRIX_TYPING_HEATMAP)
 }
 
-void hook_matrix_change_rgb(keyevent_t event)
+//void hook_matrix_change_rgb(keyevent_t event)
+void hook_matrix_change_rgb(uint8_t row, uint8_t col, bool pressed)
 {
-    process_rgb_matrix(&matrix_state, event.key.row, event.key.col, event.pressed);
+    process_rgb_matrix(&matrix_state, row, col, pressed);
 }
 
 void rgb_effect_matrix_set_rgb(rgb_effect_t effect, uint8_t led, uint8_t r, uint8_t g, uint8_t b)
