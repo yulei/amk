@@ -176,7 +176,7 @@ rgb_driver_t *rgb_led_map(uint8_t led_index)
 
 void rgb_led_config_init(void)
 {
-    rgb_led_debug("rgb_led_config_init()\n");
+    rgb_led_debug("rgb led config init\n");
     for (uint8_t i = 0; i < RGB_LED_CONFIG_NUM; i++) {
         g_rgb_configs[i].enable = ENABLE_DEFAULT;
         g_rgb_configs[i].mode = MODE_DEFAULT;

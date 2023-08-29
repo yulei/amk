@@ -9,7 +9,7 @@
 #include "amk_printf.h"
 
 #ifndef CUSTOM_MATRIX_DEBUG
-#define CUSTOM_MATRIX_DEBUG 0
+#define CUSTOM_MATRIX_DEBUG 1
 #endif
 
 #if CUSTOM_MATRIX_DEBUG
