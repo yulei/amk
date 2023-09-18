@@ -96,7 +96,8 @@ uint32_t apc_get_key_interval(uint32_t row, uint32_t col)
         index = 4;
     }
 
-    uint32_t interval = APC_INTERVAL_MIN + ((APC_INTERVAL_MAX-APC_INTERVAL_MIN)/24)*(index);
+    uint32_t interval = APC_INTERVAL_MIN + ((APC_INTERVAL_MAX-APC_INTERVAL_MIN)/12)*(index);
+    //uint32_t interval = APC_INTERVAL_MIN + ((apc_matrix[row][col].max-apc_matrix[row][col].min)/24)*(index);
 
     //custom_matrix_debug("APC INTERVAL: value=%d, row=%d, col=%d\n", interval, row, col);
     return interval;
@@ -253,6 +254,9 @@ static uint32_t adc_read(void)
 static bool sense_key(uint32_t row, uint32_t col)
 {
     bool key_down = false;
+    //gpio_write_pin(DISCHARGE_PIN, 0);
+    //wait_us(DISCHARGE_WAIT_PRE);
+
     gpio_set_input_floating(DISCHARGE_PIN);
     gpio_write_pin(custom_row_pins[row], 1);
     uint32_t adc_value = adc_read();
@@ -275,6 +279,8 @@ static bool sense_key(uint32_t row, uint32_t col)
 bool matrix_scan_custom(matrix_row_t* raw)
 {
     bool changed = false;
+    gpio_write_pin(DISCHARGE_PIN, 0);
+    wait_us(300);
 
     for (int col = 0; col < MATRIX_COLS; col++) {
         gpio_write_pin(COL_A_PIN, (custom_col_pins[col]&COL_A_MASK) ? 1 : 0);

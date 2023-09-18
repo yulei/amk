@@ -122,25 +122,28 @@ static uint32_t adc_read(void)
     return data;
 }
 
-static bool sense_key(pin_t row, bool on)
+static bool sense_key(pin_t row, bool on, bool* key)
 {
-    bool key_down = false;
+    //bool key_down = false;
     gpio_set_input_floating(DISCHARGE_PIN);
     gpio_write_pin(row, 1);
     uint32_t data = adc_read();
+    //if (data < 100 || data > 2800) return false;
     // press to release
     if (on) {
         if (data > EC_TH_LOW) {
 //        if (data > ec_modes[ec_mode_current].low) {
-            key_down = true;
+            //key_down = true;
+            *key = true;
         }
     } else {
         if (data > EC_TH_HIGH) {
  //       if (data > ec_modes[ec_mode_current].high) {
-            key_down = true;
+            //key_down = true;
+            *key = true;
         }
     }
-    if (key_down) {
+    if (*key) {
         custom_matrix_debug("key down: 0x%lx, data=%d\n", row, data);
         //amk_printf("key down: 0x%lx, data=%d\n", row, data);
     }
@@ -151,7 +154,8 @@ static bool sense_key(pin_t row, bool on)
     gpio_write_pin(row, 0);
     wait_us(DISCHARGE_WAIT_POST);
 
-    return key_down;
+    return true;
+    //key_down;
 }
 
 bool matrix_scan_custom(matrix_row_t* raw)
@@ -160,6 +164,8 @@ bool matrix_scan_custom(matrix_row_t* raw)
 #if SCAN_ONE
     changed = scan_one(raw);
 #else
+    gpio_write_pin(DISCHARGE_PIN, 0);
+    wait_us(300);
     for (int col = 0; col < MATRIX_COLS; col++) {
 
         gpio_write_pin(COL_A_PIN, (custom_col_pins[col]&COL_A_MASK) ? 1 : 0);
@@ -177,10 +183,14 @@ bool matrix_scan_custom(matrix_row_t* raw)
             matrix_row_t last_row_value    = raw[row];
             matrix_row_t current_row_value = last_row_value;
 
-            if (sense_key(custom_row_pins[row], (last_row_value&col))) {
-                current_row_value |= (1 << col);
-            } else {
-                current_row_value &= ~(1 << col);
+            bool key = false;
+            if (sense_key(custom_row_pins[row], (last_row_value&col), &key)) {
+            //if (sense_key(custom_row_pins[row], (last_row_value&col))) {
+                if (key) {
+                    current_row_value |= (1 << col);
+                } else {
+                    current_row_value &= ~(1 << col);
+                }
             }
 
             if (last_row_value != current_row_value) {
