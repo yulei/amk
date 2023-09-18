@@ -306,18 +306,14 @@ void hook_matrix_change_kb(keyevent_t event)
 
 layer_state_t layer_state_set_kb(layer_state_t state)
 {
+    state = layer_state_set_user(state);
+
     cmd_t cmd = {0};
     cmd.type = CMD_LAYER;
-    cmd.param.layer = 0;
+    cmd.param.layer = get_highest_layer(state);
 
-    for (int i = 31; i >= 0; i--) {
-        if (layer_state & (1UL << i)) {
-            cmd.param.layer = i;
-            break;
-        }
-    }
     uart_cmd_send(&cmd);
-    return layer_state_set_user(state);
+    return state;
 }
 
 void hook_send_report(uint32_t type, const void* data)
