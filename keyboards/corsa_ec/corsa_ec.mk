@@ -6,7 +6,7 @@ EECONFIG_FLASH = yes
 MSC_ENABLE = yes
 DYNAMIC_CONFIGURATION = yes
 VIAL_ENABLE = yes
-#NKRO_ENABLE = yes
+NKRO_ENABLE = yes
 AMK_CUSTOM_MATRIX = yes
 DEBOUNCE_TYPE = sym_defer_pk
 
@@ -16,7 +16,6 @@ UF2_FAMILY = STM32F4
 LINKER_PATH = $(KEYBOARD_DIR)
 
 SRCS += $(KEYBOARD_DIR)/corsa_ec.c
-#SRCS += $(KEYBOARD_DIR)/ec_matrix.c
 SRCS += $(KEYBOARD_DIR)/apc_matrix.c
 
 SRCS += $(KEYBOARD_DIR)/display.c

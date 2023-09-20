@@ -300,7 +300,7 @@ void msc_init_kb(void)
 
     for (int i = 0; i < sizeof(renders)/sizeof(render_t); i++) {
         renders[i].anim = anim_open(NULL, renders[i].type);
-        if (renders[i].anim) {
+        if (!renders[i].anim) {
             disp_debug("ANIM: faield to open root path\n");
         }
     }

@@ -45,7 +45,7 @@
 
 #define CAPS_LED_PIN        A10
 
-#define DEBOUNCE            2
+#define DEBOUNCE            0
 #define DWT_DELAY
 #define VECT_TAB_OFFSET     0x20000
 #define HSE_VALUE           16000000U
@@ -70,5 +70,19 @@
 #define SUSPEND_RECONNECT
 
 // vial 
-//#define VIAL_INSECURE
 #define VIAL_KEYBOARD_UID {0xE7, 0x09, 0xBA, 0x4A, 0x54, 0x05, 0xF8, 0x76}
+#define DYNAMIC_KEYMAP_LAYER_COUNT  6
+
+// for apc
+#define APC_KEY_MIN             200 
+#define APC_KEY_MAX             4096
+
+#define APC_INTERVAL_MIN        50
+#define APC_INTERVAL_MAX        2560
+
+#define APC_INTERVAL_INVALID    0
+#define APC_INTERVAL_DEFAULT    1024
+#define APC_INTERVAL_INDEX      8
+
+#define APC_KEYMAP_DOWN_LAYER       4
+#define APC_KEYMAP_UP_LAYER         5
