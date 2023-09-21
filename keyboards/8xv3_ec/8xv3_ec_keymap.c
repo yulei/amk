@@ -23,20 +23,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 		_______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                   			KC_VOLU,
 		_______, _______, _______,                            KC_MPLY,                                     _______, _______, _______,          KC_MPRV, KC_VOLD, KC_MNXT),
 	[2]=LAYOUT_default(
-		_______,          _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, _______,
+		KC_F8,          KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8,          KC_F8, KC_F8, KC_F8,
 
-		_______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, _______,
-		_______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, _______,
-		_______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-		_______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                   			_______,
-		_______, _______, _______,                            _______,                                     _______, _______, _______,          _______, _______, _______),
+		KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8,          KC_F8, KC_F8, KC_F8,
+		KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8,          KC_F8, KC_F8, KC_F8,
+		KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8,
+		KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8, KC_F8,                   			KC_F8,
+		KC_F8, KC_F8, KC_F8,                            KC_F8,                                     KC_F8, KC_F8, KC_F8,          KC_F8, KC_F8, KC_F8),
 	[3]=LAYOUT_default(
-		KC_F5,          KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5,          KC_F5, KC_F5, KC_F5,
+		KC_NO,          KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,          KC_NO, KC_NO, KC_NO,
 
-		KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5,          KC_F5, KC_F5, KC_F5,
-		KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5,          KC_F5, KC_F5, KC_F5,
-		KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5,
-		KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5,                   			KC_F5,
-		KC_F5, KC_F5, KC_F5,                            KC_F5,                                     KC_F5, KC_F5, KC_F5,          KC_F5, KC_F5, KC_F5),
+		KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,          KC_NO, KC_NO, KC_NO,
+		KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,          KC_NO, KC_NO, KC_NO,
+		KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+		KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                   			KC_NO,
+		_______, _______, _______,                            _______,                                     _______, _______, _______,          _______, _______, _______),
 };
 

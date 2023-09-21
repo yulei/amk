@@ -96,3 +96,16 @@
 
 #define VIAL_KEYBOARD_UID {0x46, 0x52, 0xB3, 0xFD, 0xD6, 0x01, 0xD1, 0x3B}
 
+// for apc
+#define APC_KEY_MIN             200 
+#define APC_KEY_MAX             4096
+
+#define APC_INTERVAL_MIN        50
+#define APC_INTERVAL_MAX        2560
+
+#define APC_INTERVAL_INVALID    0
+#define APC_INTERVAL_DEFAULT    1024
+#define APC_INTERVAL_INDEX      8
+
+#define APC_KEYMAP_DOWN_LAYER   2
+#define APC_KEYMAP_UP_LAYER     3

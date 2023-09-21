@@ -376,7 +376,7 @@ void dcd_init(uint8_t rhport)
     dcd_usb.usbCfg.ep1Status           = DISABLE;
 
     /* NVIC */
-    NVIC_EnableIRQRequest(OTG_HS1_IRQn, 1, 0);
+    NVIC_EnableIRQRequest(DCD_USB_IRQn, 1, 0);
 
     /* Disable USB OTG all global interrupt */
     USB_OTG_DisableAllGlobalInterrupt(dcd_usb.usbGlobal);
@@ -384,6 +384,8 @@ void dcd_init(uint8_t rhport)
     /* Init USB Core */
     my_usbd_config(&dcd_usb);
     //USBD_Config(&dcd_usb);
+
+    busy_delay_ms(10);
 
     USBD_Start(&dcd_usb);
 }
