@@ -4,6 +4,7 @@
 
 #include "8xv2.h"
 #include "rgb_common.h"
+#include "rgb_linear.h"
 #include "is31fl3731.h"
 #include "rgb_driver.h"
 
@@ -40,3 +41,111 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
     {0,  0, 16},
     {1, 16, 4},
 };
+
+static bool typing_trigger = false;
+static uint32_t typing_ticks;
+static hsv_t typing_leds[RGB_LED_NUM];
+
+#define TYPING_UPDATE_INTERVAL  10
+#define TYPING_VAL_STEP      8
+
+static void typing_leds_init(void)
+{
+    for (int i = 0; i < RGB_LED_NUM; i++) {
+        typing_leds[i].h = 0;
+        typing_leds[i].s = 0;
+        typing_leds[i].v = 0;
+    }
+    typing_ticks = timer_read32();
+    srand(typing_ticks);
+}
+
+static void typing_leds_pressed(void)
+{
+    // pick less than 6
+    int num = (rand() % 6) + 1;
+    for (int i = 0; i < num; i++) {
+        int index = rand() % 16;
+        if (typing_leds[index].v == 0) {
+            typing_leds[index].h = pick_hue();
+        }
+        typing_leds[index].s = 255;
+        typing_leds[index].v = 255;
+    }
+}
+
+static void typing_leds_update(void)
+{
+    if (timer_elapsed32(typing_ticks) > TYPING_UPDATE_INTERVAL) {
+        for (int i = 0; i < RGB_LED_NUM; i++) {
+            if (typing_leds[i].v > TYPING_VAL_STEP) {
+                typing_leds[i].v -= TYPING_VAL_STEP;
+            } else {
+                typing_leds[i].v = 0;
+            }
+        }
+        typing_ticks = timer_read32();
+    }
+}
+
+static void typing_leds_flush(void)
+{
+    for (int i = 0; i < 16; i++) {
+        rgb_t rgb = hsv_to_rgb(typing_leds[i]);
+        rgb_linear_set_rgb(0, i, rgb.r, rgb.g, rgb.b);
+    }
+    for (int i = 0; i < 4; i++) {
+        rgb_linear_set_rgb(1, i, 0, 0, 0);
+    }
+}
+
+void matrix_init_kb(void)
+{
+    if (eeconfig_read_kb()) {
+        typing_trigger = true;
+    } else {
+        typing_trigger = false;
+    }
+    //typing_trigger = true;
+    typing_leds_init();
+}
+
+void matrix_scan_kb(void)
+{
+    if( typing_trigger) {
+        typing_leds_update();
+    }
+}
+
+bool process_record_kb(uint16_t keycode, keyrecord_t *record)
+{
+    if (!record->event.pressed) {
+        return true;
+    }
+
+    switch(keycode) {
+        case KC_F24:
+            typing_trigger = !typing_trigger;
+            typing_leds_init();
+            eeconfig_update_kb((uint32_t)typing_trigger);
+            return false;
+        default:
+            break;
+    }
+
+    return true;
+}
+
+void rgb_led_pre_flush(void)
+{
+    if (typing_trigger) {
+        typing_leds_flush();
+    }
+}
+
+void hook_matrix_change_rgb(uint8_t row, uint8_t col, bool pressed)
+{
+    if (pressed) {
+        typing_leds_pressed();
+    }
+}

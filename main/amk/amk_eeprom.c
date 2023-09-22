@@ -63,6 +63,9 @@ void eeconfig_update_rgb(const void* rgb, uint8_t index)
 
 void eeconfig_init_kb(void)
 {
+    eeconfig_update_kb(0);
+    eeconfig_init_user();
+
 #ifdef RGB_ENABLE
     rgb_led_config_init();
 #endif
