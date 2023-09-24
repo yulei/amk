@@ -19,8 +19,8 @@
 
 #define DISCHARGE_WAIT_PRE  20
 #define DISCHARGE_WAIT_POST 20
-#define EC_TH_LOW       1080
-#define EC_TH_HIGH      1280
+#define EC_TH_LOW       1280
+#define EC_TH_HIGH      1680
 
 #define LEFT_EN_PIN     C5
 #define RIGHT_EN_PIN    B0
@@ -107,5 +107,6 @@
 #define APC_INTERVAL_DEFAULT    1024
 #define APC_INTERVAL_INDEX      8
 
+#define DYNAMIC_KEYMAP_LAYER_COUNT  4
 #define APC_KEYMAP_DOWN_LAYER   2
 #define APC_KEYMAP_UP_LAYER     3

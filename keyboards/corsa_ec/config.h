@@ -84,5 +84,6 @@
 #define APC_INTERVAL_DEFAULT    1024
 #define APC_INTERVAL_INDEX      8
 
+#define DYNAMIC_KEYMAP_LAYER_COUNT  6
 #define APC_KEYMAP_DOWN_LAYER       4
 #define APC_KEYMAP_UP_LAYER         5
