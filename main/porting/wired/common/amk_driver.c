@@ -136,10 +136,14 @@ void amk_driver_task(void)
     #ifdef RTOS_ENABLE
                 NVIC_SystemReset();
     #else
-        #ifdef SUSPEND_RECONNECT
+        #ifndef NO_SUSPEND_RECONNECT
                 usb_connect(false);
-                wait_ms(100);
+                wait_ms(500);
+            #ifdef SUSPEND_RESET
+                NVIC_SystemReset();
+            #else
                 usb_connect(true);
+            #endif
         #endif
     #endif
             }

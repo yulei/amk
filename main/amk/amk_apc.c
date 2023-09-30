@@ -61,6 +61,25 @@ static struct apc_key apc_matrix[MATRIX_ROWS][MATRIX_COLS];
 extern const uint16_t keymaps[][][];
 #endif
 
+//
+// TODO:
+// actually the relationship between the interval and the magnetic value
+// was non-linear. Currently implementation was not accurate.
+//
+static uint32_t apc_compute_interval(uint32_t row, uint32_t col, uint32_t index)
+{
+    struct apc_key *key = &apc_matrix[row][col];
+    uint32_t interval = APC_INTERVAL_INVALID;
+
+    if ((key->min == APC_KEY_MIN_DEFAULT) || (key->max < APC_KEY_MAX)) {
+        interval = APC_INTERVAL_MIN + ((APC_INTERVAL_MAX-APC_INTERVAL_MIN)/APC_INTERVAL_COUNT)*(index);
+    } else {
+        interval = APC_INTERVAL_MIN + ((key->max-key->min)/APC_INTERVAL_COUNT)*(index);
+    }
+
+    return interval;
+}
+
 static uint32_t apc_get_key_interval(uint32_t row, uint32_t col, uint32_t layer)
 {
 #ifdef DYNAMIC_KEYMAP_ENABLE
@@ -80,9 +99,7 @@ static uint32_t apc_get_key_interval(uint32_t row, uint32_t col, uint32_t layer)
         index = APC_INTERVAL_INDEX;
     }
 
-    uint32_t interval = APC_INTERVAL_MIN + ((APC_INTERVAL_MAX-APC_INTERVAL_MIN)/APC_INTERVAL_COUNT)*(index);
-
-    return interval;
+    return apc_compute_interval(row, col, index);
 }
 
 static void apc_update_key_interval(uint32_t row, uint32_t col)
