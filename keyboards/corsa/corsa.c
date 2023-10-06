@@ -176,7 +176,7 @@ led_config_t g_led_config = {
 void rgb_led_pre_flush(void)
 {
     if (!rgb_matrix_enabled(0)) {
-        if (host_keyboard_leds() & (1 << USB_LED_CAPS_LOCK)) {
+        if (host_keyboard_led_state().caps_lock) {
             rgb_matrix_set_rgb(0, CAPS_LED_INDEX, 0xFF, 0xFF, 0xFF);
         } else {
             rgb_matrix_set_rgb(0, CAPS_LED_INDEX, 0, 0, 0);

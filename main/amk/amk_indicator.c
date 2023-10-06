@@ -32,6 +32,12 @@ void led_set_kb(uint8_t led)
 {
 }
 
+#define USB_LED_NUM_LOCK                0
+#define USB_LED_CAPS_LOCK               1
+#define USB_LED_SCROLL_LOCK             2
+#define USB_LED_COMPOSE                 3
+#define USB_LED_KANA                    4
+
 void led_set(uint8_t led)
 {
 #ifdef CAPS_LED_PIN

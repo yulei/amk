@@ -53,8 +53,7 @@ uint32_t amk_macro_delay = 0;
 static uint8_t keyboard_leds(void);
 static void send_keyboard(report_keyboard_t *report);
 static void send_mouse(report_mouse_t *report);
-static void send_system(uint16_t data);
-static void send_consumer(uint16_t data);
+static void send_extra(report_extra_t *report);
 
 #ifdef KEYBOARD_ENABLE
 static void remote_wakeup(void);
@@ -64,8 +63,7 @@ host_driver_t amk_driver = {
     keyboard_leds,
     send_keyboard,
     send_mouse,
-    send_system,
-    send_consumer
+    send_extra,
 };
 
 __attribute__((weak))
@@ -209,30 +207,24 @@ void send_mouse(report_mouse_t *report)
     }
 }
 
-void send_system(uint16_t data)
+void send_extra(report_extra_t *report)
 {
 #ifdef RF_ENABLE
     if(usb_setting & USB_OUTPUT_RF) {
-        rf_driver_put_report(CMD_SYSTEM_REPORT, &data, sizeof(data));
-    } else 
-#endif
-    {
-        if (!usb_suspended()) {
-            usb_send_report(HID_REPORT_ID_SYSTEM, &data, sizeof(data));
+        if (report->report_id == REPORT_ID_CONSUMER) {
+            rf_driver_put_report(CMD_CONSUMER_REPORT, &report->usage, sizeof(uint16_t));
+        } else {
+            rf_driver_put_report(CMD_SYSTEM_REPORT, &report->usage, sizeof(uint16_t));
         }
-    }
-}
-
-void send_consumer(uint16_t data)
-{
-#ifdef RF_ENABLE
-    if(usb_setting & USB_OUTPUT_RF) {
-        rf_driver_put_report(CMD_CONSUMER_REPORT, &data, sizeof(data));
     } else 
 #endif
     {
         if (!usb_suspended()) {
-            usb_send_report(HID_REPORT_ID_CONSUMER, &data, sizeof(data));
+            if (report->report_id == REPORT_ID_CONSUMER) {
+                usb_send_report(HID_REPORT_ID_CONSUMER, &report->usage, sizeof(uint16_t));
+            } else {
+                usb_send_report(HID_REPORT_ID_SYSTEM, &report->usage, sizeof(uint16_t));
+            }
         }
     }
 }

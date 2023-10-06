@@ -56,5 +56,9 @@
 #define APC_KEYMAP_UP_LAYER     5
 #endif
 
+#ifndef APC_KEYMAP_DKS_LAYER
+#define APC_KEYMAP_DKS_LAYER    6
+#endif
+
 void apc_matrix_init(void);
 bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t value);

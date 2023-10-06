@@ -34,8 +34,7 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
 
 void rgb_led_pre_flush(void)
 {
-    uint8_t led = host_keyboard_leds();
-    if (led & (1 << USB_LED_CAPS_LOCK)) {
+    if (host_keyboard_led_state().caps_lock) {
         rgb_linear_set_rgb(1, CAPS_LED_INDEX, 0xFF, 0xFF, 0xFF);
     } else {
         rgb_linear_set_rgb(1, CAPS_LED_INDEX, 0, 0, 0);

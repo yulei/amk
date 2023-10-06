@@ -17,6 +17,7 @@ endif
 
 SRCS += \
 	$(MAIN_DIR)/amk/amk_apc.c \
+	$(MAIN_DIR)/amk/amk_dks.c \
 	$(MAIN_DIR)/amk/amk_printf.c \
 	$(MAIN_DIR)/amk/amk_indicator.c \
 	$(MAIN_DIR)/amk/amk_cmd.c \

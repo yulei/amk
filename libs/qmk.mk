@@ -43,6 +43,7 @@ INCS += \
 	$(QMK_DIR)/quantum/bootmagic \
 	$(QMK_DIR)/quantum/logging \
 	$(QMK_DIR)/quantum/sequencer \
+	$(QMK_DIR)/quantum/keymap_extras \
 
 INCS += \
 	$(QMK_PORT_DIR) \
@@ -70,7 +71,7 @@ endif
 
 ifeq ($(strip $(VIAL_ENABLE)), yes)
     #SRCS += $(QMK_DIR)/quantum/dynamic_keymap.c
-	SRCS += $(LIB_DIR)/qmk/protocol/dynamic_keymap.c
+	SRCS += $(LIB_DIR)/qmk/protocol/dynamic_keymap_amk.c
     SRCS += $(QMK_DIR)/quantum/keymap_introspection.c
 
     APP_DEFS += -DDYNAMIC_KEYMAP_ENABLE
