@@ -86,5 +86,4 @@
 
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 
-#define VIAL_INSECURE
 #define VIAL_KEYBOARD_UID {0x61, 0xCF, 0xD5, 0xB6, 0x3B, 0x89, 0x09, 0xE9}

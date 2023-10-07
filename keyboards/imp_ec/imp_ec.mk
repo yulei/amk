@@ -15,6 +15,4 @@ UF2_FAMILY = STM32F4
 #HID_OTHER_ENABLE = no
 #CDC_ENABLE = yes
 
-SRCS += \
-	$(KEYBOARD_DIR)/imp_ec.c \
-	$(KEYBOARD_DIR)/imp_ec_gcmap.c \
+SRCS += $(KEYBOARD_DIR)/imp_ec.c
