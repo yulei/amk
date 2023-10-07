@@ -208,7 +208,7 @@ bool vial_process_kb(uint8_t *data, uint8_t length)
 extern uint8_t amk_led_state;
 void tud_hid_set_report_cb(uint8_t itf, uint8_t report_id, hid_report_type_t report_type, uint8_t const *buffer, uint16_t bufsize)
 {
-    amk_printf("Set Report: itf=%d, id=%d, type=%d\n", itf, report_id, report_type);
+    //amk_printf("Set Report: itf=%d, id=%d, type=%d\n", itf, report_id, report_type);
     (void) report_id;
 #ifdef KEYBOARD_ENABLE
     if (itf == ITF_NUM_HID_KBD && report_type == HID_REPORT_TYPE_OUTPUT) {

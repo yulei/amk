@@ -6,11 +6,10 @@
  */
 
 #include "amk_apc.h"
+#include "amk_dks.h"
+
 #include "quantum.h"
-#include "matrix.h"
-#include "wait.h"
-#include "led.h"
-#include "timer.h"
+#include "keymap_introspection.h"
 
 #include "amk_gpio.h"
 #include "amk_utils.h"
@@ -49,19 +48,13 @@ struct apc_key
     uint32_t max;
     uint32_t last;
     uint32_t trigger;
-    uint32_t down;
-    uint32_t up;
+    uint32_t apc;
+    uint32_t rt;
     bool on;
 };
 
 
 static struct apc_key apc_matrix[MATRIX_ROWS][MATRIX_COLS];
-
-#ifdef DYNAMIC_KEYMAP_ENABLE
-#include "dynamic_keymap.h"
-#else
-extern const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
-#endif
 
 //
 // TODO:
@@ -70,30 +63,23 @@ extern const uint16_t keymaps[][MATRIX_ROWS][MATRIX_COLS];
 //
 static uint32_t apc_compute_interval(uint32_t row, uint32_t col, uint32_t index)
 {
+    if (index == 0) return APC_INTERVAL_INVALID;
+
     struct apc_key *key = &apc_matrix[row][col];
     uint32_t interval = APC_INTERVAL_INVALID;
 
     if ((key->min == APC_KEY_MIN_DEFAULT) || (key->max < APC_KEY_MAX)) {
         interval = APC_INTERVAL_MIN + ((APC_INTERVAL_MAX-APC_INTERVAL_MIN)/APC_INTERVAL_COUNT)*(index);
     } else {
-        interval = APC_INTERVAL_MIN + ((key->max-key->min)/APC_INTERVAL_COUNT)*(index);
+        interval = APC_INTERVAL_MIN + ((key->max-key->min-APC_INTERVAL_MIN)/APC_INTERVAL_COUNT)*(index);
     }
 
     return interval;
 }
 
-static uint16_t apc_get_keycode(uint32_t row, uint32_t col, uint32_t layer)
-{
-#ifdef DYNAMIC_KEYMAP_ENABLE
-    return dynamic_keymap_get_keycode(layer, row, col);
-#else
-    return keymaps[layer][row][col];
-#endif
-}
-
 static uint32_t apc_get_key_interval(uint32_t row, uint32_t col, uint32_t layer)
 {
-    uint16_t keycode = apc_get_keycode(row, col, layer);
+    uint16_t keycode = keycode_at_keymap_location(layer, row, col);
 
     uint16_t index = 0;
     if (keycode>=KC_F1 && keycode <= KC_F12) {
@@ -107,29 +93,25 @@ static uint32_t apc_get_key_interval(uint32_t row, uint32_t col, uint32_t layer)
         index = APC_INTERVAL_INDEX;
     }
 
-    return apc_compute_interval(row, col, index);
-}
-
-static void apc_update_key_interval(uint32_t row, uint32_t col)
-{
-    apc_matrix[row][col].down = apc_get_key_interval(row, col, APC_KEYMAP_DOWN_LAYER);
-    apc_matrix[row][col].up = apc_get_key_interval(row, col, APC_KEYMAP_UP_LAYER);
+    return index;//apc_compute_interval(row, col, index);
 }
 
 void apc_matrix_init(void)
 {
-    for (int i = 0; i < MATRIX_ROWS; i++) {
-        for (int j = 0; j < MATRIX_COLS; j++) {
-            apc_matrix[i][j].state = APC_KEY_STATE_DEFAULT;
-            apc_matrix[i][j].min = APC_KEY_MIN_DEFAULT;
-            apc_matrix[i][j].max = APC_KEY_MAX_DEFAULT;
-            apc_matrix[i][j].last = APC_KEY_LAST_DEFAULT;
-            apc_matrix[i][j].trigger = APC_KEY_TRIGGER_DEFAULT;
-            apc_matrix[i][j].down = APC_KEY_DOWN_DEFAULT;
-            apc_matrix[i][j].up = APC_KEY_UP_DEFAULT;
-            apc_matrix[i][j].on = false;
+    for (int row = 0; row < MATRIX_ROWS; row++) {
+        for (int col = 0; col < MATRIX_COLS; col++) {
+            apc_matrix[row][col].state = APC_KEY_STATE_DEFAULT;
+            apc_matrix[row][col].min = APC_KEY_MIN_DEFAULT;
+            apc_matrix[row][col].max = APC_KEY_MAX_DEFAULT;
+            apc_matrix[row][col].last = APC_KEY_LAST_DEFAULT;
+            apc_matrix[row][col].trigger = APC_KEY_TRIGGER_DEFAULT;
+            apc_matrix[row][col].on = false;
+            apc_matrix[row][col].apc = apc_get_key_interval(row, col, APC_KEYMAP_DOWN_LAYER);
+            apc_matrix[row][col].rt = apc_get_key_interval(row, col, APC_KEYMAP_UP_LAYER);
         }
     }
+
+    dks_matrix_init();
 }
 
 static bool is_adc_value_valid(uint32_t value)
@@ -155,12 +137,17 @@ static int apc_update_dir(struct apc_key* key, uint32_t value)
 
 bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t value)
 {
+    if (dks_matrix_valid(row, col)) {
+        return dks_matrix_update(row, col, value);
+    }
     struct apc_key* key = &apc_matrix[row][col];
     if (is_adc_value_valid(value)) {
         if (key->min > value) key->min = value;
         if (key->max < value) key->max = value;
         if (key->last == APC_KEY_LAST_DEFAULT) key->last = value;
-        apc_update_key_interval(row, col);
+        //apc_update_key_interval(row, col);
+        uint32_t down = apc_compute_interval(row, col, key->apc);
+        uint32_t up = apc_compute_interval(row, col, key->rt);
         int dir = apc_update_dir(key, value);
 
         switch(key->state) {
@@ -176,6 +163,13 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t value)
                 // key up
                 key->state = APC_KEY_RELEASING;
                 key->trigger = value;
+            } else {
+                if (value < key->min + APC_THRESHOLD) {
+                    key->state = APC_KEY_OFF;
+                    key->on = false;
+                    key->trigger = value;
+                    custom_matrix_debug("APC RT from ON to OFF, value=%d, min=%d, max=%d, trigger=%d, up=%d\n", value, key->min, key->max, key->trigger, up);
+                }
             }
             break;
         case APC_KEY_PRESSING: 
@@ -186,11 +180,11 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t value)
                     key->trigger = value;
                 } else {
                     if (!key->on) {
-                        if (value > key->min + key->down) {
+                        if (value > key->min + down) {
                             key->trigger = value;
                             key->state = APC_KEY_ON;
                             key->on = true;
-                            custom_matrix_debug("APC from PRESSING to ON, value=%d, min=%d, max=%d, trigger=%d, down=%d\n", value, key->min, key->max, key->trigger, key->down);
+                            custom_matrix_debug("APC from PRESSING to ON, value=%d, min=%d, max=%d, trigger=%d, down=%d\n", value, key->min, key->max, key->trigger, down);
                         }
                     }
                 }
@@ -204,16 +198,16 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t value)
                     key->trigger = value;
                 } else {
                     if (key->on) {
-                        if (key->up != APC_INTERVAL_INVALID) {
-                            if (((value + key->up) < key->trigger)) {
+                        if (up != APC_INTERVAL_INVALID) {
+                            if (((value + up) < key->trigger) || (value < key->min + APC_THRESHOLD)) {
                                 // rapid trigger
                                 key->state = APC_KEY_OFF;
                                 key->on = false;
                                 key->trigger = value;
-                                custom_matrix_debug("APC RT from RELEASING to OFF, value=%d, min=%d, max=%d, trigger=%d, up=%d\n", value, key->min, key->max, key->trigger, key->up);
+                                custom_matrix_debug("APC RT from RELEASING to OFF, value=%d, min=%d, max=%d, trigger=%d, up=%d\n", value, key->min, key->max, key->trigger, up);
                             }
                         } else {
-                            if ((value + APC_THRESHOLD) < key->min + key->down) {
+                            if ((value + APC_THRESHOLD) < key->min + down) {
                                 key->state = APC_KEY_OFF;
                                 key->on = false;
                                 key->trigger = value;
@@ -236,4 +230,28 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t value)
     }
 
     return key->on;
+}
+
+void apc_matrix_update_interval(void)
+{
+    for (int row = 0; row < MATRIX_ROWS; row++) {
+        for (int col = 0; col < MATRIX_COLS; col++) {
+            apc_matrix[row][col].apc = apc_get_key_interval(row, col, APC_KEYMAP_DOWN_LAYER);
+            apc_matrix[row][col].rt = apc_get_key_interval(row, col, APC_KEYMAP_UP_LAYER);
+        }
+    }
+}
+
+void raw_hid_send_kb(uint8_t *data, uint8_t length)
+{
+    if (data[0] == id_dynamic_keymap_set_keycode) {
+        // update apc/rt/dks
+        if (data[1] == APC_KEYMAP_DKS_LAYER) {
+            dks_matrix_update_action();
+        } else {
+            if ((data[1] == APC_KEYMAP_DOWN_LAYER) || (data[1] == APC_KEYMAP_UP_LAYER)) {
+                apc_matrix_update_interval();
+            }
+        }
+    }
 }
