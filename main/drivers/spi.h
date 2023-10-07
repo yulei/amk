@@ -9,6 +9,7 @@
 #include "amk_error.h"
 
 typedef enum {
+    SPI_INSTANCE_0,
     SPI_INSTANCE_1,
     SPI_INSTANCE_2,
     SPI_INSTANCE_3,

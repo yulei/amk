@@ -9,6 +9,8 @@
 #include "generic_hal.h"
 #include "cm_misc.h"
 #include "wait.h"
+#include "usb_common.h"
+#include "amk_printf.h"
 
 #include "tusb.h"
 
@@ -112,6 +114,58 @@ static void usb_custom_init(void)
     NVIC_SetPriority(USBHS_IRQn, 1U);
 }
 
+#ifdef USE_SPI0
+uint32_t hspi0 = SPI0;
+static void spi0_init(void)
+{
+    rcu_periph_clock_enable(RCU_SPI0);
+    gpio_pin_remap_config(GPIO_SPI0_REMAP, ENABLE);
+    /* SPI0 GPIO config: NSS/PA15, SCK/PB3, MOSI/PB5 */
+    gpio_init(GPIOA, GPIO_MODE_AF_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_15);
+    gpio_init(GPIOB, GPIO_MODE_AF_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_3 | GPIO_PIN_5);
+    /* SPI0 GPIO config: MISO/PB4 */
+    gpio_init(GPIOB, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, GPIO_PIN_4);
+
+    /* SPI parameter config */
+    spi_parameter_struct spi_init_struct;
+    spi_init_struct.trans_mode           = SPI_TRANSMODE_FULLDUPLEX;
+    spi_init_struct.device_mode          = SPI_MASTER;
+    spi_init_struct.frame_size           = SPI_FRAMESIZE_8BIT;
+    spi_init_struct.clock_polarity_phase = SPI_CK_PL_HIGH_PH_2EDGE;//SPI_CK_PL_LOW_PH_1EDGE;
+    spi_init_struct.nss                  = SPI_NSS_SOFT;
+    spi_init_struct.prescale             = SPI_PSC_8;
+    spi_init_struct.endian               = SPI_ENDIAN_MSB;
+    spi_init_gd32(SPI0, &spi_init_struct);
+    spi_enable(SPI0);
+}
+#endif
+
+#ifdef USE_SPI1
+uint32_t hspi1 = SPI1;
+static void spi1_init(void)
+{
+    rcu_periph_clock_enable(RCU_SPI1);
+    /* SPI1 GPIO config: NSS/PB12, SCK/PB13, MOSI/PB15 */
+    gpio_init(GPIOB, GPIO_MODE_AF_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_12);
+    gpio_init(GPIOB, GPIO_MODE_AF_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_13 | GPIO_PIN_15);
+    /* SPI0 GPIO config: MISO/PB14 */
+    gpio_init(GPIOB, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, GPIO_PIN_14);
+
+    /* SPI parameter config */
+    spi_parameter_struct spi_init_struct;
+    spi_init_struct.trans_mode           = SPI_BIDIRECTIONAL_TRANSMIT;//SPI_TRANSMODE_FULLDUPLEX;
+    spi_init_struct.device_mode          = SPI_MASTER;
+    spi_init_struct.frame_size           = SPI_FRAMESIZE_8BIT;
+    spi_init_struct.clock_polarity_phase = /*SPI_CK_PL_HIGH_PH_2EDGE;*/
+                                        SPI_CK_PL_LOW_PH_1EDGE;
+    spi_init_struct.nss                  = SPI_NSS_SOFT;
+    spi_init_struct.prescale             = SPI_PSC_16;
+    spi_init_struct.endian               = SPI_ENDIAN_MSB;
+    spi_init_gd32(SPI1, &spi_init_struct);
+    spi_enable(SPI1);
+}
+#endif
+
 void custom_board_init(void)
 {
     rcu_periph_clock_enable(RCU_PMU);
@@ -124,6 +178,30 @@ void custom_board_init(void)
     rcu_periph_clock_enable(RCU_AF);
 
     gpio_pin_remap_config(GPIO_SWJ_SWDPENABLE_REMAP,ENABLE);
+
+    #ifdef USE_SPI0
+    spi0_init();
+    #endif
+
+    #ifdef USE_SPI1
+    spi1_init();
+    #endif
+
+    #ifdef DYNAMIC_CONFIGURATION
+    rcu_periph_clock_enable(RCU_PMU);
+    rcu_periph_clock_enable(RCU_BKPI);
+
+    pmu_backup_write_enable();
+    uint32_t magic = bkp_read_data(BKP_DATA_2);
+    //if (magic == 0) {
+    if (magic > 0) {
+        usb_setting |= USB_MSC_BIT;
+    } else {
+        usb_setting = 0;
+    }
+    amk_printf("usb_setting: %ld\n", usb_setting);
+    bkp_write_data(BKP_DATA_2, 0);
+#endif
 }
 
 void custom_board_task(void)

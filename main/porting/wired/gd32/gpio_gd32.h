@@ -10,6 +10,7 @@
 
 #include "generic_hal.h"
 
+#define INVALID_PIN 0xFFFFFFFF
 typedef uint32_t pin_t;
 typedef uint32_t port_t;
 #define PIN_P(x) (1<<(x))

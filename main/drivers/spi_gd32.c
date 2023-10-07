@@ -93,7 +93,7 @@ static void spi_dma_tx(uint32_t spi, uint32_t dma, uint32_t channel, const void*
 
 bool spi_ready(spi_handle_t spi)
 {
-    uint32_t* hspi = (uint32_t)spi;
+    //uint32_t* hspi = (uint32_t*)spi;
 
     if (dma_flag_get(DMA0, DMA_CH2, DMA_FLAG_FTF) == SET) {
         return false;
@@ -105,7 +105,7 @@ bool spi_ready(spi_handle_t spi)
 amk_error_t spi_send_async(spi_handle_t spi, const void *data, size_t length)
 {
     if (spi_ready(spi)) {
-        uint32_t* hspi = (uint32_t)spi;
+        uint32_t* hspi = (uint32_t*)spi;
         spi_dma_tx(*hspi, DMA0, DMA_CH2, data, length);
         return AMK_SUCCESS;
     } else {
@@ -125,7 +125,7 @@ amk_error_t spi_xfer_async(spi_handle_t spi, const void *tx_buffer, void *rx_buf
 
 amk_error_t spi_send(spi_handle_t spi, const void *data, size_t length)
 {
-    uint32_t* hspi = (uint32_t)spi;
+    uint32_t* hspi = (uint32_t*)spi;
     const uint8_t* cur = (const uint8_t*)data;
     while(length--) {
         spi_write_byte(*hspi, *cur++);
@@ -136,8 +136,8 @@ amk_error_t spi_send(spi_handle_t spi, const void *data, size_t length)
 
 amk_error_t spi_recv(spi_handle_t spi, void* data, size_t length)
 {
-    uint32_t* hspi = (uint32_t)spi;
-    uint8_t* cur = (const uint8_t*)data;
+    uint32_t* hspi = (uint32_t*)spi;
+    uint8_t* cur = (uint8_t*)data;
     while(length--) {
         *cur = spi_write_byte(*hspi, *cur);
         cur++;
@@ -148,7 +148,7 @@ amk_error_t spi_recv(spi_handle_t spi, void* data, size_t length)
 
 amk_error_t spi_xfer(spi_handle_t spi, const void *tx_buffer, void *rx_buffer, size_t length)
 {
-    uint32_t* hspi = (uint32_t)spi;
+    uint32_t* hspi = (uint32_t*)spi;
     const uint8_t* tx_cur = (const uint8_t*)tx_buffer;
     uint8_t* rx_cur = (uint8_t*)rx_buffer;
 
