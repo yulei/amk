@@ -110,7 +110,7 @@ void timer_config(void)
     timer_initpara.period            = PWM_TIM_PERIOD;
     timer_initpara.clockdivision     = TIMER_CKDIV_DIV1;
     timer_initpara.repetitioncounter = 0;
-    gd32_timer_init(TIMER3,&timer_initpara);
+    timer_init_gd32(TIMER3,&timer_initpara);
 
     /* CH1 configuration in PWM1 mode */
     timer_ocintpara.outputstate  = TIMER_CCX_ENABLE;

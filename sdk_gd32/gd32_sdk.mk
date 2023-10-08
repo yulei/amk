@@ -15,7 +15,7 @@ MCU_ARCH := CORTEX_M33
 MCU_PREFIX := GD32E50x
 MCU_SERIES := gd32e50x
 MCU_TYPE := e505
-GD32_LIB_VER := 1.2.2
+GD32_LIB_VER := 1.3.0
 GD32_LIB_DIR := $(MCU_PREFIX)_Firmware_Library_V$(GD32_LIB_VER)
 GD32_LIB_STD := $(MCU_PREFIX)_standard_peripheral
 endif
