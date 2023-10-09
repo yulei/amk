@@ -34,11 +34,13 @@
 
 //#define CAPS_LED_PIN        B7
 #define USE_3729
-#ifdef AMK_RGB_MATRIX_ENABLE
+#ifdef RGB_MATRIX_ENABLE
 //#define IS31FL3729_I2C_ID   I2C_INSTANCE_1
 #define IS31FL3729_SCALE_DEFAULT    0x4F
 #define IS31FL3729_NUM          2
 #define RGB_MATRIX_LED_NUM      68
+#define RGB_MATRIX_LED_COUNT    RGB_MATRIX_LED_NUM
+
 #define RGB_LED_NUM             (RGB_MATRIX_LED_NUM)
 #define RGB_DEVICE_NUM          2
 #define RGB_MATRIX_NUM          1

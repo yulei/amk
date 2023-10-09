@@ -12,8 +12,8 @@
 #include "is31fl3729.h"
 #include "rgb_led.h"
 
-#ifdef AMK_RGB_MATRIX_ENABLE
-#include "rgb_matrix.h"
+#ifdef RGB_MATRIX_ENABLE
+#include "rgb_matrix_stub.h"
 
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     // left
@@ -128,7 +128,7 @@ rgb_param_t g_rgb_matrix_params[RGB_MATRIX_NUM] = {
     {0, 0, 68},
 };
 
-#include "rgb_effect_matrix_qmk.h"
+#include "rgb_matrix_stub.h"
 #define LED_NO
 
 led_config_t g_led_config = {
@@ -175,11 +175,11 @@ led_config_t g_led_config = {
 #if 1
 void rgb_led_pre_flush(void)
 {
-    if (!rgb_matrix_enabled(0)) {
+    if (!rgb_matrix_is_enabled()) {
         if (host_keyboard_led_state().caps_lock) {
-            rgb_matrix_set_rgb(0, CAPS_LED_INDEX, 0xFF, 0xFF, 0xFF);
+            rgb_matrix_set_rgb_stub(0, CAPS_LED_INDEX, 0xFF, 0xFF, 0xFF);
         } else {
-            rgb_matrix_set_rgb(0, CAPS_LED_INDEX, 0, 0, 0);
+            rgb_matrix_set_rgb_stub(0, CAPS_LED_INDEX, 0, 0, 0);
         }
     }
 }

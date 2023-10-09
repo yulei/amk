@@ -174,7 +174,7 @@ void indicator_led_set(uint8_t led)
 {
 }
 
-#ifdef AMK_RGB_MATRIX_ENABLE
+#ifdef RGB_MATRIX_ENABLE
 #include "rgb_common.h"
 #include "is31fl3729.h"
 #include "is31fl3731.h"
@@ -374,7 +374,7 @@ rgb_param_t g_rgb_matrix_params[RGB_MATRIX_NUM] = {
 //    {1,  90, 16},
 //};
 
-#include "rgb_effect_matrix_qmk.h"
+#include "rgb_matrix_stub.h"
 
 led_config_t g_led_config = {
 #if META_RGB_V1
@@ -467,11 +467,11 @@ led_config_t g_led_config = {
 
 void rgb_led_pre_flush(void)
 {
-    if (!rgb_matrix_enabled(0)) {
+    if (!rgb_matrix_is_enabled()) {
         if (host_keyboard_led_state().caps_lock) {
-            rgb_matrix_set_rgb(0, CAPS_LED_INDEX, 0xFF, 0xFF, 0xFF);
+            rgb_matrix_set_rgb_stub(0, CAPS_LED_INDEX, 0xFF, 0xFF, 0xFF);
         } else {
-            rgb_matrix_set_rgb(0, CAPS_LED_INDEX, 0, 0, 0);
+            rgb_matrix_set_rgb_stub(0, CAPS_LED_INDEX, 0, 0, 0);
         }
     }
 }

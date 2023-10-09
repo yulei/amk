@@ -58,7 +58,7 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
     {1, 26, 4},
 };
 
-#include "rgb_effect_matrix_qmk.h"
+#include "rgb_matrix_stub.h"
 
 led_config_t g_led_config = {
     {
