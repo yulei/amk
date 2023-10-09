@@ -30,7 +30,7 @@
 #ifdef RGB_ENABLE
 void eeconfig_read_rgb(void* rgb, uint8_t index)
 {
-    rgb_config_t *config = (rgb_config_t*)rgb;
+    rgb_cfg_t *config = (rgb_cfg_t*)rgb;
     uint8_t *addr = ((uint8_t*)EECONFIG_RGB) + index*6;
     config->enable  = eeprom_read_byte(addr);
     config->mode    = eeprom_read_byte(addr+1);
@@ -44,7 +44,7 @@ void eeconfig_read_rgb(void* rgb, uint8_t index)
 
 void eeconfig_write_rgb(const void* rgb, uint8_t index)
 {
-    rgb_config_t *config = (rgb_config_t*)rgb;
+    rgb_cfg_t *config = (rgb_cfg_t*)rgb;
     uint8_t *addr = ((uint8_t*)EECONFIG_RGB) + index*6;
     eeprom_write_byte(addr,   config->enable);
     eeprom_write_byte(addr+1, config->mode);

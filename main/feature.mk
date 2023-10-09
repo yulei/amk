@@ -65,11 +65,9 @@ ifeq (yes, $(strip $(RGB_INDICATOR_ENABLE)))
 endif
 
 ifeq (yes, $(strip $(RGB_MATRIX_ENABLE)))
-	SRCS += $(MAIN_DIR)/rgb/rgb_matrix.c
-	#SRCS += $(MAIN_DIR)/rgb/rgb_effect_matrix.c
-	SRCS += $(MAIN_DIR)/rgb/rgb_effect_matrix_qmk.c
-	SRCS += $(MAIN_DIR)/rgb/qmk/lib8tion/lib8tion.c
-	APP_DEFS += -DAMK_RGB_MATRIX_ENABLE
+	SRCS += $(MAIN_DIR)/rgb/rgb_matrix_stub.c
+	APP_DEFS += -DRGB_MATRIX_ENABLE
+	APP_DEFS += -include rgb_matrix_cfg.h
 	RGB_ENABLE = yes
 endif
 

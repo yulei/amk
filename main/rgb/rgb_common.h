@@ -53,7 +53,7 @@ typedef struct {
     uint8_t type;
     uint8_t index;
     void*   data;
-} rgb_config_t;
+} rgb_cfg_t;
 
 typedef struct {
     uint8_t config;
@@ -113,13 +113,13 @@ extern rgb_led_t g_rgb_leds[];
 extern rgb_led_attr_t g_rgb_led_attrs[];
 
 extern rgb_device_t g_rgb_devices[];
-extern rgb_config_t g_rgb_configs[];
+extern rgb_cfg_t g_rgb_configs[];
 
-rgb_t hsv_to_rgb(hsv_t hsv);
+rgb_t hsv_to_rgb_stub(hsv_t hsv);
 rgb_t pick_color(uint8_t hue);
 uint8_t pick_hue(void);
 
-#define HSV hsv_t
-#define RGB rgb_t
+//#define HSV hsv_t
+//#define RGB rgb_t
 
 extern const uint8_t CIE1931_CURVE[];

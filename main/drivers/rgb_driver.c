@@ -68,7 +68,7 @@ static void rd_ws2812_set_color(rgb_driver_t *driver, uint32_t index, uint8_t hu
 {
 #ifdef WS2812_LED_PIN
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     ws2812_set_color(index, rgb.r, rgb.g, rgb.b);
 #endif
 }
@@ -84,7 +84,7 @@ static void rd_ws2812_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t s
 {
 #ifdef WS2812_LED_PIN
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     ws2812_set_color_all(rgb.r, rgb.g, rgb.b);
 #endif
 }
@@ -129,7 +129,7 @@ static void rd_aw9523b_set_color_rgb(rgb_driver_t *driver, uint32_t index, uint8
 static void rd_aw9523b_set_color(rgb_driver_t *driver, uint32_t index, uint8_t hue, uint8_t sat, uint8_t val)
 {
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     i2c_led_t *awinic = (i2c_led_t *)driver->data;
     aw9523b_set_color(awinic, index, rgb.r, rgb.g, rgb.b);
 }
@@ -143,7 +143,7 @@ static void rd_aw9523b_set_color_all_rgb(rgb_driver_t *driver, uint8_t red, uint
 static void rd_aw9523b_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t sat, uint8_t val)
 {
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     i2c_led_t *awinic = (i2c_led_t *)driver->data;
     aw9523b_set_color_all(awinic, rgb.r, rgb.g, rgb.b);
 }
@@ -187,7 +187,7 @@ static void rd_aw9106b_set_color_rgb(rgb_driver_t *driver, uint32_t index, uint8
 static void rd_aw9106b_set_color(rgb_driver_t *driver, uint32_t index, uint8_t hue, uint8_t sat, uint8_t val)
 {
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     i2c_led_t *awinic = (i2c_led_t *)driver->data;
 
     aw9106b_set_color(awinic, index, rgb.r, rgb.g, rgb.b);
@@ -202,7 +202,7 @@ static void rd_aw9106b_set_color_all_rgb(rgb_driver_t *driver, uint8_t red, uint
 static void rd_aw9106b_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t sat, uint8_t val)
 {
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     i2c_led_t *awinic = (i2c_led_t *)driver->data;
     aw9106b_set_color_all(awinic, rgb.r, rgb.g, rgb.b);
 }
@@ -236,7 +236,7 @@ static void rd_3731_set_color_rgb(rgb_driver_t *driver, uint32_t index, uint8_t 
 static void rd_3731_set_color(rgb_driver_t *driver, uint32_t index, uint8_t hue, uint8_t sat, uint8_t val)
 {
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3731_set_color(is31, index, rgb.r, rgb.g, rgb.b);
 }
@@ -250,7 +250,7 @@ static void rd_3731_set_color_all_rgb(rgb_driver_t *driver, uint8_t red, uint8_t
 static void rd_3731_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t sat, uint8_t val)
 {
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3731_set_color_all(is31, rgb.r, rgb.g, rgb.b);
 }
@@ -283,7 +283,7 @@ static void rd_3733_set_color_rgb(rgb_driver_t *driver, uint32_t index, uint8_t 
 static void rd_3733_set_color(rgb_driver_t *driver, uint32_t index, uint8_t hue, uint8_t sat, uint8_t val)
 {
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3733_set_color(is31, index, rgb.r, rgb.g, rgb.b);
 }
@@ -297,7 +297,7 @@ static void rd_3733_set_color_all_rgb(rgb_driver_t *driver, uint8_t red, uint8_t
 static void rd_3733_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t sat, uint8_t val)
 {
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3733_set_color_all(is31, rgb.r, rgb.g, rgb.b);
 }
@@ -330,7 +330,7 @@ static void rd_3236_set_color_rgb(rgb_driver_t *driver, uint32_t index, uint8_t 
 static void rd_3236_set_color(rgb_driver_t *driver, uint32_t index, uint8_t hue, uint8_t sat, uint8_t val)
 {
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3236_set_color(is31, index, rgb.r, rgb.g, rgb.b);
 }
@@ -344,7 +344,7 @@ static void rd_3236_set_color_all_rgb(rgb_driver_t *driver, uint8_t red, uint8_t
 static void rd_3236_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t sat, uint8_t val)
 {
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3236_set_color_all(is31, rgb.r, rgb.g, rgb.b);
 }
@@ -377,7 +377,7 @@ static void rd_3741_set_color_rgb(rgb_driver_t *driver, uint32_t index, uint8_t 
 static void rd_3741_set_color(rgb_driver_t *driver, uint32_t index, uint8_t hue, uint8_t sat, uint8_t val)
 {
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3741_set_color(is31, index, rgb.r, rgb.g, rgb.b);
 }
@@ -391,7 +391,7 @@ static void rd_3741_set_color_all_rgb(rgb_driver_t *driver, uint8_t red, uint8_t
 static void rd_3741_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t sat, uint8_t val)
 {
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3741_set_color_all(is31, rgb.r, rgb.g, rgb.b);
 }
@@ -424,7 +424,7 @@ static void rd_3746_set_color_rgb(rgb_driver_t *driver, uint32_t index, uint8_t 
 static void rd_3746_set_color(rgb_driver_t *driver, uint32_t index, uint8_t hue, uint8_t sat, uint8_t val)
 {
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3746_set_color(is31, index, rgb.r, rgb.g, rgb.b);
 }
@@ -438,7 +438,7 @@ static void rd_3746_set_color_all_rgb(rgb_driver_t *driver, uint8_t red, uint8_t
 static void rd_3746_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t sat, uint8_t val)
 {
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3746_set_color_all(is31, rgb.r, rgb.g, rgb.b);
 }
@@ -471,7 +471,7 @@ static void rd_3729_set_color_rgb(rgb_driver_t *driver, uint32_t index, uint8_t 
 static void rd_3729_set_color(rgb_driver_t *driver, uint32_t index, uint8_t hue, uint8_t sat, uint8_t val)
 {
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3729_set_color(is31, index, rgb.r, rgb.g, rgb.b);
 }
@@ -485,7 +485,7 @@ static void rd_3729_set_color_all_rgb(rgb_driver_t *driver, uint8_t red, uint8_t
 static void rd_3729_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t sat, uint8_t val)
 {
     hsv_t hsv = {hue, sat, val};
-    rgb_t rgb = hsv_to_rgb(hsv);
+    rgb_t rgb = hsv_to_rgb_stub(hsv);
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3729_set_color_all(is31, rgb.r, rgb.g, rgb.b);
 }

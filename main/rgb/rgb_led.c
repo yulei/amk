@@ -11,17 +11,15 @@
 #ifdef RGB_INDICATOR_ENABLE
 #include "rgb_indicator.h"
 #endif
-#ifdef AMK_RGB_MATRIX_ENABLE
-#include "rgb_matrix.h"
-//#include "rgb_effect_matrix.h"
-#include "rgb_effect_matrix_qmk.h"
+#ifdef RGB_MATRIX_ENABLE
+#include "rgb_matrix_stub.h"
 #endif
 #include "wait.h"
 #include "amk_eeprom.h"
 #include "amk_gpio.h"
 #include "amk_printf.h"
 
-#include "qmk/lib8tion/lib8tion.h"
+#include "lib8tion.h"
 
 #ifndef RGB_LED_DEBUG
 #define RGB_LED_DEBUG 1
@@ -45,7 +43,7 @@
     #define RGB_INDICATOR_CONFIG_NUM    0
 #endif
 
-#ifdef AMK_RGB_MATRIX_ENABLE
+#ifdef RGB_MATRIX_ENABLE
     #define RGB_MATRIX_CONFIG_NUM       RGB_MATRIX_NUM
 #else
     #define RGB_MATRIX_CONFIG_NUM       0
@@ -57,8 +55,17 @@
 #define RGB_LED_CONFIG_NUM              RGB_CONFIG_NUM
 #endif
 
-rgb_config_t g_rgb_configs[RGB_LED_CONFIG_NUM];
+rgb_cfg_t g_rgb_configs[RGB_LED_CONFIG_NUM];
 static uint8_t rgb_config_cur;
+
+static bool rgb_is_matrix(void)
+{
+#ifdef RGB_MATRIX_ENABLE
+    return g_rgb_configs[rgb_config_cur].type == RGB_EFFECT_MATRIX;
+#else
+    return false;
+#endif
+}
 
 static void rgb_led_set_power(bool on)
 {
@@ -117,8 +124,8 @@ void rgb_led_init(void)
     rgb_indicator_init();
 #endif
 
-#ifdef AMK_RGB_MATRIX_ENABLE
-    rgb_matrix_init();
+#ifdef RGB_MATRIX_ENABLE
+    rgb_matrix_init_stub();
 #endif
 }
 
@@ -147,15 +154,14 @@ void rgb_led_task(void)
     rgb_indicator_task();
 #endif
 
-#ifdef AMK_RGB_MATRIX_ENABLE
-    rgb_matrix_task();
+#ifdef RGB_MATRIX_ENABLE
+    rgb_matrix_task_stub();
 #endif
 
 #ifdef RGBLIGHT_EN_PIN
     if (rgb_led_is_on()) {
 #endif
         rgb_led_pre_flush();
-        //for (int i = 0; i < 1; i++) {
         for (int i = 0; i < RGB_DEVICE_NUM; i++) {
             rgb_driver_t *driver = rgb_driver_get(i);
             driver->flush(driver);
@@ -197,14 +203,29 @@ void rgb_led_config_next(void)
 
 bool rgb_led_config_enabled(void)
 {
-    return g_rgb_configs[rgb_config_cur].enable;
+#ifdef RGB_MATRIX_ENABLE
+    if (rgb_is_matrix()) {
+        return rgb_matrix_is_enabled() != 0;
+
+    } else
+#endif
+    {
+        return g_rgb_configs[rgb_config_cur].enable;
+    }
 }
 
 void rgb_led_config_toggle_temp(void)
 {
     bool all_off = !rgb_led_is_on();
 
-    g_rgb_configs[rgb_config_cur].enable = !g_rgb_configs[rgb_config_cur].enable;
+#ifdef RGB_MATRIX_ENABLE
+    if (rgb_is_matrix()) {
+        rgb_matrix_toggle();
+    } else
+#endif
+    {
+        g_rgb_configs[rgb_config_cur].enable = !g_rgb_configs[rgb_config_cur].enable;
+    }
 
     if (all_off) {
         // all off to on, need re-init driver and turn led power
@@ -229,7 +250,7 @@ void rgb_led_config_toggle(void)
     eeconfig_update_rgb(&g_rgb_configs[rgb_config_cur], rgb_config_cur);
 }
 
-static void rgb_led_effect_init_mode(rgb_config_t *config)
+static void rgb_led_effect_init_mode(rgb_cfg_t *config)
 {
     switch(config->type) {
 #ifdef RGB_LINEAR_ENABLE
@@ -241,9 +262,9 @@ static void rgb_led_effect_init_mode(rgb_config_t *config)
         case RGB_EFFECT_INDICATOR:
         break;
 #endif
-#ifdef AMK_RGB_MATRIX_ENABLE
+#ifdef RGB_MATRIX_ENABLE
         case RGB_EFFECT_MATRIX:
-            rgb_effect_matrix_init_mode(config->data);
+            //rgb_effect_matrix_init_mode(config->data);
         break;
 #endif
         default:
@@ -251,7 +272,7 @@ static void rgb_led_effect_init_mode(rgb_config_t *config)
     }
 }
 
-static uint8_t rgb_led_effect_max(rgb_config_t *config)
+static uint8_t rgb_led_effect_max(rgb_cfg_t *config)
 {
     switch(config->type) {
 #ifdef RGB_LINEAR_ENABLE
@@ -262,9 +283,9 @@ static uint8_t rgb_led_effect_max(rgb_config_t *config)
         case RGB_EFFECT_INDICATOR:
         break;
 #endif
-#ifdef AMK_RGB_MATRIX_ENABLE
+#ifdef RGB_MATRIX_ENABLE
         case RGB_EFFECT_MATRIX:
-            return RM_EFFECT_MAX;
+            return RGB_MATRIX_EFFECT_MAX;
 #endif
         default:
         break;
@@ -319,63 +340,113 @@ static void rgb_led_config_set_param(uint8_t param, uint8_t value)
 
 void rgb_led_config_inc_param(uint8_t param)
 {
-    uint8_t value;
-    switch(param) {
-        case RGB_EFFECT_MODE:
-            value = (g_rgb_configs[rgb_config_cur].mode+1) % rgb_led_effect_max(&g_rgb_configs[rgb_config_cur]);
-            rgb_led_config_set_param(RGB_EFFECT_MODE, value);
-            break;
-        case RGB_EFFECT_SPEED:
-            value = qadd8(g_rgb_configs[rgb_config_cur].speed, SPEED_STEP);
-            rgb_led_config_set_param(RGB_EFFECT_SPEED, value);
-            break;
-        case RGB_EFFECT_HUE:
-            value = g_rgb_configs[rgb_config_cur].hue + HUE_STEP;
-            rgb_led_config_set_param(RGB_EFFECT_HUE, value);
-            break;
-        case RGB_EFFECT_SAT:
-            value = qadd8(g_rgb_configs[rgb_config_cur].sat, SAT_STEP);
-            rgb_led_config_set_param(RGB_EFFECT_SAT, value);
-            break;
-        case RGB_EFFECT_VAL:
-            value = qadd8(g_rgb_configs[rgb_config_cur].val, VAL_STEP);
-            if (value > VAL_MAX) value = VAL_MAX;
-            rgb_led_config_set_param(RGB_EFFECT_VAL, value);
-            break;
-        default:
-            break;
+#ifdef RGB_MATRIX_ENABLE
+    if (rgb_is_matrix()) {
+            switch(param) {
+            case RGB_EFFECT_MODE:
+                rgb_matrix_step();
+                break;
+            case RGB_EFFECT_SPEED:
+                rgb_matrix_increase_speed();
+                break;
+            case RGB_EFFECT_HUE:
+                rgb_matrix_increase_hue();
+                break;
+            case RGB_EFFECT_SAT:
+                rgb_matrix_increase_sat();
+                break;
+            case RGB_EFFECT_VAL:
+                rgb_matrix_increase_val();
+                break;
+            default:
+                break;
+        }
+    } else
+#endif
+    {
+        uint8_t value;
+        switch(param) {
+            case RGB_EFFECT_MODE:
+                value = (g_rgb_configs[rgb_config_cur].mode+1) % rgb_led_effect_max(&g_rgb_configs[rgb_config_cur]);
+                rgb_led_config_set_param(RGB_EFFECT_MODE, value);
+                break;
+            case RGB_EFFECT_SPEED:
+                value = qadd8(g_rgb_configs[rgb_config_cur].speed, SPEED_STEP);
+                rgb_led_config_set_param(RGB_EFFECT_SPEED, value);
+                break;
+            case RGB_EFFECT_HUE:
+                value = g_rgb_configs[rgb_config_cur].hue + HUE_STEP;
+                rgb_led_config_set_param(RGB_EFFECT_HUE, value);
+                break;
+            case RGB_EFFECT_SAT:
+                value = qadd8(g_rgb_configs[rgb_config_cur].sat, SAT_STEP);
+                rgb_led_config_set_param(RGB_EFFECT_SAT, value);
+                break;
+            case RGB_EFFECT_VAL:
+                value = qadd8(g_rgb_configs[rgb_config_cur].val, VAL_STEP);
+                if (value > VAL_MAX) value = VAL_MAX;
+                rgb_led_config_set_param(RGB_EFFECT_VAL, value);
+                break;
+            default:
+                break;
+        }
     }
 }
 
 void rgb_led_config_dec_param(uint8_t param)
 {
-    uint8_t value;
-    switch(param) {
-        case RGB_EFFECT_MODE:
-            value = g_rgb_configs[rgb_config_cur].mode > 0 ? g_rgb_configs[rgb_config_cur].mode - 1 : 0;
-            rgb_led_config_set_param(RGB_EFFECT_MODE, value);
-            break;
-        case RGB_EFFECT_SPEED:
-            value = qsub8(g_rgb_configs[rgb_config_cur].speed, SPEED_STEP);
-            if (value < SPEED_MIN) value = SPEED_MIN;
-            rgb_led_config_set_param(RGB_EFFECT_SPEED, value);
-            break;
-        case RGB_EFFECT_HUE:
-            value = g_rgb_configs[rgb_config_cur].hue - HUE_STEP;
-            rgb_led_config_set_param(RGB_EFFECT_HUE, value);
-            break;
-        case RGB_EFFECT_SAT:
-            value = qsub8(g_rgb_configs[rgb_config_cur].sat, SAT_STEP);
-            if(value < SAT_MIN) value = SAT_MIN;
-            rgb_led_config_set_param(RGB_EFFECT_SAT, value);
-            break;
-        case RGB_EFFECT_VAL:
-            value = qsub8(g_rgb_configs[rgb_config_cur].val, VAL_STEP);
-            if (value > VAL_MAX) value = VAL_MAX;
-            rgb_led_config_set_param(RGB_EFFECT_VAL, value);
-            break;
-        default:
-            break;
+#ifdef RGB_MATRIX_ENABLE
+    if (rgb_is_matrix()) {
+            switch(param) {
+            case RGB_EFFECT_MODE:
+                rgb_matrix_step_reverse();
+                break;
+            case RGB_EFFECT_SPEED:
+                rgb_matrix_decrease_speed();
+                break;
+            case RGB_EFFECT_HUE:
+                rgb_matrix_decrease_hue();
+                break;
+            case RGB_EFFECT_SAT:
+                rgb_matrix_decrease_sat();
+                break;
+            case RGB_EFFECT_VAL:
+                rgb_matrix_decrease_val();
+                break;
+            default:
+                break;
+        }
+    } else
+#endif
+    {
+        uint8_t value;
+        switch(param) {
+            case RGB_EFFECT_MODE:
+                value = g_rgb_configs[rgb_config_cur].mode > 0 ? g_rgb_configs[rgb_config_cur].mode - 1 : 0;
+                rgb_led_config_set_param(RGB_EFFECT_MODE, value);
+                break;
+            case RGB_EFFECT_SPEED:
+                value = qsub8(g_rgb_configs[rgb_config_cur].speed, SPEED_STEP);
+                if (value < SPEED_MIN) value = SPEED_MIN;
+                rgb_led_config_set_param(RGB_EFFECT_SPEED, value);
+                break;
+            case RGB_EFFECT_HUE:
+                value = g_rgb_configs[rgb_config_cur].hue - HUE_STEP;
+                rgb_led_config_set_param(RGB_EFFECT_HUE, value);
+                break;
+            case RGB_EFFECT_SAT:
+                value = qsub8(g_rgb_configs[rgb_config_cur].sat, SAT_STEP);
+                if(value < SAT_MIN) value = SAT_MIN;
+                rgb_led_config_set_param(RGB_EFFECT_SAT, value);
+                break;
+            case RGB_EFFECT_VAL:
+                value = qsub8(g_rgb_configs[rgb_config_cur].val, VAL_STEP);
+                if (value > VAL_MAX) value = VAL_MAX;
+                rgb_led_config_set_param(RGB_EFFECT_VAL, value);
+                break;
+            default:
+                break;
+        }
     }
 }
 
@@ -383,7 +454,13 @@ bool rgb_led_is_on(void)
 {
     uint8_t on = 0;
     for (uint8_t i = 0; i < RGB_LED_CONFIG_NUM; i++) {
-        on |= g_rgb_configs[i].enable;
+        if (rgb_is_matrix()){
+#ifdef RGB_MATRIX_ENABLE
+            on |= rgb_matrix_is_enabled();
+#endif
+        } else {
+            on |= g_rgb_configs[i].enable;
+        }
     }
 
     return on ? true : false;
@@ -392,7 +469,17 @@ bool rgb_led_is_on(void)
 void rgb_led_set_all(bool on)
 {
     for (uint8_t i = 0; i < RGB_LED_CONFIG_NUM; i++) {
-        g_rgb_configs[i].enable = on ? 1 : 0;
+        if (rgb_is_matrix()){
+#ifdef RGB_MATRIX_ENABLE
+            if (on) {
+                rgb_matrix_enable();
+            } else {
+                rgb_matrix_disable();
+            }
+#endif
+        } else {
+            g_rgb_configs[i].enable = on ? 1 : 0;
+        }
     }
 
     if (!on) {
@@ -412,7 +499,8 @@ void rgb_led_prepare_sleep(void)
 #ifdef RGB_INDICATOR_ENABLE
     rgb_indicator_prepare_sleep();
 #endif
-#ifdef AMK_RGB_MATRIX_ENABLE
+#ifdef RGB_MATRIX_ENABLE
+    rgb_matrix_prepare_sleep_stub();
 #endif
 
     // shutdown drivers

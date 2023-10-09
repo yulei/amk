@@ -136,3 +136,5 @@ $(OUTPUT_DIR)/version.h: FORCE
 FORCE:
 
 endif
+
+INCS += $(QMK_DIR)/lib/lib8tion

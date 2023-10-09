@@ -37,7 +37,7 @@ typedef struct s_rgb_linear_state rgb_linear_state_t;
 typedef void (*RGB_EFFECT_FUN)(rgb_linear_state_t*);
 
 struct s_rgb_linear_state {
-    rgb_config_t            *config;
+    rgb_cfg_t            *config;
     RGB_EFFECT_FUN          effects[RL_EFFECT_MAX];
     uint32_t                last_ticks;
     uint32_t                counter;
@@ -54,7 +54,7 @@ struct s_rgb_linear_state {
 static rgb_linear_state_t effects_state[RGB_EFFECT_LINEAR_NUM];
 
 
-static bool effects_config_valid(rgb_config_t *config)
+static bool effects_config_valid(rgb_cfg_t *config)
 {
     if (config->mode >= RL_EFFECT_MAX) {
         return false;
@@ -352,7 +352,7 @@ static void effects_state_init(rgb_linear_state_t *state)
 }
 
 // interface
-rgb_effect_t rgb_effect_linear_init(rgb_config_t *config, uint8_t index, uint8_t led_start, uint8_t led_num)
+rgb_effect_t rgb_effect_linear_init(rgb_cfg_t *config, uint8_t index, uint8_t led_start, uint8_t led_num)
 {
     rgb_linear_state_t *state = &effects_state[index];
     state->config = config;
