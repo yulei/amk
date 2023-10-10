@@ -20,6 +20,7 @@ void rgb_matrix_init_stub(void)
         g_rgb_matrix_params[i].led_num = g_rgb_matrix_params[i].led_num;
         rgb_matrix_init();
     }
+    //rgb_matrix_mode_noeeprom(RGB_MATRIX_ALPHAS_MODS);
 }
 
 void rgb_matrix_task_stub(void)
@@ -81,4 +82,24 @@ const rgb_matrix_driver_t rgb_matrix_driver = {
 bool process_rgb(const uint16_t keycode, const keyrecord_t *record)
 {
     return true;
+}
+
+void rgb_matrix_step_stub(void)
+{
+    rgb_matrix_step();
+#ifdef SIGNALRGB_ENABLE
+    if (rgb_matrix_get_mode() == RGB_MATRIX_CUSTOM_SIGNALRGB) {
+        rgb_matrix_step();
+    }
+#endif
+}
+
+void rgb_matrix_step_reverse_stub(void)
+{
+    rgb_matrix_step_reverse();
+#ifdef SIGNALRGB_ENABLE
+    if (rgb_matrix_get_mode() == RGB_MATRIX_CUSTOM_SIGNALRGB) {
+        rgb_matrix_step_reverse();
+    }
+#endif
 }

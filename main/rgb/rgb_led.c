@@ -344,7 +344,7 @@ void rgb_led_config_inc_param(uint8_t param)
     if (rgb_is_matrix()) {
             switch(param) {
             case RGB_EFFECT_MODE:
-                rgb_matrix_step();
+                rgb_matrix_step_stub();
                 break;
             case RGB_EFFECT_SPEED:
                 rgb_matrix_increase_speed();
@@ -399,7 +399,7 @@ void rgb_led_config_dec_param(uint8_t param)
     if (rgb_is_matrix()) {
             switch(param) {
             case RGB_EFFECT_MODE:
-                rgb_matrix_step_reverse();
+                rgb_matrix_step_reverse_stub();
                 break;
             case RGB_EFFECT_SPEED:
                 rgb_matrix_decrease_speed();

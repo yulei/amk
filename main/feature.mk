@@ -69,6 +69,12 @@ ifeq (yes, $(strip $(RGB_MATRIX_ENABLE)))
 	APP_DEFS += -DRGB_MATRIX_ENABLE
 	APP_DEFS += -include rgb_matrix_cfg.h
 	RGB_ENABLE = yes
+	ifeq (yes, $(strip $(SIGNALRGB_ENABLE)))
+		SRCS += $(MAIN_DIR)/rgb/signalrgb/signalrgb_via.c
+		INCS += $(MAIN_DIR)/rgb/signalrgb
+		APP_DEFS += -DSIGNALRGB_ENABLE
+		APP_DEFS += -DRGB_MATRIX_CUSTOM_KB
+	endif
 endif
 
 ifeq (yes, $(strip $(RGB_ENABLE)))

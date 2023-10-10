@@ -1,36 +1,37 @@
+
 #pragma once
 
-enum signalrgb_commands
-{
-    GET_QMK_VERSION = 0x21,
-    GET_PROTOCOL_VERSION = 0x22,
-    GET_UNIQUE_IDENTIFIER = 0x23,
-    STREAM_RGB_DATA = 0x24,
-    SET_SIGNALRGB_MODE_ENABLE = 0x25,
-    SET_SIGNALRGB_MODE_DISABLE = 0x26,
-    GET_TOTAL_LEDS = 0x27,
-    GET_FIRMWARE_TYPE = 0x28,
+#include <stdint.h>
+
+/* 
+Part of enum via_command_id {
+    goes after id_dynamic_keymap_set_encoder           = 0x15,
+*/
+
+enum signalrgb_command_id {
+    id_signalrgb_qmk_version                = 0x21,
+    id_signalrgb_protocol_version           = 0x22,
+    id_signalrgb_unique_identifier          = 0x23,
+    id_signalrgb_stream_leds                = 0x24,
+    id_signalrgb_effect_enable              = 0x25,
+    id_signalrgb_effect_disable             = 0x26,
+    id_signalrgb_total_leds                 = 0x27,
+    id_signalrgb_firmware_type              = 0x28,
 };
 
-enum signalrgb_responses //These are a bit clunky right now. Could use improvement.
-{
+
+/* This follows directly after via_command_id */
+
+enum signalrgb_responses {
     PROTOCOL_VERSION_BYTE_1 = 1,
     PROTOCOL_VERSION_BYTE_2 = 0,
     PROTOCOL_VERSION_BYTE_3 = 5,
     DEVICE_UNIQUE_IDENTIFIER_BYTE_1 = 0,
     DEVICE_UNIQUE_IDENTIFIER_BYTE_2 = 0,
     DEVICE_UNIQUE_IDENTIFIER_BYTE_3 = 0,
-    FIRMWARE_TYPE_BYTE = 1, 
-    DEVICE_ERROR_LEDS = 255, //Error code to show that there are more leds than a packet will allow.
+    FIRMWARE_TYPE_BYTE = 2, 
+    DEVICE_ERROR_LEDS = 254,
 };
-
-void get_qmk_version(void);
-void get_signalrgb_protocol_version(void);
-void get_unique_identifier(void);
-void led_streaming(uint8_t *data);
-void signalrgb_mode_enable(void);
-void signalrgb_mode_disable(void);
-void get_total_leds(void);
 
 //Changelogs for Firmware Versions------------------------------------
 //V1.0.1 added detection for the total number of LEDs a board has. Plugins need a rewrite to make use of this change. Rewritten plugins will not function with older firmware.
@@ -48,13 +49,16 @@ gmmk/gmmk2/p65/ansi:default                 0 0 7
 gmmk/gmmk2/p65/iso:default                  0 0 8
 gmmk/gmmk2/p96/ansi:default                 0 0 9
 gmmk/gmmk2/p96/iso:default                  0 0 10
-redragon/k530:default                       0 1 1
-redragon/k552/rev1:ansi                     0 1 2
-redragon/k552/rev1:iso                      0 1 2
-redragon/k552/rev2:default                  0 1 2
-redragon/k552/rev2:abnt2                    0 1 2
-redragon/k556:default                       0 1 3
-redragon/k580:default                       0 1 4
-redragon/k582:default                       0 1 3
-redragon/k630:default                       0 1 5
+redragon/k556:via                       0 1 3
+redragon/k580:via                       0 1 4
 */
+
+
+/*
+
+This is placed directory after:
+// Used by VIA to store and retrieve the layout options.
+
+*/
+
+//Used to handle SignalRGB Compatibility
