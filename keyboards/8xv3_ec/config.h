@@ -19,8 +19,8 @@
 
 #define DISCHARGE_WAIT_PRE  20
 #define DISCHARGE_WAIT_POST 20
-#define EC_TH_LOW       1280
-#define EC_TH_HIGH      1680
+#define EC_TH_LOW       1024
+#define EC_TH_HIGH      1280
 
 #define LEFT_EN_PIN     C5
 #define RIGHT_EN_PIN    B0
@@ -70,7 +70,7 @@
 #define WS2812_LED_PIN      B7
 
 #define USE_PWM_TIM4
-#define PWM_TIM_PERIOD      119
+#define PWM_TIM_PERIOD      224
 #define PWM_TIM             htim4
 #define PWM_TIM_CHANNEL     TIM_CHANNEL_2
 #define PWM_TIM_DMA_ID      TIM_DMA_ID_CC2
@@ -86,7 +86,7 @@
 #endif
 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
-#define DEBOUNCE        10
+//#define DEBOUNCE        10
 #define HSE_VALUE       16000000
 #define VECT_TAB_OFFSET 0x20000
 #define DWT_DELAY
@@ -97,10 +97,10 @@
 #define VIAL_KEYBOARD_UID {0x46, 0x52, 0xB3, 0xFD, 0xD6, 0x01, 0xD1, 0x3B}
 
 // for apc
-#define APC_KEY_MIN             200 
-#define APC_KEY_MAX             4096
+#define APC_KEY_MIN             20
+#define APC_KEY_MAX             2560
 
-#define APC_INTERVAL_MIN        50
+#define APC_INTERVAL_MIN        100
 #define APC_INTERVAL_MAX        2560
 
 #define APC_INTERVAL_INVALID    0

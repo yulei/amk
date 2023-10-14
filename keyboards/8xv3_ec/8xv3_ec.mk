@@ -10,6 +10,8 @@ MSC_ENABLE = yes
 DYNAMIC_CONFIGURATION = yes
 NKRO_ENABLE = yes
 
+DEBOUNCE_TYPE = none
+
 LINKER_PATH = $(KEYBOARD_DIR)
 
 UF2_ENABLE = yes
@@ -18,5 +20,5 @@ UF2_FAMILY = STM32F4
 SRCS += $(KEYBOARD_DIR)/8xv3_ec.c
 SRCS +=	$(KEYBOARD_DIR)/display.c
 SRCS +=	$(MAIN_DIR)/drivers/st7735.c
-#SRCS +=	$(KEYBOARD_DIR)/apc_matrix.c
-SRCS +=	$(KEYBOARD_DIR)/ec_matrix.c
+SRCS +=	$(KEYBOARD_DIR)/apc_matrix.c
+#SRCS += $(KEYBOARD_DIR)/ec_matrix.c

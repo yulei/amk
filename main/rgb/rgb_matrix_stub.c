@@ -92,6 +92,12 @@ void rgb_matrix_step_stub(void)
         rgb_matrix_step();
     }
 #endif
+
+#ifdef OPENRGB_ENABLE
+    if (rgb_matrix_get_mode() == RGB_MATRIX_CUSTOM_OPENRGB) {
+        rgb_matrix_step();
+    }
+#endif
 }
 
 void rgb_matrix_step_reverse_stub(void)
@@ -99,6 +105,12 @@ void rgb_matrix_step_reverse_stub(void)
     rgb_matrix_step_reverse();
 #ifdef SIGNALRGB_ENABLE
     if (rgb_matrix_get_mode() == RGB_MATRIX_CUSTOM_SIGNALRGB) {
+        rgb_matrix_step_reverse();
+    }
+#endif
+
+#ifdef OPENRGB_ENABLE
+    if (rgb_matrix_get_mode() == RGB_MATRIX_CUSTOM_OPENRGB) {
         rgb_matrix_step_reverse();
     }
 #endif

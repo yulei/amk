@@ -45,7 +45,7 @@
 
 #define CAPS_LED_PIN        A10
 
-#define DEBOUNCE            0
+//#define DEBOUNCE            5
 #define DWT_DELAY
 #define VECT_TAB_OFFSET     0x20000
 #define HSE_VALUE           16000000U
@@ -74,10 +74,10 @@
 #define DYNAMIC_KEYMAP_LAYER_COUNT  6
 
 // for apc
-#define APC_KEY_MIN             200 
-#define APC_KEY_MAX             4096
+#define APC_KEY_MIN             20
+#define APC_KEY_MAX             2560
 
-#define APC_INTERVAL_MIN        50
+#define APC_INTERVAL_MIN        100
 #define APC_INTERVAL_MAX        2560
 
 #define APC_INTERVAL_INVALID    0

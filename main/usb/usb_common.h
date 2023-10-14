@@ -11,6 +11,7 @@
 #define USB_AUDIO_BIT       (1u << 4)
 #define USB_VIAL_BIT        (1u << 5)
 #define USB_SWITCH_BIT      (1u << 6)
+#define USB_OPENRGB_BIT     (1u << 7)
 
 extern uint32_t usb_setting;
 
@@ -18,8 +19,12 @@ extern uint32_t usb_setting;
 // id for 1
 // mods for 1
 // keys for 30
-#define AMK_NKRO_TOTAL_SIZE  32
+#define AMK_NKRO_TOTAL_SIZE     32
 #define NKRO_KEYCODE_SIZE   (AMK_NKRO_TOTAL_SIZE-1)
+#define AMK_KEYBOARD_EP_SIZE    8
+#define AMK_OTHER_EP_SIZE       32
+#define AMK_VIAL_EP_SIZE        32
+#define AMK_OPENRGB_EP_SIZE     64
 
 #ifdef DYNAMIC_CONFIGURATION
 // Interface number
@@ -30,11 +35,12 @@ enum {
     ITF_NUM_HID_OTHER,
     #endif
 #endif
-#if defined(VIAL_ENABLE) || defined(MSC_ENABLE) || defined(AUDIO_ENABLE)
+#if defined(VIAL_ENABLE) || defined(MSC_ENABLE) || defined(AUDIO_ENABLE) || defined(OPENRGB_ENABLE)
     ITF_NUM_DUMMY,
     #define ITF_NUM_VIAL            ITF_NUM_DUMMY
     #define ITF_NUM_MSC             ITF_NUM_DUMMY
     #define ITF_NUM_AUDIO           ITF_NUM_DUMMY  
+    #define ITF_NUM_OPENRGB         ITF_NUM_DUMMY
 #endif
 #ifdef AUDIO_ENABLE
     ITF_NUM_AUDIO_STREAMING,
@@ -51,7 +57,7 @@ enum {
     EPNUM_HID_OTHER,
     #endif
 #endif
-#if defined(VIAL_ENABLE) || defined(MSC_ENABLE) || defined(AUDIO_ENABLE)
+#if defined(VIAL_ENABLE) || defined(MSC_ENABLE) || defined(AUDIO_ENABLE) || defined(OPENRGB_ENABLE)
     EPNUM_DUMMY,
     #define EPNUM_VIAL_OUT      EPNUM_DUMMY
     #define EPNUM_VIAL_IN       EPNUM_DUMMY
@@ -59,6 +65,8 @@ enum {
     #define EPNUM_MSC_IN        EPNUM_DUMMY 
     #define EPNUM_AUDIO_OUT     EPNUM_DUMMY
     #define EPNUM_AUDIO_IN      EPNUM_DUMMY
+    #define EPNUM_OPENRGB_OUT   EPNUM_DUMMY
+    #define EPNUM_OPENRGB_IN    EPNUM_DUMMY
 #endif
     EPNUM_MAX
 };
@@ -84,6 +92,9 @@ enum {
 #ifdef AUDIO_ENABLE
     ITF_NUM_AUDIO,
     ITF_NUM_AUDIO_STREAMING,
+#endif
+#ifdef OPENRGB_ENABLE
+    ITF_NUM_OPENRGB,
 #endif
     ITF_NUM_TOTAL
 };
@@ -121,6 +132,14 @@ enum {
     EPNUM_AUDIO_OUT,
     #define EPNUM_AUDIO_IN  EPNUM_AUDIO_IN
 #endif
+#ifdef OPENRGB_ENABLE
+    EPNUM_OPENRGB_OUT,
+    #if defined(STM32F103xB) || defined(NRF52840_XXAA) || defined(STM32L072xx)
+    EPNUM_OPENRGB_IN,
+    #else
+        #define EPNUM_OPENRGB_IN EPNUM_OPENRGB_OUT
+    #endif
+#endif
     EPNUM_MAX
 };
 
@@ -137,6 +156,7 @@ enum {
     HID_REPORT_ID_MACRO,
     HID_REPORT_ID_DELAY,
     HID_REPORT_ID_CDC,
+    HID_REPORT_ID_OPENRGB,
     HID_REPORT_ID_UNKNOWN,
 };
 

@@ -112,7 +112,7 @@ static bool sense_key(uint32_t row, uint32_t col)
 
     key_down = apc_matrix_update(row, col, adc_value);
     if (key_down) {
-        custom_matrix_debug("key down: row=%d, col=%d, data=%d\n", row, col, adc_value);
+        //custom_matrix_debug("key down: row=%d, col=%d, data=%d\n", row, col, adc_value);
     }
 
     // clean up
