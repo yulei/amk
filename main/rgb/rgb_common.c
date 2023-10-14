@@ -26,9 +26,9 @@ const uint8_t CIE1931_CURVE[256] = {
 };
 
  // the converter comes from https://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both
-rgb_t hsv_to_rgb_stub(hsv_t hsv)
+amk_rgb_t hsv_to_rgb_stub(amk_hsv_t hsv)
 {
-    rgb_t rgb;
+    amk_rgb_t rgb;
     uint8_t region, remainder, p, q, t;
     uint16_t h, s, v;
     if (hsv.s == 0)
@@ -71,9 +71,9 @@ rgb_t hsv_to_rgb_stub(hsv_t hsv)
     return rgb;
 }
 
-rgb_t pick_color(uint8_t hue)
+amk_rgb_t pick_color(uint8_t hue)
 {
-    hsv_t hsv = {hue, 255, 255};
+    amk_hsv_t hsv = {hue, 255, 255};
     return hsv_to_rgb_stub(hsv);
 }
 

@@ -12,13 +12,13 @@ typedef struct {
     uint8_t r;
     uint8_t g;
     uint8_t b;
-} rgb_t;
+} amk_rgb_t;
 
 typedef struct {
     uint8_t h;
     uint8_t s;
     uint8_t v;
-} hsv_t;
+} amk_hsv_t;
 
 typedef struct {
     uint16_t driver;
@@ -115,11 +115,9 @@ extern rgb_led_attr_t g_rgb_led_attrs[];
 extern rgb_device_t g_rgb_devices[];
 extern rgb_cfg_t g_rgb_configs[];
 
-rgb_t hsv_to_rgb_stub(hsv_t hsv);
-rgb_t pick_color(uint8_t hue);
+amk_rgb_t hsv_to_rgb_stub(amk_hsv_t hsv);
+amk_rgb_t pick_color(uint8_t hue);
 uint8_t pick_hue(void);
 
-//#define HSV hsv_t
-//#define RGB rgb_t
 
 extern const uint8_t CIE1931_CURVE[];

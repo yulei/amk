@@ -464,12 +464,20 @@ bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t t
     if (dir == TUSB_DIR_IN) {
         USBD_EP_Transfer(&dcd_usb, epnum, buffer, total_bytes);
     } else {
+//***************************************************************
+//**** tinyusb use buffer size as HID OUT packet receiving size
+//**** this was not true in my application
+//****
+        if (total_bytes > dcd_usb.epOUT[epnum].mps) {
+            total_bytes = dcd_usb.epOUT[epnum].mps;
+        }
         USBD_EP_Receive(&dcd_usb, epnum, buffer, total_bytes);
     }
 
     return true;
 }
-
+/*
+// only for audio?
 static uint8_t ff_buf[1024];
 static tu_fifo_t *cur_ff = NULL;
 static bool ff_valid = false;
@@ -490,6 +498,7 @@ bool dcd_edpt_xfer_fifo(uint8_t rhport, uint8_t ep_addr, tu_fifo_t * ff, uint16_
     }
     return dcd_edpt_xfer(rhport, ep_addr, ff_buf, total_bytes);
 }
+*/
 
 void dcd_edpt_stall(uint8_t rhport, uint8_t ep_addr)
 {
@@ -541,11 +550,13 @@ void USBD_DataInStageCallback(USBD_HANDLE_T* usbdh, uint8_t epnum)
 
 void USBD_DataOutStageCallback(USBD_HANDLE_T* usbdh, uint8_t epnum)
 {
+    /*
     if (ff_valid) {
         int readed = USBD_EP_ReadRxDataLen(usbdh, epnum);
         tu_fifo_write_n(cur_ff, ff_buf,  readed);
         ff_valid = false;
     }
+    */
     dcd_event_xfer_complete(0, epnum & EP_ADDR_MSK, USBD_EP_ReadRxDataLen(usbdh, epnum & EP_ADDR_MSK), XFER_RESULT_SUCCESS, true); 
 }
 
