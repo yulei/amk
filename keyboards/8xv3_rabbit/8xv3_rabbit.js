@@ -54,8 +54,8 @@ const vKeyPositions = [
 	[13,1], [15,1], [12,3], [14,3], [0,4],  [2,4],  [13,4], [15,4],  [4,5], [8, 5], [9,5], //11
 ];
 
-let LEDCount = 97;
-let IsViaKeyboard = true;
+let LEDCount = 0;
+let IsViaKeyboard = false;
 const MainlineQMKFirmware = 1;
 const VIAFirmware = 2;
 const PluginProtocolVersion = "1.0.4";
@@ -327,7 +327,7 @@ function hexToRgb(hex) {
 }
 
 export function Validate(endpoint) {
-	return endpoint.interface === 1;
+	return endpoint.interface === 2;
 }
 
 export function Image() {
