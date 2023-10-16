@@ -44,7 +44,7 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
 
 static bool typing_trigger = false;
 static uint32_t typing_ticks;
-static hsv_t typing_leds[RGB_LED_NUM];
+static amk_hsv_t typing_leds[RGB_LED_NUM];
 
 #define TYPING_UPDATE_INTERVAL  10
 #define TYPING_VAL_STEP      8
@@ -91,7 +91,7 @@ static void typing_leds_update(void)
 static void typing_leds_flush(void)
 {
     for (int i = 0; i < 16; i++) {
-        rgb_t rgb = hsv_to_rgb(typing_leds[i]);
+        amk_rgb_t rgb = hsv_to_rgb_stub(typing_leds[i]);
         rgb_linear_set_rgb(0, i, rgb.r, rgb.g, rgb.b);
     }
     for (int i = 0; i < 4; i++) {
