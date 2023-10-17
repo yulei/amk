@@ -20,8 +20,12 @@
 #define APC_KEY_MAX             4096
 #endif
 
+#ifndef APC_KEY_MAX_PRESET
+#define APC_KEY_MAX_PRESET      3000
+#endif
+
 #ifndef APC_INTERVAL_MIN
-#define APC_INTERVAL_MIN        100
+#define APC_INTERVAL_MIN        200
 #endif
 
 #ifndef APC_INTERVAL_MAX

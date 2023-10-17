@@ -68,7 +68,7 @@ static uint32_t apc_compute_interval(uint32_t row, uint32_t col, uint32_t index)
     struct apc_key *key = &apc_matrix[row][col];
     uint32_t interval = APC_INTERVAL_INVALID;
 
-    if ((key->min == APC_KEY_MIN_DEFAULT) || (key->max < APC_KEY_MAX)) {
+    if ((key->min == APC_KEY_MIN_DEFAULT) || (key->max < APC_KEY_MAX_PRESET)) {
         interval = APC_INTERVAL_MIN + ((APC_INTERVAL_MAX-APC_INTERVAL_MIN)/APC_INTERVAL_COUNT)*(index);
     } else {
         interval = APC_INTERVAL_MIN + ((key->max-key->min-APC_INTERVAL_MIN)/APC_INTERVAL_COUNT)*(index);

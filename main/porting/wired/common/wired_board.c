@@ -9,6 +9,7 @@
 #include "amk_driver.h"
 #include "amk_profile.h"
 #include "amk_printf.h"
+#include "SEGGER_SYSVIEW.h"
 
 #ifdef SCREEN_ENABLE
 #include "render.h"
@@ -59,19 +60,26 @@ void board_init(void)
 
     amk_driver_init();
     gb_debug("amk_init\n");
+
+    SEGGER_SYSVIEW_Conf();
+    gb_debug("segger sysview init\n");
+    SEGGER_SYSVIEW_NameResource(1, "amk_driver");
+    SEGGER_SYSVIEW_NameResource(2, "usb_task");
+    SEGGER_SYSVIEW_NameResource(3, "custom_task");
 }
 
 
 void board_task(void)
 {
-    uint32_t region = AMK_PROFILE_BEGIN("board_task");
-
+    SEGGER_SYSVIEW_MarkStart(1);
     amk_driver_task();
-    AMK_PROFILE_SAMPLE("amk_driver", region);
+    SEGGER_SYSVIEW_MarkStop(1);
+
 
 #ifndef RTOS_ENABLE
+    SEGGER_SYSVIEW_MarkStart(2);
     usb_task();
-    AMK_PROFILE_SAMPLE("usb_task", region);
+    SEGGER_SYSVIEW_MarkStop(2);
 #endif
 
 #if defined(MSC_ENABLE) && !defined(RTOS_ENABLE)
@@ -94,8 +102,7 @@ void board_task(void)
     rf_driver_task();
 #endif
 
+    SEGGER_SYSVIEW_MarkStart(3);
     custom_board_task();
-    AMK_PROFILE_SAMPLE("custom_task", region);
-
-    AMK_PROFILE_END(region);
+    SEGGER_SYSVIEW_MarkStop(3);
 }
