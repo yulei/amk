@@ -468,9 +468,9 @@ bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t t
 //**** tinyusb use buffer size as HID OUT packet receiving size
 //**** this was not true in my application
 //****
-        if (total_bytes > dcd_usb.epOUT[epnum].mps) {
-            total_bytes = dcd_usb.epOUT[epnum].mps;
-        }
+        //if (total_bytes > dcd_usb.epOUT[epnum].mps) {
+        //    total_bytes = dcd_usb.epOUT[epnum].mps;
+        //}
         USBD_EP_Receive(&dcd_usb, epnum, buffer, total_bytes);
     }
 
