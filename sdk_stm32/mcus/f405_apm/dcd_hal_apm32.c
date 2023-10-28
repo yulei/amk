@@ -5,7 +5,6 @@
  * @copyright Copyright (c) 2023
 */
 
-#include "apm32f4xx.h"
 #include "apm32f4xx_misc.h"
 #include "apm32f4xx_rcm.h"
 #include "apm32f4xx_usb.h"
@@ -21,6 +20,9 @@
 #else
     #error "HAL USB unsupported APM32 mcu"
 #endif
+
+#pragma GCC push_options
+#pragma GCC optimize ("Og")
 
 static void busy_delay_us(uint32_t us)
 {
@@ -53,7 +55,7 @@ static void my_usbd_config(USBD_HANDLE_T* usbdh)
     if (usbdh->usbCfg.phyType == USB_OTG_PHY_EMB)
     {
         /* Embedded FS PHY */
-        if(usbdh->usbCfg.speed == USB_OTG_SPEED_FSLS)
+        if(0)//usbdh->usbCfg.speed == USB_OTG_SPEED_FSLS)
         {
             USB_OTG_ConfigPHY(usbdh->usbGlobal, USB_OTG_PHY_SP_FS);
 
@@ -372,7 +374,7 @@ void dcd_init(uint8_t rhport)
     dcd_usb.usbCfg.speedChannel        = USBD_SPEED_CH_HS;
 #else
     dcd_usb.usbCfg.speed               = USB_OTG_SPEED_FSLS;
-    dcd_usb.usbCfg.speedChannel        = USBD_SPEED_CH_FS;
+    dcd_usb.usbCfg.speedChannel        = USBD_SPEED_CH_HS;//USBD_SPEED_CH_FS;
 #endif
     dcd_usb.usbCfg.devEndpointNum      = DCD_MAX_EP_NUM;
     dcd_usb.usbCfg.lowPowerStatus      = DISABLE;
@@ -564,3 +566,5 @@ void USBD_SOFCallback(USBD_HANDLE_T* usbdh)
 {
     dcd_event_bus_signal(0, DCD_EVENT_SOF, true);
 }
+
+#pragma GCC pop_options

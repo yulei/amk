@@ -16,6 +16,8 @@
 #include "raw_hid.h"
 #endif
 
+//#define PRINT_REPORT
+
 void amk_usb_init(void)
 {
     tusb_init();
@@ -70,10 +72,12 @@ bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t si
             amk_printf("failed to sent keyboard report\n");
             return false;
         }
-        //{
-        //    uint8_t * p = (uint8_t*)data;
-        //    amk_printf("Key:%x-%x-%x-%x-%x-%x-%x-%x\n", p[0],p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
-        //}
+#ifdef PRINT_REPORT
+        {
+            uint8_t * p = (uint8_t*)data;
+            amk_printf("Key:%x-%x-%x-%x-%x-%x-%x-%x\n", p[0],p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
+        }
+#endif
         break;
 #endif
 
@@ -83,6 +87,13 @@ bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t si
             amk_printf("failed to sent mouse report\n");
             return false;
         }
+#ifdef PRINT_REPORT
+        {
+            report_mouse_t* mouse = (report_mouse_t*)data;
+            amk_printf("Mouse: size=%d, sizeofmouse=%d, button:%x, x:%d, y:%d, vertical wheel:%d, horizontal wheel:%d\n",
+                    size, sizeof(report_mouse_t), mouse->buttons, mouse->x, mouse->y, mouse->v, mouse->h);
+        }
+#endif
         break;
     case HID_REPORT_ID_SYSTEM:
         if (!tud_hid_n_report(ITF_NUM_HID_OTHER, HID_REPORT_ID_SYSTEM, data, (uint8_t)size)) {
