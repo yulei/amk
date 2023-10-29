@@ -21,25 +21,22 @@
     #error "HAL USB unsupported APM32 mcu"
 #endif
 
-#pragma GCC push_options
-#pragma GCC optimize ("Og")
-
-static void busy_delay_us(uint32_t us)
+__attribute__((noinline)) static void usb_busy_delay_us(uint32_t us)
 {
     __IO uint32_t ticks = us * (SystemCoreClock/1000000);
     while( ticks--) ;
 }
 
-static void busy_delay_ms(uint32_t ms)
+__attribute__((noinline)) static void usb_busy_delay_ms(uint32_t ms)
 {
     for (int i = 0; i < ms; i++) {
-        busy_delay_us(1000);
+        usb_busy_delay_us(1000);
     }
 }
 
 USBD_HANDLE_T dcd_usb;
 
-static void dcd_open_ep0(USBD_HANDLE_T* usbdh)
+__attribute__((noinline)) static void dcd_open_ep0(USBD_HANDLE_T* usbdh)
 {
     amk_printf("open ep0\n");
     // open ep0 here
@@ -47,37 +44,14 @@ static void dcd_open_ep0(USBD_HANDLE_T* usbdh)
     USBD_EP_Open(usbdh, 0x80U, TUSB_XFER_CONTROL, CFG_TUD_ENDPOINT0_SIZE);
 }
 
-static void my_usbd_config(USBD_HANDLE_T* usbdh)
+__attribute__((noinline)) static void my_usbd_config(USBD_HANDLE_T* usbdh)
 {
     uint8_t i;
     
     /* Embedded PHY */
     if (usbdh->usbCfg.phyType == USB_OTG_PHY_EMB)
     {
-        /* Embedded FS PHY */
-        if(0)//usbdh->usbCfg.speed == USB_OTG_SPEED_FSLS)
-        {
-            USB_OTG_ConfigPHY(usbdh->usbGlobal, USB_OTG_PHY_SP_FS);
-
-            /* Reset core */
-            USB_OTG_CoreReset(usbdh->usbGlobal);
-            //APM_DelayMs(50);
-            busy_delay_ms(50);
-
-            /* battery status */
-            if (usbdh->usbCfg.batteryStatus == ENABLE)
-            {
-                /* Activate the power down*/
-                USB_OTG_EnablePowerDown(usbdh->usbGlobal);
-            }
-            else
-            {
-                /* Deactivate the power down*/
-                USB_OTG_DisablePowerDown(usbdh->usbGlobal);
-            }
-        }
-        /* Embedded HS2 PHY */
-        else
+        /* Only Use Embedded HS2 PHY */
         {
             USB_OTG_HS2->USB_SWITCH_B.usb_switch = BIT_SET;
             USB_OTG_HS2->POWERON_CORE_B.poweron_core = BIT_SET;
@@ -89,7 +63,7 @@ static void my_usbd_config(USBD_HANDLE_T* usbdh)
             /* Reset core */
             USB_OTG_CoreReset(usbdh->usbGlobal);
             //APM_DelayMs(50);
-            busy_delay_ms(50);
+            usb_busy_delay_ms(50);
             
             /* battery status */
             if (usbdh->usbCfg.batteryStatus == ENABLE)
@@ -103,30 +77,6 @@ static void my_usbd_config(USBD_HANDLE_T* usbdh)
                 USB_OTG_DisablePowerDown(usbdh->usbGlobal);
             }
         }
-    }
-    /* External PHY */
-    else
-    {
-        /* Activate the power down*/
-        USB_OTG_EnablePowerDown(usbdh->usbGlobal);
-        
-        USB_OTG_ConfigPHY(usbdh->usbGlobal, USB_OTG_PHY_SP_HS);
-
-        usbdh->usbGlobal->GUSBCFG_B.DPSEL       = BIT_RESET;
-        usbdh->usbGlobal->GUSBCFG_B.ULPISEL     = BIT_RESET;
-
-        usbdh->usbGlobal->GUSBCFG_B.ULPIEVDSEL  = BIT_RESET;
-        usbdh->usbGlobal->GUSBCFG_B.ULPIEVC     = BIT_RESET;
-        
-        if (usbdh->usbCfg.extVbusStatus == ENABLE)
-        {
-            usbdh->usbGlobal->GUSBCFG_B.ULPIEVDSEL = BIT_SET;
-        }
-        
-        /* Reset core */
-        USB_OTG_CoreReset(usbdh->usbGlobal);
-        //APM_DelayMs(50);
-        busy_delay_ms(50);
     }
 
     if (usbdh->usbCfg.dmaStatus == ENABLE)
@@ -392,7 +342,7 @@ void dcd_init(uint8_t rhport)
     my_usbd_config(&dcd_usb);
     //USBD_Config(&dcd_usb);
 
-    busy_delay_ms(10);
+    usb_busy_delay_ms(10);
 
     USBD_Start(&dcd_usb);
 }
@@ -466,41 +416,11 @@ bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t t
     if (dir == TUSB_DIR_IN) {
         USBD_EP_Transfer(&dcd_usb, epnum, buffer, total_bytes);
     } else {
-//***************************************************************
-//**** tinyusb use buffer size as HID OUT packet receiving size
-//**** this was not true in my application
-//****
-        //if (total_bytes > dcd_usb.epOUT[epnum].mps) {
-        //    total_bytes = dcd_usb.epOUT[epnum].mps;
-        //}
         USBD_EP_Receive(&dcd_usb, epnum, buffer, total_bytes);
     }
 
     return true;
 }
-/*
-// only for audio?
-static uint8_t ff_buf[1024];
-static tu_fifo_t *cur_ff = NULL;
-static bool ff_valid = false;
-
-bool dcd_edpt_xfer_fifo(uint8_t rhport, uint8_t ep_addr, tu_fifo_t * ff, uint16_t total_bytes)
-{
-    if (total_bytes > 1024) {
-        amk_printf("XFER fifo oversize, ep:%d, size:%d\n", ep_addr, total_bytes);
-        return false;
-    }
-
-    uint8_t const dir = tu_edpt_dir(ep_addr);
-    if (dir == TUSB_DIR_OUT) {
-        cur_ff = ff;
-        ff_valid = true;
-    } else {
-        tu_fifo_read_n(ff, ff_buf, total_bytes);
-    }
-    return dcd_edpt_xfer(rhport, ep_addr, ff_buf, total_bytes);
-}
-*/
 
 void dcd_edpt_stall(uint8_t rhport, uint8_t ep_addr)
 {
@@ -566,5 +486,3 @@ void USBD_SOFCallback(USBD_HANDLE_T* usbdh)
 {
     dcd_event_bus_signal(0, DCD_EVENT_SOF, true);
 }
-
-#pragma GCC pop_options

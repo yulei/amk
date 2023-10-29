@@ -66,7 +66,11 @@ $(LIB_OBJ_DIRS):
 #$(info $(APP_DEFS))
 
 ifeq (1,$(NO_DEBUG))
-OPT += -Os -ggdb
+OPT += -Os -ggdb3
+#O1
+#OPT += -fno-inline-functions-called-once
+#O2
+#OPT += -fno-inline-small-functions
 else
 OPT += -Og -ggdb3 #-DDEBUG
 endif

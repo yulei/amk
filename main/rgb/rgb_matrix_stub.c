@@ -6,7 +6,7 @@
 #include "rgb_driver.h"
 #include "rgb_led.h"
 
-rgb_param_t g_rgb_matrix_params[RGB_MATRIX_NUM];
+//rgb_param_t g_rgb_matrix_params[RGB_MATRIX_NUM];
 
 void rgb_matrix_init_stub(void)
 {

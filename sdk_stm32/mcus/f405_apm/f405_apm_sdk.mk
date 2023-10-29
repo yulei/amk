@@ -32,3 +32,7 @@ APP_DEFS += \
 SDK_DEFS += -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
 MCU_LD = STM32F405RGTx
+
+#XXX
+APP_DEFS += -fno-inline-functions-called-once
+APP_DEFS += -fno-inline-small-functions
