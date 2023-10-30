@@ -71,7 +71,7 @@ static uint32_t apc_compute_interval(uint32_t row, uint32_t col, uint32_t index)
     if ((key->min == APC_KEY_MIN_DEFAULT) || (key->max < APC_KEY_MAX_PRESET)) {
         interval = APC_INTERVAL_MIN + ((APC_INTERVAL_MAX-APC_INTERVAL_MIN)/APC_INTERVAL_COUNT)*(index);
     } else {
-        interval = APC_INTERVAL_MIN + ((key->max-key->min-APC_INTERVAL_MIN)/APC_INTERVAL_COUNT)*(index);
+        interval = APC_INTERVAL_MIN + ((key->max - key->min - APC_INTERVAL_MIN)/APC_INTERVAL_COUNT)*(index);
     }
 
     return interval;
@@ -85,7 +85,7 @@ static uint32_t apc_get_key_interval(uint32_t row, uint32_t col, uint32_t layer)
     if (keycode>=KC_F1 && keycode <= KC_F12) {
         index = keycode - KC_F1 + 1;
     } else if (keycode>=KC_F13 && keycode <= KC_F24) {
-        index = keycode - KC_F13 + (KC_F12 - KC_F1) + 1;
+        index = keycode - KC_F13 + 1 + (KC_F12 - KC_F1) + 1;
     } else {
         if (layer == APC_KEYMAP_UP_LAYER) {
             return APC_INTERVAL_INVALID;
