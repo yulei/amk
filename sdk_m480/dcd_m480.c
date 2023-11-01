@@ -24,15 +24,6 @@
  * This file is part of the TinyUSB stack.
  */
 
-/*
-  Theory of operation:
-
-  The NUC505 USBD peripheral has twelve "EP"s, where each is simplex, in addition 
-  to dedicated support for the control endpoint (EP0).  The non-user endpoints
-  are referred to as "user" EPs in this code, and follow the datasheet 
-  nomenclature of EPA through EPL.
-*/
-
 #include "tusb_option.h"
 
 #if TUSB_OPT_DEVICE_ENABLED && (CFG_TUSB_MCU == OPT_MCU_M484)
@@ -306,22 +297,21 @@ void dcd_init(uint8_t rhport)
   bufseg_addr = CFG_TUD_ENDPOINT0_SIZE;
   HSUSBD_ENABLE_CEP_INT(HSUSBD_CEPINTEN_SETUPPKIEN_Msk | HSUSBD_CEPINTEN_STSDONEIEN_Msk | HSUSBD_CEPINTEN_RXPKIEN_Msk | HSUSBD_CEPINTEN_TXPKIEN_Msk);
 
-  NVIC_EnableIRQ(USBD20_IRQn);
-
+  dcd_int_enable(0);
   HSUSBD->OPER = HSUSBD_OPER_HISPDEN_Msk;   /* high-speed */
-  HSUSBD_CLR_SE0();
+  dcd_connect(0);
 }
 
 void dcd_int_enable(uint8_t rhport)
 {
   (void) rhport;
-  NVIC_EnableIRQ(USBD_IRQn);
+  NVIC_EnableIRQ(USBD20_IRQn);
 }
 
 void dcd_int_disable(uint8_t rhport)
 {
   (void) rhport;
-  NVIC_DisableIRQ(USBD_IRQn);
+  NVIC_DisableIRQ(USBD20_IRQn);
 }
 
 void dcd_set_address(uint8_t rhport, uint8_t dev_addr)

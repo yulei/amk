@@ -116,31 +116,3 @@ void UsageFault_Handler(void)
     fault_handler();
 }
 #endif
-
-volatile uint32_t g_systick_counter = 0;
-
-void SysTick_Handler(void)
-{
-    g_systick_counter ++;
-}
-
-uint32_t systick_get_tick(void)
-{
-    return g_systick_counter;
-}
-
-void systick_delay(uint32_t ticks)
-{
-    uint32_t tick_start = systick_get_tick();
-    uint32_t wait = ticks;
-
-    /* Add a freq to guarantee minimum wait */
-    if (wait < 0xFFFFFFFFUL)
-    {
-        wait += 1;
-    }
-
-    while((systick_get_tick() - tick_start) < wait) {
-        ;
-    }
-}

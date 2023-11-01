@@ -142,6 +142,7 @@
     #define H13     MAKE_PIN(7,13)
     #define H14     MAKE_PIN(7,14)
     #define H15     MAKE_PIN(7,15)
+    #if 0
     #define I0      MAKE_PIN(8,1)
     #define I1      MAKE_PIN(8,1)
     #define I2      MAKE_PIN(8,2)
@@ -158,3 +159,4 @@
     #define I13     MAKE_PIN(8,13)
     #define I14     MAKE_PIN(8,14)
     #define I15     MAKE_PIN(8,15)
+    #endif
