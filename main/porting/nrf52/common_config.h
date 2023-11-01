@@ -174,6 +174,7 @@ typedef enum {
     NRF_REPORT_ID_SYSTEM,
     NRF_REPORT_ID_CONSUMER,
     NRF_REPORT_ID_COMMAND,
+    NRF_REPORT_ID_DELAY,
     NRF_REPORT_ID_LAST,
 } nrf_report_id;
 

@@ -81,6 +81,10 @@ void system_usb_init(void)
 void custom_board_task(void)
 {}
 
+void magic_write(uint32_t magic)
+{
+}
+
 #if 0
 static void fault_handler(void) 
 {

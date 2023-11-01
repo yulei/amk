@@ -163,6 +163,7 @@ APP_DEFS += \
 	-D__STACK_SIZE=8192 \
 	-DGAZELL_PRESENT \
     -DCFG_TUSB_MCU=OPT_MCU_NRF5X \
+	-Wno-array-bounds \
 	#-DCONFIG_GPIO_AS_PINRESET \
 
 SDK_DEFS += -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16

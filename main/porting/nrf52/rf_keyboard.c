@@ -56,15 +56,13 @@ void keyboard_prepare_sleep(void)
 static uint8_t keyboard_leds(void);
 static void    send_keyboard(report_keyboard_t *report);
 static void    send_mouse(report_mouse_t *report);
-static void    send_system(uint16_t data);
-static void    send_consumer(uint16_t data);
+static void     send_extra(report_extra_t *report);
 
 host_driver_t kbd_driver = {
     .keyboard_leds = keyboard_leds,
     .send_keyboard = send_keyboard,
     .send_mouse = send_mouse,
-    .send_system = send_system,
-    .send_consumer = send_consumer,
+    .send_extra = send_extra,
 };
 
 static void usb_enabled(void);
@@ -241,26 +239,17 @@ static void send_mouse(report_mouse_t *report)
     }
 }
 
-static void send_system(uint16_t data)
+void send_extra(report_extra_t *report)
 {
-    NRF_LOG_INFO("Send system: %d", data);
-    if (rf_driver.output_target & OUTPUT_RF) {
-        rf_send_report(NRF_REPORT_ID_SYSTEM, (uint8_t *)&data, sizeof(data));
-    }
-    if (rf_driver.output_target & OUTPUT_USB) {
-        nrf_usb_send_report(NRF_REPORT_ID_SYSTEM, &data, sizeof(data));
-    }
-}
+    NRF_LOG_INFO("Send extra: id=%d, usage=%d", report->report_id, report->usage);
+    uint8_t report_id = report->report_id == REPORT_ID_SYSTEM ? NRF_REPORT_ID_SYSTEM : NRF_REPORT_ID_CONSUMER;
 
-static void send_consumer(uint16_t data)
-{
-    NRF_LOG_INFO("Send consumer: %d", data);
     if (rf_driver.output_target & OUTPUT_RF) {
-        rf_send_report(NRF_REPORT_ID_CONSUMER, (uint8_t *)&data, sizeof(data));
+        rf_send_report(report_id, (uint8_t *)&report->usage, sizeof(report->usage));
     }
 
     if (rf_driver.output_target & OUTPUT_USB) {
-        nrf_usb_send_report(NRF_REPORT_ID_CONSUMER, &data, sizeof(data));
+        nrf_usb_send_report(report_id, (uint8_t *)&report->usage, sizeof(report->usage));
     }
 }
 

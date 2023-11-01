@@ -14,7 +14,9 @@
 #include <stdint.h>
 
 #if defined(NRF52832_XXAA) || defined(NRF52840_XXAA)
+    #include "generic_hal.h"
     #include "nrf_gpio.h"
+
     typedef uint32_t pin_t;
     typedef uint32_t port_t;
     #define INVALID_PIN 0xFFFFFFFF

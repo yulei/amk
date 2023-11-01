@@ -894,8 +894,7 @@ static bool hfclk_running(void)
   }
 #endif
 
-  //return nrf_clock_hf_is_running(NRF_CLOCK, NRF_CLOCK_HFCLK_HIGH_ACCURACY);
-  return nrf_clock_hf_is_running(NRF_CLOCK_HFCLK_HIGH_ACCURACY);
+  return nrf_clock_hf_is_running(/*NRF_CLOCK,*/ NRF_CLOCK_HFCLK_HIGH_ACCURACY);
 }
 
 static void hfclk_enable(void)
@@ -916,10 +915,8 @@ static void hfclk_enable(void)
   }
 #endif
 
-  //nrf_clock_event_clear(NRF_CLOCK, NRF_CLOCK_EVENT_HFCLKSTARTED);
-  //nrf_clock_task_trigger(NRF_CLOCK, NRF_CLOCK_TASK_HFCLKSTART);
-  nrf_clock_event_clear(NRF_CLOCK_EVENT_HFCLKSTARTED);
-  nrf_clock_task_trigger(NRF_CLOCK_TASK_HFCLKSTART);
+  nrf_clock_event_clear(/*NRF_CLOCK,*/ NRF_CLOCK_EVENT_HFCLKSTARTED);
+  nrf_clock_task_trigger(/*NRF_CLOCK,*/ NRF_CLOCK_TASK_HFCLKSTART);
 #endif
 }
 
@@ -938,8 +935,7 @@ static void hfclk_disable(void)
   }
 #endif
 
-  //nrf_clock_task_trigger(NRF_CLOCK, NRF_CLOCK_TASK_HFCLKSTOP);
-  nrf_clock_task_trigger(NRF_CLOCK_TASK_HFCLKSTOP);
+  nrf_clock_task_trigger(/*NRF_CLOCK,*/ NRF_CLOCK_TASK_HFCLKSTOP);
 #endif
 }
 
