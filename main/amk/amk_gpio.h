@@ -12,9 +12,9 @@
 #pragma once
 
 #include <stdint.h>
+#include "amk_hal.h"
 
 #if defined(NRF52832_XXAA) || defined(NRF52840_XXAA)
-    #include "generic_hal.h"
     #include "nrf_gpio.h"
 
     typedef uint32_t pin_t;
@@ -94,7 +94,6 @@
     defined(STM32L452xx) || defined(STM32F412Rx)
     #include "gpio_stm32.h"
 #elif defined(__SAMD21G18A__)
-    #include "generic_hal.h"
     typedef uint8_t pin_t;
 
     #define GPIO_PIN_FUNCTION_A 0

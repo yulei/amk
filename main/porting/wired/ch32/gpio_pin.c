@@ -2,7 +2,6 @@
  * @file gpio_pin.c
  */
 
-#include "generic_hal.h"
 #include "amk_gpio.h"
 
 int gpio_read_pin(pin_t pin)

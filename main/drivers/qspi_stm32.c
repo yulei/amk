@@ -7,7 +7,7 @@
  */
 
 #include <stdbool.h>
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "amk_error.h"
 #include "amk_printf.h"
 

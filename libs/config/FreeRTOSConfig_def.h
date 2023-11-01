@@ -29,7 +29,7 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 
 /*-----------------------------------------------------------
  * Application specific definitions.

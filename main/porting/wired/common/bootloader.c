@@ -3,7 +3,7 @@
  *  jump to bootloader
  */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "bootloader.h"
 #include "wait.h"
 #include "usb_interface.h"

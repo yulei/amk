@@ -2,7 +2,7 @@
  * stm32f411xe.c
  */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "tusb.h"
 #include "amk_printf.h"
 #include "usb_descriptors.h"

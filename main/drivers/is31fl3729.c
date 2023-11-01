@@ -4,7 +4,7 @@
  */
 
 #include <string.h>
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "is31fl3729.h"
 #include "rgb_common.h"
 #include "i2c.h"

@@ -28,7 +28,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "usbd_def.h"
 
 /* USER CODE BEGIN INCLUDE */

@@ -7,7 +7,7 @@
  */
 
 #include "qspi.h"
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "amk_printf.h"
 
 #ifndef QSPI_DEBUG

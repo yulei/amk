@@ -2,7 +2,7 @@
  * wait.c
  */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "wait.h"
 
 void wait_ms(int ms)

@@ -5,7 +5,7 @@
  * @copyright Copyright (c) 2022
  * 
  */
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "wait.h"
 
 static void dwt_delay_init(void);

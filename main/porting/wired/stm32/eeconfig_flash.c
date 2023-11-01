@@ -253,7 +253,7 @@ uint8_t fee_read(uintptr_t address)
 //==============================================
 // flash hardware operation
 //==============================================
-#include "generic_hal.h"
+#include "amk_hal.h"
 void flash_unlock(void)
 {
     HAL_FLASH_Unlock();

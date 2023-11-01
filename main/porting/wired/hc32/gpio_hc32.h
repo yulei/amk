@@ -8,7 +8,7 @@
 
 #pragma once
 
-    #include "generic_hal.h"
+#include "amk_hal.h"
 
     #define INVALID_PIN 0xFFFFFFFF
     typedef uint32_t pin_t;

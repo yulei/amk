@@ -6,7 +6,7 @@
  * 
  */
 #include "spi.h"
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "amk_printf.h"
 
 #ifndef SPI_DEBUG

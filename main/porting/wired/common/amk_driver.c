@@ -6,7 +6,7 @@
  * 
  */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "amk_driver.h"
 
 #include "usb_descriptors.h"

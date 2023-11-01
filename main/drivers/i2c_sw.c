@@ -8,7 +8,7 @@
 
 #include <stdbool.h>
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "i2c.h"
 #include "wait.h"
 #include "amk_gpio.h"

@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "i2c.h"
 #include "amk_gpio.h"
 #include "amk_printf.h"

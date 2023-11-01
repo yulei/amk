@@ -20,7 +20,7 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "usbd_def.h"
 #include "usbd_core.h"
 

@@ -2,7 +2,7 @@
  * stm32_l433xx.c
  */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "usb_device.h"
 
 ADC_HandleTypeDef hadc1;

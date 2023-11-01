@@ -2,7 +2,7 @@
  * stm32.c
  */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "wait.h"
 
 #ifdef DWT_DELAY

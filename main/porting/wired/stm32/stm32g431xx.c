@@ -6,7 +6,7 @@
  * 
  */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 
 #ifdef TINYUSB_ENABLE
 #include "tusb.h"

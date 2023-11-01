@@ -2,7 +2,7 @@
  * stm32_f722xx.c
  */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "usb_descriptors.h"
 
 #ifdef TINYUSB_ENABLE

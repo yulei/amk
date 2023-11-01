@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "anim.h"
 #include "ff.h"
 #include "timer.h"

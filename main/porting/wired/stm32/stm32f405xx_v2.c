@@ -2,7 +2,7 @@
  * @file stm32f405xx_v2.c
  */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "usb_descriptors.h"
 #include "amk_printf.h"
 

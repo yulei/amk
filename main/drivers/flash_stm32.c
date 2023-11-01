@@ -5,8 +5,8 @@
 
 #include <string.h>
 
+#include "amk_hal.h"
 #include "flash.h"
-#include "generic_hal.h"
 #include "amk_printf.h"
 
 #if defined(STM32F103xB)

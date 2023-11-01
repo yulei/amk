@@ -8,6 +8,7 @@
  * @file amk_printf.c
  */
 
+#include "amk_hal.h"
 #include "amk_printf.h"
 
 int xprintf(char* fmt, ...)
@@ -42,7 +43,6 @@ void _putchar(char character)
 
 #if AMK_PRINT_TIMESTAMP
 
-#include "generic_hal.h"
 int amk_printf_ts(const char* format, ...)
 {
     int size = 0;

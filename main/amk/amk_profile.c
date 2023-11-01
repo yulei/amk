@@ -10,7 +10,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "amk_profile.h"
 #include "amk_printf.h"
 //#include "amk_timer.h"

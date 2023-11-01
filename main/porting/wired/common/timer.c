@@ -3,7 +3,7 @@
  * timer based on systemtick
  */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "timer.h"
 
 #ifdef RTOS_ENABLE

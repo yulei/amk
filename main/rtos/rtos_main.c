@@ -3,7 +3,7 @@
  */
 
 #include "cmsis_os2.h"
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "board.h"
 #include "usb_interface.h"
 #include "rgb_led.h"

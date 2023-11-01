@@ -2,7 +2,7 @@
  * @file hc32.c
  */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "cm_misc.h"
 #include "wait.h"
 

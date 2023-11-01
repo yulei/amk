@@ -3,7 +3,7 @@
  * @brief actually it's APM32F407
  */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "amk_printf.h"
 #include "usb_descriptors.h"
 

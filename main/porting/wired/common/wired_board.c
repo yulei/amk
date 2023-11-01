@@ -2,7 +2,7 @@
  * generic_board.c
  */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "board.h"
 #include "usb_interface.h"
 

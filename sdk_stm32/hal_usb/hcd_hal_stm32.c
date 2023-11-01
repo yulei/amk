@@ -6,7 +6,7 @@
 
 #include <string.h>
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "host/hcd.h"
 #include "amk_printf.h"
 

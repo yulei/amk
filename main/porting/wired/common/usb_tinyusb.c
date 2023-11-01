@@ -2,7 +2,7 @@
  * usb_tinyusb.c
  */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 
 #include "tusb.h"
 

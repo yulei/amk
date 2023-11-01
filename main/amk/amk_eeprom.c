@@ -8,7 +8,7 @@
  * @file amk_eeprom.c
  */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "eeprom.h"
 #include "amk_eeprom.h"
 #include "amk_printf.h"

@@ -28,7 +28,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "generic_hal.h"
+#include "amk_hal.h"
 
 /* USER CODE BEGIN INCLUDE */
 

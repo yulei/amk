@@ -2,7 +2,7 @@
  * @file usbx_usb.c
  */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "ux_api.h"
 #include "ux_device_class_hid.h"
 #include "ux_dcd_stm32.h"

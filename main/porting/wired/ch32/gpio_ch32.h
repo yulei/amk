@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 
 typedef uint32_t pin_t;
 typedef uint32_t port_t;

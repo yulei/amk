@@ -5,7 +5,7 @@
 #include "amk_usb.h"
 #include "usb_descriptors.h"
 //#include "udd_desc.h"
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "usb_device.h"
 #include "usbd_composite.h"
 #include "usb_host.h"
