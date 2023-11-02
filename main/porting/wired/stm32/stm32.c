@@ -99,3 +99,8 @@ void UsageFault_Handler(void)
 {
     fault_handler();
 }
+
+void Error_Handler(void)
+{
+    __asm__("BKPT");
+}

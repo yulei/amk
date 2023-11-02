@@ -64,7 +64,7 @@
 #elif defined(STM32F103xB) 
     #include "stm32f1xx.h"
     #include "stm32f1xx_hal.h"
-#elif defined(STM32L432xx) 
+#elif defined(STM32L432xx) || defined(STM32L452xx) || defined(STM32L476xx)
     #include "stm32l4xx.h"
     #include "stm32l4xx_hal.h"
 #elif defined(STM32L072xx) 
@@ -73,9 +73,6 @@
 #elif defined(STM32G431xx) 
     #include "stm32g4xx.h"
     #include "stm32g4xx_hal.h"
-#elif defined(STM32L452xx) 
-    #include "stm32l4xx.h"
-    #include "stm32l4xx_hal.h"
 #else
 #error "unsupport platform"
 #endif

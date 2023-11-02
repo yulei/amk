@@ -10,3 +10,5 @@ UF2_FAMILY = 0xADA52840
 
 SRCS += $(KEYBOARD_DIR)/rfhost.c
 SRCS += $(KEYBOARD_DIR)/rfhost_matrix.c
+
+#NO_DEBUG:=0

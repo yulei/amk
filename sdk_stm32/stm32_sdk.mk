@@ -86,6 +86,13 @@ MCU_FAMILY := stm32f4xx
 MCU_TYPE := f412
 endif
 
+ifeq (STM32L476, $(strip $(MCU)))
+MCU_ARCH := CORTEX_M4
+MCU_SERIES := l4
+MCU_FAMILY := stm32l4xx
+MCU_TYPE := l476
+endif
+
 SRCS += \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_tim.c \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_tim_ex.c \
