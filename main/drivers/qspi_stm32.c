@@ -25,14 +25,14 @@ extern QSPI_HandleTypeDef hqspi;
 extern DMA_HandleTypeDef hdma_quadspi;
 extern void Error_Handler(void);
 
-#define FLASH_ADDR_SIZE                 (23)
+#define QSPI_FLASH_ADDR_SIZE                 (23)
 
 /* FLASH parameters definition */
-#define FLASH_PAGE_SIZE                 (0x100u)
-#define FLASH_SECTOR_SIZE               (0x1000u)
-#define FLASH_MAX_ADDR                  (0x1000000u)
-#define FLASH_DUMMY_BYTE_VALUE          (0xffu)
-#define FLASH_BUSY_BIT_MASK             (0x01u)
+#define QSPI_FLASH_PAGE_SIZE                 (0x100u)
+#define QSPI_FLASH_SECTOR_SIZE               (0x1000u)
+#define QSPI_FLASH_MAX_ADDR                  (0x1000000u)
+#define QSPI_FLASH_DUMMY_BYTE_VALUE          (0xffu)
+#define QSPI_FLASH_BUSY_BIT_MASK             (0x01u)
 
 /* FLASH instruction definition */
 #define FLASH_INSTR_WRITE_ENABLE        (0x06u)
@@ -78,15 +78,26 @@ bool qspi_init(uint32_t map_addr)
     //    return false;
     //}
             
+#if defined(STM32F412Rx)
     /* QSPI initialization */
     hqspi.Init.ClockPrescaler     = 2;
     hqspi.Init.FifoThreshold      = 4;
     hqspi.Init.SampleShifting     = QSPI_SAMPLE_SHIFTING_HALFCYCLE;
-    hqspi.Init.FlashSize          = FLASH_ADDR_SIZE;
+    hqspi.Init.FlashSize          = QSPI_FLASH_ADDR_SIZE;
     hqspi.Init.ChipSelectHighTime = QSPI_CS_HIGH_TIME_8_CYCLE;
     hqspi.Init.ClockMode          = QSPI_CLOCK_MODE_0;
     hqspi.Init.FlashID            = QSPI_FLASH_ID_2;
     hqspi.Init.DualFlash          = QSPI_DUALFLASH_DISABLE;
+#elif defined(STM32L476xx)
+    hqspi.Init.ClockPrescaler       = 2;
+    hqspi.Init.FifoThreshold        = 4;
+    hqspi.Init.SampleShifting       = QSPI_SAMPLE_SHIFTING_HALFCYCLE;
+    hqspi.Init.FlashSize            = QSPI_FLASH_ADDR_SIZE;
+    hqspi.Init.ChipSelectHighTime   = QSPI_CS_HIGH_TIME_8_CYCLE;
+    hqspi.Init.ClockMode            = QSPI_CLOCK_MODE_0;
+#else
+#error "Unsupported QSPI driver"
+#endif
 
     if (HAL_QSPI_Init(&hqspi) != HAL_OK) {
         return false;
@@ -102,7 +113,7 @@ bool qspi_init(uint32_t map_addr)
 
 amk_error_t qspi_read_sector(uint32_t address, uint8_t *buffer, size_t length)
 {
-    if (length != FLASH_SECTOR_SIZE) {
+    if (length != QSPI_FLASH_SECTOR_SIZE) {
         qspi_debug("QSPI: read_sector: invalid size:%d\n", length);
         return AMK_QSPI_INVALID_PARAM;
     }
@@ -157,13 +168,13 @@ amk_error_t qspi_read_sector(uint32_t address, uint8_t *buffer, size_t length)
 amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t length)
 {
     //qspi_debug("QSPI WRITE: addr=%d, size=%d\n", address, length);
-    if (length != FLASH_SECTOR_SIZE) {
+    if (length != QSPI_FLASH_SECTOR_SIZE) {
         qspi_debug("QSPI: write_sector: invalid size:%u\n", length);
         return AMK_QSPI_INVALID_PARAM;
     }
 
     // erase sector first
-    if (address >= FLASH_MAX_ADDR) {
+    if (address >= QSPI_FLASH_MAX_ADDR) {
         qspi_debug("QSPI: write_sector: invalid address:%u\n", address);
         return AMK_QSPI_INVALID_PARAM;
     } else {
@@ -176,7 +187,7 @@ amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t le
     // then program
     uint32_t addr = address;
     const uint8_t *cur = buffer;
-    for (int i = 0; i < length/FLASH_PAGE_SIZE; i++) {
+    for (int i = 0; i < length/QSPI_FLASH_PAGE_SIZE; i++) {
         QSPI_CommandTypeDef s_command;
 
         s_command.InstructionMode       = QSPI_INSTRUCTION_1_LINE;
@@ -193,7 +204,7 @@ amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t le
         s_command.AlternateBytesSize    = QSPI_ALTERNATE_BYTES_NONE;
 
         s_command.Address = addr;
-        s_command.NbData  = FLASH_PAGE_SIZE;
+        s_command.NbData  = QSPI_FLASH_PAGE_SIZE;
         
         /* Enable write operations */
         if (QSPI_WriteEnable(&hqspi) != AMK_SUCCESS) {
@@ -214,8 +225,8 @@ amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t le
         if (QSPI_BusyWait(&hqspi, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != AMK_SUCCESS) {
             return AMK_QSPI_ERROR;
         }
-        addr += FLASH_PAGE_SIZE;
-        cur += FLASH_PAGE_SIZE;
+        addr += QSPI_FLASH_PAGE_SIZE;
+        cur += QSPI_FLASH_PAGE_SIZE;
     }
     
     qspi_debug("QSPI: write_sector:%u success\n", address);
@@ -384,7 +395,7 @@ amk_error_t QSPI_BusyWait(QSPI_HandleTypeDef *hqspi, uint32_t Timeout)
 
     QSPI_AutoPollingTypeDef s_config;
     s_config.Match           = 0;//FLASH_BUSY_BIT_MASK;
-    s_config.Mask            = FLASH_BUSY_BIT_MASK;
+    s_config.Mask            = QSPI_FLASH_BUSY_BIT_MASK;
     s_config.MatchMode       = QSPI_MATCH_MODE_AND;
     s_config.StatusBytesSize = 1;
     s_config.Interval        = 0x10;

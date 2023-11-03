@@ -16,13 +16,13 @@
 //#define FLASH_INVALID_DATA      0xFFFFFFFF
 //#define FLASH_INVALID_ADDRESS   0xFFFFFFFF
 //#define FLASH_PAGE_NUM          1
-#elif defined(STM32G431xx)
+#elif defined(STM32G431xx) || defined(STM32L432xx)
 #define FLASH_BASE_ADDRESS      0x800A000
 #define FLASH_TOTAL_SIZE        0x6000
 #define FLASH_RW_SIZE           8
-#elif defined(STM32L432xx)
-#define FLASH_BASE_ADDRESS      0x800A000
-#define FLASH_TOTAL_SIZE        0x6000
+#elif defined(STM32L476xx)
+#define FLASH_BASE_ADDRESS      0x8010000
+#define FLASH_TOTAL_SIZE        0x10000
 #define FLASH_RW_SIZE           8
 
 #elif defined(STM32F411xE) || defined(STM32F722xx) || defined(STM32F405xx) || defined(STM32F446xx) || defined(STM32F401xC) || defined(STM32F412Rx)
@@ -52,7 +52,7 @@ uint32_t flash_unit_size = FLASH_RW_SIZE;
 void flash_unlock(void)
 {
     HAL_FLASH_Unlock();
-#if defined(STM32G431xx) || defined(STM32L432xx)
+#if defined(STM32G431xx) || defined(STM32L432xx) || defined(STM32L476xx)
     __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_OPTVERR);
 #endif
 }
@@ -64,7 +64,7 @@ void flash_lock(void)
 
 void flash_read(uint32_t address, uint16_t* offset, uint16_t* data)
 {
-#if defined(STM32G431xx) || defined(STM32L432xx)
+#if defined(STM32G431xx) || defined(STM32L432xx) || defined(STM32L476xx)
     uint64_t d = *((__IO uint64_t*)(address));
     uint32_t value = (uint32_t)(d&0x00000000FFFFFFFF);
 #else
@@ -81,7 +81,7 @@ bool flash_write(uint32_t address, uint16_t offset, uint16_t data)
     data = ~data;
     uint32_t value = (offset << 16) | data;
     flash_unlock();
-#if defined(STM32G431xx) || defined(STM32L432xx)
+#if defined(STM32G431xx) || defined(STM32L432xx) || defined(STM32L476xx)
     uint64_t d = (((uint64_t)value)<<32) | value;
     HAL_StatusTypeDef status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, address, d);
 #else
@@ -117,7 +117,7 @@ void flash_erase_pages(void)
     erase.Sector = FLASH_SECTOR_ID;
     erase.NbSectors = FLASH_SECTOR_NUM;
     erase.VoltageRange = FLASH_VOLTAGE_RANGE_3;
-#elif defined(STM32G431xx) || defined(STM32L432xx)
+#elif defined(STM32G431xx) || defined(STM32L432xx) || defined(STM32L476xx)
     erase.TypeErase = FLASH_TYPEERASE_PAGES;
     erase.Page = (FLASH_BASE_ADDRESS - FLASH_BASE) / FLASH_PAGE_SIZE;;
     erase.NbPages = (FLASH_TOTAL_SIZE) / FLASH_PAGE_SIZE;
