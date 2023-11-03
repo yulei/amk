@@ -21,6 +21,10 @@
 #define qspi_debug(...)
 #endif
 
+#if !defined(STM32F412Rx) && !defined(STM32L476xx)
+#error "Current MCU Do NOt Support QSPI"
+#endif
+
 extern QSPI_HandleTypeDef hqspi;
 extern DMA_HandleTypeDef hdma_quadspi;
 extern void Error_Handler(void);
@@ -77,26 +81,17 @@ bool qspi_init(uint32_t map_addr)
     //if (HAL_QSPI_DeInit(&hqspi) != HAL_OK) {
     //    return false;
     //}
-            
-#if defined(STM32F412Rx)
-    /* QSPI initialization */
     hqspi.Init.ClockPrescaler     = 2;
     hqspi.Init.FifoThreshold      = 4;
     hqspi.Init.SampleShifting     = QSPI_SAMPLE_SHIFTING_HALFCYCLE;
     hqspi.Init.FlashSize          = QSPI_FLASH_ADDR_SIZE;
     hqspi.Init.ChipSelectHighTime = QSPI_CS_HIGH_TIME_8_CYCLE;
     hqspi.Init.ClockMode          = QSPI_CLOCK_MODE_0;
+            
+#if defined(STM32F412Rx)
+    /* QSPI initialization */
     hqspi.Init.FlashID            = QSPI_FLASH_ID_2;
     hqspi.Init.DualFlash          = QSPI_DUALFLASH_DISABLE;
-#elif defined(STM32L476xx)
-    hqspi.Init.ClockPrescaler       = 2;
-    hqspi.Init.FifoThreshold        = 4;
-    hqspi.Init.SampleShifting       = QSPI_SAMPLE_SHIFTING_HALFCYCLE;
-    hqspi.Init.FlashSize            = QSPI_FLASH_ADDR_SIZE;
-    hqspi.Init.ChipSelectHighTime   = QSPI_CS_HIGH_TIME_8_CYCLE;
-    hqspi.Init.ClockMode            = QSPI_CLOCK_MODE_0;
-#else
-#error "Unsupported QSPI driver"
 #endif
 
     if (HAL_QSPI_Init(&hqspi) != HAL_OK) {
