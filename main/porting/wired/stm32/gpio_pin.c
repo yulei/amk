@@ -5,6 +5,8 @@
 #include <string.h>
 #include "amk_gpio.h"
 
+#include "stm32f4xx_ll_gpio.h"
+
 /*
 int gpio_read_pin(pin_t pin)
 {
@@ -110,4 +112,9 @@ void gpio_set_input_pullup(pin_t pin)
 void gpio_set_input_pulldown(pin_t pin)
 {
     gpio_set_mode(pin, GPIO_MODE_INPUT, GPIO_SPEED_FREQ_HIGH, GPIO_PULLDOWN);
+}
+
+uint32_t gpio_read_port(port_t port)
+{
+    return LL_GPIO_ReadInputPort((GPIO_TypeDef *)port);
 }

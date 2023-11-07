@@ -15,6 +15,7 @@ static void system_usb_init(void);
 void system_init(void)
 {
     system_clock_init();
+    system_usb_init();
 
     SystemCoreClockUpdate();
 
@@ -26,7 +27,7 @@ void system_init(void)
 extern void fee_init(void);
     fee_init();
 #endif
-    system_usb_init();
+    //system_usb_init();
 }
 
 static void dwt_delay_init(void)

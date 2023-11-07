@@ -29,6 +29,11 @@
     #define GET_PIN(port_pin) PIN_P(((port_pin)&0x0F))
     #define GET_PORT(port_pin) ((GPIO_TypeDef*)((port_pin)&~0x0F))
 
+    #define PORT_A  (port_t)(GPIOA)
+    #define PORT_B  (port_t)(GPIOB)
+    #define PORT_C  (port_t)(GPIOC)
+    #define PORT_D  (port_t)(GPIOD)
+
     #define A0 MAKE_PIN(GPIOA, 0)
     #define A1 MAKE_PIN(GPIOA, 1)
     #define A2 MAKE_PIN(GPIOA, 2)

@@ -6,8 +6,9 @@
  */
 
 #include <stdbool.h>
-#include "rgb_common.h"
+
 #include "ws2812.h"
+#include "rgb_common.h"
 
 #ifndef PWM_TIM
 #error "pwm time must been defined"
