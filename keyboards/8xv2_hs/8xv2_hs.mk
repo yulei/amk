@@ -1,0 +1,21 @@
+
+MCU = GD32E505
+TINYUSB_ENABLE = yes
+RGB_LINEAR_ENABLE = yes
+EECONFIG_FLASH = yes
+VIAL_ENABLE = yes
+NKRO_ENABLE = yes
+AMK_CUSTOM_MATRIX = yes
+DEBOUNCE_TYPE = asym_eager_defer_pk
+#RTOS_ENABLE = yes
+
+UF2_ENABLE = yes
+UF2_FAMILY = GD32E5
+
+LINKER_PATH = $(KEYBOARD_DIR)
+
+SRCS += $(KEYBOARD_DIR)/8xv2_hs.c
+SRCS += $(KEYBOARD_DIR)/port_matrix.c
+
+NO_DEBUG := 1
+OPT += -Wno-cpp
