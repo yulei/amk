@@ -1,10 +1,12 @@
 COMMON_PORTING_DIR := $(MAIN_DIR)/porting/wired/common
 
+ifeq (,$(filter $(strip $(MCU)),$(CH32V_MCUS)))
 SRCS += \
 	$(MAIN_DIR)/segger/SEGGER_RTT.c \
 	$(MAIN_DIR)/segger/SEGGER_SYSVIEW.c \
 	$(MAIN_DIR)/segger/SEGGER_SYSVIEW_Config_NoOS.c \
 	$(MAIN_DIR)/segger/SEGGER_RTT_ASM_ARMv7M.S
+endif
 
 SRCS += \
 	$(COMMON_PORTING_DIR)/bootloader.c \

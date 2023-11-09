@@ -285,7 +285,7 @@ bool dks_matrix_update(uint32_t row, uint32_t col, uint32_t value)
                     key->trigger = value;
                     key->state = DKS_KEY_FIRST_ON;
                     // trigger action
-                    dks_debug("DKS from FIRST_PRESSING to FIRST_ON, value=%d, min=%d, max=%d, trigger=%d, interval=%d\n", value, key->min, key->max, key->trigger, interval);
+                    dks_debug("DKS from FIRST_PRESSING to FIRST_ON, value=%ld, min=%ld, max=%ld, trigger=%ld, interval=%ld\n", value, key->min, key->max, key->trigger, interval);
                     dks_key_action(key, 0);
                 }
             }
@@ -308,7 +308,7 @@ bool dks_matrix_update(uint32_t row, uint32_t col, uint32_t value)
                 key->state = DKS_KEY_SECOND_PRESSING;
                 key->trigger = value;
                 uint32_t interval = dks_get_interval(key, DKS_SECOND_INTERVAL);
-                dks_debug("DKS from FIRST_ON to SECOND_PRESSING, value=%d, min=%d, max=%d, trigger=%d, interval=%d\n", value, key->min, key->max, key->trigger, interval);
+                dks_debug("DKS from FIRST_ON to SECOND_PRESSING, value=%ld, min=%ld, max=%ld, trigger=%ld, interval=%ld\n", value, key->min, key->max, key->trigger, interval);
 
             } else {
                 if (dir < 0) {
@@ -327,7 +327,7 @@ bool dks_matrix_update(uint32_t row, uint32_t col, uint32_t value)
                     key->trigger = value;
                     key->state = DKS_KEY_ON;
                     // trigger action
-                    dks_debug("DKS from SECOND_PRESSING to SECOND_ON, value=%d, min=%d, max=%d, trigger=%d, interval=%d\n", value, key->min, key->max, key->trigger, interval);
+                    dks_debug("DKS from SECOND_PRESSING to SECOND_ON, value=%ld, min=%ld, max=%ld, trigger=%ld, interval=%ld\n", value, key->min, key->max, key->trigger, interval);
                     dks_key_action(key, 1);
                 }
             }
@@ -343,7 +343,7 @@ bool dks_matrix_update(uint32_t row, uint32_t col, uint32_t value)
                         key->trigger = value;
                         key->state = DKS_KEY_FIRST_ON;
                         // trigger action
-                        dks_debug("DKS from SECOND_RELEASING to FIST_ON, value=%d, min=%d, max=%d, trigger=%d, interval=%d\n", value, key->min, key->max, key->trigger, interval);
+                        dks_debug("DKS from SECOND_RELEASING to FIST_ON, value=%ld, min=%ld, max=%ld, trigger=%ld, interval=%ld\n", value, key->min, key->max, key->trigger, interval);
                         dks_key_action(key, 3);
                     }
                 }
@@ -357,7 +357,7 @@ bool dks_matrix_update(uint32_t row, uint32_t col, uint32_t value)
                     key->state = DKS_KEY_SECOND_RELEASING;
                     key->trigger = value;
                     // trigger action
-                    dks_debug("DKS from DKS_ON to DKS_SECOND_RELEASING, value=%d, min=%d, max=%d, trigger=%d, interval=%d\n", value, key->min, key->max, key->trigger, interval);
+                    dks_debug("DKS from DKS_ON to DKS_SECOND_RELEASING, value=%ld, min=%ld, max=%ld, trigger=%ld, interval=%ld\n", value, key->min, key->max, key->trigger, interval);
                     dks_key_action(key, 2);
                 }
             }

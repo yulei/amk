@@ -41,8 +41,9 @@ enum
 
 #ifdef USE_I2C1
     #define I2C1_ID     I2C0 
-    #define I2C1_SCL    I2C1_SCL_PIN
-    #define I2C1_SDA    I2C1_SDA_PIN
+    #ifndef I2C1_PINS
+    #define I2C1_PINS   (GPIO_PIN_6 | GPIO_PIN_7)
+    #endif
     static i2c_instance_t m_i2c1 = {
         .ready = false,
     };
@@ -54,7 +55,10 @@ enum
 
         i2c_deinit(I2C0);
 
-        gpio_init(GPIOB, GPIO_MODE_AF_OD, GPIO_OSPEED_50MHZ, GPIO_PIN_6 | GPIO_PIN_7);
+        gpio_init(GPIOB, GPIO_MODE_AF_OD, GPIO_OSPEED_50MHZ, I2C1_PINS);
+        #ifdef I2C1_REMAP
+        gpio_pin_remap_config(GPIO_I2C0_REMAP, ENABLE);
+        #endif
 
         i2c_clock_config(I2C0, 100000, I2C_DTCY_2);
         /* I2C address configure */

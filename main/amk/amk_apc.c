@@ -168,7 +168,7 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t value)
                     key->state = APC_KEY_OFF;
                     key->on = false;
                     key->trigger = value;
-                    custom_matrix_debug("APC RT from ON to OFF, value=%d, min=%d, max=%d, trigger=%d, up=%d\n", value, key->min, key->max, key->trigger, up);
+                    custom_matrix_debug("APC RT from ON to OFF, value=%ld, min=%ld, max=%ld, trigger=%ld, up=%ld\n", value, key->min, key->max, key->trigger, up);
                 }
             }
             break;
@@ -184,7 +184,7 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t value)
                             key->trigger = value;
                             key->state = APC_KEY_ON;
                             key->on = true;
-                            custom_matrix_debug("APC from PRESSING to ON, value=%d, min=%d, max=%d, trigger=%d, down=%d\n", value, key->min, key->max, key->trigger, down);
+                            custom_matrix_debug("APC from PRESSING to ON, value=%ld, min=%ld, max=%ld, trigger=%ld, down=%ld\n", value, key->min, key->max, key->trigger, down);
                         }
                     }
                 }
@@ -204,14 +204,14 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t value)
                                 key->state = APC_KEY_OFF;
                                 key->on = false;
                                 key->trigger = value;
-                                custom_matrix_debug("APC RT from RELEASING to OFF, value=%d, min=%d, max=%d, trigger=%d, up=%d\n", value, key->min, key->max, key->trigger, up);
+                                custom_matrix_debug("APC RT from RELEASING to OFF, value=%ld, min=%ld, max=%ld, trigger=%ld, up=%ld\n", value, key->min, key->max, key->trigger, up);
                             }
                         } else {
                             if ((value + APC_THRESHOLD) < key->min + down) {
                                 key->state = APC_KEY_OFF;
                                 key->on = false;
                                 key->trigger = value;
-                                custom_matrix_debug("APC Normal from RELEASING to OFF, value=%d, min=%d, max=%d, trigger=%d\n", value, key->min, key->max, key->trigger);
+                                custom_matrix_debug("APC Normal from RELEASING to OFF, value=%ld, min=%ld, max=%ld, trigger=%ld\n", value, key->min, key->max, key->trigger);
                             }
                         }
                     } else {

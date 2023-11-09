@@ -61,25 +61,35 @@ void board_init(void)
     amk_driver_init();
     gb_debug("amk_init\n");
 
+#ifndef CH32V307
     SEGGER_SYSVIEW_Conf();
     gb_debug("segger sysview init\n");
     SEGGER_SYSVIEW_NameResource(1, "amk_driver");
     SEGGER_SYSVIEW_NameResource(2, "usb_task");
     SEGGER_SYSVIEW_NameResource(3, "custom_task");
+#endif
 }
 
 
 void board_task(void)
 {
+#ifndef CH32V307
     SEGGER_SYSVIEW_MarkStart(1);
+#endif
     amk_driver_task();
+#ifndef CH32V307
     SEGGER_SYSVIEW_MarkStop(1);
+#endif
 
 
 #ifndef RTOS_ENABLE
+#ifndef CH32V307
     SEGGER_SYSVIEW_MarkStart(2);
+#endif
     usb_task();
+#ifndef CH32V307
     SEGGER_SYSVIEW_MarkStop(2);
+#endif
 #endif
 
 #if defined(MSC_ENABLE) && !defined(RTOS_ENABLE)
@@ -102,7 +112,11 @@ void board_task(void)
     rf_driver_task();
 #endif
 
+#ifndef CH32V307
     SEGGER_SYSVIEW_MarkStart(3);
+#endif
     custom_board_task();
+#ifndef CH32V307
     SEGGER_SYSVIEW_MarkStop(3);
+#endif
 }

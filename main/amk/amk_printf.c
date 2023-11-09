@@ -8,10 +8,12 @@
  * @file amk_printf.c
  */
 
+#include <stdarg.h>
 #include "amk_hal.h"
 #include "amk_printf.h"
 
-int xprintf(char* fmt, ...)
+#ifndef CH32V307
+int xprintf(char* fmt, ... )
 {
     int result = 0;
     va_list va;
@@ -20,6 +22,7 @@ int xprintf(char* fmt, ...)
     va_end(va);
     return result;
 }
+#endif
 
 #ifndef SEGGER_RTT_ENABLE
 #ifndef CH32V307
@@ -41,9 +44,10 @@ void _putchar(char character)
 {}
 #endif
 
+#ifndef CH32V307
 #if AMK_PRINT_TIMESTAMP
 
-int amk_printf_ts(const char* format, ...)
+int amk_printf_ts(const char* format, ... )
 {
     int size = 0;
 #ifndef STM32L072xx
@@ -70,4 +74,5 @@ int amk_printf_fl(const char* format, ...)
     return size;
 }
 
+#endif
 #endif
