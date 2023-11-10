@@ -30,7 +30,6 @@
 #define RGB_SEGMENT_NUM     2
 
 
-#define DEBOUNCE            5
 #define DWT_DELAY
 #define HSE_VALUE           16000000
 #define VECT_TAB_OFFSET     0x10000
@@ -46,4 +45,6 @@
 
 #ifdef USE_HS_USB
 #define DEBOUNCE        1
+#else
+#define DEBOUNCE        5
 #endif
