@@ -23,11 +23,6 @@ void USB_IRQHandler(void)
     tud_int_handler(0);
 }
 
-void Error_Handler(void)
-{
-    __asm__("BKPT");
-}
-
 static void ADCClock_Config(void)
 {
     RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};

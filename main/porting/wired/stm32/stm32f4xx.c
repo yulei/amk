@@ -18,11 +18,6 @@ void OTG_FS_IRQHandler(void)
 }
 #endif
 
-void Error_Handler(void)
-{
-    __asm__("BKPT");
-}
-
 #ifdef USE_I2C1
 I2C_HandleTypeDef hi2c1;
 DMA_HandleTypeDef hdma_i2c1_rx;

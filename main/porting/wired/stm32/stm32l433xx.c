@@ -9,11 +9,6 @@ ADC_HandleTypeDef hadc1;
 I2C_HandleTypeDef hi2c1;
 LPTIM_HandleTypeDef hlptim1;
 
-void Error_Handler(void)
-{
-    __asm__("BKPT");
-}
-
 /**
   * @brief System Clock Configuration
   * @retval None

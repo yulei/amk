@@ -36,11 +36,6 @@ void USB_IRQHandler(void)
     tud_int_handler(0);
 }
 
-void Error_Handler(void)
-{
-    __asm__("BKPT");
-}
-
 #ifdef USE_LSE
 void SystemClock_Config(void)
 {

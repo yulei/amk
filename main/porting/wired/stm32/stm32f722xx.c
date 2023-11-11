@@ -49,12 +49,6 @@ void OTG_FS_IRQHandler(void)
 #endif
 #endif
 
-void Error_Handler(void)
-{
-    __asm__("BKPT");
-}
-
-
 /**
   * @brief System Clock Configuration
   * @retval None

@@ -51,11 +51,6 @@ void OTG_FS_IRQHandler(void)
     tud_int_handler(0);
 }
 
-void Error_Handler(void)
-{
-    __asm__("BKPT");
-}
-
 void SystemClock_Config(void)
 {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
