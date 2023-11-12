@@ -74,6 +74,7 @@
     #include "apm32f4xx_usb.h"
     extern void Error_Handler(void);
 #elif defined(AT32F405RCT7)
+    #define system_core_clock SystemCoreClock 
     #include "at32f402_405.h"
 #else
 #error "unsupport platform"

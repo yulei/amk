@@ -49,7 +49,7 @@
   #define DWC2_EP_MAX   EP_MAX_FS
 #endif
 
-// - Port0 to OTG_FS, and Port1 to OTG_HS
+// - Only use OTG_HS
 static const dwc2_controller_t _dwc2_controller[] =
 {
 #ifdef USB_OTG_HS_PERIPH_BASE
@@ -61,8 +61,7 @@ static const dwc2_controller_t _dwc2_controller[] =
 //
 //--------------------------------------------------------------------+
 
-// SystemCoreClock is already included by family header
-// extern uint32_t SystemCoreClock;
+extern uint32_t SystemCoreClock;
 
 TU_ATTR_ALWAYS_INLINE
 static inline void dwc2_dcd_int_enable(uint8_t rhport)
