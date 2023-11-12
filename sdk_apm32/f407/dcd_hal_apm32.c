@@ -5,7 +5,7 @@
  * @copyright Copyright (c) 2023
 */
 
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "device/dcd.h"
 #include "amk_printf.h"
 

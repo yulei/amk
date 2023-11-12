@@ -56,24 +56,8 @@
     #include "stm32g4xx_hal.h"
 #elif defined(APM32F407)
     #include "apm32f4xx.h"
-    #include "apm32f4xx_adc.h"
-    #include "apm32f4xx_dbgmcu.h"
-    #include "apm32f4xx_dma.h"
-    #include "apm32f4xx_fmc.h"
-    #include "apm32f4xx_gpio.h"
-    #include "apm32f4xx_i2c.h"
-    #include "apm32f4xx_misc.h"
-    #include "apm32f4xx_pmu.h"
-    #include "apm32f4xx_rcm.h"
-    #include "apm32f4xx_rtc.h"
-    #include "apm32f4xx_spi.h"
-    #include "apm32f4xx_syscfg.h"
-    #include "apm32f4xx_tmr.h"
-    #include "apm32f4xx_usart.h"
-    #include "apm32f4xx_usb_device.h"
-    #include "apm32f4xx_usb.h"
-    extern void Error_Handler(void);
-#elif defined(AT32F405RCT7)
+    #include "apm32f4xx_conf.h"
+#elif defined(AT32F405)
     #define system_core_clock SystemCoreClock 
     #include "at32f402_405.h"
 #else
