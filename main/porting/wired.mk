@@ -58,3 +58,7 @@ endif
 ifneq (,$(filter $(strip $(MCU)),$(APM32_MCUS)))
 	include $(MAIN_DIR)/porting/wired/apm32.mk
 endif
+
+ifneq (,$(filter $(strip $(MCU)),$(AT32_MCUS)))
+	include $(MAIN_DIR)/porting/wired/at32.mk
+endif

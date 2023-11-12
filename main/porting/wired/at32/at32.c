@@ -1,5 +1,5 @@
 /**
- * @file gd32.c
+ * @file at32.c
  * @author astro
  * 
  * @copyright Copytight (c) 2023
@@ -9,15 +9,11 @@
 #include "cm_misc.h"
 #include "wait.h"
 
-#ifndef HSE_VALUE
-#define HSE_VALUE   HXTAL_VALUE
-#endif
-
 extern void system_clock_init(void);
 
 void system_init(void)
 {
-    NVIC_ConfigPriorityGroup(NVIC_PRIORITY_GROUP_4);
+    nvic_priority_group_config(NVIC_PRIORITY_GROUP_4);
 
     system_clock_init();
 
@@ -45,17 +41,11 @@ static void fault_handler(void)
 
 uint32_t magic_read(void)
 {
-    RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_PMU);
-    PMU_EnableBackupAccess();
-    return RTC_ReadBackup(RTC_BAKP_REG_0);
+    return 0;
 }
 
 void magic_write(uint32_t magic)
 {
-    RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_PMU);
-    PMU_EnableBackupAccess();
-
-    RTC_WriteBackup(RTC_BAKP_REG_0, magic);
 }
 
 void NMI_Handler(void)

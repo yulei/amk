@@ -73,6 +73,8 @@
     #include "apm32f4xx_usb_device.h"
     #include "apm32f4xx_usb.h"
     extern void Error_Handler(void);
+#elif defined(AT32F405RCT7)
+    #include "at32f402_405.h"
 #else
 #error "unsupport platform"
 #endif
