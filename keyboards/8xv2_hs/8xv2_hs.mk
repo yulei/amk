@@ -17,5 +17,4 @@ LINKER_PATH = $(KEYBOARD_DIR)
 
 SRCS += $(KEYBOARD_DIR)/8xv2_hs.c
 
-NO_DEBUG := 1
-OPT += -Wno-cpp
+#NO_DEBUG := 0

@@ -68,6 +68,10 @@
 //#define DCD_ATTR_ENDPOINT_MAX 6
 #endif
 
+#if (CFG_TUSB_MCU == OPT_MCU_GD32E505)
+#define TUP_DCD_ENDPOINT_MAX 6
+#endif
+
 // This example doesn't use an RTOS
 #ifdef RTOS_ENABLE
 #define CFG_TUSB_OS                 OPT_OS_FREERTOS

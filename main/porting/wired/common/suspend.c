@@ -37,6 +37,7 @@ void suspend_wakeup_init(void)
     // so only clear the variables in memory
     // the reports will be sent from main.c afterwards
     // or if the PC asks for GET_REPORT
+    matrix_init();
     clear_mods();
     clear_weak_mods();
     clear_keys();

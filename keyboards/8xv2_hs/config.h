@@ -22,7 +22,9 @@
 
 #define USE_3731
 #define USE_I2C1
-#define I2C1_PINS   (GPIO_PIN_8 | GPIO_PIN_9)
+#define I2C1_SCL_PIN        GPIO_PIN_8
+#define I2C1_SDA_PIN        GPIO_PIN_9
+#define I2C1_PINS           (I2C1_SCL_PIN| I2C1_SDA_PIN)
 #define I2C1_REMAP
 
 #define RGB_LED_NUM         20
