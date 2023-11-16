@@ -18,6 +18,7 @@ endif
 SRCS += \
 	$(MAIN_DIR)/amk/amk_apc.c \
 	$(MAIN_DIR)/amk/amk_dks.c \
+	$(MAIN_DIR)/amk/amk_state.c \
 	$(MAIN_DIR)/amk/amk_printf.c \
 	$(MAIN_DIR)/amk/amk_indicator.c \
 	$(MAIN_DIR)/amk/amk_cmd.c \
@@ -27,7 +28,6 @@ SRCS += \
 	$(MAIN_DIR)/amk/amk_eeprom.c \
 	$(MAIN_DIR)/amk/ring_buffer.c \
 	$(MAIN_DIR)/amk/linear_buffer.c \
-	$(MAIN_DIR)/usb/udd_desc_stub.c \
 
 INCS += \
 	$(MAIN_DIR) \
@@ -66,4 +66,14 @@ endif
 ifeq (yes, $(strip $(USB_DEVICE_ENABLE)))
 	SRCS += $(MAIN_DIR)/usb/usb_descriptors.c
 	APP_DEFS += -DUSB_DEVICE_ENABLE
+endif
+
+ifeq (, $(strip $(AMK_CUSTOM_MATRIX)))
+	SRCS += $(MAIN_DIR)/amk/amk_matrix_scan.c
+	ifeq (yes, $(strip $(PORT_SCAN_ENABLE)))
+		APP_DEFS += -DPORT_SCAN_ENABLE
+	endif
+	ifeq (yes, $(strip $(STATE_SCAN_ENABLE)))
+		APP_DEFS += -DSTATE_SCAN_ENABLE
+	endif
 endif

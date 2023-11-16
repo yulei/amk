@@ -132,6 +132,8 @@ void amk_driver_task(void)
                 remote_wakeup();
                 wait_ms(SUSPEND_WAKEUP_DELAY);
     #ifdef RTOS_ENABLE
+                usb_connect(false);
+                wait_ms(500);
                 NVIC_SystemReset();
     #else
         #ifndef NO_SUSPEND_RECONNECT

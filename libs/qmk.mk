@@ -7,10 +7,6 @@ include $(LIB_DIR)/qmk/qmk_feature.mk
 SRCS += \
 	$(QMK_PORT_DIR)/qmk_driver.c \
 
-ifneq (yes,$(strip $(AMK_CUSTOM_MATRIX)))
-	SRCS += $(QMK_PORT_DIR)/matrix_scan.c
-endif
-
 SRCS += \
 	$(LIB_DIR)/qmk/protocol/host.c \
 	$(LIB_DIR)/qmk/protocol/report.c \

@@ -37,18 +37,16 @@
 #define I2C1_SDA_PIN    B7
 
 // vial
-//#define VIAL_INSECURE
 #define VIAL_KEYBOARD_UID {0x09, 0x2A, 0xF3, 0x2B, 0x6D, 0xDB, 0x25, 0xEF}
 
+#define SCAN_ROW2COL
 //
 #define DWT_DELAY
-//#define VECT_TAB_OFFSET     0x10000
-#define SUSPEND_RECONNECT
+#define VECT_TAB_OFFSET     0x10000
+#define SUSPEND_RESET
 
-//#define USE_HS_USB
-
+#define USE_HS_USB
 #ifdef USE_HS_USB
-#define DEBOUNCE        1
+#define DOWN_DEBOUNCE   0
+#define UP_DEBOUNCE     4
 #endif
-
-

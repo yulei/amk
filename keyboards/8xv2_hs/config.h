@@ -41,10 +41,8 @@
 // custom tusb definitions
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 
-//#define USE_HS_USB
+#define USE_HS_USB
 
 #ifdef USE_HS_USB
-#define DEBOUNCE        1
-#else
-#define DEBOUNCE        5
+#define DOWN_DEBOUNCE   0
 #endif
