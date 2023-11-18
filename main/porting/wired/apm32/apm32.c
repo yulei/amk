@@ -58,6 +58,21 @@ void magic_write(uint32_t magic)
     RTC_WriteBackup(RTC_BAKP_REG_0, magic);
 }
 
+uint32_t reset_read(void)
+{
+    RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_PMU);
+    PMU_EnableBackupAccess();
+    return RTC_ReadBackup(RTC_BAKP_REG_1);
+}
+
+void reset_write(uint32_t reason)
+{
+    RCM_EnableAPB1PeriphClock(RCM_APB1_PERIPH_PMU);
+    PMU_EnableBackupAccess();
+
+    RTC_WriteBackup(RTC_BAKP_REG_1, reason);
+}
+
 void NMI_Handler(void)
 {
     fault_handler();

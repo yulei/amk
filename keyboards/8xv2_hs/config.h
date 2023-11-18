@@ -45,6 +45,4 @@
 
 #define USE_HS_USB
 
-#ifdef USE_HS_USB
-#define DOWN_DEBOUNCE   0
-#endif
+#define DYNAMIC_KEYMAP_LAYER_COUNT  7

@@ -15,6 +15,7 @@
 #define USB_HS_BIT          (1u << 8)
 
 extern uint32_t usb_setting;
+extern uint32_t usb_polling_rate;
 
 // HID ep size was 32
 // id for 1

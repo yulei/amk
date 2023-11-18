@@ -186,6 +186,14 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t value)
                             key->on = true;
                             custom_matrix_debug("APC from PRESSING to ON, value=%ld, min=%ld, max=%ld, trigger=%ld, down=%ld\n", value, key->min, key->max, key->trigger, down);
                         }
+                    } else {
+                        if (value < key->min + APC_THRESHOLD) {
+                            // force OFF
+                            key->state = APC_KEY_OFF;
+                            key->on = false;
+                            key->trigger = value;
+                            custom_matrix_debug("APC from PRESSING to OFF, value=%ld, min=%ld, max=%ld, trigger=%ld, down=%ld\n", value, key->min, key->max, key->trigger, down);
+                        }
                     }
                 }
             }
@@ -199,7 +207,7 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t value)
                 } else {
                     if (key->on) {
                         if (up != APC_INTERVAL_INVALID) {
-                            if (((value + up) < key->trigger) || (value < key->min + APC_THRESHOLD)) {
+                            if (((value + up) < key->trigger) || (value < (key->min + APC_THRESHOLD))) {
                                 // rapid trigger
                                 key->state = APC_KEY_OFF;
                                 key->on = false;
@@ -207,7 +215,7 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t value)
                                 custom_matrix_debug("APC RT from RELEASING to OFF, value=%ld, min=%ld, max=%ld, trigger=%ld, up=%ld\n", value, key->min, key->max, key->trigger, up);
                             }
                         } else {
-                            if ((value + APC_THRESHOLD) < key->min + down) {
+                            if (((value + APC_THRESHOLD) < key->min + down) || (value < key->min + APC_THRESHOLD)) {
                                 key->state = APC_KEY_OFF;
                                 key->on = false;
                                 key->trigger = value;

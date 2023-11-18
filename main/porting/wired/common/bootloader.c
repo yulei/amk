@@ -4,13 +4,12 @@
  */
 
 #include "amk_hal.h"
+#include "cm_misc.h"
 #include "bootloader.h"
 #include "wait.h"
 #include "usb_interface.h"
 
 const uint32_t Bootloader_Magic = 0x41544B42;
-
-extern void magic_write(uint32_t magic);
 
 void bootloader_jump(void)
 {

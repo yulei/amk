@@ -16,9 +16,6 @@ ifeq (yes, $(strip $(CDC_ENABLE)))
 endif
 
 SRCS += \
-	$(MAIN_DIR)/amk/amk_apc.c \
-	$(MAIN_DIR)/amk/amk_dks.c \
-	$(MAIN_DIR)/amk/amk_state.c \
 	$(MAIN_DIR)/amk/amk_printf.c \
 	$(MAIN_DIR)/amk/amk_indicator.c \
 	$(MAIN_DIR)/amk/amk_cmd.c \
@@ -74,6 +71,14 @@ ifeq (, $(strip $(AMK_CUSTOM_MATRIX)))
 		APP_DEFS += -DPORT_SCAN_ENABLE
 	endif
 	ifeq (yes, $(strip $(STATE_SCAN_ENABLE)))
+		SRCS += $(MAIN_DIR)/amk/amk_state.c
 		APP_DEFS += -DSTATE_SCAN_ENABLE
 	endif
+endif
+
+ifeq (ms, $(strip $(AMK_CUSTOM_MATRIX)))
+	SRCS += $(MAIN_DIR)/amk/amk_apc.c
+	SRCS += $(MAIN_DIR)/amk/amk_dks.c
+	APP_DEFS += -DAPC_ENABLE
+	APP_DEFS += -DDKS_ENABLE
 endif

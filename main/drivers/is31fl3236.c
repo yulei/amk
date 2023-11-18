@@ -75,7 +75,7 @@ i2c_led_t *is31fl3236_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8
 
     driver->ready = init_driver(driver);
 
-    fl3236_debug("IS31FL3236: initialized: addr=0x%x, ready=%d\n", addr, driver->ready);
+    fl3236_debug("IS31FL3236: initialized: addr=0x%x, ready=%d, available=%d\n", addr, driver->ready, fl3236_available[index]);
     return &driver->i2c_led;
 }
 

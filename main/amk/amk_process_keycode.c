@@ -7,6 +7,10 @@
  */
 
 #include "quantum.h"
+#include "cm_misc.h"
+#include "usb_interface.h"
+#include "amk_eeprom.h"
+#include "amk_keycode.h"
 #include "amk_printf.h"
 
 #ifndef AMK_KEYCODE_DEBUG
@@ -128,16 +132,69 @@ static bool process_rgb_amk(uint16_t keycode, const keyrecord_t *record)
 }
 #endif
 
+#ifdef USE_HS_USB
+static void store_and_reset(uint8_t polling)
+{
+    eeconfig_update_usb(polling);
+    usb_connect(0);
+    wait_ms(100);
+    NVIC_SystemReset();
+}
+static bool process_hs_usb(uint16_t keycode, const keyrecord_t *record)
+{
+    switch(keycode) {
+        case POLL_1K:
+            if (record->event.pressed) {
+                store_and_reset(0);
+            }
+            return false;
+        case POLL_2K:
+            if (record->event.pressed) {
+                store_and_reset(1);
+            }
+            return false;
+        case POLL_4K:
+            if (record->event.pressed) {
+                store_and_reset(2);
+            }
+            return false;
+        case POLL_8K:
+            if (record->event.pressed) {
+                store_and_reset(3);
+            }
+            return false;
+        default:
+            break;
+    }
+    return true;
+}
+#endif
+
+static bool process_amk_keycode(uint16_t keycode, const keyrecord_t *record)
+{
+    switch(keycode) {
+        default:
+            break;
+    }
+    return true;
+}
+
 bool process_action_kb(keyrecord_t *record)
 {
     uint16_t keycode = get_record_keycode(record, true);
-#ifdef RGB_ENABLE
+#if defined(RGB_ENABLE)
     if (!process_rgb_amk(keycode, record)) {
         return false;
     }
-#else
-    (void)keycode;
 #endif
+
+#if defined(USE_HS_USB)
+    if (!process_hs_usb(keycode, record)) {
+        return false;
+    }
+#endif
+
+    process_amk_keycode(keycode, record);
 
     return true;
 }

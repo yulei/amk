@@ -7,6 +7,7 @@
  */
 
 #include "amk_hal.h"
+#include "amk_eeprom.h"
 #include "usb_interface.h"
 #include "amk_usb.h"
 #include "usb_descriptors.h"
@@ -35,6 +36,14 @@ static ring_buffer_t report_queue;
 
 void usb_init(void)
 {
+#ifdef USE_HS_USB
+    usb_polling_rate = eeconfig_read_usb();
+    amk_printf("Current polling rate is: %d\n", usb_polling_rate);
+    if (usb_polling_rate != 0) {
+        usb_setting |= USB_HS_BIT;
+    }
+#endif
+
     amk_usb_init();
 
     rb_init(&report_queue, report_queue_buf, REPORT_QUEUE_SIZE);

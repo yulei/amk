@@ -16,7 +16,7 @@
 #include "raw_hid.h"
 #endif
 
-//#define PRINT_REPORT
+#define PRINT_REPORT
 
 void amk_usb_init(void)
 {

@@ -65,10 +65,11 @@ enum
 
         i2c_deinit(I2C0);
 
-        gpio_init(GPIOB, GPIO_MODE_AF_OD, GPIO_OSPEED_50MHZ, I2C1_PINS);
         #ifdef I2C1_REMAP
         gpio_pin_remap_config(GPIO_I2C0_REMAP, ENABLE);
         #endif
+
+        gpio_init(GPIOB, GPIO_MODE_AF_OD, GPIO_OSPEED_50MHZ, I2C1_PINS);
 
         i2c_clock_config(I2C0, 100000, I2C_DTCY_2);
         /* I2C address configure */
@@ -80,6 +81,7 @@ enum
     }
 #endif
 
+#ifdef USE_I2C1
 static void i2c_bus_reset(void)
 {
     /* configure SDA/SCL for GPIO */
@@ -99,10 +101,9 @@ static void i2c_bus_reset(void)
     __NOP();
     GPIO_BOP(GPIOB) |= I2C1_SDA_PIN;
 
-#ifdef USE_I2C1
     i2c1_config();
-#endif
 }
+#endif
 
 bool i2c_ready(i2c_handle_t i2c)
 {
@@ -155,104 +156,7 @@ bool i2c_wait_flag_timeout(uint32_t i2c, i2c_flag_enum flag, FlagStatus status, 
     return true;
 }
 
-amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t length, size_t timeout)
-{
-    uint32_t start = timer_read32();
-    uint32_t state = I2C_START;
-    bool quit = false;
-    amk_error_t error = AMK_SUCCESS;
-
-    while (!quit) {
-        switch(state) {
-        case I2C_START:
-            if (i2c_wait_flag_timeout(I2C0, I2C_FLAG_I2CBSY, RESET, timeout, start)) {
-                error = AMK_I2C_TIMEOUT;
-                i2c_debug("I2C GD32: i2c_send: BUS Busy timeout\n");
-            } else {
-                i2c_start_on_bus(I2C0);
-                if (i2c_wait_flag_timeout(I2C0, I2C_FLAG_SBSEND, SET, timeout, start)) {
-                    error = AMK_I2C_TIMEOUT;
-                    i2c_debug("I2C GD32: i2c_send: SBSSEND timeout\n");
-                } else {
-                    state = I2C_SEND_ADDRESS; 
-                }
-            }
-        break;
-        case I2C_SEND_ADDRESS:
-            i2c_master_addressing(I2C0, addr, I2C_TRANSMITTER);
-            if (i2c_wait_flag_timeout(I2C0, I2C_FLAG_ADDSEND, SET, timeout, start)) {
-                error = AMK_I2C_TIMEOUT;
-                i2c_debug("I2C GD32: i2c_send: ADDSEND timeout\n");
-            } else {
-                i2c_flag_clear(I2C0, I2C_FLAG_ADDSEND);
-                state = I2C_TRANSMIT_DATA;
-            }
-        break;
-        case I2C_TRANSMIT_DATA:
-            {
-                uint8_t *p = (uint8_t *)data;
-                for(int i = 0; i < length; i++) {
-                    if(i2c_wait_flag_timeout(I2C0, I2C_FLAG_TBE, SET, timeout, start)) {
-                        error = AMK_I2C_TIMEOUT;
-                        i2c_debug("I2C GD32: i2c_send: TBE timeout, breakout\n");
-                        break;
-                    } 
-
-                    i2c_data_transmit(I2C0, p[i]);
-                }
-
-                if(i2c_wait_flag_timeout(I2C0, I2C_FLAG_TBE, SET, timeout, start)) {
-                    error = AMK_I2C_TIMEOUT;
-                    i2c_debug("I2C GD32: i2c_send: TBE timeout\n");
-                } else {
-                    state = I2C_STOP;
-                }
-            }
-        break;
-        case I2C_STOP:
-            i2c_stop_on_bus(I2C0);
-            while(I2C_CTL0(I2C0)&0x0200) {
-                if (timer_elapsed32(start)  > timeout) {
-                    error = AMK_I2C_TIMEOUT;
-                    i2c_debug("I2C GD32: i2c_send: STOP timeout\n");
-                    break;
-                }
-            }
-            quit = true;
-        break;
-        default:
-            // never here
-            quit = true;
-            i2c_debug("I2C GD32: i2c_send: default state\n");
-        break;
-        }
-
-        if (error != AMK_SUCCESS) {
-            i2c_debug("I2C GD32: i2c_send: error=%d\n", error);
-            break;
-        }
-
-        if (timer_elapsed32(start) > timeout) {
-            error = AMK_I2C_TIMEOUT;
-            i2c_debug("I2C GD32: i2c_send: total timeout\n");
-            quit = true;
-        }
-    }
-
-    if (error != AMK_SUCCESS) {
-        i2c_bus_reset();
-        i2c_debug("I2C GD32: i2c_send: bus reset because error\n");
-    }
-
-    return error;
-}
-
-amk_error_t i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, size_t timeout)
-{
-    return AMK_ERROR;
-}
-
-amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
+static amk_error_t i2c_write(i2c_handle_t i2c, uint8_t addr, uint8_t reg, uint8_t reg_size, const void* data, size_t length, size_t timeout)
 {
     uint32_t start = timer_read32();
     uint32_t state = I2C_START;
@@ -289,7 +193,7 @@ amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const voi
         case I2C_TRANSMIT_DATA:
             {   
                 uint8_t *p = (uint8_t *)data;
-                for(int i = 0; i < length+1; i++) {
+                for(int i = 0; i < length+reg_size; i++) {
                     if(i2c_wait_flag_timeout(I2C0, I2C_FLAG_TBE, SET, timeout, start)) {
                         error = AMK_I2C_TIMEOUT;
                         i2c_debug("I2C GD32: i2c_write_reg: TBE timeout, index=%d, breakout\n", i);
@@ -297,10 +201,10 @@ amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const voi
                     } 
 
                     // transmit register first
-                    if (i == 0) {
+                    if (i == 0 && reg_size) {
                         i2c_data_transmit(I2C0, reg);
                     } else {
-                        i2c_data_transmit(I2C0, p[i-1]);
+                        i2c_data_transmit(I2C0, p[i-reg_size]);
                     }
                 }
 
@@ -347,6 +251,22 @@ amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const voi
     }
 
     return error;
+
+}
+
+amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t length, size_t timeout)
+{
+    return i2c_write(i2c, addr, 0, 0, data, length, timeout);
+}
+
+amk_error_t i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, size_t timeout)
+{
+    return AMK_ERROR;
+}
+
+amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
+{
+    return i2c_write(i2c, addr, reg, 1, data, length, timeout);
 }
 
 amk_error_t i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)

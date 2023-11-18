@@ -66,6 +66,15 @@ void magic_write(uint32_t magic)
 #endif
 }
 
+uint32_t reset_read(void)
+{
+    return 0;
+}
+
+void reset_write(uint32_t reason)
+{
+}
+
 static void fault_handler(void) 
 {
     #ifdef FAULT_BREAK

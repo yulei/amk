@@ -40,15 +40,46 @@ static void fault_handler(void)
     #endif
 }
 
-void magic_write(uint32_t magic)
+static uint32_t gd32_bkp_read(uint32_t high, uint32_t low)
 {
     rcu_periph_clock_enable(RCU_PMU);
     rcu_periph_clock_enable(RCU_BKPI);
     pmu_backup_write_enable();
-    uint16_t high = (uint16_t)((magic>>16)&0xFFFF);
-    bkp_write_data(BKP_DATA_1, high);
-    uint16_t low = (uint16_t)((magic)&0xFFFF);
-    bkp_write_data(BKP_DATA_0, low);
+    uint32_t high_half = bkp_read_data(high);
+    uint32_t low_half = bkp_read_data(low);
+
+    return ((high_half << 16) | low_half);
+}
+
+static void gd32_bkp_write(uint32_t magic, uint32_t high, uint32_t low)
+{
+    rcu_periph_clock_enable(RCU_PMU);
+    rcu_periph_clock_enable(RCU_BKPI);
+    pmu_backup_write_enable();
+    uint16_t high_half = (uint16_t)((magic>>16)&0xFFFF);
+    bkp_write_data(high, high_half);
+    uint16_t low_half = (uint16_t)((magic)&0xFFFF);
+    bkp_write_data(low, low_half);
+}
+
+uint32_t magic_read(void)
+{
+    return gd32_bkp_read(BKP_DATA_1, BKP_DATA_0);
+}
+
+void magic_write(uint32_t magic)
+{
+    gd32_bkp_write(magic, BKP_DATA_1, BKP_DATA_0);
+}
+
+uint32_t reset_read(void)
+{
+    return gd32_bkp_read(BKP_DATA_3, BKP_DATA_2);
+}
+
+void reset_write(uint32_t reason)
+{
+    gd32_bkp_write(reason, BKP_DATA_3, BKP_DATA_2);
 }
 
 void NMI_Handler(void)

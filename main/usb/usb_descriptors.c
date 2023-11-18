@@ -435,25 +435,72 @@ static uint8_t desc_with_audio[] = {
 
 #endif
 
+static uint8_t* update_desc_polling_rate(uint8_t *desc)
+{
+    //return desc;
+
+    int offset = TUD_CONFIG_DESC_LEN;
+    if (KEYBOARD_DESC_LEN) {
+        offset += KEYBOARD_DESC_LEN;
+        switch(usb_polling_rate) {
+            case 0:
+                desc[offset-1] = 1;
+                break;
+            case 1:
+                desc[offset-1] = 4;
+                break;
+            case 2:
+                desc[offset-1] = 2;
+                break;
+            case 3:
+                desc[offset-1] = 1;
+                break;
+            default:
+                break;
+        }
+    }
+    if (HID_OTHER_DESC_LEN) {
+        offset += HID_OTHER_DESC_LEN;
+        switch(usb_polling_rate) {
+            case 0:
+                desc[offset-1] = 1;
+                break;
+            case 1:
+                desc[offset-1] = 4;
+                break;
+            case 2:
+                desc[offset-1] = 2;
+                break;
+            case 3:
+                desc[offset-1] = 1;
+                break;
+            default:
+                break;
+        }
+    }
+
+    return desc;
+}
+
 // Invoked when received GET CONFIGURATION DESCRIPTOR
 uint8_t const* tud_descriptor_configuration_cb(uint8_t index)
 {
 #ifdef DYNAMIC_CONFIGURATION
     if (usb_setting & USB_MSC_BIT) {
-        return desc_with_msc;
+        return update_desc_polling_rate(desc_with_msc);
     }
 
     if (usb_setting & USB_AUDIO_BIT) {
-        return desc_with_audio;
+        return update_desc_polling_rate(desc_with_audio);
     }
 
     //if (usb_setting & USB_VIAL_BIT) {
-        return desc_with_vial;
+        return update_desc_polling_rate(desc_with_vial);
     //}
 
 #endif
 
-    return desc_configuration;
+    return update_desc_polling_rate(desc_configuration);
 }
 
 uint32_t tud_descriptor_configuration_size(uint8_t index)
@@ -567,13 +614,36 @@ uint32_t tud_hid_descriptor_interface_size(uint8_t itf)
     return 0;
 }
 
+static uint8_t *update_hid_desc_polling_rate(uint8_t *desc)
+{
+    //return desc;
+    int offset = TUD_HID_DESC_LEN;
+    switch(usb_polling_rate) {
+        case 0:
+            desc[offset-1] = 1;
+            break;
+        case 1:
+            desc[offset-1] = 4;
+            break;
+        case 2:
+            desc[offset-1] = 2;
+            break;
+        case 3:
+            desc[offset-1] = 1;
+            break;
+        default:
+            break;
+    }
+    return desc;
+}
+
 #ifdef KEYBOARD_ENABLE
 static uint8_t desc_hid_kbd[] = {
     TUD_HID_DESCRIPTOR(ITF_NUM_HID_KBD, 0, HID_ITF_PROTOCOL_KEYBOARD, sizeof(desc_hid_report_kbd), 0x80|EPNUM_HID_KBD, AMK_KEYBOARD_EP_SIZE, CFG_TUD_HID_POLL_INTERVAL),
 };
 uint8_t const* tud_descriptor_hid_interface_kbd_cb(void)
 {
-    return desc_hid_kbd;
+    return update_hid_desc_polling_rate(desc_hid_kbd);
 }
 
 uint32_t tud_descriptor_hid_interface_kbd_size(void)
@@ -590,7 +660,7 @@ static uint8_t desc_hid_other[] = {
 // Invoded when received GET HID DESCRIPTOR
 uint8_t const* tud_descriptor_hid_interface_other_cb(void)
 {
-    return desc_hid_other;
+    return update_hid_desc_polling_rate(desc_hid_other);
 }
 
 uint32_t tud_descriptor_hid_interface_other_size(void)
@@ -670,7 +740,8 @@ static uint8_t desc_other_configuration[] = {
 
 uint8_t const* tud_descriptor_other_speed_configuration_cb(uint8_t index)
 {
-    return (uint8_t const*) &desc_other_configuration;
+    uint8_t *desc = update_desc_polling_rate(desc_other_configuration);
+    return (uint8_t const*) desc;
 }
 
 uint32_t tud_descriptor_other_speed_configuration_size(uint8_t index)

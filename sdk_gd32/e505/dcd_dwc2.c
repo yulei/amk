@@ -29,6 +29,7 @@
 
 #include "tusb_option.h"
 #include "device/dcd.h"
+#include "usb_common.h"
 
 #if TUSB_OPT_DEVICE_ENABLED && \
     ( defined(DCD_ATTR_DWC2_STM32) || \
@@ -418,11 +419,14 @@ static void phy_hs_init(dwc2_regs_t * dwc2)
   // Set max speed
   uint32_t dcfg = dwc2->dcfg;
   dcfg &= ~DCFG_DSPD_Msk;
-#ifdef USE_HS_USB
-  dcfg |= DCFG_DSPD_HS << DCFG_DSPD_Pos;
-#else
-  dcfg |= DCFG_DSPD_FS_HSPHY << DCFG_DSPD_Pos;
-#endif
+
+  if (usb_setting & USB_HS_BIT) {
+    dcfg |= DCFG_DSPD_HS << DCFG_DSPD_Pos;
+  }
+  else
+  {
+    dcfg |= DCFG_DSPD_FS_HSPHY << DCFG_DSPD_Pos;
+  }
 
   // XCVRDLY: transceiver delay between xcvr_sel and txvalid during device chirp is required
   // when using with some PHYs such as USB334x (USB3341, USB3343, USB3346, USB3347)

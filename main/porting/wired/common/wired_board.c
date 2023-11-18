@@ -48,18 +48,18 @@ extern void custom_board_task(void);
 
 void board_init(void)
 {
-
     system_init();
     gb_debug("system_init\n");
 
     custom_board_init();
     gb_debug("custom_board_init\n");
 
+    amk_driver_init();
+    gb_debug("amk_init\n");
+
     usb_init();
     gb_debug("usb_init\n");
 
-    amk_driver_init();
-    gb_debug("amk_init\n");
 
 #ifndef CH32V307
     SEGGER_SYSVIEW_Conf();

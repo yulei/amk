@@ -19,9 +19,10 @@
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 
 // rgb led
-#define RGB_DEVICE_NUM  2
+//#define RGB_DEVICE_NUM  2
+#define RGB_DEVICE_NUM  1
 
-#define USE_3733
+//#define USE_3733
 #define RGB_MATRIX_LED_NUM      63
 #define RGB_MATRIX_LED_COUNT    RGB_MATRIX_LED_NUM
 #define RGB_MATRIX_NUM          1
@@ -30,23 +31,22 @@
 #define RGB_LED_3236    3
 #define RGB_SEGMENT_NUM 1
 
-#define RGB_LED_NUM     (RGB_LED_3236 + RGB_MATRIX_LED_NUM)
+//#define RGB_LED_NUM     (RGB_LED_3236 + RGB_MATRIX_LED_NUM)
+#define RGB_LED_NUM     (RGB_LED_3236)
 
 #define USE_I2C1
-#define I2C1_SCL_PIN    B6
-#define I2C1_SDA_PIN    B7
+#define I2C1_SCL_PIN        GPIO_PIN_6
+#define I2C1_SDA_PIN        GPIO_PIN_7
+#define I2C1_PINS           (I2C1_SCL_PIN| I2C1_SDA_PIN)
 
 // vial
 #define VIAL_KEYBOARD_UID {0x09, 0x2A, 0xF3, 0x2B, 0x6D, 0xDB, 0x25, 0xEF}
 
-#define SCAN_ROW2COL
-//
+// keyboard settings
 #define DWT_DELAY
 #define VECT_TAB_OFFSET     0x10000
 #define SUSPEND_RESET
 
+#define SCAN_ROW2COL
 #define USE_HS_USB
-#ifdef USE_HS_USB
-#define DOWN_DEBOUNCE   0
-#define UP_DEBOUNCE     4
-#endif
+#define DYNAMIC_KEYMAP_LAYER_COUNT  7

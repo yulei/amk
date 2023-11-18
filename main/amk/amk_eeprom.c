@@ -70,3 +70,14 @@ void eeconfig_init_kb(void)
     rgb_led_config_init();
 #endif
 }
+
+#ifdef USE_HS_USB
+uint8_t eeconfig_read_usb(void)
+{
+    return eeprom_read_byte(EECONFIG_USB);
+}
+void eeconfig_update_usb(uint8_t usb)
+{
+    eeprom_write_byte(EECONFIG_USB, usb);
+}
+#endif
