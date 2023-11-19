@@ -11,6 +11,7 @@
 #include "apm32f4xx_usb_device.h"
 
 #include "device/dcd.h"
+#include "usb_common.h"
 #include "amk_printf.h"
 
 #if defined(APM32F407)
@@ -319,12 +320,24 @@ void dcd_init(uint8_t rhport)
     dcd_usb.usbCfg.phyType             = USB_OTG_PHY_EMB;
     dcd_usb.usbCfg.dmaStatus           = DISABLE;
     dcd_usb.usbCfg.sofStatus           = DISABLE;
-#ifdef USE_HS_USB
+
+    if (usb_setting & USB_HS_BIT) {
+        dcd_usb.usbCfg.speed               = USB_OTG_SPEED_HSFSLS;
+        dcd_usb.usbCfg.speedChannel        = USBD_SPEED_CH_HS;
+    } else {
+        dcd_usb.usbCfg.speed               = USB_OTG_SPEED_FSLS;
+        dcd_usb.usbCfg.speedChannel        = USBD_SPEED_CH_HS;
+    }
+
+
+#if 0
+//#ifdef USE_HS_USB
     dcd_usb.usbCfg.speed               = USB_OTG_SPEED_HSFSLS;
     dcd_usb.usbCfg.speedChannel        = USBD_SPEED_CH_HS;
-#else
+//#else
     dcd_usb.usbCfg.speed               = USB_OTG_SPEED_FSLS;
     dcd_usb.usbCfg.speedChannel        = USBD_SPEED_CH_HS;//USBD_SPEED_CH_FS;
+//#endif
 #endif
     dcd_usb.usbCfg.devEndpointNum      = DCD_MAX_EP_NUM;
     dcd_usb.usbCfg.lowPowerStatus      = DISABLE;
