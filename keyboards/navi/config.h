@@ -50,7 +50,7 @@
 #define DEBOUNCE            5
 #define DWT_DELAY
 #define VECT_TAB_OFFSET     0x20000
-#define HSE_VALUE       16000000U
+#define HSE_VALUE           16000000U
 //#define FAULT_BREAK
 
 #define USE_SPI1
@@ -64,12 +64,6 @@
 #define GC9107_AS_ST7735
 
 #define SCREEN_ROTATION     3
-//#define SCREEN_DRIVER_NUM   1
-//#define SCREEN_NUM          1
-//#define DISPLAY_NUM         1
-//#define ANIM_DISPLAY_NUM    1
-//#define AUDIO_DISPLAY_NUM   1
-//#define RENDER_BUFFER_SIZE  (60*60*2)
 
 // vial 
 #define VIAL_KEYBOARD_UID {0x21, 0x8B, 0xFE, 0xA4, 0xE9, 0x5F, 0x65, 0x1B}
@@ -77,4 +71,4 @@
 // custom tusb definitions
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 
-#define SUSPEND_RECONNECT
+#define SUSPEND_RESET

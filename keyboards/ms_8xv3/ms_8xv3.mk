@@ -8,7 +8,7 @@ RGB_MATRIX_ENABLE = yes
 EECONFIG_FLASH = yes
 VIAL_ENABLE = yes
 NKRO_ENABLE = yes
-AMK_CUSTOM_MATRIX = yes
+AMK_CUSTOM_MATRIX = ms 
 MSC_ENABLE = yes
 DYNAMIC_CONFIGURATION = yes
 DEBOUNCE_TYPE = none
@@ -23,4 +23,4 @@ SRCS += $(KEYBOARD_DIR)/display.c
 SRCS +=	$(MAIN_DIR)/drivers/st7735.c
 SRCS += $(KEYBOARD_DIR)/apc_matrix.c
 
-NO_DEBUG := 0
+#NO_DEBUG := 0
