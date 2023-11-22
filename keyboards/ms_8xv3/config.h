@@ -99,6 +99,7 @@
 #define VIAL_KEYBOARD_UID {0xAC, 0x0D, 0xCB, 0x0E, 0xCC, 0xB1, 0x0E, 0x07}
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 
+#define APC_INTERVAL_MIN            200
 #define DYNAMIC_KEYMAP_LAYER_COUNT  7
 #define APC_KEYMAP_DOWN_LAYER       4
 #define APC_KEYMAP_UP_LAYER         5

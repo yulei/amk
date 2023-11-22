@@ -276,6 +276,7 @@
 
 #ifdef HAL_GPIO_MODULE_ENABLED
   #include "stm32f4xx_hal_gpio.h"
+  #include "stm32f4xx_ll_gpio.h"
 #endif /* HAL_GPIO_MODULE_ENABLED */
 
 #ifdef HAL_EXTI_MODULE_ENABLED

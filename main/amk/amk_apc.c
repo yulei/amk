@@ -33,6 +33,9 @@
 #define APC_KEY_DOWN_DEFAULT    1024
 #define APC_KEY_UP_DEFAULT      0
 
+#define MIN_ADJUST_VALUE        100
+#define MAX_ADJUST_VALUE        100
+
 enum apc_key_state
 {
     APC_KEY_OFF,
@@ -107,6 +110,21 @@ static uint32_t apc_get_key_interval(uint32_t row, uint32_t col, uint32_t layer)
     return index;
 }
 
+static void apc_adjust_minmax(struct apc_key* key, uint32_t value)
+{
+    return;
+
+    uint32_t diff = value > key->min ? value-key->min : key->min-value;
+    if (diff < MIN_ADJUST_VALUE) {
+        key->min = (key->min * 80 + value * 20) / 100;
+    }
+
+    diff = value > key->max ? value-key->max: key->max-value;
+    if (diff < MAX_ADJUST_VALUE) {
+        key->max = (key->max * 80 + value * 20) / 100;
+    }
+}
+
 void apc_matrix_init(void)
 {
     for (int row = 0; row < MATRIX_ROWS; row++) {
@@ -151,7 +169,7 @@ static int apc_update_dir(struct apc_key* key, uint32_t value)
 
 static bool update_if_off(struct apc_key* key, uint32_t value)
 {
-    if (value < (key->min + APC_THRESHOLD)) {
+    if (key->on && (value < (key->min + APC_THRESHOLD))) {
         key->state = APC_KEY_OFF;
         key->on = false;
         key->trigger = value;
@@ -169,12 +187,14 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t value)
         return dks_matrix_update(row, col, value);
     }
 #endif
+
     struct apc_key* key = &apc_matrix[row][col];
 
     if (is_adc_value_valid(value)) {
         if (key->min > value) key->min = value;
         if (key->max < value) key->max = value;
         if (key->last == APC_KEY_LAST_DEFAULT) key->last = value;
+        apc_adjust_minmax(key, value);
 
         uint32_t down = apc_compute_interval(row, col, key->apc);
         uint32_t up = apc_compute_interval(row, col, key->rt);

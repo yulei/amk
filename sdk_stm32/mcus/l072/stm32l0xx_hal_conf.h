@@ -193,6 +193,7 @@
 
 #ifdef HAL_GPIO_MODULE_ENABLED
   #include "stm32l0xx_hal_gpio.h"
+  #include "stm32l0xx_ll_gpio.h"
 #endif /* HAL_GPIO_MODULE_ENABLED */
 
 #ifdef HAL_DMA_MODULE_ENABLED

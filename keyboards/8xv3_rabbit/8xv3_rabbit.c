@@ -6,6 +6,7 @@
 #include "rgb_common.h"
 #include "is31fl3741.h"
 #include "is31fl3236.h"
+#include "is31fl3731.h"
 #include "rgb_driver.h"
 
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
@@ -120,17 +121,38 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {0, CS32_SW1, CS31_SW1, CS33_SW1},
 
     // 6 leds
+#if 0
     {1, OUT_24, OUT_23, OUT_22},
     {1, OUT_21, OUT_20, OUT_19},
     {1, OUT_18, OUT_17, OUT_16},
     {1, OUT_15, OUT_14, OUT_13},
     {1, OUT_12, OUT_11, OUT_10},
     {1,  OUT_9,  OUT_8,  OUT_7},
+#else
+    {1, C1_1,   C3_2,   C4_2},
+    {1, C1_2,   C2_2,   C4_3},
+    {1, C1_3,   C2_3,   C3_3},
+    {1, C1_4,   C2_4,   C3_4},
+    {1, C1_5,   C2_5,   C3_5},
+    {1, C1_6,   C2_6,   C3_6},
+    {1, C1_7,   C2_7,   C3_7},
+    {1, C1_8,   C2_8,   C3_8},
+
+    {1, C9_1,   C8_1,   C7_1},
+    {1, C9_2,   C8_2,   C7_2},
+    {1, C9_3,   C8_3,   C7_3},
+    {1, C9_4,   C8_4,   C7_4},
+    {1, C9_5,   C8_5,   C7_5},
+    {1, C9_6,   C8_6,   C7_6},
+    {1, C9_7,   C8_7,   C6_6},
+    {1, C9_8,   C7_7,   C6_7},
+#endif
 };
 
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
     {RGB_DRIVER_IS31FL3741, 0x60, 0, 0, 97},
-    {RGB_DRIVER_IS31FL3236, 0x78, 0, 97, 6},
+    //{RGB_DRIVER_IS31FL3236, 0x78, 0, 97, 6},
+    {RGB_DRIVER_IS31FL3731, 0xE8, 0, 97, 16},
 };
 
 rgb_param_t g_rgb_matrix_params[RGB_MATRIX_NUM] = {
@@ -138,8 +160,9 @@ rgb_param_t g_rgb_matrix_params[RGB_MATRIX_NUM] = {
 };
 
 rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
-    {1,  97, 3},
-    {2, 100, 3},
+    //{1,  97, 3},
+    //{2, 100, 3},
+    {1,  97, 16},
 };
 
 #include "rgb_matrix_stub.h"

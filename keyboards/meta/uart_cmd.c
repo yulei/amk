@@ -5,7 +5,7 @@
  * @copyright Copyright (c) 2022
  * 
  */
-#include "generic_hal.h"
+#include "amk_hal.h"
 #include "amk_cmd.h"
 #include "amk_gpio.h"
 #include "amk_printf.h"

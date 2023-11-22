@@ -20,7 +20,7 @@
 #define DISCHARGE_WAIT_PRE  20
 #define DISCHARGE_WAIT_POST 20
 #define EC_TH_LOW       1024
-#define EC_TH_HIGH      1280
+#define EC_TH_HIGH      1180
 
 #define LEFT_EN_PIN     C5
 #define RIGHT_EN_PIN    B0
@@ -64,7 +64,8 @@
 
 #if 1
 #define USE_WS2812
-#define USE_3236
+//#define USE_3236
+#define USE_3731
 
 #define WS2812_LED_NUM      7
 #define WS2812_LED_PIN      B7
@@ -79,9 +80,11 @@
 #define PWM_DMA_IRQHnadler  DMA1_Stream3_IRQHandler
 
 #define USE_I2C1
-#define RGB_LED_NUM         (WS2812_LED_NUM+6)
+//#define RGB_LED_NUM         (WS2812_LED_NUM+6)
+#define RGB_LED_NUM         (WS2812_LED_NUM+16)
 #define RGB_DEVICE_NUM      2
-#define RGB_SEGMENT_NUM     3
+//#define RGB_SEGMENT_NUM     3
+#define RGB_SEGMENT_NUM     2
 
 #endif
 

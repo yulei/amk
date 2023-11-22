@@ -214,6 +214,7 @@ The real value may vary depending on the variations in voltage and temperature.*
 
 #ifdef HAL_GPIO_MODULE_ENABLED
 #include "stm32g4xx_hal_gpio.h"
+#include "stm32g4xx_ll_gpio.h"
 #endif /* HAL_GPIO_MODULE_ENABLED */
 
 #ifdef HAL_DMA_MODULE_ENABLED

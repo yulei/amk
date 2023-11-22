@@ -3,22 +3,22 @@
     "vendorId": "0x4D58",
     "productId": "0x4852",
     "lighting": "none",
-    "customKeycodes": [
+        "customKeycodes": [
         {"name": "FS1K",
         "title": "Fullspeed 1K polling rate",
         "shortName": "FS_1K"
         },
         {"name": "HS2K",
         "title": "Highspeed 2K polling rate",
-        "shortname": "HS_2K"
+        "shortName": "HS_2K"
         },
         {"name": "HS4K",
         "title": "Highspeed 4K polling rate",
-        "shortname": "HS_4K"
+        "shortName": "HS_4K"
         },
         {"name": "HS8K",
         "title": "Highspeed 8K polling rate",
-        "shortname": "HS_8K"
+        "shortName": "HS_8K"
         }
       ],
     "matrix": {

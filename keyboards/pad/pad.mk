@@ -12,3 +12,4 @@ LINKER_PATH = $(KEYBOARD_DIR)
 
 SRCS += $(KEYBOARD_DIR)/pad.c
 SRCS += $(KEYBOARD_DIR)/direct_pins.c
+SRCS += $(MAIN_DIR)/usb/udd_desc_stub.c

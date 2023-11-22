@@ -5,8 +5,6 @@
 #include <string.h>
 #include "amk_gpio.h"
 
-#include "stm32f4xx_ll_gpio.h"
-
 /*
 int gpio_read_pin(pin_t pin)
 {

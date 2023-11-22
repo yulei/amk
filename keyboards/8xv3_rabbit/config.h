@@ -29,19 +29,23 @@
 #define KEY_PIN             A1
 
 #define USE_3741
-#define USE_3236
+//#define USE_3236
+#define USE_3731
 
 #define USE_I2C1
 #define IS31FL3741_I2C_ID   I2C_INSTANCE_1
 #define IS31FL3236_I2C_ID   I2C_INSTANCE_1
+#define IS31FL3731_I2C_ID   I2C_INSTANCE_1
 
 #define RGB_MATRIX_LED_NUM  97
 #define RGB_MATRIX_LED_COUNT    RGB_MATRIX_LED_NUM
 #define RGB_MATRIX_NUM      1
 
 #define IS31FL3236_LED_NUM  6
+#define IS31FL3731_LED_NUM  16
+#define LED_NUM             IS31FL3731_LED_NUM
 
-#define RGB_LED_NUM         (IS31FL3236_LED_NUM+RGB_MATRIX_LED_NUM)
+#define RGB_LED_NUM         (LED_NUM+RGB_MATRIX_LED_NUM)
 #define RGB_DEVICE_NUM      2
 #define RGB_SEGMENT_NUM     2
 

@@ -52,7 +52,7 @@
 
 #define DWT_DELAY
 
-#define VECT_TAB_OFFSET 0x20000
+//#define VECT_TAB_OFFSET 0x20000
 #define HSE_VALUE       16000000
 
 #define VIAL_KEYBOARD_UID {0x33, 0x83, 0x29, 0x0D, 0xA3, 0xCA, 0xDB, 0x94}
