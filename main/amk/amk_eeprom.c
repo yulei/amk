@@ -10,6 +10,7 @@
 
 #include "amk_hal.h"
 #include "eeprom.h"
+#include "keycode_config.h"
 #include "amk_eeprom.h"
 #include "amk_printf.h"
 
@@ -65,6 +66,11 @@ void eeconfig_init_kb(void)
 {
     eeconfig_update_kb(0);
     eeconfig_init_user();
+
+#ifdef NKRO_ENABLE
+    keymap_config.nkro = 1;
+    eeconfig_update_keymap(keymap_config.raw);
+#endif
 
 #ifdef RGB_ENABLE
     rgb_led_config_init();

@@ -179,7 +179,11 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
     PB8     ------> I2C1_SCL
     PB9     ------> I2C1_SDA
     */
+  #ifdef I2C1_PINS
+    GPIO_InitStruct.Pin = I2C1_PINS;
+  #else
     GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9;
+  #endif
     GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;

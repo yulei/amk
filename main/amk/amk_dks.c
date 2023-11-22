@@ -23,6 +23,10 @@
 #define dks_debug(...)
 #endif
 
+#ifndef APC_KEYMAP_DKS_LAYER
+#define APC_KEYMAP_DKS_LAYER    6
+#endif
+
 #define DKS_KEY_COUNT       4
 #define DKS_EVENT_COUNT     4
 #define DKS_FIRST_INTERVAL  30

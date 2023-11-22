@@ -65,7 +65,7 @@
 
 #define VIAL_KEYBOARD_UID {0xC4, 0xDD, 0x9C, 0xE7, 0xED, 0xE0, 0x71, 0xC8}
 
-#define APC_INTERVAL_MIN            300
+//#define APC_INTERVAL_MIN            300
 #define DYNAMIC_KEYMAP_LAYER_COUNT  7
 #define APC_KEYMAP_DOWN_LAYER       4
 #define APC_KEYMAP_UP_LAYER         5

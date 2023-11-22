@@ -19,10 +19,10 @@
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 
 // rgb led
-//#define RGB_DEVICE_NUM  2
-#define RGB_DEVICE_NUM  1
+#define RGB_DEVICE_NUM  2
+//#define RGB_DEVICE_NUM  1
 
-//#define USE_3733
+#define USE_3733
 #define RGB_MATRIX_LED_NUM      63
 #define RGB_MATRIX_LED_COUNT    RGB_MATRIX_LED_NUM
 #define RGB_MATRIX_NUM          1
@@ -31,8 +31,8 @@
 #define RGB_LED_3236    3
 #define RGB_SEGMENT_NUM 1
 
-//#define RGB_LED_NUM     (RGB_LED_3236 + RGB_MATRIX_LED_NUM)
-#define RGB_LED_NUM     (RGB_LED_3236)
+#define RGB_LED_NUM     (RGB_LED_3236 + RGB_MATRIX_LED_NUM)
+//#define RGB_LED_NUM     (RGB_LED_3236)
 
 #define USE_I2C1
 #define I2C1_SCL_PIN        GPIO_PIN_6
@@ -45,6 +45,7 @@
 // keyboard settings
 #define DWT_DELAY
 #define VECT_TAB_OFFSET     0x10000
+#define HSE_VALUE           16000000
 #define SUSPEND_RESET
 
 #define SCAN_ROW2COL
