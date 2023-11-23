@@ -10,6 +10,10 @@
 #define HSE_VALUE   XTAL_VALUE
 #endif
 
+// put on retention memory
+uint32_t BKP_DR0 __attribute__((section(".ret_ram_data")));     // for reboot to bootloader 
+uint32_t BKP_DR1 __attribute__((section(".ret_ram_data")));     // for special reboot 
+
 static void system_clock_init(void);
 static void system_usb_init(void);
 static void debug_port_init(void);
@@ -35,8 +39,26 @@ extern void fee_init(void);
     system_usb_init();
 }
 
+
+uint32_t magic_read(void)
+{
+    return BKP_DR0;
+}
+
 void magic_write(uint32_t magic)
-{}
+{
+    BKP_DR0 = magic;
+}
+
+uint32_t reset_read(void)
+{
+    return BKP_DR1;
+}
+
+void reset_write(uint32_t reason)
+{
+    BKP_DR1 = reason;
+}
 
 static void debug_port_init(void)
 {

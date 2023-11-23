@@ -9,7 +9,7 @@
 #pragma once
 
 #if CFG_TUSB_MCU == OPT_MCU_HC32F460
-  #include "generic_hal.h"
+  #include "amk_hal.h"
   #include "tusb.h"
   #define EP_MAX_FS       8
   #define EP_FIFO_SIZE_FS 1280

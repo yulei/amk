@@ -32,18 +32,24 @@
 #define SPI_UNIT                        (M4_SPI3)
 #define SPI_UNIT_CLOCK                  (PWC_FCG1_PERIPH_SPI3)
 
+#ifndef SPI_NSS_PORT
 #define SPI_NSS_PORT                    (PortB)
 #define SPI_NSS_PIN                     (Pin05)
 #define SPI_NSS_HIGH()                  (PORT_SetBits(SPI_NSS_PORT, SPI_NSS_PIN))
 #define SPI_NSS_LOW()                   (PORT_ResetBits(SPI_NSS_PORT, SPI_NSS_PIN))
+#endif
 
+#ifndef SPI_SCK_PORT
 #define SPI_SCK_PORT                    (PortB)
 #define SPI_SCK_PIN                     (Pin04)
 #define SPI_SCK_FUNC                    (Func_Spi3_Sck)
+#endif
 
+#ifndef SPI_MOSI_PORT
 #define SPI_MOSI_PORT                   (PortB)
 #define SPI_MOSI_PIN                    (Pin03)
 #define SPI_MOSI_FUNC                   (Func_Spi3_Mosi)
+#endif
 
 #define SPI_DMA_UNIT                    (M4_DMA1)
 #define SPI_DMA_CLOCK_UNIT              (PWC_FCG0_PERIPH_DMA1)
@@ -138,24 +144,19 @@ void screen_spi_init(void)
 }
 #endif
 
-// put on retention memory
-uint32_t BKP_DR0 __attribute__((section(".ret_ram_data")));     // for reboot to bootloader 
-uint32_t BKP_DR1 __attribute__((section(".ret_ram_data")));     // for special reboot 
-
 void custom_board_init(void)
 {
 #ifdef USE_SPI1
     screen_spi_init();
 #endif
 #ifdef DYNAMIC_CONFIGURATION
-    uint32_t magic = BKP_DR1;
-    //if (magic == 0) {
-    if (magic > 0) {
+    uint32_t reset = reset_read();
+    if (reset > 0) {
         usb_setting |= USB_MSC_BIT;
     } else {
         usb_setting = 0;
     }
     amk_printf("usb_setting: %d\n", usb_setting);
-    BKP_DR1 = 0;
+    reset_write(0);
 #endif
 }
