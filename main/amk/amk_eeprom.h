@@ -18,7 +18,9 @@
 #define EECONFIG_RGB                (uint8_t*)(EEPROM_SIZE)
 #define EECONFIG_USB                (uint8_t*)(EEPROM_SIZE+EECONFIG_RGB_COUNT)
 #define EECONFIG_USB_COUNT          1
-#define AMK_EEPROM_SIZE             (EEPROM_SIZE+EECONFIG_RGB_COUNT+EECONFIG_USB_COUNT)
+#define EECONFIG_DEBOUNCE           (uint8_t*)(EEPROM_SIZE+EECONFIG_RGB_COUNT+1)
+#define EECONFIG_DEBOUNCE_COUNT     1
+#define AMK_EEPROM_SIZE             (EEPROM_SIZE+EECONFIG_RGB_COUNT+EECONFIG_USB_COUNT+EECONFIG_DEBOUNCE_COUNT)
 
 #ifdef RGB_ENABLE
 void eeconfig_read_rgb(void* rgb, uint8_t index);
@@ -29,4 +31,9 @@ void eeconfig_update_rgb(const void* rgb, uint8_t index);
 #ifdef USE_HS_USB
 uint8_t eeconfig_read_usb(void);
 void eeconfig_update_usb(uint8_t usb);
+#endif
+
+#ifdef STATE_SCAN_ENABLE
+uint8_t eeconfig_read_debounce(void);
+void eeconfig_update_debounce(uint8_t debounce);
 #endif

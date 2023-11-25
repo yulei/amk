@@ -36,6 +36,10 @@
 #define MIN_ADJUST_VALUE        100
 #define MAX_ADJUST_VALUE        100
 
+#ifndef KEY_ADJUST_MIN
+#define KEY_ADJUST_MIN          2150
+#endif
+
 enum apc_key_state
 {
     APC_KEY_OFF,
@@ -68,7 +72,7 @@ static struct apc_key apc_matrix[MATRIX_ROWS][MATRIX_COLS];
 
 #define FIST_PART   1
 #define LAST_PART   2
-#define TOTAL_PART  3
+#define TOTAL_PART  (FIST_PART + LAST_PART)
 
 static uint32_t apc_compute_interval(uint32_t row, uint32_t col, uint32_t index)
 {
@@ -77,7 +81,7 @@ static uint32_t apc_compute_interval(uint32_t row, uint32_t col, uint32_t index)
     struct apc_key *key = &apc_matrix[row][col];
     uint32_t interval = APC_INTERVAL_INVALID;
 
-    if ((key->min == APC_KEY_MIN_DEFAULT) || (key->max < APC_KEY_MAX_PRESET) || (key->max <(key->min+APC_INTERVAL_MIN))) {
+    if ((key->min > APC_KEY_MIN_PRESET) || (key->max < APC_KEY_MAX_PRESET) || (key->max < (key->min+APC_INTERVAL_MIN))) {
         interval = APC_INTERVAL_MIN + ((APC_INTERVAL_MAX - APC_INTERVAL_MIN)/(APC_INTERVAL_COUNT*TOTAL_PART))*(index);
     } else {
         interval = APC_INTERVAL_MIN + ((key->max - key->min - APC_INTERVAL_MIN)/(APC_INTERVAL_COUNT*TOTAL_PART))*(index);
@@ -110,19 +114,11 @@ static uint32_t apc_get_key_interval(uint32_t row, uint32_t col, uint32_t layer)
     return index;
 }
 
-static void apc_adjust_minmax(struct apc_key* key, uint32_t value)
+static void apc_adjust_min(struct apc_key* key, uint32_t value)
 {
-    return;
+    if ((value > KEY_ADJUST_MIN) || (key->min > KEY_ADJUST_MIN)) return;
 
-    uint32_t diff = value > key->min ? value-key->min : key->min-value;
-    if (diff < MIN_ADJUST_VALUE) {
-        key->min = (key->min * 80 + value * 20) / 100;
-    }
-
-    diff = value > key->max ? value-key->max: key->max-value;
-    if (diff < MAX_ADJUST_VALUE) {
-        key->max = (key->max * 80 + value * 20) / 100;
-    }
+    key->min = (key->min * 80 + value * 20) / 100;
 }
 
 void apc_matrix_init(void)
@@ -194,7 +190,7 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t value)
         if (key->min > value) key->min = value;
         if (key->max < value) key->max = value;
         if (key->last == APC_KEY_LAST_DEFAULT) key->last = value;
-        apc_adjust_minmax(key, value);
+        apc_adjust_min(key, value);
 
         uint32_t down = apc_compute_interval(row, col, key->apc);
         uint32_t up = apc_compute_interval(row, col, key->rt);

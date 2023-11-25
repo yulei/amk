@@ -133,7 +133,7 @@ static bool process_rgb_amk(uint16_t keycode, const keyrecord_t *record)
 #endif
 
 #ifdef USE_HS_USB
-static void store_and_reset(uint8_t polling)
+static void store_and_reset_usb(uint8_t polling)
 {
     eeconfig_update_usb(polling);
     usb_connect(0);
@@ -145,22 +145,22 @@ static bool process_hs_usb(uint16_t keycode, const keyrecord_t *record)
     switch(keycode) {
         case POLL_1K:
             if (record->event.pressed) {
-                store_and_reset(0);
+                store_and_reset_usb(0);
             }
             return false;
         case POLL_2K:
             if (record->event.pressed) {
-                store_and_reset(1);
+                store_and_reset_usb(1);
             }
             return false;
         case POLL_4K:
             if (record->event.pressed) {
-                store_and_reset(2);
+                store_and_reset_usb(2);
             }
             return false;
         case POLL_8K:
             if (record->event.pressed) {
-                store_and_reset(3);
+                store_and_reset_usb(3);
             }
             return false;
         default:
@@ -170,6 +170,45 @@ static bool process_hs_usb(uint16_t keycode, const keyrecord_t *record)
 }
 #endif
 
+#ifdef STATE_SCAN_ENABLE
+#include "amk_state.h"
+
+static void store_and_update_debounce(uint8_t down, uint8_t up)
+{
+    uint8_t debounce = ((down&0x0F) << 4) | (up&0x0F);
+    eeconfig_update_debounce(debounce);
+    state_matrix_update_debounce(down, up);
+}
+
+static bool process_state_debounce(uint16_t keycode, const keyrecord_t *record)
+{
+    switch(keycode) {
+        case DOWN_0MS ... DOWN_5MS:
+        {
+            uint8_t press = keycode - DOWN_0MS;
+            if (press != state_matrix_get_debounce(true)) {
+                uint8_t release = state_matrix_get_debounce(false);
+                store_and_update_debounce(press, release);
+            }
+        }
+        return false;
+        case UP_0MS ... UP_5MS:
+        {
+            uint8_t release = keycode - UP_0MS;
+            if (release != state_matrix_get_debounce(false)) {
+                uint8_t press = state_matrix_get_debounce(true);
+                store_and_update_debounce(press, release);
+            }
+        }
+        return false;
+        default:
+            break;
+    }
+
+    return true;
+}
+
+#endif
 static bool process_amk_keycode(uint16_t keycode, const keyrecord_t *record)
 {
     switch(keycode) {
@@ -190,6 +229,12 @@ bool process_action_kb(keyrecord_t *record)
 
 #if defined(USE_HS_USB)
     if (!process_hs_usb(keycode, record)) {
+        return false;
+    }
+#endif
+
+#ifdef STATE_SCAN_ENABLE
+    if (!process_state_debounce(keycode, record)) {
         return false;
     }
 #endif

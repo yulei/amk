@@ -75,6 +75,11 @@ void eeconfig_init_kb(void)
 #ifdef RGB_ENABLE
     rgb_led_config_init();
 #endif
+
+#ifdef STATE_SCAN_ENABLE 
+    uint8_t debounce = (0<<4) | 5;
+    eeconfig_update_debounce(debounce);
+#endif
 }
 
 #ifdef USE_HS_USB
@@ -85,5 +90,16 @@ uint8_t eeconfig_read_usb(void)
 void eeconfig_update_usb(uint8_t usb)
 {
     eeprom_write_byte(EECONFIG_USB, usb);
+}
+#endif
+
+#ifdef STATE_SCAN_ENABLE
+uint8_t eeconfig_read_debounce(void)
+{
+    return eeprom_read_byte(EECONFIG_DEBOUNCE);
+}
+void eeconfig_update_debounce(uint8_t debounce)
+{
+    eeprom_write_byte(EECONFIG_DEBOUNCE, debounce);
 }
 #endif

@@ -13,11 +13,15 @@
 #include <stdint.h>
 
 #ifndef APC_KEY_MIN
-#define APC_KEY_MIN             2100
+#define APC_KEY_MIN             2048
 #endif
 
 #ifndef APC_KEY_MAX
 #define APC_KEY_MAX             4000
+#endif
+
+#ifndef APC_KEY_MIN_PRESET
+#define APC_KEY_MIN_PRESET      2200
 #endif
 
 #ifndef APC_KEY_MAX_PRESET
@@ -25,7 +29,7 @@
 #endif
 
 #ifndef APC_INTERVAL_MIN
-#define APC_INTERVAL_MIN        150
+#define APC_INTERVAL_MIN        100
 #endif
 
 #ifndef APC_INTERVAL_MAX
