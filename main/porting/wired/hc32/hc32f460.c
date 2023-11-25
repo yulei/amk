@@ -8,6 +8,7 @@
 
 #include "amk_hal.h"
 #include "usb_common.h"
+#include "cm_misc.h"
 #include "amk_printf.h"
 
 #ifdef USE_SPI1
@@ -120,8 +121,10 @@ void screen_spi_init(void)
     stcSpiInit.enFrameNumber = SpiFrameNumber1;
     stcSpiInit.enDataLength = SpiDataLengthBit8;
     stcSpiInit.enFirstBitPosition = SpiFirstBitPositionMSB;
-    stcSpiInit.enSckPolarity = SpiSckIdleLevelHigh;//SpiSckIdleLevelLow;
-    stcSpiInit.enSckPhase = SpiSckOddChangeEvenSample;//SpiSckOddSampleEvenChange;
+    stcSpiInit.enSckPolarity = SpiSckIdleLevelHigh;
+    stcSpiInit.enSckPhase = SpiSckOddChangeEvenSample;
+    //stcSpiInit.enSckPolarity = SpiSckIdleLevelLow;
+    //stcSpiInit.enSckPhase = SpiSckOddSampleEvenChange;
     stcSpiInit.enReadBufferObject = SpiReadReceiverBuffer;
     stcSpiInit.enWorkMode = SpiWorkMode3Line;
     stcSpiInit.enTransMode = SpiTransOnlySend;
@@ -151,6 +154,7 @@ void custom_board_init(void)
 #endif
 #ifdef DYNAMIC_CONFIGURATION
     uint32_t reset = reset_read();
+    //if (reset == 0) {
     if (reset > 0) {
         usb_setting |= USB_MSC_BIT;
     } else {
