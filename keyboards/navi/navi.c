@@ -9,6 +9,7 @@
 #include "navi.h"
 #include "is31fl3236.h"
 #include "rgb_led.h"
+#include "rgb_linear.h"
 
 #ifdef RGB_ENABLE
 
@@ -27,5 +28,27 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
     {0, 0, 3},
 //    {1, 3, 1},
 };
+
+#include "host.h"
+#include "led.h"
+
+#define CAPS_LED_INDEX 0
+#define SCROLL_LED_INDEX 1
+
+void rgb_led_pre_flush(void)
+{
+    if (!rgb_led_is_on()) {
+        if (host_keyboard_led_state().caps_lock) {
+            rgb_linear_set_rgb(0, CAPS_LED_INDEX, 0xFF, 0xFF, 0xFF);
+        } else {
+            rgb_linear_set_rgb(0, CAPS_LED_INDEX, 0, 0, 0);
+        }
+        if (host_keyboard_led_state().scroll_lock) {
+            rgb_linear_set_rgb(0, SCROLL_LED_INDEX, 0xFF, 0xFF, 0xFF);
+        } else {
+            rgb_linear_set_rgb(0, SCROLL_LED_INDEX, 0, 0, 0);
+        }
+    }
+}
 
 #endif
