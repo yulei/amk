@@ -37,18 +37,18 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
 
 void rgb_led_pre_flush(void)
 {
-    if (!rgb_led_is_on()) {
+    //if (!rgb_led_is_on()) {
         if (host_keyboard_led_state().caps_lock) {
             rgb_linear_set_rgb(0, CAPS_LED_INDEX, 0xFF, 0xFF, 0xFF);
         } else {
-            rgb_linear_set_rgb(0, CAPS_LED_INDEX, 0, 0, 0);
+            if (!rgb_led_is_on()) rgb_linear_set_rgb(0, CAPS_LED_INDEX, 0, 0, 0);
         }
         if (host_keyboard_led_state().scroll_lock) {
             rgb_linear_set_rgb(0, SCROLL_LED_INDEX, 0xFF, 0xFF, 0xFF);
         } else {
-            rgb_linear_set_rgb(0, SCROLL_LED_INDEX, 0, 0, 0);
+            if (!rgb_led_is_on()) rgb_linear_set_rgb(0, SCROLL_LED_INDEX, 0, 0, 0);
         }
-    }
+    //}
 }
 
 #endif
