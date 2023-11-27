@@ -138,6 +138,30 @@ bool qspi_init(uint32_t map_addr)
     PORT_SetFunc(QSIO3_PORT, QSIO3_PIN, Func_Qspi, Disable);
 
     /* Configuration QSPI structure */
+#if 0
+    stcQspiInit.enClkDiv = QspiHclkDiv2;
+    stcQspiInit.enSpiMode = QspiSpiMode0;
+    stcQspiInit.enBusCommMode = QspiBusModeRomAccess;
+    stcQspiInit.enPrefetchMode = QspiPrefetchStopComplete;
+    stcQspiInit.enPrefetchFuncEn = Disable;
+    stcQspiInit.enQssnValidExtendTime = QspiQssnValidExtendNot;
+    stcQspiInit.enQssnIntervalTime = QspiQssnIntervalQsck8;
+    stcQspiInit.enQsckDutyCorr = QspiQsckDutyCorrNot;
+    stcQspiInit.enVirtualPeriod = QspiVirtualPeriodQsck8;
+    stcQspiInit.enWpPinLevel = QspiWpPinOutputLow;
+    stcQspiInit.enQssnSetupDelayTime = QspiQssnSetupDelayHalfQsck;
+    stcQspiInit.enQssnHoldDelayTime = QspiQssnHoldDelayHalfQsck;
+    stcQspiInit.enFourByteAddrReadEn = Disable;
+    stcQspiInit.enAddrWidth = QspiAddressByteThree;
+
+    stcQspiInit.stcCommProtocol.enReadMode = QspiReadModeStandard;
+    stcQspiInit.stcCommProtocol.enTransInstrProtocol = QspiProtocolExtendSpi;
+    stcQspiInit.stcCommProtocol.enTransAddrProtocol = QspiProtocolExtendSpi;
+    stcQspiInit.stcCommProtocol.enReceProtocol = QspiProtocolExtendSpi;
+    stcQspiInit.u8RomAccessInstr = QSPI_3BINSTR_FAST_READ;
+#endif
+
+    #if 1
     stcQspiInit.enClkDiv = QspiHclkDiv2;
     stcQspiInit.enSpiMode = QspiSpiMode3;
     stcQspiInit.enBusCommMode = QspiBusModeRomAccess;
@@ -146,17 +170,18 @@ bool qspi_init(uint32_t map_addr)
     stcQspiInit.enQssnValidExtendTime = QspiQssnValidExtendSck32;
     stcQspiInit.enQssnIntervalTime = QspiQssnIntervalQsck8;
     stcQspiInit.enQsckDutyCorr = QspiQsckDutyCorrHalfHclk;
-    stcQspiInit.enVirtualPeriod = QspiVirtualPeriodQsck6;
+    stcQspiInit.enVirtualPeriod = QspiVirtualPeriodQsck8;
     stcQspiInit.enWpPinLevel = QspiWpPinOutputHigh;
     stcQspiInit.enQssnSetupDelayTime = QspiQssnSetupDelay1Dot5Qsck;
     stcQspiInit.enQssnHoldDelayTime = QspiQssnHoldDelay1Dot5Qsck;
     stcQspiInit.enFourByteAddrReadEn = Disable;
     stcQspiInit.enAddrWidth = QspiAddressByteThree;
-    stcQspiInit.stcCommProtocol.enReadMode = QspiReadModeFourWiresIO;
+    stcQspiInit.stcCommProtocol.enReadMode = QspiReadModeFourWiresOutput;
     stcQspiInit.stcCommProtocol.enTransInstrProtocol = QspiProtocolExtendSpi;
     stcQspiInit.stcCommProtocol.enTransAddrProtocol = QspiProtocolExtendSpi;
     stcQspiInit.stcCommProtocol.enReceProtocol = QspiProtocolExtendSpi;
-    stcQspiInit.u8RomAccessInstr = QSPI_3BINSTR_FOUR_WIRES_IO_READ;
+    stcQspiInit.u8RomAccessInstr = QSPI_3BINSTR_FOUR_WIRES_OUTPUT_READ;
+    #endif
 
     QSPI_Init(&stcQspiInit);
 
@@ -179,6 +204,24 @@ amk_error_t qspi_read_sector(uint32_t address, uint8_t *buffer, size_t length)
     return AMK_SUCCESS;
 }
 
+static void switch_to_std()
+{
+    stc_qspi_comm_protocol_t stcQspiCommProtocol;
+    MEM_ZERO_STRUCT(stcQspiCommProtocol);
+
+    stcQspiCommProtocol.enReadMode = QspiReadModeStandard;
+    QSPI_CommProtocolConfig(&stcQspiCommProtocol);
+}
+
+static void switch_to_quad()
+{
+    stc_qspi_comm_protocol_t stcQspiCommProtocol;
+    MEM_ZERO_STRUCT(stcQspiCommProtocol);
+
+    stcQspiCommProtocol.enReadMode = QspiReadModeFourWiresOutput;
+    QSPI_CommProtocolConfig(&stcQspiCommProtocol);
+}
+
 amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t length)
 {
     //qspi_debug("QSPI WRITE: addr=%d, size=%d\n", address, length);
@@ -192,6 +235,7 @@ amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t le
         qspi_debug("QSPI: write_sector: invalid address:%u\n", address);
         return AMK_QSPI_INVALID_PARAM;
     } else {
+        switch_to_std();
         QspiFlash_WriteEnable();
         /* Send instruction to flash */
         QSPI_EnterDirectCommMode();
@@ -204,6 +248,7 @@ amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t le
         en_result_t ret = QspiFlash_WaitForWriteEnd();
         if (ret != Ok) {
             qspi_debug("QSPI: write_sector: erase failed:%d\n", ret);
+            switch_to_quad();
             return AMK_QSPI_ERROR;
         }
     }
@@ -229,6 +274,7 @@ amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t le
         en_result_t ret = QspiFlash_WaitForWriteEnd();
         if (ret != Ok) {
             qspi_debug("QSPI: write_sector: program failed:%d\n", ret);
+            switch_to_quad();
             return AMK_QSPI_ERROR;
         } else {
             qspi_debug("QSPI: write_sector: addr=0x%x, size=%d\n", addr, FLASH_PAGE_SIZE);
@@ -236,6 +282,7 @@ amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t le
         }
     }
 
+    switch_to_quad();
     return AMK_SUCCESS;
 }
 

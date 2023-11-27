@@ -154,8 +154,8 @@ void custom_board_init(void)
 #endif
 #ifdef DYNAMIC_CONFIGURATION
     uint32_t reset = reset_read();
-    //if (reset == 0) {
-    if (reset > 0) {
+    if (reset == 0) {
+    //if (reset > 0) {
         usb_setting |= USB_MSC_BIT;
     } else {
         usb_setting = 0;

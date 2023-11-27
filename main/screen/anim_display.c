@@ -185,8 +185,12 @@ void anim_display_task(display_t *display)
         //    ad_debug("ANIM: elapsed=%d, delay=%d\n", elapsed, obj->delay);
         //}
 
-        if ( false || elapsed > obj->delay) {
-            if ( 0 == anim_step(obj->anim, &obj->delay, obj->buffer, obj->buffer_size)) {
+        if ( false || elapsed*2 > obj->delay) {
+            obj->ticks = timer_read32();
+            uint32_t step_start = timer_read32();
+            uint32_t res = anim_step(obj->anim, &obj->delay, obj->buffer, obj->buffer_size);
+            ad_debug("ANIM: Last=%d, Elapsed=%d, Step start=%d, finish=%d\n", obj->ticks, elapsed, step_start, timer_read32());
+            if ( 0 == res)  {
                 bool play = false;
                 switch(obj->anim_mode) {
                     case MODE_SINGLE:
@@ -221,9 +225,10 @@ void anim_display_task(display_t *display)
 
             //obj->screen->fill_rect_async(obj->screen, 0, 0, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
             anim_display_post_process(obj->buffer, obj->param.screen);
+            uint32_t render_start = timer_read32();
             obj->screen->fill_rect(obj->screen, x, y, obj->param.width, obj->param.height, obj->buffer, obj->buffer_size);
-
-            obj->ticks = timer_read32();
+            ad_debug("ANIM: Render start=%d, finish=%d\n", render_start, timer_read32());
+            //obj->ticks = timer_read32();
         }
     }
 }
