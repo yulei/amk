@@ -68,8 +68,8 @@ void eeconfig_init_kb(void)
     eeconfig_init_user();
 
 #ifdef NKRO_ENABLE
-    keymap_config.nkro = 1;
-    eeconfig_update_keymap(keymap_config.raw);
+    //keymap_config.nkro = 1;
+    //eeconfig_update_keymap(keymap_config.raw);
 #endif
 
 #ifdef RGB_ENABLE
@@ -85,6 +85,7 @@ void eeconfig_init_kb(void)
 #ifdef USE_HS_USB
 uint8_t eeconfig_read_usb(void)
 {
+    //return 1;
     return eeprom_read_byte(EECONFIG_USB);
 }
 void eeconfig_update_usb(uint8_t usb)
