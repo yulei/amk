@@ -13,10 +13,6 @@
 #include "is31fl3733.h"
 
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
-    {0, OUT_22, OUT_23, OUT_24},
-    {0, OUT_25, OUT_26, OUT_27},
-    {0, OUT_28, OUT_29, OUT_30},
-
 #ifdef RGB_MATRIX_ENABLE
     {1, E_1,  D_1,  F_1},
     {1, E_2,  D_2,  F_2},
@@ -86,41 +82,45 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {1, K_15, J_15, L_15},
     //{1K L_16J K_16L J_16},
 #endif
+    {0, OUT_22, OUT_23, OUT_24},
+    {0, OUT_25, OUT_26, OUT_27},
+    {0, OUT_28, OUT_29, OUT_30},
+
 };
 
 
+#ifdef RGB_MATRIX_ENABLE
+rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
+    {RGB_DRIVER_IS31FL3236, 0x78, 0, 63, 3},
+    {RGB_DRIVER_IS31FL3733, 0xA0, 0, 0, 63},
+};
+rgb_param_t g_rgb_matrix_params[RGB_MATRIX_NUM] = {
+    {0, 0, 63},
+};
+rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
+    {1, 63, 3},
+};
+
+#else
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
     {RGB_DRIVER_IS31FL3236, 0x78, 0, 0, 3},
-#ifdef RGB_MATRIX_ENABLE
-    {RGB_DRIVER_IS31FL3733, 0xA0, 0, 3, 63},
-#endif
 };
-
 rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
     {0, 0, 3},
 };
+#endif
 
 #ifdef RGB_MATRIX_ENABLE
-rgb_param_t g_rgb_matrix_params[RGB_MATRIX_NUM] = {
-    {1, 3, 63},
-};
 
 #include "rgb_matrix_stub.h"
-#define LED_NO
 
 led_config_t g_led_config = {
     {
-#ifdef RABBIT_MS_V2
-        { 20,    21, 22, 23, 40,  4,  5,     6,  3,  2,  1,  0, 19, 18, 17, 16},
-        { 51,    52, 54, 53, 55, 56, 57,    46, 38, 37, 45, 36, 44, 43, 35, 34},
-        { 11,NO_LED,  9,  8,  7, 47, 58,    39, 14, 60, 59, 61, 15, 13, 10, 12},
-        { 28,    29, 30, 48, 31, 49, 50,NO_LED, 33, 32, 42, 41, 27, 26, 25, 24}
-#else
-        { 20, 21, 22, 23, 40,  4,  5,     6,  3,  2,  1,  0, 19, 18, 17, 16},
-        { 51, 52, 54, 53, 55, 56, 57,NO_LED, 38, 37, 45, 36, 44, 43, 35, 34},
-        { 11,  9,  8,  7, 47, 46, 58,    39, 14, 60, 59, 61, 15, 13, 10, 12},
-        { 28, 29, 30, 48, 31, 49, 50,NO_LED, 33, 32, 42, 41, 27, 26, 25, 24}
-#endif
+        {     5,      4,  3,     2,     1,     0,     19, 18,    17, 16,NO_LED,NO_LED, 9,     8, 7, 6},
+        {    45,     44, 43,    42,    41,    40,     23, 22,    21, 20,NO_LED,NO_LED,12,    11,47,46},
+        {    37,     36, 35,    34,    33,    32,     27, 26,    25, 24,NO_LED,NO_LED,13,NO_LED,39,38},
+        {    56,     55, 54,    52,    51,    50,     49, 48,NO_LED, 28,NO_LED,NO_LED,15,    14,58,57},
+        {NO_LED, NO_LED, 53,NO_LED,NO_LED,NO_LED, NO_LED, 31,    30, 29,NO_LED,NO_LED,62,    61,60,59},
     },
     {
         {64,0}, {80,0}, {96,0},  {112,0}, {128,0}, {144,0}, {160,0}, {176,0}, {192,0}, {208,0}, {224,0}, {200,16},{220,16},{214,32},{202,48},{224,48},
@@ -135,6 +135,22 @@ led_config_t g_led_config = {
         4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
     },
 };
+
+#include "host.h"
+#include "led.h"
+
+#define CAPS_LED_INDEX 10
+
+void rgb_led_pre_flush(void)
+{
+    if (!rgb_matrix_is_enabled()) {
+        if (host_keyboard_led_state().caps_lock) {
+            rgb_matrix_set_rgb_stub(0, CAPS_LED_INDEX, 0xFF, 0xFF, 0xFF);
+        } else {
+            rgb_matrix_set_rgb_stub(0, CAPS_LED_INDEX, 0, 0, 0);
+        }
+    }
+}
 #endif
 
 #endif
