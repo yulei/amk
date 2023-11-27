@@ -12,10 +12,6 @@
 #include "is31fl3733.h"
 
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
-    {0, OUT_22, OUT_23, OUT_24},
-    {0, OUT_25, OUT_26, OUT_27},
-    {0, OUT_28, OUT_29, OUT_30},
-
 #ifdef RGB_MATRIX_ENABLE
     {1, E_1,  D_1,  F_1},
     {1, E_2,  D_2,  F_2},
@@ -85,25 +81,35 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {1, K_15, J_15, L_15},
     //{1K L_16J K_16L J_16},
 #endif
+    {0, OUT_22, OUT_23, OUT_24},
+    {0, OUT_25, OUT_26, OUT_27},
+    {0, OUT_28, OUT_29, OUT_30},
+
 };
 
 
+#ifdef RGB_MATRIX_ENABLE
+rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
+    {RGB_DRIVER_IS31FL3733, 0xA0, 0, 0, 63},
+    {RGB_DRIVER_IS31FL3236, 0x78, 0, 63, 3},
+};
+rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
+    {0, 63, 3},
+};
+rgb_param_t g_rgb_matrix_params[RGB_MATRIX_NUM] = {
+    {1, 0, 63},
+};
+
+#else
 rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
     {RGB_DRIVER_IS31FL3236, 0x78, 0, 0, 3},
-#ifdef RGB_MATRIX_ENABLE
-    {RGB_DRIVER_IS31FL3733, 0xA0, 0, 3, 63},
-#endif
 };
-
 rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
     {0, 0, 3},
 };
+#endif
 
 #ifdef RGB_MATRIX_ENABLE
-rgb_param_t g_rgb_matrix_params[RGB_MATRIX_NUM] = {
-    {1, 3, 63},
-};
-
 #include "rgb_matrix_stub.h"
 #define LED_NO
 

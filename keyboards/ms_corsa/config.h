@@ -87,7 +87,7 @@
 #endif
 
 #define USE_3729
-#define IS31FL3729_SCALE_DEFAULT    0xAF
+#define IS31FL3729_SCALE_DEFAULT    0x7F
 #define IS31FL3729_NUM          2
 #define RGB_MATRIX_LED_NUM      68
 #define RGB_MATRIX_LED_COUNT    RGB_MATRIX_LED_NUM

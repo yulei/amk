@@ -52,7 +52,7 @@
 
 #define DWT_DELAY
 
-//#define VECT_TAB_OFFSET 0x20000
+#define VECT_TAB_OFFSET 0x20000
 #define HSE_VALUE       16000000
 
 #define VIAL_KEYBOARD_UID {0x33, 0x83, 0x29, 0x0D, 0xA3, 0xCA, 0xDB, 0x94}
@@ -60,7 +60,7 @@
 
 #define RABBIT_MS_V2
 
-#define APC_INTERVAL_MIN            250
+#define APC_INTERVAL_MIN            200
 #define DYNAMIC_KEYMAP_LAYER_COUNT  7
 #define APC_KEYMAP_DOWN_LAYER       4
 #define APC_KEYMAP_UP_LAYER         5
