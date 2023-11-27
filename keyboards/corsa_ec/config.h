@@ -49,6 +49,7 @@
 #define DWT_DELAY
 #define VECT_TAB_OFFSET     0x20000
 #define HSE_VALUE           16000000U
+#define SUSPEND_RESET
 //#define FAULT_BREAK
 
 #define USE_SPI1
@@ -67,7 +68,6 @@
 #define GC9107_AS_ST7735
 #define SCREEN_ROTATION     3
 
-#define SUSPEND_RECONNECT
 
 // vial 
 #define VIAL_KEYBOARD_UID {0xE7, 0x09, 0xBA, 0x4A, 0x54, 0x05, 0xF8, 0x76}
