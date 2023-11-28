@@ -19,6 +19,54 @@
         {"name": "HS8K",
         "title": "Highspeed 8K polling rate",
         "shortName": "HS_8K"
+        },
+        {"name": "D0MS",
+        "title": "Key down debounce 0ms",
+        "shortName": "D_0MS"
+        },
+        {"name": "D1MS",
+        "title": "Key down debounce 1ms",
+        "shortName": "D_1MS"
+        },
+        {"name": "D2MS",
+        "title": "Key down debounce 2ms",
+        "shortName": "D_2MS"
+        },
+        {"name": "D3MS",
+        "title": "Key down debounce 3ms",
+        "shortName": "D_3MS"
+        },
+        {"name": "D4MS",
+        "title": "Key down debounce 4ms",
+        "shortName": "D_4MS"
+        },
+        {"name": "D5MS",
+        "title": "Key down debounce 5ms",
+        "shortName": "D_5MS"
+        },
+        {"name": "U0MS",
+        "title": "Key up debounce 0ms",
+        "shortName": "U_0MS"
+        },
+        {"name": "U1MS",
+        "title": "Key up debounce 1ms",
+        "shortName": "U_1MS"
+        },
+        {"name": "U2MS",
+        "title": "Key up debounce 2ms",
+        "shortName": "U_2MS"
+        },
+        {"name": "U3MS",
+        "title": "Key up debounce 3ms",
+        "shortName": "U_3MS"
+        },
+        {"name": "U4MS",
+        "title": "Key up debounce 4ms",
+        "shortName": "U_4MS"
+        },
+        {"name": "U5MS",
+        "title": "Key up debounce 5ms",
+        "shortName": "U_5MS"
         }
       ],
     "matrix": {

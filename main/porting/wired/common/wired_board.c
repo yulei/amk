@@ -6,6 +6,7 @@
 #include "board.h"
 #include "usb_interface.h"
 
+#include "timer.h"
 #include "amk_driver.h"
 #include "amk_profile.h"
 #include "amk_printf.h"
@@ -32,7 +33,7 @@
 #endif
 
 #ifndef GENERIC_BOARD_DEBUG
-#define GENERIC_BOARD_DEBUG 1
+#define GENERIC_BOARD_DEBUG 0
 #endif
 
 #if GENERIC_BOARD_DEBUG
@@ -73,10 +74,21 @@ void board_init(void)
 
 void board_task(void)
 {
+
+#ifdef PRINTF_TASK_TIME
+    uint32_t ticks;
+#endif
+
 #ifndef CH32V307
     SEGGER_SYSVIEW_MarkStart(1);
 #endif
+#ifdef PRINTF_TASK_TIME
+    ticks = timer_read32();
+#endif
     amk_driver_task();
+#ifdef PRINTF_TASK_TIME
+    gb_debug("BOARD, amk_driver_task(): begin =%d, end=%d\n", ticks, timer_read32());
+#endif
 #ifndef CH32V307
     SEGGER_SYSVIEW_MarkStop(1);
 #endif
@@ -86,7 +98,13 @@ void board_task(void)
 #ifndef CH32V307
     SEGGER_SYSVIEW_MarkStart(2);
 #endif
+#ifdef PRINTF_TASK_TIME
+    ticks = timer_read32();
+#endif
     usb_task();
+#ifdef PRINTF_TASK_TIME
+    gb_debug("BOARD, usb_task(): begin =%d, end=%d\n", ticks, timer_read32());
+#endif
 #ifndef CH32V307
     SEGGER_SYSVIEW_MarkStop(2);
 #endif
@@ -101,7 +119,13 @@ void board_task(void)
 #endif
 
 #ifdef SCREEN_ENABLE
+#ifdef PRINTF_TASK_TIME
+    ticks = timer_read32();
+#endif
     render_task();
+#ifdef PRINTF_TASK_TIME
+    gb_debug("BOARD, render_task(): begin =%d, end=%d\n", ticks, timer_read32());
+#endif
 #endif
 
 #ifdef RGB_ENABLE
