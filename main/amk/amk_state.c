@@ -27,12 +27,10 @@ struct key_state {
     uint16_t alt;
 };
 
-uint8_t debounce_press;
-uint8_t debounce_release;
+uint8_t debounce_press = 0;
+uint8_t debounce_release = 5;
 
 static struct key_state state_matrix[MATRIX_ROWS][MATRIX_COLS];
-static uint8_t press_debounce;
-static uint8_t release_debounce;
 
 static uint16_t get_keycode(uint32_t row, uint32_t col, uint32_t layer)
 {
@@ -46,7 +44,7 @@ static uint16_t get_keycode(uint32_t row, uint32_t col, uint32_t layer)
     return alt;
 }
 
-static void update_state_matrix(void)
+static void update_state_matrix_alt(void)
 {
     for (int row = 0; row < MATRIX_ROWS; row++) {
         for (int col = 0; col < MATRIX_COLS; col++) {
@@ -54,21 +52,20 @@ static void update_state_matrix(void)
             amk_printf("State Matrix Update: row=%d, col=%d, keycode=%d\n", row, col, state_matrix[row][col].alt);
         }
     }
-
 }
 
 void state_matrix_init(void)
 {
     uint8_t debounce = eeconfig_read_debounce();
-    press_debounce = (debounce & 0xF0) >> 4;
-    release_debounce = debounce & 0x0F;
+    debounce_press = (debounce & 0xF0) >> 4;
+    debounce_release = debounce & 0x0F;
     for (int row = 0; row < MATRIX_ROWS; row++) {
         for (int col = 0; col < MATRIX_COLS; col++) {
             state_matrix[row][col].on = 0;
             state_matrix[row][col].status = KEY_STATUS_OFF;
             state_matrix[row][col].last = timer_read32();
             state_matrix[row][col].alt = get_keycode(row, col, STATE_ALTERNATE_KEYCODE_LAYER); 
-            amk_printf("DEBOUNCE: row=%d, col=%d, keycode=%d\n", row, col, state_matrix[row][col].alt);
+            amk_printf("Alternate Keycode: row=%d, col=%d, keycode=%d\n", row, col, state_matrix[row][col].alt);
         }
     }
 }
@@ -79,17 +76,19 @@ bool state_matrix_update(uint32_t row, uint32_t col, uint32_t value)
     switch (key->status) {
     case KEY_STATUS_OFF:
         if (value) {
-            key->status = KEY_STATUS_DOWN;
-            key->last = timer_read32();
-        } else {
-            // do nothing
+            if (debounce_press == 0) {
+                key->status = KEY_STATUS_ON;
+            } else {
+                key->status = KEY_STATUS_DOWN;
+                key->last = timer_read32();
+            }
         }
         break;
     case KEY_STATUS_DOWN:
         if (value) {
-            if (timer_elapsed32(key->last) > press_debounce) {
+            if (timer_elapsed32(key->last) > debounce_press) {
                 key->status = KEY_STATUS_ON;
-                key->on = 1 << col;
+                key->on = 1;
             }
         } else {
             key->status = KEY_STATUS_OFF;
@@ -97,15 +96,17 @@ bool state_matrix_update(uint32_t row, uint32_t col, uint32_t value)
         break;
     case KEY_STATUS_ON:
         if (!value) {
-            key->status = KEY_STATUS_UP;
-            key->last = timer_read32();
-        } else {
-            // do nothing
+            if (debounce_release == 0) {
+                key->status = KEY_STATUS_OFF;
+            } else {
+                key->status = KEY_STATUS_UP;
+                key->last = timer_read32();
+            }
         }
         break;
     case KEY_STATUS_UP:
         if (!value) {
-            if (timer_elapsed32(key->last) > release_debounce) {
+            if (timer_elapsed32(key->last) > debounce_release) {
                 key->status = KEY_STATUS_OFF;
                 key->on = 0;
                 if (key->alt != KC_NO) {
@@ -126,23 +127,23 @@ bool state_matrix_update(uint32_t row, uint32_t col, uint32_t value)
 
 uint8_t state_matrix_get_debounce(bool press)
 {
-    if (press) return press_debounce;
+    if (press) return debounce_press;
 
-    return release_debounce;
+    return debounce_release;
 }
 
 void state_matrix_update_debounce(uint8_t down, uint8_t up)
 {
-    press_debounce = down;
-    release_debounce = up;
+    debounce_press= down;
+    debounce_release = up;
 }
 
 void raw_hid_send_kb(uint8_t *data, uint8_t length)
 {
     if (data[0] == id_dynamic_keymap_set_keycode) {
-        // update press/release/lt
-        if ( data[1] == STATE_ALTERNATE_KEYCODE_LAYER) {
-            update_state_matrix();
+        // update alternate keycode
+        if (data[1] == STATE_ALTERNATE_KEYCODE_LAYER) {
+            update_state_matrix_alt();
         }
     }
 }

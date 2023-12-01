@@ -62,10 +62,13 @@ void eeconfig_update_rgb(const void* rgb, uint8_t index)
 }
 #endif
 
+__attribute__((weak)) void eeconfig_init_custom(void) {}
+
 void eeconfig_init_kb(void)
 {
     eeconfig_update_kb(0);
     eeconfig_init_user();
+    eeconfig_init_custom();
 
 #ifdef NKRO_ENABLE
     //keymap_config.nkro = 1;
@@ -82,7 +85,6 @@ void eeconfig_init_kb(void)
 #endif
 }
 
-#ifdef USE_HS_USB
 uint8_t eeconfig_read_usb(void)
 {
     //return 1;
@@ -92,9 +94,7 @@ void eeconfig_update_usb(uint8_t usb)
 {
     eeprom_write_byte(EECONFIG_USB, usb);
 }
-#endif
 
-#ifdef STATE_SCAN_ENABLE
 uint8_t eeconfig_read_debounce(void)
 {
     return eeprom_read_byte(EECONFIG_DEBOUNCE);
@@ -103,4 +103,3 @@ void eeconfig_update_debounce(uint8_t debounce)
 {
     eeprom_write_byte(EECONFIG_DEBOUNCE, debounce);
 }
-#endif
