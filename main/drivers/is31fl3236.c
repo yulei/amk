@@ -119,36 +119,35 @@ void is31fl3236_set_color_all(i2c_led_t *driver, uint8_t red, uint8_t green, uin
     }
 }
 
-void is31fl3236_update_buffers(i2c_led_t *driver)
+bool is31fl3236_update_buffers(i2c_led_t *driver)
 {
-    if (!is31fl3236_available(driver->index)) return;
+    if (!is31fl3236_available(driver->index)) return true;
    
-    uint32_t status = AMK_SUCCESS;
     is31fl3236_driver_t *is31 = (is31fl3236_driver_t*)(driver->data);
     bool need_update = is31->pwm_dirty || is31->control_dirty;
+    if (!need_update) return true;
+
     if (is31->pwm_dirty) {
-        status = i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1, TIMEOUT);
-        if (status != AMK_SUCCESS) {
-            fl3236_debug("IS31FL3236: failed to update pwm buffer: addr=%d, status=%d\n", driver->addr, status);
+        if (AMK_SUCCESS == i2c_send_async(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1)) {
+            is31->pwm_dirty = false;
+            uint8_t data = 0;
+            if (AMK_SUCCESS != i2c_write_reg(i2c_inst, driver->addr, UPDATE_REG, &data, 1, TIMEOUT)) {
+                fl3236_debug("IS31FL3236: failed to update UPDATE register for pwm\n");
+            }
         }
-        is31->pwm_dirty = false;
     }
 
     if (is31->control_dirty) {
-        status = i2c_send(i2c_inst, driver->addr, is31->control_buffer, CONTROL_BUFFER_SIZE + 1, TIMEOUT);
-        if (status != AMK_SUCCESS) {
-            fl3236_debug("IS31FL3236: failed to update control buffer: %d\n", status);
+        if( AMK_SUCCESS == i2c_send(i2c_inst, driver->addr, is31->control_buffer, CONTROL_BUFFER_SIZE + 1, TIMEOUT)){
+            is31->control_dirty = false;
+            uint8_t data = 0;
+            if (AMK_SUCCESS != i2c_write_reg(i2c_inst, driver->addr, UPDATE_REG, &data, 1, TIMEOUT)) {
+                fl3236_debug("IS31FL3236: failed to update UPDATE register for control\n");
+            }
         }
-        is31->pwm_dirty = false;
     }
 
-    if (need_update) {
-        uint8_t data = 0;
-        status = i2c_write_reg(i2c_inst, driver->addr, UPDATE_REG, &data, 1, TIMEOUT);
-        if (status != AMK_SUCCESS) {
-            fl3236_debug("IS31FL3236: failed to update UPDATE register: %d\n", status);
-        }
-    }
+    return !(is31->pwm_dirty || is31->control_dirty);
 }
 
 

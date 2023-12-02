@@ -168,30 +168,27 @@ void is31fl3729_set_color_all(i2c_led_t *driver, uint8_t red, uint8_t green, uin
     }
 }
 
-static void is31fl3729_update_pwm_buffers(i2c_led_t *driver)
+static bool is31fl3729_update_pwm_buffers(i2c_led_t *driver)
 {
-    if (!is31fl3729_available(0)) return;
+    if (!is31fl3729_available(0)) return true;
 
     is31fl3729_driver_t *is31 = (is31fl3729_driver_t*)(driver->data);
 
-    if (!is31->pwm_dirty) return;
+    if (!is31->pwm_dirty) return true;
 
     // write from sw1 to sw9
+    static int last_index = 0;
+    if (AMK_SUCCESS != i2c_send_async(i2c_inst, driver->addr, &is31->pwm_buffer[last_index*0x10], 0x10)) {
+        return false;
+    }
+    last_index = (last_index + 1) % 9;
 
-    for (int i = 0; i < 9; i++) {
-        uint32_t status = i2c_send(i2c_inst, driver->addr, &is31->pwm_buffer[i*0x10], 0x10, TIMEOUT);
-        //i2c_write_reg(i2c_inst, driver->addr, is31->pwm_buffer[i*10], &is31->pwm_buffer[i*0x10+1], 15, TIMEOUT);
-        if (status != AMK_SUCCESS) {
-            fl3729_debug("IS31FL3729: failed to set pwm buffer: %d\n", status);
-            #if defined(USE_I2C1) && !defined(GD32E50X)
-            //extern I2C_HandleTypeDef hi2c1;
-            //HAL_I2C_DeInit(&hi2c1);
-            //HAL_I2C_Init(&hi2c1);        
-            #endif
-        }
+    if (last_index == 0) {
+        is31->pwm_dirty = false;
+        return true;
     }
 
-    is31->pwm_dirty = false;
+    return false;
 }
 
 #ifdef SDB_EN_PIN
@@ -261,9 +258,9 @@ void init_driver(is31fl3729_driver_t *driver)
     driver->pwm_dirty = true;
 }
 
-void is31fl3729_update_buffers(i2c_led_t *driver)
+bool is31fl3729_update_buffers(i2c_led_t *driver)
 {
-    is31fl3729_update_pwm_buffers(driver);
+    return is31fl3729_update_pwm_buffers(driver);
 }
 
 void uninit_driver(i2c_led_t *driver)

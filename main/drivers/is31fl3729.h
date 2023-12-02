@@ -15,7 +15,7 @@ void is31fl3729_uninit(i2c_led_t *driver);
 
 void is31fl3729_set_color(i2c_led_t *driver, uint8_t index, uint8_t red, uint8_t green, uint8_t blue);
 void is31fl3729_set_color_all(i2c_led_t *driver, uint8_t red, uint8_t green, uint8_t blue);
-void is31fl3729_update_buffers(i2c_led_t *driver);
+bool is31fl3729_update_buffers(i2c_led_t *driver);
 
 #define CS1_SW1_29 0x01
 #define CS2_SW1_29 0x02

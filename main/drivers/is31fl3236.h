@@ -15,7 +15,7 @@ void is31fl3236_uninit(i2c_led_t *driver);
 
 void is31fl3236_set_color(i2c_led_t *driver, uint8_t index, uint8_t red, uint8_t green, uint8_t blue);
 void is31fl3236_set_color_all(i2c_led_t *driver, uint8_t red, uint8_t green, uint8_t blue);
-void is31fl3236_update_buffers(i2c_led_t *driver);
+bool is31fl3236_update_buffers(i2c_led_t *driver);
 
 #define OUT_1 0x00
 #define OUT_2 0x01

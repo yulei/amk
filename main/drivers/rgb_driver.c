@@ -89,12 +89,13 @@ static void rd_ws2812_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t s
 #endif
 }
 
-static void rd_ws2812_flush(rgb_driver_t *driver)
+static bool rd_ws2812_flush(rgb_driver_t *driver)
 {
 #ifdef WS2812_LED_PIN
     pin_t p = WS2812_LED_PIN;
     ws2812_update_buffers(p);
 #endif
+    return true;
 }
 #endif
 
@@ -148,10 +149,11 @@ static void rd_aw9523b_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t 
     aw9523b_set_color_all(awinic, rgb.r, rgb.g, rgb.b);
 }
 
-static void rd_aw9523b_flush(rgb_driver_t *driver)
+static bool rd_aw9523b_flush(rgb_driver_t *driver)
 {
     i2c_led_t *awinic = (i2c_led_t *)driver->data;
     aw9523b_update_buffers(awinic);
+    return true;
 }
 #endif
 
@@ -207,10 +209,11 @@ static void rd_aw9106b_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t 
     aw9106b_set_color_all(awinic, rgb.r, rgb.g, rgb.b);
 }
 
-static void rd_aw9106b_flush(rgb_driver_t *driver)
+static bool rd_aw9106b_flush(rgb_driver_t *driver)
 {
     i2c_led_t *awinic = (i2c_led_t *)driver->data;
     aw9106b_update_buffers(awinic);
+    return true;
 }
 #endif
 
@@ -255,10 +258,10 @@ static void rd_3731_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t sat
     is31fl3731_set_color_all(is31, rgb.r, rgb.g, rgb.b);
 }
 
-static void rd_3731_flush(rgb_driver_t *driver)
+static bool rd_3731_flush(rgb_driver_t *driver)
 {
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
-    is31fl3731_update_buffers(is31);
+    return is31fl3731_update_buffers(is31);
 }
 #endif
 
@@ -302,10 +305,11 @@ static void rd_3733_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t sat
     is31fl3733_set_color_all(is31, rgb.r, rgb.g, rgb.b);
 }
 
-static void rd_3733_flush(rgb_driver_t *driver)
+static bool rd_3733_flush(rgb_driver_t *driver)
 {
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3733_update_buffers(is31);
+    return true;
 }
 #endif
 
@@ -349,10 +353,10 @@ static void rd_3236_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t sat
     is31fl3236_set_color_all(is31, rgb.r, rgb.g, rgb.b);
 }
 
-static void rd_3236_flush(rgb_driver_t *driver)
+static bool rd_3236_flush(rgb_driver_t *driver)
 {
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
-    is31fl3236_update_buffers(is31);
+    return is31fl3236_update_buffers(is31);
 }
 #endif
 
@@ -396,10 +400,11 @@ static void rd_3741_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t sat
     is31fl3741_set_color_all(is31, rgb.r, rgb.g, rgb.b);
 }
 
-static void rd_3741_flush(rgb_driver_t *driver)
+static bool rd_3741_flush(rgb_driver_t *driver)
 {
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3741_update_buffers(is31);
+    return true;
 }
 #endif
 
@@ -443,10 +448,11 @@ static void rd_3746_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t sat
     is31fl3746_set_color_all(is31, rgb.r, rgb.g, rgb.b);
 }
 
-static void rd_3746_flush(rgb_driver_t *driver)
+static bool rd_3746_flush(rgb_driver_t *driver)
 {
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     is31fl3746_update_buffers(is31);
+    return true;
 }
 #endif
 
@@ -490,10 +496,10 @@ static void rd_3729_set_color_all(rgb_driver_t *driver, uint8_t hue, uint8_t sat
     is31fl3729_set_color_all(is31, rgb.r, rgb.g, rgb.b);
 }
 
-static void rd_3729_flush(rgb_driver_t *driver)
+static bool rd_3729_flush(rgb_driver_t *driver)
 {
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
-    is31fl3729_update_buffers(is31);
+    return is31fl3729_update_buffers(is31);
 }
 #endif
 

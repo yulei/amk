@@ -113,17 +113,19 @@ void is31fl3731_set_color_all(i2c_led_t *driver, uint8_t red, uint8_t green, uin
     }
 }
 
-void is31fl3731_update_buffers(i2c_led_t *driver)
+bool is31fl3731_update_buffers(i2c_led_t *driver)
 {
-    if (!is31fl3731_available(driver->index)) return;
+    if (!is31fl3731_available(driver->index)) return true;
 
     is31fl3731_driver_t *is31 = (is31fl3731_driver_t*)(driver->data);
-    if (is31->pwm_dirty) {
-        if (AMK_SUCCESS == i2c_send_async(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1)) {
-            is31->pwm_dirty = false;
-            amk_printf("IS31FL3731: i2c_send success\n");
-        }
+    if (!is31->pwm_dirty) return true;
+
+    if (AMK_SUCCESS == i2c_send_async(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1)) {
+        is31->pwm_dirty = false;
+        return true;
     }
+
+    return false;
 }
 
 bool init_driver(is31fl3731_driver_t *driver)

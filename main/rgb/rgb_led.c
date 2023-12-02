@@ -184,10 +184,12 @@ void rgb_led_task(void)
 #ifdef RGB_PRINT_TASK_TICKS
         ticks = timer_read32();
 #endif
-        for (int i = 0; i < RGB_DEVICE_NUM; i++) {
-            rgb_driver_t *driver = rgb_driver_get(i);
-            driver->flush(driver);
+        static int last_index = 0;
+        rgb_driver_t *driver = rgb_driver_get(last_index);
+        if (driver->flush(driver)) {
+            last_index = (last_index+1) % RGB_DEVICE_NUM;
         }
+
 #ifdef RGB_PRINT_TASK_TICKS
         rgb_led_debug("RGB: Flush: from %d to %d\n", ticks, timer_read32());
 #endif
