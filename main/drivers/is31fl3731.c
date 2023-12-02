@@ -89,10 +89,19 @@ void is31fl3731_set_color(i2c_led_t *driver, uint8_t index, uint8_t red, uint8_t
 
     rgb_led_t *led = &g_rgb_leds[index];
     is31fl3731_driver_t *is31 = (is31fl3731_driver_t*)(driver->data);
-    is31->pwm_buffer[led->r + 1] = red;
-    is31->pwm_buffer[led->g + 1] = green;
-    is31->pwm_buffer[led->b + 1] = blue;
-    is31->pwm_dirty = true;
+    if (is31->pwm_buffer[led->r + 1] != red) {
+        is31->pwm_buffer[led->r + 1] = red;
+        is31->pwm_dirty = true;
+    }
+    if (is31->pwm_buffer[led->g + 1] != green) {
+        is31->pwm_buffer[led->g + 1] = green;
+        is31->pwm_dirty = true;
+    }
+    if (is31->pwm_buffer[led->b + 1] != blue) {
+        is31->pwm_buffer[led->b + 1] = blue;
+        is31->pwm_dirty = true;
+    }
+    //is31->pwm_dirty = true;
 }
 
 void is31fl3731_set_color_all(i2c_led_t *driver, uint8_t red, uint8_t green, uint8_t blue)
@@ -110,8 +119,10 @@ void is31fl3731_update_buffers(i2c_led_t *driver)
 
     is31fl3731_driver_t *is31 = (is31fl3731_driver_t*)(driver->data);
     if (is31->pwm_dirty) {
-        i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1, TIMEOUT);
-        is31->pwm_dirty = false;
+        if (AMK_SUCCESS == i2c_send_async(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1)) {
+            is31->pwm_dirty = false;
+            amk_printf("IS31FL3731: i2c_send success\n");
+        }
     }
 }
 

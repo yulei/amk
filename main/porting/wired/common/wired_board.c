@@ -33,7 +33,7 @@
 #endif
 
 #ifndef GENERIC_BOARD_DEBUG
-#define GENERIC_BOARD_DEBUG 0
+#define GENERIC_BOARD_DEBUG 1
 #endif
 
 #if GENERIC_BOARD_DEBUG
@@ -71,22 +71,23 @@ void board_init(void)
 #endif
 }
 
+//#define PRINT_TASK_TIME
 
 void board_task(void)
 {
 
-#ifdef PRINTF_TASK_TIME
+#ifdef PRINT_TASK_TIME
     uint32_t ticks;
 #endif
 
 #ifndef CH32V307
     SEGGER_SYSVIEW_MarkStart(1);
 #endif
-#ifdef PRINTF_TASK_TIME
+#ifdef PRINT_TASK_TIME
     ticks = timer_read32();
 #endif
     amk_driver_task();
-#ifdef PRINTF_TASK_TIME
+#ifdef PRINT_TASK_TIME
     gb_debug("BOARD, amk_driver_task(): begin =%d, end=%d\n", ticks, timer_read32());
 #endif
 #ifndef CH32V307
@@ -98,11 +99,11 @@ void board_task(void)
 #ifndef CH32V307
     SEGGER_SYSVIEW_MarkStart(2);
 #endif
-#ifdef PRINTF_TASK_TIME
+#ifdef PRINT_TASK_TIME
     ticks = timer_read32();
 #endif
     usb_task();
-#ifdef PRINTF_TASK_TIME
+#ifdef PRINT_TASK_TIME
     gb_debug("BOARD, usb_task(): begin =%d, end=%d\n", ticks, timer_read32());
 #endif
 #ifndef CH32V307
@@ -119,17 +120,23 @@ void board_task(void)
 #endif
 
 #ifdef SCREEN_ENABLE
-#ifdef PRINTF_TASK_TIME
+#ifdef PRINT_TASK_TIME
     ticks = timer_read32();
 #endif
     render_task();
-#ifdef PRINTF_TASK_TIME
+#ifdef PRINT_TASK_TIME
     gb_debug("BOARD, render_task(): begin =%d, end=%d\n", ticks, timer_read32());
 #endif
 #endif
 
 #ifdef RGB_ENABLE
+#ifdef PRINT_TASK_TIME
+    ticks = timer_read32();
+#endif
     rgb_led_task();
+#ifdef PRINT_TASK_TIME
+    gb_debug("BOARD, rgb_led_task(): begin =%d, end=%d\n", ticks, timer_read32());
+#endif
 #endif
 
 #ifdef RF_ENABLE

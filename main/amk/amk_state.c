@@ -27,8 +27,8 @@ struct key_state {
     uint16_t alt;
 };
 
-uint8_t debounce_press = 0;
-uint8_t debounce_release = 5;
+extern uint8_t debounce_press;
+extern uint8_t debounce_release;
 
 static struct key_state state_matrix[MATRIX_ROWS][MATRIX_COLS];
 
@@ -78,6 +78,7 @@ bool state_matrix_update(uint32_t row, uint32_t col, uint32_t value)
         if (value) {
             if (debounce_press == 0) {
                 key->status = KEY_STATUS_ON;
+                key->on = 1;
             } else {
                 key->status = KEY_STATUS_DOWN;
                 key->last = timer_read32();
@@ -98,6 +99,7 @@ bool state_matrix_update(uint32_t row, uint32_t col, uint32_t value)
         if (!value) {
             if (debounce_release == 0) {
                 key->status = KEY_STATUS_OFF;
+                key->on = 0;
             } else {
                 key->status = KEY_STATUS_UP;
                 key->last = timer_read32();

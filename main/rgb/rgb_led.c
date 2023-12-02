@@ -15,6 +15,7 @@
 #include "rgb_matrix_stub.h"
 #endif
 #include "wait.h"
+#include "timer.h"
 #include "amk_eeprom.h"
 #include "amk_gpio.h"
 #include "amk_printf.h"
@@ -133,8 +134,20 @@ __attribute__((weak))
 void rgb_led_pre_flush(void)
 {}
 
+
+#ifndef RGB_UPDATE_INTERVAL
+#define RGB_UPDATE_INTERVAL     0
+#endif
+
+//#define RGB_PRINT_TASK_TICKS
 void rgb_led_task(void)
 {
+    static uint32_t rgb_ticks = 0;
+    if (timer_elapsed32(rgb_ticks) < RGB_UPDATE_INTERVAL) {
+        return;
+    }
+    rgb_ticks = timer_read32();
+
 #ifdef RGB_INIT_DELAY
     if (!inited) {
         if (timer_elapsed32(last_ticks) > RGB_INIT_DELAY) {
@@ -146,8 +159,14 @@ void rgb_led_task(void)
     } 
 #endif
 
+#ifdef RGB_PRINT_TASK_TICKS
+    uint32_t ticks = timer_read32();
+#endif
 #ifdef RGB_LINEAR_ENABLE
     rgb_linear_task();
+#ifdef RGB_PRINT_TASK_TICKS
+    rgb_led_debug("RGB: Linear Task: from %d to %d\n", ticks, timer_read32());
+#endif
 #endif
 
 #ifdef RGB_INDICATOR_ENABLE
@@ -162,10 +181,16 @@ void rgb_led_task(void)
     if (rgb_led_is_on()) {
 #endif
         rgb_led_pre_flush();
+#ifdef RGB_PRINT_TASK_TICKS
+        ticks = timer_read32();
+#endif
         for (int i = 0; i < RGB_DEVICE_NUM; i++) {
             rgb_driver_t *driver = rgb_driver_get(i);
             driver->flush(driver);
         }
+#ifdef RGB_PRINT_TASK_TICKS
+        rgb_led_debug("RGB: Flush: from %d to %d\n", ticks, timer_read32());
+#endif
 #ifdef RGBLIGHT_EN_PIN
     } else {
         rgb_led_set_power(false);

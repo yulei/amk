@@ -96,10 +96,20 @@ void is31fl3236_set_color(i2c_led_t *driver, uint8_t index, uint8_t red, uint8_t
 {
     rgb_led_t *led = &g_rgb_leds[index];
     is31fl3236_driver_t *is31 = (is31fl3236_driver_t*)(driver->data);
-    is31->pwm_buffer[led->r + 1] = red;
-    is31->pwm_buffer[led->g + 1] = green;
-    is31->pwm_buffer[led->b + 1] = blue;
-    is31->pwm_dirty = true;
+    if (is31->pwm_buffer[led->r + 1] != red) {
+        is31->pwm_buffer[led->r + 1] = red;
+        is31->pwm_dirty = true;
+    }
+
+    if (is31->pwm_buffer[led->g + 1] != green) {
+        is31->pwm_buffer[led->g + 1] = green;
+        is31->pwm_dirty = true;
+    }
+
+    if (is31->pwm_buffer[led->b + 1] != blue) {
+        is31->pwm_buffer[led->b + 1] = blue;
+        is31->pwm_dirty = true;
+    }
 }
 
 void is31fl3236_set_color_all(i2c_led_t *driver, uint8_t red, uint8_t green, uint8_t blue)

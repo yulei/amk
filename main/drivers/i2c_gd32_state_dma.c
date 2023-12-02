@@ -1,9 +1,9 @@
 /**
- * @file i2c_gd32_state.c
+ * @file i2c_gd32_dma.c
  * @author astro
- * @brief state machine based
+ * @brief state machine with dma
  * 
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2023
  * 
  */
 #include <stdbool.h>
@@ -27,6 +27,7 @@
 
 typedef struct {
     uint32_t handle;
+    bool busy;
     bool ready;
 } i2c_instance_t;
 
@@ -55,6 +56,7 @@ enum
     #define I2C1_SDA_PIN GPIO_PIN_7
     #endif
     static i2c_instance_t m_i2c1 = {
+        .busy = false,
         .ready = false,
     };
     static void i2c1_config(void)
@@ -62,6 +64,7 @@ enum
         rcu_periph_clock_enable(RCU_GPIOB);
         rcu_periph_clock_enable(RCU_I2C0);
         rcu_periph_clock_enable(RCU_AF);
+        rcu_periph_clock_enable(RCU_DMA0);
 
         i2c_deinit(I2C0);
 
@@ -78,6 +81,23 @@ enum
         i2c_enable(I2C0);
         /* enable acknowledge */
         i2c_ack_config(I2C0, I2C_ACK_ENABLE);
+
+        /* initialize DMA channel 5 (i2c0 tx) */
+        dma_parameter_struct dma_init_struct;
+        dma_deinit(DMA0, DMA_CH5);
+        dma_struct_para_init(&dma_init_struct);
+
+        dma_init_struct.direction = DMA_MEMORY_TO_PERIPHERAL;
+        dma_init_struct.periph_addr = (uint32_t)&I2C_DATA(I2C1);
+        dma_init_struct.periph_inc = DMA_PERIPH_INCREASE_DISABLE;
+        dma_init_struct.periph_width = DMA_PERIPHERAL_WIDTH_8BIT;
+        dma_init_struct.periph_addr = (uint32_t)&I2C_DATA(I2C0);
+        dma_init_struct.priority = DMA_PRIORITY_HIGH;
+        dma_init_struct.memory_inc = DMA_MEMORY_INCREASE_ENABLE;
+        dma_init_struct.memory_width = DMA_MEMORY_WIDTH_8BIT;
+        //dma_init_struct.memory_addr = (uint32_t)i2c0_buff_tx;
+        //dma_init_struct.number = BUFFER_SIZE;
+        dma_init(DMA0, DMA_CH5, &dma_init_struct);
     }
 #endif
 
@@ -254,6 +274,133 @@ static amk_error_t i2c_write(i2c_handle_t i2c, uint8_t addr, uint8_t reg, uint8_
 
 }
 
+static amk_error_t i2c_write_dma(i2c_handle_t i2c, uint8_t addr, uint8_t reg, uint8_t reg_size, const void* data, size_t length, size_t timeout)
+{
+    uint32_t start = timer_read32();
+    uint32_t state = I2C_START;
+    bool quit = false;
+    amk_error_t error = AMK_SUCCESS;
+    i2c_instance_t *inst = (i2c_instance_t*)i2c;
+    if (inst->busy) {
+        if (dma_flag_get(DMA0, DMA_CH5, DMA_FLAG_FTF)) {
+            dma_flag_clear(DMA0, DMA_CH5,DMA_FLAG_G);
+            dma_channel_disable(DMA0, DMA_CH5);
+            i2c_dma_config(I2C0, I2C_DMA_OFF);
+            state = I2C_STOP;
+            inst->busy = false;
+        } else {
+            return AMK_I2C_BUSY;
+        }
+    }
+
+    while (!quit) {
+        switch(state) {
+        case I2C_START:
+            if (i2c_wait_flag_timeout(I2C0, I2C_FLAG_I2CBSY, RESET, timeout, start)) {
+                error = AMK_I2C_TIMEOUT;
+                i2c_debug("I2C GD32: i2c_write_reg: BUS Busy timeout\n");
+            } else {
+                i2c_start_on_bus(I2C0);
+                if (i2c_wait_flag_timeout(I2C0, I2C_FLAG_SBSEND, SET, timeout, start)) {
+                    error = AMK_I2C_TIMEOUT;
+                    i2c_debug("I2C GD32: i2c_write_reg: SBSSEND timeout\n");
+                } else {
+                    state = I2C_SEND_ADDRESS; 
+                }
+            }
+        break;
+        case I2C_SEND_ADDRESS:
+            i2c_master_addressing(I2C0, addr, I2C_TRANSMITTER);
+            if (i2c_wait_flag_timeout(I2C0, I2C_FLAG_ADDSEND, SET, timeout, start)) {
+                error = AMK_I2C_TIMEOUT;
+                i2c_debug("I2C GD32: i2c_write_reg: ADDSEND timeout\n");
+                //state = I2C_START;
+            } else {
+                i2c_flag_clear(I2C0, I2C_FLAG_ADDSEND);
+                state = I2C_TRANSMIT_DATA;
+            }
+        break;
+        case I2C_TRANSMIT_DATA:
+            {   
+                if (length > 3) {
+                    dma_memory_address_config(DMA0, DMA_CH5, (uint32_t)(data));
+                    dma_transfer_number_config(DMA0, DMA_CH5, length);
+
+                    i2c_dma_config(I2C0, I2C_DMA_ON);
+                    dma_channel_enable(DMA0, DMA_CH5);
+                    #if 0
+                    while(!dma_flag_get(DMA0, DMA_CH5, DMA_FLAG_FTF));
+                    dma_flag_clear(DMA0, DMA_CH5,DMA_FLAG_G);
+                    dma_channel_disable(DMA0, DMA_CH5);
+                    i2c_dma_config(I2C0, I2C_DMA_OFF);
+                    #else
+                    inst->busy = true;
+                    return AMK_I2C_BUSY;
+                    #endif
+                } else {
+                    uint8_t *p = (uint8_t *)data;
+                    for(int i = 0; i < length+reg_size; i++) {
+                        if(i2c_wait_flag_timeout(I2C0, I2C_FLAG_TBE, SET, timeout, start)) {
+                            error = AMK_I2C_TIMEOUT;
+                            i2c_debug("I2C GD32: i2c_write_reg: TBE timeout, index=%d, breakout\n", i);
+                            break;
+                        } 
+
+                        // transmit register first
+                        if (i == 0 && reg_size) {
+                            i2c_data_transmit(I2C0, reg);
+                        } else {
+                            i2c_data_transmit(I2C0, p[i-reg_size]);
+                        }
+                    }
+                }
+
+                if(i2c_wait_flag_timeout(I2C0, I2C_FLAG_TBE, SET, timeout, start)) {
+                    error = AMK_I2C_TIMEOUT;
+                    i2c_debug("I2C GD32: i2c_write_reg: TBE timeout\n");
+                } else {
+                    state = I2C_STOP;
+                }
+            }
+        break;
+        case I2C_STOP:
+            i2c_stop_on_bus(I2C0);
+            while(I2C_CTL0(I2C0)&0x0200) {
+                if (timer_elapsed32(start)  > timeout) {
+                    error = AMK_I2C_TIMEOUT;
+                    i2c_debug("I2C GD32: i2c_write_reg: STOP timeout\n");
+                    break;
+                }
+            }
+            quit = true;
+        break;
+        default:
+            // never here
+            quit = true;
+            i2c_debug("I2C GD32: i2c_write_reg: default state\n");
+        break;
+        }
+
+        if (error != AMK_SUCCESS) {
+            break;
+        }
+
+        if (timer_elapsed32(start) > timeout) {
+            error = AMK_I2C_TIMEOUT;
+            i2c_debug("I2C GD32: i2c_write_reg: total timeout\n");
+            quit = true;
+        }
+    }
+
+    if (error != AMK_SUCCESS) {
+        i2c_bus_reset();
+        i2c_debug("I2C GD32: i2c_write_reg: bus reset because error\n");
+    }
+
+    return error;
+
+}
+
 amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t length, size_t timeout)
 {
     return i2c_write(i2c, addr, 0, 0, data, length, timeout);
@@ -281,5 +428,5 @@ void i2c_uninit(i2c_handle_t i2c)
 
 amk_error_t i2c_send_async(i2c_handle_t i2c, uint8_t addr, const void *data, size_t length)
 {
-    return AMK_ERROR;
+    return i2c_write_dma(i2c, addr, 0, 0, data, length, 10);
 }

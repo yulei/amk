@@ -47,6 +47,8 @@
 
 uint32_t usb_setting = 0;
 uint32_t usb_polling_rate = 0;
+uint8_t debounce_press = 0;
+uint8_t debounce_release = 5;
 uint8_t amk_led_state = 0;
 uint8_t amk_macro_state = 0;
 uint32_t amk_macro_delay = 0;
