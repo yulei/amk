@@ -8,6 +8,8 @@ NKRO_ENABLE = yes
 PORT_SCAN_ENABLE = yes
 STATE_SCAN_ENABLE = yes
 DEBOUNCE_TYPE = none
+#DEBOUNCE_TYPE = asym_eager_defer_pk
+#RTOS_ENABLE = yes
 
 UF2_ENABLE = yes
 UF2_FAMILY = GD32E5
