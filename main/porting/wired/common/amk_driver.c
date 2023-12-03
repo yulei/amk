@@ -52,6 +52,7 @@ uint8_t debounce_release = 5;
 uint8_t amk_led_state = 0;
 uint8_t amk_macro_state = 0;
 uint32_t amk_macro_delay = 0;
+uint32_t amk_delay_reset = 0;
 
 static uint8_t keyboard_leds(void);
 static void send_keyboard(report_keyboard_t *report);
@@ -124,8 +125,16 @@ __attribute__((weak))
 void amk_driver_task_kb(void)
 {}
 
+#define AMK_RESET_DELAY     100
 void amk_driver_task(void)
 {
+    if (amk_delay_reset != 0) {
+        if (timer_elapsed32(amk_delay_reset) > AMK_RESET_DELAY) {
+            NVIC_SystemReset();
+        }
+
+    }
+
 #ifdef KEYBOARD_ENABLE
     if (!(usb_setting&USB_SWITCH_BIT)) {
         if (usb_suspended() ) {
