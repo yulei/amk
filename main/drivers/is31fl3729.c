@@ -178,9 +178,15 @@ static bool is31fl3729_update_pwm_buffers(i2c_led_t *driver)
 
     // write from sw1 to sw9
     static int last_index = 0;
+    #if 1
     if (AMK_SUCCESS != i2c_send_async(i2c_inst, driver->addr, &is31->pwm_buffer[last_index*0x10], 0x10)) {
         return false;
     }
+    #else
+    if (AMK_SUCCESS != i2c_send(i2c_inst, driver->addr, &is31->pwm_buffer[last_index*0x10], 0x10, TIMEOUT)) {
+        return false;
+    }
+    #endif
     last_index = (last_index + 1) % 9;
 
     if (last_index == 0) {
