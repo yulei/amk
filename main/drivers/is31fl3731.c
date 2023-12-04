@@ -120,17 +120,14 @@ bool is31fl3731_update_buffers(i2c_led_t *driver)
     is31fl3731_driver_t *is31 = (is31fl3731_driver_t*)(driver->data);
     if (!is31->pwm_dirty) return true;
 
-#if 1
+#ifdef RGB_FLUSH_ASYNC
     if (AMK_SUCCESS == i2c_send_async(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1)) {
-        is31->pwm_dirty = false;
-        return true;
-    }
 #else
     if (AMK_SUCCESS == i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1, TIMEOUT)) {
+#endif
         is31->pwm_dirty = false;
         return true;
     }
-#endif
 
     return false;
 }

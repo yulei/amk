@@ -48,4 +48,5 @@
 #define DEBOUNCE 1
 #endif
 
+#define RGB_FLUSH_ASYNC
 #define DYNAMIC_KEYMAP_LAYER_COUNT  7
