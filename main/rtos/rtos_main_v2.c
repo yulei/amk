@@ -64,7 +64,7 @@ static const osThreadAttr_t main_thread_attr = {
 
 static osThreadId_t aux_thread_id;
 static uint32_t aux_thread_cb[WORDS(sizeof(StaticTask_t))];
-static uint64_t aux_thread_stack[MAIN_THREAD_STACK / sizeof(uint64_t)];
+static uint64_t aux_thread_stack[AUX_THREAD_STACK / sizeof(uint64_t)];
 static const osThreadAttr_t aux_thread_attr = {
     .name = "aux",
     .cb_mem = aux_thread_cb,

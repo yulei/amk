@@ -8,12 +8,12 @@ SRCS += \
 	$(FREERTOS_DIR)/Source/tasks.c \
 	$(FREERTOS_DIR)/Source/list.c \
 	$(FREERTOS_DIR)/Source/queue.c \
-	$(FREERTOS_DIR)/Source/timers.c \
 	$(FREERTOS_DIR)/Source/event_groups.c \
-	$(FREERTOS_DIR)/Source/portable/MemMang/heap_4.c \
 	$(FREERTOS_DIR)/CMSIS/RTOS2/FreeRTOS/Source/ARM/clib_arm.c \
 	$(FREERTOS_DIR)/CMSIS/RTOS2/FreeRTOS/Source/cmsis_os2.c \
 	$(FREERTOS_DIR)/CMSIS/RTOS2/FreeRTOS/Source/freertos_evr.c \
+#	$(FREERTOS_DIR)/Source/portable/MemMang/heap_4.c \
+#	$(FREERTOS_DIR)/Source/timers.c \
 #	$(FREERTOS_DIR)/CMSIS/RTOS2/FreeRTOS/Source/os_systick.c \
 #	$(FREERTOS_DIR)/CMSIS/RTOS2/FreeRTOS/Source/handlers.c \
 #	$(FREERTOS_DIR)/Source/croutine.c \

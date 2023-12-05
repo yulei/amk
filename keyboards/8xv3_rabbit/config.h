@@ -52,7 +52,7 @@
 #define DEBOUNCE            5
 #define DWT_DELAY
 #define VECT_TAB_OFFSET     0x20000
-#define SUSPEND_RECONNECT
+#define SUSPEND_RESET
 //#define FAULT_BREAK
 
 // vial 

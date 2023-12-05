@@ -54,7 +54,7 @@ extern uint32_t SystemCoreClock;
 #define configTICK_RATE_HZ                    ((TickType_t)1000)
 #define configTOTAL_HEAP_SIZE                 ((size_t)(8*1024))
 #define configMINIMAL_STACK_SIZE              ((uint16_t)512)
-#define configSUPPORT_DYNAMIC_ALLOCATION      1
+#define configSUPPORT_DYNAMIC_ALLOCATION      0
 #define configSUPPORT_STATIC_ALLOCATION       1
 
 /* Constants related to the behaviour or the scheduler. */
@@ -67,7 +67,7 @@ extern uint32_t SystemCoreClock;
 #define configUSE_16_BIT_TICKS                0
 
 /* Software timer definitions. */
-#define configUSE_TIMERS                      1
+#define configUSE_TIMERS                      0
 #define configTIMER_TASK_PRIORITY             (configMAX_PRIORITIES-2)
 #define configTIMER_QUEUE_LENGTH              16
 #define configTIMER_TASK_STACK_DEPTH          (configMINIMAL_STACK_SIZE * 2)

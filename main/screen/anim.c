@@ -36,7 +36,7 @@
 #define ASTS_SIG    "ASTS"
 #define ABKG_SIG    "ABKG"
 
-#define FRAME_MAX   1024
+#define FRAME_MAX   512//1024
 typedef struct __attribute__((packed)) {
     char signature[4];  //"ANIM" or "AUXI"
     uint16_t size;      // size of the header
@@ -60,7 +60,7 @@ typedef struct {
 #define ANIM_INVALID_HEIGHT     0xFFFFFFFF
 
 #define ANIM_FILE_NAME_MAX  13
-#define ANIM_FILE_MAX       32
+#define ANIM_FILE_MAX       16//32
 #define ANIM_ROOT_DIR       "/"
 
 struct anim_t {
