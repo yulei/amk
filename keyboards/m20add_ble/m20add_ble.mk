@@ -1,7 +1,0 @@
-
-SRCS += $(wildcard $(KEYBOARD_DIR)/*.c)
-
-MCU = NRF52840
-MATRIX_USE_TCA6424 = yes
-EECONFIG_FDS = yes
-RGB_LINEAR_ENABLE = yes
