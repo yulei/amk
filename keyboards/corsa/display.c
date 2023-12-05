@@ -64,6 +64,12 @@ enum {
     MODE_MAX
 };
 
+enum {
+    RENDER_IDLE,
+    RENDER_FETCH,
+    RENDER_FILL,
+};
+
 typedef struct {
     uint32_t type;
     uint32_t x;
@@ -76,7 +82,9 @@ typedef struct {
     uint16_t *buf;
     uint32_t buf_size;
     uint32_t ticks;
+    uint32_t state;
     bool filling;
+    bool filled;
 } render_t;
 
 #define BYTE_PER_PIXEL  2
@@ -101,7 +109,6 @@ static uint16_t anim_buf[ANIM_WIDTH*ANIM_HEIGHT];
 
 static bool screen_enable = true;
 static bool screen_adjust = false;
-static bool filling = false;
 static render_t renders[] = {
     {
         .type = ANIM_TYPE_MAIN,
@@ -115,6 +122,9 @@ static render_t renders[] = {
         .buf = anim_buf,
         .buf_size = ANIM_WIDTH*ANIM_HEIGHT*BYTE_PER_PIXEL,
         .ticks = 0,
+        .state = RENDER_IDLE,
+        .filling = false,
+        .filled = false,
     },
 };
 
@@ -164,20 +174,7 @@ void update_speed(void)
 }
 #endif
 
-static bool need_refresh(uint32_t last, uint32_t delay)
-{
-    uint32_t elapsed = timer_elapsed32(last);
-    #ifdef TYPING_SPEED
-    if (typing_enable) {
-        update_speed();
-        return (elapsed*typing_speed) > delay;
-    } else {
-        return elapsed > delay;
-    }
-    #else
-        return elapsed > delay;
-    #endif
-}
+
 
 static uint32_t last_ticks = 0;
 
@@ -238,13 +235,28 @@ void matrix_init_kb(void)
     }
 }
 
-static bool filled = false;
+
+#if 1
+static bool need_refresh(uint32_t last, uint32_t delay)
+{
+    uint32_t elapsed = timer_elapsed32(last);
+    #ifdef TYPING_SPEED
+    if (typing_enable) {
+        update_speed();
+        return (elapsed*typing_speed) > delay;
+    } else {
+        return elapsed > delay;
+    }
+    #else
+        return elapsed > delay;
+    #endif
+}
 void render_task(render_t* render)
 {
     if (!render->anim)
         return;
 
-    if (!filled) {
+    if (!render->filled) {
         if ( 0 == anim_step(render->anim, &render->delay, render->buf, render->buf_size)) {
             bool play = false;
             switch(render->mode) {
@@ -273,14 +285,14 @@ void render_task(render_t* render)
                 //render->anim = NULL;
             }
         }
-        filled = true;
+        render->filled = true;
     }
 
-    if (filling) {
+    if (render->filling) {
         //if (screen_fill_ready()) {
         if(st7735_fill_ready(&st7735_driver)){
-            filling = false;
-            filled = false;
+            render->filling = false;
+            render->filled = false;
         } else {
             return;
         }
@@ -289,10 +301,33 @@ void render_task(render_t* render)
     if ( need_refresh(render->ticks, render->delay)) {
         st7735_fill_rect_async(&st7735_driver, render->x, render->y, render->width, render->height, render->buf, render->buf_size);
         //st7735_fill_rect(&st7735_driver, render->x, render->y, render->width, render->height, render->buf, render->buf_size);
-        filling = true;
+        render->filling = true;
         render->ticks = timer_read32();
     }
 }
+#else
+
+void render_task(render_t* render)
+{
+    if (!render->anim) return;
+
+    switch (render->state) {
+        case RENDER_IDLE:
+            if (!render->filled) {
+                
+            }
+            break;
+        case RENDER_FETCH:
+            break;
+        case RENDER_FILL:
+            break;
+        
+        default:
+            break;
+    }
+}
+
+#endif
 
 void msc_init_kb(void)
 {

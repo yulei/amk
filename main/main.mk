@@ -49,7 +49,7 @@ endif
 ifeq (yes, $(strip $(RTOS_ENABLE)))
 	INCS += $(LIB_DIR)/cmsis_5/CMSIS/RTOS2/Include
 #	SRCS += $(MAIN_DIR)/rtos/freertos_main.c
-	SRCS += $(MAIN_DIR)/rtos/rtos_main.c
+	SRCS += $(MAIN_DIR)/rtos/rtos_main_v2.c
 #	include $(LIB_DIR)/cmsis_os.mk
 	include $(LIB_DIR)/cmsis_freertos.mk
 	APP_DEFS += -DRTOS_ENABLE

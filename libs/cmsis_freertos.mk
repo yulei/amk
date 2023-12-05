@@ -24,7 +24,7 @@ ifeq (STM32F722, $(strip $(MCU)))
 	SRCS += $(FREERTOS_DIR)/kernel/portable/GCC/ARM_CM7/r0p1/port.c
 endif
 
-ifneq (,$(filter $(strip $(MCU)),STM32F411 STM32L432))
+ifneq (,$(filter $(strip $(MCU)),STM32F411 STM32L432 STM32F405))
 	INCS += $(FREERTOS_DIR)/Source/portable/GCC/ARM_CM4F/
 	SRCS += $(FREERTOS_DIR)/Source/portable/GCC/ARM_CM4F/port.c
 endif

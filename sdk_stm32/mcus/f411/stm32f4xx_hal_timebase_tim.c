@@ -6,13 +6,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2023 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under Ultimate Liberty license
-  * SLA0044, the "License"; You may not use this file except in compliance with
-  * the License. You may obtain a copy of the License at:
-  *                             www.st.com/SLA0044
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -42,14 +41,11 @@ TIM_HandleTypeDef        htim5;
 HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 {
   RCC_ClkInitTypeDef    clkconfig;
-  uint32_t              uwTimclock = 0;
-  uint32_t              uwPrescalerValue = 0;
-  uint32_t              pFLatency;
-  /*Configure the TIM5 IRQ priority */
-  HAL_NVIC_SetPriority(TIM5_IRQn, TickPriority ,0);
+  uint32_t              uwTimclock, uwAPB1Prescaler = 0U;
 
-  /* Enable the TIM5 global Interrupt */
-  HAL_NVIC_EnableIRQ(TIM5_IRQn);
+  uint32_t              uwPrescalerValue = 0U;
+  uint32_t              pFLatency;
+  HAL_StatusTypeDef     status;
 
   /* Enable TIM5 clock */
   __HAL_RCC_TIM5_CLK_ENABLE();
@@ -57,8 +53,18 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   /* Get clock configuration */
   HAL_RCC_GetClockConfig(&clkconfig, &pFLatency);
 
+  /* Get APB1 prescaler */
+  uwAPB1Prescaler = clkconfig.APB1CLKDivider;
   /* Compute TIM5 clock */
-  uwTimclock = 2*HAL_RCC_GetPCLK1Freq();
+  if (uwAPB1Prescaler == RCC_HCLK_DIV1)
+  {
+    uwTimclock = HAL_RCC_GetPCLK1Freq();
+  }
+  else
+  {
+    uwTimclock = 2UL * HAL_RCC_GetPCLK1Freq();
+  }
+
   /* Compute the prescaler value to have TIM5 counter clock equal to 1MHz */
   uwPrescalerValue = (uint32_t) ((uwTimclock / 1000000U) - 1U);
 
@@ -66,6 +72,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   htim5.Instance = TIM5;
 
   /* Initialize TIMx peripheral as follow:
+
   + Period = [(TIM5CLK/1000) - 1]. to have a (1/1000) s time base.
   + Prescaler = (uwTimclock/1000000 - 1) to have a 1MHz counter clock.
   + ClockDivision = 0
@@ -75,15 +82,33 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   htim5.Init.Prescaler = uwPrescalerValue;
   htim5.Init.ClockDivision = 0;
   htim5.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim5.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
 
-  if(HAL_TIM_Base_Init(&htim5) == HAL_OK)
+  status = HAL_TIM_Base_Init(&htim5);
+  if (status == HAL_OK)
   {
     /* Start the TIM time Base generation in interrupt mode */
-    return HAL_TIM_Base_Start_IT(&htim5);
+    status = HAL_TIM_Base_Start_IT(&htim5);
+    if (status == HAL_OK)
+    {
+    /* Enable the TIM5 global Interrupt */
+        HAL_NVIC_EnableIRQ(TIM5_IRQn);
+      /* Configure the SysTick IRQ priority */
+      if (TickPriority < (1UL << __NVIC_PRIO_BITS))
+      {
+        /* Configure the TIM IRQ priority */
+        HAL_NVIC_SetPriority(TIM5_IRQn, TickPriority, 0U);
+        uwTickPrio = TickPriority;
+      }
+      else
+      {
+        status = HAL_ERROR;
+      }
+    }
   }
 
-  /* Return function status */
-  return HAL_ERROR;
+ /* Return function status */
+  return status;
 }
 
 /**
@@ -109,6 +134,18 @@ void HAL_ResumeTick(void)
   /* Enable TIM5 Update interrupt */
   __HAL_TIM_ENABLE_IT(&htim5, TIM_IT_UPDATE);
 }
+
+void TIM5_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM5_IRQn 0 */
+
+  /* USER CODE END TIM5_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim5);
+  /* USER CODE BEGIN TIM5_IRQn 1 */
+
+  /* USER CODE END TIM5_IRQn 1 */
+}
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   /* USER CODE BEGIN Callback 0 */
@@ -121,4 +158,3 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
   /* USER CODE END Callback 1 */
 }
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
