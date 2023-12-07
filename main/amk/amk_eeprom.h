@@ -18,7 +18,7 @@
 #define EECONFIG_RGB                (uint8_t*)(EEPROM_SIZE)
 #define EECONFIG_USB                (uint8_t*)(EEPROM_SIZE+EECONFIG_RGB_COUNT)
 #define EECONFIG_USB_COUNT          1
-#define EECONFIG_DEBOUNCE           (uint8_t*)(EEPROM_SIZE+EECONFIG_RGB_COUNT+1)
+#define EECONFIG_DEBOUNCE           (uint8_t*)(EECONFIG_USB+EECONFIG_USB_COUNT)
 #define EECONFIG_DEBOUNCE_COUNT     1
 #define EECONFIG_REMAIN_COUNT       6
 #define EECONFIG_RESERVED_COUNT     2048

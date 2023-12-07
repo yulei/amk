@@ -7,7 +7,6 @@
  */
 
 #include "quantum.h"
-#include "cm_misc.h"
 #include "usb_interface.h"
 #include "amk_eeprom.h"
 #include "amk_keycode.h"
@@ -21,6 +20,10 @@
 #define keycode_debug  amk_printf
 #else
 #define keycode_debug(...)
+#endif
+
+#if !defined(NRF52840_XXAA) && !defined(NRF52)
+#include "cm_misc.h"
 #endif
 
 #ifdef RGB_ENABLE

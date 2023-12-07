@@ -75,10 +75,3 @@ ifeq (, $(strip $(AMK_CUSTOM_MATRIX)))
 		APP_DEFS += -DSTATE_SCAN_ENABLE
 	endif
 endif
-
-ifeq (ms, $(strip $(AMK_CUSTOM_MATRIX)))
-	SRCS += $(MAIN_DIR)/amk/amk_apc.c
-	SRCS += $(MAIN_DIR)/amk/amk_dks.c
-	APP_DEFS += -DAPC_ENABLE
-	APP_DEFS += -DDKS_ENABLE
-endif

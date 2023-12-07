@@ -87,7 +87,7 @@ void eeconfig_init_kb(void)
 
 uint8_t eeconfig_read_usb(void)
 {
-    //return 1;
+    //return 3;
     return eeprom_read_byte(EECONFIG_USB);
 }
 void eeconfig_update_usb(uint8_t usb)
