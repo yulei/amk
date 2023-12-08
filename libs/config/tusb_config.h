@@ -81,7 +81,11 @@
 #endif
 
 // This example doesn't use an RTOS
+#ifdef RTOS_ENABLE
+#define CFG_TUSB_OS                 OPT_OS_FREERTOS
+#else
 #define CFG_TUSB_OS                 OPT_OS_NONE
+#endif
 
 // CFG_TUSB_DEBUG is defined by compiler in DEBUG build
 #define CFG_TUSB_DEBUG              0

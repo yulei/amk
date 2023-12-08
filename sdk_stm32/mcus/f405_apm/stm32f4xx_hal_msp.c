@@ -56,6 +56,7 @@ void HAL_MspInit(void)
   __HAL_RCC_PWR_CLK_ENABLE();
 
   /* System interrupt init*/
+  HAL_NVIC_SetPriority(PendSV_IRQn, 15, 0);
 
   /* USER CODE BEGIN MspInit 1 */
 
@@ -209,14 +210,14 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
 
     __HAL_LINKDMA(hi2c,hdmatx,hdma_i2c1_tx);
      // I2C1 DMA Irq
-    HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
-    HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
     // I2C1 Irq
-    HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(I2C1_EV_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
-    HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(I2C1_ER_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
   }
 }
@@ -333,7 +334,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
 */
 void HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc)
 {
-    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
   if(hrtc->Instance==RTC)
   {
   /* USER CODE BEGIN RTC_MspInit 0 */
@@ -456,9 +457,9 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     __HAL_LINKDMA(hspi,hdmatx,hdma_spi1_tx);
 
     // spi1 irq
-    HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
-    HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 
   /* USER CODE BEGIN SPI1_MspInit 1 */
@@ -535,9 +536,9 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
 
     __HAL_LINKDMA(hspi,hdmatx,hdma_spi3_tx);
     // SPI3 IRq
-    HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
-    HAL_NVIC_SetPriority(DMA1_Stream7_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(DMA1_Stream7_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream7_IRQn);
   }
   #endif

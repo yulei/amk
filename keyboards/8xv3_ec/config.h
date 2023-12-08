@@ -18,9 +18,11 @@
 #define MATRIX_COL_PINS {L_MASK|2, L_MASK|1, L_MASK|0, L_MASK|3, L_MASK|5, L_MASK|7, L_MASK|6, L_MASK|4, R_MASK|2, R_MASK|1, R_MASK|0, R_MASK|3, R_MASK|5, R_MASK|7, R_MASK|6, R_MASK|4}
 
 #define DISCHARGE_WAIT_PRE  20
-#define DISCHARGE_WAIT_POST 20
-#define EC_TH_LOW       1024
-#define EC_TH_HIGH      1180
+#define DISCHARGE_WAIT_POST 50
+//#define EC_TH_LOW       1280
+//#define EC_TH_HIGH      1680
+#define EC_TH_LOW       1180
+#define EC_TH_HIGH      1280
 
 #define LEFT_EN_PIN     C5
 #define RIGHT_EN_PIN    B0
@@ -100,10 +102,14 @@
 #define VIAL_KEYBOARD_UID {0x46, 0x52, 0xB3, 0xFD, 0xD6, 0x01, 0xD1, 0x3B}
 
 // for apc
-#define APC_KEY_MIN             20
+#define APC_KEY_MIN             50
 #define APC_KEY_MAX             2560
+#define KEY_ADJUST_MIN          100
 
-#define APC_INTERVAL_MIN        100
+#define APC_KEY_MIN_PRESET      100
+#define APC_KEY_MAX_PRESET      2400
+
+#define APC_INTERVAL_MIN        200
 #define APC_INTERVAL_MAX        2560
 
 #define APC_INTERVAL_INVALID    0

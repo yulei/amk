@@ -11,16 +11,17 @@ SRCS += \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_tim_ex.c \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_spi.c \
 
-SRCS += \
-	$(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/src/apm32f4xx_misc.c \
-	$(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/src/apm32f4xx_rcm.c \
-	$(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/src/apm32f4xx_usb_device.c \
-	$(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/src/apm32f4xx_usb.c \
+ifeq (yes, $(strip $(RTOS_ENABLE)))
+	SRCS += $(STM32SDK_DIR)/mcus/$(MCU_TYPE)/$(MCU_FAMILY)_hal_timebase_tim.c
+else
+	SRCS += $(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/src/apm32f4xx_misc.c
+	SRCS += $(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/src/apm32f4xx_rcm.c
+	SRCS += $(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/src/apm32f4xx_usb_device.c
+	SRCS += $(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/src/apm32f4xx_usb.c
 
-INCS += \
-	$(LIB_DIR)/vendor/geehy/APM32F4xx/Include \
-	$(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/inc \
-
+	INCS += $(LIB_DIR)/vendor/geehy/APM32F4xx/Include
+	INCS += $(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/inc
+endif
 
 APP_DEFS += \
 	-DCFG_TUSB_MCU=OPT_MCU_APM32F40X \

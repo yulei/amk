@@ -44,9 +44,5 @@
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 
 #define USE_HS_USB
-#ifdef USE_HS_USB
-#define DEBOUNCE 1
-#endif
-
 #define RGB_FLUSH_ASYNC
 #define DYNAMIC_KEYMAP_LAYER_COUNT  7

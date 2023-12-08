@@ -20,9 +20,14 @@
 #define EECONFIG_USB_COUNT          1
 #define EECONFIG_DEBOUNCE           (uint8_t*)(EECONFIG_USB+EECONFIG_USB_COUNT)
 #define EECONFIG_DEBOUNCE_COUNT     1
-#define EECONFIG_REMAIN_COUNT       6
+#define EECONFIG_POLE               (uint8_t*)(EECONFIG_DEBOUNCE+EECONFIG_DEBOUNCE_COUNT)
+#define EECONFIG_POLE_COUNT         1
+#define EECONFIG_REMAIN_COUNT       5
 #define EECONFIG_RESERVED_COUNT     2048
-#define AMK_EEPROM_SIZE             (EEPROM_SIZE+EECONFIG_RGB_COUNT+EECONFIG_USB_COUNT+EECONFIG_DEBOUNCE_COUNT+EECONFIG_REMAIN_COUNT+EECONFIG_RESERVED_COUNT)
+#define AMK_EEPROM_SIZE             (EEPROM_SIZE \
+                                    +EECONFIG_RGB_COUNT+EECONFIG_USB_COUNT \
+                                    +EECONFIG_DEBOUNCE_COUNT+EECONFIG_POLE_COUNT \
+                                    +EECONFIG_REMAIN_COUNT+EECONFIG_RESERVED_COUNT)
 
 void eeconfig_read_rgb(void* rgb, uint8_t index);
 void eeconfig_write_rgb(const void* rgb, uint8_t index);
@@ -33,3 +38,6 @@ void eeconfig_update_usb(uint8_t usb);
 
 uint8_t eeconfig_read_debounce(void);
 void eeconfig_update_debounce(uint8_t debounce);
+
+uint8_t eeconfig_read_pole(void);
+void eeconfig_update_pole(uint8_t pole);

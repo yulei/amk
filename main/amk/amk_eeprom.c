@@ -87,7 +87,7 @@ void eeconfig_init_kb(void)
 
 uint8_t eeconfig_read_usb(void)
 {
-    //return 3;
+    //return 0;
     return eeprom_read_byte(EECONFIG_USB);
 }
 void eeconfig_update_usb(uint8_t usb)
@@ -102,4 +102,13 @@ uint8_t eeconfig_read_debounce(void)
 void eeconfig_update_debounce(uint8_t debounce)
 {
     eeprom_write_byte(EECONFIG_DEBOUNCE, debounce);
+}
+
+uint8_t eeconfig_read_pole(void)
+{
+    return eeprom_read_byte(EECONFIG_POLE);
+}
+void eeconfig_update_pole(uint8_t pole)
+{
+    eeprom_write_byte(EECONFIG_POLE, pole);
 }
