@@ -71,6 +71,15 @@ void board_init(void)
 #endif
 }
 
+
+__attribute__((weak))
+void misc_task_kb(void) {}
+
+static void misc_task(void) 
+{
+    misc_task_kb();
+}
+
 //#define PRINT_TASK_TIME
 
 void board_task(void)
@@ -150,4 +159,5 @@ void board_task(void)
 #ifndef CH32V307
     SEGGER_SYSVIEW_MarkStop(3);
 #endif
+    misc_task();
 }
