@@ -5,6 +5,7 @@
 #include "usb_descriptors.h"
 #include "usb_desc_def.h"
 #include "tusb.h"
+uint32_t usb_polling_rate = 0;
 
 #define TUD_COMPOSITE_DEVICE_DESCRIPTOR(usb_ver, vender_id, product_id, device_ver, str_manufacture, str_product, str_serial ) \
     18, TUSB_DESC_DEVICE, U16_TO_U8S_LE(usb_ver), \
@@ -64,17 +65,6 @@
         HID_REPORT_COUNT ( (AMK_NKRO_TOTAL_SIZE-2)*8             )  ,\
         HID_REPORT_SIZE  ( 1                                   )  ,\
         HID_INPUT        ( HID_DATA | HID_ARRAY | HID_ABSOLUTE )  ,\
-    /* 5-bit LED Indicator Kana | Compose | ScrollLock | CapsLock | NumLock */ \
-    HID_USAGE_PAGE  ( HID_USAGE_PAGE_LED ) ,\
-        HID_USAGE_MIN    ( 1                                       ) ,\
-        HID_USAGE_MAX    ( 5                                       ) ,\
-        HID_REPORT_COUNT ( 5                                       ) ,\
-        HID_REPORT_SIZE  ( 1                                       ) ,\
-        HID_OUTPUT       ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE  ) ,\
-        /* led padding */ \
-        HID_REPORT_COUNT ( 1                                       ) ,\
-        HID_REPORT_SIZE  ( 3                                       ) ,\
-        HID_OUTPUT       ( HID_CONSTANT                            ) ,\
     HID_COLLECTION_END
 
 #define VIAL_USAGE_PAGE     0xFF60
@@ -614,6 +604,7 @@ uint32_t tud_hid_descriptor_interface_size(uint8_t itf)
     return 0;
 }
 
+#ifdef KEYBOARD_ENABLE
 static uint8_t *update_hid_desc_polling_rate(uint8_t *desc)
 {
     //return desc;
@@ -636,6 +627,7 @@ static uint8_t *update_hid_desc_polling_rate(uint8_t *desc)
     }
     return desc;
 }
+#endif
 
 #ifdef KEYBOARD_ENABLE
 static uint8_t desc_hid_kbd[] = {
