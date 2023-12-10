@@ -1,4 +1,4 @@
-CH32SDK_DIR := sdk_ch32
+CH32SDK_DIR := sdk/ch32
 
 ifeq (CH32V307, $(strip $(MCU)))
 MCU_ARCH := RV32

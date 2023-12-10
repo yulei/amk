@@ -1,4 +1,4 @@
-APM32SDK_DIR := sdk_apm32
+APM32SDK_DIR := sdk/apm32
 
 ifeq (APM32F407, $(strip $(MCU)))
 MCU_ARCH := CORTEX_M4 

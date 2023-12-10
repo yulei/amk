@@ -1,4 +1,4 @@
-ATSAMDSDK_DIR := sdk_samd
+ATSAMDSDK_DIR := sdk/samd
 
 ifeq (ATSAMD21, $(strip $(MCU)))
 MCU_SERIES := atsam

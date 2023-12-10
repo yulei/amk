@@ -3,11 +3,11 @@
 build/
 core/
 keyboards/amkbd/
-sdk_nrf5/nRF5_SDK_*
-sdk_stm32/misc/*
-!sdk_stm32/misc/*.ioc
-sdk_samd/d21/gcc/*
-!sdk_samd/d21/gcc/Makefile
+sdk/nrf5/nRF5_SDK_*
+sdk/stm32/misc/*
+!sdk/stm32/misc/*.ioc
+sdk/samd/d21/gcc/*
+!sdk/samd/d21/gcc/Makefile
 *.DS_Store
 *.bin
 *.hex

@@ -1,4 +1,4 @@
-STM32SDK_DIR := sdk_stm32
+STM32SDK_DIR := sdk/stm32
 
 ifeq (STM32F401, $(strip $(MCU)))
 MCU_ARCH := CORTEX_M4

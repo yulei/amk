@@ -1,4 +1,4 @@
-M480SDK_DIR := sdk_m480
+M480SDK_DIR := sdk/m480
 
 ifeq (M484, $(strip $(MCU)))
 MCU_ARCH := CORTEX_M4

@@ -1,4 +1,4 @@
-HC32SDK_DIR := sdk_hc32
+HC32SDK_DIR := sdk/hc32
 
 ifeq (HC32F460, $(strip $(MCU)))
 MCU_ARCH := CORTEX_M4

@@ -28,11 +28,6 @@ GOALS := $(filter-out default list clean flash erase flash_softdevice sdk_config
 OUTPUT_DIR := build
 MAIN_DIR := main
 LIB_DIR := libs
-#NRF5_DIR := sdk_nrf5
-#STM32_DIR := sdk_stm32
-#ATSAMD_DIR := sdk_samd
-#NUVOTON_DIR := sdk_nuvoton
-#GD32_DIR := sdk_gd32
 
 ifneq (, $(GOALS))
 GOAL_LIST := $(subst /, ,$(GOALS))
@@ -65,31 +60,31 @@ include $(LIB_DIR)/qmk.mk
 include $(LIB_DIR)/printf.mk
 ifneq (,$(filter $(strip $(MCU)),$(NRF_MCUS)))
 VENDOR_DIR := libs/vendor/nordic
-include sdk_nrf5/nrf5_sdk.mk
+include sdk/nrf5/nrf5_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(STM32_MCUS)))
 VENDOR_DIR := libs/vendor/st
-include sdk_stm32/stm32_sdk.mk
+include sdk/stm32/stm32_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(ATSAMD_MCUS)))
 VENDOR_DIR := libs/vendor/microchip
-include sdk_samd/atsamd_sdk.mk
+include sdk/atsamd/atsamd_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(GD32_MCUS)))
 VENDOR_DIR := libs/vendor/gigadevice
-include sdk_gd32/gd32_sdk.mk
+include sdk/gd32/gd32_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(HC32_MCUS)))
 VENDOR_DIR := libs/vendor/hdsc
-include sdk_hc32/hc32_sdk.mk
+include sdk/hc32/hc32_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(M480_MCUS)))
 VENDOR_DIR := libs/vendor/nuvoton
-include sdk_m480/m480_sdk.mk
+include sdk/m480/m480_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(CH32V_MCUS)))
 VENDOR_DIR := libs/vendor/wch
-include sdk_ch32/ch32_sdk.mk
+include sdk/ch32/ch32_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(APM32_MCUS)))
 VENDOR_DIR := libs/vendor/geehy
-include sdk_apm32/apm32_sdk.mk
+include sdk/apm32/apm32_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(AT32_MCUS)))
 VENDOR_DIR := libs/vendor/artery
-include sdk_at32/at32_sdk.mk
+include sdk/at32/at32_sdk.mk
 else
 $(error Unsupported MCU: $(MCU))
 endif

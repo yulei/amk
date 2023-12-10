@@ -1,4 +1,4 @@
-AT32SDK_DIR := sdk_at32
+AT32SDK_DIR := sdk/at32
 
 ifeq (AT32F405, $(strip $(MCU)))
 MCU_ARCH := CORTEX_M4 

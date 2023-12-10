@@ -1,4 +1,4 @@
-GD32SDK_DIR := sdk_gd32
+GD32SDK_DIR := sdk/gd32
 
 ifeq (GD32E103, $(strip $(MCU)))
 MCU_ARCH := CORTEX_M4

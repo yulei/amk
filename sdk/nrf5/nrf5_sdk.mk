@@ -3,7 +3,7 @@
 #NRF5SDK_VERSION := nRF5_SDK_17.0.2_d674dde
 NRF5SDK_VERSION := nRF5_SDK_17.1.0_ddde560
 NRF5SDK_DIR := $(VENDOR_DIR)/$(NRF5SDK_VERSION)
-SDK_NRF5 := sdk_nrf5
+SDK_NRF5 := sdk/nrf5
 
 SRCS += \
 	$(NRF5SDK_DIR)/components/boards/boards.c \
