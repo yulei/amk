@@ -23,6 +23,7 @@ SRCS += \
     $(QMK_DIR)/quantum/eeconfig.c \
     $(QMK_DIR)/quantum/matrix_common.c \
     $(QMK_DIR)/quantum/keymap_common.c \
+    $(QMK_DIR)/quantum/keymap_introspection.c \
     $(QMK_DIR)/quantum/keycode_config.c \
     $(QMK_DIR)/quantum/sync_timer.c \
     $(QMK_DIR)/quantum/bootmagic/bootmagic_lite.c \
@@ -66,9 +67,8 @@ ifeq (yes,$(strip $(EXTRAKEY_ENABLE)))
 endif
 
 ifeq ($(strip $(VIAL_ENABLE)), yes)
-    #SRCS += $(QMK_DIR)/quantum/dynamic_keymap.c
 	SRCS += $(LIB_DIR)/qmk/protocol/dynamic_keymap_amk.c
-    SRCS += $(QMK_DIR)/quantum/keymap_introspection.c
+	SRCS += $(LIB_DIR)/qmk/protocol/send_string.c
 
     APP_DEFS += -DDYNAMIC_KEYMAP_ENABLE
     SRCS += $(QMK_DIR)/quantum/via.c
@@ -87,8 +87,6 @@ ifeq ($(strip $(VIAL_ENABLE)), yes)
     APP_DEFS += -DNO_DEBUG
     APP_DEFS += -DSEND_STRING_ENABLE
     INCS += $(QMK_DIR)/quantum/send_string
-	SRCS += $(LIB_DIR)/qmk/protocol/send_string.c
-    #SRCS += $(QMK_DIR)/quantum/send_string/send_string.c
 endif
 
 ifeq ($(strip $(VIAL_INSECURE)), yes)

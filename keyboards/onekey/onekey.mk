@@ -36,7 +36,7 @@ TINYUSB_USE_HAL = yes
 #QSPI_ENABLE = yes
 
 SRCS += $(KEYBOARD_DIR)/onekey.c
-SRCS += $(KEYBOARD_DIR)/onekey_keymap.c
+#SRCS += $(KEYBOARD_DIR)/onekey_keymap.c
 
 #SRCS += $(KEYBOARD_DIR)/display.c
 #SRCS += $(MAIN_DIR)/drivers/gc9107.c
