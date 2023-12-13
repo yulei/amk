@@ -118,7 +118,11 @@ endif
 ifeq (yes, $(strip $(VIAL_ENABLE)))
 $(QMK_DIR)/quantum/vial.c: $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h
 
-$(KEYBOARD_DIR)/vial_generated_keyboard_definition.h: $(KEYBOARD_DIR)/vial.json
+ifeq (, $(strip $(VIAL_JSON_NAME)))
+    VIAL_JSON_NAME = vial
+endif
+
+$(KEYBOARD_DIR)/vial_generated_keyboard_definition.h: $(KEYBOARD_DIR)/$(VIAL_JSON_NAME).json
 	@python3 $(QMK_DIR)/util/vial_generate_definition.py $(KEYBOARD_DIR)/vial.json $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h
 
 $(QMK_DIR)/quantum/via.c: $(OUTPUT_DIR)/version.h
