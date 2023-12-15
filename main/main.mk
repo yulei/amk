@@ -75,3 +75,13 @@ ifeq (, $(strip $(AMK_CUSTOM_MATRIX)))
 		APP_DEFS += -DSTATE_SCAN_ENABLE
 	endif
 endif
+
+ifeq (yes, $(strip $(NOFRENDO_ENABLE)))
+	SRCS += $(MAIN_DIR)/screen/nofrendo/emuapi.c
+	SRCS += $(MAIN_DIR)/screen/nofrendo/libsnss.c
+	SRCS += $(MAIN_DIR)/screen/nofrendo/nes_display.c
+	SRCS += $(MAIN_DIR)/screen/nofrendo/nes_emu.c
+	SRCS += $(MAIN_DIR)/screen/nofrendo/nofrendo_task.c
+	INCS += $(MAIN_DIR)/screen/nofrendo
+	include ${LIB_DIR}/umm_malloc.mk
+endif

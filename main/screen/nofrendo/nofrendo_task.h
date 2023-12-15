@@ -1,12 +1,13 @@
 /**
- * @file nofrendo.c
+ * @file nofrendo_task.h
  */
 
-#include "nofrendo.h"
+#pragma once
 
-void nofrendo_init(void)
-{}
+#include <stdint.h>
+#include <stdbool.h>
 
+void nofrendo_init(void);
 bool nofrendo_start(const char* rom);
 void nofrendo_task(uint32_t ticks);
 void nofrendo_pause(void);
