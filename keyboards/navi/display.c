@@ -33,6 +33,19 @@ static void reset_to_msc(bool msc);
 #include "amk_printf.h"
 #include "ff.h"
 
+#ifdef NOFRENDO_ENABLE
+
+#include "arcada_def.h"
+#include "nofrendo_emu.h"
+#include "nes_display.h"
+
+keypos_t arcada_keys[ARCADA_BUTTON_COUNT] = 
+{
+    {14,4}, {16,4}, {15,3}, {15,4},
+    {2,1},  {2,2}, {1,2}, {3,2},
+};
+#endif
+
 //////////////////////
 // adaptive layer
 ///////////////////
@@ -61,6 +74,9 @@ enum {
     MODE_SINGLE,
     MODE_SEQUENCE,
     MODE_RANDOM,
+#ifdef NOFRENDO_ENABLE
+    MODE_NOFRENDO,
+#endif
     MODE_MAX
 };
 
@@ -243,6 +259,14 @@ void matrix_init_kb(void)
 static bool filled = false;
 void render_task(render_t* render)
 {
+#ifdef NOFRENDO_ENABLE
+    if (render->mode == MODE_NOFRENDO) {
+        nofrendo_task(0);
+        st7735_fill_rect(&st7735_driver, render->x, render->y, render->width, render->height, nes_display.get_frame_buffer(), 128*128*2);
+        return;
+    }
+#endif
+
     if (!render->anim)
         return;
 
@@ -306,7 +330,7 @@ void msc_init_kb(void)
 
     for (int i = 0; i < sizeof(renders)/sizeof(render_t); i++) {
         renders[i].anim = anim_open(NULL, renders[i].type);
-        if (renders[i].anim) {
+        if (!renders[i].anim) {
             disp_debug("ANIM: faield to open root path\n");
         }
     }
@@ -382,7 +406,17 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record)
         case KC_F21: {
             render_t *render = NULL;
             render = &renders[0];
+#ifdef NOFRENDO_ENABLE
+            if (render->mode == MODE_NOFRENDO) {
+                nofrendo_deinit();
+            }
+#endif
             render->mode = (render->mode+1) % MODE_MAX;
+#ifdef NOFRENDO_ENABLE
+            if (render->mode == MODE_NOFRENDO) {
+                nofrendo_init(render->buf, "/nes");
+            }
+#endif
         } return false;
         //case KC_F23:
         //    msc_erase();

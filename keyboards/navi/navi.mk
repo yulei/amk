@@ -22,3 +22,7 @@ SRCS += $(KEYBOARD_DIR)/navi.c
 SRCS += $(KEYBOARD_DIR)/display.c
 SRCS += $(MAIN_DIR)/drivers/st7735.c
 SRCS += $(MAIN_DIR)/drivers/spi.c
+
+NOFRENDO_ENABLE = yes
+
+#NO_DEBUG := 1

@@ -2,7 +2,8 @@
 #include  <errno.h>
 #include  <sys/unistd.h> // STDOUT_FILENO, STDERR_FILENO
 
-#include "umm_malloc.h"
+//#include "umm_malloc.h"
+#include "static_memory.h"
 #include "arcada_def.h"
 #include "nes_display.h"
 #include "nes_emu.h"
@@ -75,7 +76,7 @@ void emu_Step(uint32_t frame)
 
 void * emu_Malloc(int size)
 {
-  void * retval =  umm_malloc(size);
+  void * retval =  static_memory_alloc(size);
   if (!retval) {
     char error_msg[255];
     sprintf(error_msg, "emu_Malloc: failed to allocate %d bytes", size);
@@ -91,7 +92,7 @@ void * emu_Malloc(int size)
 void emu_Free(void * pt)
 {
   emu_printf("Freeing memory");
-  umm_free(pt);
+  static_memory_free(pt);
 }
 
 int emu_FileOpen(char * filename)
@@ -392,7 +393,7 @@ void emu_sndInit()
 char *emu_Strdup(const char *src)
 {
   size_t size = strlen(src);
-  char* dst = umm_malloc(size+1);
+  char* dst = static_memory_alloc(size+1);
   if (!dst) return NULL;
   strcpy(dst, src);
   return dst;

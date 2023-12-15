@@ -7,9 +7,9 @@
 //#include "Adafruit_Arcada_Def.h"
 
 //Nes stuff wants to define this as well...
-#undef false
-#undef true
-#undef bool
+//#undef false
+//#undef true
+//#undef bool
 
 #include "noftypes.h"
 
@@ -251,17 +251,25 @@ char *osd_getromdata() {
 
 
 
-
+extern bool emu_inited;
 void nes_Init(void)
 {
 #if HAS_SND
   emu_sndInit();
 #endif
-  nofrendo_main(0, NULL); 
+   if ( 0 != nofrendo_main(0, NULL) ) {
+      emu_printf("Failed to initialize NES\n");
+      emu_inited = false;
+   } else {
+      emu_printf("NES initialized success\n");
+      emu_inited = true;
+   } 
 }
 
 void nes_Step(void)
 {
+   if (!romdata) return;
+
 	nes_step(emu_FrameSkip());	
 	emu_DrawVsync();	
 }

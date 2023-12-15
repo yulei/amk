@@ -81,7 +81,8 @@ ifeq (yes, $(strip $(NOFRENDO_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/nofrendo/libsnss.c
 	SRCS += $(MAIN_DIR)/screen/nofrendo/nes_display.c
 	SRCS += $(MAIN_DIR)/screen/nofrendo/nes_emu.c
-	SRCS += $(MAIN_DIR)/screen/nofrendo/nofrendo_task.c
+	SRCS += $(MAIN_DIR)/screen/nofrendo/nofrendo_emu.c
+	SRCS += $(MAIN_DIR)/screen/nofrendo/static_memory.c
 	INCS += $(MAIN_DIR)/screen/nofrendo
-	include ${LIB_DIR}/umm_malloc.mk
+	#include ${LIB_DIR}/umm_malloc.mk
 endif

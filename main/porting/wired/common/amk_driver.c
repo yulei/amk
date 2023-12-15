@@ -177,8 +177,15 @@ uint8_t keyboard_leds(void)
     return amk_led_state;
 }
 
+#ifdef NOFRENDO_ENABLE
+volatile bool nofrendo_mode = false;
+#endif
+
 void send_keyboard(report_keyboard_t *report)
 {
+#ifdef NOFRENDO_ENABLE
+    if (nofrendo_mode) return;
+#endif
 #ifdef RF_ENABLE
     if(usb_setting & USB_OUTPUT_RF) {
     #ifdef NKRO_ENABLE

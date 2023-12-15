@@ -72,3 +72,4 @@
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 
 #define SUSPEND_RESET
+#define FAULT_BREAK
