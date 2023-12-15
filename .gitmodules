@@ -28,3 +28,6 @@
 [submodule "libs/nes"]
 	path = libs/nofrendo
 	url = https://github.com/yulei/nofrendo_arcada.git
+[submodule "libs/umm_malloc"]
+	path = libs/umm_malloc
+	url = https://github.com/rhempel/umm_malloc.git

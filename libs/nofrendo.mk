@@ -9,7 +9,6 @@ SRCS += \
 	$(NOFRENDO_DIR)/gui.c \
 	$(NOFRENDO_DIR)/log.c \
 	$(NOFRENDO_DIR)/mapvrc.c \
-	$(NOFRENDO_DIR)/memguard.c \
 	$(NOFRENDO_DIR)/mmc5_snd.c \
 	$(NOFRENDO_DIR)/mmclist.c \
 	$(NOFRENDO_DIR)/nes_apu.c \
@@ -25,10 +24,11 @@ SRCS += \
 	$(NOFRENDO_DIR)/pcx.c \
 	$(NOFRENDO_DIR)/vid_drv.c \
 	$(NOFRENDO_DIR)/vrcvisnd.c \
+	#$(NOFRENDO_DIR)/memguard.c \
 
 SRCS += $(wildcard $(NOFRENDO_DIR)/mappers/*.c)
 
 INCS += \
 	$(NOFRENDO_DIR) \
 
-APP_DEFS += -DNOFRENDO_ENABLE
+APP_DEFS += -DNOFRENDO_ENABLE -DAMK_NOFRENDO
