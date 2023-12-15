@@ -8,6 +8,17 @@
 #define ARCADA_TFT_WIDTH    128
 #define ARCADA_TFT_HEIGHT   128
 
+// Button definitions
+#define ARCADA_BUTTONMASK_A         0x01
+#define ARCADA_BUTTONMASK_B         0x02
+#define ARCADA_BUTTONMASK_SELECT    0x04
+#define ARCADA_BUTTONMASK_START     0x08
+#define ARCADA_BUTTONMASK_UP        0x10
+#define ARCADA_BUTTONMASK_DOWN      0x20
+#define ARCADA_BUTTONMASK_LEFT      0x40
+#define ARCADA_BUTTONMASK_RIGHT     0x80
+#define ARCADA_BUTTON_COUNT         8
+
 // Color definitions
 #define ARCADA_BLACK 0x0000       ///<   0,   0,   0
 #define ARCADA_NAVY 0x000F        ///<   0,   0, 123
@@ -28,4 +39,3 @@
 #define ARCADA_ORANGE 0xFD20      ///< 255, 165,   0
 #define ARCADA_GREENYELLOW 0xAFE5 ///< 173, 255,  41
 #define ARCADA_PINK 0xFC18        ///< 255, 130, 198
-

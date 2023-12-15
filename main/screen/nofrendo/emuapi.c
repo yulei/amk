@@ -303,9 +303,23 @@ uint16_t emu_DebounceLocalKeys(void) {
   return 0;//bClick;
 }
 
-uint32_t emu_ReadKeys(void)  {
-  //return arcada.readButtons();
-  return 0;
+#include "keyboard.h"
+#include "matrix.h"
+
+extern keypos_t arcada_keys[ARCADA_BUTTON_COUNT];
+
+uint32_t emu_ReadKeys(void)
+{
+  uint32_t button = 0;
+  for (int i = 0; i < ARCADA_BUTTON_COUNT; i++) {
+    int row = arcada_keys[i].row;
+    int col = arcada_keys[i].col;
+    matrix_row_t data = matrix_get_row(row);
+    if (data&(1<<col)) {
+      button |= (1<<i);
+    }
+  }
+  return button;
 }
 
 

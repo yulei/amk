@@ -19,6 +19,7 @@
 #include "nesinput.h"
 #include "event.h"
 #include "nofconfig.h"
+#include "arcada_def.h"
 
 #define  DEFAULT_WIDTH        256
 #define  DEFAULT_HEIGHT       NES_VISIBLE_HEIGHT
@@ -100,7 +101,6 @@ void osd_getsoundinfo(sndinfo_t *info)
 
 void osd_getinput(void)
 {
-/*   
 	const int ev[16]={
 			event_joypad1_select,0,0,event_joypad1_start,event_joypad1_up,event_joypad1_right,event_joypad1_down,event_joypad1_left,
 			0,0,0,0,event_soft_reset,event_joypad1_a,event_joypad1_b,event_hard_reset
@@ -140,7 +140,6 @@ void osd_getinput(void)
 		chg>>=1;
 		b>>=1;
 	}
-   */
 }
 
 
