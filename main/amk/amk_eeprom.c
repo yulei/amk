@@ -112,3 +112,33 @@ void eeconfig_update_pole(uint8_t pole)
 {
     eeprom_write_byte(EECONFIG_POLE, pole);
 }
+
+uint8_t eeconfig_read_rt_sens(void)
+{
+    return eeprom_read_byte(EECONFIG_RT_SENS);
+}
+
+void eeconfig_update_rt_sens(uint8_t rt)
+{
+    eeprom_write_byte(EECONFIG_RT_SENS, rt);
+}
+
+uint8_t eeconfig_read_top_sens(void)
+{
+    return eeprom_read_byte(EECONFIG_TOP_SENS);
+}
+
+void eeconfig_update_top_sens(uint8_t top)
+{
+    eeprom_write_byte(EECONFIG_TOP_SENS, top);
+}
+
+uint8_t eeconfig_read_btm_sens(void)
+{
+    return eeprom_read_byte(EECONFIG_BTM_SENS);
+}
+
+void eeconfig_update_btm_sens(uint8_t btm)
+{
+    eeprom_write_byte(EECONFIG_BTM_SENS, btm);
+}
