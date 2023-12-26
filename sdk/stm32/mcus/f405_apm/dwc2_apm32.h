@@ -31,7 +31,7 @@
  extern "C" {
 #endif
 
-//#include "stm32f4xx.h"
+#include "stm32f4xx.h"
 
 /*
 #define USB_OTG_HS_BASE         ((uint32_t)0x40040000)
@@ -69,165 +69,114 @@
 
 typedef struct
 {
-
-    union
-    {
+    union {
         __IOM uint32_t USB_SWITCH;
-
-        struct
-        {
+        struct {
             __IOM uint32_t usb_switch : 1;
         } USB_SWITCH_B;
     } ;
 
-    union
-    {
+    union {
         __IOM uint32_t POWERON_CORE;
-
-        struct
-        {
+        struct {
             __IOM uint32_t poweron_core : 1;
         } POWERON_CORE_B;
     } ;
 
-    union
-    {
+    union {
         __IOM uint32_t USB_PLL_EN;
-
-        struct
-        {
+        struct {
             __IOM uint32_t usb_pll_en : 1;
         } USB_PLL_EN_B;
     } ;
 
-    union
-    {
+    union {
         __IOM uint32_t SHORT_5V_ENABLE;
-
-        struct
-        {
+        struct {
             __IOM uint32_t short_5v_enable : 1;
         } SHORT_5V_ENABLE_B;
     } ;
 
-    union
-    {
+    union {
         __IOM uint32_t OTG_SUSPENDM;
-
-        struct
-        {
+        struct {
             __IOM uint32_t otg_suspendm : 1;
         } OTG_SUSPENDM_B;
     } ;
 
-    union
-    {
+    union {
         __IOM uint32_t TXBITSTUFFENABLE;
-
-        struct
-        {
+        struct {
             __IOM uint32_t txbitstuffenable : 1;
         } TXBITSTUFFENABLE_B;
     } ;
 
-    union
-    {
+    union {
         __IOM uint32_t PLLICP_SEL_I2C;
-
-        struct
-        {
+        struct {
             __IOM uint32_t pllicp_sel_i2c : 1;
         } PLLICP_SEL_I2C_B;
     } ;
 
-    union
-    {
+    union {
         __IOM  uint32_t HSZR_CNTL_I2C;
-
-        struct
-        {
+        struct {
             __IOM  uint32_t hszr_cntl_i2c : 3;
         } HSZR_CNTL_I2C_B;
     } ;
 
-    union
-    {
+    union {
         __IOM  uint32_t SQVTH_CNTL_I2C;
-
-        struct
-        {
+        struct {
             __IOM  uint32_t sqvth_cntl_i2c : 2;
         } SQVTH_CNTL_I2C_B;
     } ;
 
-    union
-    {
+    union {
         __IOM  uint32_t SW_RREF_I2C;
-
-        struct
-        {
+        struct {
             __IOM  uint32_t sw_rref_i2c : 3;
         } SW_RREF_I2C_B;
     } ;
 
-    union
-    {
+    union {
         __IOM  uint32_t SW_BUF_I2C;
-
-        struct
-        {
+        struct {
             __IOM  uint32_t sw_buf_i2c : 1;
         } SW_BUF_I2C_B;
     } ;
 
-    union
-    {
+    union {
         __IOM uint32_t TX2RX_T_CFG_I2C;
-
-        struct
-        {
+        struct {
             __IOM uint32_t tx2rx_t_cfg_i2c : 2;
         } TX2RX_T_CFG_I2C_B;
     } ;
 
-    union
-    {
+    union {
         __IOM uint32_t TEST_ANA_FAST_I2C;
-
-        struct
-        {
+        struct {
             __IOM uint32_t test_ana_fast_i2c : 3;
         } TEST_ANA_FAST_I2C_B;
     } ;
 
-    union
-    {
+    union {
         __IOM uint32_t CLK_MODE_I2C;
-
-        struct
-        {
+        struct {
             __IOM uint32_t clk_mode_i2c : 3;
         } CLK_MODE_I2C_B;
     } ;
 
-    union
-    {
+    union {
         __IOM  uint32_t USB_DBNCE_FLTR_BYPASS;
-
-
-        struct
-        {
+        struct {
             __IOM  uint32_t usb_dbnce_fltr_bypass : 1;
-
         } USB_DBNCE_FLTR_BYPASS_B;
     } ;
 
-    union
-    {
+    union {
         __IOM uint32_t USB_SS_SCALEDOWN_MODE;
-
-        struct
-        {
+        struct {
             __IOM uint32_t usb_ss_scaledown_mode : 2;
         } USB_SS_SCALEDOWN_MODE_B;
     } ;

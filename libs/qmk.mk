@@ -123,7 +123,7 @@ ifeq (, $(strip $(VIAL_JSON_NAME)))
 endif
 
 $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h: $(KEYBOARD_DIR)/$(VIAL_JSON_NAME).json
-	@python3 $(QMK_DIR)/util/vial_generate_definition.py $(KEYBOARD_DIR)/vial.json $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h
+	@python3 $(QMK_DIR)/util/vial_generate_definition.py $(KEYBOARD_DIR)/$(VIAL_JSON_NAME).json $(KEYBOARD_DIR)/vial_generated_keyboard_definition.h
 
 $(QMK_DIR)/quantum/via.c: $(OUTPUT_DIR)/version.h
 INCS += $(OUTPUT_DIR)

@@ -122,7 +122,6 @@ anim_t *anim_open_with_size(const char *path, anim_type_t type, uint32_t width, 
     if (anim_init(&anim_inst[type])) {
         srand(timer_read32());
         return &anim_inst[type];
-
     }
     
     return NULL;

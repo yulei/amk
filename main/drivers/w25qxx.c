@@ -20,6 +20,10 @@
 #define W25QXX_NUM 1
 #endif
 
+#ifdef RTOS_ENABLE
+#define W25QXX_ASYNC    0
+#endif
+
 #define WQCMD_DUMMY 0xA5
 
 //Write Enable
@@ -119,10 +123,18 @@ static amk_error_t w25qxx_wait(w25qxx_t *w25qxx, uint32_t timeout);
 static amk_error_t w25qxx_write_address(w25qxx_t *w25qxx, uint8_t cmd, uint32_t address);
 static bool w25qxx_sector_empty(w25qxx_t *w25qxx, uint32_t address);
 
-#if 0 //def RTOS_ENABLE
+#if W25QXX_ASYNC
 #include "cmsis_os2.h"
-osSemaphoreId_t readSema;
-spi_handle_t current_spi;
+#include "FreeRTOS.h"
+static StaticSemaphore_t sema_def;
+static osSemaphoreAttr_t sema_attr = {
+    .name = "w25_sema",
+    .attr_bits = 0,
+    .cb_mem = &sema_def,
+    .cb_size = sizeof(sema_def),
+};
+static osSemaphoreId_t read_sema;
+static spi_handle_t current_spi;
 #endif
 
 w25qxx_t *w25qxx_current(void)
@@ -157,8 +169,8 @@ w25qxx_t *w25qxx_init(w25qxx_config_t *config)
     device->sector_count    = 4096;
     device->type = W25Q128; 
     gpio_write_pin(config->cs, 1);
-#if 0 //def RTOS_ENABLE
-    readSema = osSemaphoreNew(1, 0, NULL);
+#if W25QXX_ASYNC
+    read_sema = osSemaphoreNew(1, 0, &sema_attr);
     current_spi = config->spi;
 #endif
     return device;
@@ -258,11 +270,11 @@ amk_error_t w25qxx_read_sector(w25qxx_t* w25qxx, uint32_t address, uint8_t *data
     return w25qxx_read_bytes(w25qxx, address, data, size);
 }
 
-#if 0 //def RTOS_ENABLE
+#if W25QXX_ASYNC
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 {
     if (hspi == current_spi) {
-        osSemaphoreRelease(readSema);
+        osSemaphoreRelease(read_sema);
     }
 }
 #endif
@@ -271,9 +283,9 @@ amk_error_t w25qxx_read_bytes(w25qxx_t* w25qxx, uint32_t address, uint8_t *data,
     gpio_write_pin(w25qxx->config.cs, 0);
     w25qxx_write_address(w25qxx, WQCMD_FAST_READ, address);
 	w25qxx_spi_write(w25qxx, 0);
-#if 0 //def RTOS_ENABLE
+#if W25QXX_ASYNC
     spi_recv_async(w25qxx->config.spi, data, size);
-    osSemaphoreAcquire(readSema, osWaitForever);
+    osSemaphoreAcquire(read_sema, osWaitForever);
 #else
     spi_recv(w25qxx->config.spi, data, size);
 #endif
