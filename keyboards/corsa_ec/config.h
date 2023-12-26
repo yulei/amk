@@ -23,11 +23,6 @@
 #define DISCHARGE_WAIT_PRE  20
 #define DISCHARGE_WAIT_POST 20
 
-//#define EC_TH_LOW       864
-//#define EC_TH_HIGH      1024
-//#define EC_TH_LOW       1024
-//#define EC_TH_HIGH      1280
-
 #define LEFT_EN_PIN     B5
 #define RIGHT_EN_PIN    B9
 #define COL_A_PIN       B8
@@ -45,7 +40,7 @@
 
 #define CAPS_LED_PIN        A10
 
-//#define DEBOUNCE            5
+#define DEBOUNCE            8
 #define DWT_DELAY
 #define VECT_TAB_OFFSET     0x20000
 #define HSE_VALUE           16000000U

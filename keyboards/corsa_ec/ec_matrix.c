@@ -29,8 +29,8 @@ struct ec_mode_t{
 
 #define EC_MODE_MAX 4
 struct ec_mode_t ec_modes[EC_MODE_MAX] = {
-    {768, 864},
     {1024, 1280},
+    {768, 864},
     {864, 1024},
     {1280, 1444},
 };
