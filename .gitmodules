@@ -28,6 +28,11 @@
 [submodule "libs/nes"]
 	path = libs/nofrendo
 	url = https://github.com/yulei/nofrendo_arcada.git
-[submodule "libs/umm_malloc"]
-	path = libs/umm_malloc
-	url = https://github.com/rhempel/umm_malloc.git
+[submodule "libs/cmsis_6"]
+	path = libs/cmsis_6
+	url = https://github.com/ARM-software/CMSIS_6.git
+	ignore = dirty
+[submodule "cmsis_rtx"]
+	path = libs/cmsis_rtx
+	url = https://github.com/ARM-software/CMSIS-RTX.git
+	ignore = dirty
