@@ -142,3 +142,13 @@ void eeconfig_update_btm_sens(uint8_t btm)
 {
     eeprom_write_byte(EECONFIG_BTM_SENS, btm);
 }
+
+uint8_t eeconfig_read_apc_sens(void)
+{
+    return eeprom_read_byte(EECONFIG_APC_SENS);
+}
+
+void eeconfig_update_apc_sens(uint8_t apc)
+{
+    eeprom_write_byte(EECONFIG_APC_SENS, apc);
+}

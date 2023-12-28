@@ -30,6 +30,6 @@ ifeq (CORTEX_M7, $(strip $(MCU_ARCH)))
 	SRCS += $(CMSIS_OS_DIR)/RTX/Source/GCC/irq_armv7m.S
 endif
 
-#ifeq (CORTEX_M33, $(strip $(MCU_ARCH)))
+ifeq (CORTEX_M33, $(strip $(MCU_ARCH)))
 	SRCS += $(CMSIS_OS_DIR)/RTX/Source/GCC/irq_armv8mbl.S
-#endif
+endif
