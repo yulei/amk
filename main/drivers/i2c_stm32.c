@@ -120,10 +120,23 @@ amk_error_t i2c_send_async(i2c_handle_t i2c, uint8_t addr, const void *data, siz
         return AMK_I2C_BUSY;
     }
 #endif
+
+#ifdef USE_I2C2
+    if (i2c2_busy) {
+        if (i2c_ready(i2c)) {
+            i2c2_busy = false;
+            return AMK_SUCCESS;
+        }
+        return AMK_I2C_BUSY;
+    }
+#endif
     I2C_HandleTypeDef *inst = (I2C_HandleTypeDef*)i2c;
     HAL_I2C_Master_Transmit_DMA(inst, addr, (void*)data, length);
 #ifdef USE_I2C1
     i2c1_busy = true;
+#endif
+#ifdef USE_I2C2
+    i2c2_busy = true;
 #endif
     return AMK_I2C_BUSY;
 }
