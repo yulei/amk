@@ -75,7 +75,11 @@ void MX_USB_HOST_Init(void)
   /* USER CODE END USB_HOST_Init_PreTreatment */
 
   /* Init host Library, add supported class and start the library. */
+#ifdef HAL_HOST_ENABLE
+  if (USBH_Init(&hUsbHostHS, USBH_UserProcess, HOST_FS) != USBH_OK)
+#else
   if (USBH_Init(&hUsbHostHS, USBH_UserProcess, HOST_HS) != USBH_OK)
+#endif
   {
     Error_Handler();
   }

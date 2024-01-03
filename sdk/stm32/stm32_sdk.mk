@@ -156,5 +156,9 @@ else
 	APP_DEFS += -DHALUSB_ENABLE
 endif #TINYUSB_ENABLE
 
+ifeq (yes, $(strip $(HAL_HOST_ENABLE)))
+	include $(STM32SDK_DIR)/hal_host.mk
+endif #HAL_HOST_ENABLE
+
 LINKER_PATH	?= $(STM32SDK_DIR)/mcus/linker
 LINKER_SCRIPT := $(LINKER_PATH)/$(MCU_LD)_FLASH.ld
