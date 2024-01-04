@@ -108,7 +108,7 @@ SRCS += \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_cortex.c \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal.c \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_exti.c \
-	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_uart.c
+	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_uart.c \
 
 INCS += \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Inc \
@@ -116,6 +116,7 @@ INCS += \
 	$(VENDOR_DIR)/device_$(MCU_SERIES)/Include \
 
 include $(LIB_DIR)/cmsis_core.mk
+#include $(LIB_DIR)/cmsis_compiler.mk
 
 ifeq (yes, $(strip $(AUDIO_ENABLE)))
 include $(LIB_DIR)/cmsis_dsp.mk
