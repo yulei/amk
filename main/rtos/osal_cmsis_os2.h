@@ -88,11 +88,12 @@ typedef osMessageQueueId_t osal_queue_t;
 static inline osal_queue_t osal_queue_create(osal_queue_def_t* qdef)
 {
   qdef->sq = osMessageQueueNew(qdef->depth, qdef->item_sz, NULL);
+  return qdef->sq;
 }
 
-static inline bool osal_queue_receive(osal_queue_t qhdl, void* data)
+static inline bool osal_queue_receive(osal_queue_t qhdl, void* data, uint32_t msec)
 {
-  return osMessageQueuePut(qhdl, data, 0U, osWaitForever) == osOK;
+  return osMessageQueueGet(qhdl, data, 0U, msec) == osOK;
 }
 
 static inline bool osal_queue_send(osal_queue_t qhdl, void const * data, bool in_isr)

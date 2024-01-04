@@ -13,14 +13,14 @@ SRCS += \
 
 ifeq (yes, $(strip $(RTOS_ENABLE)))
 	SRCS += $(STM32SDK_DIR)/mcus/$(MCU_TYPE)/$(MCU_FAMILY)_hal_timebase_tim.c
-else
-	SRCS += $(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/src/apm32f4xx_misc.c
-	SRCS += $(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/src/apm32f4xx_rcm.c
-	SRCS += $(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/src/apm32f4xx_usb_device.c
-	SRCS += $(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/src/apm32f4xx_usb.c
+#else
+#	SRCS += $(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/src/apm32f4xx_misc.c
+#	SRCS += $(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/src/apm32f4xx_rcm.c
+#	SRCS += $(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/src/apm32f4xx_usb_device.c
+#	SRCS += $(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/src/apm32f4xx_usb.c
 
-	INCS += $(LIB_DIR)/vendor/geehy/APM32F4xx/Include
-	INCS += $(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/inc
+#	INCS += $(LIB_DIR)/vendor/geehy/APM32F4xx/Include
+#	INCS += $(LIB_DIR)/vendor/geehy/APM32F4xx_StdPeriphDriver/inc
 endif
 
 APP_DEFS += \

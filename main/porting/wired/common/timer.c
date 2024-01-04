@@ -7,8 +7,7 @@
 #include "timer.h"
 
 #ifdef RTOS_ENABLE
-#include "FreeRTOS.h"
-#include "task.h"
+#include "os_tick.h"
 #endif
 
 extern uint32_t systick_get_tick(void);
@@ -25,7 +24,7 @@ uint16_t timer_read(void)
 uint32_t timer_read32(void)
 {
 #ifdef RTOS_ENABLE
-    return xTaskGetTickCount();
+    return OS_Tick_GetCount();//xTaskGetTickCount();
 #else
     return systick_get_tick();
 #endif

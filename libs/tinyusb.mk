@@ -19,11 +19,11 @@ ifeq (yes, $(strip $(TINYUSB_USE_HAL)))
 else
 	ifeq (STM32F405, $(strip $(MCU)))
 		ifeq (yes, $(strip $(USE_F405_APM)))
-			ifeq (yes, $(strip $(RTOS_ENABLE)))
+			#ifeq (yes, $(strip $(RTOS_ENABLE)))
 				SRCS += $(STM32SDK_DIR)/mcus/f405_apm/dcd_dwc2_apm32.c
-			else
-				SRCS += $(STM32SDK_DIR)/mcus/f405_apm/dcd_hal_apm32.c
-			endif
+			#else
+			#	SRCS += $(STM32SDK_DIR)/mcus/f405_apm/dcd_hal_apm32.c
+			#endif
 		endif
 	endif	
 	ifeq (STM32F103, $(strip $(MCU)))

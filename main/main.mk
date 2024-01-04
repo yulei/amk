@@ -47,11 +47,14 @@ else
 endif
 
 ifeq (yes, $(strip $(RTOS_ENABLE)))
-	INCS += $(LIB_DIR)/cmsis_5/CMSIS/RTOS2/Include
+#	INCS += $(LIB_DIR)/cmsis_5/CMSIS/RTOS2/Include
 #	SRCS += $(MAIN_DIR)/rtos/freertos_main.c
-	SRCS += $(MAIN_DIR)/rtos/rtos_main_v2.c
+#	SRCS += $(MAIN_DIR)/rtos/rtos_main_v2.c
 #	include $(LIB_DIR)/cmsis_os.mk
-	include $(LIB_DIR)/cmsis_freertos.mk
+#	include $(LIB_DIR)/cmsis_freertos.mk
+	INCS += $(MAIN_DIR)/rtos
+	SRCS += $(MAIN_DIR)/rtos/rtos_main_rtx.c
+	include $(LIB_DIR)/cmsis_rtx.mk
 	APP_DEFS += -DRTOS_ENABLE
 	ifeq (yes, $(strip $(LPM_ENABLE)))
 		APP_DEFS += -DLPM_ENABLE

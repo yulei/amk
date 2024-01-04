@@ -114,7 +114,8 @@ INCS += \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Inc \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Inc/Legacy \
 	$(VENDOR_DIR)/device_$(MCU_SERIES)/Include \
-	$(LIB_DIR)/cmsis_5/CMSIS/Core/Include
+
+include $(LIB_DIR)/cmsis_core.mk
 
 ifeq (yes, $(strip $(AUDIO_ENABLE)))
 include $(LIB_DIR)/cmsis_dsp.mk
