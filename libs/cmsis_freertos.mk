@@ -1,10 +1,13 @@
+CMSIS_DIR := $(LIB_DIR)/cmsis_6/CMSIS
 FREERTOS_DIR := $(LIB_DIR)/cmsis_freertos
 
 INCS += \
+	$(CMSIS_DIR)/RTOS2/Include \
 	$(FREERTOS_DIR)/Source/include \
 	$(FREERTOS_DIR)/CMSIS/RTOS2/FreeRTOS/Include \
 
 SRCS += \
+	$(CMSIS_DIR)/RTOS2/Source/os_systick.c \
 	$(FREERTOS_DIR)/Source/tasks.c \
 	$(FREERTOS_DIR)/Source/list.c \
 	$(FREERTOS_DIR)/Source/queue.c \

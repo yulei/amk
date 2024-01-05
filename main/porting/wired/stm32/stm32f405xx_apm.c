@@ -114,12 +114,6 @@ static void MX_DMA_Init(void)
     /* DMA controller clock enable */
     __HAL_RCC_DMA2_CLK_ENABLE();
     __HAL_RCC_DMA1_CLK_ENABLE();
-
-    /* DMA interrupt init */
-
-    // TIM4_CH2
-    HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 1, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
 }
 
 static void MX_RTC_Init(void)
@@ -322,7 +316,7 @@ static void MX_USB_DEVICE_Init(void)
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
     __HAL_RCC_USB_OTG_HS_CLK_ENABLE();
-    HAL_NVIC_SetPriority(OTG_HS_IRQn, 1, 0);
+    HAL_NVIC_SetPriority(OTG_HS_IRQn, 3, 0);
 #else
 
     GPIO_InitTypeDef GPIO_InitStruct = {0};
