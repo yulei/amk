@@ -8,4 +8,5 @@
 
 #pragma once
 
-#include "osal_cmsis_os2.h"
+//#include "osal_cmsis_os2.h"
+#include "osal_threadx.h"

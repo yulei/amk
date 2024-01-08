@@ -32,10 +32,6 @@
 	path = libs/cmsis_6
 	url = https://github.com/ARM-software/CMSIS_6.git
 	ignore = dirty
-[submodule "cmsis_rtx"]
-	path = libs/cmsis_rtx
-	url = https://github.com/ARM-software/CMSIS-RTX.git
-	ignore = dirty
 [submodule "libs/cmsis_compiler"]
 	path = libs/cmsis_compiler
 	url = https://github.com/ARM-software/CMSIS-Compiler.git

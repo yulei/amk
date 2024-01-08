@@ -52,8 +52,11 @@ ifeq (yes, $(strip $(RTOS_ENABLE)))
 #	include $(LIB_DIR)/cmsis_os.mk
 #	SRCS += $(MAIN_DIR)/rtos/rtos_main_v2.c
 #	include $(LIB_DIR)/cmsis_freertos.mk
-	SRCS += $(MAIN_DIR)/rtos/rtos_main_rtx.c
-	include $(LIB_DIR)/cmsis_rtx.mk
+#	SRCS += $(MAIN_DIR)/rtos/rtos_main_rtx.c
+#	include $(LIB_DIR)/cmsis_rtx.mk
+	SRCS += $(MAIN_DIR)/rtos/tx_initialize_low_level.s
+	SRCS += $(MAIN_DIR)/rtos/rtos_main_tx.c
+	include $(LIB_DIR)/threadx.mk
 	APP_DEFS += -DRTOS_ENABLE
 	ifeq (yes, $(strip $(LPM_ENABLE)))
 		APP_DEFS += -DLPM_ENABLE

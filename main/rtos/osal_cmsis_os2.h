@@ -1,8 +1,8 @@
 /**
- * @file osal_cmsis_os2.h
+ * @file osal_threadx.h
  * @author astro
  * 
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2024
  * 
  */
 

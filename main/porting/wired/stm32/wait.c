@@ -2,11 +2,13 @@
  * wait.c
  */
 
+#include <stdbool.h>
 #include "amk_hal.h"
 #include "wait.h"
 
 #ifdef RTOS_ENABLE
-#include "cmsis_os2.h"
+//#include "cmsis_os2.h"
+#include "tx_api.h"
 static void busy_delay_ms(uint32_t ms)
 {
     while (ms--) {
@@ -19,8 +21,11 @@ static void busy_delay_ms(uint32_t ms)
 void wait_ms(int ms)
 {
 #ifdef RTOS_ENABLE
-    if (osKernelGetState() == osKernelRunning) {
-        osDelay(ms);
+    //if (osKernelGetState() == osKernelRunning) {
+    //    osDelay(ms);
+    extern bool rtos_running;
+    if (rtos_running) {
+        tx_thread_sleep(ms);
     } else {
         busy_delay_ms(ms);
     }
