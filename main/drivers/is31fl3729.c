@@ -89,14 +89,18 @@
     #define IS31FL3729_I2C_ID   I2C_INSTANCE_1
 #endif
 
+#define FLUSH_COUNT     9
+#define FLUSH_BATCH     9
 static i2c_handle_t i2c_inst;
 static bool fl3729_available = true;
 
 typedef struct {
     i2c_led_t       i2c_led;
     uint8_t         pwm_buffer[PWM_BUFFER_SIZE];
+    uint8_t         last_index;
     bool            pwm_dirty;
     bool            ready;
+    uint32_t        count;
 } is31fl3729_driver_t;
 
 static is31fl3729_driver_t is31_drivers[IS31FL3729_NUM] = {0};
@@ -177,21 +181,29 @@ static bool is31fl3729_update_pwm_buffers(i2c_led_t *driver)
     if (!is31->pwm_dirty) return true;
 
     // write from sw1 to sw9
-    static int last_index = 0;
 #ifdef RGB_FLUSH_ASYNC
-    if (AMK_SUCCESS != i2c_send_async(i2c_inst, driver->addr, &is31->pwm_buffer[last_index*0x10], 0x10)) {
-#else
-    if (AMK_SUCCESS != i2c_send(i2c_inst, driver->addr, &is31->pwm_buffer[last_index*0x10], 0x10, TIMEOUT)) {
-#endif
+    if (AMK_SUCCESS != i2c_send_async(i2c_inst, driver->addr, &is31->pwm_buffer[is31->last_index*0x10], 0x10)) {
         return false;
     }
+#else
+    for (int i = 0; i < FLUSH_BATCH; i++) {
+        i2c_send(i2c_inst, driver->addr, &is31->pwm_buffer[i*0x10], 0x10, TIMEOUT);
+    }
+    is31->pwm_dirty = false;
+    return true;
+#endif
 
-    last_index = (last_index + 1) % 9;
+#ifdef RGB_FLUSH_ASYNC
+    is31->last_index = (is31->last_index + 1) % FLUSH_BATCH;
 
-    if (last_index == 0) {
-        is31->pwm_dirty = false;
+    if (is31->last_index == 0) {
+        is31->count++;
+        if (is31->count % FLUSH_COUNT == 0) {
+            is31->pwm_dirty = false;
+        }
         return true;
     }
+#endif
 
     return false;
 }
@@ -261,6 +273,8 @@ void init_driver(is31fl3729_driver_t *driver)
     }
 
     driver->pwm_dirty = true;
+    driver->last_index = 0;
+    driver->count = 0;
 }
 
 bool is31fl3729_update_buffers(i2c_led_t *driver)

@@ -39,3 +39,6 @@
 [submodule "libs/cmsis_compiler"]
 	path = libs/cmsis_compiler
 	url = https://github.com/ARM-software/CMSIS-Compiler.git
+[submodule "libs/threadx"]
+	path = libs/threadx
+	url = https://github.com/azure-rtos/threadx.git
