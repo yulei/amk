@@ -39,7 +39,7 @@ extern void custom_board_task(void);
 static CHAR usb_stack[USB_STACK_SIZE];
 
 #define MAIN_STACK_SIZE             5888
-#define MAIN_THREAD_PRIO            10
+#define MAIN_THREAD_PRIO            11
 #define MAIN_PREEMPTION_THRESHOLD   (MAIN_THREAD_PRIO)
 static CHAR main_stack[MAIN_STACK_SIZE];
 

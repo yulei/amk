@@ -21,7 +21,7 @@
 #endif
 
 #ifdef RTOS_ENABLE
-#define W25QXX_ASYNC    0
+#define W25QXX_ASYNC    1
 #endif
 
 #define WQCMD_DUMMY 0xA5
@@ -124,17 +124,16 @@ static amk_error_t w25qxx_write_address(w25qxx_t *w25qxx, uint8_t cmd, uint32_t 
 static bool w25qxx_sector_empty(w25qxx_t *w25qxx, uint32_t address);
 
 #if W25QXX_ASYNC
-#include "cmsis_os2.h"
-#include "FreeRTOS.h"
-static StaticSemaphore_t sema_def;
-static osSemaphoreAttr_t sema_attr = {
-    .name = "w25_sema",
-    .attr_bits = 0,
-    .cb_mem = &sema_def,
-    .cb_size = sizeof(sema_def),
-};
-static osSemaphoreId_t read_sema;
+#include "tx_api.h"
 static spi_handle_t current_spi;
+static TX_SEMAPHORE w25qxx_sema;
+static TX_SEMAPHORE* p_sema = NULL;
+static void w25qxx_sema_init(void)
+{
+    if (TX_SUCCESS == tx_semaphore_create(&w25qxx_sema, "w25qxx_sema", 0)) {
+        p_sema = &w25qxx_sema;
+    }
+}
 #endif
 
 w25qxx_t *w25qxx_current(void)
@@ -170,7 +169,7 @@ w25qxx_t *w25qxx_init(w25qxx_config_t *config)
     device->type = W25Q128; 
     gpio_write_pin(config->cs, 1);
 #if W25QXX_ASYNC
-    read_sema = osSemaphoreNew(1, 0, &sema_attr);
+    //read_sema = osSemaphoreNew(1, 0, &sema_attr);
     current_spi = config->spi;
 #endif
     return device;
@@ -274,7 +273,9 @@ amk_error_t w25qxx_read_sector(w25qxx_t* w25qxx, uint32_t address, uint8_t *data
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 {
     if (hspi == current_spi) {
-        osSemaphoreRelease(read_sema);
+        if (p_sema) {
+            tx_semaphore_put(p_sema);
+        }
     }
 }
 #endif
@@ -285,7 +286,10 @@ amk_error_t w25qxx_read_bytes(w25qxx_t* w25qxx, uint32_t address, uint8_t *data,
 	w25qxx_spi_write(w25qxx, 0);
 #if W25QXX_ASYNC
     spi_recv_async(w25qxx->config.spi, data, size);
-    osSemaphoreAcquire(read_sema, osWaitForever);
+    if (p_sema == NULL) {
+        w25qxx_sema_init();
+    }
+    tx_semaphore_get(p_sema, TX_WAIT_FOREVER);
 #else
     spi_recv(w25qxx->config.spi, data, size);
 #endif

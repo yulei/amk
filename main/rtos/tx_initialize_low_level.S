@@ -64,8 +64,8 @@
 	.global     Image$$RW_IRAM1$$ZI$$Limit
 @
 @
-SYSTEM_CLOCK      =   168000000
-SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / 100) -1)
+@SYSTEM_CLOCK      =   168000000
+SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / 1000) -1)
 
     .text 32
     .align 4
@@ -278,8 +278,8 @@ __tx_DBGHandler:
     EXTERN  _tx_execution_isr_exit
 ;
 ;
-SYSTEM_CLOCK      EQU   168000000
-SYSTICK_CYCLES    EQU   ((SYSTEM_CLOCK / 100) -1)
+@SYSTEM_CLOCK      EQU   168000000
+SYSTICK_CYCLES    EQU   ((SYSTEM_CLOCK / 1000) -1)
 
 #ifdef USE_DYNAMIC_MEMORY_ALLOCATION
     RSEG    FREE_MEM:DATA
@@ -462,8 +462,8 @@ SysTick_Handler:
 @
 @
 
-SYSTEM_CLOCK      =   168000000
-SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / 100) -1)
+@SYSTEM_CLOCK      =   168000000
+SYSTICK_CYCLES    =   ((SYSTEM_CLOCK / 1000) -1)
 
     .text 32
     .align 4
