@@ -166,6 +166,7 @@ SECTIONS
     PROVIDE ( end = . );
     PROVIDE ( _end = . );
     . = . + _heap_size;
+    __HeapLimit = .;
     . = . + _stack_size;
     . = ALIGN(8);
   } >RAM

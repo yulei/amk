@@ -31,6 +31,7 @@
 #define USE_WS2812
 #define USE_3741
 #define USE_3236
+#define USE_3731
 
 #define USE_I2C1
 #define IS31FL3741_I2C_ID   I2C_INSTANCE_1
@@ -42,11 +43,17 @@
 #define RGB_MATRIX_NUM      1
 
 //#define RABBIT_VER
+#define LED_SCREEN_VER 
 
 #ifdef RABBIT_VER
 #define IS31FL3236_LED_NUM  6
 
 #define RGB_LED_NUM         (IS31FL3236_LED_NUM+RGB_MATRIX_LED_NUM)
+#define RGB_DEVICE_NUM      2
+#define RGB_SEGMENT_NUM     2
+#elif defined(LED_SCREEN_VER)
+#define IS31FL3731_LED_NUM  16
+#define RGB_LED_NUM         (IS31FL3731_LED_NUM+RGB_MATRIX_LED_NUM)
 #define RGB_DEVICE_NUM      2
 #define RGB_SEGMENT_NUM     2
 #else
@@ -103,4 +110,4 @@
 // custom tusb definitions
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 
-#define SUSPEND_RECONNECT
+#define SUSPEND_RESET

@@ -80,14 +80,20 @@ void busy_delay_us(uint32_t us)
 }
 
 #ifdef RTOS_ENABLE
-#include "cmsis_os2.h"
+//#include "cmsis_os2.h"
+#include "tx_api.h"
 #endif
 
 void wait_ms(int ms)
 {
 #ifdef RTOS_ENABLE
-    if (osKernelGetState() == osKernelRunning) {
-        osDelay(ms);
+    extern bool rtos_running;
+
+    //if (osKernelGetState() == osKernelRunning) {
+    //    osDelay(ms);
+    if (rtos_running) {
+        tx_thread_sleep(ms);
+    }
     } else {
         busy_delay_ms(ms);
     }
@@ -111,7 +117,7 @@ void wait_us(int us)
 void dwt_delay_init(void)
 {
 #ifdef DWT_DELAY
-    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    DCB->DEMCR |= DCB_DEMCR_TRCENA_Msk;
     DWT->CYCCNT = 0;
     DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 #endif

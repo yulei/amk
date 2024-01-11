@@ -64,9 +64,9 @@
   #error "Incorrect RHPort configuration"
 #endif
 
-// This example doesn't use an RTOS
 #ifdef RTOS_ENABLE
-#define CFG_TUSB_OS                 OPT_OS_FREERTOS
+//#define CFG_TUSB_OS                 OPT_OS_FREERTOS
+#define CFG_TUSB_OS                 OPT_OS_CUSTOM
 #else
 #define CFG_TUSB_OS                 OPT_OS_NONE
 #endif
