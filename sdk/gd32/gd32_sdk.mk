@@ -6,7 +6,7 @@ MCU_PREFIX := GD32E10x
 MCU_SERIES := gd32e10x
 MCU_TYPE := e103
 GD32_LIB_VER := 1.2.2
-GD32_LIB_DIR := $(MCU_PREFIX)_Firmware_Library_v$(GD32_LIB_VER)
+GD32_LIB_DIR := $(MCU_PREFIX)_Firmware_Library_V$(GD32_LIB_VER)
 GD32_LIB_STD := $(MCU_PREFIX)_standard_peripheral
 endif
 
