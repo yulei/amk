@@ -39,7 +39,7 @@ void usb_init(void)
 #ifdef USE_HS_USB
     usb_polling_rate = eeconfig_read_usb();
     amk_printf("Current polling rate is: %d\n", usb_polling_rate);
-    if (usb_polling_rate != 0) {
+    if (usb_polling_rate != 0 && !(usb_setting&USB_MSC_BIT)) {
         usb_setting |= USB_HS_BIT;
     }
 #endif
