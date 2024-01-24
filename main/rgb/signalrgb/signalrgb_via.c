@@ -148,7 +148,7 @@ specifically in (*command_id)
 right before protocol version
 
 */
-void raw_hid_receive_kb(uint8_t *data, uint8_t length)
+void signalrgb_process(uint8_t *data, uint8_t length)
 {
     uint8_t command_id = data[0];
     switch(command_id) {

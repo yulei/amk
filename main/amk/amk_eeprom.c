@@ -152,3 +152,13 @@ void eeconfig_update_apc_sens(uint8_t apc)
 {
     eeprom_write_byte(EECONFIG_APC_SENS, apc);
 }
+
+uint8_t eeconfig_read_noise_sens(void)
+{
+    return eeprom_read_byte(EECONFIG_NOISE_SENS);
+}
+
+void eeconfig_update_noise_sens(uint8_t noise)
+{
+    eeprom_write_byte(EECONFIG_NOISE_SENS, noise);
+}

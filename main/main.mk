@@ -25,6 +25,8 @@ SRCS += \
 	$(MAIN_DIR)/amk/amk_eeprom.c \
 	$(MAIN_DIR)/amk/ring_buffer.c \
 	$(MAIN_DIR)/amk/linear_buffer.c \
+	$(MAIN_DIR)/amk/amk_protocol.c \
+	$(MAIN_DIR)/amk/amk_store.c \
 
 INCS += \
 	$(MAIN_DIR) \

@@ -46,6 +46,10 @@
 #define EECONFIG_APC_SENS           (uint8_t*)(EECONFIG_APC_SENS_START)
 #define EECONFIG_APC_SENS_COUNT     1
 
+#define EECONFIG_NOISE_SENS_START   (EECONFIG_APC_SENS_START+EECONFIG_APC_SENS_COUNT)
+#define EECONFIG_NOISE_SENS         (uint8_t*)(EECONFIG_NOISE_SENS_START)
+#define EECONFIG_NOISE_SENS_COUNT   1
+
 #define AMK_EEPROM_SIZE             4096
 #define EECONFIG_RESERVED_COUNT     (AMK_EEPROM_SIZE \
                                     -EEPROM_SIZE \
@@ -55,8 +59,9 @@
                                     -EECONFIG_POLE_COUNT \
                                     -EECONFIG_RT_SENS_COUNT \
                                     -EECONFIG_TOP_SENS_COUNT \
-                                    -EECONFIG_BTM_SENS_COUNT\
-                                    -EECONFIG_APC_SENS_COUNT)
+                                    -EECONFIG_BTM_SENS_COUNT \
+                                    -EECONFIG_APC_SENS_COUNT \
+                                    -EECONFIG_NOISE_SENS_COUNT)
 
 void eeconfig_read_rgb(void* rgb, uint8_t index);
 void eeconfig_write_rgb(const void* rgb, uint8_t index);
@@ -82,3 +87,6 @@ void eeconfig_update_btm_sens(uint8_t btm);
 
 uint8_t eeconfig_read_apc_sens(void);
 void eeconfig_update_apc_sens(uint8_t apc);
+
+uint8_t eeconfig_read_noise_sens(void);
+void eeconfig_update_noise_sens(uint8_t noise);
