@@ -59,12 +59,12 @@ uint32_t usb_polling_rate = 0;
         HID_INPUT        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE )  ,\
     HID_USAGE_PAGE ( HID_USAGE_PAGE_KEYBOARD ) ,\
         HID_USAGE_MIN    ( 0                                   )  ,\
-        HID_USAGE_MAX    ( (AMK_NKRO_TOTAL_SIZE-2)*8             )  ,\
+        HID_USAGE_MAX    ( (AMK_NKRO_TOTAL_SIZE-2)*8-1         )  ,\
         HID_LOGICAL_MIN  ( 0                                   )  ,\
         HID_LOGICAL_MAX  ( 1                                   )  ,\
         HID_REPORT_COUNT ( (AMK_NKRO_TOTAL_SIZE-2)*8             )  ,\
         HID_REPORT_SIZE  ( 1                                   )  ,\
-        HID_INPUT        ( HID_DATA | HID_ARRAY | HID_ABSOLUTE )  ,\
+        HID_INPUT        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE )  ,\
     HID_COLLECTION_END
 
 #define VIAL_USAGE_PAGE     0xFF60
