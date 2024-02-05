@@ -94,10 +94,10 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     PA2     ------> ADC1_IN2
     */
     //GPIO_InitStruct.Pin = GPIO_PIN_1;
-    GPIO_InitStruct.Pin = GPIO_PIN_2;
+    GPIO_InitStruct.Pin = KEY_IN_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    HAL_GPIO_Init(KEY_IN_PORT, &GPIO_InitStruct);
 
   /* USER CODE BEGIN ADC1_MspInit 1 */
 
@@ -405,7 +405,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     PA7     ------> SPI1_MOSI
     */
   #ifdef SPI1_PINS
-    GPIO_InitStruct.Pin = GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5;
+    GPIO_InitStruct.Pin = SPI1_PINS;
   #else
     GPIO_InitStruct.Pin = GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7;
   #endif
@@ -487,8 +487,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     PB5     ------> SPI3_MOSI
     */
   #ifdef SPI3_PINS
-    GPIO_InitStruct.Pin = //GPIO_PIN_10|GPIO_PIN_11|GPIO_PIN_12;
-                          SPI3_PINS;
+    GPIO_InitStruct.Pin = SPI3_PINS;
   #else
     GPIO_InitStruct.Pin = GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5;
   #endif
