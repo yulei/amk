@@ -39,7 +39,7 @@ extern "C" {
   *
   */
 #if !defined  HEXT_VALUE
-#define HEXT_VALUE                       ((uint32_t)16000000) /*!< value of the high speed external crystal in hz */
+#define HEXT_VALUE                       ((uint32_t)12000000) /*!< value of the high speed external crystal in hz */
 #endif
 
 /**
