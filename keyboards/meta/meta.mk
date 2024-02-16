@@ -9,6 +9,8 @@ NKRO_ENABLE = yes
 UF2_ENABLE = yes
 UF2_FAMILY = STM32F4
 
+DEBOUNCE_TYPE = asym_eager_defer_pk
+
 LINKER_PATH = $(KEYBOARD_DIR)
 
 SRCS += $(KEYBOARD_DIR)/meta.c

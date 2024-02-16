@@ -5,7 +5,7 @@ MCU_ARCH := CORTEX_M4
 MCU_PREFIX := artery 
 MCU_SERIES := at32f402_405
 MCU_TYPE := f405
-AT32_LIB_DIR := AT32F402_405_Firmware_Library_V2.0.2
+AT32_LIB_DIR := AT32F402_405_Firmware_Library_V2.0.5
 endif
 
 SRCS += \
@@ -36,6 +36,7 @@ APP_DEFS += \
 	-DUSE_STDPERIPH_DRIVER \
 
 include $(AT32SDK_DIR)/$(MCU_TYPE)_sdk.mk
+include $(LIB_DIR)/cmsis_core.mk
 
 ifeq (yes, $(strip $(TINYUSB_ENABLE)))
 	include $(LIB_DIR)/tinyusb.mk
@@ -46,3 +47,4 @@ endif
 
 LINKER_PATH	?= $(AT32SDK_DIR)/$(MCU_TYPE)
 LINKER_SCRIPT := $(LINKER_PATH)/$(MCU_LD)_FLASH.ld
+

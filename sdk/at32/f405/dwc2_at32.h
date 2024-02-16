@@ -78,7 +78,7 @@ static inline void dwc2_dcd_int_disable (uint8_t rhport)
 TU_ATTR_ALWAYS_INLINE
 static inline void dwc2_delay_1ms(void)
 {
-  // try to delay for 5 ms
+  // try to delay for 1 ms
   uint32_t count = (SystemCoreClock / 1000);
   while ( count-- ) __NOP();
 }

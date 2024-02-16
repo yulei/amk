@@ -28,6 +28,9 @@
  */
 
 #include "tusb_option.h"
+#include <stdint.h>
+#include "usb_common.h"
+
 
 #if CFG_TUD_ENABLED //&& defined(TUP_USBIP_DWC2)
 
@@ -435,15 +438,20 @@ static void phy_hs_init(dwc2_regs_t * dwc2)
   dwc2_phy_update(dwc2, dwc2->ghwcfg2_bm.hs_phy_type);
 
   // Set max speed
-  uint32_t dcfg = dwc2->dcfg;
+/*  uint32_t dcfg = dwc2->dcfg;
   dcfg &= ~DCFG_DSPD_Msk;
-  dcfg |= DCFG_DSPD_HS << DCFG_DSPD_Pos;
+  dcfg &= ~DCFG_PFIVL_Msk;
 
-  // XCVRDLY: transceiver delay between xcvr_sel and txvalid during device chirp is required
-  // when using with some PHYs such as USB334x (USB3341, USB3343, USB3346, USB3347)
-  //if (dwc2->ghwcfg2_bm.hs_phy_type == HS_PHY_TYPE_ULPI) dcfg |= DCFG_XCVRDLY;
+  if (usb_setting & USB_HS_BIT) {
+    dcfg |= DCFG_DSPD_HS << DCFG_DSPD_Pos;
+  }
+  else
+  {
+    dcfg |= DCFG_DSPD_FS_HSPHY << DCFG_DSPD_Pos;
+  }
 
-  //dwc2->dcfg = dcfg;
+  dwc2->dcfg = dcfg;
+  */
 }
 
 static bool check_dwc2(dwc2_regs_t * dwc2)
@@ -508,6 +516,20 @@ void dcd_init (uint8_t rhport)
   // If USB host misbehaves during status portion of control xfer
   // (non zero-length packet), send STALL back and discard.
   dwc2->dcfg |= DCFG_NZLSOHSK;
+
+  // set Periodic frame interval
+  dwc2->dcfg &= ~DCFG_PFIVL_Msk;
+
+   // Set max speed
+  dwc2->dcfg &= ~DCFG_DSPD_Msk;
+
+  if (usb_setting & USB_HS_BIT) {
+    dwc2->dcfg |= DCFG_DSPD_HS << DCFG_DSPD_Pos;
+  }
+  else
+  {
+    dwc2->dcfg |= DCFG_DSPD_FS_HSPHY << DCFG_DSPD_Pos;
+  }
 
   // Clear all interrupts
   uint32_t int_mask = dwc2->gintsts;
