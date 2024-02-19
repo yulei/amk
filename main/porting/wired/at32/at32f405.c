@@ -9,6 +9,7 @@
 #include "amk_hal.h"
 #include "cm_misc.h"
 #include "wait.h"
+#include "usb_common.h"
 
 #include "tusb.h"
 
@@ -109,6 +110,56 @@ static void usb_custom_init(void)
     nvic_irq_enable(OTGHS_IRQn, 0, 0);
 }
 
+#ifdef USE_SPI1
+spi_type *hspi1 = SPI1;
+static void spi1_gpio_init(void)
+{
+    gpio_init_type gpio_initstructure;
+    crm_periph_clock_enable(CRM_GPIOA_PERIPH_CLOCK, TRUE);
+
+    /* master sck pin */
+    gpio_initstructure.gpio_out_type       = GPIO_OUTPUT_PUSH_PULL;
+    gpio_initstructure.gpio_pull           = GPIO_PULL_DOWN;
+    gpio_initstructure.gpio_mode           = GPIO_MODE_MUX;
+    gpio_initstructure.gpio_drive_strength = GPIO_DRIVE_STRENGTH_STRONGER;
+    gpio_initstructure.gpio_pins           = GPIO_PINS_5;
+    gpio_init(GPIOA, &gpio_initstructure);
+    gpio_pin_mux_config(GPIOA, GPIO_PINS_SOURCE5, GPIO_MUX_5);
+
+    /* master miso pin */
+    gpio_initstructure.gpio_pull           = GPIO_PULL_UP;
+    gpio_initstructure.gpio_pins           = GPIO_PINS_6;
+    gpio_init(GPIOA, &gpio_initstructure);
+    gpio_pin_mux_config(GPIOA, GPIO_PINS_SOURCE6, GPIO_MUX_5);
+
+        /* master mosi pin */
+    gpio_initstructure.gpio_pull           = GPIO_PULL_UP;
+    gpio_initstructure.gpio_pins           = GPIO_PINS_7;
+    gpio_init(GPIOA, &gpio_initstructure);
+    gpio_pin_mux_config(GPIOA, GPIO_PINS_SOURCE7, GPIO_MUX_5);
+}
+
+static void spi1_init(void)
+{
+    spi1_gpio_init();
+
+    crm_periph_clock_enable(CRM_SPI1_PERIPH_CLOCK, TRUE);
+    spi_init_type spi_init_struct;
+    spi_default_para_init(&spi_init_struct);
+    spi_init_struct.transmission_mode = SPI_TRANSMIT_FULL_DUPLEX;
+    spi_init_struct.master_slave_mode = SPI_MODE_MASTER;
+    spi_init_struct.mclk_freq_division = SPI_MCLK_DIV_16;
+    spi_init_struct.first_bit_transmission = SPI_FIRST_BIT_MSB;
+    spi_init_struct.frame_bit_num = SPI_FRAME_8BIT;
+    spi_init_struct.clock_polarity = SPI_CLOCK_POLARITY_HIGH;
+    spi_init_struct.clock_phase = SPI_CLOCK_PHASE_2EDGE;
+    spi_init_struct.cs_mode_selection = SPI_CS_SOFTWARE_MODE;
+    spi_init_at32(SPI1, &spi_init_struct);
+
+    spi_enable(SPI1, TRUE);
+}
+#endif
+
 void custom_board_init(void)
 {
     crm_periph_clock_enable(CRM_GPIOA_PERIPH_CLOCK, TRUE);
@@ -116,6 +167,12 @@ void custom_board_init(void)
     crm_periph_clock_enable(CRM_GPIOC_PERIPH_CLOCK, TRUE);
     crm_periph_clock_enable(CRM_GPIOD_PERIPH_CLOCK, TRUE);
     usb_custom_init();
+
+    //usb_setting |= USB_MSC_BIT;
+
+#ifdef USE_SPI1
+    spi1_init();
+#endif
 }
 
 void custom_board_task(void)

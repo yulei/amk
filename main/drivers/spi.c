@@ -11,6 +11,8 @@
 #   include "spi_hc32.c"
 #elif defined(GD32E50X)
 #   include "spi_gd32.c"
+#elif defined(AT32F405)
+#   include "spi_at32.c"
 #else
 #   error "spi not available"
 #endif
