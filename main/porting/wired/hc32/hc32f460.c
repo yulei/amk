@@ -117,7 +117,7 @@ void screen_spi_init(void)
     PORT_SetFunc(SPI_MOSI_PORT, SPI_MOSI_PIN, SPI_MOSI_FUNC, Disable);
 
     /* Configuration SPI structure */
-    stcSpiInit.enClkDiv = SpiClkDiv2;  //pclk1 = 50, 50/8 = 6.25
+    stcSpiInit.enClkDiv = SpiClkDiv2;  //pclk1 = 50
     stcSpiInit.enFrameNumber = SpiFrameNumber1;
     stcSpiInit.enDataLength = SpiDataLengthBit8;
     stcSpiInit.enFirstBitPosition = SpiFirstBitPositionMSB;

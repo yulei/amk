@@ -90,6 +90,7 @@ static bool anim_display_init(display_t *display, screen_t *screen)
 
     obj->anim = anim_open_with_size(NULL, obj->anim_type, obj->param.width, obj->param.height);
     if (!obj->anim) {
+        //ad_debug("failed to open animation files: type=%d, widht=%d, height=%d\n", obj->anim_type, obj->param.width, obj->param.height);
         return false;
     }
 
@@ -185,7 +186,7 @@ void anim_display_task(display_t *display)
         //    ad_debug("ANIM: elapsed=%d, delay=%d\n", elapsed, obj->delay);
         //}
 
-        if ( false || elapsed*2 > obj->delay) {
+        if ( false || elapsed > obj->delay) {
             obj->ticks = timer_read32();
             uint32_t step_start = timer_read32();
             uint32_t res = anim_step(obj->anim, &obj->delay, obj->buffer, obj->buffer_size);

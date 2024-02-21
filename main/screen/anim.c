@@ -116,6 +116,7 @@ anim_t *anim_open_with_size(const char *path, anim_type_t type, uint32_t width, 
     anim_scan(&anim_inst[type], width, height);
 
     if (anim_inst[type].total == 0) {
+        amk_printf("anim scan failed, type=%d, width=%d, height=%d\n", type, width, height);
         return NULL;
     }
 
@@ -334,6 +335,7 @@ static void anim_scan(anim_t *anim, uint32_t width, uint32_t height)
         for (;;) {
             FILINFO fno;
             res = f_readdir(&dir, &fno);
+            amk_printf("anim SCAN: failed to readdir\n");
             if (res != FR_OK || fno.fname[0] == 0) break;
             if ( (fno.fattrib & AM_DIR) == 0) {
                 const char* sig = ANIM_SIG;
@@ -360,12 +362,16 @@ static void anim_scan(anim_t *anim, uint32_t width, uint32_t height)
                         // oversize, break the loop
                         break;
                     }
+                } else {
+                    amk_printf("anim SCAN: failed to check: %s, width=%d, height=%d\n", fno.fname, width, height);
                 }
             }
         }
         f_closedir(&dir);
+    } else {
+        amk_printf("anim SCAN: failed to open=%s, res=%d\n", anim->path, res);
     }
-}
+} 
 
 static bool anim_check_file(const char *path, const char* sig, uint32_t width, uint32_t height)
 {

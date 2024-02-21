@@ -21,7 +21,7 @@
 #define ORG_WIDTH           135
 #define ORG_HEIGHT          240
 
-#if  0
+#if 0
 #define ST7789_ROTATION     (ST7789_MADCTL_MX | ST7789_MADCTL_MY | ST7789_MADCTL_RGB)
 #define ST7789_XSTART       ORG_YSTART2
 #define ST7789_YSTART       ORG_XSTART
@@ -29,7 +29,7 @@
 #define ST7789_HEIGHT       ORG_HEIGHT
 #endif
 
-#if 1
+#if 0
 #define ST7789_ROTATION     (ST7789_MADCTL_MY | ST7789_MADCTL_MV | ST7789_MADCTL_RGB)
 #define ST7789_XSTART       ORG_XSTART
 #define ST7789_YSTART       ORG_YSTART1
@@ -45,12 +45,12 @@
 #define ST7789_HEIGHT       ORG_HEIGHT
 #endif
 
-#if 0
+#if 1
 #define ST7789_ROTATION     (ST7789_MADCTL_MX | ST7789_MADCTL_MV | ST7789_MADCTL_RGB)
 #define ST7789_XSTART       ORG_XSTART
 #define ST7789_YSTART       ORG_YSTART2
-#define ST7789_WIDTH        ORG_WIDTH
-#define ST7789_HEIGHT       ORG_HEIGHT
+#define ST7789_WIDTH        ORG_HEIGHT
+#define ST7789_HEIGHT       ORG_WIDTH
 #endif
 
 #endif
@@ -265,6 +265,7 @@ void st7789_init(screen_driver_t *lcd)
     execute_commands(driver, init_cmds2);
     set_address_window(driver, 0, 0, ST7789_WIDTH-1, ST7789_HEIGHT-1);
     uint16_t color = 0;
+    //uint16_t color = 0xFFFF;
     for (int x = 0; x < ST7789_WIDTH; x++) {
         for (int y = 0; y < ST7789_HEIGHT; y++) {
             write_data(driver, (uint8_t*)&color, sizeof(color));

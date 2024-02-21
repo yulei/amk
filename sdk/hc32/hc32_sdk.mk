@@ -37,6 +37,7 @@ INCS += \
 	$(LIB_DIR)/cmsis_5/CMSIS/Core/Include
 
 
+include $(LIB_DIR)/cmsis_core.mk
 
 APP_DEFS += \
 	-DUSE_DEVICE_DRIVER_LIB \
