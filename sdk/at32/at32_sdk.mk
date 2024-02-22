@@ -26,9 +26,9 @@ SRCS += \
 	${VENDOR_DIR}/${AT32_LIB_DIR}/libraries/drivers/src/${MCU_SERIES}_wdt.c \
 
 INCS += \
-	${LIB_DIR}/cmsis_5/CMSIS/Core/Include \
 	${VENDOR_DIR}/${AT32_LIB_DIR}/libraries/cmsis/cm4/device_support \
 	${VENDOR_DIR}/${AT32_LIB_DIR}/libraries/drivers/inc \
+	${VENDOR_DIR}/${AT32_LIB_DIR}/middlewares/i2c_application_library \
 	${AT32SDK_DIR} \
 	${AT32SDK_DIR}/$(MCU_TYPE) \
 

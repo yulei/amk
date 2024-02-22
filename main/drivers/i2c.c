@@ -13,4 +13,8 @@
 #   include "i2c_gd32_state_dma.c"
 #elif defined(HC32F460xE)
 #   include "i2c_hc32.c"
+#elif defined(AT32F405)
+#   include "i2c_at32.c"
+#else
+#   error "i2c not available"
 #endif

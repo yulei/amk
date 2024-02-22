@@ -41,11 +41,16 @@ static void fault_handler(void)
 
 uint32_t magic_read(void)
 {
-    return 0;
+    crm_periph_clock_enable(CRM_PWC_PERIPH_CLOCK, TRUE);
+    pwc_battery_powered_domain_access(TRUE);
+    return ertc_bpr_data_read(ERTC_DT1);
 }
 
 void magic_write(uint32_t magic)
 {
+    crm_periph_clock_enable(CRM_PWC_PERIPH_CLOCK, TRUE);
+    pwc_battery_powered_domain_access(TRUE);
+    ertc_bpr_data_write(ERTC_DT1, magic);
 }
 
 void NMI_Handler(void)

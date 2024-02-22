@@ -136,7 +136,7 @@ bool is31fl3236_update_buffers(i2c_led_t *driver)
         if (AMK_SUCCESS != i2c_write_reg(i2c_inst, driver->addr, UPDATE_REG, &data, 1, TIMEOUT)) {
             fl3236_debug("IS31FL3236: failed to update UPDATE register for pwm\n");
         }
-        fl3236_debug("IS31FL3236: pwm UPDATE success\n");
+        //fl3236_debug("IS31FL3236: pwm UPDATE success\n");
         return true;
     }
 

@@ -160,6 +160,58 @@ static void spi1_init(void)
 }
 #endif
 
+#ifdef USE_I2C1
+#include "i2c_application.h"
+#define I2Cx_ADDRESS                     0x78 
+//#define I2Cx_CLKCTRL                   0x4170FEFE   //10K
+//#define I2Cx_CLKCTRL                   0x90F06666   //50K
+#define I2Cx_CLKCTRL                     0x90F03030   //100K
+//#define I2Cx_CLKCTRL                   0x20F07DDE   //200K
+i2c_handle_type hi2c1;
+
+static void i2c1_init(void)
+{
+    /* i2c peripheral initialization */
+    gpio_init_type gpio_init_structure;
+
+
+    /* configure i2c pins: scl */
+    gpio_init_structure.gpio_drive_strength = GPIO_DRIVE_STRENGTH_STRONGER;
+    gpio_init_structure.gpio_mode           = GPIO_MODE_MUX;
+    gpio_init_structure.gpio_out_type       = GPIO_OUTPUT_OPEN_DRAIN;
+    gpio_init_structure.gpio_pull           = GPIO_PULL_UP;
+
+    gpio_init_structure.gpio_pins           = GPIO_PINS_8;
+    gpio_init(GPIOB, &gpio_init_structure);
+    gpio_pin_mux_config(GPIOB, GPIO_PINS_SOURCE8, GPIO_MUX_4);
+
+    /* configure i2c pins: sda */
+    gpio_init_structure.gpio_pins           = GPIO_PINS_9;
+    gpio_init(GPIOB, &gpio_init_structure);
+    gpio_pin_mux_config(GPIOB, GPIO_PINS_SOURCE9, GPIO_MUX_4);
+
+    /* config i2c */
+    i2c_init_at32(hi2c1.i2cx, 0x0F, I2Cx_CLKCTRL);
+    i2c_own_address1_set(hi2c1.i2cx, I2C_ADDRESS_MODE_7BIT, 0);
+
+    /* i2c peripheral enable */
+    i2c_enable(hi2c1.i2cx, TRUE);
+    wait_ms(1);
+}
+
+static void i2c1_bus_reset(void)
+{ 
+    /* i2c periph clock enable */
+    crm_periph_clock_enable(CRM_I2C1_PERIPH_CLOCK, TRUE);
+    crm_periph_clock_enable(CRM_GPIOB_PERIPH_CLOCK, TRUE);
+
+    hi2c1.i2cx = I2C1;
+    /* reset i2c peripheral */
+    i2c_reset(hi2c1.i2cx);
+
+    i2c1_init();
+}
+#endif
 void custom_board_init(void)
 {
     crm_periph_clock_enable(CRM_GPIOA_PERIPH_CLOCK, TRUE);
@@ -172,6 +224,23 @@ void custom_board_init(void)
 
 #ifdef USE_SPI1
     spi1_init();
+#endif
+#ifdef USE_I2C1
+    i2c1_bus_reset();
+#endif
+
+#ifdef DYNAMIC_CONFIGURATION
+    crm_periph_clock_enable(CRM_PWC_PERIPH_CLOCK, TRUE);
+    pwc_battery_powered_domain_access(TRUE);
+    uint32_t magic = ertc_bpr_data_read(ERTC_DT2);
+
+    //if (magic == 0) {
+    if (magic > 0) {
+        usb_setting |= USB_MSC_BIT;
+    } else {
+        usb_setting = 0;
+    }
+    ertc_bpr_data_write(ERTC_DT2, 0);
 #endif
 }
 
