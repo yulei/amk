@@ -43,7 +43,7 @@
 #define RGB_MATRIX_NUM      1
 
 //#define RABBIT_VER
-#define LED_SCREEN_VER 
+//#define LED_SCREEN_VER 
 
 #ifdef RABBIT_VER
 #define IS31FL3236_LED_NUM  6
