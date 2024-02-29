@@ -32,7 +32,7 @@ void flash_read(uint32_t address, uint16_t* offset, uint16_t* data)
     *data = ~tmp;
 }
 
-#define FLASH_FLAGS (FLASH_OBF_FLAG | FLASH_ODF_FLAG | FLASH_PRGMERR_FLAG | FLASH_EPPERR_FLAG)
+#define FLASH_FLAGS (FLASH_ODF_FLAG | FLASH_PRGMERR_FLAG | FLASH_EPPERR_FLAG)
 
 bool flash_write(uint32_t address, uint16_t offset, uint16_t data)
 {

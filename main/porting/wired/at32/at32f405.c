@@ -171,9 +171,17 @@ i2c_handle_type hi2c1;
 
 static void i2c1_init(void)
 {
+    /* i2c periph clock enable */
+    crm_periph_clock_enable(CRM_I2C1_PERIPH_CLOCK, TRUE);
+    crm_periph_clock_enable(CRM_GPIOB_PERIPH_CLOCK, TRUE);
+
+    hi2c1.i2cx = I2C1;
+
+    /* reset i2c peripheral */
+    i2c_reset(hi2c1.i2cx);
+
     /* i2c peripheral initialization */
     gpio_init_type gpio_init_structure;
-
 
     /* configure i2c pins: scl */
     gpio_init_structure.gpio_drive_strength = GPIO_DRIVE_STRENGTH_STRONGER;
@@ -198,19 +206,54 @@ static void i2c1_init(void)
     i2c_enable(hi2c1.i2cx, TRUE);
     wait_ms(1);
 }
+#endif
 
-static void i2c1_bus_reset(void)
-{ 
-    /* i2c periph clock enable */
-    crm_periph_clock_enable(CRM_I2C1_PERIPH_CLOCK, TRUE);
-    crm_periph_clock_enable(CRM_GPIOB_PERIPH_CLOCK, TRUE);
+#ifdef USE_ADC1
 
-    hi2c1.i2cx = I2C1;
-    /* reset i2c peripheral */
-    i2c_reset(hi2c1.i2cx);
+uint32_t adc1_channels[ADC_CHANNEL_COUNT] = ADC_CHANNELS;
 
-    i2c1_init();
+extern void adc1_pins_init(void);
+extern void adc1_dma_init(void);
+
+static void adc1_init(void)
+{
+    adc1_pins_init();
+    adc1_dma_init();
+
+    adc_base_config_type adc_base_struct;
+    crm_periph_clock_enable(CRM_ADC1_PERIPH_CLOCK, TRUE);
+    adc_clock_div_set(ADC_DIV_8);
+    //nvic_irq_enable(ADC1_IRQn, 1, 0);
+
+    adc_base_default_para_init(&adc_base_struct);
+
+    adc_base_struct.sequence_mode = TRUE;
+    adc_base_struct.repeat_mode = FALSE;
+    adc_base_struct.data_align = ADC_RIGHT_ALIGNMENT;
+    adc_base_struct.ordinary_channel_length = ADC_CHANNEL_COUNT;
+    adc_base_config(ADC1, &adc_base_struct);
+
+    /* config ordinary channel */
+    for (int i = 0; i < ADC_CHANNEL_COUNT; i++) {
+        adc_ordinary_channel_set(ADC1, adc1_channels[i], i+1, ADC_SAMPLETIME_7_5);
+    }
+
+    /* config ordinary trigger source and trigger edge */
+    adc_ordinary_conversion_trigger_set(ADC1, ADC12_ORDINARY_TRIG_SOFTWARE, TRUE);
+
+    /* config dma mode,it's not useful when common dma mode is use */
+    adc_dma_mode_enable(ADC1, TRUE);
+
+    /* adc enable */
+    adc_enable(ADC1, TRUE);
+
+    /* adc calibration */
+    adc_calibration_init(ADC1);
+    while(adc_calibration_init_status_get(ADC1));
+    adc_calibration_start(ADC1);
+    while(adc_calibration_status_get(ADC1));
 }
+
 #endif
 void custom_board_init(void)
 {
@@ -220,13 +263,15 @@ void custom_board_init(void)
     crm_periph_clock_enable(CRM_GPIOD_PERIPH_CLOCK, TRUE);
     usb_custom_init();
 
-    //usb_setting |= USB_MSC_BIT;
-
 #ifdef USE_SPI1
     spi1_init();
 #endif
 #ifdef USE_I2C1
-    i2c1_bus_reset();
+    i2c1_init();
+#endif
+
+#ifdef USE_ADC1
+    adc1_init();
 #endif
 
 #ifdef DYNAMIC_CONFIGURATION
