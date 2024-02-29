@@ -16,6 +16,8 @@
 #   include "flash_gd32.c"
 #elif defined(CH32V307)
 #   include "flash_ch32.c"
+#elif defined(AT32F405)
+#   include "flash_at32.c"
 #else
 #   error "flash read/write not implemented"
 #endif
