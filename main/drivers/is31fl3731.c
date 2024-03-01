@@ -22,6 +22,9 @@
 #define SHUTDOWN_REG        0x0A
 #define BANK_FUNCTION_REG   0x0B
 
+#define GHOST_PREV_REG      0xC2
+#define GHOST_PREV_GEN      0x10
+
 #define CONTROL_REG         0
 #define PWM_REG             0x24
 #define TIMEOUT             100
@@ -159,6 +162,8 @@ bool init_driver(is31fl3731_driver_t *driver)
 
     data = 0;
     i2c_write_reg(i2c_inst, driver->i2c_led.addr, SHUTDOWN_REG, &data, 1, TIMEOUT);
+    data = GHOST_PREV_GEN;
+    i2c_write_reg(i2c_inst, driver->i2c_led.addr, GHOST_PREV_REG, &data, 1, TIMEOUT);
 
     wait_ms(10);
 
