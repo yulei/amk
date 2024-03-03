@@ -275,17 +275,15 @@ void custom_board_init(void)
 #endif
 
 #ifdef DYNAMIC_CONFIGURATION
-    crm_periph_clock_enable(CRM_PWC_PERIPH_CLOCK, TRUE);
-    pwc_battery_powered_domain_access(TRUE);
-    uint32_t magic = ertc_bpr_data_read(ERTC_DT2);
+    uint32_t reset = reset_read();
 
-    //if (magic == 0) {
-    if (magic > 0) {
+    //if (reset == 0) {
+    if (reset > 0) {
         usb_setting |= USB_MSC_BIT;
     } else {
         usb_setting = 0;
     }
-    ertc_bpr_data_write(ERTC_DT2, 0);
+    reset_write(0);
 #endif
 }
 
