@@ -91,7 +91,8 @@
     defined(STM32F401xC) || defined(STM32F411xE) || defined(STM32F405xx) || \
     defined(STM32F722xx) || defined(STM32F103xB) || defined(STM32L432xx) ||  \
     defined(STM32L072xx) || defined(STM32F446xx) || defined(STM32G431xx) || \
-    defined(STM32L452xx) || defined(STM32F412Rx) || defined(STM32L476xx)
+    defined(STM32L452xx) || defined(STM32F412Rx) || defined(STM32L476xx) || \
+    defined(STM32U575xx)
     #include "gpio_stm32.h"
 #elif defined(__SAMD21G18A__)
     typedef uint8_t pin_t;

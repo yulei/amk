@@ -54,6 +54,10 @@
 #elif defined(STM32G431xx) 
     #include "stm32g4xx.h"
     #include "stm32g4xx_hal.h"
+#elif defined(STM32U575xx) 
+    #include "stm32u5xx.h"
+    #include "stm32u5xx_hal.h"
+    #include "stm32u5xx_ll_gpio.h"
 #elif defined(APM32F407)
     #include "apm32f4xx.h"
     #include "apm32f4xx_conf.h"

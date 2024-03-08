@@ -92,3 +92,5 @@
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 //#define CFG_TUSB_CONFIG_FILE    "tusb_def_host.h"
 #endif
+
+#define CFG_TUSB_CONFIG_FILE    "tusb_def.h"

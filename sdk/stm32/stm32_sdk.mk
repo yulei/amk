@@ -93,6 +93,13 @@ MCU_FAMILY := stm32l4xx
 MCU_TYPE := l476
 endif
 
+ifeq (STM32U575, $(strip $(MCU)))
+MCU_ARCH := CORTEX_M33
+MCU_SERIES := u5
+MCU_FAMILY := stm32u5xx
+MCU_TYPE := u575
+endif
+
 SRCS += \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_tim.c \
 	$(VENDOR_DIR)/driver_$(MCU_SERIES)/Src/$(MCU_FAMILY)_hal_tim_ex.c \
