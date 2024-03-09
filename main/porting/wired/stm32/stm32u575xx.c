@@ -20,8 +20,6 @@ void OTG_FS_IRQHandler(void)
 
 #ifdef USE_I2C1
 I2C_HandleTypeDef hi2c1;
-DMA_HandleTypeDef hdma_i2c1_rx;
-DMA_HandleTypeDef hdma_i2c1_tx;
 #endif
 
 #ifdef USE_ADC1
@@ -90,6 +88,17 @@ void SystemClock_Config(void)
     }
 }
 
+static void SystemPower_Config(void)
+{
+    PWR_PVDTypeDef sConfigPVD = {0};
+
+    sConfigPVD.PVDLevel = PWR_PVDLEVEL_0;
+    sConfigPVD.Mode = PWR_PVD_MODE_NORMAL;
+    HAL_PWR_ConfigPVD(&sConfigPVD);
+
+    HAL_PWR_EnablePVD();
+}
+
 static void MX_ICACHE_Init(void)
 {
     /** Enable instruction cache in 1-way (direct mapped cache)
@@ -143,7 +152,8 @@ static void MX_RTC_Init(void)
 static void MX_I2C1_Init(void)
 {
     hi2c1.Instance = I2C1;
-    hi2c1.Init.Timing = 0x30909DEC;
+    HAL_I2C_DeInit(&hi2c1);
+    hi2c1.Init.Timing = 0x00F07BFF;
     hi2c1.Init.OwnAddress1 = 0;
     hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
     hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -172,8 +182,10 @@ static void MX_SPI1_Init(void)
     hspi1.Init.Mode = SPI_MODE_MASTER;
     hspi1.Init.Direction = SPI_DIRECTION_2LINES;
     hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-    hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
-    hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
+    //hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
+    //hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
+    hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+    hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
     hspi1.Init.NSS = SPI_NSS_SOFT;
     hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
     hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
@@ -312,10 +324,12 @@ static void MX_ADC1_Init(void)
 void custom_board_init(void)
 {
     SystemClock_Config();
+    SystemPower_Config();
 
     MX_GPIO_Init();
     MX_DMA_Init();
     MX_ICACHE_Init();
+    MX_RTC_Init();
 
 #ifdef USE_I2C1
     MX_I2C1_Init();
@@ -325,13 +339,12 @@ void custom_board_init(void)
     MX_SPI1_Init();
 #endif
 
-    MX_RTC_Init();
 
 #ifdef DYNAMIC_CONFIGURATION
     HAL_PWR_EnableBkUpAccess();
     uint32_t magic = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1);
-    if (magic == 0) {
-    //if (magic > 0) {
+    //if (magic == 0) {
+    if (magic > 0) {
         usb_setting |= USB_MSC_BIT;
     } else {
         usb_setting = 0;

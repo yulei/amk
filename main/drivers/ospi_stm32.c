@@ -60,7 +60,8 @@ extern void Error_Handler(void);
 #define FLASH_INSTR_JEDECID             (0x9FU)
 
 /* TIMEOUT*/
-#define FLASH_DUMMY_CYCLES_READ_QUAD    (10)
+#define DUMMY_CYCLES_READ_QUAD          (8)
+#define DUMMY_CYCLES_READ_QUAD_IO       (4)
 #define FLASH_BULK_ERASE_MAX_TIME       (250000)
 #define FLASH_SECTOR_ERASE_MAX_TIME     (3000)
 #define FLASH_SUBSECTOR_ERASE_MAX_TIME  (800)
@@ -89,7 +90,7 @@ bool qspi_init(uint32_t map_addr)
     hospi1.Init.FreeRunningClock = HAL_OSPI_FREERUNCLK_DISABLE;
     hospi1.Init.ClockMode = HAL_OSPI_CLOCK_MODE_0;
     hospi1.Init.WrapSize = HAL_OSPI_WRAP_NOT_SUPPORTED;
-    hospi1.Init.ClockPrescaler = 4;
+    hospi1.Init.ClockPrescaler = 2;
     hospi1.Init.SampleShifting = HAL_OSPI_SAMPLE_SHIFTING_NONE;
     hospi1.Init.DelayHoldQuarterCycle = //HAL_OSPI_DHQC_DISABLE;
                                     HAL_OSPI_DHQC_ENABLE;
@@ -144,13 +145,23 @@ amk_error_t qspi_read_sector(uint32_t address, uint8_t *buffer, size_t length)
     s_command.DQSMode           = HAL_OSPI_DQS_DISABLE;
     s_command.SIOOMode          = HAL_OSPI_SIOO_INST_EVERY_CMD;
 
-    //s_command.Instruction       = FLASH_INSTR_QUAD_READ_IO_CMD;
-    s_command.Instruction       = FLASH_INSTR_READ_CMD;
+    s_command.Instruction       = FLASH_INSTR_QUAD_READ_CMD;
     s_command.AddressMode       = HAL_OSPI_ADDRESS_1_LINE;
+    s_command.DataMode          = HAL_OSPI_DATA_4_LINES;
+    s_command.DummyCycles       = DUMMY_CYCLES_READ_QUAD;
+
+    //s_command.Instruction       = FLASH_INSTR_QUAD_READ_IO_CMD;
+    //s_command.AddressMode       = HAL_OSPI_ADDRESS_4_LINES;
+    //s_command.DataMode          = HAL_OSPI_DATA_4_LINES;
+    //s_command.DummyCycles       = DUMMY_CYCLES_READ_QUAD_IO;
+
+    //s_command.Instruction       = FLASH_INSTR_READ_CMD;
+    //s_command.AddressMode       = HAL_OSPI_ADDRESS_1_LINE;
+    //s_command.DataMode          = HAL_OSPI_DATA_1_LINE;
+    //s_command.DummyCycles       = 0;
+
     s_command.Address           = address;
-    s_command.DataMode          = HAL_OSPI_DATA_1_LINE;
     s_command.NbData            = length;
-    s_command.DummyCycles       = 0;
     
     HAL_StatusTypeDef status = HAL_OSPI_Command(&hospi1, &s_command, HAL_OSPI_TIMEOUT_DEFAULT_VALUE);
     if (status != HAL_OK) {
@@ -207,11 +218,15 @@ amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t le
         s_command.DQSMode           = HAL_OSPI_DQS_DISABLE;
         s_command.SIOOMode          = HAL_OSPI_SIOO_INST_EVERY_CMD;
 
-        //s_command.Instruction       = FLASH_INSTR_PAGE_PROGRAM_QUAD;
-        s_command.Instruction       = FLASH_INSTR_PAGE_PROGRAM;
+        s_command.Instruction       = FLASH_INSTR_PAGE_PROGRAM_QUAD;
         s_command.AddressMode       = HAL_OSPI_ADDRESS_1_LINE;
-        s_command.DataMode          = HAL_OSPI_DATA_1_LINE;
+        s_command.DataMode          = HAL_OSPI_DATA_4_LINES;
         s_command.DummyCycles       = 0;
+
+        //s_command.Instruction       = FLASH_INSTR_PAGE_PROGRAM;
+        //s_command.AddressMode       = HAL_OSPI_ADDRESS_1_LINE;
+        //s_command.DataMode          = HAL_OSPI_DATA_1_LINE;
+        //s_command.DummyCycles       = 0;
 
         s_command.Address = addr;
         s_command.NbData  = OSPI_FLASH_PAGE_SIZE;

@@ -55,10 +55,7 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern DMA_HandleTypeDef handle_GPDMA1_Channel2;
-extern DMA_HandleTypeDef handle_GPDMA1_Channel1;
-extern DMA_HandleTypeDef handle_GPDMA1_Channel0;
-extern SPI_HandleTypeDef hspi1;
+
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -204,6 +201,8 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 #ifdef USE_OSPI
+extern DMA_HandleTypeDef handle_GPDMA1_Channel2;
+extern DMA_HandleTypeDef handle_GPDMA1_Channel1;
 /**
   * @brief This function handles GPDMA1 Channel 1 global interrupt.
   */
@@ -234,6 +233,8 @@ void GPDMA1_Channel2_IRQHandler(void)
 #endif
 
 #ifdef USE_SPI1
+extern DMA_HandleTypeDef handle_GPDMA1_Channel0;
+extern SPI_HandleTypeDef hspi1;
 /**
   * @brief This function handles SPI1 global interrupt.
   */

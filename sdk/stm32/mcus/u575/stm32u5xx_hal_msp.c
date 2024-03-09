@@ -145,7 +145,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 
 #endif
 
-#ifdef USE_I2C
+#ifdef USE_I2C1
 /**
 * @brief I2C MSP Initialization
 * This function configures the hardware resources used in this example
@@ -519,7 +519,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     }
 
     /* SPI1 interrupt Init */
-    HAL_NVIC_SetPriority(SPI1_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(SPI1_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(SPI1_IRQn);
   /* USER CODE BEGIN SPI1_MspInit 1 */
 
