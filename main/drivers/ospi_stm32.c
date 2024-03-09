@@ -31,7 +31,7 @@ extern DMA_HandleTypeDef handle_GPDMA1_Channel1;
 
 extern void Error_Handler(void);
 
-#define OSPI_FLASH_ADDR_SIZE            (23)
+#define OSPI_FLASH_ADDR_SIZE            (24)
 
 /* FLASH parameters definition */
 #define OSPI_FLASH_PAGE_SIZE            (0x100u)
@@ -79,17 +79,20 @@ static amk_error_t OSPI_BusyWait(OSPI_HandleTypeDef *hospi, uint32_t Timeout);
 bool qspi_init(uint32_t map_addr)
 {
     hospi1.Instance = OCTOSPI1;
+    HAL_OSPI_DeInit(&hospi1);
+
     hospi1.Init.FifoThreshold = 1;
     hospi1.Init.DualQuad = HAL_OSPI_DUALQUAD_DISABLE;
     hospi1.Init.MemoryType = HAL_OSPI_MEMTYPE_MICRON;
     hospi1.Init.DeviceSize = OSPI_FLASH_ADDR_SIZE;
-    hospi1.Init.ChipSelectHighTime = 2;
+    hospi1.Init.ChipSelectHighTime = 1;
     hospi1.Init.FreeRunningClock = HAL_OSPI_FREERUNCLK_DISABLE;
     hospi1.Init.ClockMode = HAL_OSPI_CLOCK_MODE_0;
     hospi1.Init.WrapSize = HAL_OSPI_WRAP_NOT_SUPPORTED;
-    hospi1.Init.ClockPrescaler = 8;
+    hospi1.Init.ClockPrescaler = 4;
     hospi1.Init.SampleShifting = HAL_OSPI_SAMPLE_SHIFTING_NONE;
-    hospi1.Init.DelayHoldQuarterCycle = HAL_OSPI_DHQC_DISABLE;
+    hospi1.Init.DelayHoldQuarterCycle = //HAL_OSPI_DHQC_DISABLE;
+                                    HAL_OSPI_DHQC_ENABLE;
     hospi1.Init.ChipSelectBoundary = 0;
     hospi1.Init.DelayBlockBypass = HAL_OSPI_DELAY_BLOCK_BYPASSED;
     hospi1.Init.MaxTran = 0;
@@ -141,6 +144,7 @@ amk_error_t qspi_read_sector(uint32_t address, uint8_t *buffer, size_t length)
     s_command.DQSMode           = HAL_OSPI_DQS_DISABLE;
     s_command.SIOOMode          = HAL_OSPI_SIOO_INST_EVERY_CMD;
 
+    //s_command.Instruction       = FLASH_INSTR_QUAD_READ_IO_CMD;
     s_command.Instruction       = FLASH_INSTR_READ_CMD;
     s_command.AddressMode       = HAL_OSPI_ADDRESS_1_LINE;
     s_command.Address           = address;
@@ -148,15 +152,20 @@ amk_error_t qspi_read_sector(uint32_t address, uint8_t *buffer, size_t length)
     s_command.NbData            = length;
     s_command.DummyCycles       = 0;
     
-    if (HAL_OSPI_Command(&hospi1, &s_command, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
-    {
+    HAL_StatusTypeDef status = HAL_OSPI_Command(&hospi1, &s_command, HAL_OSPI_TIMEOUT_DEFAULT_VALUE);
+    if (status != HAL_OK) {
+        ospi_debug("QSPI: read_sector: failed to send read cmd, error=%d\n", status);
         return AMK_QSPI_ERROR;
+    } else {
+        //ospi_debug("QSPI: read_sector: send read cmd SUCCESS\n");
     }
 
-    /* Reception of the data */
-    if (HAL_OSPI_Receive(&hospi1, buffer, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
-    {
+    status = HAL_OSPI_Receive(&hospi1, buffer, HAL_OSPI_TIMEOUT_DEFAULT_VALUE);
+    if (status != HAL_OK) {
+        ospi_debug("QSPI: read_sector: failed to receive data, address=%d, size=%d, error=%d\n", address, length, status);
         return AMK_QSPI_ERROR;
+    } else {
+        //ospi_debug("QSPI: read_sector: receive data SUCCESS, address=%d, size=%d\n", address, length);
     }
 
     return AMK_SUCCESS;
@@ -198,12 +207,11 @@ amk_error_t qspi_write_sector(uint32_t address, const uint8_t* buffer, size_t le
         s_command.DQSMode           = HAL_OSPI_DQS_DISABLE;
         s_command.SIOOMode          = HAL_OSPI_SIOO_INST_EVERY_CMD;
 
-        s_command.Instruction       = FLASH_INSTR_PAGE_PROGRAM_QUAD;
+        //s_command.Instruction       = FLASH_INSTR_PAGE_PROGRAM_QUAD;
+        s_command.Instruction       = FLASH_INSTR_PAGE_PROGRAM;
         s_command.AddressMode       = HAL_OSPI_ADDRESS_1_LINE;
-        s_command.Address           = address;
-        s_command.DataMode          = HAL_OSPI_DATA_4_LINES;
+        s_command.DataMode          = HAL_OSPI_DATA_1_LINE;
         s_command.DummyCycles       = 0;
-        s_command.NbData            = length;
 
         s_command.Address = addr;
         s_command.NbData  = OSPI_FLASH_PAGE_SIZE;
@@ -381,11 +389,31 @@ amk_error_t OSPI_WriteEnable(OSPI_HandleTypeDef *hospi)
     s_command.DummyCycles       = 0;
 
     if (HAL_OSPI_Command(hospi, &s_command, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK) {
+        ospi_debug("QSPI: state=%d\n", hospi->State);
         ospi_debug("QSPI: failed to send WRITE ENABLE command\n");
         return AMK_QSPI_ERROR;
     }
 
-    if (OSPI_BusyWait(hospi, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) != AMK_SUCCESS) {
+    s_command.Instruction       = FLASH_INSTR_READ_SR1;
+    s_command.AddressMode       = HAL_OSPI_ADDRESS_1_LINE;
+    s_command.Address           = 0;
+    s_command.DataMode          = HAL_OSPI_DATA_1_LINE;
+    s_command.NbData            = 1;
+    s_command.DummyCycles       = 0;
+    if (HAL_OSPI_Command(hospi, &s_command, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK) {
+        ospi_debug("QSPI: failed to send READ SR1 command\n");
+        return AMK_QSPI_ERROR;
+    }
+
+    OSPI_AutoPollingTypeDef s_config;
+    s_config.Match          = W25Q128FV_FSR_WREN;
+    s_config.Mask           = W25Q128FV_FSR_WREN;
+    s_config.MatchMode      = HAL_OSPI_MATCH_MODE_AND;
+    s_config.Interval       = 0x10;
+    s_config.AutomaticStop  = HAL_OSPI_AUTOMATIC_STOP_ENABLE;
+
+    if (HAL_OSPI_AutoPolling(hospi, &s_config, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK) {
+        ospi_debug("QSPI: failed to AutoPolling\n");
         return AMK_QSPI_ERROR;
     }
 
@@ -419,8 +447,8 @@ amk_error_t OSPI_BusyWait(OSPI_HandleTypeDef *hospi, uint32_t Timeout)
     }
 
     OSPI_AutoPollingTypeDef s_config;
-    s_config.Match          = W25Q128FV_FSR_WREN;
-    s_config.Mask           = W25Q128FV_FSR_WREN;
+    s_config.Match          = 0;
+    s_config.Mask           = OSPI_FLASH_BUSY_BIT_MASK;
     s_config.MatchMode      = HAL_OSPI_MATCH_MODE_AND;
     s_config.Interval       = 0x10;
     s_config.AutomaticStop  = HAL_OSPI_AUTOMATIC_STOP_ENABLE;
@@ -435,8 +463,6 @@ amk_error_t OSPI_BusyWait(OSPI_HandleTypeDef *hospi, uint32_t Timeout)
 
 static amk_error_t OSPI_InitW25Qxx(OSPI_HandleTypeDef *hospi)
 {
-    return AMK_SUCCESS;
-
     if (OSPI_ResetMemory(hospi) != AMK_SUCCESS) {
         ospi_debug("QSPI: failed to RESET memory\n");
         return AMK_QSPI_ERROR;
