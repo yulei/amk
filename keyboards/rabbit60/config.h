@@ -57,5 +57,4 @@
 
 #define SCAN_ROW2COL
 #define USE_HS_USB
-#define DYNAMIC_KEYMAP_LAYER_COUNT  7
 #define RGB_FLUSH_ASYNC

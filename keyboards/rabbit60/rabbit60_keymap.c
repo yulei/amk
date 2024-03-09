@@ -17,34 +17,4 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, KC_VOLU, KC_VOLD, _______, _______, _______, KC_LEFT, KC_DOWN,   KC_UP,KC_RIGHT, _______, _______,          _______,
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______,
         _______, _______, _______,                   _______,                                              _______, _______,_______),
-    [2]=LAYOUT_default(
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______,
-        _______, _______, _______,                   _______,                                              _______, _______,_______),
-    [3]=LAYOUT_default(
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______,
-        _______, _______, _______,                   _______,                                              _______, _______,_______),
-    [4]=LAYOUT_default(
-        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
-        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
-        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,          KC_NO,
-        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,          KC_NO, KC_NO,
-        KC_NO, KC_NO, KC_NO,                   KC_NO,                                              KC_NO, KC_NO,KC_NO),
-    [5]=LAYOUT_default(
-        KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5,
-        KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5,
-        KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5,          KC_F5,
-        KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5, KC_F5,          KC_F5, KC_F5,
-        KC_F5, KC_F5, KC_F5,                   KC_F5,                                              KC_F5, KC_F5,KC_F5),
-    [6]=LAYOUT_default(
-        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
-        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
-        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,          KC_NO,
-        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,          KC_NO, KC_NO,
-        KC_NO, KC_NO, KC_NO,                   KC_NO,                                              KC_NO, KC_NO,KC_NO),
 };
