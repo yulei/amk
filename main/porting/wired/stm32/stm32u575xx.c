@@ -279,8 +279,14 @@ void usb_port_init(void)
 }
 
 #ifdef USE_ADC1
+
+__attribute__((weak))
+int adc_init_kb(void) { return 0;}
+
 static void MX_ADC1_Init(void)
 {
+    if (adc_init_kb()) return;
+
     /** Common config
      */
     hadc1.Instance = ADC1;

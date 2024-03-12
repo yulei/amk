@@ -1,5 +1,5 @@
 /**
- * @file amk_matrix_scan.c
+ * @file amk_ms_matrix.c
  * @author astro
  * 
  * @copyright Copyright (c) 2023
@@ -7,6 +7,7 @@
 
 #include "matrix.h"
 #include "wait.h"
+#include "timer.h"
 
 #include "amk_gpio.h"
 #include "amk_printf.h"
@@ -36,6 +37,13 @@ static pin_t col_pins[] = MATRIX_COL_PINS;
 #define SCAN_IO_DELAY_US    5
 #endif
 
+//#define SCAN_STAT
+#ifdef SCAN_STAT
+#define SCAN_STAT_COUNT     8000
+static uint32_t scan_ticks;
+static uint32_t scan_count;
+#endif
+
 void matrix_init_custom(void)
 {
     for (int r = 0; r < MATRIX_ROWS; r++) {
@@ -57,6 +65,10 @@ void matrix_init_custom(void)
 
 #ifdef STATE_SCAN_ENABLE
         state_matrix_init();
+#endif
+
+#ifdef SCAN_STAT
+    scan_ticks = timer_read32();
 #endif
 }
 
@@ -124,5 +136,14 @@ bool matrix_scan_custom(matrix_row_t* raw)
 #endif
     }
 
+#ifdef SCAN_STAT
+    scan_count++;
+
+    if ((scan_count % SCAN_STAT_COUNT) == 0) {
+        amk_printf("SCAN STAT: interval=%d, count=%d\n", timer_elapsed32(scan_ticks), scan_count);
+        scan_count = 0;
+        scan_ticks = timer_read32();
+    }
+#endif
     return changed;
 }

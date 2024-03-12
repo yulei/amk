@@ -73,7 +73,7 @@ ifeq (yes, $(strip $(USB_DEVICE_ENABLE)))
 endif
 
 ifeq (, $(strip $(AMK_CUSTOM_MATRIX)))
-	SRCS += $(MAIN_DIR)/amk/amk_matrix_scan.c
+	SRCS += $(MAIN_DIR)/amk/amk_mx_matrix.c
 	ifeq (yes, $(strip $(PORT_SCAN_ENABLE)))
 		APP_DEFS += -DPORT_SCAN_ENABLE
 	endif
@@ -91,5 +91,4 @@ ifeq (yes, $(strip $(NOFRENDO_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/nofrendo/nofrendo_emu.c
 	SRCS += $(MAIN_DIR)/screen/nofrendo/static_memory.c
 	INCS += $(MAIN_DIR)/screen/nofrendo
-	#include ${LIB_DIR}/umm_malloc.mk
 endif

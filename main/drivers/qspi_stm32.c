@@ -51,6 +51,7 @@ extern void Error_Handler(void);
 #define FLASH_INSTR_WRITE_SR2           (0x31u)
 #define FLASH_INSTR_WRITE_SR3           (0x11u)
 #define FLASH_INSTR_READ_CMD            (0x03)
+#define FLASH_INSTR_FAST_READ_CMD       (0x0B)
 #define FLASH_INSTR_QUAD_READ_CMD       (0x6B)
 #define FLASH_INSTR_QUAD_READ_IO_CMD    (0xEB)
 #define FLASH_INSTR_RESET_ENABLE        (0x66U)
@@ -58,15 +59,19 @@ extern void Error_Handler(void);
 #define FLASH_INSTR_JEDECID             (0x9FU)
 
 /* TIMEOUT*/
-#define FLASH_DUMMY_CYCLES_READ_QUAD    (10)
 #define FLASH_BULK_ERASE_MAX_TIME       (250000)
 #define FLASH_SECTOR_ERASE_MAX_TIME     (3000)
 #define FLASH_SUBSECTOR_ERASE_MAX_TIME  (800)
 
+/* DUMMY CYCLES*/
+#define DUMMY_CYCLES_FAST_READ          (8)
+#define DUMMY_CYCLES_QUAD_READ          (8)
+#define DUMMY_CYCLES_QUAD_READ_IO       (4)
+
 /* STATUS */
-#define W25Q128FV_FSR_BUSY                    ((uint8_t)0x01)    /*!< busy */
-#define W25Q128FV_FSR_WREN                    ((uint8_t)0x02)    /*!< write enable */
-#define W25Q128FV_FSR_QE                      ((uint8_t)0x02)    /*!< quad enable */
+#define W25Q128JV_FSR_BUSY              ((uint8_t)0x01)    /*!< busy */
+#define W25Q128JV_FSR_WREN              ((uint8_t)0x02)    /*!< write enable */
+#define W25Q128JV_FSR_QE                ((uint8_t)0x02)    /*!< quad enable */
 
 static amk_error_t QSPI_InitW25Qxx(QSPI_HandleTypeDef *hqspi);
 static amk_error_t QSPI_EraseSector(QSPI_HandleTypeDef *hqspi, uint32_t address);
@@ -79,9 +84,8 @@ bool qspi_init(uint32_t map_addr)
     hqspi.Instance = QUADSPI;
 
     /* Call the DeInit function to reset the driver */
-    //if (HAL_QSPI_DeInit(&hqspi) != HAL_OK) {
-    //    return false;
-    //}
+    HAL_QSPI_DeInit(&hqspi);
+
     hqspi.Init.ClockPrescaler     = 2;
     hqspi.Init.FifoThreshold      = 4;
     hqspi.Init.SampleShifting     = QSPI_SAMPLE_SHIFTING_HALFCYCLE;
@@ -117,17 +121,17 @@ amk_error_t qspi_read_sector(uint32_t address, uint8_t *buffer, size_t length)
     QSPI_CommandTypeDef s_command;
 
     /* Initialize the read command */
-#if 0
+#if 1
     s_command.InstructionMode       = QSPI_INSTRUCTION_1_LINE;
-    s_command.Instruction           = FLASH_INSTR_QUAD_FAST_READ;
-    s_command.AddressMode           = QSPI_ADDRESS_4_LINES;
+    s_command.Instruction           = FLASH_INSTR_QUAD_READ_CMD;
+    s_command.AddressMode           = QSPI_ADDRESS_1_LINE;
     s_command.AddressSize           = QSPI_ADDRESS_24_BITS;
     s_command.Address               = address;
     s_command.AlternateByteMode     = QSPI_ALTERNATE_BYTES_NONE;
 	s_command.AlternateBytes        = QSPI_ALTERNATE_BYTES_NONE;
 	s_command.AlternateBytesSize    = QSPI_ALTERNATE_BYTES_NONE;
     s_command.DataMode              = QSPI_DATA_4_LINES;
-    s_command.DummyCycles           = FLASH_DUMMY_CYCLES_READ_QUAD;
+    s_command.DummyCycles           = DUMMY_CYCLES_QUAD_READ;
     s_command.NbData                = length;
     s_command.DdrMode               = QSPI_DDR_MODE_DISABLE;
     s_command.DdrHoldHalfCycle      = QSPI_DDR_HHC_ANALOG_DELAY;
@@ -360,8 +364,8 @@ amk_error_t QSPI_WriteEnable(QSPI_HandleTypeDef *hqspi)
     s_command.NbData         = 1;
 
     QSPI_AutoPollingTypeDef s_config;
-    s_config.Match           = W25Q128FV_FSR_WREN;
-    s_config.Mask            = W25Q128FV_FSR_WREN;
+    s_config.Match           = W25Q128JV_FSR_WREN;
+    s_config.Mask            = W25Q128JV_FSR_WREN;
     s_config.MatchMode       = QSPI_MATCH_MODE_AND;
     s_config.StatusBytesSize = 1;
     s_config.Interval        = 0x10;
@@ -430,7 +434,7 @@ static amk_error_t QSPI_InitW25Qxx(QSPI_HandleTypeDef *hqspi)
         return AMK_QSPI_ERROR;
     }
 
-    uint8_t value = W25Q128FV_FSR_QE;
+    uint8_t value = W25Q128JV_FSR_QE;
     if (HAL_QSPI_Transmit(hqspi, &value, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK){
         return AMK_QSPI_ERROR;
     }
