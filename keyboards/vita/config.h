@@ -57,6 +57,7 @@
 #define VIAL_KEYBOARD_UID {0x01, 0x90, 0x17, 0x3A, 0xEC, 0xEE, 0x2B, 0x85}
 
 #define DWT_DELAY
+#define SUSPEND_RESET
 //#define WDT_ENABLE
 //#define FAULT_BREAK
 //#define TYPING_SPEED
