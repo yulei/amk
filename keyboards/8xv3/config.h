@@ -111,3 +111,6 @@
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 
 #define SUSPEND_RESET
+
+#define CAPS_LED_PIN        B5
+#define SCROLL_LED_PIN      A15

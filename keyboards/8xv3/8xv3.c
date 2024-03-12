@@ -9,6 +9,7 @@
 #include "is31fl3236.h"
 #include "rgb_driver.h"
 
+#ifdef RGB_ENABLE
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {0, CS23_SW9, CS22_SW9, CS24_SW9},
     {0, CS23_SW8, CS22_SW8, CS24_SW8},
@@ -367,3 +368,4 @@ void rgb_led_pre_flush(void)
     }
 #endif
 }
+#endif
