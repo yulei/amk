@@ -73,6 +73,17 @@ extern void Error_Handler(void);
 #define W25Q128JV_FSR_WREN              ((uint8_t)0x02)    /*!< write enable */
 #define W25Q128JV_FSR_QE                ((uint8_t)0x02)    /*!< quad enable */
 
+
+#ifdef RTOS_ENABLE
+#include "tx_api.h"
+#define FLAGS_QSPI_RX                   (1<<0)
+TX_EVENT_FLAGS_GROUP    g_qspi_flags;
+void HAL_QSPI_RxCpltCallback(QSPI_HandleTypeDef *hqspi)
+{
+    tx_event_flags_set(&g_qspi_flags, FLAGS_QSPI_RX, TX_OR);
+}
+#endif
+
 static amk_error_t QSPI_InitW25Qxx(QSPI_HandleTypeDef *hqspi);
 static amk_error_t QSPI_EraseSector(QSPI_HandleTypeDef *hqspi, uint32_t address);
 static amk_error_t QSPI_ResetMemory(QSPI_HandleTypeDef *hqspi);
@@ -86,7 +97,7 @@ bool qspi_init(uint32_t map_addr)
     /* Call the DeInit function to reset the driver */
     HAL_QSPI_DeInit(&hqspi);
 
-    hqspi.Init.ClockPrescaler     = 2;
+    hqspi.Init.ClockPrescaler     = 1;
     hqspi.Init.FifoThreshold      = 4;
     hqspi.Init.SampleShifting     = QSPI_SAMPLE_SHIFTING_HALFCYCLE;
     hqspi.Init.FlashSize          = QSPI_FLASH_ADDR_SIZE;
@@ -108,6 +119,9 @@ bool qspi_init(uint32_t map_addr)
         return false;
     }
     
+#ifdef RTOS_ENABLE
+    tx_event_flags_create(&g_qspi_flags, NULL);
+#endif
     return true;
 }
 
@@ -157,10 +171,21 @@ amk_error_t qspi_read_sector(uint32_t address, uint8_t *buffer, size_t length)
     }
 
     /* Reception of the data */
+#ifdef RTOS_ENABLE
+    if (HAL_QSPI_Receive_DMA(&hqspi, buffer) != HAL_OK) {
+        return AMK_QSPI_ERROR;
+    }
+    uint32_t flags = 0;
+    if (TX_SUCCESS !=  tx_event_flags_get(&g_qspi_flags, FLAGS_QSPI_RX, TX_OR_CLEAR, &flags, TX_WAIT_FOREVER)) {
+        return AMK_QSPI_ERROR;
+    }
+#else
+
     if (HAL_QSPI_Receive(&hqspi, buffer, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
     {
         return AMK_QSPI_ERROR;
     }
+#endif
 
     return AMK_SUCCESS;
 }

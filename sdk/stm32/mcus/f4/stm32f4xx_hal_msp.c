@@ -342,6 +342,8 @@ void HAL_QSPI_MspInit(QSPI_HandleTypeDef* hqspi)
 
     __HAL_LINKDMA(hqspi,hdma,hdma_quadspi);
 
+    HAL_NVIC_SetPriority(QUADSPI_IRQn, 1, 0);
+    HAL_NVIC_EnableIRQ(QUADSPI_IRQn);
   /* USER CODE BEGIN QUADSPI_MspInit 1 */
 
   /* USER CODE END QUADSPI_MspInit 1 */
