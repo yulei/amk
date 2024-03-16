@@ -382,12 +382,13 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record)
             render = &renders[0];
             render->mode = (render->mode+1) % MODE_MAX;
         } return false;
-        case KC_F20:
+        /*case KC_F20:
         {
             extern void ec_mode_iter(void);
             ec_mode_iter();
         }
         return false;
+        */
         //case KC_F23:
         //    msc_erase();
         //    reset_to_msc(true);

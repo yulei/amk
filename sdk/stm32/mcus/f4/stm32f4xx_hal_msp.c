@@ -75,6 +75,11 @@ extern DMA_HandleTypeDef hdma_usart2_tx;
 
 
 #ifdef USE_ADC1
+__attribute__((weak))
+int adc_msp_init_kb(void) { return 0;}
+
+__attribute__((weak))
+int adc_msp_uninit_kb(void) { return 0;}
 /**
 * @brief ADC MSP Initialization
 * This function configures the hardware resources used in this example
@@ -83,6 +88,8 @@ extern DMA_HandleTypeDef hdma_usart2_tx;
 */
 void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 {
+  if (adc_msp_init_kb()) return;
+
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(hadc->Instance==ADC1)
   {
@@ -115,6 +122,8 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 */
 void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 {
+  if (adc_msp_uninit_kb()) return;
+
   if(hadc->Instance==ADC1)
   {
   /* USER CODE BEGIN ADC1_MspDeInit 0 */

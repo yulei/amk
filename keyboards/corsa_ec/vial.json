@@ -2,6 +2,7 @@
     "name": "Matrix Corsa",
     "vendorId": "0x4543",
     "productId": "0x0365",
+    "keyboardType": "ec",
     "lighting": "none",
     "matrix": {
       "rows": 5,

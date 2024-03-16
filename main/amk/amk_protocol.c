@@ -108,13 +108,13 @@ void amk_protocol_process(uint8_t *msg, uint8_t length)
 #endif
 #ifdef AMK_DKS_ENABLE
     case amk_protocol_get_dks:
-        // msg[2]: row, msg[3]: column, msg[4...11]: dks
+        // msg[2]: row, msg[3]: column, msg[4...15]: dks
         {
             uint8_t row = msg[2];
             uint8_t col = msg[3];
             if ((row < MATRIX_ROWS) && (col < MATRIX_COLS)) {
                 msg[2] = amk_protocol_ok;
-                struct amk_dks dks;
+                struct amk_dks dks = {0};
                 amk_store_get_dks(row, col, &dks);
                 uint8_t j = 3;
                 for (int i = 0; i < AMK_DKS_EVENT_MAX; i++) {

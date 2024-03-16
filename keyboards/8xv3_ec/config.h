@@ -40,6 +40,10 @@
 #define KEY_IN_PORT     GPIOA
 #define SENSE_TH        1024
 
+#define ADC_CHANNEL_COUNT   1
+#define ADC_CHANNELS        {KEY_IN_CHANNEL}
+#define ADC_PINS            {A1}
+
 #define USE_SPI3
 #define FLASH_CS            A15
 #define W25QXX_SPI_ID       SPI_INSTANCE_3
@@ -101,21 +105,3 @@
 
 #define VIAL_KEYBOARD_UID {0x46, 0x52, 0xB3, 0xFD, 0xD6, 0x01, 0xD1, 0x3B}
 
-// for apc
-#define APC_KEY_MIN             50
-#define APC_KEY_MAX             2560
-#define KEY_ADJUST_MIN          100
-
-#define APC_KEY_MIN_PRESET      100
-#define APC_KEY_MAX_PRESET      2400
-
-#define APC_INTERVAL_MIN        200
-#define APC_INTERVAL_MAX        2560
-
-#define APC_INTERVAL_INVALID    0
-#define APC_INTERVAL_DEFAULT    1024
-#define APC_INTERVAL_INDEX      8
-
-#define DYNAMIC_KEYMAP_LAYER_COUNT  4
-#define APC_KEYMAP_DOWN_LAYER   2
-#define APC_KEYMAP_UP_LAYER     3

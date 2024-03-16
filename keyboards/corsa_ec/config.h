@@ -38,6 +38,10 @@
 #define KEY_IN_PORT     GPIOA
 #define SENSE_TH        1024
 
+#define ADC_CHANNEL_COUNT   1
+#define ADC_CHANNELS        {KEY_IN_CHANNEL}
+#define ADC_PINS            {A2}
+
 #define CAPS_LED_PIN        A10
 
 #define DEBOUNCE            8
@@ -63,22 +67,5 @@
 #define GC9107_AS_ST7735
 #define SCREEN_ROTATION     3
 
-
 // vial 
 #define VIAL_KEYBOARD_UID {0xE7, 0x09, 0xBA, 0x4A, 0x54, 0x05, 0xF8, 0x76}
-#define DYNAMIC_KEYMAP_LAYER_COUNT  6
-
-// for apc
-#define APC_KEY_MIN             20
-#define APC_KEY_MAX             2560
-
-#define APC_INTERVAL_MIN        100
-#define APC_INTERVAL_MAX        2560
-
-#define APC_INTERVAL_INVALID    0
-#define APC_INTERVAL_DEFAULT    1024
-#define APC_INTERVAL_INDEX      8
-
-#define DYNAMIC_KEYMAP_LAYER_COUNT  6
-#define APC_KEYMAP_DOWN_LAYER       4
-#define APC_KEYMAP_UP_LAYER         5

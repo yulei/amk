@@ -2,6 +2,7 @@
     "name": "8XV3.0 EC",
     "vendorId": "0x4543",
     "productId": "0x0830",
+    "keyboardType": "ec",
     "lighting": "none",
     "matrix": {
       "rows": 6,

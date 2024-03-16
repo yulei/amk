@@ -287,14 +287,19 @@ void usb_port_init(void)
     USB_OTG_FS->GOTGCTL |= USB_OTG_GOTGCTL_BVALOVAL;
 
     /* Peripheral interrupt init */
-    HAL_NVIC_SetPriority(OTG_FS_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(OTG_FS_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(OTG_FS_IRQn);
 
 }
 
 #ifdef USE_ADC1
+__attribute__((weak))
+int adc_init_kb(void) { return 0;}
+
 static void MX_ADC1_Init(void)
 {
+    if (adc_init_kb()) return;
+
     ADC_ChannelConfTypeDef sConfig = {0};
     /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
      */

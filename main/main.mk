@@ -83,6 +83,26 @@ ifeq (, $(strip $(AMK_CUSTOM_MATRIX)))
 	endif
 endif
 
+ifeq (cms, $(strip $(AMK_CUSTOM_MATRIX)))
+	SRCS += $(MAIN_DIR)/amk/amk_ms_matrix.c
+	APP_DEFS += -DMS_MATRIX_ENABLE
+
+	SRCS += $(MAIN_DIR)/amk/amk_apc.c
+	SRCS += $(MAIN_DIR)/amk/amk_dks.c
+	APP_DEFS += -DAMK_APC_ENABLE
+	APP_DEFS += -DAMK_DKS_ENABLE
+endif
+
+ifeq (cec, $(strip $(AMK_CUSTOM_MATRIX)))
+	SRCS += $(MAIN_DIR)/amk/amk_ec_matrix.c
+	APP_DEFS += -DEC_MATRIX_ENABLE
+
+	SRCS += $(MAIN_DIR)/amk/amk_apc.c
+	SRCS += $(MAIN_DIR)/amk/amk_dks.c
+	APP_DEFS += -DAMK_APC_ENABLE
+	APP_DEFS += -DAMK_DKS_ENABLE
+endif
+
 ifeq (yes, $(strip $(NOFRENDO_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/nofrendo/emuapi.c
 	SRCS += $(MAIN_DIR)/screen/nofrendo/libsnss.c
