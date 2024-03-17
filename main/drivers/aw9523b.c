@@ -81,7 +81,7 @@ bool aw9523b_available(uint8_t addr)
 {
     bool need_release = false;
     if (!i2c_inst) {
-        i2c_inst = i2c_init(AW9523B_I2C_ID);
+        i2c_inst = ak_i2c_init(AW9523B_I2C_ID);
         need_release = true;
     }
 
@@ -91,7 +91,7 @@ bool aw9523b_available(uint8_t addr)
     wait_ms(1);
 #endif
     uint8_t data = 0;
-    amk_error_t ec = i2c_write_reg(i2c_inst, addr, AW9523B_RESET, &data, 1, TIMEOUT);
+    amk_error_t ec = ak_i2c_write_reg(i2c_inst, addr, AW9523B_RESET, &data, 1, TIMEOUT);
 
 #ifdef RGBLIGHT_EN_PIN
     gpio_set_input_floating(RGBLIGHT_EN_PIN);
@@ -100,7 +100,7 @@ bool aw9523b_available(uint8_t addr)
     if (!available) {
         aw9523b_debug("aw9523b not available: %d, release=%d\n", ec, need_release);
         if (need_release) {
-            i2c_uninit(i2c_inst);
+            ak_i2c_uninit(i2c_inst);
             i2c_inst = NULL;
         }
     }
@@ -111,7 +111,7 @@ bool aw9523b_available(uint8_t addr)
 i2c_led_t *aw9523b_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t led_num)
 {
     if (!i2c_inst) {
-        i2c_inst = i2c_init(AW9523B_I2C_ID);
+        i2c_inst = ak_i2c_init(AW9523B_I2C_ID);
     }
 
     aw9523b_t *driver = &aw9523b_drivers[index];
@@ -125,17 +125,17 @@ i2c_led_t *aw9523b_init(uint8_t addr, uint8_t index, uint8_t led_start, uint8_t 
 
     // reset chip
     uint8_t data = 0;
-    amk_error_t ec = i2c_write_reg(i2c_inst, addr, AW9523B_RESET, &data, 1, TIMEOUT);
+    amk_error_t ec = ak_i2c_write_reg(i2c_inst, addr, AW9523B_RESET, &data, 1, TIMEOUT);
     if (ec != AMK_SUCCESS) aw9523b_debug("aw9523b write reset result: %d\n", ec);
 
     wait_ms(1);
     // set max led current
     data = 0x03; // 37mA/4
-    i2c_write_reg(i2c_inst, addr, AW9523B_CTL, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, addr, AW9523B_CTL, &data, 1, TIMEOUT);
     // set port to led mode
     data = 0;
-    i2c_write_reg(i2c_inst, addr, AW9523B_P0_LED, &data, 1, TIMEOUT);
-    i2c_write_reg(i2c_inst, addr, AW9523B_P1_LED, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, addr, AW9523B_P0_LED, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, addr, AW9523B_P1_LED, &data, 1, TIMEOUT);
     // clear pwm buff
     for (uint8_t i = 0; i < AW9523B_PWM_SIZE; i++) {
         driver->pwm_buffer[i] = 0;
@@ -179,9 +179,9 @@ void aw9523b_update_buffers(i2c_led_t *driver)
     if (aw9523b->ready && aw9523b->pwm_dirty) {
         for (uint8_t i = 0; i < aw9523b->i2c_led.led_num; i++){
             rgb_led_t *led = &g_rgb_leds[i];
-            i2c_write_reg(i2c_inst, aw9523b->i2c_led.addr, led->r+AW9523B_PWM_BASE, &aw9523b->pwm_buffer[led->r], 1, TIMEOUT);
-            i2c_write_reg(i2c_inst, aw9523b->i2c_led.addr, led->g+AW9523B_PWM_BASE, &aw9523b->pwm_buffer[led->g], 1, TIMEOUT);
-            i2c_write_reg(i2c_inst, aw9523b->i2c_led.addr, led->b+AW9523B_PWM_BASE, &aw9523b->pwm_buffer[led->b], 1, TIMEOUT);
+            ak_i2c_write_reg(i2c_inst, aw9523b->i2c_led.addr, led->r+AW9523B_PWM_BASE, &aw9523b->pwm_buffer[led->r], 1, TIMEOUT);
+            ak_i2c_write_reg(i2c_inst, aw9523b->i2c_led.addr, led->g+AW9523B_PWM_BASE, &aw9523b->pwm_buffer[led->g], 1, TIMEOUT);
+            ak_i2c_write_reg(i2c_inst, aw9523b->i2c_led.addr, led->b+AW9523B_PWM_BASE, &aw9523b->pwm_buffer[led->b], 1, TIMEOUT);
         }
         aw9523b->pwm_dirty = false;
     }

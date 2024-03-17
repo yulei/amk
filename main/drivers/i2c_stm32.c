@@ -20,14 +20,14 @@ extern I2C_HandleTypeDef hi2c2;
 static bool i2c2_busy = false;
 #endif
 
-bool i2c_ready(i2c_handle_t i2c)
+bool ak_i2c_ready(i2c_handle_t i2c)
 {
     I2C_HandleTypeDef *inst = (I2C_HandleTypeDef*)i2c;
     
     return (inst->State == HAL_I2C_STATE_READY);
 }
 
-i2c_handle_t i2c_init(I2C_ID id)
+i2c_handle_t ak_i2c_init(I2C_ID id)
 {
 #ifdef USE_I2C1
     if (id == I2C_INSTANCE_1) {
@@ -44,7 +44,7 @@ i2c_handle_t i2c_init(I2C_ID id)
     return NULL;
 }
 
-amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t length, size_t timeout)
+amk_error_t ak_i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t length, size_t timeout)
 {
     I2C_HandleTypeDef *inst = (I2C_HandleTypeDef*)i2c;
     HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(inst, addr, (void*)data, length, timeout);
@@ -58,7 +58,7 @@ amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t le
     return AMK_ERROR;
 }
 
-amk_error_t i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, size_t timeout)
+amk_error_t ak_i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, size_t timeout)
 {
     I2C_HandleTypeDef *inst = (I2C_HandleTypeDef*)i2c;
     HAL_StatusTypeDef status = HAL_I2C_Master_Receive(inst, addr, data, length, timeout);
@@ -72,7 +72,7 @@ amk_error_t i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, 
     return AMK_ERROR;
 }
 
-amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
+amk_error_t ak_i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
 {
     I2C_HandleTypeDef *inst = (I2C_HandleTypeDef*)i2c;
     HAL_StatusTypeDef status = HAL_I2C_Mem_Write(inst, addr, reg, 1, (void*)data, length, timeout);
@@ -86,7 +86,7 @@ amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const voi
     return AMK_ERROR;
 }
 
-amk_error_t i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
+amk_error_t ak_i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
 {
     I2C_HandleTypeDef *inst = (I2C_HandleTypeDef*)i2c;
     HAL_StatusTypeDef status = HAL_I2C_Mem_Read(inst, addr, reg, 1, data, length, timeout);
@@ -100,20 +100,20 @@ amk_error_t i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data
     return AMK_ERROR;
 }
 
-void i2c_uninit(i2c_handle_t i2c)
+void ak_i2c_uninit(i2c_handle_t i2c)
 {
-    if(!i2c_ready(i2c)) {
+    if(!ak_i2c_ready(i2c)) {
         return;
     }
     I2C_HandleTypeDef *inst = (I2C_HandleTypeDef*)i2c;
     HAL_I2C_DeInit(inst);
 }
 
-amk_error_t i2c_send_async(i2c_handle_t i2c, uint8_t addr, const void *data, size_t length)
+amk_error_t ak_i2c_send_async(i2c_handle_t i2c, uint8_t addr, const void *data, size_t length)
 {
 #ifdef USE_I2C1
     if (i2c1_busy) {
-        if (i2c_ready(i2c)) {
+        if (ak_i2c_ready(i2c)) {
             i2c1_busy = false;
             return AMK_SUCCESS;
         }
@@ -123,7 +123,7 @@ amk_error_t i2c_send_async(i2c_handle_t i2c, uint8_t addr, const void *data, siz
 
 #ifdef USE_I2C2
     if (i2c2_busy) {
-        if (i2c_ready(i2c)) {
+        if (ak_i2c_ready(i2c)) {
             i2c2_busy = false;
             return AMK_SUCCESS;
         }

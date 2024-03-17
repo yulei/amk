@@ -21,27 +21,27 @@ static i2c_handle_t i2c_inst;
 void mb85rcxx_write_byte(uint16_t addr, uint8_t data)
 {
     if (!i2c_inst) {
-        i2c_inst = i2c_init(MB85_I2C_ID);
+        i2c_inst = ak_i2c_init(MB85_I2C_ID);
     }
 
     uint8_t dev_addr = MB85RC_ADDR(addr);
     uint8_t cmd[2];
     cmd[0] = MB85RC_OFFSET(addr);
     cmd[1] = data;
-    i2c_send(i2c_inst, dev_addr, cmd, 2, TIMEOUT);
+    ak_i2c_send(i2c_inst, dev_addr, cmd, 2, TIMEOUT);
 }
 
 uint8_t mb85rcxx_read_byte(uint16_t addr)
 {
     if (!i2c_inst) {
-        i2c_inst = i2c_init(MB85_I2C_ID);
+        i2c_inst = ak_i2c_init(MB85_I2C_ID);
     }
 
     uint8_t dev_addr = MB85RC_ADDR(addr);
     uint8_t offset = MB85RC_OFFSET(addr);
-    i2c_send(i2c_inst, dev_addr, &offset, 1, TIMEOUT);
+    ak_i2c_send(i2c_inst, dev_addr, &offset, 1, TIMEOUT);
     uint8_t data = 0;
-    i2c_recv(i2c_inst, dev_addr, &data, 1, TIMEOUT);
+    ak_i2c_recv(i2c_inst, dev_addr, &data, 1, TIMEOUT);
 
     return data;
 }

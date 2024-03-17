@@ -127,13 +127,13 @@ bool is31fl3236_update_buffers(i2c_led_t *driver)
     if (!is31->pwm_dirty) return true;
 
 #ifdef RGB_FLUSH_ASYNC
-    if (AMK_SUCCESS == i2c_send_async(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1)) {
+    if (AMK_SUCCESS == ak_i2c_send_async(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1)) {
 #else
-    if (AMK_SUCCESS == i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1, TIMEOUT)) {
+    if (AMK_SUCCESS == ak_i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1, TIMEOUT)) {
 #endif
         is31->pwm_dirty = false;
         uint8_t data = 0;
-        if (AMK_SUCCESS != i2c_write_reg(i2c_inst, driver->addr, UPDATE_REG, &data, 1, TIMEOUT)) {
+        if (AMK_SUCCESS != ak_i2c_write_reg(i2c_inst, driver->addr, UPDATE_REG, &data, 1, TIMEOUT)) {
             fl3236_debug("IS31FL3236: failed to update UPDATE register for pwm\n");
         }
         //fl3236_debug("IS31FL3236: pwm UPDATE success\n");
@@ -148,7 +148,7 @@ bool init_driver(is31fl3236_driver_t *driver)
 {
     uint32_t status = AMK_SUCCESS;
     if (!i2c_inst) {
-        i2c_inst = i2c_init(IS31FL3236_I2C_ID);
+        i2c_inst = ak_i2c_init(IS31FL3236_I2C_ID);
     }
 
     memset(driver->pwm_buffer, 0, PWM_BUFFER_SIZE + 1);
@@ -160,7 +160,7 @@ bool init_driver(is31fl3236_driver_t *driver)
 
     // Reset 3236 to default state
     uint8_t data = 0;
-    status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, RESET_REG, &data, 1, TIMEOUT);
+    status = ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, RESET_REG, &data, 1, TIMEOUT);
     if (status != AMK_SUCCESS) {
         fl3236_debug("IS31FL3236: failed to reset: addr:0x%x, status:%d\n", driver->i2c_led.addr, status);
         fl3236_available[driver->i2c_led.index] = false;
@@ -171,7 +171,7 @@ bool init_driver(is31fl3236_driver_t *driver)
 
     // Turn on chip
     data = 1;
-    status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, SHUTDOWN_REG, &data, 1, TIMEOUT);
+    status = ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, SHUTDOWN_REG, &data, 1, TIMEOUT);
     if (status != AMK_SUCCESS) {
         fl3236_debug("IS31FL3236: failed to turn on chip: %d\n", status);
         fl3236_available[driver->i2c_led.index] = false;
@@ -179,7 +179,7 @@ bool init_driver(is31fl3236_driver_t *driver)
     }
 
     // Turn on all leds
-    status = i2c_send(i2c_inst, driver->i2c_led.addr, driver->control_buffer, CONTROL_BUFFER_SIZE+1, TIMEOUT);
+    status = ak_i2c_send(i2c_inst, driver->i2c_led.addr, driver->control_buffer, CONTROL_BUFFER_SIZE+1, TIMEOUT);
     if (status != AMK_SUCCESS) {
         fl3236_debug("IS31FL3236: failed to turn on leds: %d\n", status);
         fl3236_available[driver->i2c_led.index] = false;
@@ -187,7 +187,7 @@ bool init_driver(is31fl3236_driver_t *driver)
     }
 
     // Clear pwm
-    status = i2c_send(i2c_inst, driver->i2c_led.addr, driver->pwm_buffer, PWM_BUFFER_SIZE+1, TIMEOUT);
+    status = ak_i2c_send(i2c_inst, driver->i2c_led.addr, driver->pwm_buffer, PWM_BUFFER_SIZE+1, TIMEOUT);
     if (status != AMK_SUCCESS) {
         fl3236_debug("IS31FL3236: failed to clear pwm: %d\n", status);
         fl3236_available[driver->i2c_led.index] = false;
@@ -196,7 +196,7 @@ bool init_driver(is31fl3236_driver_t *driver)
 
     // update PWM and control values
     data = 0;
-    status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, UPDATE_REG, &data, 1, TIMEOUT);
+    status = ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, UPDATE_REG, &data, 1, TIMEOUT);
     if (status != AMK_SUCCESS) {
         fl3236_debug("IS31FL3236: failed to update pwm&control: %d\n", status);
         fl3236_available[driver->i2c_led.index] = false;
@@ -210,5 +210,5 @@ void uninit_driver(i2c_led_t *driver)
 {
     // shutdonw driver
     uint8_t data = 0;
-    i2c_write_reg(i2c_inst, driver->addr, RESET_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->addr, RESET_REG, &data, 1, TIMEOUT);
 }

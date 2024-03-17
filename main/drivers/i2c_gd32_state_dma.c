@@ -125,15 +125,15 @@ static void i2c_bus_reset(void)
 }
 #endif
 
-bool i2c_ready(i2c_handle_t i2c)
+bool ak_i2c_ready(i2c_handle_t i2c)
 {
     i2c_instance_t *inst = (i2c_instance_t*)i2c;
     return inst->ready;
 }
 
-void i2c_inst_init(i2c_instance_t *inst, uint32_t i2c)
+void ak_i2c_inst_init(i2c_instance_t *inst, uint32_t i2c)
 {
-    if (i2c_ready(inst))
+    if (ak_i2c_ready(inst))
         return;
 #ifdef USE_I2C1
     if (i2c == I2C1_ID) {
@@ -145,7 +145,7 @@ void i2c_inst_init(i2c_instance_t *inst, uint32_t i2c)
 #endif
 }
 
-i2c_handle_t i2c_init(I2C_ID id)
+i2c_handle_t ak_i2c_init(I2C_ID id)
 {
 #ifdef USE_I2C1
     if (id == I2C_INSTANCE_1) {
@@ -176,7 +176,7 @@ bool i2c_wait_flag_timeout(uint32_t i2c, i2c_flag_enum flag, FlagStatus status, 
     return true;
 }
 
-static amk_error_t i2c_write(i2c_handle_t i2c, uint8_t addr, uint8_t reg, uint8_t reg_size, const void* data, size_t length, size_t timeout)
+static amk_error_t ak_i2c_write(i2c_handle_t i2c, uint8_t addr, uint8_t reg, uint8_t reg_size, const void* data, size_t length, size_t timeout)
 {
     uint32_t start = timer_read32();
     uint32_t state = I2C_START;
@@ -401,32 +401,32 @@ static amk_error_t i2c_write_dma(i2c_handle_t i2c, uint8_t addr, uint8_t reg, ui
 
 }
 
-amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t length, size_t timeout)
+amk_error_t ak_i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t length, size_t timeout)
 {
     return i2c_write(i2c, addr, 0, 0, data, length, timeout);
 }
 
-amk_error_t i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, size_t timeout)
+amk_error_t ak_i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, size_t timeout)
 {
     return AMK_ERROR;
 }
 
-amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
+amk_error_t ak_i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
 {
     return i2c_write(i2c, addr, reg, 1, data, length, timeout);
 }
 
-amk_error_t i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
+amk_error_t ak_i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
 {
     return AMK_SUCCESS;
 }
 
-void i2c_uninit(i2c_handle_t i2c)
+void ak_i2c_uninit(i2c_handle_t i2c)
 {
     //i2c_instance_t *inst = (i2c_instance_t*)i2c;
 }
 
-amk_error_t i2c_send_async(i2c_handle_t i2c, uint8_t addr, const void *data, size_t length)
+amk_error_t ak_i2c_send_async(i2c_handle_t i2c, uint8_t addr, const void *data, size_t length)
 {
     return i2c_write_dma(i2c, addr, 0, 0, data, length, 10);
 }

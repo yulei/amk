@@ -176,14 +176,14 @@ static i2c_sw_t i2c_sw = {
     .ready = false,
 };
 
-bool i2c_ready(i2c_handle_t i2c)
+bool ak_i2c_ready(i2c_handle_t i2c)
 {
     i2c_sw_t* i2c_sw = (i2c_sw_t *)i2c;
 
     return i2c_sw->ready;
 }
 
-i2c_handle_t i2c_init(I2C_ID id)
+i2c_handle_t ak_i2c_init(I2C_ID id)
 {
     (void)id;
 
@@ -198,7 +198,7 @@ i2c_handle_t i2c_init(I2C_ID id)
     return &i2c_sw;
 }
 
-amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t length, size_t timeout)
+amk_error_t ak_i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t length, size_t timeout)
 {
     amk_error_t err = AMK_SUCCESS;
     uint8_t* cur = (uint8_t*)data;
@@ -223,7 +223,7 @@ amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t le
     return err;
 }
 
-amk_error_t i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, size_t timeout)
+amk_error_t ak_i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, size_t timeout)
 {
     amk_error_t err = AMK_SUCCESS;
     uint8_t* cur = (uint8_t*)data;
@@ -248,7 +248,7 @@ amk_error_t i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, 
     return err;
 }
 
-amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
+amk_error_t ak_i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
 {
     amk_error_t err = AMK_SUCCESS;
     uint8_t *cur = (uint8_t*)data;
@@ -277,7 +277,7 @@ amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const voi
     return err;
 }
 
-amk_error_t i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
+amk_error_t ak_i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
 {
     amk_error_t err = AMK_SUCCESS;
     uint8_t *cur = (uint8_t*)data;
@@ -314,7 +314,7 @@ amk_error_t i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data
     return err;
 }
 
-void i2c_uninit(i2c_handle_t i2c)
+void ak_i2c_uninit(i2c_handle_t i2c)
 {
     i2c_sw_t *i2c_sw = (i2c_sw_t*)i2c;
     i2c_sw->ready = false;

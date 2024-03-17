@@ -192,6 +192,8 @@ void is31fl3741_set_color_all(i2c_led_t *driver, uint8_t red, uint8_t green, uin
 
 static void is31fl3741_update_pwm_buffers(i2c_led_t *driver)
 {
+    if (!is31fl3741_available(0)) return;
+
     uint32_t status = AMK_SUCCESS;
     is31fl3741_driver_t *is31 = (is31fl3741_driver_t*)(driver->data);
     uint8_t data = 0;
@@ -202,17 +204,17 @@ static void is31fl3741_update_pwm_buffers(i2c_led_t *driver)
     static uint8_t pwm_buf[200];
     pwm_buf[0] = 0;
     if (current == 0) {
-        if (!i2c_ready(i2c_inst)) return;
+        if (!ak_i2c_ready(i2c_inst)) return;
 
         // select pwm page 0
         data = UNLOCK_COMMAND;
-        i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
+        ak_i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
         data = PWM_PAGE0;
-        i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
+        ak_i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
 
         memcpy(&pwm_buf[1], &is31->pwm_buffer[0], 180);
-        status = i2c_send(i2c_inst, driver->addr, pwm_buf, 181, TIMEOUT);
-        //status = i2c_send_async(i2c_inst, driver->addr, pwm_buf, 181);
+        status = ak_i2c_send(i2c_inst, driver->addr, pwm_buf, 181, TIMEOUT);
+        //status = ak_i2c_send_async(i2c_inst, driver->addr, pwm_buf, 181);
 
         if (status != AMK_SUCCESS) {
             fl3741_debug("IS31FL3741: failed to update pwm page0: addr=%d, status=%d\n", driver->addr, status);
@@ -220,17 +222,17 @@ static void is31fl3741_update_pwm_buffers(i2c_led_t *driver)
         current++;
         return;
     } else {
-        if (!i2c_ready(i2c_inst)) return;
+        if (!ak_i2c_ready(i2c_inst)) return;
 
         // select pwm page 1
         data = UNLOCK_COMMAND;
-        i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
+        ak_i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
         data = PWM_PAGE1;
-        i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
+        ak_i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
 
         memcpy(&pwm_buf[1], &is31->pwm_buffer[180], 171);
-        status = i2c_send(i2c_inst, driver->addr, pwm_buf, 172, TIMEOUT);
-        //status = i2c_send_async(i2c_inst, driver->addr, pwm_buf, 172);
+        status = ak_i2c_send(i2c_inst, driver->addr, pwm_buf, 172, TIMEOUT);
+        //status = ak_i2c_send_async(i2c_inst, driver->addr, pwm_buf, 172);
         if (status != AMK_SUCCESS) {
             fl3741_debug("IS31FL3741: failed to update pwm page0: addr=%d, status=%d\n", driver->addr, status);
         }
@@ -250,15 +252,15 @@ static void is31fl3741_update_pwm_buffers(i2c_led_t *driver)
     if (is31->pwm_dirty) {
         // select pwm page 0
         data = UNLOCK_COMMAND;
-        i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
+        ak_i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
         data = PWM_PAGE0;
-        i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
+        ak_i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
 
         //do {
-        //    status = i2c_send_async(i2c_inst, driver->addr, is31->pwm_buffer, PWM_PAGE0_SIZE+1);
+        //    status = ak_i2c_send_async(i2c_inst, driver->addr, is31->pwm_buffer, PWM_PAGE0_SIZE+1);
         //} while( status == AMK_I2C_BUSY);
 
-        status = i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_PAGE0_SIZE+1, TIMEOUT);
+        status = ak_i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_PAGE0_SIZE+1, TIMEOUT);
 
         if (status != AMK_SUCCESS) {
             fl3741_debug("IS31FL3741: failed to update pwm page0: addr=%d, status=%d\n", driver->addr, status);
@@ -266,15 +268,15 @@ static void is31fl3741_update_pwm_buffers(i2c_led_t *driver)
 
         // select pwm page 1
         data = UNLOCK_COMMAND;
-        i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
+        ak_i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
         data = PWM_PAGE1;
-        i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
+        ak_i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
 
         //do {
-        //    status = i2c_send_async(i2c_inst, driver->addr, &is31->pwm_buffer[PWM_PAGE0_SIZE+1], PWM_PAGE1_SIZE+1);
+        //    status = ak_i2c_send_async(i2c_inst, driver->addr, &is31->pwm_buffer[PWM_PAGE0_SIZE+1], PWM_PAGE1_SIZE+1);
         //} while( status == AMK_I2C_BUSY);
 
-        status = i2c_send(i2c_inst, driver->addr, &is31->pwm_buffer[PWM_PAGE0_SIZE+1], PWM_PAGE1_SIZE+1, TIMEOUT);
+        status = ak_i2c_send(i2c_inst, driver->addr, &is31->pwm_buffer[PWM_PAGE0_SIZE+1], PWM_PAGE1_SIZE+1, TIMEOUT);
 
         if (status != AMK_SUCCESS) {
             fl3741_debug("IS31FL3741: failed to update pwm page1: addr=%d, status=%d\n", driver->addr, status);
@@ -296,15 +298,15 @@ void is31fl3741_update_scale_buffers(i2c_led_t *driver)
     if (is31->scale_dirty) {
         // select scale page 0
         data = UNLOCK_COMMAND;
-        i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
+        ak_i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
         data = SCALE_PAGE0;
-        i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
+        ak_i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
 
         //do {
-        //    status = i2c_send_async(i2c_inst, driver->addr, is31->scale_buffer, SCALE_PAGE0_SIZE+1);
+        //    status = ak_i2c_send_async(i2c_inst, driver->addr, is31->scale_buffer, SCALE_PAGE0_SIZE+1);
         //} while( status == AMK_I2C_BUSY);
 
-        status = i2c_send(i2c_inst, driver->addr, is31->scale_buffer, SCALE_PAGE0_SIZE+1, TIMEOUT);
+        status = ak_i2c_send(i2c_inst, driver->addr, is31->scale_buffer, SCALE_PAGE0_SIZE+1, TIMEOUT);
 
         if (status != AMK_SUCCESS) {
             fl3741_debug("IS31FL3741: failed to update scale page0: addr=%d, status=%d\n", driver->addr, status);
@@ -312,15 +314,15 @@ void is31fl3741_update_scale_buffers(i2c_led_t *driver)
 
         // select scale page 1
         data = UNLOCK_COMMAND;
-        i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
+        ak_i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
         data = SCALE_PAGE1;
-        i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
+        ak_i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
 
         //do {
-        //    status = i2c_send_async(i2c_inst, driver->addr, &is31->scale_buffer[SCALE_PAGE0_SIZE+1], SCALE_PAGE1_SIZE+1);
+        //    status = ak_i2c_send_async(i2c_inst, driver->addr, &is31->scale_buffer[SCALE_PAGE0_SIZE+1], SCALE_PAGE1_SIZE+1);
         //} while( status == AMK_I2C_BUSY);
 
-        status = i2c_send(i2c_inst, driver->addr, &is31->scale_buffer[SCALE_PAGE0_SIZE+1], SCALE_PAGE1_SIZE+1, TIMEOUT);
+        status = ak_i2c_send(i2c_inst, driver->addr, &is31->scale_buffer[SCALE_PAGE0_SIZE+1], SCALE_PAGE1_SIZE+1, TIMEOUT);
 
         if (status != AMK_SUCCESS) {
             fl3741_debug("IS31FL3741: failed to update scale page1: addr=%d, status=%d\n", driver->addr, status);
@@ -334,18 +336,18 @@ void init_driver(is31fl3741_driver_t *driver)
 {
     uint32_t status = AMK_SUCCESS;
     if (!i2c_inst) {
-        i2c_inst = i2c_init(IS31FL3741_I2C_ID);
+        i2c_inst = ak_i2c_init(IS31FL3741_I2C_ID);
     }
 
     // select function page
     uint8_t data = UNLOCK_COMMAND;
-    i2c_write_reg(i2c_inst, driver->i2c_led.addr, UNLOCK_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, UNLOCK_REG, &data, 1, TIMEOUT);
     data = FUNCTION_PAGE;
-    i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT);
 
     // Reset 3741 to default state
     data = RESET_COMMAND;
-    status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, RESET_REG, &data, 1, TIMEOUT);
+    status = ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, RESET_REG, &data, 1, TIMEOUT);
 
     if (status != AMK_SUCCESS) {
         fl3741_debug("IS31FL3741: failed to reset: %d\n", status);
@@ -353,18 +355,19 @@ void init_driver(is31fl3741_driver_t *driver)
         return;
     }
     wait_ms(10);
+    fl3741_available = true;
 
     // enable chip
     data = 0x01;
-    status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, CONFIG_REG, &data, 1, TIMEOUT);
+    status = ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, CONFIG_REG, &data, 1, TIMEOUT);
 
     // set global current
     data = IS31FL3741_GLOBAL_CURRENT;
-    status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, GLOBAL_CURRENT_REG, &data, 1, TIMEOUT);
+    status = ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, GLOBAL_CURRENT_REG, &data, 1, TIMEOUT);
 
     // set pulldown and pullup
     data = ((IS31FL3741_PD_DEFAULT<<PD_OFFSET) | (IS31FL3741_PU_DEFAULT<<PU_OFFSET));
-    status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, PD_PU_REG, &data, 1, TIMEOUT);
+    status = ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, PD_PU_REG, &data, 1, TIMEOUT);
 
     // reset pwm and scale buffers 
     memset(driver->pwm_buffer, 0, PWM_BUFFER_SIZE+2);
@@ -387,11 +390,13 @@ void is31fl3741_update_buffers(i2c_led_t *driver)
 
 void uninit_driver(i2c_led_t *driver)
 {
+    if (!is31fl3741_available(0)) return;
+
     // shutdonw driver
     uint8_t data = UNLOCK_COMMAND;
-    i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->addr, UNLOCK_REG, &data, 1, TIMEOUT);
     data = FUNCTION_PAGE;
-    i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
     data = 0;
-    i2c_write_reg(i2c_inst, driver->addr, CONFIG_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->addr, CONFIG_REG, &data, 1, TIMEOUT);
 }

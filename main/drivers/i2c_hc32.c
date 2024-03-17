@@ -38,7 +38,7 @@ typedef struct {
 #endif
 
 
-bool i2c_ready(i2c_handle_t i2c)
+bool ak_i2c_ready(i2c_handle_t i2c)
 {
     i2c_instance_t *inst = (i2c_instance_t*)i2c;
     return inst->ready;
@@ -77,7 +77,7 @@ void i2c_inst_init(i2c_instance_t *inst, M4_I2C_TypeDef* i2c)
     }
 }
 
-i2c_handle_t i2c_init(I2C_ID id)
+i2c_handle_t ak_i2c_init(I2C_ID id)
 {
 #ifdef USE_I2C1
     if (id == I2C_INSTANCE_1) {
@@ -96,7 +96,7 @@ i2c_handle_t i2c_init(I2C_ID id)
     return NULL;
 }
 
-amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t length, size_t timeout)
+amk_error_t ak_i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t length, size_t timeout)
 {
     i2c_instance_t *inst = (i2c_instance_t*)i2c;
     I2C_Cmd(inst->handle, Enable);
@@ -125,7 +125,7 @@ amk_error_t i2c_send(i2c_handle_t i2c, uint8_t addr, const void* data, size_t le
     return AMK_ERROR;
 }
 
-amk_error_t i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, size_t timeout)
+amk_error_t ak_i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, size_t timeout)
 {
     i2c_instance_t *inst = (i2c_instance_t*)i2c;
 
@@ -164,7 +164,7 @@ amk_error_t i2c_recv(i2c_handle_t i2c, uint8_t addr, void* data, size_t length, 
     return AMK_ERROR;
 }
 
-amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
+amk_error_t ak_i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const void* data, size_t length, size_t timeout)
 {
     i2c_instance_t *inst = (i2c_instance_t*)i2c;
 
@@ -198,7 +198,7 @@ amk_error_t i2c_write_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, const voi
     return AMK_ERROR;
 }
 
-amk_error_t i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
+amk_error_t ak_i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data, size_t length, size_t timeout)
 {
     i2c_instance_t *inst = (i2c_instance_t*)i2c;
 
@@ -245,9 +245,9 @@ amk_error_t i2c_read_reg(i2c_handle_t i2c, uint8_t addr, uint8_t reg, void* data
     return AMK_ERROR;
 }
 
-void i2c_uninit(i2c_handle_t i2c)
+void ak_i2c_uninit(i2c_handle_t i2c)
 {
-    if(!i2c_ready(i2c)) {
+    if(!ak_i2c_ready(i2c)) {
         return;
     }
     i2c_instance_t *inst = (i2c_instance_t*)i2c;

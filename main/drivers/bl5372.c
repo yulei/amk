@@ -39,7 +39,7 @@ static i2c_handle_t i2c_inst;
 void rtc_driver_init(void)
 {
     if (!i2c_inst) {
-        i2c_inst = i2c_init(BL5372_I2C_ID);
+        i2c_inst = ak_i2c_init(BL5372_I2C_ID);
     }
 }
 
@@ -54,7 +54,7 @@ void rtc_driver_write(const rtc_datetime_t *datetime)
     buf[5] = dec2bcd(datetime->month);
     buf[6] = dec2bcd(datetime->year);
 
-    amk_error_t error = i2c_write_reg(i2c_inst, BL5372_ADDR, SECOND_REG, buf, 7, TIMEOUT);
+    amk_error_t error = ak_i2c_write_reg(i2c_inst, BL5372_ADDR, SECOND_REG, buf, 7, TIMEOUT);
     if (error != AMK_SUCCESS) {
         bl5372_debug("BL5372: failed to write time:%d\n", error);
     }
@@ -63,7 +63,7 @@ void rtc_driver_write(const rtc_datetime_t *datetime)
 void rtc_driver_read(rtc_datetime_t *datetime)
 {
     uint8_t buf[7];
-    amk_error_t error = i2c_read_reg(i2c_inst, BL5372_ADDR, SECOND_REG, buf, 7, TIMEOUT);
+    amk_error_t error = ak_i2c_read_reg(i2c_inst, BL5372_ADDR, SECOND_REG, buf, 7, TIMEOUT);
     if (error != AMK_SUCCESS) {
         bl5372_debug("BL5372: failed to read time:%d\n", error);
         return;

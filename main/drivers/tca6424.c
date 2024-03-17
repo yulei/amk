@@ -45,14 +45,14 @@ static uint8_t tca_addr = TCA6424_ADDR;
 void tca6424_init(void)
 {
     if (!i2c_inst) {
-        i2c_inst = i2c_init(TCA6424_I2C_ID);
+        i2c_inst = ak_i2c_init(TCA6424_I2C_ID);
         tca6424_debug("tca6424: inited, %p\n", i2c_inst);
     }
 }
 
 static void write_port(uint8_t port, uint8_t data)
 {
-    amk_error_t error = i2c_write_reg(i2c_inst, tca_addr, port, &data, 1, TIMEOUT);
+    amk_error_t error = ak_i2c_write_reg(i2c_inst, tca_addr, port, &data, 1, TIMEOUT);
     
     if (error != AMK_SUCCESS) {
         tca6424_debug("tca6424: failed to write addr:0x%x, port:%d, data:%d, error:%d\n", tca_addr, port, data, error);
@@ -62,7 +62,7 @@ static void write_port(uint8_t port, uint8_t data)
 static uint8_t read_port(uint8_t port)
 {
     uint8_t data = 0;
-    amk_error_t error = i2c_read_reg(i2c_inst, tca_addr, port, &data, 1, TIMEOUT);
+    amk_error_t error = ak_i2c_read_reg(i2c_inst, tca_addr, port, &data, 1, TIMEOUT);
     if (error != AMK_SUCCESS) {
         tca6424_debug("tca6424: failed to read port:%d, error:%d\n", port, error);
     }

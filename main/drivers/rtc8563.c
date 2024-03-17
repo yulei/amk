@@ -31,21 +31,21 @@ static i2c_handle_t i2c_inst;
 void rtc_driver_init(void)
 {
     if (!i2c_inst) {
-        i2c_inst = i2c_init(RTC8563_I2C_ID);
+        i2c_inst = ak_i2c_init(RTC8563_I2C_ID);
     }
     amk_error_t error = AMK_SUCCESS;
     uint8_t d = 0; 
-    error = i2c_read_reg(i2c_inst, RTC8563_ADDR, CLOCK_REGISTER, &d, 1, TIMEOUT);
+    error = ak_i2c_read_reg(i2c_inst, RTC8563_ADDR, CLOCK_REGISTER, &d, 1, TIMEOUT);
     rtc8563_debug("rtc8563: read clock register=%d, error=%d\n", d, error);
     d |= 0x03;
-    error = i2c_write_reg(i2c_inst, RTC8563_ADDR, CLOCK_REGISTER, &d, 1, TIMEOUT);
+    error = ak_i2c_write_reg(i2c_inst, RTC8563_ADDR, CLOCK_REGISTER, &d, 1, TIMEOUT);
     rtc8563_debug("rtc8563: write clock register=%d, error=%d\n", d, error);
 
     d = 0;
-    error = i2c_read_reg(i2c_inst, RTC8563_ADDR, CONTROL1_REGISTER, &d, 1, TIMEOUT);
+    error = ak_i2c_read_reg(i2c_inst, RTC8563_ADDR, CONTROL1_REGISTER, &d, 1, TIMEOUT);
     rtc8563_debug("rtc8563: read control 1 register=%d, error=%d\n", d, error);
     d &= ~(1<<5);
-    i2c_write_reg(i2c_inst, RTC8563_ADDR, CONTROL1_REGISTER, &d, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, RTC8563_ADDR, CONTROL1_REGISTER, &d, 1, TIMEOUT);
     rtc8563_debug("rtc8563: write control 1 register=%d, error=%d\n", d, error);
 }
 
@@ -60,7 +60,7 @@ void rtc_driver_write(const rtc_datetime_t *datetime)
     buf[5] = dec2bcd(datetime->month);
     buf[6] = dec2bcd(datetime->year);
 
-    amk_error_t error = i2c_write_reg(i2c_inst, RTC8563_ADDR, SECONDS_REGISTER, buf, 7, TIMEOUT);
+    amk_error_t error = ak_i2c_write_reg(i2c_inst, RTC8563_ADDR, SECONDS_REGISTER, buf, 7, TIMEOUT);
     if (error != AMK_SUCCESS) {
         rtc8563_debug("RTC8563: failed to write time:%d\n", error);
     }
@@ -69,7 +69,7 @@ void rtc_driver_write(const rtc_datetime_t *datetime)
 void rtc_driver_read(rtc_datetime_t *datetime)
 {
     uint8_t buf[7];
-    amk_error_t error = i2c_read_reg(i2c_inst, RTC8563_ADDR, SECONDS_REGISTER, buf, 7, TIMEOUT);
+    amk_error_t error = ak_i2c_read_reg(i2c_inst, RTC8563_ADDR, SECONDS_REGISTER, buf, 7, TIMEOUT);
     if (error != AMK_SUCCESS) {
         rtc8563_debug("RTC8563: failed to read time:%d\n", error);
         return;

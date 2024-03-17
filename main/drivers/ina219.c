@@ -35,10 +35,10 @@ static i2c_handle_t i2c_inst;
 bool ina219_init(uint8_t addr, uint16_t config)
 {
     if (!i2c_inst) {
-        i2c_inst = i2c_init(INA219_I2C_ID);
+        i2c_inst = ak_i2c_init(INA219_I2C_ID);
     }
 
-    uint32_t status = i2c_write_reg(i2c_inst, addr, INA219_CONFIG, &config, 2, TIMEOUT);
+    uint32_t status = ak_i2c_write_reg(i2c_inst, addr, INA219_CONFIG, &config, 2, TIMEOUT);
     if (status != AMK_SUCCESS) {
         ina219_debug("INA219: failed to set config: %d\n", status);
         return false;
@@ -51,7 +51,7 @@ bool ina219_init(uint8_t addr, uint16_t config)
 
 bool ina219_set_calibration(uint8_t addr, uint16_t calibration)
 {
-    uint32_t status = i2c_write_reg(i2c_inst, addr, INA219_CONFIG, &calibration, 2, TIMEOUT);
+    uint32_t status = ak_i2c_write_reg(i2c_inst, addr, INA219_CONFIG, &calibration, 2, TIMEOUT);
     if (status != AMK_SUCCESS) {
         ina219_debug("INA219: failed to set calibration: %d\n", status);
         return false;
@@ -62,7 +62,7 @@ bool ina219_set_calibration(uint8_t addr, uint16_t calibration)
 
 bool ina219_get_bus_voltage(uint8_t addr, uint16_t* voltage)
 {
-    uint32_t status = i2c_read_reg(i2c_inst, addr, INA219_BUS_VOLTAGE, voltage, 2, TIMEOUT);
+    uint32_t status = ak_i2c_read_reg(i2c_inst, addr, INA219_BUS_VOLTAGE, voltage, 2, TIMEOUT);
     if (status != AMK_SUCCESS) {
         ina219_debug("INA219: failed to read bus voltage: %d\n", status);
         return false;
@@ -73,7 +73,7 @@ bool ina219_get_bus_voltage(uint8_t addr, uint16_t* voltage)
 
 bool ina219_get_shunt_voltage(uint8_t addr, uint16_t* voltage)
 {
-    uint32_t status = i2c_read_reg(i2c_inst, addr, INA219_SHUNT_VOLTAGE, voltage, 2, TIMEOUT);
+    uint32_t status = ak_i2c_read_reg(i2c_inst, addr, INA219_SHUNT_VOLTAGE, voltage, 2, TIMEOUT);
     if (status != AMK_SUCCESS) {
         ina219_debug("INA219: failed to read shunt voltage: %d\n", status);
         return false;
@@ -84,7 +84,7 @@ bool ina219_get_shunt_voltage(uint8_t addr, uint16_t* voltage)
 
 bool ina219_get_current(uint8_t addr, uint16_t* current)
 {
-    uint32_t status = i2c_read_reg(i2c_inst, addr, INA219_CURRENT, current, 2, TIMEOUT);
+    uint32_t status = ak_i2c_read_reg(i2c_inst, addr, INA219_CURRENT, current, 2, TIMEOUT);
     if (status != AMK_SUCCESS) {
         ina219_debug("INA219: failed to read current: %d\n", status);
         return false;
@@ -96,7 +96,7 @@ bool ina219_get_current(uint8_t addr, uint16_t* current)
 
 bool ina219_get_power(uint8_t addr, uint16_t* power)
 {
-    uint32_t status = i2c_read_reg(i2c_inst, addr, INA219_POWER, power, 2, TIMEOUT);
+    uint32_t status = ak_i2c_read_reg(i2c_inst, addr, INA219_POWER, power, 2, TIMEOUT);
     if (status != AMK_SUCCESS) {
         ina219_debug("INA219: failed to read current: %d\n", status);
         return false;
@@ -107,5 +107,3 @@ bool ina219_get_power(uint8_t addr, uint16_t* power)
 }
 void ina219_uninit(uint8_t addr)
 {}
-
-

@@ -182,12 +182,12 @@ static bool is31fl3729_update_pwm_buffers(i2c_led_t *driver)
 
     // write from sw1 to sw9
 #ifdef RGB_FLUSH_ASYNC
-    if (AMK_SUCCESS != i2c_send_async(i2c_inst, driver->addr, &is31->pwm_buffer[is31->last_index*0x10], 0x10)) {
+    if (AMK_SUCCESS != ak_i2c_send_async(i2c_inst, driver->addr, &is31->pwm_buffer[is31->last_index*0x10], 0x10)) {
         return false;
     }
 #else
     for (int i = 0; i < FLUSH_BATCH; i++) {
-        i2c_send(i2c_inst, driver->addr, &is31->pwm_buffer[i*0x10], 0x10, TIMEOUT);
+        ak_i2c_send(i2c_inst, driver->addr, &is31->pwm_buffer[i*0x10], 0x10, TIMEOUT);
     }
     is31->pwm_dirty = false;
     return true;
@@ -216,7 +216,7 @@ void init_driver(is31fl3729_driver_t *driver)
 {
     uint32_t status = AMK_SUCCESS;
     if (!i2c_inst) {
-        i2c_inst = i2c_init(IS31FL3729_I2C_ID);
+        i2c_inst = ak_i2c_init(IS31FL3729_I2C_ID);
     }
 #ifdef SDB_EN_PIN
     gpio_set_output_pushpull(SDB_EN_PIN);
@@ -226,7 +226,7 @@ void init_driver(is31fl3729_driver_t *driver)
 
     // Reset 3729 to default state
     uint8_t data = RESET_COMMAND;
-    status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, RESET_REG, &data, 1, TIMEOUT);
+    status = ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, RESET_REG, &data, 1, TIMEOUT);
 
     if (status != AMK_SUCCESS) {
         fl3729_debug("IS31FL3729: failed to reset: %d\n", status);
@@ -238,14 +238,14 @@ void init_driver(is31fl3729_driver_t *driver)
 
     // enable chip
     data = 0x01; // 9x15, lgc 1.4v/0v, disalbe osde
-    status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, CONFIG_REG, &data, 1, TIMEOUT);
+    status = ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, CONFIG_REG, &data, 1, TIMEOUT);
     if (status != AMK_SUCCESS) {
         fl3729_debug("IS31FL3729: failed to enable chip: %d\n", status);
     }
 
     // set global current
     data = IS31FL3729_GLOBAL_CURRENT;
-    status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, GLOBAL_CURRENT_REG, &data, 1, TIMEOUT);
+    status = ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, GLOBAL_CURRENT_REG, &data, 1, TIMEOUT);
     if (status != AMK_SUCCESS) {
         fl3729_debug("IS31FL3729: failed to set global current: %d\n", status);
     }
@@ -259,7 +259,7 @@ void init_driver(is31fl3729_driver_t *driver)
     // set scale buffer
     data = IS31FL3729_SCALE_DEFAULT;
     for (int i = 0;i < 0x0F; i++) {
-        status = i2c_write_reg(i2c_inst, driver->i2c_led.addr, SCALE_BASE_REG+i, &data, 1, TIMEOUT);
+        status = ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, SCALE_BASE_REG+i, &data, 1, TIMEOUT);
         if (status != AMK_SUCCESS) {
             fl3729_debug("IS31FL3729: failed to set scale: index: %d, status: %d\n", i, status);
         }
@@ -286,5 +286,5 @@ void uninit_driver(i2c_led_t *driver)
 {
     // shutdonw driver
     uint8_t data = 0;
-    i2c_write_reg(i2c_inst, driver->addr, CONFIG_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->addr, CONFIG_REG, &data, 1, TIMEOUT);
 }

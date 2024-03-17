@@ -124,9 +124,9 @@ bool is31fl3731_update_buffers(i2c_led_t *driver)
     if (!is31->pwm_dirty) return true;
 
 #ifdef RGB_FLUSH_ASYNC
-    if (AMK_SUCCESS == i2c_send_async(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1)) {
+    if (AMK_SUCCESS == ak_i2c_send_async(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1)) {
 #else
-    if (AMK_SUCCESS == i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1, TIMEOUT)) {
+    if (AMK_SUCCESS == ak_i2c_send(i2c_inst, driver->addr, is31->pwm_buffer, PWM_BUFFER_SIZE + 1, TIMEOUT)) {
 #endif
         is31->pwm_dirty = false;
         return true;
@@ -138,7 +138,7 @@ bool is31fl3731_update_buffers(i2c_led_t *driver)
 bool init_driver(is31fl3731_driver_t *driver)
 {
     if (!i2c_inst) {
-        i2c_inst = i2c_init(IS31FL3731_I2C_ID);
+        i2c_inst = ak_i2c_init(IS31FL3731_I2C_ID);
     }
 
     memset(driver->pwm_buffer, 0, PWM_BUFFER_SIZE + 1);
@@ -150,45 +150,45 @@ bool init_driver(is31fl3731_driver_t *driver)
 
     // reset the 3731 to initial state
     uint8_t data = BANK_FUNCTION_REG;
-    if ( AMK_SUCCESS != i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT)) {
+    if ( AMK_SUCCESS != ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT)) {
         amk_printf("IS31FL3731: failed to select FUNCTION page\n");
         //return false;
     }
 
-    if ( AMK_SUCCESS != i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT)) {
+    if ( AMK_SUCCESS != ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT)) {
         amk_printf("IS31FL3731: failed to select FUNCTION page again\n");
         return false;
     }
 
     data = 0;
-    i2c_write_reg(i2c_inst, driver->i2c_led.addr, SHUTDOWN_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, SHUTDOWN_REG, &data, 1, TIMEOUT);
     data = GHOST_PREV_GEN;
-    i2c_write_reg(i2c_inst, driver->i2c_led.addr, GHOST_PREV_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, GHOST_PREV_REG, &data, 1, TIMEOUT);
 
     wait_ms(10);
 
     // set mode
     data = PICTURE_MODE;
-    if (AMK_SUCCESS != i2c_write_reg(i2c_inst, driver->i2c_led.addr, CONFIG_REG, &data, 1, TIMEOUT)) {
+    if (AMK_SUCCESS != ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, CONFIG_REG, &data, 1, TIMEOUT)) {
         amk_printf("IS31FL3731: failed to write PICTURE mode\n");
     }
     data = 0;
-    i2c_write_reg(i2c_inst, driver->i2c_led.addr, PICTURE_FRAME_REG, &data, 1, TIMEOUT);
-    i2c_write_reg(i2c_inst, driver->i2c_led.addr, AUDIO_SYNC_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, PICTURE_FRAME_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, AUDIO_SYNC_REG, &data, 1, TIMEOUT);
 
     // select bank 0
-    i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT);
     // turn off leds
-    i2c_send(i2c_inst, driver->i2c_led.addr, driver->pwm_buffer, PWM_BUFFER_SIZE + 1, TIMEOUT);
+    ak_i2c_send(i2c_inst, driver->i2c_led.addr, driver->pwm_buffer, PWM_BUFFER_SIZE + 1, TIMEOUT);
 
     data = BANK_FUNCTION_REG;
-    i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT);
     // enable chip
     data = 1;
-    i2c_write_reg(i2c_inst, driver->i2c_led.addr, SHUTDOWN_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, SHUTDOWN_REG, &data, 1, TIMEOUT);
     // select bank 0
     data = 0;
-    i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->i2c_led.addr, COMMAND_REG, &data, 1, TIMEOUT);
 
     // turn on used leds
     for (int i = 0; i < driver->i2c_led.led_num; i++) {
@@ -204,7 +204,7 @@ bool init_driver(is31fl3731_driver_t *driver)
         driver->control_buffer[reg_g+1] |= (1 << bit_g);
         driver->control_buffer[reg_b+1] |= (1 << bit_b);
     }
-    i2c_send(i2c_inst, driver->i2c_led.addr, driver->control_buffer, CONTROL_BUFFER_SIZE+1, TIMEOUT);
+    ak_i2c_send(i2c_inst, driver->i2c_led.addr, driver->control_buffer, CONTROL_BUFFER_SIZE+1, TIMEOUT);
 
     fl3731_available[driver->i2c_led.index] = true;
     return true;
@@ -216,8 +216,7 @@ void uninit_driver(i2c_led_t *driver)
 
     // shutdonw driver
     uint8_t data = BANK_FUNCTION_REG;
-    i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->addr, COMMAND_REG, &data, 1, TIMEOUT);
     data = 0;
-    i2c_write_reg(i2c_inst, driver->addr, SHUTDOWN_REG, &data, 1, TIMEOUT);
+    ak_i2c_write_reg(i2c_inst, driver->addr, SHUTDOWN_REG, &data, 1, TIMEOUT);
 }
-
