@@ -1,7 +1,7 @@
 
 MCU = STM32F446
 TINYUSB_ENABLE = yes
-TINYUSB_USE_HAL = yes
+#TINYUSB_USE_HAL = yes
 RGB_LINEAR_ENABLE = yes
 EECONFIG_FLASH = yes
 VIAL_ENABLE = yes
@@ -22,3 +22,6 @@ SRCS +=	$(KEYBOARD_DIR)/display.c
 SRCS +=	$(MAIN_DIR)/drivers/st7735.c
 #SRCS +=	$(KEYBOARD_DIR)/apc_matrix.c
 #SRCS += $(KEYBOARD_DIR)/ec_matrix.c
+
+RTOS_ENABLE = yes
+ASMFLAGS += -DSYSTEM_CLOCK=180000000

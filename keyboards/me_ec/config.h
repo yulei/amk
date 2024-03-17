@@ -41,6 +41,10 @@
 #define KEY_IN_PORT     GPIOA
 #define SENSE_TH        1024
 
+#define ADC_CHANNEL_COUNT   1
+#define ADC_CHANNELS        {KEY_IN_CHANNEL}
+#define ADC_PINS            {A2}
+
 #define CAPS_LED_PIN    A8
 #define WS2812_LED_NUM  4
 #define WS2812_LED_PIN  B7
@@ -72,12 +76,15 @@
 #define RGB_SEGMENT_NUM 2
 
 #define USE_I2C1
+#define USE_WS2812
+#define USE_3236
 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
 #define DEBOUNCE        5
 
 #define VECT_TAB_OFFSET 0x20000
 #define DWT_DELAY
-#define SUSPEND_RECONNECT
+#define SUSPEND_RESET
+#define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 
 #define VIAL_KEYBOARD_UID {0x64, 0x20, 0x09, 0xF6, 0x28, 0x2C, 0x68, 0xD5}

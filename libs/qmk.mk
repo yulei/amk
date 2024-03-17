@@ -67,7 +67,7 @@ ifeq (yes,$(strip $(EXTRAKEY_ENABLE)))
 endif
 
 ifeq ($(strip $(VIAL_ENABLE)), yes)
-	SRCS += $(LIB_DIR)/qmk/protocol/dynamic_keymap_amk.c
+	SRCS += $(LIB_DIR)/qmk/protocol/dynamic_keymap.c
 	SRCS += $(LIB_DIR)/qmk/protocol/send_string.c
 
     APP_DEFS += -DDYNAMIC_KEYMAP_ENABLE
@@ -83,6 +83,7 @@ ifeq ($(strip $(VIAL_ENABLE)), yes)
     COMBO_ENABLE ?= yes
     KEY_OVERRIDE_ENABLE ?= yes
     SRCS += $(QMK_DIR)/quantum/vial.c
+
     APP_DEFS += -DVIAL_ENABLE
     APP_DEFS += -DNO_DEBUG
     APP_DEFS += -DSEND_STRING_ENABLE

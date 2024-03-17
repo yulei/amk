@@ -131,9 +131,9 @@ bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t si
         {
             uint16_t delay = *((uint16_t*)data);
             amk_printf("Delay report: duration=%d\n", delay);
-            while(delay--) {
-                wait_ms(1);
-            }
+            //while(delay--) {
+                wait_ms(delay);
+            //}
         }
         break;
     default:

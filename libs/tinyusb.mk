@@ -49,7 +49,14 @@ else
 	endif
 
 	ifeq (STM32F411, $(strip $(MCU)))
-	SRCS += $(TINYUSB_DIR)/portable/st/synopsys/dcd_synopsys.c
+	INCS +=$(TINYUSB_DIR)/portable/synopsys/dwc2
+	SRCS += $(TINYUSB_DIR)/portable/synopsys/dwc2/dcd_dwc2.c
+	#SRCS += $(TINYUSB_DIR)/portable/st/synopsys/dcd_synopsys.c
+	endif
+
+	ifeq (STM32F446, $(strip $(MCU)))
+	INCS +=$(TINYUSB_DIR)/portable/synopsys/dwc2
+	SRCS += $(TINYUSB_DIR)/portable/synopsys/dwc2/dcd_dwc2.c
 	endif
 
 	ifeq (STM32F722, $(strip $(MCU)))

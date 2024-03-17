@@ -99,7 +99,7 @@
 #define HSE_VALUE       16000000
 #define VECT_TAB_OFFSET 0x20000
 #define DWT_DELAY
-#define SUSPEND_RECONNECT
+#define SUSPEND_RESET
 
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 

@@ -4,6 +4,8 @@
 
 #include "me_ec.h"
 #include "amk_printf.h"
+
+#ifndef EC_MATRIX_ENABLE
 #include "ec_matrix.h"
 
 ec_matrix_t ec_matrix = {
@@ -147,6 +149,8 @@ void matrix_init_kb(void)
     gpio_set_output_pushpull(DISCHARGE_PIN);
     gpio_write_pin(DISCHARGE_PIN, 1);
 }
+
+#endif
 
 #ifdef RGB_ENABLE
 #include "rgb_driver.h"
