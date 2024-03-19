@@ -131,7 +131,7 @@ bool ak_i2c_ready(i2c_handle_t i2c)
     return inst->ready;
 }
 
-void ak_i2c_inst_init(i2c_instance_t *inst, uint32_t i2c)
+void i2c_inst_init(i2c_instance_t *inst, uint32_t i2c)
 {
     if (ak_i2c_ready(inst))
         return;
@@ -176,7 +176,7 @@ bool i2c_wait_flag_timeout(uint32_t i2c, i2c_flag_enum flag, FlagStatus status, 
     return true;
 }
 
-static amk_error_t ak_i2c_write(i2c_handle_t i2c, uint8_t addr, uint8_t reg, uint8_t reg_size, const void* data, size_t length, size_t timeout)
+static amk_error_t i2c_write(i2c_handle_t i2c, uint8_t addr, uint8_t reg, uint8_t reg_size, const void* data, size_t length, size_t timeout)
 {
     uint32_t start = timer_read32();
     uint32_t state = I2C_START;
