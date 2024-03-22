@@ -76,6 +76,8 @@ void hook_send_report(uint32_t type, const void* data)
 
 bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t size)
 {
+    //return true;
+
     hook_send_report(report_type, data);
 
     switch(report_type) {

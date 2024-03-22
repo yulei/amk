@@ -30,7 +30,7 @@ extern void fee_init(void);
 #endif
 }
 
-#define FAULT_BREAK
+//#define FAULT_BREAK
 static void fault_handler(void) 
 {
     #ifdef FAULT_BREAK

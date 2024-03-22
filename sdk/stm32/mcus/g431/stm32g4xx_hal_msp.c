@@ -141,9 +141,9 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 
     __HAL_RCC_GPIOA_CLK_ENABLE();
     /**ADC2 GPIO Configuration
-    PA7     ------> ADC2_IN4
+    PA4     ------> ADC2_IN17
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_7;
+    GPIO_InitStruct.Pin = GPIO_PIN_4;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
@@ -188,9 +188,9 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     __HAL_RCC_ADC12_CLK_DISABLE();
 
     /**ADC2 GPIO Configuration
-    PA7     ------> ADC2_IN4
+    PA4     ------> ADC2_IN17
     */
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_7);
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_4);
 
   /* USER CODE BEGIN ADC2_MspDeInit 1 */
 
@@ -257,6 +257,56 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef* hrtc)
 
 }
 
-/* USER CODE BEGIN 1 */
+void HAL_OPAMP_MspInit(OPAMP_HandleTypeDef* hopamp)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  if(hopamp->Instance==OPAMP1)
+  {
+  /* USER CODE BEGIN OPAMP1_MspInit 0 */
 
-/* USER CODE END 1 */
+  /* USER CODE END OPAMP1_MspInit 0 */
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    /**OPAMP1 GPIO Configuration
+    PA1     ------> OPAMP1_VINP
+    PA2     ------> OPAMP1_VOUT
+    PA3     ------> OPAMP1_VINM
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /* USER CODE BEGIN OPAMP1_MspInit 1 */
+
+  /* USER CODE END OPAMP1_MspInit 1 */
+  }
+
+}
+
+/**
+* @brief OPAMP MSP De-Initialization
+* This function freeze the hardware resources used in this example
+* @param hopamp: OPAMP handle pointer
+* @retval None
+*/
+void HAL_OPAMP_MspDeInit(OPAMP_HandleTypeDef* hopamp)
+{
+  if(hopamp->Instance==OPAMP1)
+  {
+  /* USER CODE BEGIN OPAMP1_MspDeInit 0 */
+
+  /* USER CODE END OPAMP1_MspDeInit 0 */
+
+    /**OPAMP1 GPIO Configuration
+    PA1     ------> OPAMP1_VINP
+    PA2     ------> OPAMP1_VOUT
+    PA3     ------> OPAMP1_VINM
+    */
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3);
+
+  /* USER CODE BEGIN OPAMP1_MspDeInit 1 */
+
+  /* USER CODE END OPAMP1_MspDeInit 1 */
+  }
+}

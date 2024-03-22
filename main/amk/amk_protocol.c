@@ -19,7 +19,7 @@
 
 #include "keycode_config.h"
 
-#define AMK_PROTOCOL_DEBUG 1
+#define AMK_PROTOCOL_DEBUG 0
 
 #if AMK_PROTOCOL_DEBUG
 #define ap_debug  amk_printf
@@ -36,6 +36,7 @@ void amk_protocol_process(uint8_t *msg, uint8_t length)
         msg[3] = amk_protocol_version;
         ap_debug("AMK Protocol: get version:%d\n", msg[3]);
         break;
+#ifdef AMK_APC_ENABLE
     case amk_protocol_get_apc:
         // msg[2]: row, msg[4]: column
         {
@@ -53,7 +54,6 @@ void amk_protocol_process(uint8_t *msg, uint8_t length)
             }
         }
         break;
-#ifdef AMK_APC_ENABLE
     case amk_protocol_set_apc:
         // msg[2]: row, msg[3]: column, msg[4]: keycode high, msg[5]: keycode low
         {
@@ -340,7 +340,7 @@ void amk_protocol_process(uint8_t *msg, uint8_t length)
         {
             msg[2] = amk_protocol_ok;
             msg[3] = eeconfig_read_noise_sens();
-            ap_debug("AMK Protocol: get apc sense = %d\n", msg[3]);
+            ap_debug("AMK Protocol: get noise sense = %d\n", msg[3]);
         }
         break;
     case amk_protocol_set_noise_sens:

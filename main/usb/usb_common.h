@@ -13,6 +13,7 @@
 #define USB_SWITCH_BIT      (1u << 6)
 #define USB_OPENRGB_BIT     (1u << 7)
 #define USB_HS_BIT          (1u << 8)
+#define USB_NO_OUTPUT       (1u << 9)
 
 extern uint32_t usb_setting;
 extern uint32_t usb_polling_rate;
