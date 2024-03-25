@@ -129,6 +129,8 @@ void usb_connect(bool on)
 
 void usb_send_report(uint8_t report_type, const void* data, size_t size)
 {
+    if (usb_setting & USB_NO_OUTPUT) return; 
+
     rb_write_byte(&report_queue, report_type);
     rb_write(&report_queue, data, size);
 }
