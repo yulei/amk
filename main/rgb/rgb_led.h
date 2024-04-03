@@ -18,6 +18,8 @@ void rgb_led_set_all(bool on);
 void rgb_led_config_init(void);
 void rgb_led_config_next(void);
 bool rgb_led_config_enabled(void);
+bool rgb_led_config_is_global(void);
+void rgb_led_config_set_global(bool on);
 void rgb_led_config_toggle(void);
 void rgb_led_config_toggle_temp(void);
 void rgb_led_config_inc_param(uint8_t param);

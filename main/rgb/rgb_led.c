@@ -58,6 +58,7 @@
 
 rgb_cfg_t g_rgb_configs[RGB_LED_CONFIG_NUM];
 static uint8_t rgb_config_cur;
+static bool rgb_global = true;
 
 static bool rgb_is_matrix(void)
 {
@@ -271,10 +272,30 @@ void rgb_led_config_toggle_temp(void)
     }
 }
 
+bool rgb_led_config_is_global(void)
+{
+    return rgb_global;
+}
+
+void rgb_led_config_set_global(bool on)
+{
+    rgb_global = on;
+}
+
 void rgb_led_config_toggle(void)
 {
-    rgb_led_config_toggle_temp();
-    eeconfig_update_rgb(&g_rgb_configs[rgb_config_cur], rgb_config_cur);
+    if (rgb_led_config_is_global()) {
+        int temp = rgb_config_cur;
+        for (int i = 0; i < RGB_LED_CONFIG_NUM; i++) {
+            rgb_config_cur = i;
+            rgb_led_config_toggle_temp();
+            eeconfig_update_rgb(&g_rgb_configs[rgb_config_cur], rgb_config_cur);
+        }
+        rgb_config_cur = temp;
+    } else {
+        rgb_led_config_toggle_temp();
+        eeconfig_update_rgb(&g_rgb_configs[rgb_config_cur], rgb_config_cur);
+    }
 }
 
 static void rgb_led_effect_init_mode(rgb_cfg_t *config)
@@ -365,8 +386,10 @@ static void rgb_led_config_set_param(uint8_t param, uint8_t value)
     }
 }
 
-void rgb_led_config_inc_param(uint8_t param)
+static void inc_param_index(uint8_t param, uint32_t index)
 {
+    uint32_t temp = rgb_config_cur;
+    rgb_config_cur = index;
 #ifdef RGB_MATRIX_ENABLE
     if (rgb_is_matrix()) {
             switch(param) {
@@ -418,10 +441,24 @@ void rgb_led_config_inc_param(uint8_t param)
                 break;
         }
     }
+    rgb_config_cur = temp;
 }
 
-void rgb_led_config_dec_param(uint8_t param)
+void rgb_led_config_inc_param(uint8_t param)
 {
+    if (rgb_led_config_is_global()){
+        for (int i = 0; i < RGB_LED_CONFIG_NUM; i++) {
+            inc_param_index(param, i);
+        }
+    } else {
+        inc_param_index(param, rgb_config_cur);
+    }
+}
+
+static void dec_param_index(uint8_t param, uint32_t index)
+{
+    uint32_t temp = rgb_config_cur;
+    rgb_config_cur = index;
 #ifdef RGB_MATRIX_ENABLE
     if (rgb_is_matrix()) {
             switch(param) {
@@ -474,6 +511,19 @@ void rgb_led_config_dec_param(uint8_t param)
             default:
                 break;
         }
+    }
+    rgb_config_cur = temp;
+
+}
+
+void rgb_led_config_dec_param(uint8_t param)
+{
+    if (rgb_led_config_is_global()){
+        for (int i = 0; i < RGB_LED_CONFIG_NUM; i++) {
+            dec_param_index(param, i);
+        }
+    } else {
+        dec_param_index(param, rgb_config_cur);
     }
 }
 

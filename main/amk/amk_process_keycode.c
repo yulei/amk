@@ -50,10 +50,19 @@ static bool process_rgb_amk(uint16_t keycode, const keyrecord_t *record)
         uint8_t shifted = get_mods() & MOD_MASK_SHIFT;
         switch (keycode) {
         case KC_F13:
-           rgb_led_config_next();
-           return false; 
+            if (rgb_led_config_is_global()) {
+                rgb_led_config_set_global(false);
+            } else {
+                rgb_led_config_next();
+            }
+            return false; 
+        case KC_F14:
+            if (!rgb_led_config_is_global()) {
+                rgb_led_config_set_global(true);
+            }
+            return false; 
         case RGB_TOG:
-            keyboard_set_rgb(!rgb_led_config_enabled());
+            rgb_led_config_toggle();
             keycode_debug("Toggle rgb: %d\n", rgb_led_config_enabled());
             return false;
         case RGB_MODE_FORWARD:
@@ -236,7 +245,7 @@ bool process_action_kb(keyrecord_t *record)
     }
 #endif
 
-#ifdef STATE_SCAN_ENABLE
+#if defined(STATE_SCAN_ENABLE)
     if (!process_state_debounce(keycode, record)) {
         return false;
     }
