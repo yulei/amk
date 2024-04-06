@@ -39,11 +39,11 @@
 #endif
 
 #ifndef APC_KEY_MAX_PRESET
-#define APC_KEY_MAX_PRESET      1800
+#define APC_KEY_MAX_PRESET      2200
 #endif
 
 #ifndef APC_INTERVAL_PRESET
-#define APC_INTERVAL_PRESET     1400 
+#define APC_INTERVAL_PRESET     1800 
 #endif
 
 #ifndef APC_INTERVAL_INVALID
