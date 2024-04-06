@@ -24,13 +24,21 @@
 #define I2C1_SCL_PIN    B6
 #define I2C1_SDA_PIN    B7
 
+#define USE_3729
+#define IS31FL3729_NUM          2
+#define IS31FL3729_SCALE_DEFAULT    0x7F
+
 #define USE_3236
 #define IS31FL3236_NUM      4
 #define IS31FL3236_LED_NUM  21
 
-#define RGB_LED_NUM         (IS31FL3236_LED_NUM)
-#define RGB_DEVICE_NUM      4
+#define RGB_MATRIX_LED_NUM      76
+#define RGB_MATRIX_LED_COUNT    RGB_MATRIX_LED_NUM
+
+#define RGB_LED_NUM         (IS31FL3236_LED_NUM+RGB_MATRIX_LED_NUM)
+#define RGB_DEVICE_NUM      6
 #define RGB_SEGMENT_NUM     5
+#define RGB_MATRIX_NUM      1
 
 #define DEBOUNCE            5
 #define DWT_DELAY
