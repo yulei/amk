@@ -31,7 +31,35 @@ struct amk_dks {
 
 #define AMK_STORE_DKS_END   (AMK_STORE_DKS_START + MATRIX_ROWS*MATRIX_COLS*sizeof(struct amk_dks))
 
+_Static_assert(AMK_STORE_DKS_END < AMK_EEPROM_SIZE, "EEPROM: dks out of range");
+
 void amk_store_set_dks(uint8_t row, uint8_t col, void* dks);
 void amk_store_get_dks(uint8_t row, uint8_t col, void* dks);
+
+#ifdef RGB_ENABLE
+#define AMK_STORE_LED_START (AMK_STORE_DKS_END)
+struct amk_led {
+    uint8_t hue;
+    uint8_t sat;
+    uint8_t val;
+    union {
+        uint8_t param;
+        struct {
+            uint8_t on      : 1;
+            uint8_t dynamic : 1;
+            uint8_t blink   : 1;
+            uint8_t breath  : 1;
+            uint8_t speed   : 4;
+        };
+    };
+} __attribute__((packed));
+
+#define AMK_STORE_LED_COUNT RGB_LED_NUM
+#define AMK_STORE_LED_END   (AMK_STORE_LED_START + AMK_STORE_LED_COUNT*sizeof(struct amk_led))
+_Static_assert(AMK_STORE_LED_END < AMK_EEPROM_SIZE, "EEPROM: leds out of range");
+
+void amk_store_set_led(uint8_t index, const struct amk_led* led);
+void amk_store_get_led(uint8_t index, struct amk_led* led);
+#endif
 
 void amk_store_init(void);

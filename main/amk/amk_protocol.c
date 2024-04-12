@@ -19,12 +19,16 @@
 
 #include "keycode_config.h"
 
-#define AMK_PROTOCOL_DEBUG 0
+#define AMK_PROTOCOL_DEBUG 1
 
 #if AMK_PROTOCOL_DEBUG
 #define ap_debug  amk_printf
 #else
 #define ap_debug(...)
+#endif
+
+#ifdef RGB_LINEAR_ENABLE
+#include "rgb_led.h"
 #endif
 
 void amk_protocol_process(uint8_t *msg, uint8_t length)
@@ -238,6 +242,93 @@ void amk_protocol_process(uint8_t *msg, uint8_t length)
             }
         }
         break;
+#ifdef RGB_LINEAR_ENABLE 
+        case amk_protocol_get_rgb_strip_count:
+        {
+            msg[2] = amk_protocol_ok;
+            msg[3] = RGB_SEGMENT_NUM;
+            ap_debug("AMK Protocol: get rgb strip count = %d\n", msg[3]);
+        }
+        break;
+        case amk_protocol_get_rgb_strip_param:
+        {
+            uint8_t index = msg[2];
+            if (index < RGB_SEGMENT_NUM) {
+                extern rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM];
+                msg[2] = amk_protocol_ok;
+                msg[3] = index;
+                msg[4] = g_rgb_linear_params[index].config;
+                msg[5] = g_rgb_linear_params[index].led_start;
+                msg[6] = g_rgb_linear_params[index].led_num;
+                ap_debug("AMK Protocol: get rgb strip param at %d, config=%d, start=%d, num=%d\n", index, msg[4], msg[5], msg[6]);
+            } else {
+                msg[2] = amk_protocol_fail;
+                ap_debug("AMK Protocol: failed to get rgb strip param, index = %d\n", index);
+            }
+        }
+        break;
+        case amk_protocol_get_rgb_strip_led:
+        {
+            uint8_t index = msg[2];
+            if (index < RGB_LED_NUM) {
+                msg[2] = amk_protocol_ok;
+                msg[3] = index;
+                rgb_led_strip_get_led(index, &msg[4], &msg[5], &msg[6], &msg[7]);
+                ap_debug("AMK Protocol: get rgb strip led at %d, hue=%d, sat=%d, val=%d, param=0x%x\n", 
+                        index, msg[4], msg[5], msg[6], msg[7]);
+            } else {
+                msg[2] = amk_protocol_fail;
+                ap_debug("AMK Protocol: failed to get rgb strip led, index = %d, led count = %d\n", index, RGB_LED_NUM);
+            }
+        }
+        break;
+        case amk_protocol_set_rgb_strip_led:
+        {
+            uint8_t index = msg[2];
+            if (index < RGB_LED_NUM) {
+                msg[2] = amk_protocol_ok;
+
+                uint8_t hue = msg[3];
+                uint8_t sat = msg[4];
+                uint8_t val = msg[5];
+                uint8_t param = msg[6];
+                rgb_led_strip_set_led(index, hue, sat, val, param); 
+                ap_debug("AMK Protocol: set rgb strip led at %d, hue=%d, sat=%d, val=%d, param=0x%x\n", index, hue, sat, val, param);
+            } else {
+                msg[2] = amk_protocol_fail;
+                ap_debug("AMK Protocol: failed to set rgb strip led, index = %d, led count = %d\n", index, RGB_LED_NUM);
+            }
+        }
+        break;
+        case amk_protocol_get_rgb_strip_mode:
+        {
+            uint8_t index = msg[2];
+            if (index < RGB_SEGMENT_NUM) {
+                msg[2] = amk_protocol_ok;
+                msg[3] = index;
+                msg[4] = rgb_led_strip_get_mode(index);
+                ap_debug("AMK Protocol: get rgb strip mode at %d, mode=%d\n", index, msg[3]);
+            } else {
+                msg[2] = amk_protocol_fail;
+                ap_debug("AMK Protocol: failed to get rgb strip mode, index = %d\n", index);
+            }
+        }
+        break;
+        case amk_protocol_set_rgb_strip_mode:
+        {
+            uint8_t index = msg[2];
+            if (index < RGB_SEGMENT_NUM) {
+                msg[2] = amk_protocol_ok;
+                uint8_t mode = msg[3];
+                rgb_led_strip_set_mode(index, mode);
+                ap_debug("AMK Protocol: set rgb strip mode at %d, mode=%d\n", index, mode);
+            } else {
+                msg[2] = amk_protocol_fail;
+                ap_debug("AMK Protocol: failed to set rgb strip mode, index = %d, mode = %d\n", index, msg[3]);
+            }
+        }
+        break;
+#endif
 #ifdef AMK_APC_ENABLE
     case amk_protocol_get_pole:
         {

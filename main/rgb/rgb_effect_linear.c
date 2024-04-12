@@ -10,6 +10,7 @@
 #include "rgb_led.h"
 #include "timer.h"
 #include "amk_eeprom.h"
+#include "amk_store.h"
 #include "amk_printf.h"
 
 #ifndef RGB_EFFECT_LINEAR_NUM
@@ -32,6 +33,11 @@
 #define RAINBOW_STEP_DEFAULT    32
 #define BREATH_STEP_DEFAULT     0
 #define CIRCLE_STEP_DEFAULT     2
+#define CUSTOM_SPEED_DEFAULt    0
+
+#ifndef RGB_LINEAR_DEFAULT_MODE
+#define RGB_LINEAR_DEFAULT_MODE RL_EFFECT_GRADIENT
+#endif
 
 typedef struct s_rgb_linear_state rgb_linear_state_t;
 typedef void (*RGB_EFFECT_FUN)(rgb_linear_state_t*);
@@ -41,6 +47,8 @@ struct s_rgb_linear_state {
     RGB_EFFECT_FUN          effects[RL_EFFECT_MAX];
     uint32_t                last_ticks;
     uint32_t                counter;
+    bool                    blink_on;
+    uint32_t                custom_speed;
     uint32_t                rainbow_step;
     uint32_t                breath_step;
     bool                    breath_dir;
@@ -52,7 +60,7 @@ struct s_rgb_linear_state {
 };
 
 static rgb_linear_state_t effects_state[RGB_EFFECT_LINEAR_NUM];
-
+extern struct amk_led amk_leds[RGB_LED_NUM];
 
 static bool effects_config_valid(rgb_cfg_t *config)
 {
@@ -134,6 +142,8 @@ static void effects_mode_init(rgb_linear_state_t *state)
 static uint32_t effects_delay(rgb_linear_state_t *state)
 {
     switch(state->config->mode) {
+        case RL_EFFECT_CUSTOM:
+            break;
         case RL_EFFECT_STATIC:
             return DELAY_MIN;
         case RL_EFFECT_BLINK:
@@ -313,6 +323,54 @@ static void effects_mode_circle(rgb_linear_state_t *state)
     state->config->hue += state->circle_step;
 }
 
+static void effects_mode_custom(rgb_linear_state_t *state)
+{
+    for (int i = 0; i < state->led_num; i++) {
+        struct amk_led *led = &amk_leds[i+state->led_start];
+        if (led->on) {
+            // do effect
+            uint8_t hue = led->hue;
+            uint8_t sat = led->sat;
+            uint8_t val = led->val;
+
+            if (led->breath) {
+                uint8_t breath_index = (state->breath_step+led->speed) % RGBLIGHT_BREATHE_TABLE_SIZE;
+                val = rgblight_effect_breathe_table[breath_index];
+            }
+
+            if (led->blink) {
+                if(state->counter % (2+led->speed) == 0) {
+                    state->blink_on = !state->blink_on;
+                }
+
+                if (state->blink_on) {
+                    hue = 0;
+                    sat = 0;
+                    val = 0;
+                }
+            }
+
+            if (led->dynamic) {
+                led->hue += HUE_STEP;
+            }
+
+            bool update = true;
+            if ((led->speed != 0) && ((state->custom_speed % led->speed) != 0)) {
+                update = false;
+            }
+            if (update) {
+                effects_set_color(state, i, hue, sat, val);
+            }
+        } else {
+            effects_set_color(state, i, 0, 0, 0);
+        }
+    }
+
+    state->breath_step++;
+    state->counter++;
+    state->custom_speed++;
+}
+
 static void effects_set_enable(rgb_linear_state_t *state, uint8_t enable)
 {
     state->config->enable = enable;
@@ -322,7 +380,7 @@ static void effects_set_enable(rgb_linear_state_t *state, uint8_t enable)
 static void effects_update_default(rgb_linear_state_t *state)
 {
     state->config->enable   = ENABLE_DEFAULT;
-    state->config->mode     = MODE_DEFAULT;
+    state->config->mode     = RGB_LINEAR_DEFAULT_MODE;
     state->config->speed    = SPEED_DEFAULT;
     state->config->hue      = HUE_DEFAULT;
     state->config->sat      = SAT_DEFAULT;
@@ -333,7 +391,9 @@ static void effects_update_default(rgb_linear_state_t *state)
 static void effects_state_init(rgb_linear_state_t *state)
 {
     state->counter       = 0;
+    state->blink_on      = false;
     state->wipe_on       = true;
+    state->custom_speed  = CUSTOM_SPEED_DEFAULt;
     state->rainbow_step  = RAINBOW_STEP_DEFAULT;
     state->breath_step   = BREATH_STEP_DEFAULT;
     state->circle_step   = CIRCLE_STEP_DEFAULT;
@@ -348,7 +408,12 @@ static void effects_state_init(rgb_linear_state_t *state)
     state->effects[RL_EFFECT_WIPE]      = effects_mode_wipe;
     state->effects[RL_EFFECT_SCAN]      = effects_mode_scan;
     state->effects[RL_EFFECT_CIRCLE]    = effects_mode_circle;
+    state->effects[RL_EFFECT_CUSTOM]    = effects_mode_custom;
     effects_mode_init(state);
+
+    for (int i = 0; i < state->led_num; i++) {
+        amk_store_get_led(i+state->led_start, &amk_leds[i+state->led_start]);
+    }
 }
 
 // interface

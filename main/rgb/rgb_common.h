@@ -79,7 +79,7 @@ enum {
 #define ENABLE_DEFAULT  1
 
 #ifndef MODE_DEFAULT
-#define MODE_DEFAULT    0
+#define MODE_DEFAULT    1
 #endif
 
 #define SPEED_MIN 1

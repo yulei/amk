@@ -78,6 +78,26 @@ void amk_store_get_dks(uint8_t row, uint8_t col, void* dks)
     }
 }
 
+#ifdef RGB_ENABLE
+void amk_store_set_led(uint8_t index, const struct amk_led* led)
+{
+    uint8_t *addr = (uint8_t*)(index*sizeof(struct amk_led) + AMK_STORE_LED_START);
+    eeprom_write_byte(addr++, led->hue);
+    eeprom_write_byte(addr++, led->sat);
+    eeprom_write_byte(addr++, led->val);
+    eeprom_write_byte(addr++, led->param);
+}
+
+void amk_store_get_led(uint8_t index, struct amk_led* led)
+{
+    uint8_t *addr = (uint8_t*)(index*sizeof(struct amk_led) + AMK_STORE_LED_START);
+    led->hue = eeprom_read_byte(addr++);
+    led->sat = eeprom_read_byte(addr++);
+    led->val = eeprom_read_byte(addr++);
+    led->param = eeprom_read_byte(addr++);
+}
+#endif
+
 void amk_store_init(void)
 {
     uint8_t dks[sizeof(struct amk_dks)] = {[0 ... sizeof(struct amk_dks)-1] = 0};
@@ -88,6 +108,21 @@ void amk_store_init(void)
             amk_store_set_dks(row, col, dks);
         }
     }
+    #ifdef RGB_ENABLE
+    struct amk_led led = {
+        .hue = 0,
+        .sat = 0xFF,
+        .val = 0xFF,
+        .on = 1,
+        .dynamic = 0,
+        .blink = 0,
+        .breath = 0,
+        .speed = 8,
+    };
+    for (int i = 0; i < RGB_LED_NUM; i++) {
+        amk_store_set_led(i, &led);
+    }
+    #endif
 }
 
 void eeconfig_init_custom(void)

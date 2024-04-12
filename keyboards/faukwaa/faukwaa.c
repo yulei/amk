@@ -37,8 +37,8 @@ rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {3, OUT_4, OUT_5, OUT_6},
     {3, OUT_7, OUT_8, OUT_9},
     {3, OUT_19, OUT_20, OUT_21},
-    {3, OUT_16, OUT_17, OUT_18},
-    {3, OUT_13, OUT_14, OUT_15},
+    //{3, OUT_16, OUT_17, OUT_18},
+    //{3, OUT_13, OUT_14, OUT_15},
     {3, OUT_10, OUT_11, OUT_12},
 
 #ifdef RGB_MATRIX_ENABLE
@@ -150,7 +150,8 @@ rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
     {RGB_DRIVER_IS31FL3236, 0x78, 0, 0, 5},
     {RGB_DRIVER_IS31FL3236, 0x7E, 1, 5, 4},
     {RGB_DRIVER_IS31FL3236, 0x7A, 2, 9, 4},
-    {RGB_DRIVER_IS31FL3236, 0x7C, 3, 13, 8},
+    //{RGB_DRIVER_IS31FL3236, 0x7C, 3, 13, 8},
+    {RGB_DRIVER_IS31FL3236, 0x7C, 3, 13, 6},
 
 #ifdef RGB_MATRIX_ENABLE
     {RGB_DRIVER_IS31FL3729, 0x68, 0, 21, 32},
@@ -163,7 +164,8 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
     {1, 5, 4},
     {2, 9, 4},
     {3,13, 4},
-    {4,17, 4},
+    //{4,17, 4},
+    {4,17, 2},
 };
 
 #ifdef RGB_MATRIX_ENABLE

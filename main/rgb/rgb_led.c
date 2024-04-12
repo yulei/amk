@@ -418,6 +418,7 @@ static void inc_param_index(uint8_t param, uint32_t index)
         switch(param) {
             case RGB_EFFECT_MODE:
                 value = (g_rgb_configs[rgb_config_cur].mode+1) % rgb_led_effect_max(&g_rgb_configs[rgb_config_cur]);
+                if (value == 0) { ++value;}
                 rgb_led_config_set_param(RGB_EFFECT_MODE, value);
                 break;
             case RGB_EFFECT_SPEED:
@@ -486,7 +487,9 @@ static void dec_param_index(uint8_t param, uint32_t index)
         uint8_t value;
         switch(param) {
             case RGB_EFFECT_MODE:
-                value = g_rgb_configs[rgb_config_cur].mode > 0 ? g_rgb_configs[rgb_config_cur].mode - 1 : 0;
+                uint8_t mode_max = rgb_led_effect_max(&g_rgb_configs[rgb_config_cur]);
+                value = (g_rgb_configs[rgb_config_cur].mode + mode_max - 1) % mode_max;
+                if (value == 0) { value = mode_max - 1; }
                 rgb_led_config_set_param(RGB_EFFECT_MODE, value);
                 break;
             case RGB_EFFECT_SPEED:
@@ -585,3 +588,46 @@ void rgb_led_prepare_sleep(void)
     // led power off
     rgb_led_set_power(false);
 }
+
+
+#ifdef RGB_LINEAR_ENABLE
+uint8_t rgb_led_strip_get_mode(uint8_t index)
+{
+    if (index < RGB_LINEAR_CONFIG_NUM) {
+        uint8_t config = g_rgb_linear_params[index].config;
+        return g_rgb_configs[config].mode;
+    }
+
+    return 0;
+}
+
+void rgb_led_strip_set_mode(uint8_t index, uint8_t mode)
+{
+    if (index < RGB_LINEAR_CONFIG_NUM) {
+        uint8_t config = g_rgb_linear_params[index].config;
+        uint8_t temp = rgb_config_cur;
+        rgb_config_cur = config;
+
+        mode %= rgb_led_effect_max(&g_rgb_configs[rgb_config_cur]);
+        rgb_led_config_set_param(RGB_EFFECT_MODE, mode);
+
+        rgb_config_cur = temp;
+    }
+}
+
+void rgb_led_strip_get_led(uint8_t index, uint8_t* hue, uint8_t* sat, uint8_t* val, uint8_t* param)
+{
+    rgb_linear_get_led(index, hue, sat, val, param);
+}
+
+void rgb_led_strip_set_led(uint8_t index, uint8_t hue, uint8_t sat, uint8_t val, uint8_t param)
+{
+    rgb_linear_set_led(index, hue, sat, val, param);
+}
+
+#else
+uint8_t rgb_led_strip_get_mode(uint8_t index) {return 1;}
+void rgb_led_strip_set_mode(uint8_t index, uint8_t mode) {}
+void rgb_led_strip_get_led(uint8_t index, uint8_t* hue, uint8_t* sat, uint8_t* val, uint8_t* param) {}
+void rgb_led_strip_set_led(uint8_t index, uint8_t hue, uint8_t sat, uint8_t val, uint8_t param) {}
+#endif

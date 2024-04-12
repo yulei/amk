@@ -8,6 +8,7 @@
 #include "rgb_driver.h"
 
 enum {
+    RL_EFFECT_CUSTOM,
     RL_EFFECT_GRADIENT,
     RL_EFFECT_STATIC,
     RL_EFFECT_BLINK,

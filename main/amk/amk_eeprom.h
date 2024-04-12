@@ -50,7 +50,7 @@
 #define EECONFIG_NOISE_SENS         (uint8_t*)(EECONFIG_NOISE_SENS_START)
 #define EECONFIG_NOISE_SENS_COUNT   1
 
-#define AMK_EEPROM_SIZE             4096
+#define AMK_EEPROM_SIZE             6144
 #define EECONFIG_RESERVED_COUNT     (AMK_EEPROM_SIZE \
                                     -EEPROM_SIZE \
                                     -EECONFIG_RGB_COUNT \

@@ -24,3 +24,8 @@ void rgb_led_config_toggle(void);
 void rgb_led_config_toggle_temp(void);
 void rgb_led_config_inc_param(uint8_t param);
 void rgb_led_config_dec_param(uint8_t param);
+
+uint8_t rgb_led_strip_get_mode(uint8_t index);
+void rgb_led_strip_set_mode(uint8_t index, uint8_t mode);
+void rgb_led_strip_get_led(uint8_t index, uint8_t* hue, uint8_t* sat, uint8_t* val, uint8_t* param);
+void rgb_led_strip_set_led(uint8_t index, uint8_t hue, uint8_t sat, uint8_t val, uint8_t param);
