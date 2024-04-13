@@ -72,15 +72,38 @@ void matrix_init_custom(void)
 #endif
 }
 
+#ifdef ROW_MASK
+static matrix_row_t row_mask[] = ROW_MASK;
+static matrix_row_t row_masked(matrix_row_t src)
+{
+    matrix_row_t dst = 0;
+    for (int col = 0; col < MATRIX_COLS; col++) {
+        if (row_mask[col] & src) {
+            dst |= 1<<col;
+        }
+    }
+
+    return dst;
+}
+#endif
+
 static matrix_row_t read_current_row(void)
 {
     matrix_row_t current = 0;
 
 #ifdef PORT_SCAN_ENABLE
     #ifdef SCAN_ROW2COL
-    current = ((matrix_row_t)gpio_read_port(SCAN_PORT));
+        #ifdef ROW_MASK
+        current = row_masked(((matrix_row_t)gpio_read_port(SCAN_PORT)));
+        #else
+        current = ((matrix_row_t)gpio_read_port(SCAN_PORT));
+        #endif
     #else
-    current = ~((matrix_row_t)gpio_read_port(SCAN_PORT));
+        #ifdef ROW_MASK
+        current = row_masked(~((matrix_row_t)gpio_read_port(SCAN_PORT)));
+        #else
+        current = ~((matrix_row_t)gpio_read_port(SCAN_PORT));
+        #endif
     #endif
 #else
     for (int col = 0; col < MATRIX_COLS; col++) {
