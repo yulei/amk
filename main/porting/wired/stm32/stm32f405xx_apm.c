@@ -35,7 +35,7 @@ DMA_HandleTypeDef hdma_spi3_tx;
 
 #ifdef USE_PWM_TIM4
 TIM_HandleTypeDef htim4;
-DMA_HandleTypeDef hdma_tim4_ch2;
+DMA_HandleTypeDef hdma_tim4_ch3;
 #endif
 
 #ifdef USE_UART1
@@ -250,7 +250,7 @@ static void MX_TIM4_Init(void)
     htim4.Instance = TIM4;
     htim4.Init.Prescaler = 0;
     htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim4.Init.Period = 111;
+    htim4.Init.Period = PWM_TIM_PERIOD;
     htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
     if (HAL_TIM_PWM_Init(&htim4) != HAL_OK) {
@@ -265,7 +265,7 @@ static void MX_TIM4_Init(void)
     sConfigOC.Pulse = 0;
     sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
     sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-    if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_2) != HAL_OK) {
+    if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, PWM_TIM_CHANNEL) != HAL_OK) {
         Error_Handler();
     }
     HAL_TIM_MspPostInit(&htim4);

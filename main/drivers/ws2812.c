@@ -13,7 +13,7 @@
 #ifndef WS2812_USE_GPIO
 #   include "ws2812_stm32_pwm.c"
 #else
-#   include "ws2812_stm32_gpio.c"
+#   include "ws2812_gpio.c"
 #endif
 #endif
 #endif
