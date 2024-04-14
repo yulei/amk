@@ -12,7 +12,7 @@
 #include "amk_printf.h"
 
 #ifndef QSPI_DEBUG
-#define QSPI_DEBUG 0
+#define QSPI_DEBUG 1
 #endif
 
 #if QSPI_DEBUG
@@ -82,11 +82,21 @@ extern void Error_Handler(void);
 
 #if QSPI_ASYNC
 #include "tx_api.h"
-#define FLAGS_QSPI_RX                   (1<<0)
-TX_EVENT_FLAGS_GROUP    g_qspi_flags;
+static TX_SEMAPHORE qspi_sema;
+static volatile bool qspi_wait = false;
+static void qspi_sema_init(void)
+{
+    if (TX_SUCCESS != tx_semaphore_create(&qspi_sema, "qspi_sema", 0)) {
+        amk_printf("faield to create qspi semaphore\n");
+    }
+    qspi_wait = true;
+}
 void HAL_QSPI_RxCpltCallback(QSPI_HandleTypeDef *hqspi)
 {
-    tx_event_flags_set(&g_qspi_flags, FLAGS_QSPI_RX, TX_OR);
+    if (qspi_wait) {
+        qspi_wait = false;
+        tx_semaphore_put(&qspi_sema);
+    }
 }
 #endif
 
@@ -126,7 +136,7 @@ bool qspi_init(uint32_t map_addr)
     }
     
 #if QSPI_ASYNC
-    tx_event_flags_create(&g_qspi_flags, NULL);
+    qspi_sema_init();
 #endif
     return true;
 }
@@ -179,12 +189,13 @@ amk_error_t qspi_read_sector(uint32_t address, uint8_t *buffer, size_t length)
     /* Reception of the data */
 #if QSPI_ASYNC
     if (HAL_QSPI_Receive_DMA(&hqspi, buffer) != HAL_OK) {
+        qspi_debug("QSPI: receive dma failed:from 0x%x, size:%d\n", address, length);
+
         return AMK_QSPI_ERROR;
     }
-    uint32_t flags = 0;
-    if (TX_SUCCESS !=  tx_event_flags_get(&g_qspi_flags, FLAGS_QSPI_RX, TX_OR_CLEAR, &flags, TX_WAIT_FOREVER)) {
-        return AMK_QSPI_ERROR;
-    }
+
+    qspi_wait = true;
+    tx_semaphore_get(&qspi_sema, TX_WAIT_FOREVER);
 #else
 
     if (HAL_QSPI_Receive(&hqspi, buffer, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
@@ -192,6 +203,7 @@ amk_error_t qspi_read_sector(uint32_t address, uint8_t *buffer, size_t length)
         return AMK_QSPI_ERROR;
     }
 #endif
+    qspi_debug("QSPI: read_sector: from 0x%x, size:%d\n", address, length);
 
     return AMK_SUCCESS;
 }
