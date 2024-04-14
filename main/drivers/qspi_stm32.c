@@ -73,8 +73,14 @@ extern void Error_Handler(void);
 #define W25Q128JV_FSR_WREN              ((uint8_t)0x02)    /*!< write enable */
 #define W25Q128JV_FSR_QE                ((uint8_t)0x02)    /*!< quad enable */
 
-
 #ifdef RTOS_ENABLE
+//#define QSPI_ASYNC  1
+#define QSPI_ASYNC  0
+#else
+#define QSPI_ASYNC  0
+#endif
+
+#if QSPI_ASYNC
 #include "tx_api.h"
 #define FLAGS_QSPI_RX                   (1<<0)
 TX_EVENT_FLAGS_GROUP    g_qspi_flags;
@@ -119,7 +125,7 @@ bool qspi_init(uint32_t map_addr)
         return false;
     }
     
-#ifdef RTOS_ENABLE
+#if QSPI_ASYNC
     tx_event_flags_create(&g_qspi_flags, NULL);
 #endif
     return true;
@@ -171,7 +177,7 @@ amk_error_t qspi_read_sector(uint32_t address, uint8_t *buffer, size_t length)
     }
 
     /* Reception of the data */
-#ifdef RTOS_ENABLE
+#if QSPI_ASYNC
     if (HAL_QSPI_Receive_DMA(&hqspi, buffer) != HAL_OK) {
         return AMK_QSPI_ERROR;
     }
