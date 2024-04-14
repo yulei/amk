@@ -83,4 +83,4 @@
 #define GC9107_AS_ST7735
 #define SCREEN_ROTATION     3
 
-//#define LAYOUT_current      LAYOUT_default
+#define LAYOUT_current      LAYOUT_all
