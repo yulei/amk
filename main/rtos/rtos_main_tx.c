@@ -33,12 +33,12 @@ extern void custom_board_task(void);
 #define FLAGS_MAIN_DISPLAY      (1<<2)
 
 // thread parameters
-#define USB_STACK_SIZE              512
+#define USB_STACK_SIZE              768
 #define USB_THREAD_PRIO             9
 #define USB_PREEMPTION_THRESHOLD    (USB_THREAD_PRIO)
 static CHAR usb_stack[USB_STACK_SIZE];
 
-#define MAIN_STACK_SIZE             5888
+#define MAIN_STACK_SIZE             6144
 #define MAIN_THREAD_PRIO            11
 #define MAIN_PREEMPTION_THRESHOLD   (MAIN_THREAD_PRIO)
 static CHAR main_stack[MAIN_STACK_SIZE];
