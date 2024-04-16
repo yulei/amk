@@ -31,6 +31,7 @@
 #define USE_3236
 #define IS31FL3236_NUM      4
 #define IS31FL3236_LED_NUM  19
+#define RGB_INDICATOR_NUM   1
 //#define IS31FL3236_LED_NUM  21
 
 #define RGB_MATRIX_LED_NUM      76

@@ -39,7 +39,7 @@
 #endif
 
 #ifdef RGB_INDICATOR_ENABLE
-    #define RGB_INDICATOR_CONFIG_NUM    0 //RGB_INDICATOR_LED_NUM
+    #define RGB_INDICATOR_CONFIG_NUM    0 //RGB_INDICATOR_NUM
 #else
     #define RGB_INDICATOR_CONFIG_NUM    0
 #endif
@@ -170,12 +170,12 @@ void rgb_led_task(void)
 #endif
 #endif
 
-#ifdef RGB_INDICATOR_ENABLE
-    rgb_indicator_task();
-#endif
-
 #ifdef RGB_MATRIX_ENABLE
     rgb_matrix_task_stub();
+#endif
+
+#ifdef RGB_INDICATOR_ENABLE
+    rgb_indicator_task();
 #endif
 
 #ifdef RGBLIGHT_EN_PIN

@@ -10,6 +10,11 @@
 #include "is31fl3236.h"
 #include "is31fl3729.h"
 #include "rgb_driver.h"
+#include "rgb_indicator.h"
+
+struct rgb_indicator g_rgb_indicators[RGB_INDICATOR_NUM] = {
+    {0, RGB_INDICATOR_CAPS_LOCK},
+};
 
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     // left leds
@@ -213,6 +218,7 @@ led_config_t g_led_config = {
 };
 #endif
 
+#if 0
 #define CAPS_LED_INDEX 0 
 
 static void set_led_rgb(uint8_t index, uint8_t red, uint8_t green, uint8_t blue)
@@ -232,3 +238,4 @@ void rgb_led_pre_flush(void)
         set_led_rgb(CAPS_LED_INDEX, 0, 0, 0);
     }
 }
+#endif
