@@ -49,6 +49,8 @@ enum {
     amk_protocol_set_rgb_strip_led      = 30,
     amk_protocol_get_rgb_strip_mode     = 31,
     amk_protocol_set_rgb_strip_mode     = 32,
+    amk_protocol_get_rgb_indicator_led  = 33,
+    amk_protocol_set_rgb_indicator_led  = 34,
 };
 
 void amk_protocol_process(uint8_t *msg, uint8_t length);

@@ -14,8 +14,9 @@
 // key matrix
 #define MATRIX_ROWS     5
 #define MATRIX_COLS     16
+#define MATRIX_NO_KEY_MASK {0,0,1<<8,0,0x800F}
 
-#define MATRIX_COL_PINS {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+#define MATRIX_COL_PINS {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
 #define ADC_CHANNEL_COUNT   5
 #define ADC_CHANNELS    {ADC_CHANNEL_2, ADC_CHANNEL_4, ADC_CHANNEL_0, ADC_CHANNEL_3, ADC_CHANNEL_1}
 #define ADC_PINS        {A2, A4, A0, A3, A1}
@@ -84,3 +85,15 @@
 #define SCREEN_ROTATION     3
 
 #define LAYOUT_current      LAYOUT_all
+
+#define APC_INTERVAL_PRESET 800
+#define APC_KEY_MIN_PRESET  2150
+#define APC_KEY_MAX_PRESET  3000 
+
+#define AMK_RT_SENS_DEFAULT     20 
+#define AMK_TOP_SENS_DEFAULT    20
+#define AMK_BTM_SENS_DEFAULT    20
+#define AMK_APC_SENS_DEFAULT    20
+#define AMK_APC_NOISE_DEFAULT   20
+
+#define APC_SPECIAL_KEY_NUM     3 

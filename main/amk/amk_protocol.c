@@ -27,8 +27,12 @@
 #define ap_debug(...)
 #endif
 
-#ifdef RGB_LINEAR_ENABLE
+#if defined(RGB_LINEAR_ENABLE) || defined(RGB_INDICATOR_ENABLE)
 #include "rgb_led.h"
+#endif
+
+#if defined(RGB_INDICATOR_ENABLE)
+#include "rgb_indicator.h"
 #endif
 
 void amk_protocol_process(uint8_t *msg, uint8_t length)
@@ -242,7 +246,7 @@ void amk_protocol_process(uint8_t *msg, uint8_t length)
             }
         }
         break;
-#ifdef RGB_LINEAR_ENABLE 
+#if defined(RGB_LINEAR_ENABLE)
         case amk_protocol_get_rgb_strip_count:
         {
             msg[2] = amk_protocol_ok;
@@ -325,6 +329,41 @@ void amk_protocol_process(uint8_t *msg, uint8_t length)
             } else {
                 msg[2] = amk_protocol_fail;
                 ap_debug("AMK Protocol: failed to set rgb strip mode, index = %d, mode = %d\n", index, msg[3]);
+            }
+        }
+        break;
+#endif
+#if defined(RGB_INDICATOR_ENABLE)
+        case amk_protocol_get_rgb_indicator_led:
+        {
+            uint8_t index = msg[2];
+            if (index < RGB_LED_NUM) {
+                msg[2] = amk_protocol_ok;
+                msg[3] = index;
+                rgb_indicator_get_led(index, &msg[4], &msg[5], &msg[6], &msg[7]);
+                ap_debug("AMK Protocol: get rgb indicator led at %d, hue=%d, sat=%d, val=%d, param=0x%x\n", 
+                        index, msg[4], msg[5], msg[6], msg[7]);
+            } else {
+                msg[2] = amk_protocol_fail;
+                ap_debug("AMK Protocol: failed to get rgb indicator led, index = %d, led count = %d\n", index, RGB_LED_NUM);
+            }
+        }
+        break;
+        case amk_protocol_set_rgb_indicator_led:
+        {
+            uint8_t index = msg[2];
+            if (index < RGB_LED_NUM) {
+                msg[2] = amk_protocol_ok;
+
+                uint8_t hue = msg[3];
+                uint8_t sat = msg[4];
+                uint8_t val = msg[5];
+                uint8_t param = msg[6];
+                rgb_indicator_set_led(index, hue, sat, val, param); 
+                ap_debug("AMK Protocol: set rgb indicator led at %d, hue=%d, sat=%d, val=%d, param=0x%x\n", index, hue, sat, val, param);
+            } else {
+                msg[2] = amk_protocol_fail;
+                ap_debug("AMK Protocol: failed to set rgb indicator led, index = %d, led count = %d\n", index, RGB_LED_NUM);
             }
         }
         break;

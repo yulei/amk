@@ -112,4 +112,16 @@
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 
 #define USE_HS_USB
-#define RGB_FLUSH_ASYNC
+//#define RGB_FLUSH_ASYNC
+
+#define APC_INTERVAL_PRESET 600
+#define APC_KEY_MIN_PRESET  2150
+#define APC_KEY_MAX_PRESET  2800 
+
+#define AMK_RT_SENS_DEFAULT     20 
+#define AMK_TOP_SENS_DEFAULT    20
+#define AMK_BTM_SENS_DEFAULT    20
+#define AMK_APC_SENS_DEFAULT    20
+#define AMK_APC_NOISE_DEFAULT   20
+
+#define APC_SPECIAL_KEY_NUM     1

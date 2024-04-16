@@ -258,6 +258,11 @@ struct apc_key
     bool active;
 };
 
+
+#ifdef MATRIX_NO_KEY_MASK
+static matrix_row_t nokey_mask[] = MATRIX_NO_KEY_MASK;
+#endif
+
 static struct apc_key apc_matrix[MATRIX_ROWS][MATRIX_COLS];
 
 static uint32_t get_part_interval_table(uint32_t val, uint32_t max)
@@ -294,15 +299,38 @@ uint32_t get_part_interval_with_position(uint32_t val, uint32_t max, uint32_t po
     return interval;
 }
 
+static void get_preset_params(uint32_t row, uint32_t col, uint32_t* min_preset, uint32_t* max_preset, uint32_t* interval_preset)
+{
+#ifdef APC_SPECIAL_KEY_NUM
+    for (int i = 0; i < APC_SPECIAL_KEY_NUM; i++) {
+        struct apc_special_key* key = &apc_special_keys[i];
+        if (key->row == row && key->col == col) {
+            *min_preset = key->min_preset;
+            *max_preset = key->max_preset;
+            *interval_preset = key->interval_preset;
+            //apcrt_debug("APC: Get preset: row=%d, col=%d, min=%d, max=%d, interval\n", row, col, key->min_preset, key->max_preset, key->interval_preset);
+            return;
+        }
+    }
+#endif
+    *min_preset = APC_KEY_MIN_PRESET;
+    *max_preset = APC_KEY_MAX_PRESET;
+    *interval_preset = APC_INTERVAL_PRESET;
+}
+
 static uint32_t compute_interval_apc(uint32_t row, uint32_t col, uint32_t value)
 {
     if (value == 0) return APC_INTERVAL_INVALID;
 
     volatile struct apc_key *key = &apc_matrix[row][col];
     uint32_t interval = APC_INTERVAL_INVALID;
+    uint32_t min_preset = 0;
+    uint32_t max_preset = 0;
+    uint32_t interval_preset = 0;
+    get_preset_params(row, col, &min_preset, &max_preset, &interval_preset);
 
-    if ((key->min > APC_KEY_MIN_PRESET) || (key->max < APC_KEY_MAX_PRESET) || (key->max < (key->min+amk_apc_sens))) {
-        interval = amk_apc_sens + get_part_interval_table(value, APC_INTERVAL_PRESET - amk_apc_sens);
+    if ((key->min > min_preset) || (key->max < max_preset) || (key->max < (key->min+amk_apc_sens))) {
+        interval = amk_apc_sens + get_part_interval_table(value, interval_preset - amk_apc_sens);
     } else {
         interval = amk_apc_sens + get_part_interval_table(value, key->max - key->min - amk_apc_sens);
     }
@@ -313,8 +341,12 @@ static uint32_t compute_interval_apc(uint32_t row, uint32_t col, uint32_t value)
 static uint32_t compute_interval_rt(uint32_t row, uint32_t col, struct apc_key* key, bool down)
 {
     uint32_t interval_max = 0;
-    if ((key->min > APC_KEY_MIN_PRESET) || (key->max < APC_KEY_MAX_PRESET) || (key->max < (key->min+amk_apc_sens))) {
-        interval_max  = APC_INTERVAL_PRESET;
+    uint32_t min_preset = 0;
+    uint32_t max_preset = 0;
+    uint32_t interval_preset = 0;
+    get_preset_params(row, col, &min_preset, &max_preset, &interval_preset);
+    if ((key->min > min_preset) || (key->max < max_preset) || (key->max < (key->min+amk_apc_sens))) {
+        interval_max  = interval_preset;
     } else {
         interval_max = key->max - key->min;
     }
@@ -420,6 +452,11 @@ void apc_matrix_init(void)
 
 bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t org_value, bool* valid)
 {
+#ifdef MATRIX_NO_KEY_MASK
+    if ((1<<col)&nokey_mask[row]) {
+        return false;
+    }
+#endif
     uint32_t adc_value = org_value;
     if (amk_magnetive_pole) {
         adc_value = APC_POLE_MAX - org_value;

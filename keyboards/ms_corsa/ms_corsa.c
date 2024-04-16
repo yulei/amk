@@ -176,3 +176,8 @@ void rgb_led_pre_flush(void)
     }
 }
 #endif
+
+#include "amk_apc.h"
+struct apc_special_key apc_special_keys[APC_SPECIAL_KEY_NUM] = {
+    {2, 13, 2150, 2500, 350},
+};
