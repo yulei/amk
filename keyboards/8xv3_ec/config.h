@@ -77,7 +77,7 @@
 #define WS2812_LED_PIN      B7
 
 #define USE_PWM_TIM4
-#define PWM_TIM_PERIOD      224
+#define PWM_TIM_PERIOD      112//224
 #define PWM_TIM             htim4
 #define PWM_TIM_CHANNEL     TIM_CHANNEL_2
 #define PWM_TIM_DMA_ID      TIM_DMA_ID_CC2
