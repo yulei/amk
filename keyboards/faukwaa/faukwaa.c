@@ -13,7 +13,7 @@
 #include "rgb_indicator.h"
 
 struct rgb_indicator g_rgb_indicators[RGB_INDICATOR_NUM] = {
-    {0, RGB_INDICATOR_CAPS_LOCK},
+    {0, RGB_INDICATOR_CAPS_LOCK, RGB_INDICATOR_STANDALONE},
 };
 
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {

@@ -14,9 +14,12 @@ enum rgb_indicator_type {
     RGB_INDICATOR_KANA,
 };
 
+
+#define RGB_INDICATOR_STANDALONE 0xFF
 struct rgb_indicator {
     uint8_t     index;
     uint8_t     type;
+    uint8_t     config;
 };
 
 #ifdef RGB_INDICATOR_NUM

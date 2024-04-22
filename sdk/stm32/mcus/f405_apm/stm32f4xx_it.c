@@ -59,7 +59,7 @@
 /* External variables --------------------------------------------------------*/
 //extern PCD_HandleTypeDef hpcd_USB_OTG_HS;
 #ifdef USE_PWM_TIM4
-extern DMA_HandleTypeDef hdma_tim4_ch3;
+extern DMA_HandleTypeDef hdma_tim4_ch;
 #endif
 
 /* USER CODE BEGIN EV */
@@ -343,7 +343,7 @@ void PWM_DMA_IRQHnadler(void)
   /* USER CODE BEGIN DMA1_Stream3_IRQn 0 */
 
   /* USER CODE END DMA1_Stream3_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_tim4_ch3);
+  HAL_DMA_IRQHandler(&hdma_tim4_ch);
   /* USER CODE BEGIN DMA1_Stream3_IRQn 1 */
 
   /* USER CODE END DMA1_Stream3_IRQn 1 */

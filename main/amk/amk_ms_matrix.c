@@ -354,6 +354,7 @@ bool matrix_scan_custom(matrix_row_t* raw)
 #ifdef COL_D_PIN
         gpio_write_pin(COL_D_PIN, (custom_col_pins[col]&COL_D_MASK) ? 1 : 0);
 #endif
+        wait_us(1);
 
         bool keys[ADC_CHANNEL_COUNT] = {[0 ... ADC_CHANNEL_COUNT-1] = false};
         if (sense_key(keys, col) ) {

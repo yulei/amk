@@ -14,6 +14,14 @@
 #include "rgb_led.h"
 #include "amk_store.h"
 
+#ifdef RGB_LINEAR_ENABLE
+#include "rgb_linear.h"
+#include "rgb_effect_linear.h"
+#endif
+#ifdef RGB_MATRIX_ENABLE
+#include "rgb_matrix_stub.h"
+#endif
+
 typedef struct rgb_indicator_state {
     struct amk_led led;
 } rgb_indicator_state_t;
@@ -31,6 +39,21 @@ void rgb_indicator_init(void)
     s_force_update = false;
 }
 
+static bool is_effect_enabled(uint8_t config)
+{
+#ifdef RGB_MATRIX_ENABLE
+    if (g_rgb_configs[config].type == RGB_EFFECT_MATRIX) {
+        return rgb_matrix_is_enabled() != 0;
+    }
+#endif
+#ifdef RGB_LINEAR_ENABLE
+    if (g_rgb_configs[config].type == RGB_EFFECT_LINEAR) {
+        return g_rgb_configs[config].enable != 0;
+    }
+#endif
+    return false;
+}
+
 void rgb_indicator_task(void)
 {
     led_t cur = host_keyboard_led_state();
@@ -38,6 +61,12 @@ void rgb_indicator_task(void)
 
     for (int i = 0; i < RGB_INDICATOR_NUM; i++) {
         struct rgb_indicator * rgb_led = &g_rgb_indicators[i];
+        if (rgb_led->config != RGB_INDICATOR_STANDALONE) {
+            if (is_effect_enabled(rgb_led->config)) {
+                return;
+            }
+        }
+
         rgb_driver_t *driver = rgb_led_map(rgb_led->index);
         if (!driver) continue;
 

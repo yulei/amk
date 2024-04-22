@@ -35,7 +35,7 @@ extern DMA_HandleTypeDef hdma_spi3_tx;
 #endif
 
 #ifdef USE_PWM_TIM4
-extern DMA_HandleTypeDef hdma_tim4_ch3;
+extern DMA_HandleTypeDef hdma_tim4_ch;
 #endif
 
 #ifdef USE_I2C1
@@ -633,23 +633,23 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* htim_pwm)
     __HAL_RCC_TIM4_CLK_ENABLE();
 
     /* TIM4 DMA Init */
-    hdma_tim4_ch3.Instance = PWM_DMA_INSTANCE;
-    hdma_tim4_ch3.Init.Channel = PWM_DMA_CHANNEL;
-    hdma_tim4_ch3.Init.Direction = DMA_MEMORY_TO_PERIPH;
-    hdma_tim4_ch3.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_tim4_ch3.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_tim4_ch3.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
-    hdma_tim4_ch3.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
-    hdma_tim4_ch3.Init.Mode = DMA_NORMAL;
-    hdma_tim4_ch3.Init.Priority = DMA_PRIORITY_LOW;
-    hdma_tim4_ch3.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    hdma_tim4_ch.Instance = PWM_DMA_INSTANCE;
+    hdma_tim4_ch.Init.Channel = PWM_DMA_CHANNEL;
+    hdma_tim4_ch.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    hdma_tim4_ch.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_tim4_ch.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_tim4_ch.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_tim4_ch.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_tim4_ch.Init.Mode = DMA_NORMAL;
+    hdma_tim4_ch.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_tim4_ch.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
 
-    if (HAL_DMA_Init(&hdma_tim4_ch3) != HAL_OK)
+    if (HAL_DMA_Init(&hdma_tim4_ch) != HAL_OK)
     {
       Error_Handler();
     }
 
-    __HAL_LINKDMA(htim_pwm,hdma[PWM_TIM_DMA_ID],hdma_tim4_ch3);
+    __HAL_LINKDMA(htim_pwm,hdma[PWM_TIM_DMA_ID],hdma_tim4_ch);
 
     HAL_NVIC_SetPriority(PWM_DMA_IRQ, 3, 0);
     HAL_NVIC_EnableIRQ(PWM_DMA_IRQ);
@@ -676,7 +676,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
     GPIO_InitStruct.Pin = PWM_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF2_TIM4;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 

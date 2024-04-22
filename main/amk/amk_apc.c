@@ -263,6 +263,67 @@ struct apc_key
 static matrix_row_t nokey_mask[] = MATRIX_NO_KEY_MASK;
 #endif
 
+static uint32_t get_rt_sense(uint32_t row, uint32_t col)
+{
+    uint32_t rt = amk_rt_sens;
+#ifdef APC_SPECIAL_KEY_NUM
+    for (int i = 0; i < APC_SPECIAL_KEY_NUM; i++) {
+        struct apc_special_key* key = &apc_special_keys[i];
+        if (key->row == row && key->col == col) {
+            rt = ((amk_rt_sens*100)/key->sens)/1;
+            break;
+        }
+    }
+#endif
+    return rt;
+}
+
+static uint32_t get_apc_sense(uint32_t row, uint32_t col)
+{
+    uint32_t apc = amk_apc_sens;
+#ifdef APC_SPECIAL_KEY_NUM
+    for (int i = 0; i < APC_SPECIAL_KEY_NUM; i++) {
+        struct apc_special_key* key = &apc_special_keys[i];
+        if (key->row == row && key->col == col) {
+            apc = ((amk_apc_sens*100)/key->sens)/1;
+            break;
+        }
+    }
+#endif
+    return apc;
+}
+
+static uint32_t get_noise_sense(uint32_t row, uint32_t col)
+{
+    uint32_t noise = amk_noise_sens;
+#ifdef APC_SPECIAL_KEY_NUM
+    for (int i = 0; i < APC_SPECIAL_KEY_NUM; i++) {
+        struct apc_special_key* key = &apc_special_keys[i];
+        if (key->row == row && key->col == col) {
+            noise = ((amk_noise_sens*100)/key->sens)/1;
+            break;
+        }
+    }
+#endif
+    return noise;
+}
+
+static void get_top_btm_sense(uint32_t row, uint32_t col, uint32_t* top, uint32_t* btm)
+{
+    *top = amk_top_sens;
+    *btm = amk_btm_sens;
+#ifdef APC_SPECIAL_KEY_NUM
+    for (int i = 0; i < APC_SPECIAL_KEY_NUM; i++) {
+        struct apc_special_key* key = &apc_special_keys[i];
+        if (key->row == row && key->col == col) {
+            *top = ((amk_top_sens*100)/key->sens)/1;
+            *btm = ((amk_btm_sens*100)/key->sens)/1;
+            break;
+        }
+    }
+#endif
+}
+
 static struct apc_key apc_matrix[MATRIX_ROWS][MATRIX_COLS];
 
 static uint32_t get_part_interval_table(uint32_t val, uint32_t max)
@@ -328,11 +389,12 @@ static uint32_t compute_interval_apc(uint32_t row, uint32_t col, uint32_t value)
     uint32_t max_preset = 0;
     uint32_t interval_preset = 0;
     get_preset_params(row, col, &min_preset, &max_preset, &interval_preset);
+    uint32_t apc_sens = get_apc_sense(row, col);
 
-    if ((key->min > min_preset) || (key->max < max_preset) || (key->max < (key->min+amk_apc_sens))) {
-        interval = amk_apc_sens + get_part_interval_table(value, interval_preset - amk_apc_sens);
+    if ((key->min > min_preset) || (key->max < max_preset) || (key->max < (key->min+apc_sens))) {
+        interval = apc_sens + get_part_interval_table(value, interval_preset - apc_sens);
     } else {
-        interval = amk_apc_sens + get_part_interval_table(value, key->max - key->min - amk_apc_sens);
+        interval = apc_sens + get_part_interval_table(value, key->max - key->min - apc_sens);
     }
 
     return interval;
@@ -350,6 +412,8 @@ static uint32_t compute_interval_rt(uint32_t row, uint32_t col, struct apc_key* 
     } else {
         interval_max = key->max - key->min;
     }
+    uint32_t rt_sens = get_rt_sense(row, col);
+
 
 #if 0
     if (down) {
@@ -359,10 +423,10 @@ static uint32_t compute_interval_rt(uint32_t row, uint32_t col, struct apc_key* 
         } else {
             interval = get_part_interval_table(key->rt_up, interval_max);
         }
-        return (interval + amk_rt_sens);
+        return (interval + rt_sens);
     } else {
         uint32_t interval = get_part_interval_table(40-key->rt_up, interval_max);
-        return (interval_max - interval + amk_rt_sens);
+        return (interval_max - interval + rt_sens);
     }
 #else 
     uint32_t rt;
@@ -373,7 +437,7 @@ static uint32_t compute_interval_rt(uint32_t row, uint32_t col, struct apc_key* 
     }
     uint32_t pos = key->last > key->min ? key->last - key->min : 0;
     uint32_t interval = get_part_interval_with_position(rt, interval_max, pos, down);
-    return interval + amk_rt_sens;
+    return interval + rt_sens;
 #endif
 }
 
@@ -401,20 +465,23 @@ uint32_t apc_matrix_calibrate(uint32_t row, uint32_t col, uint32_t adc_value)
 
     uint32_t value = key->value / APC_KEY_COUNT;
     key->value = 0;
+    uint32_t top_sens = 0;
+    uint32_t btm_sens = 0;
+    get_top_btm_sense(row, col, &top_sens, &btm_sens);
 
 #ifdef CHECK_MINMAX
     bool updated = false;
 #endif
 
-    if (key->min > value + amk_top_sens) {
-        key->min = value + amk_top_sens;
+    if (key->min > value + top_sens) {
+        key->min = value + top_sens;
 #ifdef CHECK_MINMAX
         updated = true;
 #endif
     }
 
-    if ((value > amk_btm_sens) && (key->max < value - amk_btm_sens)) {
-        key->max = value - amk_btm_sens;
+    if ((value > btm_sens) && (key->max < value - btm_sens)) {
+        key->max = value - btm_sens;
 #ifdef CHECK_MINMAX
         updated = true;
 #endif
@@ -476,6 +543,7 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t org_value, bool* val
     }
 
     *valid = true;
+    uint32_t noise_sens = get_noise_sense(row, col);
 
     uint32_t apc = compute_interval_apc(row, col, key->apc);
     uint32_t cur_max = key->max > APC_KEY_MAX_PRESET ? key->max : APC_KEY_MAX_PRESET;
@@ -517,7 +585,7 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t org_value, bool* val
             }
         } else {
             if (key->active == true) {
-                if (value < (key->min + amk_noise_sens)) {
+                if (value < (key->min + noise_sens)) {
                     key->active = false;
                     apcrt_debug("Key Active turned OFF: value=%ld, min=%ld, max=%ld, cur_max=%ld, last=%ld\n", value, key->min, key->max, cur_max, key->last);
                 }
@@ -531,7 +599,7 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t org_value, bool* val
 
         if (key->rt_up == APC_INTERVAL_INVALID) {
             // no RT
-            if ((value + amk_noise_sens) < cur_max) {
+            if ((value + noise_sens) < cur_max) {
                 apcrt_debug("APC from ON to OFF, value=%ld, min=%ld, max=%ld, cur_max=%ld, last=%ld, apc=%ld\n", value, key->min, key->max, cur_max, key->last, apc);
                 key->last = value;
                 key->state = APC_KEY_OFF;
@@ -542,8 +610,8 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t org_value, bool* val
             }
             uint32_t rt = compute_interval_rt(row, col, key, false);
             if ((value + rt) < key->last || 
-                (!key->rt_cont && (value + amk_noise_sens) < cur_max) || 
-                (key->rt_cont && (value < key->min + amk_noise_sens)))  {
+                (!key->rt_cont && (value + noise_sens) < cur_max) || 
+                (key->rt_cont && (value < key->min + noise_sens)))  {
                 // rt turn off
                 apcrt_debug("RT from ON to OFF, value=%ld, min=%ld, max=%ld, cur_max=%ld, last=%ld, apc=%ld, rt=%ld\n", value, key->min, key->max, cur_max, key->last, apc, rt);
                 key->last = value;

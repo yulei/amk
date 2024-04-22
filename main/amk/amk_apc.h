@@ -19,6 +19,7 @@ struct apc_special_key
     uint32_t min_preset;
     uint32_t max_preset;
     uint32_t interval_preset;
+    uint32_t sens;
 };
 
 #ifdef APC_SPECIAL_KEY_NUM

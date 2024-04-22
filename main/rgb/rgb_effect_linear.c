@@ -60,7 +60,14 @@ struct s_rgb_linear_state {
 };
 
 static rgb_linear_state_t effects_state[RGB_EFFECT_LINEAR_NUM];
+
+struct amk_led_state {
+    uint32_t blink_step;
+    uint32_t breath_step;
+};
+
 extern struct amk_led amk_leds[RGB_LED_NUM];
+static struct amk_led_state amk_led_states[RGB_LED_NUM];
 
 static bool effects_config_valid(rgb_cfg_t *config)
 {
@@ -283,7 +290,6 @@ static void effects_mode_breath(rgb_linear_state_t *state)
     } else {
         state->config->val -= breath;
         if (old_val < state->config->val) {
-            state->config->val = old_val;
             state->breath_dir = true;
         }
     }
@@ -327,38 +333,35 @@ static void effects_mode_custom(rgb_linear_state_t *state)
 {
     for (int i = 0; i < state->led_num; i++) {
         struct amk_led *led = &amk_leds[i+state->led_start];
+        struct amk_led_state *led_state = &amk_led_states[i+state->led_start];
+        uint32_t speed = led->speed+1;
+
         if (led->on) {
-            // do effect
-            uint8_t hue = led->hue;
-            uint8_t sat = led->sat;
-            uint8_t val = led->val;
+            if ((state->custom_speed%speed) == 0) {
+                // do effect
+                uint8_t hue = led->hue;
+                uint8_t sat = led->sat;
+                uint8_t val = led->val;
 
-            if (led->breath) {
-                uint8_t breath_index = (state->breath_step+led->speed) % RGBLIGHT_BREATHE_TABLE_SIZE;
-                val = rgblight_effect_breathe_table[breath_index];
-            }
-
-            if (led->blink) {
-                if(state->counter % (2+led->speed) == 0) {
-                    state->blink_on = !state->blink_on;
+                if (led->breath) {
+                    uint8_t breath_index = (led_state->breath_step) % RGBLIGHT_BREATHE_TABLE_SIZE;
+                    val = rgblight_effect_breathe_table[breath_index];
+                    led_state->breath_step += 16;
                 }
 
-                if (state->blink_on) {
-                    hue = 0;
-                    sat = 0;
-                    val = 0;
+                if (led->blink) {
+                    if(led_state->blink_step % 2 == 0) {
+                        hue = 0;
+                        sat = 0;
+                        val = 0;
+                    }
+                    led_state->blink_step++;
                 }
-            }
 
-            if (led->dynamic) {
-                led->hue += HUE_STEP;
-            }
+                if (led->dynamic) {
+                    led->hue += HUE_STEP;
+                }
 
-            bool update = true;
-            if ((led->speed != 0) && ((state->custom_speed % led->speed) != 0)) {
-                update = false;
-            }
-            if (update) {
                 effects_set_color(state, i, hue, sat, val);
             }
         } else {
@@ -366,8 +369,6 @@ static void effects_mode_custom(rgb_linear_state_t *state)
         }
     }
 
-    state->breath_step++;
-    state->counter++;
     state->custom_speed++;
 }
 
@@ -413,6 +414,8 @@ static void effects_state_init(rgb_linear_state_t *state)
 
     for (int i = 0; i < state->led_num; i++) {
         amk_store_get_led(i+state->led_start, &amk_leds[i+state->led_start]);
+        amk_led_states[i].blink_step = 0;
+        amk_led_states[i].breath_step = 0;
     }
 }
 

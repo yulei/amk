@@ -30,9 +30,9 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
 
 #endif
 
+#if APC_SPECIAL_KEY_NUM
 #include "amk_apc.h"
 struct apc_special_key apc_special_keys[APC_SPECIAL_KEY_NUM] = {
-    {3, 12, 2150, 2500, 350},
-    {3, 1, 2050, 2500, 400},
-    {4, 14, 2250, 2700, 400},
+    {3, 12, 2150, 2550, 600, 100}, // caps
 };
+#endif

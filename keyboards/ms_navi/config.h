@@ -86,14 +86,15 @@
 
 #define LAYOUT_current      LAYOUT_all
 
-#define APC_INTERVAL_PRESET 800
+//#define APC_SPECIAL_KEY_NUM 1
+#ifdef APC_SPECIAL_KEY_NUM 
+#define APC_INTERVAL_PRESET 900
 #define APC_KEY_MIN_PRESET  2150
-#define APC_KEY_MAX_PRESET  3000 
-
-#define AMK_RT_SENS_DEFAULT     20 
-#define AMK_TOP_SENS_DEFAULT    20
-#define AMK_BTM_SENS_DEFAULT    50
-#define AMK_APC_SENS_DEFAULT    20
-#define AMK_APC_NOISE_DEFAULT   20
-
-#define APC_SPECIAL_KEY_NUM     3 
+#define APC_KEY_MAX_PRESET  3150
+#define APC_SPECIAL_KEY_NUM     1
+//#define AMK_RT_SENS_DEFAULT     30 
+//#define AMK_TOP_SENS_DEFAULT    50
+//#define AMK_BTM_SENS_DEFAULT    50
+//#define AMK_APC_SENS_DEFAULT    50
+//#define AMK_APC_NOISE_DEFAULT   50
+#endif

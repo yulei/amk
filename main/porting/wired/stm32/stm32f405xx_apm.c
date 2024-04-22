@@ -35,7 +35,7 @@ DMA_HandleTypeDef hdma_spi3_tx;
 
 #ifdef USE_PWM_TIM4
 TIM_HandleTypeDef htim4;
-DMA_HandleTypeDef hdma_tim4_ch3;
+DMA_HandleTypeDef hdma_tim4_ch;
 #endif
 
 #ifdef USE_UART1
