@@ -102,6 +102,7 @@ endif
 
 ifeq (yes, $(strip $(MSC_ENABLE)))
 	SRCS += $(MAIN_DIR)/screen/anim.c
+	SRCS += $(MAIN_DIR)/screen/anim_file.c
 	SRCS += $(MAIN_DIR)/usb/mscusb.c
 
 	ifeq (yes, $(strip $(QSPI_ENABLE)))

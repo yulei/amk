@@ -6,6 +6,8 @@
  *
 */
 
+#include <string.h>
+
 #include "amk_protocol.h"
 #include "amk_store.h"
 #include "amk_printf.h"
@@ -14,6 +16,9 @@
 #endif
 #ifdef AMK_DKS_ENABLE
 #include "amk_dks.h"
+#endif
+#ifdef MSC_ENABLE
+#include "anim_file.h"
 #endif
 #include "timer.h"
 
@@ -483,6 +488,131 @@ void amk_protocol_process(uint8_t *msg, uint8_t length)
             }
             msg[2] = amk_protocol_ok;
             ap_debug("AMK Protocol: set noise sens = %d\n", val);
+        }
+        break;
+#endif
+#ifdef MSC_ENABLE
+    case amk_protocol_get_file_system_info:
+        {
+            msg[2] = amk_protocol_ok;
+            struct amk_anim_file_system_info info;
+            amk_anim_file_system_info(&info);
+            msg[3] = info.total_file;
+
+            msg[4] = info.free_space & 0xFF;
+            msg[5] = (info.free_space>>8) & 0xFF;
+            msg[6] = (info.free_space>>16) & 0xFF;
+            msg[7] = (info.free_space>>24) & 0xFF;
+
+            msg[8] = info.total_space& 0xFF;
+            msg[9] = (info.total_space>>8) & 0xFF;
+            msg[10] = (info.total_space>>16) & 0xFF;
+            msg[11] = (info.total_space>>24) & 0xFF;
+            ap_debug("AMK Protocol: get anim file total = %d, free space=%d, total space=%d\n", msg[3], info.free_space, info.total_space);
+        }
+        break;
+    case amk_protocol_get_file_info:
+        {
+            uint8_t index = msg[2];
+            struct amk_anim_file_info info;
+            msg[2] = amk_protocol_fail;
+            if (amk_anim_file_get_info(index, &info)) {
+                memcpy(&msg[3], info.name, ANIM_FILE_NAME_MAX);
+                msg[3+ANIM_FILE_NAME_MAX] = info.size & 0xFF;
+                msg[4+ANIM_FILE_NAME_MAX] = (info.size>>8) & 0xFF;
+                msg[5+ANIM_FILE_NAME_MAX] = (info.size>>16) & 0xFF;
+                msg[6+ANIM_FILE_NAME_MAX] = (info.size>>24) & 0xFF;
+                ap_debug("AMK Protocol: get anim file info: name=%s\n", &msg[3]);
+                msg[2] = amk_protocol_ok;
+            }
+        }
+        break;
+    case amk_protocol_open_file:
+        {
+            uint8_t index = msg[2];
+            uint8_t read = msg[3];
+            msg[2] = amk_protocol_fail;
+
+            struct amk_anim_file_info info;
+            if (read) {
+                if (amk_anim_file_get_info(index, &info)) {
+                    if (amk_anim_file_open(&info, read)) {
+                        msg[2] = amk_protocol_ok;
+                        msg[3] = index;
+                    }
+                }
+            } else {
+                memcpy(info.name, &msg[4], ANIM_FILE_NAME_MAX);
+                if (amk_anim_file_open(&info, read)) {
+                    msg[2] = amk_protocol_ok;
+                    msg[3] = info.index;
+                }
+            }
+        }
+        break;
+    case amk_protocol_write_file:
+        {
+            uint8_t index = msg[2];
+            uint8_t size = msg[3];
+            uint32_t offset = msg[4] | (msg[5]<<8) | (msg[6]<<16) | (msg[7]<<24);
+            msg[2] = amk_protocol_fail;
+            struct amk_anim_file_info info;
+            if (amk_anim_file_get_info(index, &info)) {
+                if (amk_anim_file_write(&info, &msg[8], offset, size)) {
+                    msg[2] = amk_protocol_ok;
+                }
+            }
+        }
+        break;
+    case amk_protocol_read_file:
+        {
+            uint8_t index = msg[2];
+            uint8_t size = msg[3];
+            uint32_t offset = msg[4] | (msg[5]<<8) | (msg[6]<<16) | (msg[7]<<24);
+            msg[2] = amk_protocol_fail;
+            struct amk_anim_file_info info;
+            if (amk_anim_file_get_info(index, &info)) {
+                if (amk_anim_file_read(&info, &msg[8], offset, size)) {
+                    msg[2] = amk_protocol_ok;
+                }
+            }
+        }
+        break;
+        case amk_protocol_close_file:
+        {
+            uint8_t index = msg[2];
+            struct amk_anim_file_info info;
+            msg[2] = amk_protocol_fail;
+            if (amk_anim_file_get_info(index, &info)) {
+                if (amk_anim_file_close(&info)) {
+                    msg[2] = amk_protocol_ok;
+                }
+            }
+        }
+        break;
+    case amk_protocol_delete_file:
+        {
+            uint8_t index = msg[2];
+            msg[2] = amk_protocol_fail;
+            struct amk_anim_file_info info;
+            if (amk_anim_file_get_info(index, &info)) {
+                if (amk_anim_file_delete(&info)) {
+                    msg[2] = amk_protocol_ok;
+                }
+            }
+        }
+        break;
+    case amk_protocol_display_control:
+        {
+            extern void amk_animation_display_start(void);
+            extern void amk_animation_display_stop(void);
+            uint8_t action = msg[2];
+            if (action) {
+                amk_animation_display_start();
+            } else {
+                amk_animation_display_stop();
+            }
+            msg[2] = amk_protocol_ok;
         }
         break;
 #endif

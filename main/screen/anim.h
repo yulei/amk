@@ -7,6 +7,17 @@
 
 #include <stdint.h>
 
+#define AUXI_SIG    "AUXI"
+#define ANIM_SIG    "ANIM"
+#define AMFT_SIG    "AMFT"
+#define AMGH_SIG    "AMGH"
+#define ASTS_SIG    "ASTS"
+#define ABKG_SIG    "ABKG"
+
+#define ANIM_FILE_NAME_MAX  13
+#define ANIM_FILE_MAX       16//32
+#define ANIM_ROOT_DIR       "/"
+
 typedef enum {
     ANIM_TYPE_MAIN,
     ANIM_TYPE_AUX,

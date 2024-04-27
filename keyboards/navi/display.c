@@ -12,7 +12,7 @@
 #include "wait.h"
 
 #ifndef DISP_DEBUG
-#define DISP_DEBUG 1
+#define DISP_DEBUG 0
 #endif
 
 #if DISP_DEBUG
@@ -32,6 +32,7 @@ static void reset_to_msc(bool msc);
 #include "amk_eeprom.h"
 #include "amk_printf.h"
 #include "ff.h"
+#include "anim_file.h"
 
 #ifdef NOFRENDO_ENABLE
 
@@ -334,6 +335,8 @@ void msc_init_kb(void)
             disp_debug("ANIM: faield to open root path\n");
         }
     }
+
+    amk_anim_file_init();
 }
 
 static void render_screen(uint8_t index)
@@ -439,4 +442,28 @@ static void reset_to_msc(bool msc)
     usb_connect(false);
     HAL_Delay(10);
     HAL_NVIC_SystemReset();
+}
+
+void amk_animation_display_start(void)
+{
+     for (int i = 0; i < sizeof(renders)/sizeof(render_t); i++) {
+        if (renders[i].anim) {
+            anim_close(renders[i].anim);
+        }
+
+        renders[i].anim = anim_open(NULL, renders[i].type);
+        if (!renders[i].anim) {
+            disp_debug("ANIM: faield to open root path\n");
+        }
+    }
+}
+
+void amk_animation_display_stop(void)
+{
+    for (int i = 0; i < sizeof(renders)/sizeof(render_t); i++) {
+        if (renders[i].anim) {
+            anim_close(renders[i].anim);
+            renders[i].anim = NULL;
+        }
+    }
 }

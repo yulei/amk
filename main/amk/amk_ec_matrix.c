@@ -166,7 +166,7 @@ static bool adc_read(uint32_t *data, uint32_t timeout)
 
 static bool sense_key(bool *key, uint32_t col, uint32_t row)
 {
-    //wait_us(DISCHARGE_WAIT_PRE);
+    wait_us(DISCHARGE_WAIT_PRE);
     gpio_set_input_floating(DISCHARGE_PIN);
     gpio_write_pin(custom_row_pins[row], 1);
 

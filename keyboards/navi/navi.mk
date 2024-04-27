@@ -17,7 +17,6 @@ UF2_FAMILY = STM32F4
 LINKER_PATH = $(KEYBOARD_DIR)
 
 SRCS += $(KEYBOARD_DIR)/navi.c
-#SRCS += $(KEYBOARD_DIR)/navi_keymap.c
 
 SRCS += $(KEYBOARD_DIR)/display.c
 SRCS += $(MAIN_DIR)/drivers/st7735.c

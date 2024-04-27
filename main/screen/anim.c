@@ -29,13 +29,6 @@
 //  +---------------------------------------------------------------+
 //
 
-#define AUXI_SIG    "AUXI"
-#define ANIM_SIG    "ANIM"
-#define AMFT_SIG    "AMFT"
-#define AMGH_SIG    "AMGH"
-#define ASTS_SIG    "ASTS"
-#define ABKG_SIG    "ABKG"
-
 #define FRAME_MAX   512//1024
 typedef struct __attribute__((packed)) {
     char signature[4];  //"ANIM" or "AUXI"
@@ -58,10 +51,6 @@ typedef struct {
 
 #define ANIM_INVALID_WIDTH      0xFFFFFFFF
 #define ANIM_INVALID_HEIGHT     0xFFFFFFFF
-
-#define ANIM_FILE_NAME_MAX  13
-#define ANIM_FILE_MAX       16//32
-#define ANIM_ROOT_DIR       "/"
 
 struct anim_t {
     anim_file_t obj;

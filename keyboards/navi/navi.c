@@ -10,6 +10,7 @@
 #include "is31fl3236.h"
 #include "rgb_led.h"
 #include "rgb_linear.h"
+#include "rgb_indicator.h"
 
 #ifdef RGB_ENABLE
 
@@ -29,6 +30,13 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
 //    {1, 3, 1},
 };
 
+#if 0//def RGB_INDICATOR_ENABLE
+struct rgb_indicator g_rgb_indicators[RGB_INDICATOR_NUM] = {
+    {0, RGB_INDICATOR_CAPS_LOCK, 0},
+    {0, RGB_INDICATOR_SCROLL_LOCK, 0},
+};
+
+#else
 #include "host.h"
 #include "led.h"
 
@@ -50,5 +58,6 @@ void rgb_led_pre_flush(void)
         }
     //}
 }
+#endif
 
 #endif

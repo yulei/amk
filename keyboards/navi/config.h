@@ -72,4 +72,6 @@
 #define CFG_TUSB_CONFIG_FILE    "tusb_def.h"
 
 #define SUSPEND_RESET
-#define FAULT_BREAK
+//#define FAULT_BREAK
+
+//#define RGB_INDICATOR_NUM   2

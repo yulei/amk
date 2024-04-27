@@ -51,6 +51,14 @@ enum {
     amk_protocol_set_rgb_strip_mode     = 32,
     amk_protocol_get_rgb_indicator_led  = 33,
     amk_protocol_set_rgb_indicator_led  = 34,
+    amk_protocol_get_file_system_info   = 35,
+    amk_protocol_get_file_info          = 36,
+    amk_protocol_open_file              = 37,
+    amk_protocol_write_file             = 38,
+    amk_protocol_read_file              = 39,
+    amk_protocol_close_file             = 40,
+    amk_protocol_delete_file            = 41,
+    amk_protocol_display_control        = 42,
 };
 
 void amk_protocol_process(uint8_t *msg, uint8_t length);
