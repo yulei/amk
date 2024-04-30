@@ -20,6 +20,20 @@
 #ifdef MSC_ENABLE
 #include "anim_file.h"
 #endif
+
+#if defined(RGB_LINEAR_ENABLE) || defined(RGB_INDICATOR_ENABLE) || defined(RGB_MATRIX_ENABLE)
+#include "rgb_led.h"
+#endif
+
+#if defined(RGB_INDICATOR_ENABLE)
+#include "rgb_indicator.h"
+#endif
+
+#ifdef CUSTOMRGB_ENABLE 
+#include "rgb_matrix_stub.h"
+#include "customrgb.h"
+#endif
+
 #include "timer.h"
 
 #include "keycode_config.h"
@@ -32,13 +46,6 @@
 #define ap_debug(...)
 #endif
 
-#if defined(RGB_LINEAR_ENABLE) || defined(RGB_INDICATOR_ENABLE)
-#include "rgb_led.h"
-#endif
-
-#if defined(RGB_INDICATOR_ENABLE)
-#include "rgb_indicator.h"
-#endif
 
 void amk_protocol_process(uint8_t *msg, uint8_t length)
 {
@@ -373,6 +380,82 @@ void amk_protocol_process(uint8_t *msg, uint8_t length)
         }
         break;
 #endif
+
+#ifdef CUSTOMRGB_ENABLE
+        case amk_protocol_get_rgb_matrix_info:
+        {
+            msg[2] = amk_protocol_ok;
+            msg[3] = g_rgb_matrix_params[0].led_start;
+            msg[4] = g_rgb_matrix_params[0].led_num;
+            ap_debug("AMK Protocol: get rgb matrix info : led start=%d, led total=%d\n", msg[3], msg[4]); 
+        }
+        break;
+        case amk_protocol_get_rgb_matrix_row_info:
+        {
+            uint8_t index = msg[2];
+            uint8_t row = msg[3];
+            msg[2] = amk_protocol_ok;
+            msg[3] = row;
+
+            for (int i = 0; i < MATRIX_COLS; i++) {
+                msg[4+i] = customrgb_get_matrix_led_index(index, row, i);
+            }
+            ap_debug("AMK Protocol: get rgb matrix info: index=%d, row=%d\n", index, row); 
+        }
+        break;
+        case amk_protocol_get_rgb_matrix_mode:
+        {
+            uint8_t index = msg[2];
+
+            msg[2] = amk_protocol_ok;
+            msg[3] = customrgb_get_matrix_mode(index, &msg[4], &msg[5]);
+            ap_debug("AMK Protocol: get rgb matrix mode: current=%d, custom=%d, total=%d\n", msg[3], msg[4], msg[5]); 
+        }
+        break;
+        case amk_protocol_set_rgb_matrix_mode:
+        {
+            uint8_t index = msg[2];
+            uint8_t mode = msg[3];
+            msg[2] = amk_protocol_ok;
+            ap_debug("AMK Protocol: set rgb matrix mode at index=%d, mode=%d\n", index, mode); 
+            rgb_matrix_mode(mode);
+        }
+        break;
+        case amk_protocol_get_rgb_matrix_led:
+        {
+            uint8_t index = msg[2];
+            if (index < RGB_LED_NUM) {
+                msg[2] = amk_protocol_ok;
+                msg[3] = index;
+                customrgb_get_led(index, &msg[4], &msg[5], &msg[6], &msg[7]);
+                ap_debug("AMK Protocol: get rgb matrix led at %d, hue=%d, sat=%d, val=%d, param=0x%x\n", 
+                        index, msg[4], msg[5], msg[6], msg[7]);
+            } else {
+                msg[2] = amk_protocol_fail;
+                ap_debug("AMK Protocol: failed to get matrix led, index = %d, led count = %d\n", index, RGB_LED_NUM);
+            }
+        }
+        break;
+        case amk_protocol_set_rgb_matrix_led:
+        {
+            uint8_t index = msg[2];
+            if (index < RGB_LED_NUM) {
+                msg[2] = amk_protocol_ok;
+
+                uint8_t hue = msg[3];
+                uint8_t sat = msg[4];
+                uint8_t val = msg[5];
+                uint8_t param = msg[6];
+                customrgb_set_led(index, hue, sat, val, param); 
+                ap_debug("AMK Protocol: set rgb matrix led at %d, hue=%d, sat=%d, val=%d, param=0x%x\n", index, hue, sat, val, param);
+            } else {
+                msg[2] = amk_protocol_fail;
+                ap_debug("AMK Protocol: failed to set rgb matrix led, index = %d, led count = %d\n", index, RGB_LED_NUM);
+            }
+        }
+        break;
+#endif
+
 #ifdef AMK_APC_ENABLE
     case amk_protocol_get_pole:
         {

@@ -6,10 +6,17 @@
 #include "rgb_driver.h"
 #include "rgb_led.h"
 
+#ifdef CUSTOMRGB_ENABLE
+#include "customrgb.h"
+#endif
+
 //rgb_param_t g_rgb_matrix_params[RGB_MATRIX_NUM];
 
 void rgb_matrix_init_stub(void)
 {
+#ifdef CUSTOMRGB_ENABLE
+    customrgb_init();
+#endif
     // initialize rgb matrix 
     for (int i = 0; i < RGB_MATRIX_NUM; i++) {
         uint8_t config = g_rgb_matrix_params[i].config;
@@ -20,6 +27,7 @@ void rgb_matrix_init_stub(void)
         g_rgb_matrix_params[i].led_num = g_rgb_matrix_params[i].led_num;
         rgb_matrix_init();
     }
+
     //rgb_matrix_mode_noeeprom(RGB_MATRIX_ALPHAS_MODS);
 }
 

@@ -12,8 +12,7 @@ typedef struct {
 } rgb_linear_t;
 
 static rgb_linear_t rgb_linear;
-// global led cache
-struct amk_led amk_leds[RGB_LED_NUM];
+extern struct amk_led amk_leds[RGB_LED_NUM];
 
 void rgb_linear_init(void)
 {

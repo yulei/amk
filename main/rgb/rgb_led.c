@@ -19,6 +19,7 @@
 #include "amk_eeprom.h"
 #include "amk_gpio.h"
 #include "amk_printf.h"
+#include "amk_store.h"
 
 #include "lib8tion.h"
 
@@ -55,6 +56,9 @@
 #else
 #define RGB_LED_CONFIG_NUM              RGB_CONFIG_NUM
 #endif
+
+// global led cache
+struct amk_led amk_leds[RGB_LED_NUM];
 
 rgb_cfg_t g_rgb_configs[RGB_LED_CONFIG_NUM];
 static uint8_t rgb_config_cur;

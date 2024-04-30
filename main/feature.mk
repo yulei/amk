@@ -81,6 +81,12 @@ ifeq (yes, $(strip $(RGB_MATRIX_ENABLE)))
 		APP_DEFS += -DOPENRGB_ENABLE
 		APP_DEFS += -DRGB_MATRIX_CUSTOM_KB
 	endif
+	ifeq (yes, $(strip $(CUSTOMRGB_ENABLE)))
+		SRCS += $(MAIN_DIR)/rgb/customrgb/customrgb.c
+		INCS += $(MAIN_DIR)/rgb/customrgb
+		APP_DEFS += -DCUSTOMRGB_ENABLE
+		APP_DEFS += -DRGB_MATRIX_CUSTOM_KB
+	endif
 endif
 
 ifeq (yes, $(strip $(RGB_ENABLE)))

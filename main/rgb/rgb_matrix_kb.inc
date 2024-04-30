@@ -2,6 +2,8 @@
 #include "openrgb_direct_anim.h"
 #elif defined(SIGNALRGB_ENABLE)
 #include "signalrgb_anim.h"
+#elif defined(CUSTOMRGB_ENABLE)
+#include "customrgb_anim.h"
 #else
 #error "NO custom rgb matrix effect included"
 #endif
