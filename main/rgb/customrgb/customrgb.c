@@ -13,6 +13,9 @@
 struct amk_rgb_matrix_led_state {
     uint32_t blink_step;
     uint32_t breath_step;
+    uint8_t hue;
+    uint8_t sat;
+    uint8_t val;
 };
 
 extern struct amk_led amk_leds[RGB_LED_NUM];
@@ -27,6 +30,9 @@ void customrgb_init(void)
         amk_store_get_led(i+start, &amk_leds[i+start]);
         amk_led_states[i].blink_step = 0;
         amk_led_states[i].breath_step = 0;
+        amk_led_states[i].hue = 0;
+        amk_led_states[i].sat = 0;
+        amk_led_states[i].val = 0;
     }
 }
 
@@ -38,11 +44,12 @@ void customrgb_get_matrix_info(uint8_t index, uint8_t* start, uint8_t* count)
     }
 }
 
-uint8_t customrgb_get_matrix_mode(uint8_t index, uint8_t* custom, uint8_t* count)
+uint8_t customrgb_get_matrix_mode(uint8_t index, uint8_t* custom, uint8_t* count, uint8_t* def)
 {
     if (index < RGB_MATRIX_NUM) {
         *custom = RGB_MATRIX_CUSTOM_CUSTOMRGB;
         *count =  RGB_MATRIX_EFFECT_MAX;
+        *def = RGB_MATRIX_CYCLE_LEFT_RIGHT;
     }
     return rgb_matrix_get_mode();
 }
@@ -98,6 +105,10 @@ extern const uint8_t rgblight_effect_breathe_table[];
 
 static uint32_t custom_speed = 0;
 
+#define LED_BREATH_STEP 4
+#define LED_BLINK_STEP 4
+#define LED_HUE_STEP 4
+
 void customrgb_effect(uint8_t index, uint8_t* h, uint8_t* s, uint8_t* v)
 {
     uint8_t start = g_rgb_matrix_params[0].led_start;
@@ -110,31 +121,49 @@ void customrgb_effect(uint8_t index, uint8_t* h, uint8_t* s, uint8_t* v)
         uint8_t hue = led->hue;
         uint8_t sat = led->sat;
         uint8_t val = led->val;
-        if ((custom_speed%speed) == 0) {
+        bool update = false;
+        if ((custom_speed%(speed)) == 0) {
             // do effect
             if (led->breath) {
                 uint8_t breath_index = (led_state->breath_step) % 256;
                 val = rgblight_effect_breathe_table[breath_index];
-                led_state->breath_step += 16;
+                led_state->breath_step += LED_BREATH_STEP;
+                update = true;
             }
 
             if (led->blink) {
-                if(led_state->blink_step % 2 == 0) {
-                    hue = 0;
-                    sat = 0;
-                    val = 0;
+                if(led_state->blink_step % LED_BLINK_STEP == 0) {
+                    if (led_state->val == 0) {
+                        val = led->val;
+                    } else {
+                        val = 0;
+                    }
+                    update = true;
                 }
                 led_state->blink_step++;
             }
 
             if (led->dynamic) {
-                led->hue += HUE_STEP;
+                led->hue += LED_HUE_STEP;
+                update = true;
             }
-
         }
-        *h = hue;
-        *s = sat;
-        *v = val;
+
+        if (update) {
+            led_state->hue = hue;
+            led_state->sat = sat;
+            led_state->val = val;
+        } else {
+            if (!led->breath && !led->blink && !led->dynamic) {
+                led_state->hue = hue;
+                led_state->sat = sat;
+                led_state->val = val;
+            }
+        }
+
+        *h = led_state->hue;
+        *s = led_state->sat;
+        *v = led_state->val;
     } else {
         *h = 0;
         *s = 0;

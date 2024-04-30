@@ -408,8 +408,8 @@ void amk_protocol_process(uint8_t *msg, uint8_t length)
             uint8_t index = msg[2];
 
             msg[2] = amk_protocol_ok;
-            msg[3] = customrgb_get_matrix_mode(index, &msg[4], &msg[5]);
-            ap_debug("AMK Protocol: get rgb matrix mode: current=%d, custom=%d, total=%d\n", msg[3], msg[4], msg[5]); 
+            msg[3] = customrgb_get_matrix_mode(index, &msg[4], &msg[5], &msg[6]);
+            ap_debug("AMK Protocol: get rgb matrix mode: current=%d, custom=%d, total=%d, default=%d\n", msg[3], msg[4], msg[5], msg[6]); 
         }
         break;
         case amk_protocol_set_rgb_matrix_mode:

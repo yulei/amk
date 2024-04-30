@@ -5,6 +5,10 @@
   "keyboardType": "mx",
   "keyboardSpeed": "hs",
   "lighting": "amk_rgblight",
+  "amk_rgb_matrix": {
+    "start": 21,
+    "count": 74
+  },
   "indicator": {
     "caps_lock": {
       "index": 0
