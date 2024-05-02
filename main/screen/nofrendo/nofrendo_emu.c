@@ -13,7 +13,7 @@
 #include "amk_printf.h"
 
 #define NES_MAX_FILENAME    128
-#define NES_HEAP_SIZE       (128*1024)
+#define NES_HEAP_SIZE       (120*1024)
 static uint32_t nes_heap[NES_HEAP_SIZE/4];
 
 //static FATFS romfs;

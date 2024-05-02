@@ -135,6 +135,21 @@ static render_t renders[] = {
     },
 };
 
+#ifdef RTOS_ENABLE
+#include "tx_api.h"
+static TX_MUTEX disp_mutex;
+static TX_MUTEX* p_mutex = NULL;
+static void disp_mutex_init(void)
+{
+    if (TX_SUCCESS == tx_mutex_create(&disp_mutex, "disp_mutex", 0)) {
+        p_mutex = &disp_mutex;
+    }
+}
+#endif
+
+static bool volatile anim_reinit = false;
+static bool volatile anim_stop = false;
+
 static uint32_t decrease_min(uint32_t data, uint32_t MIN)
 {
     if(data > MIN) return (--data);
@@ -327,6 +342,12 @@ void msc_init_kb(void)
 
     if (!anim_mount(true) ) reset_to_msc(true);
 
+#ifdef RTOS_ENABLE
+    if (!p_mutex) {
+        disp_mutex_init();
+    }
+#endif
+
     memset(anim_buf, 0, sizeof(anim_buf));
 
     for (int i = 0; i < sizeof(renders)/sizeof(render_t); i++) {
@@ -350,7 +371,44 @@ void msc_task_kb(void)
 
     if (!screen_enable) return;
 
+    anim_lock();
+#ifdef RTOS_ENABLE
+    if (p_mutex) {
+        tx_mutex_get(p_mutex, TX_WAIT_FOREVER);
+    }
+#endif
+    if (anim_reinit) {
+        for (int i = 0; i < sizeof(renders)/sizeof(render_t); i++) {
+            if (renders[i].anim) {
+                anim_close(renders[i].anim);
+                renders[i].anim = NULL;
+            }
+            renders[i].anim = anim_open(NULL, renders[i].type);
+            if (renders[i].anim) {
+                disp_debug("ANIM: faield to open root path\n");
+            } else {
+                disp_debug("ANIM: re-initialized\n");
+            }
+        }
+        anim_reinit = false;
+    }
+
+    if (anim_stop) {
+        for (int i = 0; i < sizeof(renders)/sizeof(render_t); i++) {
+            if (renders[i].anim) {
+                anim_close(renders[i].anim);
+                renders[i].anim = NULL;
+            }
+        }
+        anim_stop = false;
+    }
+
     render_screen(0);
+    #ifdef RTOS_ENABLE
+    if (p_mutex) {
+        tx_mutex_put(p_mutex);
+    }
+#endif
 }
 
 void screen_task_kb(void)
@@ -446,24 +504,30 @@ static void reset_to_msc(bool msc)
 
 void amk_animation_display_start(void)
 {
-     for (int i = 0; i < sizeof(renders)/sizeof(render_t); i++) {
-        if (renders[i].anim) {
-            anim_close(renders[i].anim);
-        }
-
-        renders[i].anim = anim_open(NULL, renders[i].type);
-        if (!renders[i].anim) {
-            disp_debug("ANIM: faield to open root path\n");
-        }
+    #ifdef RTOS_ENABLE
+    if (p_mutex) {
+        tx_mutex_get(p_mutex, TX_WAIT_FOREVER);
     }
+#endif
+    anim_reinit = true;
+#ifdef RTOS_ENABLE
+    if (p_mutex) {
+        tx_mutex_put(p_mutex);
+    }
+#endif
 }
 
 void amk_animation_display_stop(void)
 {
-    for (int i = 0; i < sizeof(renders)/sizeof(render_t); i++) {
-        if (renders[i].anim) {
-            anim_close(renders[i].anim);
-            renders[i].anim = NULL;
-        }
+    #ifdef RTOS_ENABLE
+    if (p_mutex) {
+        tx_mutex_get(p_mutex, TX_WAIT_FOREVER);
     }
+#endif
+    anim_stop = true;
+#ifdef RTOS_ENABLE
+    if (p_mutex) {
+        tx_mutex_put(p_mutex);
+    }
+#endif
 }

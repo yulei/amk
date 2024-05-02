@@ -3,13 +3,16 @@
   "vendorId": "0x4D58",
   "productId": "0xAC54",
   "lighting": "amk_rgblight",
-  "animation": [
-    {
-      "name": "Navi",
-      "mode": "anim_128_128",
-      "suffix": ".crs"
-    }
-  ],
+  "animation": {
+    "format": [
+      {
+        "name": "Navi",
+        "mode": "anim_128_128",
+        "suffix": ".crs"
+      }
+    ],
+    "transfer": "fast"
+  },
   "matrix": {
     "rows": 5,
     "cols": 17

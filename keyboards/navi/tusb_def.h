@@ -64,8 +64,12 @@
   #error "Incorrect RHPort configuration"
 #endif
 
-// This example doesn't use an RTOS
+#ifdef RTOS_ENABLE
+//#define CFG_TUSB_OS                 OPT_OS_FREERTOS
+#define CFG_TUSB_OS                 OPT_OS_CUSTOM
+#else
 #define CFG_TUSB_OS                 OPT_OS_NONE
+#endif
 
 // CFG_TUSB_DEBUG is defined by compiler in DEBUG build
 #define CFG_TUSB_DEBUG              0
@@ -102,7 +106,7 @@
 
 #define CFG_TUD_MIDI              0
 
-#if WEBUSB_ENABLE
+#ifdef VENDOR_USB_ENABLE 
 #define CFG_TUD_VENDOR            1
 #else
 #define CFG_TUD_VENDOR            0
