@@ -198,11 +198,11 @@ lc = $(subst A,a,$(subst B,b,$(subst C,c,$(subst D,d,$(subst E,e,$(subst F,f,$(s
 MCU_PORT = $(call lc,$(MCU_ARCH))
 
 INCS += $(THREADX_DIR)/ports/$(MCU_PORT)/gnu/inc
-SRCS += $(THREADX_DIR)/ports/$(MCU_PORT)/gnu/src/tx_thread_context_restore.S
-SRCS += $(THREADX_DIR)/ports/$(MCU_PORT)/gnu/src/tx_thread_context_save.S
-SRCS += $(THREADX_DIR)/ports/$(MCU_PORT)/gnu/src/tx_thread_interrupt_control.S
-SRCS += $(THREADX_DIR)/ports/$(MCU_PORT)/gnu/src/tx_thread_interrupt_disable.S
-SRCS += $(THREADX_DIR)/ports/$(MCU_PORT)/gnu/src/tx_thread_interrupt_restore.S
+#SRCS += $(THREADX_DIR)/ports/$(MCU_PORT)/gnu/src/tx_thread_context_restore.S
+#SRCS += $(THREADX_DIR)/ports/$(MCU_PORT)/gnu/src/tx_thread_context_save.S
+#SRCS += $(THREADX_DIR)/ports/$(MCU_PORT)/gnu/src/tx_thread_interrupt_control.S
+#SRCS += $(THREADX_DIR)/ports/$(MCU_PORT)/gnu/src/tx_thread_interrupt_disable.S
+#SRCS += $(THREADX_DIR)/ports/$(MCU_PORT)/gnu/src/tx_thread_interrupt_restore.S
 SRCS += $(THREADX_DIR)/ports/$(MCU_PORT)/gnu/src/tx_thread_schedule.S
 SRCS += $(THREADX_DIR)/ports/$(MCU_PORT)/gnu/src/tx_thread_stack_build.S
 SRCS += $(THREADX_DIR)/ports/$(MCU_PORT)/gnu/src/tx_thread_system_return.S
