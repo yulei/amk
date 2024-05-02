@@ -6,7 +6,7 @@
 #pragma once
 
 #define USB_MSC_BIT         (1u << 1)
-//#define USB_WEBUSB_BIT      (1u << 2)
+//#define USB_VENDOR_BIT      (1u << 2)
 #define USB_OUTPUT_RF       (1u << 3)
 #define USB_AUDIO_BIT       (1u << 4)
 #define USB_VIAL_BIT        (1u << 5)
@@ -48,6 +48,9 @@ enum {
 #ifdef AUDIO_ENABLE
     ITF_NUM_AUDIO_STREAMING,
 #endif
+#ifdef VENDOR_USB_ENABLE
+    ITF_NUM_VENDOR,
+#endif
     ITF_NUM_TOTAL
 };
 
@@ -70,6 +73,14 @@ enum {
     #define EPNUM_AUDIO_IN      EPNUM_DUMMY
     #define EPNUM_OPENRGB_OUT   EPNUM_DUMMY
     #define EPNUM_OPENRGB_IN    EPNUM_DUMMY
+#endif
+#ifdef VENDOR_USB_ENABLE
+    #if defined(STM32F405xx) || defined(STM32F412Rx)
+        EPNUM_VENDOR_OUT,
+        #define EPNUM_VENDOR_IN EPNUM_VENDOR_OUT
+    #else
+        #error "VENDOR usb was not supported on this MCU"
+    #endif
 #endif
     EPNUM_MAX
 };
@@ -98,6 +109,9 @@ enum {
 #endif
 #ifdef OPENRGB_ENABLE
     ITF_NUM_OPENRGB,
+#endif
+#ifdef VENDOR_USB_ENABLE
+    ITF_NUM_VENDOR,
 #endif
     ITF_NUM_TOTAL
 };
@@ -143,6 +157,14 @@ enum {
         #define EPNUM_OPENRGB_IN EPNUM_OPENRGB_OUT
     #endif
 #endif
+#ifdef VENDOR_USB_ENABLE
+    #if defined(STM32F405xx) || defined(STM32F412Rx)
+        EPNUM_VENDOR_OUT,
+        #define EPNUM_VENDOR_IN EPNUM_VENDOR_OUT
+    #else
+        #error "VENDOR usb was not supported on this MCU"
+    #endif
+#endif
     EPNUM_MAX
 };
 
@@ -174,3 +196,11 @@ enum {
     DESC_STR_INTERFACE_HID_OTHER,
 };
 
+#ifdef VENDOR_USB_ENABLE
+enum {
+    VENDOR_REQUEST_WEBUSB = 1,
+    VENDOR_REQUEST_MICROSOFT = 2,
+};
+
+extern uint8_t const desc_ms_os_20[];
+#endif

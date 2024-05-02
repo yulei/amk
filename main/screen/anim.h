@@ -50,6 +50,9 @@ void anim_close(anim_t *anim);
 
 bool anim_load_font(const void* data, void* buf, uint32_t size);
 
+void anim_lock(void);
+void anim_unlock(void);
+
 //
 // glyph file processing
 //

@@ -9,11 +9,11 @@
     #define DCD_MAX_EP_NUM      8
     #define DCD_USB_INSTANCE    USB
     #define DCD_USB_IRQn        USB_LP_CAN1_RX0_IRQn
-#elif defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F401xC) || defined(STM32F446xx) || defined(STM32F412Rx)
+#elif defined(STM32F411xE) || defined(STM32F401xC)
     #define DCD_MAX_EP_NUM      4
     #define DCD_USB_INSTANCE    USB_OTG_FS
     #define DCD_USB_IRQn        OTG_FS_IRQn
-#elif defined(STM32F722xx)
+#elif defined(STM32F722xx) || defined(STM32F405xx) || defined(STM32F446xx) || defined(STM32F412Rx)
     #define DCD_MAX_EP_NUM      6
     #define DCD_USB_INSTANCE    USB_OTG_FS
     #define DCD_USB_IRQn        OTG_FS_IRQn
@@ -78,12 +78,19 @@ void dcd_init(uint8_t rhport)
     if (HAL_PCD_Init(&dcd_usb) != HAL_OK) {
         amk_printf("Failed to initialize HAL PCD\n");
     }
-#if defined(STM32F411xE) || defined(STM32F405xx) || defined(STM32F722xx) || defined(STM32F401xC) || defined(STM32F446xx) || defined(STM32F412Rx)
+#if defined(STM32F411xE) || defined(STM32F401xC)
     HAL_PCDEx_SetRxFiFo(&dcd_usb, 0x80);            // shared rx buffer
     HAL_PCDEx_SetTxFiFo(&dcd_usb, 0, 0x20);         // ep0 tx buffer
     HAL_PCDEx_SetTxFiFo(&dcd_usb, 1, 0x10);         // ep1 (keyboard) tx buffer
     HAL_PCDEx_SetTxFiFo(&dcd_usb, 2, 0x10);         // ep2 (mouse, system, consumer) tx buffer
     HAL_PCDEx_SetTxFiFo(&dcd_usb, 3, 0x80);         // ep3 (webusb or msc) tx buffer
+#elif defined(STM32F405xx) || defined(STM32F722xx) || defined(STM32F446xx) || defined(STM32F412Rx)
+    HAL_PCDEx_SetRxFiFo(&dcd_usb, 0x80);            // shared rx buffer
+    HAL_PCDEx_SetTxFiFo(&dcd_usb, 0, 0x20);         // ep0 tx buffer
+    HAL_PCDEx_SetTxFiFo(&dcd_usb, 1, 0x10);         // ep1 (keyboard) tx buffer
+    HAL_PCDEx_SetTxFiFo(&dcd_usb, 2, 0x10);         // ep2 (mouse, system, consumer) tx buffer
+    HAL_PCDEx_SetTxFiFo(&dcd_usb, 3, 0x40);         // ep3 (vial or msc) tx buffer
+    HAL_PCDEx_SetTxFiFo(&dcd_usb, 4, 0x40);         // ep3 (webusb) tx buffer
 #else
     HAL_PCDEx_PMAConfig(&dcd_usb, 0x00, PCD_SNG_BUF, 0x40);
     HAL_PCDEx_PMAConfig(&dcd_usb, 0x80, PCD_SNG_BUF, 0x80);

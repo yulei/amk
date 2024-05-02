@@ -106,6 +106,7 @@ bool amk_anim_file_system_info(struct amk_anim_file_system_info* info)
 
 void amk_anim_file_refresh(void)
 {
+    anim_lock();
     af_clear();
     // get file system info
     FATFS *fs = NULL;
@@ -147,6 +148,7 @@ void amk_anim_file_refresh(void)
     } else {
         af_debug("AMK FILE SCAN: failed to open=%s, res=%d\n", ANIM_ROOT_DIR, res);
     }
+    anim_unlock();
 }
 
 bool amk_anim_file_get_info(uint16_t index, struct amk_anim_file_info* info)

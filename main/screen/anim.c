@@ -71,6 +71,33 @@ static bool anim_check_file(const char *path, const char *sig, uint32_t width, u
 static FRESULT safe_open(FIL* fp, const TCHAR* path, BYTE mode);
 static void safe_close(FIL* f);
 
+#ifdef RTOS_ENABLE
+#include "tx_api.h"
+TX_MUTEX anim_mutex;
+static TX_MUTEX* p_mutex = NULL;
+void anim_mutex_init(void)
+{
+    tx_mutex_create(&anim_mutex, "anim_mutex", 0);
+    p_mutex = &anim_mutex;
+}
+#endif
+void anim_lock(void)
+{
+#ifdef RTOS_ENABLE
+    if (p_mutex == NULL) {
+        anim_mutex_init();
+    }
+
+    tx_mutex_get(p_mutex, TX_WAIT_FOREVER);
+#endif
+}
+void anim_unlock(void)
+{
+#ifdef RTOS_ENABLE
+    tx_mutex_put(p_mutex);
+#endif
+}
+
 bool anim_mount(bool mount)
 {
     FRESULT res = FR_OK;
@@ -399,6 +426,16 @@ static bool anim_check_file(const char *path, const char* sig, uint32_t width, u
 
     if (f_size(&file) != header.total) {
         amk_printf("ANIM check: file size invalid: should:%d, actually:%d\n", header.total, f_size(&file));
+        goto exit;
+    }
+
+    if (FR_OK != f_lseek(&file, header.total-1)) {
+        amk_printf("ANIM check: can't seek to %d\n", header.total-1);
+        goto exit;
+    }
+    char c;
+    if (FR_OK != f_read(&file, &c, 1, &readed)) {
+        amk_printf("ANIM check: failed to read last byte\n");
         goto exit;
     }
 

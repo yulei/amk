@@ -37,8 +37,12 @@ void amk_usb_task(void)
 {
     tud_task();
 #ifdef CDC_ENABLE
-    void cdc_task(void);
+    extern void cdc_task(void);
     cdc_task();
+#endif
+#ifdef VENDOR_USB_ENABLE
+    extern void vendorusb_task(void);
+    vendorusb_task();
 #endif
 #ifdef HAL_HOST_ENABLE
     MX_USB_HOST_Process();

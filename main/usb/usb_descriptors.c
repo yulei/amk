@@ -156,7 +156,11 @@ tusb_desc_device_t const desc_device =
 {
     .bLength            = sizeof(tusb_desc_device_t),
     .bDescriptorType    = TUSB_DESC_DEVICE,
+#ifdef VENDOR_USB_ENABLE
+    .bcdUSB             = 0x0210,
+#else
     .bcdUSB             = 0x0200,
+#endif
 #if defined(AUDIO_ENABLE) || defined(CDC_ENABLE)
     .bDeviceClass       = TUSB_CLASS_MISC,
     .bDeviceSubClass    = MISC_SUBCLASS_COMMON,
@@ -314,11 +318,19 @@ uint32_t tud_descriptor_hid_report_vial_size(void)
 #define AUDIOUSB_DESC_LEN   0
 #endif
 
-#define CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + KEYBOARD_DESC_LEN + HID_OTHER_DESC_LEN + VIAL_DESC_LEN + MSCUSB_DESC_LEN + AUDIOUSB_DESC_LEN + CDC_DESC_LEN)
+#ifdef VENDOR_USB_ENABLE
+#define VENDORUSB_DESC_LEN  TUD_VENDOR_DESC_LEN
+#define ITF_NUM_VENDOR_COUNT    1
+#else
+#define VENDORUSB_DESC_LEN  0
+#define ITF_NUM_VENDOR_COUNT    0
+#endif
 
-#define CONFIG_LEN_MSC (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + MSCUSB_DESC_LEN)
+#define CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + KEYBOARD_DESC_LEN + HID_OTHER_DESC_LEN + VIAL_DESC_LEN + MSCUSB_DESC_LEN + AUDIOUSB_DESC_LEN + CDC_DESC_LEN + VENDORUSB_DESC_LEN)
 
-#define CONFIG_LEN_VIAL (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + VIAL_DESC_LEN)
+#define CONFIG_LEN_MSC (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + MSCUSB_DESC_LEN + VENDORUSB_DESC_LEN)
+
+#define CONFIG_LEN_VIAL (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + VIAL_DESC_LEN + VENDORUSB_DESC_LEN)
 
 #define CONFIG_LEN_AUDIO (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN + TUD_HID_DESC_LEN + AUDIOUSB_DESC_LEN)
 
@@ -352,14 +364,18 @@ static uint8_t desc_configuration[] = {
     TUD_AUDIO_MONO_SPEAKER_DESCRIPTOR(ITF_NUM_AUDIO, 0, CFG_TUD_AUDIO_FUNC_1_N_BYTES_PER_SAMPLE_RX, CFG_TUD_AUDIO_FUNC_1_N_BITS_PER_SAMPLE_RX, EPNUM_AUDIO_OUT, CFG_TUD_AUDIO_EP_SZ_OUT, 0x80|EPNUM_AUDIO_IN),
 #endif
 
+#ifdef VENDOR_USB_ENABLE
+    TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, 7, EPNUM_VENDOR_OUT, 0x80 | EPNUM_VENDOR_IN, CFG_TUD_VENDOR_EPSIZE),
+#endif
+
 };
 
 #ifdef DYNAMIC_CONFIGURATION
 
 #ifdef MSC_ENABLE
-#define ITF_NUM_MSC_TOTAL  3
+#define ITF_NUM_MSC_TOTAL  (3+ITF_NUM_VENDOR_COUNT)
 #else
-#define ITF_NUM_MSC_TOTAL  2
+#define ITF_NUM_MSC_TOTAL  (2+ITF_NUM_VENDOR_COUNT)
 #endif
 static uint8_t desc_with_msc[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
@@ -377,12 +393,16 @@ static uint8_t desc_with_msc[] = {
 #ifdef MSC_ENABLE
     TUD_MSC_DESCRIPTOR(ITF_NUM_MSC, 0, EPNUM_MSC_OUT, 0x80|EPNUM_MSC_IN, CFG_TUD_MSC_EPSIZE),
 #endif
+
+#ifdef VENDOR_USB_ENABLE
+    TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, 7, EPNUM_VENDOR_OUT, 0x80 | EPNUM_VENDOR_IN, CFG_TUD_VENDOR_EPSIZE),
+#endif
 };
 
 #ifdef VIAL_ENABLE
-#define ITF_NUM_VIAL_TOTAL  3
+#define ITF_NUM_VIAL_TOTAL  (3+ITF_NUM_VENDOR_COUNT)
 #else
-#define ITF_NUM_VIAL_TOTAL  2
+#define ITF_NUM_VIAL_TOTAL  (2+ITF_NUM_VENDOR_COUNT)
 #endif
 static uint8_t desc_with_vial[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
@@ -398,6 +418,10 @@ static uint8_t desc_with_vial[] = {
 
 #ifdef VIAL_ENABLE
     TUD_HID_INOUT_DESCRIPTOR(ITF_NUM_VIAL, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report_vial), EPNUM_VIAL_OUT, 0x80 | EPNUM_VIAL_IN, VIAL_EPSIZE, CFG_TUD_HID_POLL_INTERVAL),
+#endif
+
+#ifdef VENDOR_USB_ENABLE
+    TUD_VENDOR_DESCRIPTOR(ITF_NUM_VENDOR, 7, EPNUM_VENDOR_OUT, 0x80 | EPNUM_VENDOR_IN, CFG_TUD_VENDOR_EPSIZE),
 #endif
 };
 
@@ -759,6 +783,7 @@ char const* string_desc_arr [] =
     "Configuration",                // 4: Device configuration 
     "HID Keyboard",                 // 5: Hid keyboard
     "HID Extra",                    // 6: Hid extra key
+    "AMK Vendor",                   // 7: AMK vendor usb
 };
 
 static uint16_t _desc_str[32];

@@ -126,6 +126,11 @@ ifeq (yes, $(strip $(AUDIO_ENABLE)))
 	APP_DEFS += -DAUDIO_ENABLE
 endif
 
+ifeq (yes, $(strip $(VENDOR_USB_ENABLE)))
+	SRCS += $(MAIN_DIR)/usb/vendorusb.c
+	APP_DEFS += -DVENDOR_USB_ENABLE
+endif
+
 ifeq (yes, $(strip $(VIAL_ENABLE)))
 #	INCS += $(MAIN_DIR)/vial
 #	SRCS += $(MAIN_DIR)/vial/vial_porting.c
