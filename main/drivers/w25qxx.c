@@ -126,12 +126,18 @@ static bool w25qxx_sector_empty(w25qxx_t *w25qxx, uint32_t address);
 #if W25QXX_ASYNC
 #include "tx_api.h"
 static spi_handle_t current_spi;
-static TX_SEMAPHORE w25qxx_sema;
-static TX_SEMAPHORE* p_sema = NULL;
+static TX_SEMAPHORE w25qxx_read;
+static TX_SEMAPHORE w25qxx_write;
+static TX_SEMAPHORE* p_read = NULL;
+static TX_SEMAPHORE* p_write = NULL;
 static void w25qxx_sema_init(void)
 {
-    if (TX_SUCCESS == tx_semaphore_create(&w25qxx_sema, "w25qxx_sema", 0)) {
-        p_sema = &w25qxx_sema;
+    if (TX_SUCCESS == tx_semaphore_create(&w25qxx_read, "w25qxx_read", 0)) {
+        p_read = &w25qxx_read;
+    }
+
+    if (TX_SUCCESS == tx_semaphore_create(&w25qxx_write, "w25qxx_write", 0)) {
+        p_write = &w25qxx_write;
     }
 }
 #endif
@@ -228,7 +234,15 @@ static void w25qxx_write_page(w25qxx_t *w25qxx, uint32_t address, const uint8_t 
 
     gpio_write_pin(w25qxx->config.cs, 0);
     w25qxx_write_address(w25qxx, WQCMD_PAGE_PROGRAM, address);
+#if W25QXX_ASYNC
+    if (p_write == NULL) {
+        w25qxx_sema_init();
+    }
+    spi_send_async(w25qxx->config.spi, data, size);
+    tx_semaphore_get(p_write, TX_WAIT_FOREVER);
+#else
     spi_send(w25qxx->config.spi, data, size);
+#endif
     gpio_write_pin(w25qxx->config.cs, 1);
 
     w25qxx_wait(w25qxx, WQ_WRITE_TIMEOUT);
@@ -236,6 +250,7 @@ static void w25qxx_write_page(w25qxx_t *w25qxx, uint32_t address, const uint8_t 
 
 amk_error_t w25qxx_write_sector(w25qxx_t* w25qxx, uint32_t address, const uint8_t *data, uint32_t size)
 {
+    static uint32_t count = 0;
     if (address % w25qxx->sector_size) {
         w25qxx_debug("unsupport wrtie operation: address=%d, size=%d\n", address, size);
         return AMK_ERROR;
@@ -256,6 +271,9 @@ amk_error_t w25qxx_write_sector(w25qxx_t* w25qxx, uint32_t address, const uint8_
         data += w25qxx->page_size;
     }
 
+    count++;
+    w25qxx_debug("W25Qxx, sector written count:%d\n", count);
+
     return AMK_SUCCESS;
 }
 
@@ -273,8 +291,16 @@ amk_error_t w25qxx_read_sector(w25qxx_t* w25qxx, uint32_t address, uint8_t *data
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 {
     if (hspi == current_spi) {
-        if (p_sema) {
-            tx_semaphore_put(p_sema);
+        if (p_read) {
+            tx_semaphore_put(p_read);
+        }
+    }
+}
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+    if (hspi == current_spi) {
+        if (p_write) {
+            tx_semaphore_put(p_write);
         }
     }
 }
@@ -285,11 +311,11 @@ amk_error_t w25qxx_read_bytes(w25qxx_t* w25qxx, uint32_t address, uint8_t *data,
     w25qxx_write_address(w25qxx, WQCMD_FAST_READ, address);
 	w25qxx_spi_write(w25qxx, 0);
 #if W25QXX_ASYNC
-    spi_recv_async(w25qxx->config.spi, data, size);
-    if (p_sema == NULL) {
+    if (p_read== NULL) {
         w25qxx_sema_init();
     }
-    tx_semaphore_get(p_sema, TX_WAIT_FOREVER);
+    spi_recv_async(w25qxx->config.spi, data, size);
+    tx_semaphore_get(p_read, TX_WAIT_FOREVER);
 #else
     spi_recv(w25qxx->config.spi, data, size);
 #endif
