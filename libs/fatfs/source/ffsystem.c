@@ -48,15 +48,20 @@ void ff_memfree (
 
 //const osMutexDef_t Mutex[FF_VOLUMES];	/* Table of CMSIS-RTOS mutex */
 
+TX_MUTEX ff_mutex;
 
 int ff_cre_syncobj (	/* 1:Function succeeded, 0:Could not create the sync object */
 	BYTE vol,			/* Corresponding volume (logical drive number) */
 	FF_SYNC_t* sobj		/* Pointer to return the created sync object */
 )
 {
+	tx_mutex_create(&ff_mutex, "ff_mutex", 0);
+	*sobj = &ff_mutex;
+	return 1;
+	
 	/* Win32 */
-	*sobj = CreateMutex(NULL, FALSE, NULL);
-	return (int)(*sobj != INVALID_HANDLE_VALUE);
+	//*sobj = CreateMutex(NULL, FALSE, NULL);
+	//return (int)(*sobj != INVALID_HANDLE_VALUE);
 
 	/* uITRON */
 //	T_CSEM csem = {TA_TPRI,1,1};
@@ -91,7 +96,9 @@ int ff_del_syncobj (	/* 1:Function succeeded, 0:Could not delete due to an error
 )
 {
 	/* Win32 */
-	return (int)CloseHandle(sobj);
+	//return (int)CloseHandle(sobj);
+	tx_mutex_delete(&ff_mutex);
+	return 1;
 
 	/* uITRON */
 //	return (int)(del_sem(sobj) == E_OK);
@@ -121,8 +128,10 @@ int ff_req_grant (	/* 1:Got a grant to access the volume, 0:Could not get a gran
 	FF_SYNC_t sobj	/* Sync object to wait */
 )
 {
+	tx_mutex_get(sobj, FF_FS_TIMEOUT);
+	return 1;
 	/* Win32 */
-	return (int)(WaitForSingleObject(sobj, FF_FS_TIMEOUT) == WAIT_OBJECT_0);
+	//return (int)(WaitForSingleObject(sobj, FF_FS_TIMEOUT) == WAIT_OBJECT_0);
 
 	/* uITRON */
 //	return (int)(wai_sem(sobj) == E_OK);
@@ -150,8 +159,9 @@ void ff_rel_grant (
 	FF_SYNC_t sobj	/* Sync object to be signaled */
 )
 {
+	tx_mutex_put(sobj);
 	/* Win32 */
-	ReleaseMutex(sobj);
+	//ReleaseMutex(sobj);
 
 	/* uITRON */
 //	sig_sem(sobj);

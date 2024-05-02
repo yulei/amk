@@ -274,6 +274,12 @@
 /      can be opened simultaneously under file lock control. Note that the file
 /      lock control is independent of re-entrancy. */
 
+#ifdef RTOS_ENABLE
+#include "tx_api.h"
+#define FF_FS_REENTRANT	1
+#define FF_FS_TIMEOUT	TX_WAIT_FOREVER
+#define FF_SYNC_t		TX_MUTEX*
+#else
 
 /* #include <somertos.h>	// O/S definitions */
 #define FF_FS_REENTRANT	0
@@ -295,7 +301,7 @@
 /  The FF_SYNC_t defines O/S dependent sync object type. e.g. HANDLE, ID, OS_EVENT*,
 /  SemaphoreHandle_t and etc. A header file for O/S definitions needs to be
 /  included somewhere in the scope of ff.h. */
-
+#endif
 
 
 /*--- End of configuration options ---*/
