@@ -41,10 +41,18 @@
 #define USE_I2C1
 #define I2C1_PINS       GPIO_PIN_8 | GPIO_PIN_9
 //#define RGB_INIT_DELAY              2000
+#define RGB_LED_NUM_LIN     3
 
-#define RGB_DEVICE_NUM      1
-#define RGB_LED_NUM         3
-#define RGB_SEGMENT_NUM     1
+#define USE_3729
+#define IS31FL3729_SCALE_DEFAULT    0x7F
+#define IS31FL3729_NUM              2
+#define RGB_MATRIX_LED_NUM          74
+#define RGB_MATRIX_LED_COUNT        RGB_MATRIX_LED_NUM
+
+#define RGB_LED_NUM             (RGB_MATRIX_LED_NUM+RGB_LED_NUM_LIN)
+#define RGB_DEVICE_NUM          3
+#define RGB_MATRIX_NUM          1
+#define RGB_SEGMENT_NUM         1
 
 //#define USE_UART1
 
