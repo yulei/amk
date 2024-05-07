@@ -99,6 +99,12 @@ const tusb_desc_webusb_url_t desc_url = {
     .url             = WEBUSB_URL
 };
 
+
+enum {
+    AMK_ANIM_OPEN_FILE_REQUEST = 0xAA,
+    AMK_ANIM_CLOSE_FILE_REQUEST = 0xA5,
+};
+
 //--------------------------------------------------------------------+
 // WebUSB use vendor class
 //--------------------------------------------------------------------+
@@ -108,47 +114,86 @@ const tusb_desc_webusb_url_t desc_url = {
 // return false to stall control endpoint (e.g unsupported request)
 bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const * request)
 {
+    static uint8_t amk_request_buffer[64];
+
     // nothing to with DATA & ACK stage
-    if (stage != CONTROL_STAGE_SETUP) return true;
+    if (stage == CONTROL_STAGE_ACK) return true;
 
-    switch (request->bmRequestType_bit.type) {
-        case TUSB_REQ_TYPE_VENDOR:
-            {
-                switch (request->bRequest) {
-                    case VENDOR_REQUEST_WEBUSB:
-                    // match vendor request in BOS descriptor
-                    // Get landing page url
-                    return tud_control_xfer(rhport, request, (void*)(uintptr_t) &desc_url, desc_url.bLength);
+    if (stage == CONTROL_STAGE_SETUP) {
+        switch (request->bmRequestType_bit.type) {
+            case TUSB_REQ_TYPE_VENDOR:
+                {
+                    switch (request->bRequest) {
+                        case VENDOR_REQUEST_WEBUSB:
+                        // match vendor request in BOS descriptor
+                        // Get landing page url
+                        return tud_control_xfer(rhport, request, (void*)(uintptr_t) &desc_url, desc_url.bLength);
 
-                    case VENDOR_REQUEST_MICROSOFT:
-                    {
-                        vu_debug("vendor request microsoft, index=%d\n", request->wIndex);
-                        if ( request->wIndex == 7 ) {
-                            // Get Microsoft OS 2.0 compatible descriptor
-                            uint16_t total_len;
-                            memcpy(&total_len, desc_ms_os_20+8, 2);
+                        case VENDOR_REQUEST_MICROSOFT:
+                            {
+                                vu_debug("vendor request microsoft, index=%d\n", request->wIndex);
+                                if ( request->wIndex == 7 ) {
+                                    // Get Microsoft OS 2.0 compatible descriptor
+                                    uint16_t total_len;
+                                    memcpy(&total_len, desc_ms_os_20+8, 2);
 
-                            return tud_control_xfer(rhport, request, (void*)(uintptr_t) desc_ms_os_20, total_len);
+                                    return tud_control_xfer(rhport, request, (void*)(uintptr_t) desc_ms_os_20, total_len);
 
-                        } else {
-                            return false;
-                        }
+                                } else {
+                                    return false;
+                                }
+                            }
+                            break;
+                        default:
+                            break;
                     }
-                    break;
+                }
+                break;
+
+            case TUSB_REQ_TYPE_CLASS:
+            {
+                switch(request->bRequest) {
+                    case AMK_ANIM_OPEN_FILE_REQUEST:
+                        {
+                            return tud_control_xfer(rhport, request, (void*) amk_request_buffer, request->wLength);
+                        }
+                    case AMK_ANIM_CLOSE_FILE_REQUEST:
+                        {
+                            uint8_t index = request->wValue;
+                            amk_printf("VENDOR: close file request: index=%d\n", index);
+                            return true;
+                        }
                     default:
-                    break;
+                        break;
                 }
             }
             break;
 
+            default:
+                break;
+        }
+    }
+
+    if (stage == CONTROL_STAGE_DATA) {
+        switch (request->bmRequestType_bit.type) {
         case TUSB_REQ_TYPE_CLASS:
             {
-                vu_debug("webusb class request: %d\n", request->bRequest);
+                switch (request->bRequest) {
+                case AMK_ANIM_OPEN_FILE_REQUEST:
+                    {
+                        amk_request_buffer[13] = 0;
+                        amk_printf("VENDOR: open file request: name=%s, read=%d\n", amk_request_buffer, request->wValue);
+                        return true;
+                    }
+                default:
+                    break;
+                }
             }
             break;
-
         default:
             break;
+        }
+        return true;
     }
 
     // stall unknown request

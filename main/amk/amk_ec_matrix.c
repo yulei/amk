@@ -26,6 +26,14 @@
 #define custom_matrix_debug(...)
 #endif
 
+#ifndef DISCHARGE_WAIT_PRE
+#define DISCHARGE_WAIT_PRE 0
+#endif
+
+#ifndef DISCHARGE_WAIT_POST
+#define DISCHARGE_WAIT_POST 20
+#endif
+
 #define COL_A_MASK  0x01
 #define COL_B_MASK  0x02
 #define COL_C_MASK  0x04

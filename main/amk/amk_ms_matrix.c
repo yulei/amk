@@ -293,8 +293,17 @@ static bool ms_can_run(void)
 }
 #endif
 
+#ifdef DIGITAL_POT_ENABLE
+#include "digital_pot.h"
+#endif
+
 void matrix_init_custom(void)
 {
+#ifdef DIGITAL_POT_ENABLE
+    digital_pot_init();
+    digital_pot_set(DIGITAL_POT_INDEX);
+#endif
+
 #ifdef MATRIX_ROW_PINS
     for (int i = 0; i < AMK_ARRAY_SIZE(custom_row_pins); i++) {
         gpio_set_output_pushpull(custom_row_pins[i]);

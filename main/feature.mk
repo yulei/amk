@@ -196,3 +196,9 @@ endif
 ifeq (yes,$(strip $(NKRO_ENABLE)))
 	APP_DEFS += -DNKRO_ENABLE
 endif
+
+ifeq (yes, $(strip $(DIGITAL_POT_ENABLE)))
+	SRCS += $(MAIN_DIR)/drivers/i2c.c
+	SRCS += $(MAIN_DIR)/drivers/digital_pot.c
+	APP_DEFS += -DDIGITAL_POT_ENABLE
+endif
