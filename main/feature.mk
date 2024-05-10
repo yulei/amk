@@ -148,13 +148,13 @@ ifneq (yes, $(strip $(CUSTOM_MATRIX)))
 #	INCS += $(MAIN_DIR)/amk/debounce
 endif
 
-ifeq (yes, $(EECONFIG_FRAM)) 
+ifeq (yes, $(strip $(EECONFIG_FRAM))) 
 	SRCS += $(MAIN_DIR)/amk/eeconfig_fram.c
 	SRCS += $(MAIN_DIR)/drivers/mb85rcxx.c
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	APP_DEFS += -DEECONFIG_FRAM
 else
-	ifeq (yes, $(EECONFIG_FLASH))
+	ifeq (yes, $(strip $(EECONFIG_FLASH)))
 		SRCS += $(MAIN_DIR)/amk/eeconfig_flash.c
 		SRCS += $(MAIN_DIR)/drivers/flash.c
 		APP_DEFS += -DEECONFIG_FLASH

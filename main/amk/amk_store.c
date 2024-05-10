@@ -129,5 +129,9 @@ void eeconfig_init_custom(void)
 {
     amk_printf("AMK STORE init: apc:%d, rt:%d, dks:%d-%d\n", AMK_STORE_APC_START, AMK_STORE_RT_START, AMK_STORE_DKS_START, AMK_STORE_DKS_END);
 
+    #ifdef RGB_ENABLE
+    amk_printf("AMK STORE RGB: start:%d, end:%d\n", AMK_STORE_LED_START, AMK_STORE_LED_END);
+    #endif
+
     amk_store_init();
 }

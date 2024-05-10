@@ -122,6 +122,9 @@ void fee_init(void)
 {
     // initialize DataBuf
     fee_backup();
+
+    uint16_t magic = eeprom_read_word(EECONFIG_MAGIC);
+    amk_printf("EEPROM: magic is 0x%x\n", magic);
 }
 
 static void fee_erase(void)
