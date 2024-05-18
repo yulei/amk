@@ -43,6 +43,7 @@
 //#define RGB_INIT_DELAY              2000
 #define RGB_LED_NUM_LIN     3
 
+#ifdef RGB_MATRIX_ENABLE
 #define USE_3729
 #define IS31FL3729_SCALE_DEFAULT    0x7F
 #define IS31FL3729_NUM              2
@@ -52,13 +53,17 @@
 #define RGB_LED_NUM             (RGB_MATRIX_LED_NUM+RGB_LED_NUM_LIN)
 #define RGB_DEVICE_NUM          3
 #define RGB_MATRIX_NUM          1
+#else
+#define RGB_LED_NUM             (RGB_LED_NUM_LIN)
+#define RGB_DEVICE_NUM          1
+#endif
 #define RGB_SEGMENT_NUM         1
 
 //#define USE_UART1
 
 //#define HSE_VALUE           12000000
 #define HSE_VALUE           16000000
-//#define VECT_TAB_OFFSET     0x20000
+#define VECT_TAB_OFFSET     0x20000
 
 // vial 
 #define VIAL_KEYBOARD_UID {0x8E, 0x29, 0x94, 0xA9, 0xE0, 0x81, 0x96, 0xC5}
@@ -99,13 +104,12 @@
 #define APC_INTERVAL_PRESET 900
 #define APC_KEY_MIN_PRESET  2150
 #define APC_KEY_MAX_PRESET  3150
-#define APC_SPECIAL_KEY_NUM     1
-#define AMK_RT_SENS_DEFAULT     30 
-#define AMK_TOP_SENS_DEFAULT    50
-#define AMK_BTM_SENS_DEFAULT    50
-#define AMK_APC_SENS_DEFAULT    50
-#define AMK_APC_NOISE_DEFAULT   50
+//#define APC_SPECIAL_KEY_NUM     1
+//#define AMK_RT_SENS_DEFAULT     30 
+//#define AMK_TOP_SENS_DEFAULT    50
+//#define AMK_BTM_SENS_DEFAULT    50
+//#define AMK_APC_SENS_DEFAULT    50
+//#define AMK_APC_NOISE_DEFAULT   50
 #endif
 
-#define USE_MCP4017
-#define DIGITAL_POT_INDEX   0xFF
+//#define DIGITAL_POT_INDEX   0xFF

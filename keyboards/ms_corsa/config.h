@@ -115,18 +115,18 @@
 //#define RGB_FLUSH_ASYNC
 
 
-//#define APC_SPECIAL_KEY_NUM     1
+#define APC_SPECIAL_KEY_NUM     1
 #ifdef APC_SPECIAL_KEY_NUM
 #define APC_INTERVAL_PRESET 1000
-#define APC_KEY_MIN_PRESET  1700
-#define APC_KEY_MAX_PRESET  2700
+#define APC_KEY_MIN_PRESET  1800
+#define APC_KEY_MAX_PRESET  2800
 
-#define APC_KEY_MIN             1500
-#define APC_KEY_MAX             3276
+//#define APC_KEY_MIN             1500
+//#define APC_KEY_MAX             3276
 
-#define AMK_RT_SENS_DEFAULT     20 
-#define AMK_TOP_SENS_DEFAULT    20
-#define AMK_BTM_SENS_DEFAULT    20
-#define AMK_APC_SENS_DEFAULT    20
-#define AMK_APC_NOISE_DEFAULT   20
+//#define AMK_RT_SENS_DEFAULT     20 
+//#define AMK_TOP_SENS_DEFAULT    20
+//#define AMK_BTM_SENS_DEFAULT    20
+//#define AMK_APC_SENS_DEFAULT    20
+//#define AMK_APC_NOISE_DEFAULT   20
 #endif
