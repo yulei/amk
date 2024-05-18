@@ -131,21 +131,25 @@ ifeq (yes, $(strip $(VENDOR_USB_ENABLE)))
 	APP_DEFS += -DVENDOR_USB_ENABLE
 endif
 
-ifeq (yes, $(strip $(VIAL_ENABLE)))
-#	INCS += $(MAIN_DIR)/vial
-#	SRCS += $(MAIN_DIR)/vial/vial_porting.c
-#	SRCS += $(MAIN_DIR)/vial/vial_macro.c
-#	SRCS += $(MAIN_DIR)/vial/keycode_convert.c
-#	SRCS += $(MAIN_DIR)/vial/send_string.c
-#	APP_DEFS += -DVIAL_ENABLE
-#	APP_DEFS += -DKEYMAP_CONFIG_ENABLE	
-#	ACTIONMAP_ENABLE := yes
-endif
-
-ifneq (yes, $(strip $(CUSTOM_MATRIX)))
-#	SRCS += $(MAIN_DIR)/amk/matrix_scan.c
-#	SRCS += $(MAIN_DIR)/amk/debounce/debounce.c
-#	INCS += $(MAIN_DIR)/amk/debounce
+ifneq (, $(strip $(EECONFIG_DRIVER)))
+	ifeq (fram, $(strip $(EECONFIG_DRIVER)))
+		SRCS += $(MAIN_DIR)/amk/eeconfig_fram.c
+		SRCS += $(MAIN_DIR)/drivers/mb85rcxx.c
+		SRCS += $(MAIN_DIR)/drivers/i2c.c
+		APP_DEFS += -DEECONFIG_FRAM
+	else
+		ifeq (flash, $(strip $(EECONFIG_DRIVER)))
+			SRCS += $(MAIN_DIR)/amk/eeconfig_flash.c
+			SRCS += $(MAIN_DIR)/drivers/flash.c
+			APP_DEFS += -DEECONFIG_FLASH
+		else
+			$(error Unknown eeconfig driver: $(EECONFIG_DRIVER))
+		endif
+	endif
+else
+	ifeq (, $(strip $(EECONFIG_FLASH)))
+		SRCS += $(MAIN_DIR)/amk/eeconfig_mem.c
+	endif
 endif
 
 ifeq (yes, $(strip $(EECONFIG_FRAM))) 
@@ -197,8 +201,11 @@ ifeq (yes,$(strip $(NKRO_ENABLE)))
 	APP_DEFS += -DNKRO_ENABLE
 endif
 
-ifeq (yes, $(strip $(DIGITAL_POT_ENABLE)))
+ifneq (, $(strip $(DIGITAL_POT_ENABLE)))
 	SRCS += $(MAIN_DIR)/drivers/i2c.c
 	SRCS += $(MAIN_DIR)/drivers/digital_pot.c
 	APP_DEFS += -DDIGITAL_POT_ENABLE
+	ifeq (mcp4017, $(strip $(DIGITAL_POT_ENABLE)))
+	APP_DEFS += -DUSE_MCP4017
+	endif
 endif

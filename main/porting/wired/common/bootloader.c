@@ -21,6 +21,11 @@ void bootloader_jump(void)
     usb_connect(0);
 #endif
     wait_ms(10);
+
+#ifdef RESET_CLEANPUP_EEPROM
+    extern void eeconfig_prepare(void);
+    eeconfig_prepare();
+#endif
     NVIC_SystemReset();
 }
 

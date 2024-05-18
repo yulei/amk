@@ -87,8 +87,11 @@ void eeconfig_init_kb(void)
 
 uint8_t eeconfig_read_usb(void)
 {
-    //return 3;
+#ifdef FORCE_8K
+    return 3;
+#else
     return eeprom_read_byte(EECONFIG_USB);
+#endif
 }
 void eeconfig_update_usb(uint8_t usb)
 {

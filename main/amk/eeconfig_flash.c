@@ -160,7 +160,7 @@ static void fee_backup(void)
 static void fee_restore(void)
 {
     uint32_t cur = flash_base_address;
-    for (uint8_t i = 0; i < AMK_EEPROM_SIZE; i++) {
+    for (uint32_t i = 0; i < AMK_EEPROM_SIZE; i++) {
         if (buffer[i] != EEPROM_EMPTY_VALUE) {
             flash_write(cur, i, buffer[i]);
             cur += flash_unit_size;

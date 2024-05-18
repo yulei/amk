@@ -10,8 +10,13 @@
 #include "amk_store.h"
 #include "amk_printf.h"
 
+#ifdef EC_MATRIX_ENABLE
+#define AMK_STORE_APC_DEFAULT   20
+#define AMK_STORE_RT_DEFAULT    0
+#else
 #define AMK_STORE_APC_DEFAULT   16
 #define AMK_STORE_RT_DEFAULT    0 
+#endif
 
 void amk_store_set_apc(uint8_t row, uint8_t col, uint16_t apc)
 {

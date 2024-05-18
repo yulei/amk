@@ -126,5 +126,5 @@ void flash_erase_pages(void)
 #endif
     HAL_StatusTypeDef status = HAL_FLASHEx_Erase(&erase, &error);
     flash_lock();
-    amk_printf("Flash erase page, status = %d, error=%d\n", status, error);
+    amk_printf("Flash erase page, status = %d, error=%d, flash=%d\n", status, error, HAL_FLASH_GetError());
 }

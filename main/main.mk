@@ -50,12 +50,6 @@ endif
 
 ifeq (yes, $(strip $(RTOS_ENABLE)))
 	INCS += $(MAIN_DIR)/rtos
-#	SRCS += $(MAIN_DIR)/rtos/freertos_main.c
-#	include $(LIB_DIR)/cmsis_os.mk
-#	SRCS += $(MAIN_DIR)/rtos/rtos_main_v2.c
-#	include $(LIB_DIR)/cmsis_freertos.mk
-#	SRCS += $(MAIN_DIR)/rtos/rtos_main_rtx.c
-#	include $(LIB_DIR)/cmsis_rtx.mk
 	SRCS += $(MAIN_DIR)/rtos/tx_initialize_low_level.s
 	SRCS += $(MAIN_DIR)/rtos/rtos_main_tx.c
 	include $(LIB_DIR)/threadx.mk
