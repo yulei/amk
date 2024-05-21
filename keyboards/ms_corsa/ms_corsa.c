@@ -180,6 +180,6 @@ void rgb_led_pre_flush(void)
 #if APC_SPECIAL_KEY_NUM
 #include "amk_apc.h"
 struct apc_special_key apc_special_keys[APC_SPECIAL_KEY_NUM] = {
-    {2, 13, 1700, 2200, 500, 100},
+    {2, 13, 2100, 2400, 300, 100},  // caps
 };
 #endif

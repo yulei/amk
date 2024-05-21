@@ -187,6 +187,6 @@ led_config_t g_led_config = {
 #if APC_SPECIAL_KEY_NUM
 #include "amk_apc.h"
 struct apc_special_key apc_special_keys[APC_SPECIAL_KEY_NUM] = {
-    {3, 12, 2150, 2750, 600, 100}, // caps
+    {3, 12, 2250, 2550, 300, 100}, // caps
 };
 #endif
