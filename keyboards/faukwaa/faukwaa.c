@@ -159,8 +159,8 @@ rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
     {RGB_DRIVER_IS31FL3236, 0x7C, 3, 13, 6},
 
 #ifdef RGB_MATRIX_ENABLE
-    {RGB_DRIVER_IS31FL3729, 0x68, 0, 21, 32},
-    {RGB_DRIVER_IS31FL3729, 0x6E, 1, 53, 42},
+    {RGB_DRIVER_IS31FL3729, 0x68, 0, 19, 32},
+    {RGB_DRIVER_IS31FL3729, 0x6E, 1, 51, 42},
 #endif
 };
 

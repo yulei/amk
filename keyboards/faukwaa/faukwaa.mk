@@ -18,4 +18,4 @@ UF2_FAMILY = STM32F4
 
 LINKER_PATH = $(KEYBOARD_DIR)
 
-SRCS += $(KEYBOARD_DIR)/faukwaa.c
+SRCS += $(KEYBOARD_DIR)/faukwaa_rgb.c
