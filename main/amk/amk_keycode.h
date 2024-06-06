@@ -16,18 +16,13 @@ enum amk_keycode {
     POLL_4K,                        // set polling rate to 4K hz
     POLL_8K,                        // set polling rate to 8K hz
 #endif
-#ifdef STATE_SCAN_ENABLE
-    DOWN_0MS,                       // set press debounce to 0 ms
-    DOWN_1MS,                       // set press debounce to 1 ms
-    DOWN_2MS,                       // set press debounce to 2 ms
-    DOWN_3MS,                       // set press debounce to 3 ms
-    DOWN_4MS,                       // set press debounce to 4 ms
-    DOWN_5MS,                       // set press debounce to 5 ms
-    UP_0MS,                         // set release debounce to 0 ms
-    UP_1MS,                         // set release debounce to 1 ms
-    UP_2MS,                         // set release debounce to 2 ms
-    UP_3MS,                         // set release debounce to 3 ms
-    UP_4MS,                         // set release debounce to 4 ms
-    UP_5MS,                         // set release debounce to 5 ms
+#ifdef AMK_APC_ENABLE
+    PROFILE_0,                      // set apcrt profile 0
+    PROFILE_1,                      // set apcrt profile 1
+    PROFILE_2,                      // set apcrt profile 2
+    PROFILE_3,                      // set apcrt profile 3
+#endif
+#ifdef AMK_DKS_ENABLE
+    DKS_TOGGLE,                     //  toggle dks on/off
 #endif
 };

@@ -231,6 +231,9 @@ static uint32_t apc_rt_table[] = {
 
 
 uint8_t amk_magnetive_pole = 0;
+uint8_t amk_apcrt_profile = 0;
+uint8_t amk_dks_disable = 0;
+
 static uint32_t amk_rt_sens = AMK_RT_SENS_DEFAULT;
 static uint32_t amk_top_sens = AMK_TOP_SENS_DEFAULT;
 static uint32_t amk_btm_sens = AMK_BTM_SENS_DEFAULT;
@@ -253,6 +256,7 @@ struct apc_key
     uint32_t rt_up;
     uint32_t rt_down;
     bool rt_cont;
+    //bool dks_disable;
     uint32_t count;
     uint32_t value;
     bool active;
@@ -324,7 +328,15 @@ static void get_top_btm_sense(uint32_t row, uint32_t col, uint32_t* top, uint32_
 #endif
 }
 
-static struct apc_key apc_matrix[MATRIX_ROWS][MATRIX_COLS];
+static void parse_ms_config(uint8_t config)
+{
+    amk_magnetive_pole = (config & AMK_POLE_MASK) >> AMK_POLE_OFFSET;
+    amk_apcrt_profile = (config & AMK_PROFILE_MASK ) >> AMK_PROFILE_OFFSET;
+    amk_dks_disable = (config & AMK_DKS_MASK) >> AMK_DKS_OFFSET;
+}
+
+
+static struct apc_key apc_matrix[AMK_STORE_APCRT_PROFILE_COUNT][MATRIX_ROWS][MATRIX_COLS];
 
 static uint32_t get_part_interval_table(uint32_t val, uint32_t max)
 {
@@ -383,7 +395,7 @@ static uint32_t compute_interval_apc(uint32_t row, uint32_t col, uint32_t value)
 {
     if (value == 0) return APC_INTERVAL_INVALID;
 
-    volatile struct apc_key *key = &apc_matrix[row][col];
+    volatile struct apc_key *key = &apc_matrix[amk_apcrt_profile][row][col];
     uint32_t interval = APC_INTERVAL_INVALID;
     uint32_t min_preset = 0;
     uint32_t max_preset = 0;
@@ -456,7 +468,7 @@ uint32_t apc_matrix_calibrate(uint32_t row, uint32_t col, uint32_t adc_value)
         return 0;
     }
 
-    struct apc_key* key = &apc_matrix[row][col];
+    struct apc_key* key = &apc_matrix[amk_apcrt_profile][row][col];
     key->value += adc_value;
     key->count = (key->count+1) % APC_KEY_COUNT;
     if (key->count != 0) {
@@ -497,20 +509,24 @@ uint32_t apc_matrix_calibrate(uint32_t row, uint32_t col, uint32_t adc_value)
 
 void apc_matrix_init(void)
 {
-    amk_magnetive_pole = eeconfig_read_pole();
+    amk_udpate_ms_config();
+
     apc_matrix_update_sensitivity();
 
-    for (int row = 0; row < MATRIX_ROWS; row++) {
-        for (int col = 0; col < MATRIX_COLS; col++) {
-            apc_matrix[row][col].state = APC_KEY_STATE_DEFAULT;
-            apc_matrix[row][col].min = APC_KEY_MIN_DEFAULT;
-            apc_matrix[row][col].max = APC_KEY_MAX_DEFAULT;
-            apc_matrix[row][col].last = APC_KEY_LAST_DEFAULT;
-            apc_matrix[row][col].count = 0;
-            apc_matrix[row][col].value = 0;
-            apc_matrix[row][col].active = false;
+    for (int profile = 0; profile < AMK_STORE_APCRT_PROFILE_COUNT; profile++) {
+        for (int row = 0; row < MATRIX_ROWS; row++) {
+            for (int col = 0; col < MATRIX_COLS; col++) {
+                apc_matrix[profile][row][col].state = APC_KEY_STATE_DEFAULT;
+                apc_matrix[profile][row][col].min = APC_KEY_MIN_DEFAULT;
+                apc_matrix[profile][row][col].max = APC_KEY_MAX_DEFAULT;
+                apc_matrix[profile][row][col].last = APC_KEY_LAST_DEFAULT;
+                apc_matrix[profile][row][col].count = 0;
+                apc_matrix[profile][row][col].value = 0;
+                apc_matrix[profile][row][col].active = false;
+                //apc_matrix[profile][row][col].dks_disable = false;
 
-            apc_matrix_update_interval_at(row, col);
+                apc_matrix_update_interval_at(profile, row, col);
+            }
         }
     }
 
@@ -531,12 +547,12 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t org_value, bool* val
     }
     //return false;
 
-    if (dks_matrix_valid(row, col)) {
+    if (!amk_dks_disable /*&& !apc_matrix[amk_apcrt_profile][row][col].dks_disable*/ && dks_matrix_valid(row, col)) {
         apcrt_debug("USE DKS: row=%d, col=%d, value=%d\n", row, col, org_value);
         return dks_matrix_update(row, col, adc_value);
     }
 
-    struct apc_key* key = &apc_matrix[row][col];
+    struct apc_key* key = &apc_matrix[amk_apcrt_profile][row][col];
     uint32_t value = apc_matrix_calibrate(row, col, adc_value);
     if (value == 0) {
         return key->state == APC_KEY_ON;
@@ -629,20 +645,23 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t org_value, bool* val
 
 void apc_matrix_update_interval(void)
 {
-    for (int row = 0; row < MATRIX_ROWS; row++) {
-        for (int col = 0; col < MATRIX_COLS; col++) {
-            apc_matrix_update_interval_at(row, col);
+    for (int profile = 0; profile < AMK_STORE_APCRT_PROFILE_COUNT; profile++) {
+        for (int row = 0; row < MATRIX_ROWS; row++) {
+            for (int col = 0; col < MATRIX_COLS; col++) {
+                apc_matrix_update_interval_at(profile, row, col);
+            }
         }
     }
 }
 
-void apc_matrix_update_interval_at(uint32_t row, uint32_t col)
+void apc_matrix_update_interval_at(uint8_t profile, uint32_t row, uint32_t col)
 {
-    apc_matrix[row][col].apc = amk_store_get_apc(row, col);
-    uint16_t rt = amk_store_get_rt(row, col);
-    apc_matrix[row][col].rt_up = (rt &0x003F);
-    apc_matrix[row][col].rt_down = (rt &0x0FC0) >> 6;
-    apc_matrix[row][col].rt_cont = (rt &0x8000) > 0 ? true : false;
+    apc_matrix[profile][row][col].apc = amk_store_get_apc(profile, row, col);
+    uint16_t rt = amk_store_get_rt(profile, row, col);
+    apc_matrix[profile][row][col].rt_up = (rt&0x003F);
+    apc_matrix[profile][row][col].rt_down = (rt&0x0FC0) >> 6;
+    apc_matrix[profile][row][col].rt_cont = (rt&0x8000) > 0 ? true : false;
+    //apc_matrix[profile][row][col].dks_disable = (rt&0x4000) > 0 ? true : false;
 }
 
 void apc_matrix_update_sensitivity(void)
@@ -676,4 +695,30 @@ void apc_matrix_update_sensitivity(void)
         eeconfig_update_noise_sens(amk_noise_sens);
     }
     apcrt_debug("Sensitivity: rt=%d, top=%d, bottom=%d, apc=%d, noise=%d\n", amk_rt_sens, amk_top_sens, amk_btm_sens, amk_apc_sens, amk_noise_sens);
+}
+
+void amk_set_ms_config(uint8_t config)
+{
+    parse_ms_config(config);
+    uint8_t old = eeconfig_read_ms_config();
+    if (old != config) {
+        apcrt_debug("AMK MS: Update config for 0x%x to 0x%x\n", old, config);
+        eeconfig_update_ms_config(config);
+    }
+}
+
+uint8_t amk_get_ms_config(void)
+{
+    uint8_t config = 0;
+    config |= ((amk_magnetive_pole << AMK_POLE_OFFSET) & AMK_POLE_MASK);
+    config |= ((amk_apcrt_profile << AMK_PROFILE_OFFSET) & AMK_PROFILE_MASK);
+    config |= ((amk_dks_disable << AMK_DKS_OFFSET) & AMK_DKS_MASK);
+
+    return config;
+}
+
+void amk_udpate_ms_config(void)
+{
+    uint8_t config = eeconfig_read_ms_config();
+    parse_ms_config(config);
 }

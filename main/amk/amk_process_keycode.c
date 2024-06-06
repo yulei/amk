@@ -182,45 +182,64 @@ static bool process_hs_usb(uint16_t keycode, const keyrecord_t *record)
 }
 #endif
 
-#ifdef STATE_SCAN_ENABLE
-#include "amk_state.h"
+#ifdef AMK_APC_ENABLE
+#include "amk_apc.h"
+__attribute__((weak))
+void update_apcrt_profile_kb(void) {}
 
-static void store_and_update_debounce(uint8_t down, uint8_t up)
+static void update_apcrt_profile(uint8_t profile)
 {
-    uint8_t debounce = ((down&0x0F) << 4) | (up&0x0F);
-    eeconfig_update_debounce(debounce);
-    state_matrix_update_debounce(down, up);
+    uint8_t config = amk_get_ms_config();
+    uint8_t old = (config&AMK_PROFILE_MASK) >> AMK_PROFILE_OFFSET;
+    if (old != profile) {
+        config = (config & ~AMK_PROFILE_MASK) | ((profile&AMK_PROFILE_MASK) << AMK_PROFILE_OFFSET);
+        amk_set_ms_config(config);
+        update_apcrt_profile_kb()
+    }
 }
 
-static bool process_state_debounce(uint16_t keycode, const keyrecord_t *record)
+static bool process_apcrt(uint16_t keycode, const keyrecord_t *record)
 {
     switch(keycode) {
-        case DOWN_0MS ... DOWN_5MS:
-        {
-            uint8_t press = keycode - DOWN_0MS;
-            if (press != state_matrix_get_debounce(true)) {
-                uint8_t release = state_matrix_get_debounce(false);
-                store_and_update_debounce(press, release);
+        case PROFILE_0 ... PROFILE_3:
+            if (record->event.pressed) {
+                update_apcrt_profile(keycode - PROFILE_0);
             }
-        }
-        return false;
-        case UP_0MS ... UP_5MS:
-        {
-            uint8_t release = keycode - UP_0MS;
-            if (release != state_matrix_get_debounce(false)) {
-                uint8_t press = state_matrix_get_debounce(true);
-                store_and_update_debounce(press, release);
-            }
-        }
-        return false;
+            return false;
         default:
             break;
     }
 
     return true;
 }
-
 #endif
+
+#ifdef AMK_DKS_ENABLE
+#include "amk_apc.h"
+static void toggle_dks(void)
+{
+    uint8_t config = amk_get_ms_config();
+    uint8_t new_state = ((config&AMK_DKS_MASK) >> AMK_DKS_OFFSET) > 0 ? 0 : 1;
+    config = (config & ~AMK_DKS_MASK) | ((new_state&AMK_DKS_MASK) << AMK_DKS_OFFSET);
+    amk_set_ms_config(config);
+}
+
+static bool process_dks(uint16_t keycode, const keyrecord_t *record)
+{
+    switch(keycode) {
+        case DKS_TOGGLE:
+            if (record->event.pressed) {
+                toggle_dks();
+            }
+            return false;
+        default:
+            break;
+    }
+
+    return true;
+}
+#endif
+
 static bool process_amk_keycode(uint16_t keycode, const keyrecord_t *record)
 {
     switch(keycode) {
@@ -245,8 +264,14 @@ bool process_action_kb(keyrecord_t *record)
     }
 #endif
 
-#if defined(STATE_SCAN_ENABLE)
-    if (!process_state_debounce(keycode, record)) {
+#if defined(AMK_APC_ENABLE)
+    if (!process_apcrt(keycode, record)) {
+        return false;
+    }
+#endif
+
+#if defined(AMK_DKS_ENABLE)
+    if (!process_dks(keycode, record)) {
         return false;
     }
 #endif

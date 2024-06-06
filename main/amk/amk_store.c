@@ -18,16 +18,16 @@
 #define AMK_STORE_RT_DEFAULT    0 
 #endif
 
-void amk_store_set_apc(uint8_t row, uint8_t col, uint16_t apc)
+void amk_store_set_apc(uint8_t profile, uint8_t row, uint8_t col, uint16_t apc)
 {
-    uint8_t *addr = (uint8_t *) ((row*MATRIX_COLS + col)*2 + AMK_STORE_APC_START);
+    uint8_t *addr = (uint8_t *) ((MATRIX_ROWS*MATRIX_COLS*2*profile) + (row*MATRIX_COLS + col)*2 + AMK_STORE_APC_START);
     eeprom_write_byte(addr, apc >> 8);
     eeprom_write_byte(addr+1, apc & 0xFF);
 }
 
-uint16_t amk_store_get_apc(uint8_t row, uint8_t col)
+uint16_t amk_store_get_apc(uint8_t profile, uint8_t row, uint8_t col)
 {
-    uint8_t *addr = (uint8_t *) ((row*MATRIX_COLS + col)*2 + AMK_STORE_APC_START);
+    uint8_t *addr = (uint8_t *) ((MATRIX_ROWS*MATRIX_COLS*2*profile) + (row*MATRIX_COLS + col)*2 + AMK_STORE_APC_START);
     uint16_t high = eeprom_read_byte(addr);
     uint16_t low = eeprom_read_byte(addr+1);
     uint16_t apc = (high << 8) | low;
@@ -37,16 +37,16 @@ uint16_t amk_store_get_apc(uint8_t row, uint8_t col)
     return apc;
 }
 
-void amk_store_set_rt(uint8_t row, uint8_t col, uint16_t rt)
+void amk_store_set_rt(uint8_t profile, uint8_t row, uint8_t col, uint16_t rt)
 {
-    uint8_t *addr = (uint8_t *) ((row*MATRIX_COLS + col)*2 + AMK_STORE_RT_START);
+    uint8_t *addr = (uint8_t *) ((MATRIX_ROWS*MATRIX_COLS*2*profile) + (row*MATRIX_COLS + col)*2 + AMK_STORE_RT_START);
     eeprom_write_byte(addr, rt >> 8);
     eeprom_write_byte(addr+1, rt& 0xFF);
 }
 
-uint16_t amk_store_get_rt(uint8_t row, uint8_t col)
+uint16_t amk_store_get_rt(uint8_t profile, uint8_t row, uint8_t col)
 {
-    uint8_t *addr = (uint8_t *) ((row*MATRIX_COLS + col)*2 + AMK_STORE_RT_START);
+    uint8_t *addr = (uint8_t *) ((MATRIX_ROWS*MATRIX_COLS*2*profile) + (row*MATRIX_COLS + col)*2 + AMK_STORE_RT_START);
     uint16_t high = eeprom_read_byte(addr);
     uint16_t low = eeprom_read_byte(addr+1);
 
@@ -106,10 +106,16 @@ void amk_store_get_led(uint8_t index, struct amk_led* led)
 void amk_store_init(void)
 {
     uint8_t dks[sizeof(struct amk_dks)] = {[0 ... sizeof(struct amk_dks)-1] = 0};
+    for (int profile = 0; profile < AMK_STORE_APCRT_PROFILE_COUNT; profile++) {
+        for (int row = 0; row < MATRIX_ROWS; row++) {
+            for (int col = 0; col < MATRIX_COLS; col++) {
+                amk_store_set_apc(profile, row, col, AMK_STORE_APC_DEFAULT);
+                amk_store_set_rt(profile, row, col, AMK_STORE_RT_DEFAULT);
+            }
+        }
+    }
     for (int row = 0; row < MATRIX_ROWS; row++) {
         for (int col = 0; col < MATRIX_COLS; col++) {
-            amk_store_set_apc(row, col, AMK_STORE_APC_DEFAULT);
-            amk_store_set_rt(row, col, AMK_STORE_RT_DEFAULT);
             amk_store_set_dks(row, col, dks);
         }
     }

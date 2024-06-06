@@ -107,13 +107,13 @@ void eeconfig_update_debounce(uint8_t debounce)
     eeprom_write_byte(EECONFIG_DEBOUNCE, debounce);
 }
 
-uint8_t eeconfig_read_pole(void)
+uint8_t eeconfig_read_ms_config(void)
 {
-    return eeprom_read_byte(EECONFIG_POLE);
+    return eeprom_read_byte(EECONFIG_MS_CONFIG);
 }
-void eeconfig_update_pole(uint8_t pole)
+void eeconfig_update_ms_config(uint8_t config)
 {
-    eeprom_write_byte(EECONFIG_POLE, pole);
+    eeprom_write_byte(EECONFIG_MS_CONFIG, config);
 }
 
 uint8_t eeconfig_read_rt_sens(void)

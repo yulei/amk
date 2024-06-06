@@ -46,7 +46,6 @@
 #define ap_debug(...)
 #endif
 
-
 void amk_protocol_process(uint8_t *msg, uint8_t length)
 {
      /* msg[0] is 0xFD -- prefix of amk protocol */
@@ -58,70 +57,74 @@ void amk_protocol_process(uint8_t *msg, uint8_t length)
         break;
 #ifdef AMK_APC_ENABLE
     case amk_protocol_get_apc:
-        // msg[2]: row, msg[4]: column
+        // msg[2]: row, msg[3]: column, msg[4]: profile
         {
             uint8_t row = msg[2];
             uint8_t col = msg[3];
-            if ((row < MATRIX_ROWS) && (col < MATRIX_COLS)) {
+            uint8_t profile = msg[4];
+            if ((row < MATRIX_ROWS) && (col < MATRIX_COLS) && (profile < AMK_STORE_APCRT_PROFILE_COUNT)) {
                 msg[2] = amk_protocol_ok;
-                uint16_t apc = amk_store_get_apc(row, col);
+                uint16_t apc = amk_store_get_apc(profile, row, col);
                 msg[3]  = apc >> 8;
                 msg[4]  = apc & 0xFF;
                 ap_debug("AMK Protocol: get apc:%d\n", apc);
             } else {
                 msg[2] = amk_protocol_fail;
-                ap_debug("AMK Protocol: get apc failed, row=%d, col=%d\n", row, col);
+                ap_debug("AMK Protocol: get apc failed, row=%d, col=%d, profile=%d\n", row, col, profile);
             }
         }
         break;
     case amk_protocol_set_apc:
-        // msg[2]: row, msg[3]: column, msg[4]: keycode high, msg[5]: keycode low
+        // msg[2]: row, msg[3]: column, msg[4]: apc high, msg[5]: apc low, msg[6]: profile
         {
             uint8_t row = msg[2];
             uint8_t col = msg[3];
+            uint8_t profile = msg[6];
             if ((row < MATRIX_ROWS) && (col < MATRIX_COLS)) {
                 msg[2] = amk_protocol_ok;
                 uint16_t apc = (msg[4] << 8) | msg[5];
-                amk_store_set_apc(row, col, apc);
-                apc_matrix_update_interval_at(row, col);
-                ap_debug("AMK Protocol: set apc: row=%d, col=%d, apc=%d\n", row, col, apc);
+                amk_store_set_apc(profile, row, col, apc);
+                apc_matrix_update_interval_at(profile, row, col);
+                ap_debug("AMK Protocol: set apc: row=%d, col=%d, apc=%d, profile=%d\n", row, col, apc, profile);
             } else {
                 msg[2] = amk_protocol_fail;
-                ap_debug("AMK Protocol: set apc failed\n");
+                ap_debug("AMK Protocol: set apc failed: row=%d, col=%d, profile=%d\n", row, col, profile);
             }
         }
         break;
     case amk_protocol_get_rt:
-        // msg[2]: row, msg[3]: column
+        // msg[2]: row, msg[3]: column, msg[4]: profile
         {
             uint8_t row = msg[2];
             uint8_t col = msg[3];
-            if ((row < MATRIX_ROWS) && (col < MATRIX_COLS)) {
+            uint8_t profile = msg[4];
+            if ((row < MATRIX_ROWS) && (col < MATRIX_COLS) && (profile < AMK_STORE_APCRT_PROFILE_COUNT)) {
                 msg[2] = amk_protocol_ok;
-                uint16_t rt = amk_store_get_rt(row, col);
+                uint16_t rt = amk_store_get_rt(profile, row, col);
                 msg[3]  = rt >> 8;
                 msg[4]  = rt & 0xFF;
-                ap_debug("AMK Protocol: get rt at [%d,%d]:%d\n", row, col, rt);
+                ap_debug("AMK Protocol: get rt at [%d,%d]:%d, profile=%d\n", row, col, rt, profile);
             } else {
                 msg[2] = amk_protocol_fail;
-                ap_debug("AMK Protocol: get rt failed\n");
+                ap_debug("AMK Protocol: get rt failed, row=%d, col=%d, profile=%d\n", row, col, profile);
             }
         }
         break;
     case amk_protocol_set_rt:
-        // msg[2]: row, msg[3]: column, msg[4]: keycode high, msg[5]: keycode low
+        // msg[2]: row, msg[3]: column, msg[4]: rt high, msg[5]: rt low, msg[6]: profile
         {
             uint8_t row = msg[2];
             uint8_t col = msg[3];
-            if ((row < MATRIX_ROWS) && (col < MATRIX_COLS)) {
+            uint8_t profile = msg[6];
+            if ((row < MATRIX_ROWS) && (col < MATRIX_COLS) && (profile < AMK_STORE_APCRT_PROFILE_COUNT)) {
                 msg[2] = amk_protocol_ok;
                 uint16_t rt = (msg[4] << 8) | msg[5];
-                amk_store_set_rt(row, col, rt);
-                apc_matrix_update_interval_at(row, col);
-                ap_debug("AMK Protocol: set rt: row=%d, col=%d, apc=%d\n", row, col, rt);
+                amk_store_set_rt(profile, row, col, rt);
+                apc_matrix_update_interval_at(profile, row, col);
+                ap_debug("AMK Protocol: set rt: row=%d, col=%d, apc=%d, profile=%d\n", row, col, rt, profile);
             } else {
                 msg[2] = amk_protocol_fail;
-                ap_debug("AMK Protocol: set rt failed\n");
+                ap_debug("AMK Protocol: set rt failed: row=%d, col=%d, profile=%d\n", row, col, profile);
             }
         }
         break;
@@ -457,24 +460,22 @@ void amk_protocol_process(uint8_t *msg, uint8_t length)
 #endif
 
 #ifdef AMK_APC_ENABLE
-    case amk_protocol_get_pole:
+    case amk_protocol_get_ms_config:
         {
-            extern uint8_t amk_magnetive_pole;
             msg[2] = amk_protocol_ok;
-            msg[3] = amk_magnetive_pole;
-            ap_debug("AMK Protocol: get magnetive pole = %d\n", msg[3]);
+            msg[3] = amk_get_ms_config();
+            ap_debug("AMK Protocol: get ms config = %d\n", msg[3]);
         }
         break;
-    case amk_protocol_set_pole:
+    case amk_protocol_set_ms_config:
         {
-            extern uint8_t amk_magnetive_pole;
-            uint8_t old = amk_magnetive_pole;
-            amk_magnetive_pole = msg[2];
+            uint8_t old = amk_get_ms_config();
+            uint8_t config = msg[2];
             msg[2] = amk_protocol_ok;
-            ap_debug("AMK Protocol: set magnetive pole = %d\n", amk_magnetive_pole);
+            ap_debug("AMK Protocol: set ms config = %d\n", config);
 
-            if (old != amk_magnetive_pole) {
-                eeconfig_update_pole(amk_magnetive_pole);
+            if (old != config ) {
+                amk_set_ms_config(config);
             }
         }
         break;

@@ -26,11 +26,11 @@
 #define EECONFIG_DEBOUNCE           (uint8_t*)(EECONFIG_DEBOUNCE_START)
 #define EECONFIG_DEBOUNCE_COUNT     1
 
-#define EECONFIG_POLE_START         (EECONFIG_DEBOUNCE_START+EECONFIG_DEBOUNCE_COUNT)
-#define EECONFIG_POLE               (uint8_t*)(EECONFIG_POLE_START)
-#define EECONFIG_POLE_COUNT         1
+#define EECONFIG_MS_CONFIG_START    (EECONFIG_DEBOUNCE_START+EECONFIG_DEBOUNCE_COUNT)
+#define EECONFIG_MS_CONFIG          (uint8_t*)(EECONFIG_MS_CONFIG_START)
+#define EECONFIG_MS_CONFIG_COUNT    1
 
-#define EECONFIG_RT_SENS_START      (EECONFIG_POLE_START+EECONFIG_POLE_COUNT)
+#define EECONFIG_RT_SENS_START      (EECONFIG_MS_CONFIG_START+EECONFIG_MS_CONFIG_COUNT)
 #define EECONFIG_RT_SENS            (uint8_t*)(EECONFIG_RT_SENS_START)
 #define EECONFIG_RT_SENS_COUNT      1
 
@@ -50,13 +50,13 @@
 #define EECONFIG_NOISE_SENS         (uint8_t*)(EECONFIG_NOISE_SENS_START)
 #define EECONFIG_NOISE_SENS_COUNT   1
 
-#define AMK_EEPROM_SIZE             6144
+#define AMK_EEPROM_SIZE             8192
 #define EECONFIG_RESERVED_COUNT     (AMK_EEPROM_SIZE \
                                     -EEPROM_SIZE \
                                     -EECONFIG_RGB_COUNT \
                                     -EECONFIG_USB_COUNT \
                                     -EECONFIG_DEBOUNCE_COUNT \
-                                    -EECONFIG_POLE_COUNT \
+                                    -EECONFIG_MS_CONFIG_COUNT \
                                     -EECONFIG_RT_SENS_COUNT \
                                     -EECONFIG_TOP_SENS_COUNT \
                                     -EECONFIG_BTM_SENS_COUNT \
@@ -73,8 +73,8 @@ void eeconfig_update_usb(uint8_t usb);
 uint8_t eeconfig_read_debounce(void);
 void eeconfig_update_debounce(uint8_t debounce);
 
-uint8_t eeconfig_read_pole(void);
-void eeconfig_update_pole(uint8_t pole);
+uint8_t eeconfig_read_ms_config(void);
+void eeconfig_update_ms_config(uint8_t config);
 
 uint8_t eeconfig_read_rt_sens(void);
 void eeconfig_update_rt_sens(uint8_t rt);

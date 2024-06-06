@@ -90,7 +90,7 @@ uint8_t const desc_ms_os_20[] = {
 TU_VERIFY_STATIC(sizeof(desc_ms_os_20) == MS_OS_20_DESC_LEN, "Incorrect size");
 
 
-#define WEBUSB_URL  "docs.iatkb.com"
+#define WEBUSB_URL  "matrix-lab.com"
 
 const tusb_desc_webusb_url_t desc_url = {
     .bLength         = 3 + sizeof(WEBUSB_URL) - 1,
