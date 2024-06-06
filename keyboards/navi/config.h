@@ -43,8 +43,15 @@
 #define I2C1_SCL_PIN        B8
 #define I2C1_SDA_PIN        B9
 
-#define RGB_DEVICE_NUM      1
+#define NAVI_V2
+#ifdef NAVI_V2
+#define RGB_LED_NUM         9
+#define SCREEN_ROTATION     0
+#else
 #define RGB_LED_NUM         3
+#define SCREEN_ROTATION     3
+#endif
+#define RGB_DEVICE_NUM      1
 #define RGB_SEGMENT_NUM     1
 
 #define DEBOUNCE            5
@@ -63,7 +70,6 @@
 #define SCREEN_0_DC         B6
 #define GC9107_AS_ST7735
 
-#define SCREEN_ROTATION     3
 
 // vial 
 #define VIAL_KEYBOARD_UID {0x21, 0x8B, 0xFE, 0xA4, 0xE9, 0x5F, 0x65, 0x1B}

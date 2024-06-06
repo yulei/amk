@@ -14,6 +14,28 @@
 
 #ifdef RGB_ENABLE
 
+#ifdef NAVI_V2
+rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
+    {0, OUT_27, OUT_26, OUT_25},
+    {0, OUT_24, OUT_23, OUT_22},
+    {0, OUT_21, OUT_20, OUT_19},
+    {0, OUT_18, OUT_17, OUT_16},
+    {0, OUT_15, OUT_14, OUT_13},
+    {0, OUT_12, OUT_11, OUT_10},
+    {0, OUT_9, OUT_8, OUT_7},
+    {0, OUT_6, OUT_5, OUT_4},
+    {0, OUT_3, OUT_2, OUT_1},
+};
+
+rgb_device_t g_rgb_devices[RGB_DEVICE_NUM] = {
+    {RGB_DRIVER_IS31FL3236, 0x78, 0, 0, 9},
+};
+
+rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
+    {0, 0, 9},
+//    {1, 3, 1},
+};
+#else
 rgb_led_t g_rgb_leds[RGB_LED_NUM] = {
     {0, OUT_36, OUT_35, OUT_34},
     {0, OUT_33, OUT_32, OUT_31},
@@ -29,6 +51,7 @@ rgb_param_t g_rgb_linear_params[RGB_SEGMENT_NUM] = {
     {0, 0, 3},
 //    {1, 3, 1},
 };
+#endif
 
 #if 0//def RGB_INDICATOR_ENABLE
 struct rgb_indicator g_rgb_indicators[RGB_INDICATOR_NUM] = {
