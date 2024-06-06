@@ -2,9 +2,56 @@
   "name": "Matrix Lab Navi",
   "vendorId": "0x4D47",
   "productId": "0x4E56",
-  "keyboardType": "ms",
+  "keyboardType": "ms_v2",
   "keyboardSpeed": "hs",
   "lighting": "none",
+  "customKeycodes": [
+    {
+      "name": "FS1K",
+      "title": "Fullspeed 1K polling rate",
+      "shortName": "FS\n1K"
+    },
+    {
+      "name": "HS2K",
+      "title": "Highspeed 2K polling rate",
+      "shortName": "HS\n2K"
+    },
+    {
+      "name": "HS4K",
+      "title": "Highspeed 4K polling rate",
+      "shortName": "HS\n4K"
+    },
+    {
+      "name": "HS8K",
+      "title": "Highspeed 8K polling rate",
+      "shortName": "HS\n8K"
+    },
+    {
+      "name": "PRL0",
+      "title": "Set APCRT Profile 0",
+      "shortName": "APCRT\n0"
+    },
+    {
+      "name": "PRL1",
+      "title": "Set APCRT Profile 1",
+      "shortName": "APCRT\n1"
+    },
+    {
+      "name": "PRL2",
+      "title": "Set APCRT Profile 2",
+      "shortName": "APCRT\n2"
+    },
+    {
+      "name": "PRL3",
+      "title": "Set ARCRT Profile 3",
+      "shortName": "APCRT\n3"
+    },
+    {
+      "name": "DKST",
+      "title": "Toggle DKS",
+      "shortName": "DKS\nToggle"
+    }
+  ],
   "matrix": {
     "rows": 5,
     "cols": 16

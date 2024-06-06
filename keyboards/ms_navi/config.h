@@ -111,4 +111,5 @@
 #define AMK_APC_NOISE_DEFAULT   50
 #endif
 
-//#define DIGITAL_POT_INDEX   0xFF
+#define DIGITAL_POT_INDEX   0xFF
+//#define FORCE_8K
