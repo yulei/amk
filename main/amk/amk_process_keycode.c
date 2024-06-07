@@ -194,7 +194,7 @@ static void update_apcrt_profile(uint8_t profile)
     if (old != profile) {
         config = (config & ~AMK_PROFILE_MASK) | ((profile&AMK_PROFILE_MASK) << AMK_PROFILE_OFFSET);
         amk_set_ms_config(config);
-        update_apcrt_profile_kb()
+        update_apcrt_profile_kb();
     }
 }
 
