@@ -13,3 +13,9 @@
 #define AMK_XSTRCAT(a, b)                   AMK_STRCAT(a, b)
 
 #define WORDS(s)                            (((s) + sizeof(uint32_t) - 1) / sizeof(uint32_t))
+
+#ifdef STM32F405xx
+#define SECTION_CCMRAM __attribute__((section(".ccmram")))
+#else
+#define SECTION_CCMRAM
+#endif

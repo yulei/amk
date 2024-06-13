@@ -185,8 +185,14 @@ led_config_t g_led_config = {
 #endif
 
 #if APC_SPECIAL_KEY_NUM
+#ifdef RGB_MATRIX_ENABLE
 #include "amk_apc.h"
+struct apc_special_key apc_special_keys[APC_SPECIAL_KEY_NUM] = {
+    {3, 12, 1200, 1500, 300, 100}, // caps
+};
+#else
 struct apc_special_key apc_special_keys[APC_SPECIAL_KEY_NUM] = {
     {3, 12, 2250, 2550, 300, 100}, // caps
 };
+#endif
 #endif

@@ -44,6 +44,10 @@ DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart1_tx;
 #endif
 
+#ifdef USE_UART2
+UART_HandleTypeDef huart2;
+#endif
+
 RTC_HandleTypeDef hrtc;
 
 #ifdef TINYUSB_ENABLE
@@ -87,7 +91,7 @@ void SystemClock_Config(void)
     RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
     RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
-    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV4;
+    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
     {
@@ -302,6 +306,24 @@ static void MX_USART1_UART_Init(void)
 }
 #endif
 
+#ifdef USE_UART2
+static void MX_USART2_UART_Init(void)
+{
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+#endif
+
 #if defined(TINYUSB_ENABLE)
 static void MX_USB_DEVICE_Init(void)
 {
@@ -386,6 +408,10 @@ void custom_board_init(void)
 
 #ifdef USE_UART1
     MX_USART1_UART_Init();
+#endif
+
+#ifdef USE_UART2
+    MX_USART2_UART_Init();
 #endif
 
 #ifdef DYNAMIC_CONFIGURATION

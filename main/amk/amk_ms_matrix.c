@@ -45,6 +45,37 @@ static pin_t custom_col_pins[] = MATRIX_COL_PINS;
 static pin_t custom_row_pins[] = MATRIX_ROW_PINS;
 #endif
 
+#define DWT_PROFILE(x) \
+static uint32_t x##_count = 0; \
+static uint32_t x##_value = 0; \
+
+#define DWT_PROFILE_START(x) \
+uint32_t x##_start = DWT->CYCCNT;
+
+#define DWT_PROFILE_STAT(x, fmt, count) \
+uint32_t x##_interval = TIMER_DIFF_32(DWT->CYCCNT, x##_start); \
+x##_value += x##_interval; \
+x##_count++; \
+if ((x##_count % count) == 0) { \
+    amk_printf(fmt, x##_value, count); \
+    x##_value = 0; \
+}
+
+//#define MS_SCAN_STAT
+//#define ADC_READ_STAT
+//#define ADC_DMA_STAT
+//#define APC_UPDATE_STAT
+//#define ADC_MATRIX_STAT
+//#define ADC_DMA_IRQ_STAT
+//#define ADC_WAIT_STAT
+//#define ADC_SAMPLE_STAT
+
+#ifdef ADC_SAMPLE_STAT
+static uint32_t adc_sample_start = 0;
+static uint32_t adc_sample_value = 0;
+static uint32_t adc_sample_count =0;
+#endif
+
 #ifdef AT32F405
 void adc1_pins_init(void)
 {
@@ -118,13 +149,13 @@ int adc_init_kb(void)
     hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
     hadc1.Init.NbrOfConversion = ADC_CHANNEL_COUNT;
     hadc1.Init.DMAContinuousRequests = DISABLE;
-    hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+    hadc1.Init.EOCSelection = ADC_EOC_SEQ_CONV;//ADC_EOC_SINGLE_CONV;
     if (HAL_ADC_Init(&hadc1) != HAL_OK) {
         Error_Handler();
     }
 
     ADC_ChannelConfTypeDef sConfig = {0};
-    sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
+    sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
     for ( int i = 0; i < ADC_CHANNEL_COUNT; i++) {
         sConfig.Channel = adc_channels[i];
         sConfig.Rank = i+1;
@@ -179,9 +210,32 @@ int adc_msp_uninit_kb(void)
     return 1;
 }
 
+#ifdef ADC_DMA_IRQ_STAT
+#define ADC_DMA_IRQ_COUNT   1000
+DWT_PROFILE(adc_dma_irq) 
+#endif
+
 void DMA2_Stream4_IRQHandler(void)
 {
+#ifdef ADC_SAMPLE_STAT
+    uint32_t interval = TIMER_DIFF_32(DWT->CYCCNT, adc_sample_start);
+    adc_sample_value += interval;
+    adc_sample_count ++;
+    if ((adc_sample_count % 1000) == 0) { \
+        amk_printf("ADC sample time: intervale=%d, count=%d\n", adc_sample_value, 1000);
+        adc_sample_value = 0; \
+    }
+#endif
+#ifdef ADC_DMA_IRQ_STAT
+DWT_PROFILE_START(adc_dma_irq);
+#endif
+
     HAL_DMA_IRQHandler(&hdma_adc1);
+
+#ifdef ADC_DMA_IRQ_STAT 
+DWT_PROFILE_STAT(adc_dma_irq, "ADC DMA IRQ profile: interverl=%d, count=%d\n", ADC_DMA_IRQ_COUNT);
+#endif 
+    //adc1_dma_done = 1;
 }
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* AdcHandle)
@@ -190,6 +244,15 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* AdcHandle)
 }
 #endif
 
+#ifdef ADC_DMA_STAT
+#define ADC_DMA_COUNT   1000
+DWT_PROFILE(adc_dma) 
+#endif
+
+#ifdef ADC_WAIT_STAT
+#define ADC_WAIT_COUNT   1000
+DWT_PROFILE(adc_wait) 
+#endif
 static bool adc_read(uint32_t *data, uint32_t timeout)
 {
     adc1_dma_done = 0;
@@ -198,15 +261,32 @@ static bool adc_read(uint32_t *data, uint32_t timeout)
     adc_ordinary_software_trigger_enable(ADC1, TRUE);
     if (1) {
 #else
+#ifdef ADC_SAMPLE_STAT
+    adc_sample_start = DWT->CYCCNT;
+#endif
+
+#ifdef ADC_DMA_STAT
+DWT_PROFILE_START(adc_dma);
+#endif
     if( HAL_ADC_Start_DMA(&hadc1, data, ADC_CHANNEL_COUNT) == HAL_OK) {
 #endif
+#ifdef ADC_DMA_STAT 
+    DWT_PROFILE_STAT(adc_dma, "ADC DMA profile: interverl=%d, count=%d\n", ADC_DMA_COUNT);
+#endif    
+
+#ifdef ADC_WAIT_STAT
+DWT_PROFILE_START(adc_wait);
+#endif
         uint32_t start = timer_read32();
-        while( !adc1_dma_done) {
+        while(!adc1_dma_done) {
             if (timer_elapsed32(start) > timeout) {
                 custom_matrix_debug("adc_read timeout.\n");
                 return false;
             }
         }
+#ifdef ADC_WAIT_STAT 
+    DWT_PROFILE_STAT(adc_wait, "ADC WAIT profile: interverl=%d, count=%d\n", ADC_WAIT_COUNT);
+#endif    
     } else {
         custom_matrix_debug("adc_read Start_DMA failed.\n");
         return false;
@@ -215,17 +295,40 @@ static bool adc_read(uint32_t *data, uint32_t timeout)
     return true;
 }
 
+
+#ifdef ADC_READ_STAT
+#define ADC_READ_COUNT   1000
+DWT_PROFILE(adc_read) 
+#endif
+
+#ifdef APC_UPDATE_STAT
+#define APC_UPDATE_COUNT   1000
+DWT_PROFILE(apc_update) 
+#endif
+
 static bool sense_key(bool *keys, uint32_t col)
 {
+#ifdef ADC_READ_STAT
+DWT_PROFILE_START(adc_read);
+#endif
     if ( !adc_read(adc_value, ADC_TIMEOUT)) {
         return false;
     }
-    
+#ifdef ADC_READ_STAT 
+    DWT_PROFILE_STAT(adc_read, "ADC READ profile: interverl=%d, count=%d\n", ADC_READ_COUNT);
+#endif    
+
+#ifdef APC_UPDATE_STAT
+DWT_PROFILE_START(apc_update);
+#endif
     bool valid = false;
     for (int i = 0; i < MATRIX_ROWS; i++) {
         keys[i] = apc_matrix_update(i, col, adc_value[i], &valid);
     }
 
+#ifdef APC_UPDATE_STAT 
+    DWT_PROFILE_STAT(apc_update, "APC UPDATE profile: interverl=%d, count=%d\n", APC_UPDATE_COUNT);
+#endif    
 #if 0
     for (int i = 0; i < MATRIX_ROWS; i++) {
         if (keys[i])
@@ -333,13 +436,16 @@ void matrix_init_custom(void)
 #endif
 }
 
-//#define MS_SCAN_STAT
 #ifdef MS_SCAN_STAT
 #define MS_SCAN_COUNT   10000
 static uint32_t scan_stat_count = 0;
 static uint32_t scan_stat_ticks = 0;
 #endif
 
+#ifdef ADC_MATRIX_STAT
+#define ADC_MATRIX_COUNT   1000
+DWT_PROFILE(adc_matrix) 
+#endif
 bool matrix_scan_custom(matrix_row_t* raw)
 {
 #ifdef MS_SCAN_STAT
@@ -354,6 +460,9 @@ bool matrix_scan_custom(matrix_row_t* raw)
     if (!ms_can_run()) return false;
 #endif
 
+#ifdef ADC_MATRIX_STAT
+DWT_PROFILE_START(adc_matrix);
+#endif
     bool changed = false;
 
     for (int col = 0; col < MATRIX_COLS; col++) {
@@ -390,5 +499,8 @@ bool matrix_scan_custom(matrix_row_t* raw)
         }
     }
 
+#ifdef ADC_MATRIX_STAT 
+    DWT_PROFILE_STAT(adc_matrix, "ADC MATRIX profile: interverl=%d, count=%d\n", ADC_MATRIX_COUNT);
+#endif    
     return changed;
 }

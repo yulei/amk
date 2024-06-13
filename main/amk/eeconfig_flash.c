@@ -9,6 +9,7 @@
 #include "flash.h"
 #include "eeconfig.h"
 #include "amk_eeprom.h"
+#include "amk_utils.h"
 #include "amk_printf.h"
 
 #define FLASH_INVALID_DATA      0xFFFFFFFF
@@ -19,7 +20,7 @@
 #define FLASH_EMPTY_VALUE       0xFF
 #define IS_VALID_ADDR(x)        ((x) >= 0 && (x) < AMK_EEPROM_SIZE)
 
-static uint8_t buffer[AMK_EEPROM_SIZE];
+static uint8_t buffer[AMK_EEPROM_SIZE] SECTION_CCMRAM;
 
 static void fee_erase(void);
 static void fee_backup(void);

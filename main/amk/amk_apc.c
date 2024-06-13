@@ -75,7 +75,8 @@
 #endif
 
 #define TABLE_MAX   4000
-static uint32_t apc_rt_table[] = {
+static uint32_t apc_rt_table[] //SECTION_CCMRAM 
+= {
 0,
 100,
 200,
@@ -173,7 +174,8 @@ static uint32_t apc_rt_table[] = {
 #endif
 
 #define TABLE_MAX   4000
-static uint32_t apc_rt_table[] = {
+static uint32_t apc_rt_table[] //SECTION_CCMRAM
+= {
 0,
 36,
 73,
@@ -336,7 +338,7 @@ static void parse_ms_config(uint8_t config)
 }
 
 
-static struct apc_key apc_matrix[AMK_STORE_APCRT_PROFILE_COUNT][MATRIX_ROWS][MATRIX_COLS];
+static struct apc_key apc_matrix[AMK_STORE_APCRT_PROFILE_COUNT][MATRIX_ROWS][MATRIX_COLS];// SECTION_CCMRAM;
 
 static uint32_t get_part_interval_table(uint32_t val, uint32_t max)
 {

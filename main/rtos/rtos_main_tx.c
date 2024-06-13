@@ -36,17 +36,18 @@ extern void custom_board_task(void);
 #define USB_STACK_SIZE              896
 #define USB_THREAD_PRIO             9
 #define USB_PREEMPTION_THRESHOLD    (USB_THREAD_PRIO)
-static CHAR usb_stack[USB_STACK_SIZE];
+static CHAR usb_stack[USB_STACK_SIZE];// __attribute__((section(".ccmram")));
 
+#define AUX_ACTIVE_COUNT            10
 #define MAIN_STACK_SIZE             6144
 #define MAIN_THREAD_PRIO            11
 #define MAIN_PREEMPTION_THRESHOLD   (MAIN_THREAD_PRIO)
-static CHAR main_stack[MAIN_STACK_SIZE];
+static CHAR main_stack[MAIN_STACK_SIZE];// __attribute__((section(".ccmram")));
 
 #define AUX_STACK_SIZE              6144
 #define AUX_THREAD_PRIO             10
 #define AUX_PREEMPTION_THRESHOLD    (AUX_THREAD_PRIO)
-static CHAR aux_stack[AUX_STACK_SIZE];
+static CHAR aux_stack[AUX_STACK_SIZE];// __attribute__((section(".ccmram")));
 
 TX_THREAD usb_thr;
 static void usb_thread(ULONG thread_input);
@@ -58,7 +59,7 @@ static void aux_thread(ULONG thread_input);
 TX_EVENT_FLAGS_GROUP    g_event_flags;
 
 #define BYTE_POOL_SIZE      4096
-static uint32_t g_byte_pool_mem[BYTE_POOL_SIZE/4];
+static uint32_t g_byte_pool_mem[BYTE_POOL_SIZE/4];// __attribute__((section(".ccmram")));
 
 TX_BYTE_POOL g_tx_byte_pool_inst;
 TX_BYTE_POOL* g_tx_byte_pool;
@@ -110,12 +111,16 @@ void main_thread(ULONG thread_input)
     amk_printf("amk_init\n");
     amk_driver_init();
     amk_printf("board_init end\n");
+    static volatile uint32_t count = 0;
 
     while(1) {
         usb_task_report();
         amk_driver_task();
-        tx_event_flags_set(&g_event_flags, FLAGS_MAIN_AUX, TX_OR);
-        tx_thread_relinquish();
+        count++;
+        if (count % AUX_ACTIVE_COUNT == 0) {
+            tx_event_flags_set(&g_event_flags, FLAGS_MAIN_AUX, TX_OR);
+            tx_thread_relinquish();
+        }
     }
 }
 
