@@ -105,6 +105,30 @@ typedef struct {
 
 static is31fl3729_driver_t is31_drivers[IS31FL3729_NUM] = {0};
 
+#ifdef RTOS_ENABLE
+#define IS31FL3729_ASYNC
+#endif
+
+#ifdef IS31FL3729_ASYNC
+#include "tx_api.h"
+static TX_SEMAPHORE is31_write;
+static TX_SEMAPHORE* p_write = NULL;
+static void is31_sema_init(void)
+{
+    if (TX_SUCCESS == tx_semaphore_create(&is31_write, "is31_write", 0)) {
+        p_write = &is31_write;
+    }
+}
+void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+    if (hi2c== i2c_inst) {
+        if (p_write) {
+            tx_semaphore_put(p_write);
+        }
+    }
+}
+#endif
+
 static void init_driver(is31fl3729_driver_t *driver);
 static void uninit_driver(i2c_led_t *driver);
 
@@ -185,6 +209,17 @@ static bool is31fl3729_update_pwm_buffers(i2c_led_t *driver)
     if (AMK_SUCCESS != ak_i2c_send_async(i2c_inst, driver->addr, &is31->pwm_buffer[is31->last_index*0x10], 0x10)) {
         return false;
     }
+#elif defined(IS31FL3729_ASYNC)
+    if (p_write == NULL) {
+        is31_sema_init();
+    }
+
+    for (int i = 0; i < FLUSH_BATCH; i++) {
+        ak_i2c_send_async(i2c_inst, driver->addr, &is31->pwm_buffer[i*0x10], 0x10);
+        tx_semaphore_get(p_write, TX_WAIT_FOREVER);
+    }
+    is31->pwm_dirty = false;
+    return true;
 #else
     for (int i = 0; i < FLUSH_BATCH; i++) {
         ak_i2c_send(i2c_inst, driver->addr, &is31->pwm_buffer[i*0x10], 0x10, TIMEOUT);

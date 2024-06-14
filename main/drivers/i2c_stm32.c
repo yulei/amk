@@ -12,12 +12,16 @@
 
 #ifdef USE_I2C1
 extern I2C_HandleTypeDef hi2c1;
+#ifdef RGB_FLUSH_ASYNC
 static bool i2c1_busy = false;
+#endif
 #endif
 
 #ifdef USE_I2C2
 extern I2C_HandleTypeDef hi2c2;
+#ifdef RGB_FLUSH_ASYNC
 static bool i2c2_busy = false;
+#endif
 #endif
 
 bool ak_i2c_ready(i2c_handle_t i2c)
@@ -111,6 +115,7 @@ void ak_i2c_uninit(i2c_handle_t i2c)
 
 amk_error_t ak_i2c_send_async(i2c_handle_t i2c, uint8_t addr, const void *data, size_t length)
 {
+#ifdef RGB_FLUSH_ASYNC
 #ifdef USE_I2C1
     if (i2c1_busy) {
         if (ak_i2c_ready(i2c)) {
@@ -130,13 +135,19 @@ amk_error_t ak_i2c_send_async(i2c_handle_t i2c, uint8_t addr, const void *data, 
         return AMK_I2C_BUSY;
     }
 #endif
+#endif
+
     I2C_HandleTypeDef *inst = (I2C_HandleTypeDef*)i2c;
     HAL_I2C_Master_Transmit_DMA(inst, addr, (void*)data, length);
+
+#ifdef RGB_FLUSH_ASYNC
 #ifdef USE_I2C1
     i2c1_busy = true;
 #endif
 #ifdef USE_I2C2
     i2c2_busy = true;
 #endif
+#endif
+
     return AMK_I2C_BUSY;
 }
