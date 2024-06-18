@@ -31,6 +31,61 @@
 
 rgb_driver_t rgb_drivers[RGB_DEVICE_NUM];
 
+#define RGB_DRIVER_DEF(name) \
+static void rd_init##name(rgb_driver_t *driver) \
+{ \
+    driver->data = name##_init(driver->device->addr, driver->device->index, driver->device->led_start, driver->device->led_num); \
+} \
+\
+static void rd_uninit##name(rgb_driver_t *driver) \
+{ \
+    i2c_led_t *is31 = (i2c_led_t *)driver->data; \
+    name##_uninit(is31);\
+} \
+\
+static void rd_set_color_rgb##name(rgb_driver_t *driver, uint32_t index, uint8_t red, uint8_t green, uint8_t blue) \
+{ \
+    i2c_led_t *is31 = (i2c_led_t *)driver->data; \
+    name##_set_color(is31, index, red, green, blue); \
+} \
+\
+static void rd_set_color##name(rgb_driver_t *driver, uint32_t index, uint8_t hue, uint8_t sat, uint8_t val) \
+{ \
+    amk_hsv_t hsv = {hue, sat, val}; \
+    amk_rgb_t rgb = hsv_to_rgb_stub(hsv); \
+    i2c_led_t *is31 = (i2c_led_t *)driver->data; \
+    name##_set_color(is31, index, rgb.r, rgb.g, rgb.b); \
+} \
+\
+static void rd_set_color_all_rgb##name(rgb_driver_t *driver, uint8_t red, uint8_t green, uint8_t blue) \
+{ \
+    i2c_led_t *is31 = (i2c_led_t *)driver->data; \
+    name##_set_color_all(is31, red, green, blue); \
+} \
+\
+static void rd_set_color_all##name(rgb_driver_t *driver, uint8_t hue, uint8_t sat, uint8_t val) \
+{ \
+    amk_hsv_t hsv = {hue, sat, val}; \
+    amk_rgb_t rgb = hsv_to_rgb_stub(hsv); \
+    i2c_led_t *is31 = (i2c_led_t *)driver->data; \
+    name##_set_color_all(is31, rgb.r, rgb.g, rgb.b); \
+} \
+\
+static bool rd_flush##name(rgb_driver_t *driver) \
+{ \
+    i2c_led_t *is31 = (i2c_led_t *)driver->data; \
+    return name##_update_buffers(is31); \
+} \
+
+#define RGB_DRIVER_INIT(name) \
+            driver->init = rd_init##name; \
+            driver->set_color = rd_set_color##name; \
+            driver->set_color_all = rd_set_color_all##name; \
+            driver->set_color_rgb = rd_set_color_rgb##name; \
+            driver->set_color_all_rgb = rd_set_color_all_rgb##name; \
+            driver->flush = rd_flush##name; \
+            driver->uninit = rd_uninit##name;
+
 #ifdef USE_WS2812
 static void rd_ws2812_init(rgb_driver_t *driver)
 {
@@ -314,6 +369,10 @@ static bool rd_3733_flush(rgb_driver_t *driver)
 #endif
 
 #ifdef USE_3236
+
+RGB_DRIVER_DEF(is31fl3236)
+
+#if 0
 static void rd_3236_init(rgb_driver_t *driver)
 {
     driver->data = is31fl3236_init(driver->device->addr, driver->device->index, driver->device->led_start, driver->device->led_num);
@@ -358,6 +417,7 @@ static bool rd_3236_flush(rgb_driver_t *driver)
     i2c_led_t *is31 = (i2c_led_t *)driver->data;
     return is31fl3236_update_buffers(is31);
 }
+#endif
 #endif
 
 #ifdef USE_3741
@@ -595,6 +655,8 @@ rgb_driver_t* rgb_driver_create(rgb_device_t *device, uint8_t index)
 #endif
 #ifdef USE_3236
         case RGB_DRIVER_IS31FL3236:
+        RGB_DRIVER_INIT(is31fl3236)
+        #if 0
             driver->init = rd_3236_init;
             driver->set_color = rd_3236_set_color;
             driver->set_color_all = rd_3236_set_color_all;
@@ -602,6 +664,7 @@ rgb_driver_t* rgb_driver_create(rgb_device_t *device, uint8_t index)
             driver->set_color_all_rgb = rd_3236_set_color_all_rgb;
             driver->flush = rd_3236_flush;
             driver->uninit = rd_3236_uninit;
+        #endif
             break;
 #endif
 #ifdef USE_3741

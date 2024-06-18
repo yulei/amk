@@ -91,7 +91,11 @@ void SystemClock_Config(void)
     RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
     RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+#ifdef SD_NAND_ENABLE
+    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV4;
+#else
     RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
+#endif
 
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
     {

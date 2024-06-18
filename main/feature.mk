@@ -115,8 +115,14 @@ ifeq (yes, $(strip $(MSC_ENABLE)))
 		SRCS += $(MAIN_DIR)/drivers/qspi.c
 		APP_DEFS += -DQSPI_ENABLE
 	else
-		SRCS += $(MAIN_DIR)/drivers/w25qxx.c
-		SRCS += $(MAIN_DIR)/drivers/spi.c
+		ifeq (yes, $(strip $(SD_NAND_ENABLE)))
+			SRCS += $(MAIN_DIR)/drivers/sd_nand.c
+			APP_DEFS += -DSD_NAND_ENABLE
+		else
+			SRCS += $(MAIN_DIR)/drivers/w25qxx.c
+			SRCS += $(MAIN_DIR)/drivers/spi.c
+			APP_DEFS += -DW25QXX_ENABLE
+		endif
 	endif
 	APP_DEFS += -DMSC_ENABLE
 endif

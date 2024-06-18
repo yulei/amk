@@ -6,23 +6,35 @@
 
 #include "mscusb.h"
 
-#ifndef QSPI_ENABLE
-#include "w25qxx.h"
-#else
+#if defined(QSPI_ENABLE)
 #include "qspi.h"
+#elif defined(SD_NAND_ENABLE)
+#include "sd_nand.h"
+#else
+#include "w25qxx.h"
 #endif
 
 #ifndef DISK_COUNT
 #define DISK_COUNT          1
 #endif
+
 #ifndef DISK_TOTAL_SIZE
 #define DISK_TOTAL_SIZE     (16*1024*1024)        //W25Q128, 16M Bytes
 #endif
 
-#define DISK_BLOCK_SIZE     (4*1024)
-#define DISK_BLOCK_NUM      DISK_TOTAL_SIZE/DISK_BLOCK_SIZE
+#ifdef SD_NAND_ENABLE
+#define DISK_BLOCK_SIZE     sd_nand_get_block_size()
+#else
+#define DISK_BLOCK_SIZE     (4096)
+#endif
 
-#ifndef QSPI_ENABLE
+#ifdef SD_NAND_ENABLE
+#define DISK_BLOCK_NUM      (DISK_TOTAL_SIZE/DISK_BLOCK_SIZE)
+#else
+#define DISK_BLOCK_NUM      sd_nand_get_block_count()
+#endif
+
+#if defined(W25QXX_ENABLE)
 static w25qxx_config_t w25qxx_config;
 static w25qxx_t *w25qxx;
 #endif
@@ -36,23 +48,27 @@ void wdt_refresh(void);
 
 void msc_init(void)
 {
-    #ifndef QSPI_ENABLE
+#if defined(QSPI_ENABLE)
+    qspi_init(0);
+#elif defined(SD_NAND_ENABLE)
+    sd_nand_init();
+#else
     w25qxx_config.cs = FLASH_CS;
     w25qxx_config.spi = spi_init(W25QXX_SPI_ID);
     w25qxx = w25qxx_init(&w25qxx_config);
-    #else
-    qspi_init(0);
-    #endif
+#endif
 
     msc_init_kb();
 }
 
 void msc_erase(void)
 {
-#ifndef QSPI_ENABLE
-    w25qxx_erase_chip(w25qxx);
-#else
+#if defined(QSPI_ENABLE)
     qspi_erase_chip();
+#elif defined(SD_NAND_ENABLE)
+    sd_nand_erase_chip();
+#else
+    w25qxx_erase_chip(w25qxx);
 #endif
 }
 
@@ -134,10 +150,12 @@ int32_t tud_msc_read10_cb(uint8_t lun, uint32_t lba, uint32_t offset, void* buff
 #ifdef WDT_ENABLE
     wdt_refresh();
 #endif
-#ifndef QSPI_ENABLE
-    w25qxx_read_sector(w25qxx, lba*DISK_BLOCK_SIZE, buffer, bufsize);
-#else
+#if defined(QSPI_ENABLE)
     qspi_read_sector(lba*DISK_BLOCK_SIZE, buffer, bufsize);
+#elif defined(SD_NAND_ENABLE)
+    sd_nand_read_blocks(lba*DISK_BLOCK_SIZE, buffer, bufsize);
+#else
+    w25qxx_read_sector(w25qxx, lba*DISK_BLOCK_SIZE, buffer, bufsize);
 #endif
     return bufsize;
 }
@@ -149,10 +167,12 @@ int32_t tud_msc_write10_cb(uint8_t lun, uint32_t lba, uint32_t offset, uint8_t* 
 #ifdef WDT_ENABLE
     wdt_refresh();
 #endif
-#ifndef QSPI_ENABLE
-    w25qxx_write_sector(w25qxx, lba*DISK_BLOCK_SIZE, buffer, bufsize);
-#else
+#if defined(QSPI_ENABLE)
     qspi_write_sector(lba*DISK_BLOCK_SIZE, buffer, bufsize);
+#elif defined(SD_NAND_ENABLE)
+    sd_nand_write_blocks(lba*DISK_BLOCK_SIZE, buffer, bufsize);
+#else
+    w25qxx_write_sector(w25qxx, lba*DISK_BLOCK_SIZE, buffer, bufsize);
 #endif
     return bufsize;
 }

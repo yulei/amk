@@ -1,0 +1,252 @@
+/**
+ * @file sd_nand_stm32.c
+ * @author astro
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
+
+#include "amk_printf.h"
+
+#ifndef SD_NAND_DEBUG
+#define SD_NAND_DEBUG 1
+#endif
+
+#if SD_NAND_DEBUG
+#define sd_nand_debug  amk_printf
+#else
+#define sd_nand_debug(...)
+#endif
+
+#define NAND_TIMEOUT    500
+
+extern void Error_Handler(void);
+
+SD_HandleTypeDef hsd;
+DMA_HandleTypeDef hdma_sdio_rx;
+DMA_HandleTypeDef hdma_sdio_tx;
+
+static uint32_t sd_nand_block_count = 0;
+static uint32_t sd_nand_block_size = 0;
+
+static void refresh_sd_info(void)
+{
+    HAL_SD_CardInfoTypeDef info;
+    HAL_SD_GetCardInfo(&hsd, &info);
+
+    sd_nand_block_count = info.LogBlockNbr;
+    sd_nand_block_size = info.LogBlockSize;
+
+    sd_nand_debug("Card Type:%d, Card Version: %d, Card Class:%d\n",
+        info.CardType, info.CardVersion, info.Class);
+    sd_nand_debug("Real Addr:%d, Block Number: %d, Block Size:%d, Log Block Number:%d, Log Block Size:%d\n",
+        info.RelCardAdd, info.BlockNbr, info.BlockSize, info.LogBlockNbr, info.LogBlockSize);
+}
+
+uint32_t sd_nand_get_block_count(void)
+{
+    return sd_nand_block_count;
+}
+
+uint32_t sd_nand_get_block_size(void)
+{
+    return sd_nand_block_size;
+}
+
+bool sd_nand_init(void)
+{
+    hsd.Instance = SDIO;
+    hsd.Init.ClockEdge = SDIO_CLOCK_EDGE_RISING;
+    hsd.Init.ClockBypass = SDIO_CLOCK_BYPASS_DISABLE;
+    hsd.Init.ClockPowerSave = SDIO_CLOCK_POWER_SAVE_DISABLE;
+    hsd.Init.BusWide = SDIO_BUS_WIDE_1B;
+    hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
+    hsd.Init.ClockDiv = SDIO_TRANSFER_CLK_DIV;
+    if (HAL_SD_Init(&hsd) != HAL_OK) {
+        sd_nand_debug("SD NAND Init failed=0x%x\n", HAL_SD_GetError(&hsd));
+
+        Error_Handler();
+    }
+    if (HAL_SD_ConfigWideBusOperation(&hsd, SDIO_BUS_WIDE_4B) != HAL_OK) {
+        sd_nand_debug("SD NAND bus config failed=0x%x\n", HAL_SD_GetError(&hsd));
+        Error_Handler();
+    }
+
+    sd_nand_debug("SD NAND inited\n");
+    refresh_sd_info();
+
+    //sd_nand_erase_chip();
+    return true;
+}
+
+amk_error_t sd_nand_read_blocks(uint32_t address, uint8_t *buffer, size_t count)
+{
+    sd_nand_debug("SD NAND read blocks: addr=0x%x, size=%d\n", address, count);
+    //if(HAL_SD_ReadBlocks_DMA(&hsd, buffer, address/SD_NAND_BLOCK_SIZE, count/SD_NAND_BLOCK_SIZE) != HAL_OK) {
+    if(HAL_SD_ReadBlocks(&hsd, buffer, address/SD_NAND_BLOCK_SIZE, count/SD_NAND_BLOCK_SIZE, NAND_TIMEOUT) != HAL_OK) {
+        sd_nand_debug("SD NAND read blocks failed: 0x%x\n", HAL_SD_GetError(&hsd));
+        return AMK_ERROR;
+    }
+
+    while(HAL_SD_GetCardState(&hsd) != HAL_SD_CARD_TRANSFER)
+    {
+    }
+
+    return AMK_SUCCESS;
+}
+
+amk_error_t sd_nand_write_blocks(uint32_t address, const uint8_t* buffer, size_t count)
+{
+    sd_nand_debug("SD NAND write blocks: addr=0x%x, size=%d\n", address, count);
+    //HAL_StatusTypeDef status = HAL_SD_WriteBlocks_DMA(&hsd, (uint8_t*)buffer, address/SD_NAND_BLOCK_SIZE, count/SD_NAND_BLOCK_SIZE);
+    HAL_StatusTypeDef status = HAL_SD_WriteBlocks(&hsd, (uint8_t*)buffer, address/SD_NAND_BLOCK_SIZE, count/SD_NAND_BLOCK_SIZE, NAND_TIMEOUT);
+    if(status != HAL_OK) {
+        sd_nand_debug("SD NAND write blocks failed: status=%d, error=0x%x\n", status, HAL_SD_GetError(&hsd));
+        return AMK_ERROR;
+    }
+
+    while(HAL_SD_GetCardState(&hsd) != HAL_SD_CARD_TRANSFER)
+    {
+    }
+    return AMK_SUCCESS;
+}
+
+amk_error_t sd_nand_erase_chip(void)
+{
+    if (sd_nand_block_count == 0) {
+        refresh_sd_info();
+    }
+
+    HAL_StatusTypeDef status = HAL_SD_Erase(&hsd, 0, sd_nand_block_count-1);
+    if (status != HAL_OK) {
+        sd_nand_debug("SD NAND erase chip failed: status=%d, error=0x%x\n", status, HAL_SD_GetError(&hsd));
+        return AMK_ERROR;
+    }
+    return AMK_SUCCESS;
+}
+
+void sd_nand_uninit(void)
+{
+    HAL_SD_DeInit(&hsd);
+}
+
+// HAL MSP
+void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
+{
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    __HAL_RCC_SDIO_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOD_CLK_ENABLE();
+    /**SDIO GPIO Configuration
+    PC8     ------> SDIO_D0
+    PC9     ------> SDIO_D1
+    PC10     ------> SDIO_D2
+    PC11     ------> SDIO_D3
+    PC12     ------> SDIO_CK
+    PD2     ------> SDIO_CMD
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
+                          |GPIO_PIN_12;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF12_SDIO;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = GPIO_PIN_2;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF12_SDIO;
+    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+    HAL_NVIC_SetPriority(SDIO_IRQn, 1, 0);
+    HAL_NVIC_EnableIRQ(SDIO_IRQn);
+
+    /* SDIO DMA Init */
+    /* SDIO_RX Init */
+    hdma_sdio_rx.Instance = DMA2_Stream6;
+    hdma_sdio_rx.Init.Channel = DMA_CHANNEL_4;
+    hdma_sdio_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_sdio_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_sdio_rx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_sdio_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_sdio_rx.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_sdio_rx.Init.Mode = DMA_PFCTRL;
+    hdma_sdio_rx.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_sdio_rx.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+    hdma_sdio_rx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+    hdma_sdio_rx.Init.MemBurst = DMA_MBURST_INC4;
+    hdma_sdio_rx.Init.PeriphBurst = DMA_PBURST_INC4;
+    if (HAL_DMA_Init(&hdma_sdio_rx) != HAL_OK) {
+        Error_Handler();
+    }
+
+    __HAL_LINKDMA(hsd,hdmarx,hdma_sdio_rx);
+
+    HAL_NVIC_SetPriority(DMA2_Stream6_IRQn, 1, 0);
+    HAL_NVIC_EnableIRQ(DMA2_Stream6_IRQn);
+
+    /* SDIO_TX Init */
+    hdma_sdio_tx.Instance = DMA2_Stream3;
+    hdma_sdio_tx.Init.Channel = DMA_CHANNEL_4;
+    hdma_sdio_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    hdma_sdio_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_sdio_tx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_sdio_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_sdio_tx.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_sdio_tx.Init.Mode = DMA_PFCTRL;
+    hdma_sdio_tx.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_sdio_tx.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+    hdma_sdio_tx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+    hdma_sdio_tx.Init.MemBurst = DMA_MBURST_INC4;
+    hdma_sdio_tx.Init.PeriphBurst = DMA_PBURST_INC4;
+    if (HAL_DMA_Init(&hdma_sdio_tx) != HAL_OK) {
+        Error_Handler();
+    }
+
+    __HAL_LINKDMA(hsd,hdmatx,hdma_sdio_tx);
+
+    HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 1, 0);
+    HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
+}
+
+void HAL_SD_MspDeInit(SD_HandleTypeDef* hsd)
+{
+    /* Peripheral clock disable */
+    __HAL_RCC_SDIO_CLK_DISABLE();
+
+    /**SDIO GPIO Configuration
+    PC8     ------> SDIO_D0
+    PC9     ------> SDIO_D1
+    PC10     ------> SDIO_D2
+    PC11     ------> SDIO_D3
+    PC12     ------> SDIO_CK
+    PD2     ------> SDIO_CMD
+    */
+    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
+                          |GPIO_PIN_12);
+
+    HAL_GPIO_DeInit(GPIOD, GPIO_PIN_2);
+
+    /* SDIO DMA DeInit */
+    HAL_DMA_DeInit(hsd->hdmarx);
+    HAL_DMA_DeInit(hsd->hdmatx);
+
+    HAL_NVIC_DisableIRQ(SDIO_IRQn);
+}
+
+void DMA2_Stream3_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&hdma_sdio_tx);
+}
+
+void DMA2_Stream6_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(&hdma_sdio_rx);
+}
+
+void SDIO_IRQHandler(void)
+{
+    HAL_SD_IRQHandler(&hsd);
+}
