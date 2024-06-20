@@ -96,5 +96,5 @@ void ak_i2c_uninit(i2c_handle_t i2c)
 
 amk_error_t i2c_send_async(i2c_handle_t i2c, uint8_t addr, const void *data, size_t length)
 {
-    return i2c_send(i2c, addr, data, length, 100);
+    return ak_i2c_send(i2c, addr, data, length, 100);
 }

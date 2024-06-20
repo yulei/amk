@@ -267,19 +267,19 @@ static void st7735_reset(st7735_t *driver)
 static void write_command(st7735_t *driver, uint8_t cmd)
 {
     gpio_write_pin(driver->param.dc, 0);
-    spi_send(driver->spi, &cmd, sizeof(cmd));
+    ak_spi_send(driver->spi, &cmd, sizeof(cmd));
 }
 
 static void write_data(st7735_t *driver, const uint8_t* buff, size_t buff_size)
 {
     gpio_write_pin(driver->param.dc, 1);
-    spi_send(driver->spi, buff, buff_size);
+    ak_spi_send(driver->spi, buff, buff_size);
 }
 
 static void write_data_async(st7735_t *driver, const uint8_t* buff, size_t buff_size)
 {
     gpio_write_pin(driver->param.dc, 1);
-    spi_send_async(driver->spi, buff, buff_size);
+    ak_spi_send_async(driver->spi, buff, buff_size);
 }
 
 static void execute_commands(st7735_t *driver, const uint8_t *addr)
@@ -329,7 +329,7 @@ static void set_address_window(st7735_t *driver, uint8_t x0, uint8_t y0, uint8_t
 void st7735_config(screen_driver_t *driver, screen_driver_param_t *param)
 {
     st7735_driver.param = *param;
-    st7735_driver.spi = spi_init(ST7735_SPI_ID);
+    st7735_driver.spi = ak_spi_init(ST7735_SPI_ID);
 
     driver->data        = &st7735_driver;
     driver->type        = st7735_type;
@@ -415,7 +415,7 @@ void st7735_fill_rect_async(screen_driver_t *lcd, uint32_t x, uint32_t y, uint32
 bool st7735_fill_ready(screen_driver_t *lcd)
 {
     st7735_t *driver = (st7735_t*)lcd->data;
-    return spi_ready(driver->spi);
+    return ak_spi_ready(driver->spi);
 }
 
 void st7735_release(screen_driver_t *lcd)

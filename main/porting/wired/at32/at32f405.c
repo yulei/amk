@@ -154,7 +154,7 @@ static void spi1_init(void)
     spi_init_struct.clock_polarity = SPI_CLOCK_POLARITY_HIGH;
     spi_init_struct.clock_phase = SPI_CLOCK_PHASE_2EDGE;
     spi_init_struct.cs_mode_selection = SPI_CS_SOFTWARE_MODE;
-    spi_init_at32(SPI1, &spi_init_struct);
+    spi_init(SPI1, &spi_init_struct);
 
     spi_enable(SPI1, TRUE);
 }
@@ -199,7 +199,7 @@ static void i2c1_init(void)
     gpio_pin_mux_config(GPIOB, GPIO_PINS_SOURCE9, GPIO_MUX_4);
 
     /* config i2c */
-    i2c_init_at32(hi2c1.i2cx, 0x0F, I2Cx_CLKCTRL);
+    i2c_init(hi2c1.i2cx, 0x0F, I2Cx_CLKCTRL);
     i2c_own_address1_set(hi2c1.i2cx, I2C_ADDRESS_MODE_7BIT, 0);
 
     /* i2c peripheral enable */

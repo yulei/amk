@@ -238,10 +238,10 @@ static void w25qxx_write_page(w25qxx_t *w25qxx, uint32_t address, const uint8_t 
     if (p_write == NULL) {
         w25qxx_sema_init();
     }
-    spi_send_async(w25qxx->config.spi, data, size);
+    ak_spi_send_async(w25qxx->config.spi, data, size);
     tx_semaphore_get(p_write, TX_WAIT_FOREVER);
 #else
-    spi_send(w25qxx->config.spi, data, size);
+    ak_spi_send(w25qxx->config.spi, data, size);
 #endif
     gpio_write_pin(w25qxx->config.cs, 1);
 
@@ -314,10 +314,10 @@ amk_error_t w25qxx_read_bytes(w25qxx_t* w25qxx, uint32_t address, uint8_t *data,
     if (p_read== NULL) {
         w25qxx_sema_init();
     }
-    spi_recv_async(w25qxx->config.spi, data, size);
+    ak_spi_recv_async(w25qxx->config.spi, data, size);
     tx_semaphore_get(p_read, TX_WAIT_FOREVER);
 #else
-    spi_recv(w25qxx->config.spi, data, size);
+    ak_spi_recv(w25qxx->config.spi, data, size);
 #endif
     gpio_write_pin(w25qxx->config.cs, 1);
 
@@ -346,13 +346,13 @@ static uint32_t w25qxx_read_jedec(w25qxx_t *w25qxx)
     uint8_t rx[4] = {0, 0, 0, 0};
     /*uint8_t src;
     src = WQCMD_JEDEC_ID;
-    spi_xfer(w25qxx->config.spi, &src, &rx[0], 1);
+    ak_spi_xfer(w25qxx->config.spi, &src, &rx[0], 1);
     src = WQCMD_DUMMY;
-    spi_xfer(w25qxx->config.spi, &src, &rx[1], 1);
-    spi_xfer(w25qxx->config.spi, &src, &rx[2], 1);
-    spi_xfer(w25qxx->config.spi, &src, &rx[3], 1);
+    ak_spi_xfer(w25qxx->config.spi, &src, &rx[1], 1);
+    ak_spi_xfer(w25qxx->config.spi, &src, &rx[2], 1);
+    ak_spi_xfer(w25qxx->config.spi, &src, &rx[3], 1);
     */
-    spi_xfer(w25qxx->config.spi, &tx[0], &rx[0], 4);
+    ak_spi_xfer(w25qxx->config.spi, &tx[0], &rx[0], 4);
     uint32_t id = (rx[1] << 16) | (rx[2] << 8) | rx[3];
     return id;
 }
@@ -360,7 +360,7 @@ static uint32_t w25qxx_read_jedec(w25qxx_t *w25qxx)
 static uint8_t w25qxx_spi_write(w25qxx_t *w25qxx, uint8_t data)
 {
 	uint8_t	ret;
-    spi_xfer(w25qxx->config.spi, &data, &ret, 1);
+    ak_spi_xfer(w25qxx->config.spi, &data, &ret, 1);
 	return ret;	
 }
 

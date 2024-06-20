@@ -6,6 +6,7 @@
  * 
  */
 
+#include "timer.h"
 #include "amk_printf.h"
 
 #ifndef SD_NAND_DEBUG
@@ -18,6 +19,11 @@
 #define sd_nand_debug(...)
 #endif
 
+#ifdef RTOS_ENABLE
+#define SD_NAND_ASYNC    1
+#endif
+
+
 #define NAND_TIMEOUT    500
 
 extern void Error_Handler(void);
@@ -26,31 +32,44 @@ SD_HandleTypeDef hsd;
 DMA_HandleTypeDef hdma_sdio_rx;
 DMA_HandleTypeDef hdma_sdio_tx;
 
-static uint32_t sd_nand_block_count = 0;
-static uint32_t sd_nand_block_size = 0;
+static HAL_SD_CardInfoTypeDef card_info;
 
 static void refresh_sd_info(void)
 {
-    HAL_SD_CardInfoTypeDef info;
-    HAL_SD_GetCardInfo(&hsd, &info);
-
-    sd_nand_block_count = info.LogBlockNbr;
-    sd_nand_block_size = info.LogBlockSize;
+    HAL_SD_GetCardInfo(&hsd, &card_info);
 
     sd_nand_debug("Card Type:%d, Card Version: %d, Card Class:%d\n",
-        info.CardType, info.CardVersion, info.Class);
-    sd_nand_debug("Real Addr:%d, Block Number: %d, Block Size:%d, Log Block Number:%d, Log Block Size:%d\n",
-        info.RelCardAdd, info.BlockNbr, info.BlockSize, info.LogBlockNbr, info.LogBlockSize);
+        card_info.CardType, card_info.CardVersion, card_info.Class);
+    sd_nand_debug("Relative Addr:%d, Block Number: %d, Block Size:%d, Logic Block Number:%d, Logic Block Size:%d\n",
+        card_info.RelCardAdd, card_info.BlockNbr, card_info.BlockSize, card_info.LogBlockNbr, card_info.LogBlockSize);
 }
+
+#if SD_NAND_ASYNC
+#include "tx_api.h"
+static TX_SEMAPHORE sd_nand_read;
+static TX_SEMAPHORE sd_nand_write;
+static TX_SEMAPHORE* p_read = NULL;
+static TX_SEMAPHORE* p_write = NULL;
+static void sd_nand_async_init(void)
+{
+    if (TX_SUCCESS == tx_semaphore_create(&sd_nand_read, "sd_nand_read", 0)) {
+        p_read = &sd_nand_read;
+    }
+
+    if (TX_SUCCESS == tx_semaphore_create(&sd_nand_write, "sd_nand_write", 0)) {
+        p_write = &sd_nand_write;
+    }
+}
+#endif
 
 uint32_t sd_nand_get_block_count(void)
 {
-    return sd_nand_block_count;
+    return card_info.LogBlockNbr;
 }
 
 uint32_t sd_nand_get_block_size(void)
 {
-    return sd_nand_block_size;
+    return card_info.LogBlockSize;
 }
 
 bool sd_nand_init(void)
@@ -76,48 +95,83 @@ bool sd_nand_init(void)
     refresh_sd_info();
 
     //sd_nand_erase_chip();
+#if SD_NAND_ASYNC
+    if (p_write == NULL || p_read == NULL) {
+        sd_nand_async_init();
+    }
+#endif
     return true;
+}
+
+static bool check_card_state(SD_HandleTypeDef *hsd)
+{
+#define CHECK_STATE_TIMEOUT     1000
+    uint32_t start = timer_read32();
+    while( timer_elapsed32(start) < CHECK_STATE_TIMEOUT) {
+        if (HAL_SD_GetCardState(hsd) == HAL_SD_CARD_TRANSFER) {
+            return true;
+        }
+    }
+    return false;
 }
 
 amk_error_t sd_nand_read_blocks(uint32_t address, uint8_t *buffer, size_t count)
 {
-    sd_nand_debug("SD NAND read blocks: addr=0x%x, size=%d\n", address, count);
-    //if(HAL_SD_ReadBlocks_DMA(&hsd, buffer, address/SD_NAND_BLOCK_SIZE, count/SD_NAND_BLOCK_SIZE) != HAL_OK) {
-    if(HAL_SD_ReadBlocks(&hsd, buffer, address/SD_NAND_BLOCK_SIZE, count/SD_NAND_BLOCK_SIZE, NAND_TIMEOUT) != HAL_OK) {
-        sd_nand_debug("SD NAND read blocks failed: 0x%x\n", HAL_SD_GetError(&hsd));
+    HAL_StatusTypeDef status = HAL_OK; 
+#if SD_NAND_ASYNC
+    status = HAL_SD_ReadBlocks_DMA(&hsd, buffer, address/SD_NAND_BLOCK_SIZE, count/SD_NAND_BLOCK_SIZE);
+    if (status == HAL_OK) {
+        tx_semaphore_get(p_read, TX_WAIT_FOREVER);
+    }
+#else
+    status = HAL_SD_ReadBlocks(&hsd, buffer, address/SD_NAND_BLOCK_SIZE, count/SD_NAND_BLOCK_SIZE, NAND_TIMEOUT);
+#endif
+
+    if (status != HAL_OK) {
+        sd_nand_debug("SD NAND read blocks: addr=0x%x, size=%d\n", address, count);
+        sd_nand_debug("SD NAND read blocks failed: status=0x%x, error=0x%x\n", status, HAL_SD_GetError(&hsd));
         return AMK_ERROR;
     }
 
-    while(HAL_SD_GetCardState(&hsd) != HAL_SD_CARD_TRANSFER)
-    {
+    if (check_card_state(&hsd)) {
+        return AMK_SUCCESS;
     }
 
-    return AMK_SUCCESS;
+    return AMK_ERROR;
 }
 
 amk_error_t sd_nand_write_blocks(uint32_t address, const uint8_t* buffer, size_t count)
 {
-    sd_nand_debug("SD NAND write blocks: addr=0x%x, size=%d\n", address, count);
-    //HAL_StatusTypeDef status = HAL_SD_WriteBlocks_DMA(&hsd, (uint8_t*)buffer, address/SD_NAND_BLOCK_SIZE, count/SD_NAND_BLOCK_SIZE);
-    HAL_StatusTypeDef status = HAL_SD_WriteBlocks(&hsd, (uint8_t*)buffer, address/SD_NAND_BLOCK_SIZE, count/SD_NAND_BLOCK_SIZE, NAND_TIMEOUT);
+    HAL_StatusTypeDef status = HAL_OK; 
+#if SD_NAND_ASYNC
+    status = HAL_SD_WriteBlocks_DMA(&hsd, (uint8_t*)buffer, address/SD_NAND_BLOCK_SIZE, count/SD_NAND_BLOCK_SIZE);
+    if (status == HAL_OK) {
+        tx_semaphore_get(p_write, TX_WAIT_FOREVER);
+    }
+#else
+    status = HAL_SD_WriteBlocks(&hsd, (uint8_t*)buffer, address/SD_NAND_BLOCK_SIZE, count/SD_NAND_BLOCK_SIZE, NAND_TIMEOUT);
+#endif
+
     if(status != HAL_OK) {
+        sd_nand_debug("SD NAND write blocks: addr=0x%x, size=%d\n", address, count);
         sd_nand_debug("SD NAND write blocks failed: status=%d, error=0x%x\n", status, HAL_SD_GetError(&hsd));
         return AMK_ERROR;
     }
 
-    while(HAL_SD_GetCardState(&hsd) != HAL_SD_CARD_TRANSFER)
-    {
+    if (check_card_state(&hsd)) {
+        return AMK_SUCCESS;
     }
-    return AMK_SUCCESS;
+
+    return AMK_ERROR;
 }
 
 amk_error_t sd_nand_erase_chip(void)
 {
-    if (sd_nand_block_count == 0) {
+    if (sd_nand_get_block_count()== 0) {
         refresh_sd_info();
     }
 
-    HAL_StatusTypeDef status = HAL_SD_Erase(&hsd, 0, sd_nand_block_count-1);
+    HAL_StatusTypeDef status = HAL_SD_Erase(&hsd, 0, sd_nand_get_block_count()-1);
     if (status != HAL_OK) {
         sd_nand_debug("SD NAND erase chip failed: status=%d, error=0x%x\n", status, HAL_SD_GetError(&hsd));
         return AMK_ERROR;
@@ -130,7 +184,25 @@ void sd_nand_uninit(void)
     HAL_SD_DeInit(&hsd);
 }
 
-// HAL MSP
+// HAL 
+void HAL_SD_RxCpltCallback(SD_HandleTypeDef *hsd)
+{
+#if SD_NAND_ASYNC
+    if (p_read) {
+        tx_semaphore_put(p_read);
+    }
+#endif
+}
+
+void HAL_SD_TxCpltCallback(SD_HandleTypeDef *hsd)
+{
+#if SD_NAND_ASYNC
+    if (p_write) {
+        tx_semaphore_put(p_write);
+    }
+#endif
+}
+
 void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
 {
     GPIO_InitTypeDef GPIO_InitStruct = {0};

@@ -33,7 +33,7 @@ extern spi_type* hspi1;
 #error "SPI3 not supported"
 #endif
 
-spi_handle_t spi_init(spi_instance_t inst)
+spi_handle_t ak_spi_init(spi_instance_t inst)
 {
 #ifdef USE_SPI1
     if (inst == SPI_INSTANCE_1) return hspi1;
@@ -51,27 +51,27 @@ static uint8_t spi_write_byte(spi_type* spi, uint8_t data)
     return  spi_i2s_data_receive(spi);
 }
 
-bool spi_ready(spi_handle_t spi)
+bool ak_spi_ready(spi_handle_t spi)
 {
     return true;
 }
 
-amk_error_t spi_send_async(spi_handle_t spi, const void *data, size_t length)
+amk_error_t ak_spi_send_async(spi_handle_t spi, const void *data, size_t length)
 {
-    return spi_send(spi, data, length);
+    return ak_spi_send(spi, data, length);
 }
 
-amk_error_t spi_recv_async(spi_handle_t spi, void* data, size_t length)
-{
-    return AMK_SPI_ERROR;
-}
-
-amk_error_t spi_xfer_async(spi_handle_t spi, const void *tx_buffer, void *rx_buffer, size_t length)
+amk_error_t ak_spi_recv_async(spi_handle_t spi, void* data, size_t length)
 {
     return AMK_SPI_ERROR;
 }
 
-amk_error_t spi_send(spi_handle_t spi, const void *data, size_t length)
+amk_error_t ak_spi_xfer_async(spi_handle_t spi, const void *tx_buffer, void *rx_buffer, size_t length)
+{
+    return AMK_SPI_ERROR;
+}
+
+amk_error_t ak_spi_send(spi_handle_t spi, const void *data, size_t length)
 {
     spi_type* hspi = (spi_type*)spi;
     const uint8_t* cur = (const uint8_t*)data;
@@ -82,7 +82,7 @@ amk_error_t spi_send(spi_handle_t spi, const void *data, size_t length)
     return AMK_SUCCESS;
 }
 
-amk_error_t spi_recv(spi_handle_t spi, void* data, size_t length)
+amk_error_t ak_spi_recv(spi_handle_t spi, void* data, size_t length)
 {
     spi_type* hspi = (spi_type*)spi;
     uint8_t* cur = (uint8_t*)data;
@@ -94,7 +94,7 @@ amk_error_t spi_recv(spi_handle_t spi, void* data, size_t length)
     return AMK_SUCCESS;
 }
 
-amk_error_t spi_xfer(spi_handle_t spi, const void *tx_buffer, void *rx_buffer, size_t length)
+amk_error_t ak_spi_xfer(spi_handle_t spi, const void *tx_buffer, void *rx_buffer, size_t length)
 {
     spi_type* hspi = (spi_type*)spi;
     const uint8_t* tx_cur = (const uint8_t*)tx_buffer;
@@ -107,5 +107,5 @@ amk_error_t spi_xfer(spi_handle_t spi, const void *tx_buffer, void *rx_buffer, s
     return AMK_SUCCESS;
 }
 
-void spi_uninit(spi_handle_t spi)
+void ak_spi_uninit(spi_handle_t spi)
 {}

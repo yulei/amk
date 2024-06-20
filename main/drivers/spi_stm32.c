@@ -30,7 +30,7 @@ extern SPI_HandleTypeDef hspi2;
 extern SPI_HandleTypeDef hspi3;
 #endif
 
-spi_handle_t spi_init(spi_instance_t inst)
+spi_handle_t ak_spi_init(spi_instance_t inst)
 {
 #ifdef USE_SPI1
     if (inst == SPI_INSTANCE_1) return &hspi1;
@@ -47,16 +47,16 @@ spi_handle_t spi_init(spi_instance_t inst)
     return NULL;
 }
 
-bool spi_ready(spi_handle_t spi)
+bool ak_spi_ready(spi_handle_t spi)
 {
     SPI_HandleTypeDef* hspi = (SPI_HandleTypeDef*)spi;
     return hspi->State == HAL_SPI_STATE_READY; 
 }
 
-amk_error_t spi_send_async(spi_handle_t spi, const void *data, size_t length)
+amk_error_t ak_spi_send_async(spi_handle_t spi, const void *data, size_t length)
 {
     SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)spi;
-    if (spi_ready(spi)) {
+    if (ak_spi_ready(spi)) {
         HAL_StatusTypeDef status = HAL_SPI_Transmit_DMA(hspi, (uint8_t *)data, length);
         if (status != HAL_OK) {
             spi_debug("Failed async spi transmit, error=%d\n", status);
@@ -68,10 +68,10 @@ amk_error_t spi_send_async(spi_handle_t spi, const void *data, size_t length)
     }
 }
 
-amk_error_t spi_recv_async(spi_handle_t spi, void* data, size_t length)
+amk_error_t ak_spi_recv_async(spi_handle_t spi, void* data, size_t length)
 {
     SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)spi;
-    if (spi_ready(spi)) {
+    if (ak_spi_ready(spi)) {
         HAL_StatusTypeDef status = HAL_SPI_Receive_DMA(hspi, (uint8_t*)data, length);
         if (status != HAL_OK) {
             return AMK_SPI_ERROR;
@@ -82,10 +82,10 @@ amk_error_t spi_recv_async(spi_handle_t spi, void* data, size_t length)
     }
 }
 
-amk_error_t spi_xfer_async(spi_handle_t spi, const void *tx_buffer, void *rx_buffer, size_t length)
+amk_error_t ak_spi_xfer_async(spi_handle_t spi, const void *tx_buffer, void *rx_buffer, size_t length)
 {
     SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)spi;
-    if (spi_ready(spi)) {
+    if (ak_spi_ready(spi)) {
         HAL_StatusTypeDef status = HAL_SPI_TransmitReceive_DMA(hspi, (uint8_t*)tx_buffer, (uint8_t*)rx_buffer, length);
         if (status != HAL_OK) {
             return AMK_SPI_ERROR;
@@ -96,7 +96,7 @@ amk_error_t spi_xfer_async(spi_handle_t spi, const void *tx_buffer, void *rx_buf
     }
 }
 
-amk_error_t spi_send(spi_handle_t spi, const void *data, size_t length)
+amk_error_t ak_spi_send(spi_handle_t spi, const void *data, size_t length)
 {
     SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)spi;
     HAL_StatusTypeDef status = HAL_SPI_Transmit(hspi, (uint8_t *)data, length, TIMEOUT_DEFAULT);
@@ -108,17 +108,17 @@ amk_error_t spi_send(spi_handle_t spi, const void *data, size_t length)
     return AMK_SUCCESS;
 }
 
-amk_error_t spi_recv(spi_handle_t spi, void* data, size_t length)
+amk_error_t ak_spi_recv(spi_handle_t spi, void* data, size_t length)
 {
     #if 1
     SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)spi;
-    if (spi_ready(spi)) {
+    if (ak_spi_ready(spi)) {
         HAL_StatusTypeDef status = HAL_SPI_Receive_DMA(hspi, (uint8_t *)data, length);
         if (status != HAL_OK) {
             spi_debug("Failed async spi transmit, error=%d\n", status);
             return AMK_SPI_ERROR;
         }
-        while( !spi_ready(spi));
+        while( !ak_spi_ready(spi));
         return AMK_SUCCESS;
     } else {
         return AMK_SPI_BUSY;
@@ -136,7 +136,7 @@ amk_error_t spi_recv(spi_handle_t spi, void* data, size_t length)
     #endif
 }
 
-amk_error_t spi_xfer(spi_handle_t spi, const void *tx_buffer, void *rx_buffer, size_t length)
+amk_error_t ak_spi_xfer(spi_handle_t spi, const void *tx_buffer, void *rx_buffer, size_t length)
 {
     SPI_HandleTypeDef *hspi = (SPI_HandleTypeDef *)spi;
     HAL_StatusTypeDef status = HAL_SPI_TransmitReceive(hspi, (uint8_t*)tx_buffer, (uint8_t*)rx_buffer, length, TIMEOUT_DEFAULT);
@@ -148,15 +148,5 @@ amk_error_t spi_xfer(spi_handle_t spi, const void *tx_buffer, void *rx_buffer, s
     return AMK_SUCCESS;
 }
 
-void spi_uninit(spi_handle_t spi)
+void ak_spi_uninit(spi_handle_t spi)
 {}
-
-// SPI DMA callback
-//void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
-//{
-//}
-
-//void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
-//{
-//    spi_debug("SPI DMA error:\n", hspi->ErrorCode);
-//}

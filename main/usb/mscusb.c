@@ -29,9 +29,9 @@
 #endif
 
 #ifdef SD_NAND_ENABLE
-#define DISK_BLOCK_NUM      (DISK_TOTAL_SIZE/DISK_BLOCK_SIZE)
-#else
 #define DISK_BLOCK_NUM      sd_nand_get_block_count()
+#else
+#define DISK_BLOCK_NUM      (DISK_TOTAL_SIZE/DISK_BLOCK_SIZE)
 #endif
 
 #if defined(W25QXX_ENABLE)
