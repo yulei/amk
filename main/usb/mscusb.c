@@ -54,7 +54,7 @@ void msc_init(void)
     sd_nand_init();
 #else
     w25qxx_config.cs = FLASH_CS;
-    w25qxx_config.spi = spi_init(W25QXX_SPI_ID);
+    w25qxx_config.spi = ak_spi_init(W25QXX_SPI_ID);
     w25qxx = w25qxx_init(&w25qxx_config);
 #endif
 
