@@ -48,6 +48,10 @@ DMA_HandleTypeDef hdma_usart1_tx;
 UART_HandleTypeDef huart2;
 #endif
 
+#ifdef USE_UART6
+UART_HandleTypeDef huart6;
+#endif
+
 RTC_HandleTypeDef hrtc;
 
 #ifdef TINYUSB_ENABLE
@@ -328,6 +332,23 @@ static void MX_USART2_UART_Init(void)
 }
 #endif
 
+#ifdef USE_UART6
+static void MX_USART6_UART_Init(void)
+{
+    huart6.Instance = USART6;
+    huart6.Init.BaudRate = 115200;
+    huart6.Init.WordLength = UART_WORDLENGTH_8B;
+    huart6.Init.StopBits = UART_STOPBITS_1;
+    huart6.Init.Parity = UART_PARITY_NONE;
+    huart6.Init.Mode = UART_MODE_TX_RX;
+    huart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+    huart6.Init.OverSampling = UART_OVERSAMPLING_16;
+    if (HAL_UART_Init(&huart6) != HAL_OK) {
+        Error_Handler();
+    }
+}
+#endif
+
 #if defined(TINYUSB_ENABLE)
 static void MX_USB_DEVICE_Init(void)
 {
@@ -416,6 +437,10 @@ void custom_board_init(void)
 
 #ifdef USE_UART2
     MX_USART2_UART_Init();
+#endif
+
+#ifdef USE_UART6
+    MX_USART6_UART_Init();
 #endif
 
 #ifdef DYNAMIC_CONFIGURATION

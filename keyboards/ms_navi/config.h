@@ -112,7 +112,7 @@
 #define AMK_BTM_SENS_DEFAULT    30
 #define AMK_APC_SENS_DEFAULT    30
 #define AMK_APC_NOISE_DEFAULT   30
-#define APC_KEY_COUNT           3
+#define APC_KEY_COUNT           5
 #define DIGITAL_POT_INDEX       0x33
 #endif
 //#define FORCE_8K
