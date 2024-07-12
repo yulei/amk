@@ -310,6 +310,12 @@ void tud_cdc_rx_cb(uint8_t itf)
 
 #ifdef HAL_HOST_ENABLE
 
+__attribute__((weak)) void usbh_process_raw(void* data, uint32_t size) {}
+__attribute__((weak)) bool usbh_send_report(uint32_t report_type, const void* data, uint32_t size) 
+{
+    return amk_usb_itf_send_report(report_type, data, size);
+}
+
 void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
 {
     HID_HandleTypeDef *phid = (HID_HandleTypeDef *) phost->pActiveClass->pData;
@@ -319,7 +325,7 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
     // read data out
     static uint8_t buf[64];
     uint8_t *p_buf = NULL;
-    uint8_t report_id = 0;
+    uint8_t report_id = HID_REPORT_ID_UNKNOWN;
     uint8_t report_size = 0;
     memset(&buf[0], 0, sizeof(buf));
     switch(itf->type) {
@@ -382,7 +388,8 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
         } break;
     case HID_RAW:
         USBH_HID_FifoRead(&itf->fifo, buf, itf->report_size);
-        amk_printf("HID Event: should never get data from RAW interface\n");
+        amk_printf("HID Event: received data from RAW interface\n");
+        usbh_process_raw(buf, itf->report_size);
         break;
     default:
         USBH_HID_FifoRead(&itf->fifo, buf, itf->report_size);
@@ -395,6 +402,6 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
         return;
     }
 
-    amk_usb_itf_send_report(report_id, p_buf, report_size);
+    usbh_send_report(report_id, p_buf, report_size);
 }
 #endif

@@ -106,14 +106,19 @@ void USBH_UpdateLedState(USBH_HandleTypeDef *phost)
         }
     }
 }
+
 /*
  * Background task
  */
+
+__attribute__((weak)) void usbh_process_kb(bool connected) {}
 void MX_USB_HOST_Process(void)
 {
     /* USB Host Background task */
     USBH_Process(&hUsbHostHS);
     USBH_UpdateLedState(&hUsbHostHS);
+
+    usbh_process_kb(Appli_state == APPLICATION_READY);
 }
 /*
  * user callback definition

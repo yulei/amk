@@ -124,3 +124,5 @@ uint16_t USBH_HID_FifoRead(FIFO_TypeDef *f, void *buf, uint16_t  nbytes);
 uint16_t USBH_HID_FifoWrite(FIFO_TypeDef *f, void *buf, uint16_t nbytes);
 
 void USBH_HID_EventCallback(USBH_HandleTypeDef *phost);
+
+USBH_StatusTypeDef USBH_HID_SendRaw(USBH_HandleTypeDef *phost, uint8_t *data, uint8_t size, uint8_t itf);

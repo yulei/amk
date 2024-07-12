@@ -28,6 +28,7 @@ families = {
     'GD32E5':       0x47444535,     # GDE5
     'ADA':          0xADA52840,
     'STM32U5':      0x53545535,     # STU5
+    'HOSTF4':       0x484F5354,     # HOST
 }
 
 INFO_FILE = "/INFO_UF2.TXT"
