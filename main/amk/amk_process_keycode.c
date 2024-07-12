@@ -220,7 +220,7 @@ static void toggle_dks(void)
 {
     uint8_t config = amk_get_ms_config();
     uint8_t new_state = ((config&AMK_DKS_MASK) >> AMK_DKS_OFFSET) > 0 ? 0 : 1;
-    config = (config & ~AMK_DKS_MASK) | ((new_state&AMK_DKS_MASK) << AMK_DKS_OFFSET);
+    config = ((config & ~AMK_DKS_MASK) | ((new_state << AMK_DKS_OFFSET)&AMK_DKS_MASK));
     amk_set_ms_config(config);
 }
 

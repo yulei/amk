@@ -34,12 +34,12 @@ void apc_matrix_update_interval_at(uint8_t profile, uint32_t row, uint32_t col);
 void apc_matrix_update_sensitivity(void);
 
 #define AMK_POLE_OFFSET     (0)
-#define AMK_PROFILE_OFFSET  (1)     // 2 bits
+#define AMK_PROFILE_OFFSET  (1)                             // 2 bits
 #define AMK_DKS_OFFSET      (3)
 
-#define AMK_POLE_MASK       (1 << 0)
-#define AMK_PROFILE_MASK    (3 << 1)     // 2 bits
-#define AMK_DKS_MASK        (1 << 3)
+#define AMK_POLE_MASK       (1 << AMK_POLE_OFFSET)
+#define AMK_PROFILE_MASK    (3 << AMK_PROFILE_OFFSET)       // 2 bits
+#define AMK_DKS_MASK        (1 << AMK_DKS_OFFSET)
 
 void amk_set_ms_config(uint8_t config);
 uint8_t amk_get_ms_config(void);
