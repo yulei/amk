@@ -24,7 +24,9 @@
 #include "usb_host.h"
 #include "usbh_core.h"
 #include "usbh_hid_multi.h"
+#include "usbh_msc.h"
 #include "usb_led.h"
+#include "usb_common.h"
 #include "amk_printf.h"
 
 /* USER CODE BEGIN Includes */
@@ -50,6 +52,15 @@ ApplicationTypeDef Appli_state = APPLICATION_IDLE;
  */
 /* USER CODE BEGIN 0 */
 static void USBH_UpdateLedState(USBH_HandleTypeDef *phost);
+USBH_HandleTypeDef* MX_USB_HOST_Handle(void)
+{
+  return &hUsbHostHS;
+}
+bool MX_USB_HOST_MSC_Ready(void)
+{
+  return Appli_state == APPLICATION_READY;
+}
+
 /* USER CODE END 0 */
 
 /*
@@ -83,9 +94,17 @@ void MX_USB_HOST_Init(void)
   {
     Error_Handler();
   }
-  if (USBH_RegisterClass(&hUsbHostHS, USBH_HID_CLASS) != USBH_OK)
-  {
-    Error_Handler();
+  if (usb_setting & USB_MSC_BIT) {
+    if (USBH_RegisterClass(&hUsbHostHS, USBH_MSC_CLASS) != USBH_OK)
+    {
+      Error_Handler();
+    }
+
+  } else {
+    if (USBH_RegisterClass(&hUsbHostHS, USBH_HID_CLASS) != USBH_OK)
+    {
+      Error_Handler();
+    }
   }
   if (USBH_Start(&hUsbHostHS) != USBH_OK)
   {
@@ -111,15 +130,18 @@ void USBH_UpdateLedState(USBH_HandleTypeDef *phost)
  * Background task
  */
 
-__attribute__((weak)) void usbh_process_kb(bool connected) {}
+__attribute__((weak)) void usbh_process_kb(bool connected, USBH_HandleTypeDef *phost) {}
 void MX_USB_HOST_Process(void)
 {
     /* USB Host Background task */
     USBH_Process(&hUsbHostHS);
     USBH_UpdateLedState(&hUsbHostHS);
 
-    usbh_process_kb(Appli_state == APPLICATION_READY);
+    usbh_process_kb(Appli_state == APPLICATION_READY, &hUsbHostHS);
 }
+
+
+__attribute__((weak)) void usbh_enumeration_done(USBH_HandleTypeDef *phost) {}
 /*
  * user callback definition
  */
@@ -130,6 +152,7 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
   {
   case HOST_USER_SELECT_CONFIGURATION:
   amk_printf("Host select configuration\n");
+  usbh_enumeration_done(phost);
   break;
 
   case HOST_USER_DISCONNECTION:

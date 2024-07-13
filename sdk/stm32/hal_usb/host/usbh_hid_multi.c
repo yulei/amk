@@ -668,7 +668,7 @@ USBH_StatusTypeDef USBH_HID_SendRaw(USBH_HandleTypeDef *phost, uint8_t *data, ui
     if (itf < phid->itf_num) {
         HID_InterfaceTypeDef *pitf = &phid->itfs[itf];
         status = USBH_InterruptSendData(phost, data, size, pitf->out_pipe);
-        amk_printf("send raw data to: itf=%d, size=%d, out_pipe=%d\n", itf, size, pitf->out_pipe);
+        //amk_printf("send raw data to: itf=%d, size=%d, out_pipe=%d\n", itf, size, pitf->out_pipe);
     }
 
     return status;
