@@ -50,6 +50,8 @@ DRESULT disk_read(BYTE pdrv, BYTE *buff, LBA_t sector, UINT count)
     }
 #elif defined(SD_NAND_ENABLE)
     sd_nand_read_blocks(sector*DISK_SECTOR_SIZE, buff, count*DISK_SECTOR_SIZE);
+#elif defined(HOST_MSC_ENABLE)
+
 #else
     w25qxx_read_bytes(w25qxx_current(), sector*DISK_SECTOR_SIZE, buff, count*DISK_SECTOR_SIZE);
 #endif
@@ -70,6 +72,8 @@ DRESULT disk_write(BYTE pdrv, const BYTE *buff, LBA_t sector, UINT count)
     }
 #elif defined(SD_NAND_ENABLE)
     sd_nand_write_blocks(sector*DISK_SECTOR_SIZE, buff, count*DISK_SECTOR_SIZE);
+#elif defined(HOST_MSC_ENABLE)
+
 #else
     for(UINT i = 0; i < count; i++) {
         w25qxx_write_sector(w25qxx_current(), (sector+i)*DISK_SECTOR_SIZE, buff+i*DISK_SECTOR_SIZE, DISK_SECTOR_SIZE);

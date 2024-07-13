@@ -10,6 +10,8 @@
 #include "qspi.h"
 #elif defined(SD_NAND_ENABLE)
 #include "sd_nand.h"
+#elif defined(HOST_MSC_ENABLE)
+#include "host_msc.h"
 #else
 #include "w25qxx.h"
 #endif
@@ -24,12 +26,16 @@
 
 #ifdef SD_NAND_ENABLE
 #define DISK_BLOCK_SIZE     sd_nand_get_block_size()
+#elif defined(HOST_MSC_ENABLE)
+#define DISK_BLOCK_SIZE     host_msc_get_block_size()
 #else
 #define DISK_BLOCK_SIZE     (4096)
 #endif
 
 #ifdef SD_NAND_ENABLE
 #define DISK_BLOCK_NUM      sd_nand_get_block_count()
+#elif defined(HOST_MSC_ENABLE)
+#define DISK_BLOCK_NUM      host_msc_get_block_count()
 #else
 #define DISK_BLOCK_NUM      (DISK_TOTAL_SIZE/DISK_BLOCK_SIZE)
 #endif
@@ -52,6 +58,8 @@ void msc_init(void)
     qspi_init(0);
 #elif defined(SD_NAND_ENABLE)
     sd_nand_init();
+#elif defined(HOST_MSC_ENABLE)
+    host_msc_init();
 #else
     w25qxx_config.cs = FLASH_CS;
     w25qxx_config.spi = ak_spi_init(W25QXX_SPI_ID);
@@ -67,6 +75,8 @@ void msc_erase(void)
     qspi_erase_chip();
 #elif defined(SD_NAND_ENABLE)
     sd_nand_erase_chip();
+#elif defined(HOST_MSC_ENABLE)
+    host_msc_erase_chip();
 #else
     w25qxx_erase_chip(w25qxx);
 #endif
@@ -154,6 +164,9 @@ int32_t tud_msc_read10_cb(uint8_t lun, uint32_t lba, uint32_t offset, void* buff
     qspi_read_sector(lba*DISK_BLOCK_SIZE, buffer, bufsize);
 #elif defined(SD_NAND_ENABLE)
     sd_nand_read_blocks(lba*DISK_BLOCK_SIZE, buffer, bufsize);
+#elif defined(HOST_MSC_ENABLE)
+    host_msc_read_blocks(lba, buffer, bufsize);
+
 #else
     w25qxx_read_sector(w25qxx, lba*DISK_BLOCK_SIZE, buffer, bufsize);
 #endif
@@ -171,6 +184,8 @@ int32_t tud_msc_write10_cb(uint8_t lun, uint32_t lba, uint32_t offset, uint8_t* 
     qspi_write_sector(lba*DISK_BLOCK_SIZE, buffer, bufsize);
 #elif defined(SD_NAND_ENABLE)
     sd_nand_write_blocks(lba*DISK_BLOCK_SIZE, buffer, bufsize);
+#elif defined(HOST_MSC_ENABLE)
+    host_msc_write_blocks(lba, buffer, bufsize);
 #else
     w25qxx_write_sector(w25qxx, lba*DISK_BLOCK_SIZE, buffer, bufsize);
 #endif

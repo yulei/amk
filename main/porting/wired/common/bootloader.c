@@ -17,7 +17,7 @@ void bootloader_jump(void)
     //amk_keymap_reset();
     //amk_keymap_macro_reset();
 
-#if !defined(USB_HOST_ENABLE) && !defined(GD32E10X)
+#if (!defined(USB_HOST_ENABLE)&&!defined(HAL_HOST_ENABLE)) && !defined(GD32E10X)
     usb_connect(0);
 #endif
     wait_ms(10);

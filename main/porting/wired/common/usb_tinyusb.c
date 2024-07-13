@@ -320,7 +320,7 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
 {
     HID_HandleTypeDef *phid = (HID_HandleTypeDef *) phost->pActiveClass->pData;
     HID_InterfaceTypeDef *itf = &phid->itfs[phid->current];
-    amk_printf("HID event, itf=%d, ready=%d, size=%d, type=%d\n", phid->current, itf->data_ready, itf->report_size, itf->type);
+    //amk_printf("HID event, itf=%d, ready=%d, size=%d, type=%d\n", phid->current, itf->data_ready, itf->report_size, itf->type);
 
     // read data out
     static uint8_t buf[64];
@@ -387,8 +387,9 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
         }
         } break;
     case HID_RAW:
+        report_id = HID_REPORT_ID_VIAL;
         USBH_HID_FifoRead(&itf->fifo, buf, itf->report_size);
-        amk_printf("HID Event: received data from RAW interface\n");
+        //amk_printf("HID Event: received data from RAW interface\n");
         usbh_process_raw(buf, itf->report_size);
         break;
     default:
