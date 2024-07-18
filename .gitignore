@@ -1,7 +1,6 @@
 .vscode/
 .vs/
 build/
-core/
 keyboards/amkbd/
 sdk/nrf5/nRF5_SDK_*
 sdk/stm32/misc/*

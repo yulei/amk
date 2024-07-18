@@ -94,13 +94,16 @@ void MX_USB_HOST_Init(void)
   {
     Error_Handler();
   }
+#ifdef HOST_MSC_ENABLE
   if (usb_setting & USB_MSC_BIT) {
     if (USBH_RegisterClass(&hUsbHostHS, USBH_MSC_CLASS) != USBH_OK)
     {
       Error_Handler();
     }
 
-  } else {
+  } else 
+#endif
+  {
     if (USBH_RegisterClass(&hUsbHostHS, USBH_HID_CLASS) != USBH_OK)
     {
       Error_Handler();
@@ -130,18 +133,18 @@ void USBH_UpdateLedState(USBH_HandleTypeDef *phost)
  * Background task
  */
 
-__attribute__((weak)) void usbh_process_kb(bool connected, USBH_HandleTypeDef *phost) {}
+__attribute__((weak)) void usbh_task_kb(USBH_HandleTypeDef *phost) {}
 void MX_USB_HOST_Process(void)
 {
     /* USB Host Background task */
     USBH_Process(&hUsbHostHS);
     USBH_UpdateLedState(&hUsbHostHS);
 
-    usbh_process_kb(Appli_state == APPLICATION_READY, &hUsbHostHS);
+    usbh_task_kb(&hUsbHostHS);
 }
 
 
-__attribute__((weak)) void usbh_enumeration_done(USBH_HandleTypeDef *phost) {}
+__attribute__((weak)) void usbh_user_process_kb(USBH_HandleTypeDef *phost, uint8_t id) {}
 /*
  * user callback definition
  */
@@ -152,7 +155,6 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
   {
   case HOST_USER_SELECT_CONFIGURATION:
   amk_printf("Host select configuration\n");
-  usbh_enumeration_done(phost);
   break;
 
   case HOST_USER_DISCONNECTION:
@@ -173,6 +175,8 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
   default:
   break;
   }
+
+  usbh_user_process_kb(phost, id);
   /* USER CODE END CALL_BACK_1 */
 }
 

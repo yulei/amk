@@ -391,7 +391,7 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
         USBH_HID_FifoRead(&itf->fifo, buf, itf->report_size);
         //amk_printf("HID Event: received data from RAW interface\n");
         usbh_process_raw(buf, itf->report_size);
-        break;
+        return;
     default:
         USBH_HID_FifoRead(&itf->fifo, buf, itf->report_size);
         amk_printf("HID Event: unknown interface\n");
