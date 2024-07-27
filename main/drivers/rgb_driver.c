@@ -18,6 +18,7 @@
 #include "is31fl3741.h"
 #include "is31fl3746.h"
 #include "is31fl3729.h"
+#include "is31fl3193.h"
 
 #ifndef RGB_DRIVER_DEBUG
 #define RGB_DRIVER_DEBUG 1
@@ -563,6 +564,10 @@ static bool rd_3729_flush(rgb_driver_t *driver)
 }
 #endif
 
+#ifdef USE_3193
+RGB_DRIVER_DEF(is31fl3193)
+#endif
+
 bool rgb_driver_available(rgb_driver_type_t type)
 {
     switch(type) {
@@ -585,6 +590,8 @@ bool rgb_driver_available(rgb_driver_type_t type)
         case RGB_DRIVER_IS31FL3746:
             return true;    // TODO
         case RGB_DRIVER_IS31FL3729:
+            return true;    // TODO
+        case RGB_DRIVER_IS31FL3193:
             return true;    // TODO
         default:
             break;
@@ -665,6 +672,11 @@ rgb_driver_t* rgb_driver_create(rgb_device_t *device, uint8_t index)
             driver->flush = rd_3236_flush;
             driver->uninit = rd_3236_uninit;
         #endif
+            break;
+#endif
+#ifdef USE_3193
+        case RGB_DRIVER_IS31FL3193:
+        RGB_DRIVER_INIT(is31fl3193)
             break;
 #endif
 #ifdef USE_3741

@@ -41,6 +41,7 @@ typedef enum {
     RGB_DRIVER_IS31FL3741,
     RGB_DRIVER_IS31FL3746,
     RGB_DRIVER_IS31FL3729,
+    RGB_DRIVER_IS31FL3193,
     RGB_DRIVER_MAX,
 } rgb_driver_type_t;
 
