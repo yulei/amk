@@ -38,7 +38,9 @@ extern void custom_board_task(void);
 #define USB_PREEMPTION_THRESHOLD    (USB_THREAD_PRIO)
 static CHAR usb_stack[USB_STACK_SIZE];// __attribute__((section(".ccmram")));
 
+#ifndef AUX_ACTIVE_COUNT
 #define AUX_ACTIVE_COUNT            10
+#endif
 #define MAIN_STACK_SIZE             6144
 #define MAIN_THREAD_PRIO            11
 #define MAIN_PREEMPTION_THRESHOLD   (MAIN_THREAD_PRIO)

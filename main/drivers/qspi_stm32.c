@@ -74,8 +74,8 @@ extern void Error_Handler(void);
 #define W25Q128JV_FSR_QE                ((uint8_t)0x02)    /*!< quad enable */
 
 #ifdef RTOS_ENABLE
-//#define QSPI_ASYNC  1
-#define QSPI_ASYNC  0
+#define QSPI_ASYNC  1
+//#define QSPI_ASYNC  0
 #else
 #define QSPI_ASYNC  0
 #endif
