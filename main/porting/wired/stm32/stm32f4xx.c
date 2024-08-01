@@ -48,6 +48,14 @@ DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 #endif
 
+#ifdef WDT_ENABLE
+IWDG_HandleTypeDef hiwdg;
+void wdt_refresh(void)
+{
+    HAL_IWDG_Refresh(&hiwdg);
+}
+#endif
+
 void SystemClock_Config(void)
 {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -115,6 +123,18 @@ static void MX_RTC_Init(void)
         Error_Handler();
     }
 }
+
+#ifdef WDT_ENABLE
+static void MX_IWDG_Init(void)
+{
+    hiwdg.Instance = IWDG;
+    hiwdg.Init.Prescaler = IWDG_PRESCALER_32;
+    hiwdg.Init.Reload = 1999;
+    if (HAL_IWDG_Init(&hiwdg) != HAL_OK) {
+        Error_Handler();
+    }
+}
+#endif
 
 #ifdef USE_I2C1
 
@@ -367,9 +387,16 @@ void custom_board_init(void)
     MX_ADC1_Init();
 #endif
 
+#ifdef WDT_ENABLE
+    MX_IWDG_Init();
+#endif
+
     usb_port_init();
 }
 
 void custom_board_task(void)
 {
+#ifdef WDT_ENABLE
+    HAL_IWDG_Refresh(&hiwdg);
+#endif
 }

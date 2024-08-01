@@ -64,6 +64,8 @@
 #elif defined(AT32F405)
     #define system_core_clock SystemCoreClock 
     #include "at32f402_405.h"
+#elif defined(LPC55xx)
+    #include "peripherals.h"
 #else
 #error "unsupport platform"
 #endif

@@ -262,6 +262,8 @@ struct apc_key
     uint32_t count;
     uint32_t value;
     bool active;
+
+    uint32_t ticks; // last on state
 };
 
 
@@ -525,6 +527,7 @@ void apc_matrix_init(void)
                 apc_matrix[profile][row][col].count = 0;
                 apc_matrix[profile][row][col].value = 0;
                 apc_matrix[profile][row][col].active = false;
+                apc_matrix[profile][row][col].ticks = 0;
                 //apc_matrix[profile][row][col].dks_disable = false;
 
                 apc_matrix_update_interval_at(profile, row, col);
@@ -581,6 +584,7 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t org_value, bool* val
                 apcrt_debug("APC from OFF to ON, value=%ld, min=%ld, max=%ld, cur_max=%ld, last=%ld, apc=%ld\n", value, key->min, key->max, cur_max, key->last, apc);
                 key->last = value;
                 key->state = APC_KEY_ON;
+                key->ticks = timer_read32();
             }
         } else {
             if (value > cur_max || (key->active&&key->rt_cont)) {
@@ -592,6 +596,7 @@ bool apc_matrix_update(uint32_t row, uint32_t col, uint32_t org_value, bool* val
                     apcrt_debug("RT from OFF to ON, value=%ld, min=%ld, max=%ld, cur_max=%ld, last=%ld, apc=%ld, rt=%ld\n", value, key->min, key->max, cur_max, key->last, apc, rt);
                     key->last = value;
                     key->state = APC_KEY_ON;
+                    key->ticks = timer_read32();
                 }
             }
         }
@@ -723,4 +728,20 @@ void amk_udpate_ms_config(void)
 {
     uint8_t config = eeconfig_read_ms_config();
     parse_ms_config(config);
+}
+
+bool apc_matrix_get_key(uint32_t row, uint32_t col, bool* on, uint32_t* value, uint32_t* ticks)
+{
+    if (row >= MATRIX_ROWS || col >= MATRIX_COLS) {
+        apcrt_debug("Failed to get key, (%d, %d) out of bound\n", row, col);
+        return false;
+    }
+
+    struct apc_key *key = &apc_matrix[amk_apcrt_profile][row][col];
+
+    *on = key->state == APC_KEY_ON;
+    *value = key->value / key->count;
+    *ticks = key->ticks;
+
+    return true;
 }

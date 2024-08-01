@@ -11,6 +11,7 @@
 #include "led.h"
 #include "timer.h"
 #include "amk_apc.h"
+#include "amk_snaptap.h"
 
 #include "amk_gpio.h"
 #include "amk_utils.h"
@@ -431,6 +432,10 @@ void matrix_init_custom(void)
 #endif
 
     apc_matrix_init();
+
+#ifdef AMK_SNAPTAP_ENABLE
+    snaptap_init();
+#endif
 #ifdef MS_MATRIX_SLOW_START
     ms_last_ticks = timer_read32();
 #endif
@@ -499,8 +504,12 @@ DWT_PROFILE_START(adc_matrix);
         }
     }
 
+#ifdef AMK_SNAPTAP_ENABLE
+    snaptap_process(raw);
+#endif
 #ifdef ADC_MATRIX_STAT 
     DWT_PROFILE_STAT(adc_matrix, "ADC MATRIX profile: interverl=%d, count=%d\n", ADC_MATRIX_COUNT);
 #endif    
+
     return changed;
 }

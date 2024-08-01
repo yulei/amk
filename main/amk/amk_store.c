@@ -83,6 +83,40 @@ void amk_store_get_dks(uint8_t row, uint8_t col, void* dks)
     }
 }
 
+void amk_store_set_snaptap(uint8_t index, void* snaptap)
+{
+    uint8_t *addr = (uint8_t *) (index*sizeof(struct amk_snaptap) + AMK_STORE_SNAPTAP_START);
+    struct amk_snaptap* p = (struct amk_snaptap*)snaptap;
+    eeprom_write_byte(addr++, p->first_row);
+    eeprom_write_byte(addr++, p->first_col);
+    eeprom_write_byte(addr++, p->second_row);
+    eeprom_write_byte(addr++, p->second_col);
+    eeprom_write_byte(addr++, p->mode);
+}
+
+void amk_store_get_snaptap(uint8_t index, void* snaptap)
+{
+    uint8_t *addr = (uint8_t *) (index*sizeof(struct amk_snaptap) + AMK_STORE_SNAPTAP_START);
+    struct amk_snaptap* p = (struct amk_snaptap*)snaptap;
+    p->first_row = eeprom_read_byte(addr++);
+    p->first_col = eeprom_read_byte(addr++);
+    p->second_row = eeprom_read_byte(addr++);
+    p->second_col = eeprom_read_byte(addr++);
+    p->mode = eeprom_read_byte(addr++);
+}
+
+void amk_store_set_snaptap_config(uint8_t config)
+{
+    uint8_t *addr = (uint8_t *) (AMK_STORE_SNAPTAP_CONFIG_START);
+    eeprom_write_byte(addr, config);
+}
+
+uint8_t amk_store_get_snaptap_config()
+{
+    uint8_t *addr = (uint8_t *) (AMK_STORE_SNAPTAP_CONFIG_START);
+    return eeprom_read_byte(addr);
+}
+
 #ifdef RGB_ENABLE
 void amk_store_set_led(uint8_t index, const struct amk_led* led)
 {
@@ -138,7 +172,9 @@ void amk_store_init(void)
 
 void eeconfig_init_custom(void)
 {
-    amk_printf("AMK STORE init: apc:%d, rt:%d, dks:%d-%d\n", AMK_STORE_APC_START, AMK_STORE_RT_START, AMK_STORE_DKS_START, AMK_STORE_DKS_END);
+    amk_printf("AMK STORE init: apc:%d, rt:%d, dks:%d, snaptap%d-%d\n", 
+            AMK_STORE_APC_START, AMK_STORE_RT_START, AMK_STORE_DKS_START, AMK_STORE_SNAPTAP_START,
+            AMK_STORE_ANA_END);
 
     #ifdef RGB_ENABLE
     amk_printf("AMK STORE RGB: start:%d, end:%d\n", AMK_STORE_LED_START, AMK_STORE_LED_END);

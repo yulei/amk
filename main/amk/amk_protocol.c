@@ -17,6 +17,9 @@
 #ifdef AMK_DKS_ENABLE
 #include "amk_dks.h"
 #endif
+#ifdef AMK_SNAPTAP_ENABLE
+#include "amk_snaptap.h"
+#endif
 #ifdef MSC_ENABLE
 #include "anim_file.h"
 #endif
@@ -181,6 +184,83 @@ void amk_protocol_process(uint8_t *msg, uint8_t length)
                 msg[2] = amk_protocol_fail;
                 ap_debug("AMK Protocol: set dks failed\n");
             }
+        }
+        break;
+#endif
+#ifdef AMK_SNAPTAP_ENABLE
+    case amk_protocol_get_snaptap:
+        // msg[2]: index
+        {
+            uint8_t index = msg[2];
+            if (index < AMK_SNAPTAP_COUNT) {
+                msg[2] = amk_protocol_ok;
+                struct amk_snaptap snaptap = {0};
+                amk_store_get_snaptap(index, &snaptap);
+                msg[3] = snaptap.first_row;
+                msg[4] = snaptap.first_col;
+                msg[5] = snaptap.second_row;
+                msg[6] = snaptap.second_col;
+                msg[7] = snaptap.mode;
+                ap_debug("AMK Protocol: get snaptap at index(%d),first(%d,%d),second(%d,%d),mode(%d)\n", index, 
+                        msg[3], msg[4], msg[5], msg[6], msg[7]);
+            } else {
+                msg[2] = amk_protocol_fail;
+                ap_debug("AMK Protocol: get snaptap at %d failed\n", index);
+            }
+        }
+        break;
+    case amk_protocol_set_snaptap:
+        {
+            // msg[2]: index, msg[3]: first row, msg[4]: first column, msg[5]: second row, msg[6]: second column, msg[7]: mode
+            uint8_t index = msg[2];
+
+            if (index < AMK_SNAPTAP_COUNT) {
+                msg[2] = amk_protocol_ok;
+                struct amk_snaptap snaptap = {0};
+                snaptap.first_row = msg[3];
+                snaptap.first_col = msg[4];
+                snaptap.second_row = msg[5];
+                snaptap.second_col = msg[6];
+                snaptap.mode = msg[7];
+                amk_store_set_snaptap(index, &snaptap);
+
+                snaptap_pair_t pair;
+                pair.first.row = snaptap.first_row;
+                pair.first.col = snaptap.first_col;
+                pair.second.row = snaptap.second_row;
+                pair.second.col = snaptap.second_col;
+                pair.mode = snaptap.mode;
+
+                snaptap_update(index, &pair);
+                ap_debug("AMK Protocol: set snaptap at index(%d),first(%d,%d),second(%d,%d),mode(%d)\n", index, 
+                        msg[3], msg[4], msg[5], msg[6], msg[7]);
+            } else {
+                msg[2] = amk_protocol_fail;
+                ap_debug("AMK Protocol: set snaptap at %d failed\n", index);
+            }
+        }
+        break;
+    case amk_protocol_get_snaptap_count:
+        {
+            msg[2] = amk_protocol_ok;
+            msg[3] = AMK_SNAPTAP_COUNT;
+            ap_debug("AMK Protocol: get snaptap count (%d) \n", msg[3]);
+        }
+        break;
+    case amk_protocol_get_snaptap_config:
+        {
+            msg[2] = amk_protocol_ok;
+            msg[3] = amk_store_get_snaptap_config();
+            ap_debug("AMK Protocol: get snaptap config (%d) \n", msg[3]);
+        }
+        break;
+    case amk_protocol_set_snaptap_config:
+        {
+            uint8_t config = msg[2];
+            msg[2] = amk_protocol_ok;
+            amk_store_set_snaptap_config(config);
+            ap_debug("AMK Protocol: set snaptap config (%d) \n", msg[3]);
+            snaptap_update_config(config);
         }
         break;
 #endif

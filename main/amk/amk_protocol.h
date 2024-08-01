@@ -65,6 +65,11 @@ enum {
     amk_protocol_set_rgb_matrix_mode    = 46,
     amk_protocol_get_rgb_matrix_led     = 47,
     amk_protocol_set_rgb_matrix_led     = 48,
+    amk_protocol_get_snaptap            = 49,
+    amk_protocol_set_snaptap            = 50,
+    amk_protocol_get_snaptap_count      = 51,
+    amk_protocol_get_snaptap_config     = 52,
+    amk_protocol_set_snaptap_config     = 53,
 };
 
 void amk_protocol_process(uint8_t *msg, uint8_t length);

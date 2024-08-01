@@ -83,8 +83,10 @@ ifeq (cms, $(strip $(AMK_CUSTOM_MATRIX)))
 
 	SRCS += $(MAIN_DIR)/amk/amk_apc.c
 	SRCS += $(MAIN_DIR)/amk/amk_dks.c
+	SRCS += $(MAIN_DIR)/amk/amk_snaptap.c
 	APP_DEFS += -DAMK_APC_ENABLE
 	APP_DEFS += -DAMK_DKS_ENABLE
+	APP_DEFS += -DAMK_SNAPTAP_ENABLE
 endif
 
 ifeq (cec, $(strip $(AMK_CUSTOM_MATRIX)))
@@ -93,8 +95,10 @@ ifeq (cec, $(strip $(AMK_CUSTOM_MATRIX)))
 
 	SRCS += $(MAIN_DIR)/amk/amk_apc.c
 	SRCS += $(MAIN_DIR)/amk/amk_dks.c
+	SRCS += $(MAIN_DIR)/amk/amk_snaptap.c
 	APP_DEFS += -DAMK_APC_ENABLE
 	APP_DEFS += -DAMK_DKS_ENABLE
+	APP_DEFS += -DAMK_SNAPTAP_ENABLE
 endif
 
 ifeq (yes, $(strip $(NOFRENDO_ENABLE)))

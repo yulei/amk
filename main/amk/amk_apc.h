@@ -33,6 +33,9 @@ void apc_matrix_update_interval(void);
 void apc_matrix_update_interval_at(uint8_t profile, uint32_t row, uint32_t col);
 void apc_matrix_update_sensitivity(void);
 
+bool apc_matrix_get_key(uint32_t row, uint32_t col, bool* on, uint32_t* value, uint32_t* ticks);
+
+
 #define AMK_POLE_OFFSET     (0)
 #define AMK_PROFILE_OFFSET  (1)                             // 2 bits
 #define AMK_DKS_OFFSET      (3)

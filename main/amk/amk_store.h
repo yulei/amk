@@ -10,7 +10,6 @@
 
 #include "amk_eeprom.h"
 
-
 #define AMK_STORE_START                 (AMK_EEPROM_SIZE-EECONFIG_RESERVED_COUNT)
 #define AMK_STORE_APCRT_PROFILE_COUNT   4
 
@@ -30,15 +29,38 @@ struct amk_dks {
     uint16_t    keys[AMK_DKS_KEY_MAX];
 } __attribute__((packed));
 
-#define AMK_STORE_DKS_END   (AMK_STORE_DKS_START + MATRIX_ROWS*MATRIX_COLS*sizeof(struct amk_dks))
-
-_Static_assert(AMK_STORE_DKS_END < AMK_EEPROM_SIZE, "EEPROM: dks out of range");
-
 void amk_store_set_dks(uint8_t row, uint8_t col, void* dks);
 void amk_store_get_dks(uint8_t row, uint8_t col, void* dks);
 
+#define AMK_STORE_SNAPTAP_START (AMK_STORE_DKS_START + MATRIX_ROWS*MATRIX_COLS*sizeof(struct amk_dks))
+
+#ifndef AMK_SNAPTAP_COUNT
+#define AMK_SNAPTAP_COUNT   8
+#endif
+struct amk_snaptap {
+    uint8_t first_row;
+    uint8_t first_col;
+    uint8_t second_row;
+    uint8_t second_col;
+    uint8_t mode;
+} __attribute__((packed));
+
+void amk_store_set_snaptap(uint8_t index, void* snaptap);
+void amk_store_get_snaptap(uint8_t index, void* snaptap);
+
+#define AMK_STORE_SNAPTAP_CONFIG_START (AMK_STORE_SNAPTAP_START + AMK_SNAPTAP_COUNT*sizeof(struct amk_snaptap))
+
+void amk_store_set_snaptap_config(uint8_t config);
+uint8_t amk_store_get_snaptap_config(void);
+
+#define AMK_STORE_SNAPTAP_END (AMK_STORE_SNAPTAP_CONFIG_START+1)
+
+#define AMK_STORE_ANA_END AMK_STORE_SNAPTAP_END
+_Static_assert(AMK_STORE_ANA_END < AMK_EEPROM_SIZE, "EEPROM: analog out of range");
+
 #ifdef RGB_ENABLE
-#define AMK_STORE_LED_START (AMK_STORE_DKS_END)
+#define AMK_STORE_LED_START (AMK_STORE_ANA_END)
+
 struct amk_led {
     uint8_t hue;
     uint8_t sat;

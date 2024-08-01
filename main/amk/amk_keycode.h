@@ -25,4 +25,7 @@ enum amk_keycode {
 #ifdef AMK_DKS_ENABLE
     DKS_TOGGLE,                     //  toggle dks on/off
 #endif
+#ifdef AMK_SNAPTAP_ENABLE
+    SNAPTAP_TOGGLE,                 //  toggle snaptap on/off
+#endif
 };

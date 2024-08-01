@@ -1,0 +1,628 @@
+<?xml version="1.0" encoding= "UTF-8" ?>
+<configuration name="LPC5516" xsi:schemaLocation="http://mcuxpresso.nxp.com/XSD/mex_configuration_15 http://mcuxpresso.nxp.com/XSD/mex_configuration_15.xsd" uuid="59e53443-373f-4299-b27e-59cb27651c35" version="15" xmlns="http://mcuxpresso.nxp.com/XSD/mex_configuration_15" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <common>
+      <processor>LPC5516</processor>
+      <package>LPC5516JBD64</package>
+      <mcu_data>ksdk2_0</mcu_data>
+      <cores selected="cm33_core0">
+         <core name="Cortex-M33" id="cm33_core0" description="M33 core"/>
+      </cores>
+      <description></description>
+   </common>
+   <preferences>
+      <validate_boot_init_only>true</validate_boot_init_only>
+      <generate_extended_information>false</generate_extended_information>
+      <generate_code_modified_registers_only>false</generate_code_modified_registers_only>
+      <custom_copyright>
+         <text></text>
+         <enabled>true</enabled>
+      </custom_copyright>
+      <update_include_paths>true</update_include_paths>
+      <generate_registers_defines>false</generate_registers_defines>
+      <project_links>
+         <project_link path="../../../mcux-sdk"/>
+      </project_links>
+   </preferences>
+   <tools>
+      <pins name="Pins" version="15.0" enabled="true" update_project_code="true">
+         <generated_project_files>
+            <file path="board/pin_mux.c" update_enabled="true"/>
+            <file path="board/pin_mux.h" update_enabled="true"/>
+         </generated_project_files>
+         <pins_profile>
+            <processor_version>15.0.1</processor_version>
+            <external_user_signals>
+               <routingDetailsColumns/>
+               <properties/>
+            </external_user_signals>
+         </pins_profile>
+         <functions_list>
+            <function name="BOARD_InitPins">
+               <description>Configures pin routing and optionally pin electrical features.</description>
+               <options>
+                  <callFromInitBoot>true</callFromInitBoot>
+                  <coreID>cm33_core0</coreID>
+                  <enableClock>true</enableClock>
+               </options>
+               <dependencies>
+                  <dependency resourceType="Peripheral" resourceId="ADC0" description="Peripheral ADC0 signals are routed in the Pins Tool, but the peripheral is not initialized in the Peripherals Tool." problem_level="1" source="Pins:BOARD_InitPins">
+                     <feature name="initialized" evaluation="equal">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="Peripheral" resourceId="SWD" description="Peripheral SWD signals are routed in the Pins Tool, but the peripheral is not initialized in the Peripherals Tool." problem_level="1" source="Pins:BOARD_InitPins">
+                     <feature name="initialized" evaluation="equal">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="Peripheral" resourceId="SUPPLY" description="Peripheral SUPPLY signals are routed in the Pins Tool, but the peripheral is not initialized in the Peripherals Tool." problem_level="1" source="Pins:BOARD_InitPins">
+                     <feature name="initialized" evaluation="equal">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="Peripheral" resourceId="SYSCON" description="Peripheral SYSCON signals are routed in the Pins Tool, but the peripheral is not initialized in the Peripherals Tool." problem_level="1" source="Pins:BOARD_InitPins">
+                     <feature name="initialized" evaluation="equal">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="Peripheral" resourceId="USBHSH" description="Peripheral USBHSH signals are routed in the Pins Tool, but the peripheral is not initialized in the Peripherals Tool." problem_level="1" source="Pins:BOARD_InitPins">
+                     <feature name="initialized" evaluation="equal">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="Peripheral" resourceId="RTC" description="Peripheral RTC signals are routed in the Pins Tool, but the peripheral is not initialized in the Peripherals Tool." problem_level="1" source="Pins:BOARD_InitPins">
+                     <feature name="initialized" evaluation="equal">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="SWComponent" resourceId="platform.drivers.common" description="Pins initialization requires the COMMON Driver in the project." problem_level="2" source="Pins:BOARD_InitPins">
+                     <feature name="enabled" evaluation="equal" configuration="cm33_core0">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="SWComponent" resourceId="platform.drivers.lpc_gpio" description="Pins initialization requires the LPC_GPIO Driver in the project." problem_level="2" source="Pins:BOARD_InitPins">
+                     <feature name="enabled" evaluation="equal" configuration="cm33_core0">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+               </dependencies>
+               <pins>
+                  <pin peripheral="ADC0" signal="CH, 11" pin_num="4" pin_signal="PIO1_0/FC0_RTS_SCL_SSEL1/CT_INP2/SCT_GPI4/PLU_OUT3/ADC0_11"/>
+                  <pin peripheral="GPIO" signal="PIO0, 1" pin_num="2" pin_signal="PIO0_1/FC3_CTS_SDA_SSEL0/CT_INP0/SCT_GPI1/CMP0_OUT/SECURE_GPIO0_1"/>
+                  <pin peripheral="GPIO" signal="PIO0, 7" pin_num="1" pin_signal="PIO0_7/FC3_RTS_SCL_SSEL1/FC5_SCK/FC1_SCK/SECURE_GPIO0_7"/>
+                  <pin peripheral="GPIO" signal="PIO0, 16" pin_num="7" pin_signal="PIO0_16/FC4_TXD_SCL_MISO_WS/CLKOUT/CT_INP4/SECURE_GPIO0_16/ADC0_8"/>
+                  <pin peripheral="GPIO" signal="PIO0, 17" pin_num="3" pin_signal="PIO0_17/FC4_SSEL2/SCT_GPI7/SCT0_OUT0/PLU_IN2/SECURE_GPIO0_17"/>
+                  <pin peripheral="SWD" signal="SWCLK" pin_num="6" pin_signal="PIO0_11/FC6_RXD_SDA_MOSI_DATA/CTIMER2_MAT2/FREQME_GPIO_CLK_A/SWCLK/SECURE_GPIO0_11/ADC0_9"/>
+                  <pin peripheral="SWD" signal="SWDIO" pin_num="5" pin_signal="PIO0_12/FC3_TXD_SCL_MISO_WS/FREQME_GPIO_CLK_B/SCT_GPI7/SWDIO/FC6_TXD_SCL_MISO_WS/SECURE_GPIO0_12/ADC0_10"/>
+                  <pin peripheral="SUPPLY" signal="FB" pin_num="29" pin_signal="FB"/>
+                  <pin peripheral="SUPPLY" signal="LX" pin_num="31" pin_signal="LX"/>
+                  <pin peripheral="SUPPLY" signal="VBAT_DCDC" pin_num="32" pin_signal="VBAT_DCDC32"/>
+                  <pin peripheral="SUPPLY" signal="VBAT_PMU" pin_num="33" pin_signal="VBAT_PMU"/>
+                  <pin peripheral="SUPPLY" signal="VDD" pin_num="8" pin_signal="VDD8"/>
+                  <pin peripheral="SUPPLY" signal="VDD" pin_num="16" pin_signal="VDD16"/>
+                  <pin peripheral="SUPPLY" signal="VDD" pin_num="43" pin_signal="VDD43"/>
+                  <pin peripheral="SUPPLY" signal="VDD" pin_num="54" pin_signal="VDD54"/>
+                  <pin peripheral="SUPPLY" signal="VDD_PMU" pin_num="28" pin_signal="VDD_PMU"/>
+                  <pin peripheral="SUPPLY" signal="VSS_DCDC" pin_num="30" pin_signal="VSS_DCDC30"/>
+                  <pin peripheral="ADC0" signal="VDDA" pin_num="9" pin_signal="VDDA"/>
+                  <pin peripheral="ADC0" signal="VREFP" pin_num="10" pin_signal="VREFP"/>
+                  <pin peripheral="ADC0" signal="VSSA" pin_num="11" pin_signal="VSSA"/>
+                  <pin peripheral="SYSCON" signal="XTALIN" pin_num="20" pin_signal="XTAL32M_P"/>
+                  <pin peripheral="SYSCON" signal="XTALOUT" pin_num="19" pin_signal="XTAL32M_N"/>
+                  <pin peripheral="USBHSH" signal="USB_DM" pin_num="24" pin_signal="USB1_DM"/>
+                  <pin peripheral="USBHSH" signal="USB_DP" pin_num="23" pin_signal="USB1_DP"/>
+                  <pin peripheral="USBHSH" signal="USB_VDD" pin_num="27" pin_signal="USB1_3V3"/>
+                  <pin peripheral="USBHSH" signal="USB_VSS" pin_num="22" pin_signal="USB1_VSS22"/>
+                  <pin peripheral="USBHSH" signal="USB_VSS" pin_num="26" pin_signal="USB1_VSS26"/>
+                  <pin peripheral="RTC" signal="RTCXOUT" pin_num="35" pin_signal="XTAL32K_N"/>
+                  <pin peripheral="RTC" signal="RTCXIN" pin_num="34" pin_signal="XTAL32K_P"/>
+                  <pin peripheral="USBHSH" signal="USB_VBUS" pin_num="25" pin_signal="USB1_VBUS"/>
+               </pins>
+            </function>
+         </functions_list>
+      </pins>
+      <clocks name="Clocks" version="13.0" enabled="true" update_project_code="true">
+         <generated_project_files>
+            <file path="board/clock_config.c" update_enabled="true"/>
+            <file path="board/clock_config.h" update_enabled="true"/>
+         </generated_project_files>
+         <clocks_profile>
+            <processor_version>15.0.1</processor_version>
+         </clocks_profile>
+         <clock_configurations>
+            <clock_configuration name="BOARD_BootClockRUN" id_prefix="" prefix_user_defined="false">
+               <description></description>
+               <options/>
+               <dependencies>
+                  <dependency resourceType="PinSignal" resourceId="RTC.OSC_IN" description="&apos;OSC_IN&apos; (Pins tool id: RTC.OSC_IN, Clocks tool id: RTC.RTCXIN) needs to be routed" problem_level="1" source="Clocks:BOARD_BootClockRUN">
+                     <feature name="routed" evaluation="">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="PinSignal" resourceId="RTC.OSC_IN" description="&apos;OSC_IN&apos; (Pins tool id: RTC.OSC_IN, Clocks tool id: RTC.RTCXIN) needs to have &apos;INPUT&apos; direction" problem_level="1" source="Clocks:BOARD_BootClockRUN">
+                     <feature name="direction" evaluation="">
+                        <data>INPUT</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="PinSignal" resourceId="RTC.OSC_OUT" description="&apos;OSC_OUT&apos; (Pins tool id: RTC.OSC_OUT, Clocks tool id: RTC.RTCXOUT) needs to be routed" problem_level="1" source="Clocks:BOARD_BootClockRUN">
+                     <feature name="routed" evaluation="">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="PinSignal" resourceId="RTC.OSC_OUT" description="&apos;OSC_OUT&apos; (Pins tool id: RTC.OSC_OUT, Clocks tool id: RTC.RTCXOUT) needs to have &apos;OUTPUT&apos; direction" problem_level="1" source="Clocks:BOARD_BootClockRUN">
+                     <feature name="direction" evaluation="">
+                        <data>OUTPUT</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="PinSignal" resourceId="SYSCON.XTALIN" description="&apos;XTALIN&apos; (Pins tool id: SYSCON.XTALIN, Clocks tool id: SYSCON.XTALIN) needs to be routed" problem_level="1" source="Clocks:BOARD_BootClockRUN">
+                     <feature name="routed" evaluation="">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="PinSignal" resourceId="SYSCON.XTALIN" description="&apos;XTALIN&apos; (Pins tool id: SYSCON.XTALIN, Clocks tool id: SYSCON.XTALIN) needs to have &apos;INPUT&apos; direction" problem_level="1" source="Clocks:BOARD_BootClockRUN">
+                     <feature name="direction" evaluation="">
+                        <data>INPUT</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="PinSignal" resourceId="SYSCON.XTALOUT" description="&apos;XTALOUT&apos; (Pins tool id: SYSCON.XTALOUT, Clocks tool id: SYSCON.XTALOUT) needs to be routed" problem_level="1" source="Clocks:BOARD_BootClockRUN">
+                     <feature name="routed" evaluation="">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="PinSignal" resourceId="SYSCON.XTALOUT" description="&apos;XTALOUT&apos; (Pins tool id: SYSCON.XTALOUT, Clocks tool id: SYSCON.XTALOUT) needs to have &apos;OUTPUT&apos; direction" problem_level="1" source="Clocks:BOARD_BootClockRUN">
+                     <feature name="direction" evaluation="">
+                        <data>OUTPUT</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="SWComponent" resourceId="platform.drivers.common" description="Clocks initialization requires the COMMON Driver in the project." problem_level="2" source="Clocks:BOARD_BootClockRUN">
+                     <feature name="enabled" evaluation="equal" configuration="cm33_core0">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="SWComponent" resourceId="platform.drivers.power" description="Clocks initialization requires the POWER Driver in the project." problem_level="2" source="Clocks:BOARD_BootClockRUN">
+                     <feature name="enabled" evaluation="equal" configuration="cm33_core0">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="SWComponent" resourceId="platform.drivers.clock" description="Clocks initialization requires the CLOCK Driver in the project." problem_level="2" source="Clocks:BOARD_BootClockRUN">
+                     <feature name="enabled" evaluation="equal" configuration="cm33_core0">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+               </dependencies>
+               <clock_sources>
+                  <clock_source id="RTC.XTAL32K.outFreq" value="32.768 kHz" locked="false" enabled="true"/>
+                  <clock_source id="SYSCON.XTAL32M.outFreq" value="16 MHz" locked="false" enabled="true"/>
+               </clock_sources>
+               <clock_outputs>
+                  <clock_output id="ASYNCADC_clock.outFreq" value="37.5 MHz" locked="false" accuracy=""/>
+                  <clock_output id="FRO_12MHz_clock.outFreq" value="12 MHz" locked="false" accuracy=""/>
+                  <clock_output id="HSUSB1_32K_clock.outFreq" value="32.768 kHz" locked="false" accuracy=""/>
+                  <clock_output id="OSC32KHZ_clock.outFreq" value="32.768 kHz" locked="false" accuracy=""/>
+                  <clock_output id="System_clock.outFreq" value="150 MHz" locked="false" accuracy=""/>
+                  <clock_output id="USB1_PHY_clock.outFreq" value="16 MHz" locked="false" accuracy=""/>
+               </clock_outputs>
+               <clock_settings>
+                  <setting id="PLL0_Mode" value="Normal" locked="false"/>
+                  <setting id="PLL1_Mode" value="Normal" locked="false"/>
+                  <setting id="ADCCLKDIV_HALT" value="Enable" locked="false"/>
+                  <setting id="ENABLE_CLKIN_ENA" value="Enabled" locked="false"/>
+                  <setting id="ENABLE_PLL_USB_OUT" value="Enabled" locked="false"/>
+                  <setting id="ENABLE_SYSTEM_CLK_OUT" value="Enabled" locked="false"/>
+                  <setting id="PMC_PDRUNCFG_PDEN_XTAL32K_CFG" value="Power_up" locked="false"/>
+                  <setting id="RTC.RTCOSC32KSEL.sel" value="RTC.XTAL32K" locked="false"/>
+                  <setting id="SYSCON.ADCCLKDIV.scale" value="4" locked="true"/>
+                  <setting id="SYSCON.ADCCLKSEL.sel" value="SYSCON.MAINCLKSELB" locked="false"/>
+                  <setting id="SYSCON.MAINCLKSELA.sel" value="SYSCON.CLK_IN_EN" locked="false"/>
+                  <setting id="SYSCON.MAINCLKSELB.sel" value="SYSCON.PLL0_BYPASS" locked="false"/>
+                  <setting id="SYSCON.PLL0CLKSEL.sel" value="SYSCON.CLK_IN_EN" locked="false"/>
+                  <setting id="SYSCON.PLL0M_MULT.scale" value="150" locked="true"/>
+                  <setting id="SYSCON.PLL0N_DIV.scale" value="8" locked="true"/>
+                  <setting id="SYSCON.PLL0_PDEC.scale" value="2" locked="true"/>
+               </clock_settings>
+               <called_from_default_init>true</called_from_default_init>
+            </clock_configuration>
+         </clock_configurations>
+      </clocks>
+      <dcdx name="DCDx" version="3.0" enabled="false" update_project_code="true">
+         <generated_project_files/>
+         <dcdx_profile>
+            <processor_version>N/A</processor_version>
+         </dcdx_profile>
+         <dcdx_configurations/>
+      </dcdx>
+      <periphs name="Peripherals" version="14.0" enabled="true" update_project_code="true">
+         <dependencies>
+            <dependency resourceType="SWComponent" resourceId="platform.drivers.lpc_gpio" description="GPIO Driver is not found in the toolchain/IDE project. The project will not compile!" problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.drivers.lpc_gpio" description="An unsupported version of the GPIO Driver in the toolchain/IDE project. Required: ${required_value}, actual: ${actual_value}. The project might not compile correctly." problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="equivalent">
+                  <data type="Version">2.1.1</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.drivers.lpadc" description="LPADC Driver is not found in the toolchain/IDE project. The project will not compile!" problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.drivers.lpadc" description="An unsupported version of the LPADC Driver in the toolchain/IDE project. Required: ${required_value}, actual: ${actual_value}. The project might not compile correctly." problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="greaterOrEqual">
+                  <data type="Version" maxValue="2.8.9">2.8.1</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="middleware.usb.common_header" description="USB Common Header is not found in the toolchain/IDE project. The project will not compile!" problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="middleware.usb.common_header" description="An unsupported version of the USB Common Header in the toolchain/IDE project. Required: ${required_value}, actual: ${actual_value}. The project might not compile correctly." problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="compatible">
+                  <data type="Version" maxValue="2.9.9">2.8.0</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="Tool" resourceId="Clocks" description="The Clocks tool is required by the Peripherals tool, but it is disabled." problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data>true</data>
+               </feature>
+            </dependency>
+         </dependencies>
+         <generated_project_files>
+            <file path="board/peripherals.c" update_enabled="true"/>
+            <file path="board/peripherals.h" update_enabled="true"/>
+            <file path="source/generated/usb_device_composite.c" update_enabled="true"/>
+            <file path="source/generated/usb_device_composite.h" update_enabled="true"/>
+            <file path="source/generated/usb_device_config.h" update_enabled="true"/>
+            <file path="source/generated/usb_device_descriptor.c" update_enabled="true"/>
+            <file path="source/generated/usb_device_descriptor.h" update_enabled="true"/>
+            <file path="source/usb_device_interface_0_hid_keyboard.c" update_enabled="true"/>
+         </generated_project_files>
+         <peripherals_profile>
+            <processor_version>15.0.1</processor_version>
+         </peripherals_profile>
+         <functional_groups>
+            <functional_group name="BOARD_InitPeripherals" uuid="f40f089a-30dc-498f-99b9-d9892ccb829e" called_from_default_init="true" id_prefix="" core="cm33_core0">
+               <description></description>
+               <options/>
+               <dependencies>
+                  <dependency resourceType="ClockOutput" resourceId="ASYNCADC_clock" description="ASYNCADC clock is inactive." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="frequency" evaluation="greaterThan">
+                        <data type="Frequency" unit="Hz">0</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="SWComponent" resourceId="middleware.usb.device_controller_ip3511hs" description="&quot;USB Device IP3511HS Controller Driver(HS)&quot; component is missing in the project." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="enabled" evaluation="equal">
+                        <data type="Boolean">true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="SWComponent" resourceId="platform.drivers.power" description="Component Power is missing in the project." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="enabled" evaluation="equal">
+                        <data type="Boolean">true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="SWComponent" resourceId="platform.drivers.common" description="&quot;Common&quot; driver is missing in the project." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="enabled" evaluation="equal">
+                        <data type="Boolean">true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="ClockOutput" resourceId="USB1_PHY_clock" description="Function Clock (USB1_PHY_clock) is inactive and USB module will not work." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="frequency" evaluation="greaterThan">
+                        <data type="Frequency" unit="Hz">0</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="ClockOutput" resourceId="OSC32KHZ_clock" description="Function Clock(32KHz) (OSC32KHZ_clock) is inactive and USB module will not work." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="frequency" evaluation="greaterThan">
+                        <data type="Frequency" unit="Hz">0</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="PeripheralUnifiedSignal" resourceId="USBHSH.usb_vbus" description="Signal USB_VBUS is not routed." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="routed" evaluation="equal">
+                        <data type="Boolean">true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="SWComponent" resourceId="middleware.usb.device.hid.external" description="&quot;USB device HID&quot; driver is missing in the project." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="enabled" evaluation="equal">
+                        <data type="Boolean">true</data>
+                     </feature>
+                  </dependency>
+               </dependencies>
+               <instances>
+                  <instance name="NVIC" uuid="febd85f2-17bf-4d86-91f0-05efd872b20b" type="nvic" type_id="nvic_57b5eef3774cc60acaede6f5b8bddc67" mode="general" peripheral="NVIC" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="nvic">
+                        <array name="interrupt_table"/>
+                        <array name="interrupts"/>
+                     </config_set>
+                  </instance>
+                  <instance name="GPIO" uuid="de924e02-bf5d-438c-a9f3-e22623ca82ee" type="lpc_gpio" type_id="lpc_gpio_8c9ab9b3668a514c1f4609fe43001865" mode="GPIO" peripheral="GPIO" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="lpc_gpio"/>
+                  </instance>
+                  <instance name="ADC0" uuid="dd51647d-b5d7-45ff-9e8b-702c86c3c383" type="lpadc" type_id="lpadc_62bb06ef5585c73eb81e242721fa56b2" mode="LPADC" peripheral="ADC0" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="fsl_lpadc" quick_selection="QS_LPADC_1">
+                        <struct name="lpadcConfig">
+                           <setting name="clockSource" value="AsynchronousFunctionClock"/>
+                           <setting name="clockSourceFreq" value="ClocksTool_DefaultInit"/>
+                           <setting name="enableInDozeMode" value="true"/>
+                           <setting name="conversionAverageMode" value="kLPADC_ConversionAverage1"/>
+                           <setting name="offsetCalibration" value="no"/>
+                           <setting name="autoCalibrate" value="false"/>
+                           <setting name="enableAnalogPreliminary" value="false"/>
+                           <setting name="powerUpDelay" value="0x80"/>
+                           <setting name="referenceVoltageSource" value="kLPADC_ReferenceVoltageAlt2"/>
+                           <setting name="powerLevelMode" value="kLPADC_PowerLevelAlt1"/>
+                           <setting name="triggerPriorityPolicy" value="kLPADC_ConvPreemptImmediatelyNotAutoResumed"/>
+                           <setting name="enableConvPause" value="false"/>
+                           <setting name="convPauseDelay" value="0"/>
+                           <setting name="FIFO0Watermark" value="0"/>
+                           <setting name="FIFO1Watermark" value="0"/>
+                           <setting name="FIFO0WatermarkDMA" value="false"/>
+                           <setting name="FIFO1WatermarkDMA" value="false"/>
+                        </struct>
+                        <array name="lpadcConvCommandConfig"/>
+                        <array name="lpadcConvTriggerConfig"/>
+                        <struct name="IRQ_cfg">
+                           <set name="interrupt_type">
+                              <selected/>
+                           </set>
+                           <setting name="enable_irq" value="false"/>
+                           <struct name="adc_interrupt">
+                              <setting name="IRQn" value="ADC0_IRQn"/>
+                              <setting name="enable_interrrupt" value="enabled"/>
+                              <setting name="enable_priority" value="false"/>
+                              <setting name="priority" value="0"/>
+                              <setting name="enable_custom_name" value="false"/>
+                           </struct>
+                        </struct>
+                     </config_set>
+                  </instance>
+                  <instance name="MPU" uuid="bbac8ec4-d98c-4f8e-8083-b9c17620ccda" type="mpu_utility" type_id="mpu_utility_bc3ea1f6add76edb6050f698d423d163" mode="MPU" peripheral="MPU" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="mpu_init">
+                        <setting name="mpuInit" value="disabled"/>
+                     </config_set>
+                  </instance>
+                  <instance name="USBHSD" uuid="d8638210-b701-45a3-aafb-8007ae7a3069" type="usb" type_id="usb_cbf31fb9a3cef21890d93e737c3d2690" mode="device" peripheral="USBHSD" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="deviceSetting">
+                        <setting name="vendor_id" value="0x1FC9"/>
+                        <setting name="product_id" value="0x0090"/>
+                        <setting name="manufacturer_string" value="NXP"/>
+                        <setting name="product_string" value="Product"/>
+                        <setting name="self_powered" value="false"/>
+                        <setting name="max_power" value="100"/>
+                        <array name="interfaces">
+                           <struct name="0">
+                              <setting name="interface_class" value="kClassHid"/>
+                              <struct name="setting_hid" quick_selection="QS_INTERFACE_HID_KEYBOARD">
+                                 <setting name="interface_name" value="HID Keyboard"/>
+                                 <setting name="subclass" value="kSubclassBootInterface"/>
+                                 <setting name="protocol" value="kProtocolKeyboard"/>
+                                 <setting name="implementation" value="kImplementationKeyboard"/>
+                                 <array name="endpoints_settings">
+                                    <struct name="0">
+                                       <setting name="setting_name" value="Default"/>
+                                       <array name="endpoints">
+                                          <struct name="0">
+                                             <setting name="direction" value="kIn"/>
+                                             <setting name="transfer_type" value="kInterrupt"/>
+                                             <setting name="synchronization" value="kNoSynchronization"/>
+                                             <setting name="usage" value="kData"/>
+                                             <setting name="max_packet_size_fs" value="k8"/>
+                                             <setting name="polling_interval_fs" value="4"/>
+                                             <setting name="max_packet_size_hs" value="k8"/>
+                                             <setting name="polling_interval_hs" value="6"/>
+                                             <setting name="bRefresh" value="0"/>
+                                             <setting name="bSynchAddress" value="NoSynchronization"/>
+                                          </struct>
+                                       </array>
+                                    </struct>
+                                 </array>
+                                 <array name="report_descriptor">
+                                    <struct name="0">
+                                       <setting name="type" value="kUsage_Page"/>
+                                       <setting name="value" value="0x01"/>
+                                       <setting name="remarks" value="Usage Page (Generic Desktop)"/>
+                                    </struct>
+                                    <struct name="1">
+                                       <setting name="type" value="kUsage"/>
+                                       <setting name="value" value="0x06"/>
+                                       <setting name="remarks" value="Usage (Keyboard)"/>
+                                    </struct>
+                                    <struct name="2">
+                                       <setting name="type" value="kCollection"/>
+                                       <setting name="value" value="0x01"/>
+                                       <setting name="remarks" value="Collection (Application)"/>
+                                    </struct>
+                                    <struct name="3">
+                                       <setting name="type" value="kReport_Size"/>
+                                       <setting name="value" value="0x01"/>
+                                       <setting name="remarks" value="Report Size (1U)"/>
+                                    </struct>
+                                    <struct name="4">
+                                       <setting name="type" value="kReport_Count"/>
+                                       <setting name="value" value="0x08"/>
+                                       <setting name="remarks" value="Report Count (8U)"/>
+                                    </struct>
+                                    <struct name="5">
+                                       <setting name="type" value="kUsage_Page"/>
+                                       <setting name="value" value="0x07"/>
+                                       <setting name="remarks" value="Usage Page(Key Codes)"/>
+                                    </struct>
+                                    <struct name="6">
+                                       <setting name="type" value="kUsage_Minimum"/>
+                                       <setting name="value" value="0xE0"/>
+                                       <setting name="remarks" value="Usage Minimum (224U)"/>
+                                    </struct>
+                                    <struct name="7">
+                                       <setting name="type" value="kUsage_Maximum"/>
+                                       <setting name="value" value="0xE7"/>
+                                       <setting name="remarks" value="Usage Maximum (231U)"/>
+                                    </struct>
+                                    <struct name="8">
+                                       <setting name="type" value="kLogical_Minimum"/>
+                                       <setting name="value" value="0x00"/>
+                                       <setting name="remarks" value="Logical Minimum (0U)"/>
+                                    </struct>
+                                    <struct name="9">
+                                       <setting name="type" value="kLogical_Maximum"/>
+                                       <setting name="value" value="0x01"/>
+                                       <setting name="remarks" value="Logical Maximum (1U)"/>
+                                    </struct>
+                                    <struct name="10">
+                                       <setting name="type" value="kInput"/>
+                                       <setting name="value" value="0x02"/>
+                                       <setting name="remarks" value="Input(Data, Variable, Absolute) Modifier byte"/>
+                                    </struct>
+                                    <struct name="11">
+                                       <setting name="type" value="kReport_Count"/>
+                                       <setting name="value" value="0x01"/>
+                                       <setting name="remarks" value="Report Count (1U)"/>
+                                    </struct>
+                                    <struct name="12">
+                                       <setting name="type" value="kReport_Size"/>
+                                       <setting name="value" value="0x08"/>
+                                       <setting name="remarks" value="Report Size (8U)"/>
+                                    </struct>
+                                    <struct name="13">
+                                       <setting name="type" value="kInput"/>
+                                       <setting name="value" value="0x01"/>
+                                       <setting name="remarks" value="Input(Constant), Reserved byte"/>
+                                    </struct>
+                                    <struct name="14">
+                                       <setting name="type" value="kReport_Count"/>
+                                       <setting name="value" value="0x05"/>
+                                       <setting name="remarks" value="Report Count (5U)"/>
+                                    </struct>
+                                    <struct name="15">
+                                       <setting name="type" value="kReport_Size"/>
+                                       <setting name="value" value="0x01"/>
+                                       <setting name="remarks" value="Report Size (1U)"/>
+                                    </struct>
+                                    <struct name="16">
+                                       <setting name="type" value="kUsage_Page"/>
+                                       <setting name="value" value="0x08"/>
+                                       <setting name="remarks" value="Usage Page (Page# for LEDs)"/>
+                                    </struct>
+                                    <struct name="17">
+                                       <setting name="type" value="kUsage_Minimum"/>
+                                       <setting name="value" value="0x01"/>
+                                       <setting name="remarks" value="Usage Minimum (1U)"/>
+                                    </struct>
+                                    <struct name="18">
+                                       <setting name="type" value="kUsage_Maximum"/>
+                                       <setting name="value" value="0x05"/>
+                                       <setting name="remarks" value="Usage Maximum (5U)"/>
+                                    </struct>
+                                    <struct name="19">
+                                       <setting name="type" value="kOutput"/>
+                                       <setting name="value" value="0x02"/>
+                                       <setting name="remarks" value="Output (Data, Variable, Absolute) LED report"/>
+                                    </struct>
+                                    <struct name="20">
+                                       <setting name="type" value="kReport_Count"/>
+                                       <setting name="value" value="0x01"/>
+                                       <setting name="remarks" value="Report Count (1U)"/>
+                                    </struct>
+                                    <struct name="21">
+                                       <setting name="type" value="kReport_Size"/>
+                                       <setting name="value" value="0x03"/>
+                                       <setting name="remarks" value="Report Size (3U)"/>
+                                    </struct>
+                                    <struct name="22">
+                                       <setting name="type" value="kOutput"/>
+                                       <setting name="value" value="0x03"/>
+                                       <setting name="remarks" value="Output (Constant), LED report padding"/>
+                                    </struct>
+                                    <struct name="23">
+                                       <setting name="type" value="kReport_Count"/>
+                                       <setting name="value" value="0x06"/>
+                                       <setting name="remarks" value="Report Count (6U)"/>
+                                    </struct>
+                                    <struct name="24">
+                                       <setting name="type" value="kReport_Size"/>
+                                       <setting name="value" value="0x08"/>
+                                       <setting name="remarks" value="Report Size (8U)"/>
+                                    </struct>
+                                    <struct name="25">
+                                       <setting name="type" value="kLogical_Minimum"/>
+                                       <setting name="value" value="0x00"/>
+                                       <setting name="remarks" value="Logical Minimum (0U)"/>
+                                    </struct>
+                                    <struct name="26">
+                                       <setting name="type" value="kLogical_Maximum"/>
+                                       <setting name="value" value="0xFF"/>
+                                       <setting name="remarks" value="Logical Maximum (255U)"/>
+                                    </struct>
+                                    <struct name="27">
+                                       <setting name="type" value="kUsage_Page"/>
+                                       <setting name="value" value="0x07"/>
+                                       <setting name="remarks" value="Usage Page (Key Codes)"/>
+                                    </struct>
+                                    <struct name="28">
+                                       <setting name="type" value="kUsage_Minimum"/>
+                                       <setting name="value" value="0x00"/>
+                                       <setting name="remarks" value="Usage Minimum (0U)"/>
+                                    </struct>
+                                    <struct name="29">
+                                       <setting name="type" value="kUsage_Maximum"/>
+                                       <setting name="value" value="0xFF"/>
+                                       <setting name="remarks" value="Usage Maximum (255U)"/>
+                                    </struct>
+                                    <struct name="30">
+                                       <setting name="type" value="kInput"/>
+                                       <setting name="value" value="0x00"/>
+                                       <setting name="remarks" value="Input(Data, Array), Key arrays(6U bytes)"/>
+                                    </struct>
+                                    <struct name="31">
+                                       <setting name="type" value="kEnd_Collection"/>
+                                       <setting name="remarks" value=""/>
+                                    </struct>
+                                 </array>
+                              </struct>
+                           </struct>
+                        </array>
+                     </config_set>
+                     <config_set name="commonSettings">
+                        <struct name="mpu_init">
+                           <setting name="mpu_init_component" value="MPU"/>
+                        </struct>
+                     </config_set>
+                  </instance>
+               </instances>
+            </functional_group>
+         </functional_groups>
+         <components>
+            <component name="system" uuid="488459d2-117d-48f8-9388-926b89adf7eb" type_id="system_54b53072540eeeb8f8e9343e71f28176">
+               <config_set_global name="global_system_definitions">
+                  <setting name="user_definitions" value=""/>
+                  <setting name="user_includes" value=""/>
+                  <setting name="global_init" value=""/>
+               </config_set_global>
+            </component>
+            <component name="uart_cmsis_common" uuid="5d8822a4-641f-45a9-b687-e98e444b04b5" type_id="uart_cmsis_common_9cb8e302497aa696fdbb5a4fd622c2a8">
+               <config_set_global name="global_USART_CMSIS_common" quick_selection="default"/>
+            </component>
+            <component name="msg" uuid="a9ce9053-ebb1-4a39-b2e9-e81bc054c978" type_id="msg_6e2baaf3b97dbeef01c0043275f9a0e7">
+               <config_set_global name="global_messages"/>
+            </component>
+            <component name="gpio_adapter_common" uuid="7a22cc4e-6c4b-44cb-8e3f-f72c01cc9dac" type_id="gpio_adapter_common_57579b9ac814fe26bf95df0a384c36b6">
+               <config_set_global name="global_gpio_adapter_common" quick_selection="default"/>
+            </component>
+            <component name="generic_uart" uuid="8d865bd0-61e0-4067-bfee-9b9b8fa408ad" type_id="generic_uart_8cae00565451cf2346eb1b8c624e73a6">
+               <config_set_global name="global_uart"/>
+            </component>
+            <component name="generic_enet" uuid="c0d9a78f-55a9-45a9-9022-fc7a8b280a21" type_id="generic_enet_74db5c914f0ddbe47d86af40cb77a619">
+               <config_set_global name="global_enet"/>
+            </component>
+            <component name="generic_can" uuid="4c0d4b77-aaf2-48f5-8f52-62756d897cbe" type_id="generic_can_1bfdd78b1af214566c1f23cf6a582d80">
+               <config_set_global name="global_can"/>
+            </component>
+         </components>
+      </periphs>
+      <tee name="TEE" version="6.0" enabled="false" update_project_code="true">
+         <generated_project_files/>
+         <tee_profile>
+            <processor_version>N/A</processor_version>
+         </tee_profile>
+      </tee>
+   </tools>
+</configuration>

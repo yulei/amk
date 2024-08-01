@@ -240,6 +240,29 @@ static bool process_dks(uint16_t keycode, const keyrecord_t *record)
 }
 #endif
 
+#ifdef AMK_SNAPTAP_ENABLE
+#include "amk_snaptap.h"
+static void toggle_snaptap(void)
+{
+    snaptap_toggle();
+}
+
+static bool process_snaptap(uint16_t keycode, const keyrecord_t *record)
+{
+    switch(keycode) {
+        case SNAPTAP_TOGGLE:
+            if (record->event.pressed) {
+                toggle_snaptap();
+            }
+            return false;
+        default:
+            break;
+    }
+
+    return true;
+}
+#endif
+
 static bool process_amk_keycode(uint16_t keycode, const keyrecord_t *record)
 {
     switch(keycode) {
@@ -276,6 +299,11 @@ bool process_action_kb(keyrecord_t *record)
     }
 #endif
 
+#if defined(AMK_SNAPTAP_ENABLE)
+    if (!process_snaptap(keycode, record)) {
+        return false;
+    }
+#endif
     process_amk_keycode(keycode, record);
 
     return true;

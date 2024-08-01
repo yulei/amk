@@ -70,6 +70,10 @@ else
 	ifeq (NUC126, $(strip $(MCU)))
 	SRCS += $(TINYUSB_DIR)/portable/nuvoton/nuc121/dcd_nuc121.c
 	endif
+
+	ifeq (LPC5516, $(strip $(MCU)))
+	SRCS += $(TINYUSB_DIR)/portable/nxp/lpc+ip3511/dcd_lpc3511.c
+	endif
 endif #TINYUSB_USE_HAL
 
 ifeq (NRF52840, $(strip $(MCU)))

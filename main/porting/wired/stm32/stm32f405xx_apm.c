@@ -52,6 +52,15 @@ UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart6;
 #endif
 
+#ifdef WDT_ENABLE
+IWDG_HandleTypeDef hiwdg;
+void wdt_refresh(void)
+{
+    HAL_IWDG_Refresh(&hiwdg);
+}
+#endif
+
+
 RTC_HandleTypeDef hrtc;
 
 #ifdef TINYUSB_ENABLE
@@ -142,6 +151,18 @@ static void MX_RTC_Init(void)
         Error_Handler();
     }
 }
+
+#ifdef WDT_ENABLE
+static void MX_IWDG_Init(void)
+{
+    hiwdg.Instance = IWDG;
+    hiwdg.Init.Prescaler = IWDG_PRESCALER_32;
+    hiwdg.Init.Reload = 1999;
+    if (HAL_IWDG_Init(&hiwdg) != HAL_OK) {
+        Error_Handler();
+    }
+}
+#endif
 
 #ifdef USE_ADC1
 __attribute__((weak))
@@ -443,6 +464,10 @@ void custom_board_init(void)
     MX_USART6_UART_Init();
 #endif
 
+#ifdef WDT_ENABLE
+    MX_IWDG_Init();
+#endif
+
 #ifdef DYNAMIC_CONFIGURATION
     uint32_t magic = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1);
     //if (magic == 0) {
@@ -458,4 +483,7 @@ void custom_board_init(void)
 
 void custom_board_task(void)
 {
+#ifdef WDT_ENABLE
+    HAL_IWDG_Refresh(&hiwdg);
+#endif
 }
