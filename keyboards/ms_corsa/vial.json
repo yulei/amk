@@ -5,6 +5,9 @@
   "keyboardType": "ms_v2",
   "keyboardSpeed": "hs",
   "lighting": "none",
+  "amkFeature": [
+    "snaptap"
+  ],
   "customKeycodes": [
     {
       "name": "FS1K",
@@ -50,6 +53,11 @@
       "name": "DKST",
       "title": "Toggle DKS",
       "shortName": "DKS\nToggle"
+    },
+    {
+      "name": "STPT",
+      "title": "Toggle Snaptap",
+      "shortName": "Snaptap\nToggle"
     }
   ],
   "matrix": {
