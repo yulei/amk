@@ -199,10 +199,10 @@
 
 void SystemInit(void)
 {
-#if defined(USER_VECT_TAB_ADDRESS)
+//#if defined(USER_VECT_TAB_ADDRESS)
   /* Configure the Vector Table location -------------------------------------*/
   SCB->VTOR = VECT_TAB_BASE_ADDRESS | VECT_TAB_OFFSET;
-#endif
+//#endif
 
   /* FPU settings ------------------------------------------------------------*/
 #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
