@@ -22,58 +22,65 @@ void OTG_FS_IRQHandler(void)
 I2C_HandleTypeDef hi2c1;
 #endif
 
+#ifdef USE_LPUART
+UART_HandleTypeDef hlpuart1;
+#endif
+
 #ifdef USE_ADC1
 ADC_HandleTypeDef hadc1;
 #endif
 
 RTC_HandleTypeDef hrtc;
 
-#ifdef USE_OSPI
-OSPI_HandleTypeDef hospi1;
-DMA_HandleTypeDef handle_GPDMA1_Channel2;
-DMA_HandleTypeDef handle_GPDMA1_Channel1;
-#endif
+//SD_HandleTypeDef hsd2;
 
 #ifdef USE_SPI1
 SPI_HandleTypeDef hspi1;
 DMA_HandleTypeDef handle_GPDMA1_Channel0;
 #endif
 
+#ifdef USE_SPI2
+SPI_HandleTypeDef hspi2;
+DMA_HandleTypeDef handle_GPDMA1_Channel1;
+#endif
+
 void SystemClock_Config(void)
 {
+    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
     /** Configure the main internal regulator output voltage
      */
-    if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK) {
+    if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
+    {
         Error_Handler();
     }
 
     /** Initializes the CPU, AHB and APB buses clocks
      */
-    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_LSI
+                                |RCC_OSCILLATORTYPE_HSE;
     RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-    RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-    RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+    RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
     RCC_OscInitStruct.LSIState = RCC_LSI_ON;
     RCC_OscInitStruct.LSIDiv = RCC_LSI_DIV1;
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
     RCC_OscInitStruct.PLL.PLLMBOOST = RCC_PLLMBOOST_DIV1;
-    RCC_OscInitStruct.PLL.PLLM = 1;
-    RCC_OscInitStruct.PLL.PLLN = 10;
+    RCC_OscInitStruct.PLL.PLLM = 4;
+    RCC_OscInitStruct.PLL.PLLN = 80;
     RCC_OscInitStruct.PLL.PLLP = 2;
     RCC_OscInitStruct.PLL.PLLQ = 2;
-    RCC_OscInitStruct.PLL.PLLR = 1;
-    RCC_OscInitStruct.PLL.PLLRGE = RCC_PLLVCIRANGE_1;
+    RCC_OscInitStruct.PLL.PLLR = 2;
+    RCC_OscInitStruct.PLL.PLLRGE = RCC_PLLVCIRANGE_0;
     RCC_OscInitStruct.PLL.PLLFRACN = 0;
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+    {
         Error_Handler();
     }
 
     /** Initializes the CPU, AHB and APB buses clocks
      */
-    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
     RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                                 |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2
                                 |RCC_CLOCKTYPE_PCLK3;
@@ -83,7 +90,8 @@ void SystemClock_Config(void)
     RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
     RCC_ClkInitStruct.APB3CLKDivider = RCC_HCLK_DIV1;
 
-    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK) {
+    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
+    {
         Error_Handler();
     }
 }
@@ -120,6 +128,7 @@ static void MX_GPIO_Init(void)
     __HAL_RCC_GPIOB_CLK_ENABLE();
     __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_GPIOD_CLK_ENABLE();
+    __HAL_RCC_GPIOE_CLK_ENABLE();
 }
 
 static void MX_RTC_Init(void)
@@ -185,9 +194,8 @@ static void MX_SPI1_Init(void)
     //hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
     //hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
     hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
-    hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
     hspi1.Init.NSS = SPI_NSS_SOFT;
-    hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
+    hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
     hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
     hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
     hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -201,7 +209,8 @@ static void MX_SPI1_Init(void)
     hspi1.Init.MasterKeepIOState = SPI_MASTER_KEEP_IO_STATE_DISABLE;
     hspi1.Init.IOSwap = SPI_IO_SWAP_DISABLE;
     hspi1.Init.ReadyMasterManagement = SPI_RDY_MASTER_MANAGEMENT_INTERNALLY;
-    hspi1.Init.ReadyPolarity = SPI_RDY_POLARITY_HIGH;
+    //hspi1.Init.ReadyPolarity = SPI_RDY_POLARITY_HIGH;
+    hspi1.Init.ReadyPolarity = SPI_RDY_POLARITY_LOW;
     if (HAL_SPI_Init(&hspi1) != HAL_OK) {
         Error_Handler();
     }
@@ -216,17 +225,96 @@ static void MX_SPI1_Init(void)
 }
 #endif
 
+#ifdef USE_SPI2
+static void MX_SPI2_Init(void)
+{
+    /* SPI2 parameter configuration*/
+    hspi2.Instance = SPI2;
+    hspi2.Init.Mode = SPI_MODE_MASTER;
+    //hspi2.Init.Direction = SPI_DIRECTION_2LINES;
+    hspi2.Init.Direction = SPI_DIRECTION_2LINES_TXONLY;
+
+
+    hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
+    //hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
+    //hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
+    hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
+    hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
+    hspi2.Init.NSS = SPI_NSS_SOFT;
+    hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
+    hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
+    hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
+    hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+    hspi2.Init.CRCPolynomial = 0x7;
+    hspi2.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
+    hspi2.Init.NSSPolarity = SPI_NSS_POLARITY_LOW;
+    hspi2.Init.FifoThreshold = SPI_FIFO_THRESHOLD_01DATA;
+    hspi2.Init.MasterSSIdleness = SPI_MASTER_SS_IDLENESS_00CYCLE;
+    hspi2.Init.MasterInterDataIdleness = SPI_MASTER_INTERDATA_IDLENESS_00CYCLE;
+    hspi2.Init.MasterReceiverAutoSusp = SPI_MASTER_RX_AUTOSUSP_DISABLE;
+    hspi2.Init.MasterKeepIOState = SPI_MASTER_KEEP_IO_STATE_DISABLE;
+    hspi2.Init.IOSwap = SPI_IO_SWAP_DISABLE;
+    hspi2.Init.ReadyMasterManagement = SPI_RDY_MASTER_MANAGEMENT_INTERNALLY;
+    //hspi2.Init.ReadyPolarity = SPI_RDY_POLARITY_HIGH;
+    hspi2.Init.ReadyPolarity = SPI_RDY_POLARITY_LOW;
+
+    if (HAL_SPI_Init(&hspi2) != HAL_OK)
+    {
+        Error_Handler();
+    }
+
+    SPI_AutonomousModeConfTypeDef HAL_SPI_AutonomousMode_Cfg_Struct = {0};
+    HAL_SPI_AutonomousMode_Cfg_Struct.TriggerState = SPI_AUTO_MODE_DISABLE;
+    HAL_SPI_AutonomousMode_Cfg_Struct.TriggerSelection = SPI_GRP1_GPDMA_CH0_TCF_TRG;
+    HAL_SPI_AutonomousMode_Cfg_Struct.TriggerPolarity = SPI_TRIG_POLARITY_RISING;
+    if (HAL_SPIEx_SetConfigAutonomousMode(&hspi2, &HAL_SPI_AutonomousMode_Cfg_Struct) != HAL_OK)
+    {
+        Error_Handler();
+    }
+}
+#endif
+
+#ifdef USE_LPUART1
+static void MX_LPUART1_UART_Init(void)
+{
+    hlpuart1.Instance = LPUART1;
+    hlpuart1.Init.BaudRate = 209700;
+    hlpuart1.Init.WordLength = UART_WORDLENGTH_8B;
+    hlpuart1.Init.StopBits = UART_STOPBITS_1;
+    hlpuart1.Init.Parity = UART_PARITY_NONE;
+    hlpuart1.Init.Mode = UART_MODE_TX_RX;
+    hlpuart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+    hlpuart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+    hlpuart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+    hlpuart1.FifoMode = UART_FIFOMODE_DISABLE;
+    if (HAL_UART_Init(&hlpuart1) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    if (HAL_UARTEx_SetTxFifoThreshold(&hlpuart1, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    if (HAL_UARTEx_SetRxFifoThreshold(&hlpuart1, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    if (HAL_UARTEx_DisableFifoMode(&hlpuart1) != HAL_OK)
+    {
+        Error_Handler();
+    }
+}
+#endif
+
 static void MX_DMA_Init(void)
 {
     __HAL_RCC_GPDMA1_CLK_ENABLE();
 
     /* GPDMA1 interrupt Init */
-    HAL_NVIC_SetPriority(GPDMA1_Channel0_IRQn, 1, 0);
+    HAL_NVIC_SetPriority(GPDMA1_Channel0_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(GPDMA1_Channel0_IRQn);
-    HAL_NVIC_SetPriority(GPDMA1_Channel1_IRQn, 1, 0);
+    HAL_NVIC_SetPriority(GPDMA1_Channel1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(GPDMA1_Channel1_IRQn);
-    HAL_NVIC_SetPriority(GPDMA1_Channel2_IRQn, 1, 0);
-    HAL_NVIC_EnableIRQ(GPDMA1_Channel2_IRQn);
 }
 
 void usb_port_init(void)
@@ -345,6 +433,13 @@ void custom_board_init(void)
     MX_SPI1_Init();
 #endif
 
+#ifdef USE_SPI2
+    MX_SPI2_Init();
+#endif
+
+#ifdef USE_LPUART1
+    MX_LPUART1_UART_Init();
+#endif
 
 #ifdef DYNAMIC_CONFIGURATION
     HAL_PWR_EnableBkUpAccess();

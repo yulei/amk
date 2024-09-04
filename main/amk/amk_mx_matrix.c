@@ -121,6 +121,11 @@ static matrix_row_t read_current_row(void)
     return current;
 }
 
+__attribute__((weak)) bool matrix_scan_custom_kb(matrix_row_t current_matrix[])
+{
+    return false;
+}
+
 bool matrix_scan_custom(matrix_row_t* raw)
 {
     bool changed = false;
@@ -168,5 +173,8 @@ bool matrix_scan_custom(matrix_row_t* raw)
         scan_ticks = timer_read32();
     }
 #endif
+
+    changed |= matrix_scan_custom_kb(raw);
+
     return changed;
 }
