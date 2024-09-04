@@ -29,6 +29,7 @@ families = {
     'ADA':          0xADA52840,
     'STM32U5':      0x53545535,     # STU5
     'HOSTF4':       0x484F5354,     # HOST
+    'NRF52833':     0x621E937A,
 }
 
 INFO_FILE = "/INFO_UF2.TXT"
