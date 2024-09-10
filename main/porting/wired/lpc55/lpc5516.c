@@ -10,287 +10,202 @@
 #include "cm_misc.h"
 #include "wait.h"
 #include "usb_common.h"
+#include "amk_printf.h"
 
 #include "tusb.h"
 
-// if want to USE USB_HS, the HEXT MUST be 12000000
+/*******************************************************************************
+ * Definitions for BOARD_BootClockPLL150M configuration
+ ******************************************************************************/
+#define BOARD_BOOTCLOCKPLL150M_CORE_CLOCK         150000000U  /*!< Core clock frequency: 150000000Hz */
 
-/**
-  * @brief  system clock config program
-  * @note   the system clock is configured as follow:
-  *         system clock (sclk)   = (hext * pll_ns)/(pll_ms * pll_fp)
-  *         system clock source   = pll (hext)
-  *         - hext                = HEXT_VALUE
-  *         - sclk                = 216000000
-  *         - ahbdiv              = 1
-  *         - ahbclk              = 216000000
-  *         - apb2div             = 1
-  *         - apb2clk             = 216000000
-  *         - apb1div             = 2
-  *         - apb1clk             = 108000000
-  *         - pll_ns              = 72
-  *         - pll_ms              = 1
-  *         - pll_fr              = 4
-  *         - flash_wtcyc         = 6 cycle
-  * @param  none
-  * @retval none
-  */
+
+/* Clock outputs (values are in Hz): */
+#define BOARD_BOOTCLOCKPLL150M_ASYNCADC_CLOCK         0UL            /* Clock consumers of ASYNCADC_clock output : ADC0 */
+#define BOARD_BOOTCLOCKPLL150M_CAN_CLOCK              0UL            /* Clock consumers of CAN_clock output : CAN0 */
+#define BOARD_BOOTCLOCKPLL150M_CLKOUT_CLOCK           0UL            /* Clock consumers of CLKOUT_clock output : N/A */
+#define BOARD_BOOTCLOCKPLL150M_CTIMER0_CLOCK          0UL            /* Clock consumers of CTIMER0_clock output : CTIMER0 */
+#define BOARD_BOOTCLOCKPLL150M_CTIMER1_CLOCK          0UL            /* Clock consumers of CTIMER1_clock output : CTIMER1 */
+#define BOARD_BOOTCLOCKPLL150M_CTIMER2_CLOCK          0UL            /* Clock consumers of CTIMER2_clock output : CTIMER2 */
+#define BOARD_BOOTCLOCKPLL150M_CTIMER3_CLOCK          0UL            /* Clock consumers of CTIMER3_clock output : CTIMER3 */
+#define BOARD_BOOTCLOCKPLL150M_CTIMER4_CLOCK          0UL            /* Clock consumers of CTIMER4_clock output : CTIMER4 */
+#define BOARD_BOOTCLOCKPLL150M_FRO_12MHZ_CLOCK        12000000UL     /* Clock consumers of FRO_12MHz_clock output : ANACTRL */
+#define BOARD_BOOTCLOCKPLL150M_FRO_1MHZ_CLOCK         0UL            /* Clock consumers of FRO_1MHz_clock output : N/A */
+#define BOARD_BOOTCLOCKPLL150M_FXCOM0_CLOCK           0UL            /* Clock consumers of FXCOM0_clock output : FLEXCOMM0 */
+#define BOARD_BOOTCLOCKPLL150M_FXCOM1_CLOCK           0UL            /* Clock consumers of FXCOM1_clock output : FLEXCOMM1 */
+#define BOARD_BOOTCLOCKPLL150M_FXCOM2_CLOCK           0UL            /* Clock consumers of FXCOM2_clock output : FLEXCOMM2 */
+#define BOARD_BOOTCLOCKPLL150M_FXCOM3_CLOCK           0UL            /* Clock consumers of FXCOM3_clock output : FLEXCOMM3 */
+#define BOARD_BOOTCLOCKPLL150M_FXCOM4_CLOCK           0UL            /* Clock consumers of FXCOM4_clock output : FLEXCOMM4 */
+#define BOARD_BOOTCLOCKPLL150M_FXCOM5_CLOCK           0UL            /* Clock consumers of FXCOM5_clock output : FLEXCOMM5 */
+#define BOARD_BOOTCLOCKPLL150M_FXCOM6_CLOCK           0UL            /* Clock consumers of FXCOM6_clock output : FLEXCOMM6 */
+#define BOARD_BOOTCLOCKPLL150M_FXCOM7_CLOCK           0UL            /* Clock consumers of FXCOM7_clock output : FLEXCOMM7 */
+#define BOARD_BOOTCLOCKPLL150M_HSLSPI_CLOCK           0UL            /* Clock consumers of HSLSPI_clock output : FLEXCOMM8 */
+#define BOARD_BOOTCLOCKPLL150M_HSUSB1_32K_CLOCK       32768UL        /* Clock consumers of HSUSB1_32K_clock output : USBPHY */
+#define BOARD_BOOTCLOCKPLL150M_MCLK_CLOCK             0UL            /* Clock consumers of MCLK_clock output : N/A */
+#define BOARD_BOOTCLOCKPLL150M_OSC32KHZ_CLOCK         32768UL        /* Clock consumers of OSC32KHZ_clock output : FLEXCOMM0, FLEXCOMM1, FLEXCOMM2, FLEXCOMM3, FLEXCOMM4, FLEXCOMM5, FLEXCOMM6, FLEXCOMM7, FLEXCOMM8, USBHSD, USBHSH */
+#define BOARD_BOOTCLOCKPLL150M_OSTIMER_CLOCK          0UL            /* Clock consumers of OSTIMER_clock output : OSTIMER */
+#define BOARD_BOOTCLOCKPLL150M_PLUCLKIN_CLOCK         0UL            /* Clock consumers of PLUCLKIN_clock output : PLU */
+#define BOARD_BOOTCLOCKPLL150M_PLU_GLITCH_12MHZ_CLOCK 0UL            /* Clock consumers of PLU_GLITCH_12MHz_clock output : PLU */
+#define BOARD_BOOTCLOCKPLL150M_PLU_GLITCH_1MHZ_CLOCK  0UL            /* Clock consumers of PLU_GLITCH_1MHz_clock output : PLU */
+#define BOARD_BOOTCLOCKPLL150M_RTC1HZ_CLOCK           0UL            /* Clock consumers of RTC1HZ_clock output : N/A */
+#define BOARD_BOOTCLOCKPLL150M_RTC1KHZ_CLOCK          0UL            /* Clock consumers of RTC1KHZ_clock output : N/A */
+#define BOARD_BOOTCLOCKPLL150M_SCT_CLOCK              0UL            /* Clock consumers of SCT_clock output : SCT0 */
+#define BOARD_BOOTCLOCKPLL150M_SYSTICK0_CLOCK         0UL            /* Clock consumers of SYSTICK0_clock output : N/A */
+#define BOARD_BOOTCLOCKPLL150M_SYSTEM_CLOCK           150000000UL    /* Clock consumers of System_clock output : ADC0, ANACTRL, CAN0, CRC_ENGINE, CTIMER0, CTIMER1, CTIMER2, CTIMER3, CTIMER4, DMA0, DMA1, FLASH, FLEXCOMM0, FLEXCOMM1, FLEXCOMM2, FLEXCOMM3, FLEXCOMM4, FLEXCOMM5, FLEXCOMM6, FLEXCOMM7, FLEXCOMM8, GINT0, GINT1, GPIO, INPUTMUX, IOCON, MRT0, OSTIMER, PINT, PLU, SCT0, SECGPIO, SECPINT, SWD, SYSCTL, USB0, USBFSH, USBHSD, USBHSH, USBPHY, UTICK0, WWDT */
+#define BOARD_BOOTCLOCKPLL150M_TRACE_CLOCK            0UL            /* Clock consumers of TRACE_clock output : SWD */
+#define BOARD_BOOTCLOCKPLL150M_USB0_CLOCK             0UL            /* Clock consumers of USB0_clock output : USB0, USBFSH */
+#define BOARD_BOOTCLOCKPLL150M_USB1_PHY_CLOCK         16000000UL     /* Clock consumers of USB1_PHY_clock output : USBHSD, USBHSH, USBPHY */
+#define BOARD_BOOTCLOCKPLL150M_UTICK_CLOCK            0UL            /* Clock consumers of UTICK_clock output : UTICK0 */
+#define BOARD_BOOTCLOCKPLL150M_WDT_CLOCK              0UL            /* Clock consumers of WDT_clock output : WWDT */
+
 void system_clock_init(void)
 {
-    /* reset crm */
-    crm_reset();
+    /*!< Set up the clock sources */
+    /*!< Configure FRO192M */
+    POWER_DisablePD(kPDRUNCFG_PD_FRO192M);               /*!< Ensure FRO is on  */
+    CLOCK_SetupFROClocking(12000000U);                   /*!< Set up FRO to the 12 MHz, just for sure */
+    CLOCK_AttachClk(kFRO12M_to_MAIN_CLK);                /*!< Switch to FRO 12MHz first to ensure we can change the clock setting */
 
-    /* config flash psr register */
-    flash_psr_set(FLASH_WAIT_CYCLE_6);
+    /*!< Configure XTAL32M */
+    POWER_DisablePD(kPDRUNCFG_PD_XTAL32M);                        /* Ensure XTAL32M is powered */
+    POWER_DisablePD(kPDRUNCFG_PD_LDOXO32M);                       /* Ensure XTAL32M is powered */
+    CLOCK_SetupExtClocking(16000000U);                            /* Enable clk_in clock */
+    SYSCON->CLOCK_CTRL |= SYSCON_CLOCK_CTRL_CLKIN_ENA_MASK;       /* Enable clk_in from XTAL32M clock  */
+    ANACTRL->XO32M_CTRL |= ANACTRL_XO32M_CTRL_ENABLE_SYSTEM_CLK_OUT_MASK;    /* Enable High speed Crystal oscillator output to system  */
+    ANACTRL->XO32M_CTRL |= ANACTRL_XO32M_CTRL_ENABLE_PLL_USB_OUT_MASK;       /* Enable High speed Crystal oscillator output to HS USB  */
 
-    /* enable pwc periph clock */
-    crm_periph_clock_enable(CRM_PWC_PERIPH_CLOCK, TRUE);
+    /*!< Configure RTC OSC */
+    POWER_EnablePD(kPDRUNCFG_PD_XTAL32K);                /*!< Powered down the XTAL 32 kHz RTC oscillator */
+    POWER_DisablePD(kPDRUNCFG_PD_FRO32K);                /*!< Powered the FRO 32 kHz RTC oscillator */
+    CLOCK_AttachClk(kFRO32K_to_OSC32K);                  /*!< Switch OSC32K to FRO32K */
+    CLOCK_EnableClock(kCLOCK_Rtc);                       /*!< Enable the RTC peripheral clock */
+    RTC->CTRL &= ~RTC_CTRL_SWRESET_MASK;                 /*!< Make sure the reset bit is cleared */
 
-    /* set power ldo output voltage to 1.3v */
-    pwc_ldo_output_voltage_set(PWC_LDO_OUTPUT_1V3);
+    POWER_SetVoltageForFreq(150000000U);                  /*!< Set voltage for the one of the fastest clock outputs: System clock output */
+    CLOCK_SetFLASHAccessCyclesForFreq(150000000U);          /*!< Set FLASH wait states for core */
 
-    crm_clock_source_enable(CRM_CLOCK_SOURCE_HEXT, TRUE);
+    /*!< Set up PLL */
+    CLOCK_AttachClk(kEXT_CLK_to_PLL0);                    /*!< Switch PLL0CLKSEL to EXT_CLK */
+    POWER_DisablePD(kPDRUNCFG_PD_PLL0);                  /* Ensure PLL is on  */
+    POWER_DisablePD(kPDRUNCFG_PD_PLL0_SSCG);
+    const pll_setup_t pll0Setup = {
+        .pllctrl = SYSCON_PLL0CTRL_CLKEN_MASK | SYSCON_PLL0CTRL_SELI(53U) | SYSCON_PLL0CTRL_SELP(31U),
+        .pllndec = SYSCON_PLL0NDEC_NDIV(8U),
+        .pllpdec = SYSCON_PLL0PDEC_PDIV(1U),
+        .pllsscg = {0x0U,(SYSCON_PLL0SSCG1_MDIV_EXT(150U) | SYSCON_PLL0SSCG1_SEL_EXT_MASK)},
+        .pllRate = 150000000U,
+        .flags =  PLL_SETUPFLAG_WAITLOCK
+    };
+    CLOCK_SetPLL0Freq(&pll0Setup);                       /*!< Configure PLL0 to the desired values */
 
-    /* wait till hext is ready */
-    while(crm_hext_stable_wait() == ERROR)
-    {
-    }
+    /*!< Set up dividers */
+    CLOCK_SetClkDiv(kCLOCK_DivAhbClk, 1U, false);         /*!< Set AHBCLKDIV divider to value 1 */
 
-    /* if pll parameter has changed, please use the AT32_New_Clock_Configuration tool for new configuration. */
-    crm_pll_config(CRM_PLL_SOURCE_HEXT, 72, 1, CRM_PLL_FP_4);
+    /*!< Set up clock selectors - Attach clocks to the peripheries */
+    CLOCK_AttachClk(kPLL0_to_MAIN_CLK);                 /*!< Switch MAIN_CLK to PLL0 */
+    CLOCK_AttachClk(kOSC32K_to_CLK32K);                 /*!< Switch CLK32K to OSC32K */
+    CLOCK_AttachClk(kOSC32K_to_OSTIMER);                 /*!< Switch OSTIMER to OSC32K */
 
-    /* config pllu div */
-    crm_pllu_div_set(CRM_PLL_FU_18);
-
-    /* enable pll */
-    crm_clock_source_enable(CRM_CLOCK_SOURCE_PLL, TRUE);
-
-    /* wait till pll is ready */
-    while(crm_flag_get(CRM_PLL_STABLE_FLAG) != SET)
-    {
-    }
-
-    /* config ahbclk */
-    crm_ahb_div_set(CRM_AHB_DIV_1);
-
-    /* config apb2clk, the maximum frequency of APB2 clock is 216 MHz */
-    crm_apb2_div_set(CRM_APB2_DIV_1);
-
-    /* config apb1clk, the maximum frequency of APB1 clock is 120 MHz */
-    crm_apb1_div_set(CRM_APB1_DIV_2);
-
-    /* enable auto step mode */
-    crm_auto_step_mode_enable(TRUE);
-
-    /* select pll as system clock source */
-    crm_sysclk_switch(CRM_SCLK_PLL);
-
-    /* wait till pll is used as system clock source */
-    while(crm_sysclk_switch_status_get() != CRM_SCLK_PLL)
-    {
-    }
-
-    /* disable auto step mode */
-    crm_auto_step_mode_enable(FALSE);
-
-    /* update system_core_clock global variable */
-    system_core_clock_update();
+    /*!< Set SystemCoreClock variable. */
+    SystemCoreClock = BOARD_BOOTCLOCKPLL150M_CORE_CLOCK;
 }
 
+#include "usb_phy.h"
+#define USB_DEVICE_CONTROLLER_ID kUSB_ControllerLpcIp3511Hs0
 
 static void usb_custom_init(void)
 {
-    /* enable otg clock */
-    crm_periph_clock_enable(CRM_OTGHS_PERIPH_CLOCK, TRUE);
+    /* enable usb1 host clock */
+    CLOCK_EnableClock(kCLOCK_Usbh1);
 
-    /* select usb 48m clcok source */
-    //usb_clock48m_select(USB_CLK_HEXT);
+    /* Put PHY powerdown under software control */
+    *((uint32_t *)(USBHSH_BASE + 0x50)) = USBHSH_PORTMODE_SW_PDCOM_MASK;
+    /*According to reference mannual, device mode setting has to be set by access usb host register */
+    *((uint32_t *)(USBHSH_BASE + 0x50)) |= USBHSH_PORTMODE_DEV_ENABLE_MASK;
 
-    /* enable otg irq */
-    nvic_irq_enable(OTGHS_IRQn, 0, 0);
-}
+    /* enable usb1 host clock */
+    CLOCK_DisableClock(kCLOCK_Usbh1);
 
-#ifdef USE_SPI1
-spi_type *hspi1 = SPI1;
-static void spi1_gpio_init(void)
-{
-    gpio_init_type gpio_initstructure;
-    crm_periph_clock_enable(CRM_GPIOA_PERIPH_CLOCK, TRUE);
-
-    /* master sck pin */
-    gpio_initstructure.gpio_out_type       = GPIO_OUTPUT_PUSH_PULL;
-    gpio_initstructure.gpio_pull           = GPIO_PULL_DOWN;
-    gpio_initstructure.gpio_mode           = GPIO_MODE_MUX;
-    gpio_initstructure.gpio_drive_strength = GPIO_DRIVE_STRENGTH_STRONGER;
-    gpio_initstructure.gpio_pins           = GPIO_PINS_5;
-    gpio_init(GPIOA, &gpio_initstructure);
-    gpio_pin_mux_config(GPIOA, GPIO_PINS_SOURCE5, GPIO_MUX_5);
-
-    /* master miso pin */
-    gpio_initstructure.gpio_pull           = GPIO_PULL_UP;
-    gpio_initstructure.gpio_pins           = GPIO_PINS_6;
-    gpio_init(GPIOA, &gpio_initstructure);
-    gpio_pin_mux_config(GPIOA, GPIO_PINS_SOURCE6, GPIO_MUX_5);
-
-        /* master mosi pin */
-    gpio_initstructure.gpio_pull           = GPIO_PULL_UP;
-    gpio_initstructure.gpio_pins           = GPIO_PINS_7;
-    gpio_init(GPIOA, &gpio_initstructure);
-    gpio_pin_mux_config(GPIOA, GPIO_PINS_SOURCE7, GPIO_MUX_5);
-}
-
-static void spi1_init(void)
-{
-    spi1_gpio_init();
-
-    crm_periph_clock_enable(CRM_SPI1_PERIPH_CLOCK, TRUE);
-    spi_init_type spi_init_struct;
-    spi_default_para_init(&spi_init_struct);
-    spi_init_struct.transmission_mode = SPI_TRANSMIT_FULL_DUPLEX;
-    spi_init_struct.master_slave_mode = SPI_MODE_MASTER;
-    spi_init_struct.mclk_freq_division = SPI_MCLK_DIV_16;
-    spi_init_struct.first_bit_transmission = SPI_FIRST_BIT_MSB;
-    spi_init_struct.frame_bit_num = SPI_FRAME_8BIT;
-    spi_init_struct.clock_polarity = SPI_CLOCK_POLARITY_HIGH;
-    spi_init_struct.clock_phase = SPI_CLOCK_PHASE_2EDGE;
-    spi_init_struct.cs_mode_selection = SPI_CS_SOFTWARE_MODE;
-    spi_init(SPI1, &spi_init_struct);
-
-    spi_enable(SPI1, TRUE);
-}
+#if CHIRP_ISSUE_WORKAROUND_NEEDED
+    USB_TimerInit(0, 1000U);
 #endif
 
-#ifdef USE_I2C1
-#include "i2c_application.h"
-#define I2Cx_ADDRESS                     0x78 
-//#define I2Cx_CLKCTRL                   0x4170FEFE   //10K
-//#define I2Cx_CLKCTRL                   0x90F06666   //50K
-#define I2Cx_CLKCTRL                     0x90F03030   //100K
-//#define I2Cx_CLKCTRL                   0x20F07DDE   //200K
-i2c_handle_type hi2c1;
+    POWER_DisablePD(kPDRUNCFG_PD_LDOUSBHS); /*!< Ensure xtal32k is on  */
 
-static void i2c1_init(void)
-{
-    /* i2c periph clock enable */
-    crm_periph_clock_enable(CRM_I2C1_PERIPH_CLOCK, TRUE);
-    crm_periph_clock_enable(CRM_GPIOB_PERIPH_CLOCK, TRUE);
-
-    hi2c1.i2cx = I2C1;
-
-    /* reset i2c peripheral */
-    i2c_reset(hi2c1.i2cx);
-
-    /* i2c peripheral initialization */
-    gpio_init_type gpio_init_structure;
-
-    /* configure i2c pins: scl */
-    gpio_init_structure.gpio_drive_strength = GPIO_DRIVE_STRENGTH_STRONGER;
-    gpio_init_structure.gpio_mode           = GPIO_MODE_MUX;
-    gpio_init_structure.gpio_out_type       = GPIO_OUTPUT_OPEN_DRAIN;
-    gpio_init_structure.gpio_pull           = GPIO_PULL_UP;
-
-    gpio_init_structure.gpio_pins           = GPIO_PINS_8;
-    gpio_init(GPIOB, &gpio_init_structure);
-    gpio_pin_mux_config(GPIOB, GPIO_PINS_SOURCE8, GPIO_MUX_4);
-
-    /* configure i2c pins: sda */
-    gpio_init_structure.gpio_pins           = GPIO_PINS_9;
-    gpio_init(GPIOB, &gpio_init_structure);
-    gpio_pin_mux_config(GPIOB, GPIO_PINS_SOURCE9, GPIO_MUX_4);
-
-    /* config i2c */
-    i2c_init(hi2c1.i2cx, 0x0F, I2Cx_CLKCTRL);
-    i2c_own_address1_set(hi2c1.i2cx, I2C_ADDRESS_MODE_7BIT, 0);
-
-    /* i2c peripheral enable */
-    i2c_enable(hi2c1.i2cx, TRUE);
-    wait_ms(1);
-}
-#endif
-
-#ifdef USE_ADC1
-
-uint32_t adc1_channels[ADC_CHANNEL_COUNT] = ADC_CHANNELS;
-
-extern void adc1_pins_init(void);
-extern void adc1_dma_init(void);
-
-static void adc1_init(void)
-{
-    adc1_pins_init();
-    adc1_dma_init();
-
-    adc_base_config_type adc_base_struct;
-    crm_periph_clock_enable(CRM_ADC1_PERIPH_CLOCK, TRUE);
-    adc_clock_div_set(ADC_DIV_8);
-    //nvic_irq_enable(ADC1_IRQn, 1, 0);
-
-    adc_base_default_para_init(&adc_base_struct);
-
-    adc_base_struct.sequence_mode = TRUE;
-    adc_base_struct.repeat_mode = FALSE;
-    adc_base_struct.data_align = ADC_RIGHT_ALIGNMENT;
-    adc_base_struct.ordinary_channel_length = ADC_CHANNEL_COUNT;
-    adc_base_config(ADC1, &adc_base_struct);
-
-    /* config ordinary channel */
-    for (int i = 0; i < ADC_CHANNEL_COUNT; i++) {
-        adc_ordinary_channel_set(ADC1, adc1_channels[i], i+1, ADC_SAMPLETIME_7_5);
+    POWER_DisablePD(kPDRUNCFG_PD_USB1_PHY); /* Turn on power for USB PHY */
+    uint32_t delay = 100000;
+    while (delay --)
+    {
+        __asm("nop");
     }
 
-    /* config ordinary trigger source and trigger edge */
-    adc_ordinary_conversion_trigger_set(ADC1, ADC12_ORDINARY_TRIG_SOFTWARE, TRUE);
+    CLOCK_EnableClock(kCLOCK_Usbd1);
+    CLOCK_EnableClock(kCLOCK_UsbRam1);
+    CLOCK_EnableClock(kCLOCK_Usb1Clk);
 
-    /* config dma mode,it's not useful when common dma mode is use */
-    adc_dma_mode_enable(ADC1, TRUE);
+	uint32_t pllDivSelValue = 0;
+	uint32_t inputFrequency = CLOCK_GetUsb1ClkFreq();
+    switch(CLOCK_GetUsb1ClkFreq()) {
+    case 32000000:
+    	pllDivSelValue = 0;
+    	break;
+    case 30000000:
+    	pllDivSelValue = 1;
+    	break;
+    case 24000000:
+    	pllDivSelValue = 2;
+    	break;
+    case 20000000:
+    	pllDivSelValue = 4;
+    	break;
+    case 19200000:
+    	pllDivSelValue = 5;
+    	break;
+    case 16000000:
+    	pllDivSelValue = 6;
+    	break;
+    case 12000000:
+    	pllDivSelValue = 7;
+    	break;
+    default:
+    	amk_printf("Unsupported input frequency (%lu) for USB PHY.\r\n", inputFrequency);
+    }
 
-    /* adc enable */
-    adc_enable(ADC1, TRUE);
+    USBPHY->CTRL_CLR    = USBPHY_CTRL_SFTRST_MASK;
+    USBPHY->PLL_SIC     = (USBPHY->PLL_SIC & ~USBPHY_PLL_SIC_PLL_DIV_SEL(0x7)) | USBPHY_PLL_SIC_PLL_DIV_SEL(pllDivSelValue);
+    USBPHY->PLL_SIC_SET = USBPHY_PLL_SIC_SET_PLL_REG_ENABLE_MASK;
+    USBPHY->PLL_SIC_CLR = (1 << 16);
+    USBPHY->PLL_SIC_SET = USBPHY_PLL_SIC_SET_PLL_POWER_MASK;
+    USBPHY->PLL_SIC_SET = USBPHY_PLL_SIC_SET_PLL_EN_USB_CLKS_MASK;
 
-    /* adc calibration */
-    adc_calibration_init(ADC1);
-    while(adc_calibration_init_status_get(ADC1));
-    adc_calibration_start(ADC1);
-    while(adc_calibration_status_get(ADC1));
+    USBPHY->CTRL_CLR = USBPHY_CTRL_CLR_CLKGATE_MASK;
+    USBPHY->PWD_SET  = 0x0;
+
+    uint32_t not_used = 0;
+    USB_EhciPhyInit(USB_DEVICE_CONTROLLER_ID, not_used, NULL);
+
+#if defined(FSL_FEATURE_USBHSD_USB_RAM) && (FSL_FEATURE_USBHSD_USB_RAM)
+    for (int i = 0; i < FSL_FEATURE_USBHSD_USB_RAM; i++)
+    {
+        ((uint8_t *)FSL_FEATURE_USBHSD_USB_RAM_BASE_ADDRESS)[i] = 0x00U;
+    }
+#endif
 }
 
-#endif
 void custom_board_init(void)
 {
-    crm_periph_clock_enable(CRM_GPIOA_PERIPH_CLOCK, TRUE);
-    crm_periph_clock_enable(CRM_GPIOB_PERIPH_CLOCK, TRUE);
-    crm_periph_clock_enable(CRM_GPIOC_PERIPH_CLOCK, TRUE);
-    crm_periph_clock_enable(CRM_GPIOD_PERIPH_CLOCK, TRUE);
+    // init gpio clocks
+    CLOCK_EnableClock(kCLOCK_Iocon);
+    CLOCK_EnableClock(kCLOCK_Gpio0);
+    CLOCK_EnableClock(kCLOCK_Gpio1);
+
     usb_custom_init();
-
-#ifdef USE_SPI1
-    spi1_init();
-#endif
-#ifdef USE_I2C1
-    i2c1_init();
-#endif
-
-#ifdef USE_ADC1
-    adc1_init();
-#endif
-
-#ifdef DYNAMIC_CONFIGURATION
-    uint32_t reset = reset_read();
-
-    //if (reset == 0) {
-    if (reset > 0) {
-        usb_setting |= USB_MSC_BIT;
-    } else {
-        usb_setting = 0;
-    }
-    reset_write(0);
-#endif
 }
 
 void custom_board_task(void)
 {}
 
-void OTGHS_IRQHandler(void)
+void USB1_IRQHandler(void)
 {
-    tud_int_handler(0);
+    tud_int_handler(1);
 }

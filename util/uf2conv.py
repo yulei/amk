@@ -30,6 +30,7 @@ families = {
     'STM32U5':      0x53545535,     # STU5
     'HOSTF4':       0x484F5354,     # HOST
     'NRF52833':     0x621E937A,
+    'STM32F7':      0x53b80f00,
 }
 
 INFO_FILE = "/INFO_UF2.TXT"

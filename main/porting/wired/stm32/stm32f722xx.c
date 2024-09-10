@@ -9,20 +9,40 @@
 #include "tusb.h"
 #endif
 
+#ifdef USE_I2C1
 I2C_HandleTypeDef hi2c1;
 DMA_HandleTypeDef hdma_i2c1_rx;
 DMA_HandleTypeDef hdma_i2c1_tx;
+#endif
 
+#ifdef USE_I2C2
+I2C_HandleTypeDef hi2c2;
+DMA_HandleTypeDef hdma_i2c2_rx;
+DMA_HandleTypeDef hdma_i2c2_tx;
+#endif
+
+#ifdef USE_SPI1
 SPI_HandleTypeDef hspi1;
 DMA_HandleTypeDef hdma_spi1_rx;
 DMA_HandleTypeDef hdma_spi1_tx;
+#endif
 
+#ifdef USE_SPI2
 SPI_HandleTypeDef hspi2;
 DMA_HandleTypeDef hdma_spi2_rx;
 DMA_HandleTypeDef hdma_spi2_tx;
+#endif
 
+#ifdef USE_SPI3
+SPI_HandleTypeDef hspi3;
+DMA_HandleTypeDef hdma_spi3_rx;
+DMA_HandleTypeDef hdma_spi3_tx;
+#endif
+
+#ifdef USE_PWM_TIM2
 TIM_HandleTypeDef htim2;
 DMA_HandleTypeDef hdma_tim2_ch1;
+#endif
 
 RTC_HandleTypeDef hrtc;
 
@@ -57,21 +77,21 @@ void SystemClock_Config(void)
 {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
     /** Configure the main internal regulator output voltage
-     */
+    */
     __HAL_RCC_PWR_CLK_ENABLE();
     __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+
     /** Initializes the RCC Oscillators according to the specified parameters
-     * in the RCC_OscInitTypeDef structure.
-     */
+    * in the RCC_OscInitTypeDef structure.
+    */
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
     RCC_OscInitStruct.HSEState = RCC_HSE_ON;
     RCC_OscInitStruct.LSIState = RCC_LSI_ON;
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-    RCC_OscInitStruct.PLL.PLLM = 8;
+    RCC_OscInitStruct.PLL.PLLM = 16;
     RCC_OscInitStruct.PLL.PLLN = 432;
     RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
     RCC_OscInitStruct.PLL.PLLQ = 9;
@@ -79,35 +99,27 @@ void SystemClock_Config(void)
     {
         Error_Handler();
     }
+
     /** Activate the Over-Drive mode
-     */
+    */
     if (HAL_PWREx_EnableOverDrive() != HAL_OK)
     {
         Error_Handler();
     }
+
     /** Initializes the CPU, AHB and APB buses clocks
-     */
+    */
     RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                                 |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
     RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
     RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
-    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV4;
+    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7) != HAL_OK)
     {
         Error_Handler();
     }
-    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_I2C1
-                                |RCC_PERIPHCLK_CLK48;
-    PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
-    PeriphClkInitStruct.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
-    PeriphClkInitStruct.Clk48ClockSelection = RCC_CLK48SOURCE_PLL;
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-    {
-        Error_Handler();
-    }
-
 }
 
 /**
@@ -125,49 +137,69 @@ static void MX_GPIO_Init(void)
     __HAL_RCC_GPIOB_CLK_ENABLE();
 }
 
+#ifdef USE_I2C1
 static void MX_I2C1_Init(void)
 {
+    hi2c1.Instance = I2C1;
+    hi2c1.Init.Timing = 0x20404768;
+    hi2c1.Init.OwnAddress1 = 0;
+    hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+    hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+    hi2c1.Init.OwnAddress2 = 0;
+    hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+    hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+    hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+    if (HAL_I2C_Init(&hi2c1) != HAL_OK) {
+        Error_Handler();
+    }
 
-  /* USER CODE BEGIN I2C1_Init 0 */
+    /** Configure Analogue filter
+    */
+    if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK) {
+        Error_Handler();
+    }
 
-  /* USER CODE END I2C1_Init 0 */
-
-  /* USER CODE BEGIN I2C1_Init 1 */
-
-  /* USER CODE END I2C1_Init 1 */
-  hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x20404768;
-  hi2c1.Init.OwnAddress1 = 0;
-  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  hi2c1.Init.OwnAddress2 = 0;
-  hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
-  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure Analogue filter
-  */
-  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure Digital filter
-  */
-  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN I2C1_Init 2 */
-
-  /* USER CODE END I2C1_Init 2 */
-
+    /** Configure Digital filter
+    */
+    if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK) {
+        Error_Handler();
+    }
 }
+#endif
+#ifdef USE_I2C2
+static void MX_I2C2_Init(void)
+{
+    hi2c2.Instance = I2C2;
+    hi2c2.Init.Timing = 0x6000030D;
+    hi2c2.Init.OwnAddress1 = 0;
+    hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+    hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+    hi2c2.Init.OwnAddress2 = 0;
+    hi2c2.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+    hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+    hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+    if (HAL_I2C_Init(&hi2c2) != HAL_OK)
+    {
+        Error_Handler();
+    }
 
+    /** Configure Analogue filter
+    */
+    if (HAL_I2CEx_ConfigAnalogFilter(&hi2c2, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+    {
+        Error_Handler();
+    }
+
+    /** Configure Digital filter
+    */
+    if (HAL_I2CEx_ConfigDigitalFilter(&hi2c2, 0) != HAL_OK)
+    {
+        Error_Handler();
+    }
+}
+#endif
+
+#ifdef USE_SPI1
 static void MX_SPI1_Init(void)
 {
     hspi1.Instance = SPI1;
@@ -188,7 +220,9 @@ static void MX_SPI1_Init(void)
         Error_Handler();
     }
 }
+#endif
 
+#ifdef USE_SPI2
 static void MX_SPI2_Init(void)
 {
     hspi2.Instance = SPI2;
@@ -210,7 +244,52 @@ static void MX_SPI2_Init(void)
         Error_Handler();
     }
 }
+#endif
 
+#ifdef USE_SPI3
+static void MX_SPI3_Init(void)
+{
+    hspi3.Instance = SPI3;
+    hspi3.Init.Mode = SPI_MODE_MASTER;
+    hspi3.Init.Direction = SPI_DIRECTION_2LINES;
+    hspi3.Init.DataSize = SPI_DATASIZE_8BIT;
+    hspi3.Init.CLKPolarity = SPI_POLARITY_LOW;
+    hspi3.Init.CLKPhase = SPI_PHASE_1EDGE;
+    hspi3.Init.NSS = SPI_NSS_SOFT;
+    hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
+    hspi3.Init.FirstBit = SPI_FIRSTBIT_MSB;
+    hspi3.Init.TIMode = SPI_TIMODE_DISABLE;
+    hspi3.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+    hspi3.Init.CRCPolynomial = 7;
+    hspi3.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
+    hspi3.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
+    if (HAL_SPI_Init(&hspi3) != HAL_OK) {
+        Error_Handler();
+    }
+}
+#endif
+
+#ifdef USE_UART2
+static void MX_USART2_UART_Init(void)
+{
+    huart2.Instance = USART2;
+    huart2.Init.BaudRate = 115200;
+    huart2.Init.WordLength = UART_WORDLENGTH_8B;
+    huart2.Init.StopBits = UART_STOPBITS_1;
+    huart2.Init.Parity = UART_PARITY_NONE;
+    huart2.Init.Mode = UART_MODE_TX_RX;
+    huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+    huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+    huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+    huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+    if (HAL_UART_Init(&huart2) != HAL_OK) {
+        Error_Handler();
+    }
+}
+#endif
+
+
+#ifdef USE_PWM_TIM2
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim);
 /**
   * @brief TIM2 Initialization Function
@@ -246,34 +325,12 @@ static void MX_TIM2_Init(void)
 
     HAL_TIM_MspPostInit(&htim2);
 }
+#endif
 
 static void MX_DMA_Init(void)
 {
     __HAL_RCC_DMA2_CLK_ENABLE();
     __HAL_RCC_DMA1_CLK_ENABLE();
-
-    /* DMA interrupt init */
-    /* DMA1_Stream0_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
-    /* DMA1_Stream3_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
-    /* DMA1_Stream4_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
-    /* DMA1_Stream5_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
-    /* DMA1_Stream6_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
-    /* DMA2_Stream0_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
-    /* DMA2_Stream3_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 }
 
 static void MX_RTC_Init(void)
@@ -289,7 +346,6 @@ static void MX_RTC_Init(void)
         Error_Handler();
     }
 }
-
 
 #ifdef WDT_ENABLE
 static void MX_IWDG_Init(void)
@@ -346,14 +402,37 @@ void custom_board_init(void)
 
     MX_GPIO_Init();
     MX_DMA_Init();
+
 #if defined(TINYUSB_ENABLE)
     MX_USB_DEVICE_Init();
 #endif
+
+#ifdef USE_I2C1
     MX_I2C1_Init();
+#endif
+
+#ifdef USE_I2C2
+    MX_I2C2_Init();
+#endif
+
+#ifdef USE_SPI1
     MX_SPI1_Init();
+#endif
+
+#ifdef USE_SPI2
     MX_SPI2_Init();
+#endif
+
+#ifdef USE_SPI3
+    MX_SPI3_Init();
+#endif
+
     MX_RTC_Init();
+
+#ifdef USE_PWM_TIM2
     MX_TIM2_Init();
+#endif
+
 #ifdef DYNAMIC_CONFIGURATION
     uint32_t magic = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1);
     //if (magic == 0) {

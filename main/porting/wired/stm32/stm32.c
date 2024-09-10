@@ -38,7 +38,6 @@ uint32_t systick_get_tick(void)
     return HAL_GetTick();
 }
 
-#if !defined(STM32F722xx) 
 #if !defined(RTOS_ENABLE)
 void SysTick_Handler(void)
 {
@@ -48,7 +47,6 @@ void SysTick_Handler(void)
     //screen_ticks(1);
     #endif
 }
-#endif
 #endif
 
 extern RTC_HandleTypeDef hrtc;

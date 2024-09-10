@@ -183,6 +183,8 @@
    #include "gpio_apm32.h" 
 #elif defined(AT32F405)
    #include "gpio_at32.h" 
+#elif defined(LPC55xx)
+   #include "gpio_lpc55.h" 
 #else
     #error "MCU_TYPE not defined"
 #endif

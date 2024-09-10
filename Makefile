@@ -10,6 +10,7 @@ M480_MCUS := M484
 CH32V_MCUS := CH32V307
 APM32_MCUS := APM32F407
 AT32_MCUS := AT32F405
+LPC55_MCUS := LPC5516
 
 # Source files
 SRCS += \
@@ -85,6 +86,8 @@ include sdk/apm32/apm32_sdk.mk
 else ifneq (,$(filter $(strip $(MCU)),$(AT32_MCUS)))
 VENDOR_DIR := libs/vendor/artery
 include sdk/at32/at32_sdk.mk
+else ifneq (,$(filter $(strip $(MCU)),$(LPC55_MCUS)))
+include sdk/lpc55/lpc55_sdk.mk
 else
 $(error Unsupported MCU: $(MCU))
 endif

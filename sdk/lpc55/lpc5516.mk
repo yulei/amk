@@ -1,8 +1,6 @@
 
 SRCS += \
-	$(LPC55SDK_DIR)/$(MCU_TYPE)/clock_config.c \
-	$(LPC55SDK_DIR)/$(MCU_TYPE)/peripherals.c \
-	$(LPC55SDK_DIR)/$(MCU_TYPE)/pin_mux.c \
+	$(LPC55SDK_DIR)/$(MCU_TYPE)/usb_phy.c
 
 INCS += $(LPC55SDK_DIR)/$(MCU_TYPE)
 

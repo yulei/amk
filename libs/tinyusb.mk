@@ -60,7 +60,9 @@ else
 	endif
 
 	ifeq (STM32F722, $(strip $(MCU)))
-	SRCS += $(TINYUSB_DIR)/portable/st/synopsys/dcd_synopsys.c
+	INCS +=$(TINYUSB_DIR)/portable/synopsys/dwc2
+	SRCS += $(TINYUSB_DIR)/portable/synopsys/dwc2/dcd_dwc2.c
+	#SRCS += $(TINYUSB_DIR)/portable/st/synopsys/dcd_synopsys.c
 	endif
 
 	ifeq (ATSAMD21, $(strip $(MCU)))
@@ -72,7 +74,7 @@ else
 	endif
 
 	ifeq (LPC5516, $(strip $(MCU)))
-	SRCS += $(TINYUSB_DIR)/portable/nxp/lpc+ip3511/dcd_lpc3511.c
+	SRCS += $(TINYUSB_DIR)/portable/nxp/lpc_ip3511/dcd_lpc_ip3511.c
 	endif
 endif #TINYUSB_USE_HAL
 

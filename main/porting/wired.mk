@@ -62,3 +62,7 @@ endif
 ifneq (,$(filter $(strip $(MCU)),$(AT32_MCUS)))
 	include $(MAIN_DIR)/porting/wired/at32.mk
 endif
+
+ifneq (,$(filter $(strip $(MCU)),$(LPC55_MCUS)))
+	include $(MAIN_DIR)/porting/wired/lpc55.mk
+endif
