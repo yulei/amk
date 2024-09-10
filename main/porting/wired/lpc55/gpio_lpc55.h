@@ -15,9 +15,9 @@
 typedef uint32_t pin_t;
 typedef uint32_t port_t;
 
-#define MAKE_PIN(port, pin) (((uint32_t)(port)<<16)|((pin)&0xFF))
+#define MAKE_PIN(port, pin) (((uint32_t)(port)<<8)|((pin)&0xFF))
 #define GET_PIN(port_pin) (((port_pin)&0xFF))
-#define GET_PORT(port_pin) (((port_pin)&0xFF00)>>16)
+#define GET_PORT(port_pin) (((port_pin)&0xFF00)>>8)
 
 #define P0_0    MAKE_PIN(0, 0)
 #define P0_1    MAKE_PIN(0, 1)

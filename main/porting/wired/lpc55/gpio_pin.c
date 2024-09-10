@@ -36,14 +36,7 @@ static void gpio_set_mode(pin_t pin, uint32_t mode, uint32_t otype, uint32_t pul
     uint32_t p_pin = GET_PIN(pin);
     GPIO_PinInit(GPIO, p_port, p_pin, &config);
 
-    IOCON->PIO[p_port][p_pin] = ((IOCON->PIO[p_port][p_pin] & (~(IOCON_PIO_FUNC_MASK | 
-                                                                    IOCON_PIO_MODE_MASK | 
-                                                                    IOCON_PIO_DIGIMODE_MASK |
-                                                                    IOCON_PIO_OD_MASK)))
-                                | IOCON_PIO_FUNC(IOCON_FUNC0)
-                                | IOCON_PIO_MODE(pull)
-                                | IOCON_PIO_DIGIMODE(1)
-                                | IOCON_PIO_OD(otype));
+    IOCON_PinMuxSet(IOCON, p_port, p_pin, IOCON_PIO_FUNC(IOCON_FUNC0) | IOCON_PIO_MODE(pull) | IOCON_PIO_DIGIMODE(1) | IOCON_PIO_OD(otype));
 }
 
 void gpio_set_output_pushpull(pin_t pin)
@@ -58,15 +51,15 @@ void gpio_set_output_opendrain(pin_t pin)
 
 void gpio_set_input_floating(pin_t pin)
 {
-    gpio_set_mode(pin, kGPIO_DigitalInput, OUTPUT_PUSHPULL, INPUT_FLOATING);
+    gpio_set_mode(pin, kGPIO_DigitalInput, 0, INPUT_FLOATING);
 }
 
 void gpio_set_input_pullup(pin_t pin)
 {
-    gpio_set_mode(pin, kGPIO_DigitalInput, OUTPUT_PUSHPULL, INPUT_PULL_UP);
+    gpio_set_mode(pin, kGPIO_DigitalInput, 0, INPUT_PULL_UP);
 }
 
 void gpio_set_input_pulldown(pin_t pin)
 {
-    gpio_set_mode(pin, kGPIO_DigitalInput, OUTPUT_PUSHPULL, INPUT_PULL_DOWN);
+    gpio_set_mode(pin, kGPIO_DigitalInput, 0, INPUT_PULL_DOWN);
 }
