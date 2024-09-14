@@ -44,6 +44,10 @@ TIM_HandleTypeDef htim2;
 DMA_HandleTypeDef hdma_tim2_ch1;
 #endif
 
+#ifdef USE_UART2
+UART_HandleTypeDef huart2;
+#endif
+
 RTC_HandleTypeDef hrtc;
 
 #ifdef WDT_ENABLE
@@ -469,6 +473,10 @@ void custom_board_init(void)
 
 #ifdef USE_PWM_TIM2
     MX_TIM2_Init();
+#endif
+
+#ifdef USE_UART2
+    MX_USART2_UART_Init();
 #endif
 
 #ifdef DYNAMIC_CONFIGURATION

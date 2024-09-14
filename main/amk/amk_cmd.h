@@ -23,6 +23,7 @@ enum {
     CMD_LAYER,
     CMD_KEYHIT,
     CMD_STATUS,
+    CMD_TOUCH,
     CMD_TYPE_MAX,
 };
 
@@ -41,6 +42,7 @@ static const char CMD_STATUS_STR[] = "STS";
 static const char CMD_LED_STR[] = "LED";
 static const char CMD_LAYER_STR[] = "LYR";
 static const char CMD_KEYHIT_STR[] = "KH";
+static const char CMD_TOUCH_STR[] = "TC";
 
 static const char CMD_PARAM_OK[] = "OK";
 static const char CMD_PARAM_FAIL[] = "FAIL";
@@ -69,6 +71,10 @@ enum {
 #define MOUSE_PARAM_SIZE        6
 #define NKRO_PARAM_SIZE         32
 
+#ifndef TOUCH_PARAM_SIZE
+#define TOUCH_PARAM_SIZE        8
+#endif
+
 typedef struct {
     uint8_t type;
     union {
@@ -92,6 +98,7 @@ typedef struct {
             uint8_t col;
             uint8_t pressed;
         } keyhit;
+        uint8_t touch_keys[TOUCH_PARAM_SIZE];
     } param;
 } cmd_t;
 

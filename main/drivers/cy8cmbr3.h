@@ -15,6 +15,7 @@
 bool cy8cmbr3_init(void);
 
 bool cy8cmbr3_read(uint16_t* port);
+bool cy8cmbr3_read_keys(uint8_t* keys, uint8_t start, uint8_t count);
 
 void cy8cmbr3_reset(void);
 

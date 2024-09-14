@@ -24,6 +24,7 @@ extern I2C_HandleTypeDef hi2c2;
 
 #define hc_i2c  hi2c2
 
+#define CY8CMBR3_KEY_MAX        16
 #define CY8CMBR3_TIMEOUT        100
 
 // Register address
@@ -62,21 +63,6 @@ const unsigned char cy8xmbr3_config[128] = {
     0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u,
     0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0xF5u, 0x8Du
 };
-
-void dump_sensor_data(void)
-{
-    uint16_t data[16];
-    HAL_StatusTypeDef status = HAL_ERROR;
-    status = HAL_I2C_Mem_Read(&hc_i2c, CY8CMBR3_ADDR, CY8CMBR3_SENSOR_DATA, 1, (uint8_t*)&data[0], sizeof(data), CY8CMBR3_TIMEOUT);
-    if (status != HAL_OK) {
-        cmbr3_debug("CY8CMBR3: Faield to read sensor data, error=%d\n", status);
-        return;
-    }
-
-    for (int i = 0; i < 16; i++) {
-        cmbr3_debug("CY8CMBR3: Sensor Data(index:%d, value:%d)\n", i, data[i]);
-    }
-}
 
 bool cy8cmbr3_init(void)
 {
@@ -131,8 +117,32 @@ bool cy8cmbr3_read(uint16_t* port)
             if (old_port != *port) {
                 cmbr3_debug("CY8CMBR3: port data is 0x%x\n", *port);
                 old_port = *port;
-                dump_sensor_data();
             }
+        }
+    }
+    return true;
+}
+
+bool cy8cmbr3_read_keys(uint8_t* keys, uint8_t start, uint8_t count)
+{
+    if ((start + count) > CY8CMBR3_KEY_MAX) {
+        cmbr3_debug("CY8CMBR3: Read data out of range(start:%d, count:%d)\n", start, count);
+        return false;
+    }
+
+    uint16_t buf[CY8CMBR3_KEY_MAX];
+    HAL_StatusTypeDef status = HAL_ERROR;
+    status = HAL_I2C_Mem_Read(&hc_i2c, CY8CMBR3_ADDR, CY8CMBR3_SENSOR_DATA+start, 1, (uint8_t*)&buf[0], count*2, CY8CMBR3_TIMEOUT);
+    if (status != HAL_OK) {
+        cmbr3_debug("CY8CMBR3: Faield to read sensor data, error=%d\n", status);
+        return false;
+    }
+    static uint8_t old[CY8CMBR3_KEY_MAX];
+    for (int i = 0; i < count; i++) {
+        keys[i] = (uint8_t)buf[i];
+        if (old[i] != keys[i]) {
+            cmbr3_debug("CY8CMBR3: Sensor Data(index:%d, old:%d, new:%d)\n", start+i, old[i], keys[i]);
+            old[i] = keys[i];
         }
     }
     return true;

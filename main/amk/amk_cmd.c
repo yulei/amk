@@ -41,6 +41,7 @@ static cmd_str_t cmd_strs[] = {
     {CMD_LAYER, CMD_LAYER_STR},
     {CMD_KEYHIT, CMD_KEYHIT_STR},
     {CMD_STATUS, CMD_STATUS_STR},
+    {CMD_TOUCH, CMD_TOUCH_STR},
     {CMD_TYPE_MAX, NULL},
 };
 
@@ -208,6 +209,17 @@ static void cmd_process_status_param(const char *name, const char *value, cmd_t 
     }
 }
 
+static void cmd_process_touch_param(const char *name, const char *value, cmd_t *cmd)
+{
+    int index = strtol(name, NULL, 16);
+    int data = strtol(value, NULL, 16);
+    if (index < TOUCH_PARAM_SIZE) {
+        cmd->param.touch_keys[index] = data;
+    } else {
+        cmd_debug("CMD: invalid touch index=%d, value=%\n", index, data);
+    }
+}
+
 static int32_t cmd_parse_param(const void *data, uint32_t size, cmd_t* cmd)
 {
     char name[NAME_MAX];
@@ -251,6 +263,9 @@ static int32_t cmd_parse_param(const void *data, uint32_t size, cmd_t* cmd)
                 break;
             case CMD_STATUS:
                 cmd_process_status_param(name, value, cmd);
+                break;
+            case CMD_TOUCH:
+                cmd_process_touch_param(name, value, cmd);
                 break;
             default:
                 break;
@@ -362,6 +377,32 @@ static int32_t cmd_compose_status(const cmd_t *cmd, void *buf, uint32_t size)
     return result;
 }
 
+static int32_t cmd_compose_touch(const cmd_t *cmd, void *buf, uint32_t size)
+{
+    int32_t valid = 0;
+    char *p = (char *)buf;
+    // put cmd prefix
+    int32_t result = snprintf(p, size, "%s:", CMD_TOUCH_STR);
+    if (result < 0) return result;
+
+    valid += result;
+    p += result;
+    size -= result;
+    for(int i = 0; i < TOUCH_PARAM_SIZE; i++) {
+        result = snprintf(p, size, "%x=%x;", i, cmd->param.touch_keys[i]);
+        if (result < 0) return result;
+
+        valid += result;
+        p += result;
+        size -= result;
+    }
+
+    result = snprintf(p, size, "\n");
+    if (result < 0) return result;
+
+    return result+valid;
+}
+
 int32_t cmd_compose(const cmd_t *cmd, void* buf, uint32_t size)
 {
     int32_t result = -1;
@@ -391,6 +432,9 @@ int32_t cmd_compose(const cmd_t *cmd, void* buf, uint32_t size)
         break;
     case CMD_STATUS:
         result = cmd_compose_status(cmd, buf, size);
+        break;
+    case CMD_TOUCH:
+        result = cmd_compose_touch(cmd, buf, size);
         break;
     default:
         break;
