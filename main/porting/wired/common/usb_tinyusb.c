@@ -27,7 +27,9 @@ bool usb_led_event = false;
 
 void amk_usb_init(void)
 {
+#ifndef USB_DELAY_INIT
     tusb_init();
+#endif
 #ifdef HAL_HOST_ENABLE
     MX_USB_HOST_Init();
 #endif

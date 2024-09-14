@@ -469,6 +469,9 @@ void custom_board_init(void)
 #endif
 
 #ifdef DYNAMIC_CONFIGURATION
+#ifdef FORCE_MSC_MODE
+    usb_setting |= USB_MSC_BIT;
+#else
     uint32_t magic = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1);
     //if (magic == 0) {
     if (magic > 0) {
@@ -476,6 +479,7 @@ void custom_board_init(void)
     } else {
         usb_setting = 0;
     }
+#endif
     HAL_PWR_EnableBkUpAccess();
     HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0);
 #endif

@@ -9,22 +9,34 @@
     #define DCD_MAX_EP_NUM      8
     #define DCD_USB_INSTANCE    USB
     #define DCD_USB_IRQn        USB_LP_CAN1_RX0_IRQn
+    #define PHY_INTERFACE       PCD_PHY_EMBEDDED
 #elif defined(STM32F411xE) || defined(STM32F401xC)
     #define DCD_MAX_EP_NUM      4
     #define DCD_USB_INSTANCE    USB_OTG_FS
     #define DCD_USB_IRQn        OTG_FS_IRQn
+    #define PHY_INTERFACE       PCD_PHY_EMBEDDED
 #elif defined(STM32F722xx) || defined(STM32F405xx) || defined(STM32F446xx) || defined(STM32F412Rx)
-    #define DCD_MAX_EP_NUM      6
-    #define DCD_USB_INSTANCE    USB_OTG_FS
-    #define DCD_USB_IRQn        OTG_FS_IRQn
+    #ifdef USE_HS_USB
+        #define DCD_MAX_EP_NUM      6
+        #define DCD_USB_INSTANCE    USB_OTG_HS
+        #define DCD_USB_IRQn        OTG_HS_IRQn
+        #define PHY_INTERFACE       USB_OTG_EMBEDDED_PHY
+    #else
+        #define DCD_MAX_EP_NUM      6
+        #define DCD_USB_INSTANCE    USB_OTG_FS
+        #define DCD_USB_IRQn        OTG_FS_IRQn
+        #define PHY_INTERFACE       PCD_PHY_EMBEDDED
+    #endif
 #elif defined(STM32L432xx)
     #define DCD_MAX_EP_NUM      8
     #define DCD_USB_INSTANCE    USB
     #define DCD_USB_IRQn        USB_FS_IRQn
+    #define PHY_INTERFACE       PCD_PHY_EMBEDDED
 #elif defined(STM32L072xx)
     #define DCD_MAX_EP_NUM      8
     #define DCD_USB_INSTANCE    USB
     #define DCD_USB_IRQn        USB_IRQn
+    #define PHY_INTERFACE       PCD_PHY_EMBEDDED
 #else
     #error "HAL USB unsupported mcu"
 #endif
@@ -54,10 +66,11 @@ void dcd_init(uint8_t rhport)
     /* Enable USB power on Pwrctrl CR2 register. */
     HAL_PWREx_EnableVddUSB();
 #endif
+
     dcd_usb.Instance                = DCD_USB_INSTANCE;
     dcd_usb.Init.dev_endpoints      = DCD_MAX_EP_NUM;
     dcd_usb.Init.speed              = PCD_SPEED_FULL;
-    dcd_usb.Init.phy_itface         = PCD_PHY_EMBEDDED;
+    dcd_usb.Init.phy_itface         = PHY_INTERFACE;
     dcd_usb.Init.Sof_enable         = DISABLE;
     dcd_usb.Init.low_power_enable   = DISABLE;
     dcd_usb.Init.lpm_enable         = DISABLE;
@@ -74,6 +87,10 @@ void dcd_init(uint8_t rhport)
 
 #if defined(STM32F103xB) || defined(STM32F722xx) || defined(STM32L432xx) || defined(STM32L072xx) || defined(STM32F412Rx)
     dcd_usb.Init.battery_charging_enable = DISABLE;
+#endif
+
+#if defined(STM32F722xx)
+    dcd_usb.Init.use_external_vbus = DISABLE;
 #endif
     if (HAL_PCD_Init(&dcd_usb) != HAL_OK) {
         amk_printf("Failed to initialize HAL PCD\n");

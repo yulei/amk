@@ -55,10 +55,17 @@ void wdt_refresh(void)
 #endif
 
 #ifdef TINYUSB_ENABLE
+#ifdef USE_HS_USB
+void OTG_HS_IRQHandler(void)
+{
+    tud_int_handler(0);
+}
+#else
 void OTG_FS_IRQHandler(void)
 {
     tud_int_handler(0);
 }
+#endif
 #else
 #ifndef RTOS_ENABLE
 extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
@@ -91,7 +98,7 @@ void SystemClock_Config(void)
     RCC_OscInitStruct.LSIState = RCC_LSI_ON;
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-    RCC_OscInitStruct.PLL.PLLM = 16;
+    RCC_OscInitStruct.PLL.PLLM = HSE_VALUE/1000000;
     RCC_OscInitStruct.PLL.PLLN = 432;
     RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
     RCC_OscInitStruct.PLL.PLLQ = 9;
@@ -364,6 +371,39 @@ static void MX_IWDG_Init(void)
 static void MX_USB_DEVICE_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
+    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+#ifdef USE_HS_USB
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_CLK48;
+    PeriphClkInitStruct.Clk48ClockSelection = RCC_CLK48SOURCE_PLL;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
+        Error_Handler();
+    }
+
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    /**USB_OTG_HS GPIO Configuration
+    PB14     ------> USB_OTG_HS_DM
+    PB15     ------> USB_OTG_HS_DP
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_14|GPIO_PIN_15;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF12_OTG_HS_FS;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    /* Peripheral clock enable */
+    __HAL_RCC_USB_OTG_HS_CLK_ENABLE();
+    //__HAL_RCC_USB_OTG_HS_ULPI_CLK_ENABLE();
+
+    /* Peripheral interrupt init */
+    HAL_NVIC_SetPriority(OTG_HS_IRQn, 0, 0);
+#else
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_CLK48;
+    PeriphClkInitStruct.Clk48ClockSelection = RCC_CLK48SOURCE_PLL;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+    {
+      Error_Handler();
+    }
 
     __HAL_RCC_GPIOA_CLK_ENABLE();
     /**USB_OTG_FS GPIO Configuration
@@ -376,23 +416,21 @@ static void MX_USB_DEVICE_Init(void)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF10_OTG_FS;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-#if 0
-    /* Configure OTG-FS ID pin */
-    GPIO_InitStruct.Pin = GPIO_PIN_10;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Alternate = GPIO_AF10_OTG_FS;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-#endif
+
     /* Peripheral clock enable */
     __HAL_RCC_USB_OTG_FS_CLK_ENABLE();
 
-#define USB_DEVICE     ((USB_OTG_DeviceTypeDef *)(USB_OTG_FS_PERIPH_BASE + USB_OTG_DEVICE_BASE))
+    /* Peripheral interrupt init */
+    HAL_NVIC_SetPriority(OTG_FS_IRQn, 0, 0);
+
+
+    //#define USB_DEVICE     ((USB_OTG_DeviceTypeDef *)(USB_OTG_FS_PERIPH_BASE + USB_OTG_DEVICE_BASE))
     /* Deactivate VBUS Sensing B */
-    USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBDEN;
+    //USB_OTG_FS->GCCFG &= ~USB_OTG_GCCFG_VBDEN;
     /* B-peripheral session valid override enable */
-    USB_OTG_FS->GOTGCTL |= USB_OTG_GOTGCTL_BVALOEN;
-    USB_OTG_FS->GOTGCTL |= USB_OTG_GOTGCTL_BVALOVAL;
+    //USB_OTG_FS->GOTGCTL |= USB_OTG_GOTGCTL_BVALOEN;
+    //USB_OTG_FS->GOTGCTL |= USB_OTG_GOTGCTL_BVALOVAL;
+#endif
 }
 #endif
 
@@ -434,13 +472,17 @@ void custom_board_init(void)
 #endif
 
 #ifdef DYNAMIC_CONFIGURATION
+#ifdef FORCE_MSC_MODE
+    usb_setting |= USB_MSC_BIT;
+#else
     uint32_t magic = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1);
     //if (magic == 0) {
-    if (magic > 0) {
+    if (magic > 0 ) {
         usb_setting |= USB_MSC_BIT;
     } else {
         usb_setting = 0;
     }
+#endif
     HAL_PWR_EnableBkUpAccess();
     HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR1, 0);
 #endif
