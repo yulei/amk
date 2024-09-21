@@ -55,7 +55,7 @@ int32_t cmd_parse(const void* data, uint32_t size, cmd_t* cmd)
 {
     const uint8_t *cur = (const uint8_t*)data;
     if (size < 2) {
-        cmd_debug("INVALID command!!!! \n");
+        //cmd_debug("INVALID command!!!! \n");
         return -1;
     }
     cmd_debug("%s\n", cur);
@@ -506,10 +506,14 @@ static int32_t cmd_compose_time(const cmd_t *cmd, void *buf, uint32_t size)
     int32_t valid = 0;
     char *p = (char *)buf;
     // put cmd prefix
-    int32_t result = snprintf(p, size, "%s:", CMD_TEXT_STR);
+    int32_t result = snprintf(p, size, "%s:", CMD_TIME_STR);
     if (result < 0) return result;
 
-    result = snprintf(p, size, "%s=%d;%s=%d;%s=%d;%s:%d;%s=%d;%s=%d;%s=%d;",
+    valid += result;
+    p += result;
+    size -= result;
+
+    result = snprintf(p, size, "%s=%d;%s=%d;%s=%d;%s=%d;%s=%d;%s=%d;%s=%d;",
                         TIME_PARAM_YEAR, cmd->param.time.year,
                         TIME_PARAM_MONTH, cmd->param.time.month,
                         TIME_PARAM_DAY, cmd->param.time.day,
@@ -519,6 +523,9 @@ static int32_t cmd_compose_time(const cmd_t *cmd, void *buf, uint32_t size)
                         TIME_PARAM_SECOND, cmd->param.time.second);
 
     if (result < 0) return result;
+    valid += result;
+    p += result;
+    size -= result;
 
     result = snprintf(p, size, "\n");
     if (result < 0) return result;

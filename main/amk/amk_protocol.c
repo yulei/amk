@@ -279,6 +279,7 @@ void amk_protocol_process(uint8_t *msg, uint8_t length)
             uint8_t second = msg[9];
             ap_debug("AMK Protocol: set date time(%d/%d/%d-%d %d:%d:%d)\n", year, month, day, weekday, hour, minute, second);
             msg[2] = amk_protocol_ok;
+            amk_set_datetime_kb(year, month, day, weekday, hour, minute, second);
         }
         break;
     case amk_protocol_get_datetime:
