@@ -1,8 +1,11 @@
 /**
- * @file ring_buffer.c
+ * @file amk_ring_buffer.c
+ * @author astro
+ *
+ * @copyright Copyright (c) 2024
  */
 
-#include "ring_buffer.h"
+#include "amk_ring_buffer.h"
 
 
 void rb_init(ring_buffer_t *ring, uint8_t *data, uint32_t size)
@@ -55,5 +58,12 @@ void rb_read(ring_buffer_t *ring, uint8_t *data, uint32_t size)
 {
     for(uint32_t i = 0; i < size; i++) {
         data[i] = rb_read_byte(ring);
+    }
+}
+
+void rb_peek(ring_buffer_t *ring, uint8_t *data, uint32_t size)
+{
+    for (uint32_t i = 0; i < size; i++) {
+        data[i] = ring->data[(ring->tail+i) % ring->size];
     }
 }

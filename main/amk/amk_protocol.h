@@ -70,6 +70,8 @@ enum {
     amk_protocol_get_snaptap_count      = 51,
     amk_protocol_get_snaptap_config     = 52,
     amk_protocol_set_snaptap_config     = 53,
+    amk_protocol_set_datetime           = 54,
+    amk_protocol_get_datetime           = 55,
 };
 
 void amk_protocol_process(uint8_t *msg, uint8_t length);

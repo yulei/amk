@@ -9,7 +9,7 @@
 #include "arm_const_structs.h"
 
 #include "audiousb.h"
-#include "ring_buffer.h"
+#include "amk_ring_buffer.h"
 #include "amk_printf.h"
 
 #ifndef AUDIO_DEBUG

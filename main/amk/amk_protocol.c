@@ -49,6 +49,10 @@
 #define ap_debug(...)
 #endif
 
+__attribute__((weak)) void amk_set_datetime_kb(uint16_t year, uint8_t month, uint8_t day, uint8_t weekday, uint8_t hour, uint8_t minute, uint8_t second)
+{
+}
+
 void amk_protocol_process(uint8_t *msg, uint8_t length)
 {
      /* msg[0] is 0xFD -- prefix of amk protocol */
@@ -264,6 +268,24 @@ void amk_protocol_process(uint8_t *msg, uint8_t length)
         }
         break;
 #endif
+    case amk_protocol_set_datetime:
+        {
+            uint16_t year = (msg[2] << 8) | msg[3];
+            uint8_t month = msg[4];
+            uint8_t day = msg[5];
+            uint8_t weekday = msg[6];
+            uint8_t hour = msg[7];
+            uint8_t minute = msg[8];
+            uint8_t second = msg[9];
+            ap_debug("AMK Protocol: set date time(%d/%d/%d-%d %d:%d:%d)\n", year, month, day, weekday, hour, minute, second);
+            msg[2] = amk_protocol_ok;
+        }
+        break;
+    case amk_protocol_get_datetime:
+        {
+            msg[2] = amk_protocol_fail;
+        }
+        break;
     case amk_protocol_get_poll_rate:
         {
             msg[2] = amk_protocol_ok;

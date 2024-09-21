@@ -7,7 +7,7 @@
 #include "rf_driver.h"
 #include "amk_printf.h"
 #include "amk_gpio.h"
-#include "ring_buffer.h"
+#include "amk_ring_buffer.h"
 #include "usb_descriptors.h"
 #include "wait.h"
 

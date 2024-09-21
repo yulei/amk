@@ -7,12 +7,13 @@
  */
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "amk_cmd.h"
 #include "amk_printf.h"
 
 #ifndef CMD_DEBUG
-#define CMD_DEBUG   0
+#define CMD_DEBUG   1
 #endif
 
 #if CMD_DEBUG
@@ -42,6 +43,8 @@ static cmd_str_t cmd_strs[] = {
     {CMD_KEYHIT, CMD_KEYHIT_STR},
     {CMD_STATUS, CMD_STATUS_STR},
     {CMD_TOUCH, CMD_TOUCH_STR},
+    {CMD_TEXT, CMD_TEXT_STR},
+    {CMD_TIME, CMD_TIME_STR},
     {CMD_TYPE_MAX, NULL},
 };
 
@@ -51,6 +54,10 @@ static int32_t cmd_parse_param(const void *data, uint32_t size, cmd_t* cmd);
 int32_t cmd_parse(const void* data, uint32_t size, cmd_t* cmd)
 {
     const uint8_t *cur = (const uint8_t*)data;
+    if (size < 2) {
+        cmd_debug("INVALID command!!!! \n");
+        return -1;
+    }
     cmd_debug("%s\n", cur);
 
     cmd->type = CMD_TYPE_MAX;
@@ -197,6 +204,9 @@ static void cmd_process_screen_param(const char *name, const char *value, cmd_t 
     } else if (strcmp(name, SCREEN_PARAM_ADJUST) == 0) {
         cmd->param.screen.action = CMD_SCREEN_ADJUST;
         cmd->param.screen.state = strtol(value, NULL, 10);
+    } else if (strcmp(name, SCREEN_PARAM_DISPLAY) == 0) {
+        cmd->param.screen.action = CMD_SCREEN_DISPLAY;
+        cmd->param.screen.state = strtol(value, NULL, 10);
     }
 }
 
@@ -216,7 +226,49 @@ static void cmd_process_touch_param(const char *name, const char *value, cmd_t *
     if (index < TOUCH_PARAM_SIZE) {
         cmd->param.touch_keys[index] = data;
     } else {
-        cmd_debug("CMD: invalid touch index=%d, value=%\n", index, data);
+        cmd_debug("CMD: invalid touch index=%d, value=%d\n", index, data);
+    }
+}
+
+static void cmd_process_text_param(const char *name, const char *value, cmd_t *cmd)
+{
+    if (strcmp(name, CMD_PARAM_OFF) == 0) {
+        for (int i = 0; i < TEXT_PARAM_SIZE; i++) {
+            cmd->param.text[i] = 0;
+        }
+        cmd_debug("CMD: TEXT OFF\n");
+        return;
+    }
+
+    for (int i = 0; i < TEXT_PARAM_SIZE; i++) {
+        if (cmd->param.text[i] == 0) {
+            cmd->param.text[i] = *name;
+            cmd_debug("CMD: TEXT added %c\n", cmd->param.text[i]);
+            return;
+        }
+    }
+
+    cmd_debug("CMD: too many character in text\n");
+}
+
+static void cmd_process_time_param(const char *name, const char *value, cmd_t *cmd)
+{
+    if (strcmp(name, TIME_PARAM_YEAR) == 0) {
+        cmd->param.time.year = strtol(value, NULL, 10);
+    } else if (strcmp(name, TIME_PARAM_MONTH) == 0) {
+        cmd->param.time.month = strtol(value, NULL, 10);
+    } else if (strcmp(name, TIME_PARAM_DAY) == 0) {
+        cmd->param.time.day = strtol(value, NULL, 10);
+    } else if (strcmp(name, TIME_PARAM_WEEKDAY) == 0) {
+        cmd->param.time.weekday = strtol(value, NULL, 10);
+    } else if (strcmp(name, TIME_PARAM_HOUR) == 0) {
+        cmd->param.time.hour = strtol(value, NULL, 10);
+    } else if (strcmp(name, TIME_PARAM_MINUTE) == 0) {
+        cmd->param.time.minute = strtol(value, NULL, 10);
+    } else if (strcmp(name, TIME_PARAM_SECOND) == 0) {
+        cmd->param.time.second = strtol(value, NULL, 10);
+    } else {
+        cmd_debug("CMD: TIME unknown name(%s), value(%s)\n", name, value);
     }
 }
 
@@ -267,7 +319,14 @@ static int32_t cmd_parse_param(const void *data, uint32_t size, cmd_t* cmd)
             case CMD_TOUCH:
                 cmd_process_touch_param(name, value, cmd);
                 break;
+            case CMD_TEXT:
+                cmd_process_text_param(name, value, cmd);
+                break;
+            case CMD_TIME:
+                cmd_process_time_param(name, value, cmd);
+                break;
             default:
+                cmd_debug("CMD: unkown type=%d\n", cmd->type);
                 break;
             }
         }
@@ -331,6 +390,11 @@ static int32_t cmd_compose_screen(const cmd_t *cmd, void *buf, uint32_t size)
         result = snprintf(buf, size, "%s:%s=%d;\n", 
                     CMD_SCREEN_STR, 
                     SCREEN_PARAM_ADJUST,
+                    cmd->param.screen.state);
+    } else if (cmd->param.screen.action == CMD_SCREEN_DISPLAY) {
+        result = snprintf(buf, size, "%s:%s=%d;\n", 
+                    CMD_SCREEN_STR, 
+                    SCREEN_PARAM_DISPLAY,
                     cmd->param.screen.state);
     }
 
@@ -403,6 +467,65 @@ static int32_t cmd_compose_touch(const cmd_t *cmd, void *buf, uint32_t size)
     return result+valid;
 }
 
+static int32_t cmd_compose_text(const cmd_t *cmd, void *buf, uint32_t size)
+{
+    int32_t valid = 0;
+    char *p = (char *)buf;
+    // put cmd prefix
+    int32_t result = snprintf(p, size, "%s:", CMD_TEXT_STR);
+    if (result < 0) return result;
+
+    valid += result;
+    p += result;
+    size -= result;
+    bool has_char = false;
+    for(int i = 0; i < TEXT_PARAM_SIZE; i++) {
+        if (cmd->param.text[i] != 0) {
+            result = snprintf(p, size, "%c;", cmd->param.text[i]);
+            if (result < 0) return result;
+            valid += result;
+            p += result;
+            size -= result;
+            has_char = true;
+        }
+    }
+
+    if (!has_char) {
+        result = snprintf(p, size, "%s;\n", CMD_PARAM_OFF);
+    } else {
+        result = snprintf(p, size, "\n");
+    }
+
+    if (result < 0) return result;
+
+    return result+valid;
+}
+
+static int32_t cmd_compose_time(const cmd_t *cmd, void *buf, uint32_t size)
+{
+    int32_t valid = 0;
+    char *p = (char *)buf;
+    // put cmd prefix
+    int32_t result = snprintf(p, size, "%s:", CMD_TEXT_STR);
+    if (result < 0) return result;
+
+    result = snprintf(p, size, "%s=%d;%s=%d;%s=%d;%s:%d;%s=%d;%s=%d;%s=%d;",
+                        TIME_PARAM_YEAR, cmd->param.time.year,
+                        TIME_PARAM_MONTH, cmd->param.time.month,
+                        TIME_PARAM_DAY, cmd->param.time.day,
+                        TIME_PARAM_WEEKDAY, cmd->param.time.weekday,
+                        TIME_PARAM_HOUR, cmd->param.time.hour,
+                        TIME_PARAM_MINUTE, cmd->param.time.minute,
+                        TIME_PARAM_SECOND, cmd->param.time.second);
+
+    if (result < 0) return result;
+
+    result = snprintf(p, size, "\n");
+    if (result < 0) return result;
+
+    return result+valid;
+}
+
 int32_t cmd_compose(const cmd_t *cmd, void* buf, uint32_t size)
 {
     int32_t result = -1;
@@ -435,6 +558,12 @@ int32_t cmd_compose(const cmd_t *cmd, void* buf, uint32_t size)
         break;
     case CMD_TOUCH:
         result = cmd_compose_touch(cmd, buf, size);
+        break;
+    case CMD_TEXT:
+        result = cmd_compose_text(cmd, buf, size);
+        break;
+    case CMD_TIME:
+        result = cmd_compose_time(cmd, buf, size);
         break;
     default:
         break;

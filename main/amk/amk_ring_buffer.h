@@ -1,5 +1,8 @@
 /**
- * @file ring_buffer.h
+ * @file amk_ring_buffer.h
+ * @author astro
+ *
+ * @copyright Copyright (c) 2024
  */
 
 #pragma once
@@ -22,3 +25,4 @@ uint32_t rb_free_count(ring_buffer_t *ring);
 
 void rb_write(ring_buffer_t *ring, const uint8_t *data, uint32_t size);
 void rb_read(ring_buffer_t *ring, uint8_t *data, uint32_t size);
+void rb_peek(ring_buffer_t *ring, uint8_t *data, uint32_t size);

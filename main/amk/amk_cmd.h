@@ -24,6 +24,8 @@ enum {
     CMD_KEYHIT,
     CMD_STATUS,
     CMD_TOUCH,
+    CMD_TEXT,
+    CMD_TIME,
     CMD_TYPE_MAX,
 };
 
@@ -43,6 +45,8 @@ static const char CMD_LED_STR[] = "LED";
 static const char CMD_LAYER_STR[] = "LYR";
 static const char CMD_KEYHIT_STR[] = "KH";
 static const char CMD_TOUCH_STR[] = "TC";
+static const char CMD_TEXT_STR[] = "TX";
+static const char CMD_TIME_STR[] = "TM";
 
 static const char CMD_PARAM_OK[] = "OK";
 static const char CMD_PARAM_FAIL[] = "FAIL";
@@ -58,13 +62,22 @@ static const char SCREEN_PARAM_POWER[] = "PWR";
 static const char SCREEN_PARAM_MSC[] = "MSC";
 static const char SCREEN_PARAM_MODE[] = "MODE";
 static const char SCREEN_PARAM_ADJUST[] = "ADJ";
+static const char SCREEN_PARAM_DISPLAY[] = "DSP";
 static const char KEYBOARD_PARAM_MODS[] = "M";
+static const char TIME_PARAM_YEAR[] = "YR";
+static const char TIME_PARAM_MONTH[] = "MH";
+static const char TIME_PARAM_DAY[] = "DY";
+static const char TIME_PARAM_WEEKDAY[] = "WY";
+static const char TIME_PARAM_HOUR[] = "HR";
+static const char TIME_PARAM_MINUTE[] = "ME";
+static const char TIME_PARAM_SECOND[] = "SD";
 
 enum {
     CMD_SCREEN_POWER,
     CMD_SCREEN_MSC,
     CMD_SCREEN_MODE,
     CMD_SCREEN_ADJUST,
+    CMD_SCREEN_DISPLAY,
 };
 
 #define KEYBOARD_KEY_SIZE       6
@@ -74,6 +87,8 @@ enum {
 #ifndef TOUCH_PARAM_SIZE
 #define TOUCH_PARAM_SIZE        8
 #endif
+
+#define TEXT_PARAM_SIZE         8
 
 typedef struct {
     uint8_t type;
@@ -99,6 +114,16 @@ typedef struct {
             uint8_t pressed;
         } keyhit;
         uint8_t touch_keys[TOUCH_PARAM_SIZE];
+        char text[TEXT_PARAM_SIZE];
+        struct {
+            uint16_t year;
+            uint8_t month;
+            uint8_t day;
+            uint8_t weekday;
+            uint8_t hour;
+            uint8_t minute;
+            uint8_t second;
+        } time;
     } param;
 } cmd_t;
 

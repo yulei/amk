@@ -59,6 +59,7 @@ uint32_t host_msc_get_block_size(void)
 amk_error_t host_msc_read_blocks(uint32_t block_no, uint8_t *buffer, size_t buffer_size)
 {
     if (!MX_USB_HOST_MSC_Ready()) {
+        amk_printf("USB Host not ready, read blocks\n");
         return AMK_ERROR;
     }
 
@@ -75,6 +76,7 @@ amk_error_t host_msc_read_blocks(uint32_t block_no, uint8_t *buffer, size_t buff
 amk_error_t host_msc_write_blocks(uint32_t block_no, const uint8_t* buffer, size_t buffer_size)
 {
     if (!MX_USB_HOST_MSC_Ready()) {
+        amk_printf("USB Host not ready, write blocks\n");
         return AMK_ERROR;
     }
 

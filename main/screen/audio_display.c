@@ -10,7 +10,7 @@
 #include "arm_math.h"
 
 #include "audio_display.h"
-#include "ring_buffer.h"
+#include "amk_ring_buffer.h"
 #include "timer.h"
 #include "amk_printf.h"
 

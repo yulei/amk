@@ -14,7 +14,7 @@
 #include "report.h"
 #include "wait.h"
 #include "amk_printf.h"
-#include "ring_buffer.h"
+#include "amk_ring_buffer.h"
 
 #ifndef USBITF_DEBUG
 #define USBITF_DEBUG 0
