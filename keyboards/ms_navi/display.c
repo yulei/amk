@@ -76,6 +76,7 @@ typedef struct {
     uint16_t *buf;
     uint32_t buf_size;
     uint32_t ticks;
+    uint32_t current;
     bool filling;
 } render_t;
 
@@ -110,11 +111,12 @@ static render_t renders[] = {
         .width = ANIM_WIDTH,
         .height = ANIM_HEIGHT,
         .delay = 0,
-        .mode = MODE_SEQUENCE,
+        .mode = MODE_SINGLE,
         .anim = NULL,
         .buf = anim_buf,
         .buf_size = ANIM_WIDTH*ANIM_HEIGHT*BYTE_PER_PIXEL,
         .ticks = 0,
+        .current = 0,
     },
 };
 
@@ -198,8 +200,10 @@ static void set_screen_state(bool enable)
 
 void matrix_init_kb(void)
 {
+#ifdef FLASH_CS
     gpio_set_output_pushpull(FLASH_CS);
     gpio_write_pin(FLASH_CS, 1);
+#endif
 
     gpio_set_output_pushpull(SCREEN_0_RESET);
     gpio_write_pin(SCREEN_0_RESET, 0);
@@ -296,6 +300,8 @@ void render_task(render_t* render)
 
 void msc_init_kb(void)
 {
+    HAL_PWR_EnableBkUpAccess();
+
     if (usb_setting & USB_MSC_BIT) return;
 
     if (!anim_mount(true) ) reset_to_msc(true);
@@ -306,6 +312,15 @@ void msc_init_kb(void)
         renders[i].anim = anim_open(NULL, renders[i].type);
         if (renders[i].anim) {
             disp_debug("ANIM: faield to open root path\n");
+        }
+    }
+
+    if (renders[0].anim) {
+        renders[0].current = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR3);
+        if (anim_total(renders[0].anim) > 0) {
+            renders[0].current = renders[0].current % anim_total(renders[0].anim);
+            anim_set_current(renders[0].anim, renders[0].current);
+            HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR3, renders[0].current);
         }
     }
 }
@@ -379,7 +394,15 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record)
         case KC_F21: {
             render_t *render = NULL;
             render = &renders[0];
-            render->mode = (render->mode+1) % MODE_MAX;
+            if (render->anim) {
+                uint32_t total = anim_total(render->anim);
+                if (total > 0) {
+                    render->current = (render->current+1) % total;
+                    anim_set_current(render->anim, render->current);
+                    HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR3, render->current);
+                }
+            }
+            //render->mode = (render->mode+1) % MODE_MAX;
         } return false;
         //case KC_F23:
         //    msc_erase();
