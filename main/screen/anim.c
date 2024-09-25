@@ -248,6 +248,15 @@ bool anim_next(anim_t *anim)
     return anim_init(anim);
 }
 
+bool anim_set_current(anim_t *anim, uint32_t current)
+{
+    if (anim->total > 0) {
+        anim->current = current % anim->total;
+        return anim_init(anim);
+    }
+    return false;
+}
+
 bool anim_rewind(anim_t *anim)
 {
     //safe_close(&anim->obj.file);

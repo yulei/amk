@@ -45,6 +45,7 @@ bool anim_set_frame(anim_t* anim, uint32_t frame);
 uint32_t anim_step(anim_t *anim, uint32_t *delay, void *buf, uint32_t size);
 bool anim_rewind(anim_t *anim);
 bool anim_next(anim_t *anim);
+bool anim_set_current(anim_t *anim, uint32_t current);
 bool anim_random(anim_t *anim);
 void anim_close(anim_t *anim);
 
