@@ -41,9 +41,15 @@ static volatile uint32_t adc1_dma_done;
 #endif
 
 static pin_t adc_pins[ADC_CHANNEL_COUNT]= ADC_PINS;
+#ifdef MATRIX_COL_PINS
 static pin_t custom_col_pins[] = MATRIX_COL_PINS;
+#endif
 #ifdef MATRIX_ROW_PINS
 static pin_t custom_row_pins[] = MATRIX_ROW_PINS;
+#endif
+
+#ifdef MS_SWITCH_PINS
+static pin_t custom_switch_pins[] = MS_SWITCH_PINS;
 #endif
 
 #define DWT_PROFILE(x) \
@@ -62,7 +68,7 @@ if ((x##_count % count) == 0) { \
     x##_value = 0; \
 }
 
-//#define MS_SCAN_STAT
+#define MS_SCAN_STAT
 //#define ADC_READ_STAT
 //#define ADC_DMA_STAT
 //#define APC_UPDATE_STAT
@@ -307,7 +313,7 @@ DWT_PROFILE(adc_read)
 DWT_PROFILE(apc_update) 
 #endif
 
-static bool sense_key(bool *keys, uint32_t col)
+static bool sense_key(bool *keys, uint32_t index)
 {
 #ifdef ADC_READ_STAT
 DWT_PROFILE_START(adc_read);
@@ -323,9 +329,15 @@ DWT_PROFILE_START(adc_read);
 DWT_PROFILE_START(apc_update);
 #endif
     bool valid = false;
-    for (int i = 0; i < MATRIX_ROWS; i++) {
-        keys[i] = apc_matrix_update(i, col, adc_value[i], &valid);
+#ifdef MS_SWITCH_PINS
+    for (int i = 0; i < MATRIX_COLS; i++) {
+        keys[i] = apc_matrix_update(index, i, adc_value[i], &valid);
     }
+#else
+    for (int i = 0; i < MATRIX_ROWS; i++) {
+        keys[i] = apc_matrix_update(i, index, adc_value[i], &valid);
+    }
+#endif
 
 #ifdef APC_UPDATE_STAT 
     DWT_PROFILE_STAT(apc_update, "APC UPDATE profile: interverl=%d, count=%d\n", APC_UPDATE_COUNT);
@@ -408,6 +420,13 @@ void matrix_init_custom(void)
     digital_pot_set(DIGITAL_POT_INDEX);
 #endif
 
+#ifdef MS_SWITCH_PINS
+    for (int i = 0; i < AMK_ARRAY_SIZE(custom_switch_pins); i++) {
+        gpio_set_output_pushpull(custom_switch_pins[i]);
+        gpio_write_pin(custom_switch_pins[i], 1);
+    }
+#endif
+
 #ifdef MATRIX_ROW_PINS
     for (int i = 0; i < AMK_ARRAY_SIZE(custom_row_pins); i++) {
         gpio_set_output_pushpull(custom_row_pins[i]);
@@ -415,20 +434,22 @@ void matrix_init_custom(void)
     }
 #endif
 
-#ifdef SELECT_EN_PIN
-    gpio_set_output_pushpull(SELECT_EN_PIN);
-    gpio_write_pin(SELECT_EN_PIN, 0);
-#endif
+#ifdef MATRIX_COL_PINS
+    #ifdef SELECT_EN_PIN
+        gpio_set_output_pushpull(SELECT_EN_PIN);
+        gpio_write_pin(SELECT_EN_PIN, 0);
+    #endif
 
-    gpio_set_output_pushpull(COL_A_PIN);
-    gpio_write_pin(COL_A_PIN, 0);
-    gpio_set_output_pushpull(COL_B_PIN);
-    gpio_write_pin(COL_B_PIN, 0);
-    gpio_set_output_pushpull(COL_C_PIN);
-    gpio_write_pin(COL_C_PIN, 0);
-#ifdef COL_D_PIN
-    gpio_set_output_pushpull(COL_D_PIN);
-    gpio_write_pin(COL_D_PIN, 0);
+        gpio_set_output_pushpull(COL_A_PIN);
+        gpio_write_pin(COL_A_PIN, 0);
+        gpio_set_output_pushpull(COL_B_PIN);
+        gpio_write_pin(COL_B_PIN, 0);
+        gpio_set_output_pushpull(COL_C_PIN);
+        gpio_write_pin(COL_C_PIN, 0);
+    #ifdef COL_D_PIN
+        gpio_set_output_pushpull(COL_D_PIN);
+        gpio_write_pin(COL_D_PIN, 0);
+    #endif
 #endif
 
     apc_matrix_init();
@@ -470,6 +491,29 @@ DWT_PROFILE_START(adc_matrix);
 #endif
     bool changed = false;
 
+#ifdef MS_SWITCH_PINS
+    for (int row = 0; row < MATRIX_ROWS; row++) {
+        gpio_write_pin(custom_switch_pins[row], 0);
+        wait_us(1);
+        bool keys[ADC_CHANNEL_COUNT] = {[0 ... ADC_CHANNEL_COUNT-1] = false};
+        if (sense_key(keys, row) ) {
+            matrix_row_t last_row_value    = raw[row];
+            matrix_row_t current_row_value = last_row_value;
+            for ( int col = 0; col < MATRIX_COLS; col++) {
+                if (keys[col]) {
+                    current_row_value |= (1 << col);
+                } else {
+                    current_row_value &= ~(1 << col);
+                }
+            }
+            if (last_row_value != current_row_value) {
+                raw[row] = current_row_value;
+                changed = true;
+            }
+        }
+        gpio_write_pin(custom_switch_pins[row], 1);
+    }
+#else
     for (int col = 0; col < MATRIX_COLS; col++) {
         gpio_write_pin(COL_A_PIN, (custom_col_pins[col]&COL_A_MASK) ? 1 : 0);
         gpio_write_pin(COL_B_PIN, (custom_col_pins[col]&COL_B_MASK) ? 1 : 0);
@@ -497,6 +541,7 @@ DWT_PROFILE_START(adc_matrix);
             }
         }
     }
+#endif
 
     if (changed) {
         for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
