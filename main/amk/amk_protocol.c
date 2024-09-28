@@ -796,8 +796,10 @@ void amk_protocol_process(uint8_t *msg, uint8_t length)
             uint8_t action = msg[2];
             if (action) {
                 amk_animation_display_start();
+                ap_debug("AMK Protocol: start display\n");
             } else {
                 amk_animation_display_stop();
+                ap_debug("AMK Protocol: stop display\n");
             }
             msg[2] = amk_protocol_ok;
         }

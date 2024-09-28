@@ -13,7 +13,7 @@ void rgb_led_prepare_sleep(void);
 rgb_driver_t *rgb_led_map(uint8_t led_index);
 
 bool rgb_led_is_on(void);
-void rgb_led_set_all(bool on);
+void rgb_led_set_all(bool on, bool persist);
 
 void rgb_led_config_init(void);
 void rgb_led_config_next(void);

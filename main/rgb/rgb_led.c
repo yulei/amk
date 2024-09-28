@@ -550,19 +550,30 @@ bool rgb_led_is_on(void)
     return on ? true : false;
 }
 
-void rgb_led_set_all(bool on)
+void rgb_led_set_all(bool on, bool persist)
 {
     for (uint8_t i = 0; i < RGB_LED_CONFIG_NUM; i++) {
         if (rgb_is_matrix()){
 #ifdef RGB_MATRIX_ENABLE
             if (on) {
-                rgb_matrix_enable();
+                if (persist) {
+                    rgb_matrix_enable();
+                } else {
+                    rgb_matrix_enable_noeeprom();
+                }
             } else {
-                rgb_matrix_disable();
+                if (persist) {
+                    rgb_matrix_disable();
+                } else {
+                    rgb_matrix_disable_noeeprom();
+                }
             }
 #endif
         } else {
             g_rgb_configs[i].enable = on ? 1 : 0;
+            if (persist) {
+                eeconfig_update_rgb(&g_rgb_configs[i], i);
+            }
         }
     }
 

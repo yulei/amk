@@ -5,6 +5,7 @@
 #include "usb_descriptors.h"
 #include "usb_desc_def.h"
 #include "tusb.h"
+#include "amk_printf.h"
 uint32_t usb_polling_rate = 0;
 
 #define TUD_COMPOSITE_DEVICE_DESCRIPTOR(usb_ver, vender_id, product_id, device_ver, str_manufacture, str_product, str_serial ) \
@@ -496,44 +497,93 @@ static uint8_t* update_desc_polling_rate(uint8_t *desc)
     return desc;
 }
 
+#define ITF_NUM_OFFSET      4
+#define DESC_TOTAL_OFFSET   2
+static uint8_t* remove_vendor_usb(uint8_t *desc)
+{
+#if defined(VENDOR_USB_ENABLE) && !defined(RESERVE_VENDOR_USB)
+    #if 0
+    #ifdef DYNAMIC_CONFIGURATION
+    uint8_t no_vendor_usb[] = {
+        TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL-1, 0, CONFIG_LEN_VIAL-VENDORUSB_DESC_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500)};
+    #else
+    uint8_t no_vendor_usb[] = {
+        TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL-1, 0, CONFIG_TOTAL_LEN-VENDORUSB_DESC_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500)};
+    #endif
+    if (usb_polling_rate != 0) {
+        memcpy(desc, no_vendor_usb, sizeof(no_vendor_usb));
+    }
+    #endif
+    #if 1
+    static bool desc_updated = false;
+    if (!desc_updated && usb_polling_rate !=0) {
+        uint8_t itf_num = desc[ITF_NUM_OFFSET];
+        uint16_t total = desc[DESC_TOTAL_OFFSET]+(desc[DESC_TOTAL_OFFSET+1]<<8);
+        amk_printf("DESC original itf=%d, total=%d\n", itf_num, total);
+        itf_num -= 1;
+        total -= VENDORUSB_DESC_LEN;
+
+        desc[ITF_NUM_OFFSET] = itf_num;
+        desc[DESC_TOTAL_OFFSET] = total & 0xFF;
+        desc[DESC_TOTAL_OFFSET+1] = total >> 8;
+
+        amk_printf("DESC modified ift=%d, total=%d\n", itf_num, total);
+        desc_updated = true;
+    }
+    #endif
+#endif
+    return desc;
+}
+
+static uint32_t remove_vendor_usb_size(uint32_t size)
+{
+#ifdef VENDOR_USB_ENABLE
+    if (usb_polling_rate !=0) {
+        size -= VENDORUSB_DESC_LEN;
+    }
+#endif
+    return size;
+}
+
+
 // Invoked when received GET CONFIGURATION DESCRIPTOR
 uint8_t const* tud_descriptor_configuration_cb(uint8_t index)
 {
 #ifdef DYNAMIC_CONFIGURATION
     if (usb_setting & USB_MSC_BIT) {
-        return update_desc_polling_rate(desc_with_msc);
+        return remove_vendor_usb(update_desc_polling_rate(desc_with_msc));
     }
 
     if (usb_setting & USB_AUDIO_BIT) {
-        return update_desc_polling_rate(desc_with_audio);
+        return remove_vendor_usb(update_desc_polling_rate(desc_with_audio));
     }
 
     //if (usb_setting & USB_VIAL_BIT) {
-        return update_desc_polling_rate(desc_with_vial);
+        return remove_vendor_usb(update_desc_polling_rate(desc_with_vial));
     //}
 
 #endif
 
-    return update_desc_polling_rate(desc_configuration);
+    return remove_vendor_usb(update_desc_polling_rate(desc_configuration));
 }
 
 uint32_t tud_descriptor_configuration_size(uint8_t index)
 {
 #ifdef DYNAMIC_CONFIGURATION
     if (usb_setting & USB_MSC_BIT) {
-        return sizeof(desc_with_msc);
+        return remove_vendor_usb_size(sizeof(desc_with_msc));
     }
 
     if (usb_setting & USB_AUDIO_BIT) {
-        return sizeof(desc_with_audio);
+        return remove_vendor_usb_size(sizeof(desc_with_audio));
     }
 
     //if (usb_setting & USB_VIAL_BIT) {
-        return sizeof(desc_with_vial);
+        return remove_vendor_usb_size(sizeof(desc_with_vial));
     //}
 
 #endif
-    return sizeof(desc_configuration);
+    return remove_vendor_usb_size(sizeof(desc_configuration));
 }
 
 // Invoked when received GET HID REPORT DESCRIPTOR

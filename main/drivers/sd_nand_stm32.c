@@ -79,8 +79,11 @@ bool sd_nand_init(void)
     hsd.Init.ClockBypass = SDIO_CLOCK_BYPASS_DISABLE;
     hsd.Init.ClockPowerSave = SDIO_CLOCK_POWER_SAVE_DISABLE;
     hsd.Init.BusWide = SDIO_BUS_WIDE_1B;
-    hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
-    hsd.Init.ClockDiv = SDIO_TRANSFER_CLK_DIV;
+    hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_ENABLE;
+                                //SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
+    hsd.Init.ClockDiv = SDIO_TRANSFER_CLK_DIV;//+2;
+    HAL_SD_DeInit(&hsd);
+
     if (HAL_SD_Init(&hsd) != HAL_OK) {
         sd_nand_debug("SD NAND Init failed=0x%x\n", HAL_SD_GetError(&hsd));
 
@@ -130,6 +133,8 @@ amk_error_t sd_nand_read_blocks(uint32_t address, uint8_t *buffer, size_t count)
     if (status != HAL_OK) {
         sd_nand_debug("SD NAND read blocks: addr=0x%x, size=%d\n", address, count);
         sd_nand_debug("SD NAND read blocks failed: status=0x%x, error=0x%x\n", status, HAL_SD_GetError(&hsd));
+        status = HAL_SD_Abort(&hsd);
+        sd_nand_debug("SD NAND: Abort state=0x%x, status=0x%x\n, error=0x%x\n", HAL_SD_GetCardState(&hsd), status, HAL_SD_GetError(&hsd));
         return AMK_ERROR;
     }
 
@@ -155,6 +160,8 @@ amk_error_t sd_nand_write_blocks(uint32_t address, const uint8_t* buffer, size_t
     if(status != HAL_OK) {
         sd_nand_debug("SD NAND write blocks: addr=0x%x, size=%d\n", address, count);
         sd_nand_debug("SD NAND write blocks failed: status=%d, error=0x%x\n", status, HAL_SD_GetError(&hsd));
+        status = HAL_SD_Abort(&hsd);
+        sd_nand_debug("SD NAND: Abort state=0x%x, status=0x%x\n, error=0x%x\n", HAL_SD_GetCardState(&hsd), status, HAL_SD_GetError(&hsd));
         return AMK_ERROR;
     }
 
@@ -221,6 +228,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
                           |GPIO_PIN_12;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
+    //GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF12_SDIO;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
@@ -228,6 +236,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
     GPIO_InitStruct.Pin = GPIO_PIN_2;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
+    //GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF12_SDIO;
     HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
@@ -245,7 +254,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
     hdma_sdio_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
     hdma_sdio_rx.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
     hdma_sdio_rx.Init.Mode = DMA_PFCTRL;
-    hdma_sdio_rx.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_sdio_rx.Init.Priority = DMA_PRIORITY_VERY_HIGH;
     hdma_sdio_rx.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
     hdma_sdio_rx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
     hdma_sdio_rx.Init.MemBurst = DMA_MBURST_INC4;
@@ -256,7 +265,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
 
     __HAL_LINKDMA(hsd,hdmarx,hdma_sdio_rx);
 
-    HAL_NVIC_SetPriority(DMA2_Stream6_IRQn, 1, 0);
+    HAL_NVIC_SetPriority(DMA2_Stream6_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(DMA2_Stream6_IRQn);
 
     /* SDIO_TX Init */
@@ -268,7 +277,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
     hdma_sdio_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
     hdma_sdio_tx.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
     hdma_sdio_tx.Init.Mode = DMA_PFCTRL;
-    hdma_sdio_tx.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_sdio_tx.Init.Priority = DMA_PRIORITY_VERY_HIGH;
     hdma_sdio_tx.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
     hdma_sdio_tx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
     hdma_sdio_tx.Init.MemBurst = DMA_MBURST_INC4;
@@ -279,7 +288,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
 
     __HAL_LINKDMA(hsd,hdmatx,hdma_sdio_tx);
 
-    HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 1, 0);
+    HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 }
 

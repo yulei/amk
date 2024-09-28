@@ -13,7 +13,7 @@
 #include "amk_printf.h"
 
 #ifndef CMD_DEBUG
-#define CMD_DEBUG   1
+#define CMD_DEBUG   0
 #endif
 
 #if CMD_DEBUG

@@ -57,6 +57,8 @@ static uint8_t keyboard_leds(void);
 static void send_keyboard(report_keyboard_t *report);
 static void send_mouse(report_mouse_t *report);
 static void send_extra(report_extra_t *report);
+static void amk_prepare_sleep(void);
+static void amk_wakeup(void);
 
 #ifdef KEYBOARD_ENABLE
 static void remote_wakeup(void);
@@ -137,6 +139,7 @@ void amk_driver_task(void)
 #ifdef KEYBOARD_ENABLE
     if (!(usb_setting&USB_SWITCH_BIT)) {
         if (usb_suspended() ) {
+            amk_prepare_sleep();
             if (suspend_wakeup_condition()) {
                 // wake up remote
                 amk_printf("suspend_wakeup, usb_setting=%lx\n", usb_setting);
@@ -260,5 +263,25 @@ void remote_wakeup(void)
     #ifdef HID_OTHER_ENABLE
     mousekey_send();
     #endif
+    amk_wakeup();
 }
 #endif
+
+__attribute__((weak)) void amk_prepare_sleep_kb(void) {}
+static bool sleeped = false;
+void amk_prepare_sleep(void)
+{
+    if (sleeped) return;
+
+#ifdef RGB_ENABLE
+    rgb_led_set_all(false, false);
+#endif
+
+    amk_prepare_sleep_kb();
+    sleeped = true;
+}
+
+void amk_wakeup(void)
+{
+    sleeped = false;
+}
