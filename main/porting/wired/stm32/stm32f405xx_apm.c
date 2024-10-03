@@ -473,6 +473,7 @@ void custom_board_init(void)
     usb_setting |= USB_MSC_BIT;
 #else
     uint32_t magic = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR1);
+    amk_printf("Current MAGIC: %ld\n", magic);
     //if (magic == 0) {
     if (magic > 0) {
         usb_setting |= USB_MSC_BIT;

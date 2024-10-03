@@ -71,3 +71,5 @@
 #endif
 
 extern void Error_Handler(void);
+
+#include "amk_log_conf.h"

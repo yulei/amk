@@ -81,7 +81,7 @@ bool sd_nand_init(void)
     hsd.Init.BusWide = SDIO_BUS_WIDE_1B;
     hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_ENABLE;
                                 //SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
-    hsd.Init.ClockDiv = SDIO_TRANSFER_CLK_DIV;//+2;
+    hsd.Init.ClockDiv = SDIO_TRANSFER_CLK_DIV+2;
     HAL_SD_DeInit(&hsd);
 
     if (HAL_SD_Init(&hsd) != HAL_OK) {

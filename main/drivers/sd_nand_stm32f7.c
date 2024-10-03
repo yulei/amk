@@ -79,7 +79,7 @@ bool sd_nand_init(void)
     hsd1.Init.ClockBypass = SDMMC_CLOCK_BYPASS_DISABLE;
     hsd1.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
     hsd1.Init.BusWide = SDMMC_BUS_WIDE_1B;
-    hsd1.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
+    hsd1.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_ENABLE;
     hsd1.Init.ClockDiv = 3;
 
     HAL_SD_DeInit(&hsd1);
@@ -263,7 +263,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
     hdma_sdmmc1_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
     hdma_sdmmc1_rx.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
     hdma_sdmmc1_rx.Init.Mode = DMA_PFCTRL;
-    hdma_sdmmc1_rx.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_sdmmc1_rx.Init.Priority = DMA_PRIORITY_VERY_HIGH;
     hdma_sdmmc1_rx.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
     hdma_sdmmc1_rx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
     hdma_sdmmc1_rx.Init.MemBurst = DMA_MBURST_INC4;
@@ -274,6 +274,8 @@ void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
     }
 
     __HAL_LINKDMA(hsd,hdmarx,hdma_sdmmc1_rx);
+    HAL_NVIC_SetPriority(DMA2_Stream6_IRQn, 2, 0);
+    HAL_NVIC_EnableIRQ(DMA2_Stream6_IRQn);
 
     /* SDMMC1_TX Init */
     hdma_sdmmc1_tx.Instance = DMA2_Stream3;
@@ -284,7 +286,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
     hdma_sdmmc1_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
     hdma_sdmmc1_tx.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
     hdma_sdmmc1_tx.Init.Mode = DMA_PFCTRL;
-    hdma_sdmmc1_tx.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_sdmmc1_tx.Init.Priority = DMA_PRIORITY_VERY_HIGH;
     hdma_sdmmc1_tx.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
     hdma_sdmmc1_tx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
     hdma_sdmmc1_tx.Init.MemBurst = DMA_MBURST_INC4;
@@ -295,9 +297,11 @@ void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
     }
 
     __HAL_LINKDMA(hsd,hdmatx,hdma_sdmmc1_tx);
+    HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 2, 0);
+    HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 
     /* SDMMC1 interrupt Init */
-    HAL_NVIC_SetPriority(SDMMC1_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(SDMMC1_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(SDMMC1_IRQn);
     }
 }

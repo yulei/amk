@@ -502,21 +502,32 @@ static uint8_t* update_desc_polling_rate(uint8_t *desc)
 static uint8_t* remove_vendor_usb(uint8_t *desc)
 {
 #if defined(VENDOR_USB_ENABLE) && !defined(RESERVE_VENDOR_USB)
-    #if 0
     #ifdef DYNAMIC_CONFIGURATION
-    uint8_t no_vendor_usb[] = {
-        TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL-1, 0, CONFIG_LEN_VIAL-VENDORUSB_DESC_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500)};
-    #else
-    uint8_t no_vendor_usb[] = {
-        TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL-1, 0, CONFIG_TOTAL_LEN-VENDORUSB_DESC_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500)};
-    #endif
-    if (usb_polling_rate != 0) {
+    if (usb_setting & USB_MSC_BIT) {
+        uint8_t no_vendor_usb[] = {
+            TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL-1, 0, CONFIG_LEN_MSC-VENDORUSB_DESC_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500)};
         memcpy(desc, no_vendor_usb, sizeof(no_vendor_usb));
+        return desc;
+    } else {
+        uint8_t no_vendor_usb[] = {
+            TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL-1, 0, CONFIG_LEN_VIAL-VENDORUSB_DESC_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500)};
+        if (usb_polling_rate != 0) {
+            memcpy(desc, no_vendor_usb, sizeof(no_vendor_usb));
+        }
+        return desc;
     }
+    #else
+        uint8_t no_vendor_usb[] = {
+        TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL-1, 0, CONFIG_TOTAL_LEN-VENDORUSB_DESC_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 500)};
+        if (usb_polling_rate != 0) {
+            memcpy(desc, no_vendor_usb, sizeof(no_vendor_usb));
+        }
     #endif
-    #if 1
+    return desc;
+
+    #if 0
     static bool desc_updated = false;
-    if (!desc_updated && usb_polling_rate !=0) {
+    if (!desc_updated && usb_polling_rate !=0 && !(usb_setting & USB_MSC_BIT)) {
         uint8_t itf_num = desc[ITF_NUM_OFFSET];
         uint16_t total = desc[DESC_TOTAL_OFFSET]+(desc[DESC_TOTAL_OFFSET+1]<<8);
         amk_printf("DESC original itf=%d, total=%d\n", itf_num, total);
@@ -537,10 +548,16 @@ static uint8_t* remove_vendor_usb(uint8_t *desc)
 
 static uint32_t remove_vendor_usb_size(uint32_t size)
 {
-#ifdef VENDOR_USB_ENABLE
-    if (usb_polling_rate !=0) {
+#if defined(VENDOR_USB_ENABLE) && !defined(RESERVE_VENDOR_USB)
+    #ifdef DYNAMIC_CONFIGURATION
+    if (usb_setting & USB_MSC_BIT) {
         size -= VENDORUSB_DESC_LEN;
+    } else {
+        if (usb_polling_rate != 0) {
+            size -= VENDORUSB_DESC_LEN;
+        }
     }
+    #endif
 #endif
     return size;
 }
