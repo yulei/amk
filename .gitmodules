@@ -34,3 +34,6 @@
 [submodule "libs/threadx"]
 	path = libs/threadx
 	url = https://github.com/azure-rtos/threadx.git
+[submodule "libs/guix"]
+	path = libs/guix
+	url = https://github.com/eclipse-threadx/guix.git
