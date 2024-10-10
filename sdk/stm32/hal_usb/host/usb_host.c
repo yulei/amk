@@ -79,6 +79,11 @@ static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id);
   * Init USB host library, add supported class and start the library
   * @retval None
   */
+ #ifdef USE_HS_USB
+ #define CUR_HOST_ID  HOST_FS
+ #else
+ #define CUR_HOST_ID  HOST_HS
+ #endif
 void MX_USB_HOST_Init(void)
 {
   /* USER CODE BEGIN USB_HOST_Init_PreTreatment */
@@ -86,11 +91,7 @@ void MX_USB_HOST_Init(void)
   /* USER CODE END USB_HOST_Init_PreTreatment */
 
   /* Init host Library, add supported class and start the library. */
-#ifdef HAL_HOST_ENABLE
-  if (USBH_Init(&hUsbHostHS, USBH_UserProcess, HOST_FS) != USBH_OK)
-#else
-  if (USBH_Init(&hUsbHostHS, USBH_UserProcess, HOST_HS) != USBH_OK)
-#endif
+  if (USBH_Init(&hUsbHostHS, USBH_UserProcess, CUR_HOST_ID) != USBH_OK)
   {
     Error_Handler();
   }

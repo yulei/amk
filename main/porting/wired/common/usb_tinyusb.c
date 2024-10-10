@@ -176,8 +176,10 @@ void amk_usb_connect(bool on)
 }
 
 
+#ifdef POWER_DOWN_SUSPEND
 extern void amk_power_down(void);
 extern void amk_wake_up(void);
+#endif
 
 __attribute__((weak)) void usb_state_kb(uint8_t state) {}
 //=============================
@@ -188,14 +190,18 @@ __attribute__((weak)) void usb_state_kb(uint8_t state) {}
 void tud_mount_cb(void)
 {
     usb_state_kb(USB_STATE_MOUNTED);
+#ifdef POWER_DOWN_SUSPEND
     amk_wake_up();
+#endif
 }
 
 // Invoked when device is unmounted
 void tud_umount_cb(void)
 {
     usb_state_kb(USB_STATE_UNMOUNTED);
+#ifdef POWER_DOWN_SUSPEND
     amk_power_down();
+#endif
 }
 
 // Invoked when usb bus is suspended
@@ -205,14 +211,18 @@ void tud_suspend_cb(bool remote_wakeup_en)
 {
     (void) remote_wakeup_en;
     usb_state_kb(USB_STATE_SUSPENDED);
+#ifdef POWER_DOWN_SUSPEND
     amk_power_down();
+#endif
 }
 
 // Invoked when usb bus is resumed
 void tud_resume_cb(void)
 {
     usb_state_kb(USB_STATE_RESUMED);
+#ifdef POWER_DOWN_SUSPEND
     amk_wake_up();
+#endif
 }
 
 // Invoked when received GET_REPORT control request
