@@ -217,6 +217,22 @@ int adc_msp_uninit_kb(void)
     return 1;
 }
 
+void reset_adc_pins(bool analog)
+{
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    if (analog) {
+        GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+    } else {
+        GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+        GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+    }
+    for (int i = 0; i < AMK_ARRAY_SIZE(adc_pins); i++) {
+        GPIO_InitStruct.Pin = GET_PIN(adc_pins[i]);
+        HAL_GPIO_Init(GET_PORT(adc_pins[i]), &GPIO_InitStruct);
+    }
+}
+
 #ifdef ADC_DMA_IRQ_STAT
 #define ADC_DMA_IRQ_COUNT   1000
 DWT_PROFILE(adc_dma_irq) 
@@ -511,7 +527,10 @@ DWT_PROFILE_START(adc_matrix);
                 changed = true;
             }
         }
-        gpio_write_pin(custom_switch_pins[row], 1);
+        //gpio_write_pin(custom_switch_pins[row], 1);
+        //reset_adc_pins(false);
+        //wait_us(200);
+        //reset_adc_pins(true);
     }
 #else
     for (int col = 0; col < MATRIX_COLS; col++) {

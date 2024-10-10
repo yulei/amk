@@ -53,12 +53,16 @@ uint8_t amk_macro_state = 0;
 uint32_t amk_macro_delay = 0;
 uint32_t amk_delay_reset = 0;
 
+#ifdef POWER_DOWN_SUSPEND
+static bool power_down = false;
+void amk_power_down(void);
+void amk_wake_up(void);
+#endif
+
 static uint8_t keyboard_leds(void);
 static void send_keyboard(report_keyboard_t *report);
 static void send_mouse(report_mouse_t *report);
 static void send_extra(report_extra_t *report);
-static void amk_prepare_sleep(void);
-static void amk_wakeup(void);
 
 #ifdef KEYBOARD_ENABLE
 static void remote_wakeup(void);
@@ -133,13 +137,11 @@ void amk_driver_task(void)
         if (timer_elapsed32(amk_delay_reset) > AMK_RESET_DELAY) {
             NVIC_SystemReset();
         }
-
     }
 
 #ifdef KEYBOARD_ENABLE
     if (!(usb_setting&USB_SWITCH_BIT)) {
         if (usb_suspended() ) {
-            amk_prepare_sleep();
             if (suspend_wakeup_condition()) {
                 // wake up remote
                 amk_printf("suspend_wakeup, usb_setting=%lx\n", usb_setting);
@@ -263,25 +265,33 @@ void remote_wakeup(void)
     #ifdef HID_OTHER_ENABLE
     mousekey_send();
     #endif
-    amk_wakeup();
 }
 #endif
 
-__attribute__((weak)) void amk_prepare_sleep_kb(void) {}
-static bool sleeped = false;
-void amk_prepare_sleep(void)
+#ifdef POWER_DOWN_SUSPEND
+__attribute__((weak)) void amk_power_down_kb(void) {}
+void amk_power_down(void)
 {
-    if (sleeped) return;
+    if (power_down) return;
 
 #ifdef RGB_ENABLE
-    rgb_led_set_all(false, false);
+    rgb_led_power_down();
 #endif
 
-    amk_prepare_sleep_kb();
-    sleeped = true;
+    amk_power_down_kb();
+    power_down = true;
 }
 
-void amk_wakeup(void)
+__attribute__((weak)) void amk_wake_up_kb(void) {}
+void amk_wake_up(void)
 {
-    sleeped = false;
+    if (!power_down) return;
+
+#ifdef RGB_ENABLE
+    rgb_led_wake_up();
+#endif
+
+    amk_wake_up_kb();
+    power_down = false;
 }
+#endif

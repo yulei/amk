@@ -646,3 +646,33 @@ void rgb_led_strip_set_mode(uint8_t index, uint8_t mode) {}
 void rgb_led_strip_get_led(uint8_t index, uint8_t* hue, uint8_t* sat, uint8_t* val, uint8_t* param) {}
 void rgb_led_strip_set_led(uint8_t index, uint8_t hue, uint8_t sat, uint8_t val, uint8_t param) {}
 #endif
+
+void rgb_led_power_down(void)
+{
+    for (uint8_t i = 0; i < RGB_LED_CONFIG_NUM; i++) {
+#ifdef RGB_MATRIX_ENABLE
+        if (rgb_is_matrix()){
+            rgb_matrix_set_suspend_state(true);
+        } else
+#endif
+        {
+            g_rgb_configs[i].enable = 0;
+        }
+    }
+}
+
+void rgb_led_wake_up(void)
+{
+    for (int i = 0; i < RGB_LED_CONFIG_NUM; i++) {
+#ifdef RGB_MATRIX_ENABLE
+        if (rgb_is_matrix()){
+            rgb_matrix_set_suspend_state(false);
+        } else
+#endif
+        {
+            rgb_cfg_t cfg;
+            eeconfig_read_rgb(&cfg, i);
+            g_rgb_configs[i].enable = cfg.enable;
+        }
+    }
+}
