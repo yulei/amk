@@ -10,12 +10,12 @@ SRCS += \
 SRCS += \
 	$(LIB_DIR)/qmk/protocol/host.c \
 	$(LIB_DIR)/qmk/protocol/report.c \
+	$(LIB_DIR)/qmk/protocol/action.c \
 
 SRCS += \
     $(QMK_DIR)/quantum/quantum.c \
     $(QMK_DIR)/quantum/bitwise.c \
     $(QMK_DIR)/quantum/led.c \
-    $(QMK_DIR)/quantum/action.c \
     $(QMK_DIR)/quantum/action_layer.c \
     $(QMK_DIR)/quantum/action_tapping.c \
     $(QMK_DIR)/quantum/action_util.c \
