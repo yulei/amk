@@ -12,7 +12,6 @@ NKRO_ENABLE = yes
 AMK_CUSTOM_MATRIX = yes
 DEBOUNCE_TYPE = asym_eager_defer_pk #sym_defer_pk
 
-RTOS_ENABLE = yes
 
 UF2_ENABLE = yes
 UF2_FAMILY = STM32F4
@@ -24,3 +23,6 @@ SRCS += $(KEYBOARD_DIR)/cm2.c
 
 SRCS += $(KEYBOARD_DIR)/display.c
 SRCS += $(MAIN_DIR)/drivers/st7735.c
+
+#RTOS_ENABLE = yes
+#ASMFLAGS += -DSYSTEM_CLOCK=96000000

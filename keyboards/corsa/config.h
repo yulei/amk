@@ -91,3 +91,4 @@
 #define SUSPEND_RECONNECT
 //#define RGB_FLUSH_ASYNC
 
+#define FRAME_MAX   256
