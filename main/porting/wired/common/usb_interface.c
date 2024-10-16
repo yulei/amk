@@ -12,6 +12,8 @@
 #include "amk_usb.h"
 #include "usb_descriptors.h"
 #include "report.h"
+#include "action_util.h"
+#include "mousekey.h"
 #include "wait.h"
 #include "amk_printf.h"
 #include "amk_ring_buffer.h"
@@ -33,6 +35,32 @@
 static uint8_t report_queue_buf[REPORT_QUEUE_SIZE];
 
 static ring_buffer_t report_queue;
+static bool report_play_macro;
+static uint8_t report_play_macro_id;
+
+bool usb_is_play_macro(uint8_t id)
+{
+    if (report_play_macro) {
+        return id == report_play_macro_id;
+    }
+
+    return false;
+}
+
+void usb_break_macro(void)
+{
+    if (report_play_macro) {
+        amk_printf("Macro break, drop all queued report\n");
+        rb_init(&report_queue, report_queue_buf, REPORT_QUEUE_SIZE);
+        // cleanup state
+        send_keyboard_report();
+        #ifdef HID_OTHER_ENABLE
+        mousekey_send();
+        #endif
+        amk_usb_clear_busy();
+        report_play_macro = false;
+    }
+}
 
 void usb_init(void)
 {
@@ -45,6 +73,7 @@ void usb_init(void)
 #endif
 
     amk_usb_init();
+    report_play_macro = false;
 
     rb_init(&report_queue, report_queue_buf, REPORT_QUEUE_SIZE);
 }
@@ -56,7 +85,7 @@ void usb_task_usb(void)
 
 void usb_task_report(void)
 {
-    if (rb_used_count(&report_queue)){
+    if (!amk_usb_busy() && rb_used_count(&report_queue)){
         uint8_t type = rb_peek_byte(&report_queue);
         if (amk_usb_itf_ready(type)) {
             usbitf_debug("ITF ready, type:%d, send report\n", item->type);
@@ -82,6 +111,12 @@ void usb_task_report(void)
             case HID_REPORT_ID_DELAY:
                 size = sizeof(uint16_t);
             break;
+            case HID_REPORT_ID_MACRO_BEGIN:
+                size = 1;
+                break;
+            case HID_REPORT_ID_MACRO_END:
+                size = 1;
+                break;
             default:
                 amk_printf("usb task report: can't be here, drop all data\n");
                 rb_init(&report_queue, report_queue_buf, REPORT_QUEUE_SIZE);
@@ -91,7 +126,15 @@ void usb_task_report(void)
                 static uint8_t data[64];
                 type = rb_read_byte(&report_queue);
                 rb_read(&report_queue, data, size);
-                amk_usb_itf_send_report(type, data, size);
+                if (type == HID_REPORT_ID_MACRO_BEGIN) {
+                    report_play_macro = true;
+                    report_play_macro_id = data[0];
+                } else if (type == HID_REPORT_ID_MACRO_END) {
+                    report_play_macro = false;
+                    amk_printf("usb task report: macro(%d) end\n", data[0]);
+                } else {
+                    amk_usb_itf_send_report(type, data, size);
+                }
             }
         } else {
             usbitf_debug("ITF not ready\n");

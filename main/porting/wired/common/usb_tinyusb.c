@@ -10,6 +10,7 @@
 #include "usb_descriptors.h"
 #include "report.h"
 #include "wait.h"
+#include "timer.h"
 #include "amk_printf.h"
 
 #ifdef VIAL_ENABLE
@@ -51,6 +52,26 @@ void amk_usb_task(void)
 #endif
 }
 
+static uint32_t amk_usb_delay_start;
+static uint32_t amk_usb_delay_interval;
+static bool amk_usb_is_delay;
+
+bool amk_usb_busy(void)
+{
+    if (amk_usb_is_delay) {
+        if (timer_elapsed32(amk_usb_delay_start) > amk_usb_delay_interval) {
+            amk_usb_is_delay = false;
+        }
+    }
+
+    return amk_usb_is_delay;
+}
+
+void amk_usb_clear_busy(void)
+{
+    amk_usb_is_delay = false;
+}
+
 bool amk_usb_itf_ready(uint32_t type)
 {
     switch(type) {
@@ -67,6 +88,8 @@ bool amk_usb_itf_ready(uint32_t type)
     case HID_REPORT_ID_NKRO:
         return tud_hid_n_ready(ITF_NUM_HID_OTHER);
 #endif
+    case HID_REPORT_ID_MACRO_BEGIN:
+    case HID_REPORT_ID_MACRO_END:
     case HID_REPORT_ID_DELAY:
         return true;
     default:
@@ -139,8 +162,11 @@ bool amk_usb_itf_send_report(uint32_t report_type, const void* data, uint32_t si
         {
             uint16_t delay = *((uint16_t*)data);
             amk_printf("Delay report: duration=%d\n", delay);
+            amk_usb_is_delay = true;
+            amk_usb_delay_start = timer_read32();
+            amk_usb_delay_interval = delay;
             //while(delay--) {
-                wait_ms(delay);
+            //    wait_ms(delay);
             //}
         }
         break;

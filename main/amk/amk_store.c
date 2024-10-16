@@ -14,7 +14,7 @@
 #define AMK_STORE_APC_DEFAULT   20
 #define AMK_STORE_RT_DEFAULT    0
 #else
-#define AMK_STORE_APC_DEFAULT   16
+#define AMK_STORE_APC_DEFAULT   160
 #define AMK_STORE_RT_DEFAULT    0 
 #endif
 

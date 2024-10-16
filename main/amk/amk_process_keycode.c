@@ -308,3 +308,18 @@ bool process_action_kb(keyrecord_t *record)
 
     return true;
 }
+
+bool pre_process_record_kb(uint16_t keycode, keyrecord_t *record) {
+    if (record->event.pressed) {
+        if (keycode >= QK_MACRO && keycode <= QK_MACRO_MAX) {
+            uint8_t id = keycode - QK_MACRO;
+            keycode_debug("keyboard macro pressed: %d\n", id);
+            if (usb_is_play_macro(id)) {
+                usb_break_macro();
+                return false;
+            }
+        }
+    }
+
+    return true;
+}

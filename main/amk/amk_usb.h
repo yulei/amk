@@ -20,6 +20,10 @@ typedef enum
 } usb_state_t;
 
 bool amk_usb_itf_ready(uint32_t type);
+
+bool amk_usb_busy(void);
+void amk_usb_clear_busy(void);
+
 bool amk_usb_itf_send_report(uint32_t type, const void* data, uint32_t size);
 void amk_usb_init(void);
 void amk_usb_task(void);

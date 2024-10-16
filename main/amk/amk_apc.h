@@ -12,6 +12,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifndef AMK_APCRT_SCALE
+#define AMK_APCRT_SCALE 1
+#endif
 struct apc_special_key
 {
     uint8_t row;

@@ -29,7 +29,9 @@
 //  +---------------------------------------------------------------+
 //
 
+#ifndef FRAME_MAX
 #define FRAME_MAX   512//1024
+#endif
 typedef struct __attribute__((packed)) {
     char signature[4];  //"ANIM" or "AUXI"
     uint16_t size;      // size of the header
