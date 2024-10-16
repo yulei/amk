@@ -26,7 +26,7 @@ SRCS += $(KEYBOARD_DIR)/display.c
 SRCS += $(MAIN_DIR)/drivers/st7735.c
 
 #NO_DEBUG := 1
-#VIAL_JSON_NAME = vial_v1
+VIAL_JSON_NAME = vial_v1
 
 RTOS_ENABLE = yes
 ASMFLAGS += -DSYSTEM_CLOCK=168000000

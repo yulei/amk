@@ -116,3 +116,5 @@
 #define DIGITAL_POT_INDEX       0x33
 #endif
 //#define FORCE_8K
+
+//#define AMK_APCRT_SCALE         5
