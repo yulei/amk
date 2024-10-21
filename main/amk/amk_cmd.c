@@ -109,15 +109,26 @@ static int32_t cmd_parse_param_token(const void* data, uint32_t size, char* name
 
     char* deli = memchr(data, CMD_PARAM_DELI, endl-cur);
     if (!deli) {
+        if (cur == endl) {
+            endl++;
+            //amk_printf("Only ;\n");
+        }
         // no value
         memcpy(name, cur, endl-cur);
         name[endl-cur] = '\0';
     } else {
-        // has value
-        memcpy(name, cur, deli-cur);
-        name[deli-cur] = '\0';
-        memcpy(value, deli+1, endl-deli-1);
-        value[endl-deli-1] = '\0';
+        // only deli
+        if ((endl-cur) == 1) {
+            *name = *cur;
+            name[1] = '\0';
+            //amk_printf("Only =\n");
+        } else {
+            // has value
+            memcpy(name, cur, deli-cur);
+            name[deli-cur] = '\0';
+            memcpy(value, deli+1, endl-deli-1);
+            value[endl-deli-1] = '\0';
+        }
     }
 
     return (endl-cur+1);

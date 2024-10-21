@@ -5,7 +5,7 @@ MCU_ARCH := CORTEX_M4
 MCU_PREFIX := artery 
 MCU_SERIES := at32f402_405
 MCU_TYPE := f405
-AT32_LIB_DIR := AT32F402_405_Firmware_Library_V2.0.9
+AT32_LIB_DIR := AT32F402_405_Firmware_Library_V2.1.0
 endif
 
 SRCS += \

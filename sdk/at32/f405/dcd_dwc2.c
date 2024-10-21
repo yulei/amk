@@ -456,6 +456,7 @@ static void phy_hs_init(dwc2_regs_t * dwc2)
 
 static bool check_dwc2(dwc2_regs_t * dwc2)
 {
+  return true;
 #if CFG_TUSB_DEBUG >= DWC2_DEBUG
   print_dwc2_info(dwc2);
 #endif

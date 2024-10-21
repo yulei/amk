@@ -9,3 +9,4 @@
 #pragma once
 
 #define HOST_MSC_DEBUG  1
+#define HDC1080_DEBUG   0
