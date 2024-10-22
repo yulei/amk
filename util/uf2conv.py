@@ -31,6 +31,7 @@ families = {
     'HOSTF4':       0x484F5354,     # HOST
     'NRF52833':     0x621E937A,
     'STM32F7':      0x53b80f00,
+    'AT32F4':       0xa0c97b8e,
 }
 
 INFO_FILE = "/INFO_UF2.TXT"
